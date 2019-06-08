@@ -2,8 +2,8 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer
-pkgver=1.17
-pkgrel=2
+pkgver=2.0
+pkgrel=1
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="http://www.endeavouros.com"
 arch=('any')
