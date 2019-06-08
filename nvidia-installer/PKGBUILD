@@ -1,0 +1,22 @@
+# Maintainer: Gustau Castells <karasu@antergos.com>
+
+pkgname=nvidia-installer
+pkgver=1.17
+pkgrel=2
+pkgdesc="Script to setup nvidia drivers in Antergos"
+url="http://www.antergos.com"
+arch=('any')
+license=('GPL2')
+depends=('python')
+source=("${pkgname}-${pkgver}::git+https://github.com/Antergos/${pkgname}.git")
+sha256sums=('SKIP')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 ${pkgname} ${pkgdir}/usr/bin/${pkgname}
+
+  install -d "${pkgdir}/var/lib/pci"
+  for file in $(find pci/. -type f); do
+        install -Dm644 ${file#./} "${pkgdir}/var/lib/pci/${file#pci/./}"
+  done
+}
