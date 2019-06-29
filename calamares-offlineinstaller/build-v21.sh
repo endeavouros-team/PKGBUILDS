@@ -30,7 +30,7 @@ case $CHOICE in
     1 )
     #### via clean chroot
 
-    CHROOT=$HOME/Documents/chroot-arcolinux
+    CHROOT=$HOME/Daten/Dokumente/ENDEAVOUROS/chroot-endeavouros
     arch-nspawn $CHROOT/root pacman -Syu
     makechrootpkg -c -r $CHROOT
 
@@ -56,8 +56,8 @@ esac
 echo "Moving created files to repo"
 echo "###########################################################"
 echo
-mv $search*pkg.tar.xz ../../arcolinux_repo_iso/x86_64/
-mv $search*pkg.tar.xz.sig ../../arcolinux_repo_iso/x86_64/
+mv $search*pkg.tar.xz ../../EndeavourOS-repository/
+mv $search*pkg.tar.xz.sig ../../EndeavourOS-repository/
 
 echo "Cleaning up"
 echo "###########################################################"
