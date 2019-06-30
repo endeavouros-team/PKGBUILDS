@@ -9,7 +9,7 @@ url="http://www.endeavouros.com"
 arch=('any')
 license=('GPL2')
 depends=('python')
-source=("${pkgname}-${pkgver}::git+https://gitlab.com/EndeavourOS/${pkgname}.git")
+source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
 sha256sums=('SKIP')
 
 package() {
