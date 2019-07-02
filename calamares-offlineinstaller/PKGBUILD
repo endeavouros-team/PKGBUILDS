@@ -1,25 +1,31 @@
-# Original Maintainer: Erik Dubois
-# maintainer joekamprad <joekamprad@endeavouros.com>
-pkgname=calamares-offlineinstaller
-_destname="/etc/calamares"
-_licensedir="/usr/share/endeavouros/licenses/"
-pkgver=19.7
-pkgrel=4
-pkgdesc="calamares for endeavouros"
+# Maintainer: Portergos Linux <portergoslinux@gmail.com>
+# Multipurpose installer for arch based distros
+
+pkgname=calamares_offline
+reponame=calamares-offlineinstaller
+pkgver=1
+pkgrel=1
+destdir="/usr"
+pkgdesc="calamares installer for arch based distros"
 arch=('any')
-url="https://github.com/endeavouros-team/calamares-offlineinstaller"
+url="https://github.com/endeavouros-team"
 license=('GPL3')
 makedepends=('git')
-conflicts=('calamares-netinstaller')
-depends=()
+conflicts=('endeavouros-calamares-git' 'endeavouros-calamares-dev-git')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
-source=(${_pkgname}::"git+https://github.com/endeavouros-team/${_pkgname}.git")
+source=("git+https://github.com/endeavouros-team/$reponame.git")
 sha256sums=('SKIP')
-install='readme.install'
+
+build() {
+    mkdir -p $srcdir/$reponame/build/$pkgname
+    cd $srcdir/$reponame/build
+	cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
+	export DESTDIR="$srcdir/$reponame/build/$pkgname" && make -j4 install
+
+  }
+
 package() {
-	mkdir -p "${pkgdir}${_licensedir}${_pkgname}"
-	mv "${srcdir}/${_pkgname}/"LICENSE "${pkgdir}${_licensedir}${_pkgname}/LICENSE"
-	mkdir -p "${pkgdir}${_destname}"
-	cp -r "${srcdir}/${_pkgname}/calamares/"* "${pkgdir}${_destname}"
+	cd $srcdir/$reponame/build/$pkgname
+    cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 }
