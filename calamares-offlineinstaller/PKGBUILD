@@ -1,4 +1,4 @@
-# Maintainer: Portergos Linux <portergoslinux@gmail.com>
+# Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_offline
