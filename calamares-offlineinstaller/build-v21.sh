@@ -1,7 +1,7 @@
 #!/bin/bash
 #https://wiki.archlinux.org/index.php/DeveloperWiki:Building_in_a_Clean_Chroot
 
-search=arcolinux
+search=endeavouros
 echo "We will start building "$search "now."
 echo "###########################################################"
 echo
