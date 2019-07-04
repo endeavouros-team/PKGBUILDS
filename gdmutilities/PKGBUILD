@@ -1,0 +1,31 @@
+# Maintainer: Jose Galvez <jose@cybergalvez.com
+# Co-Maintainer:
+# Packager: Jose Galvez <jose@cybergalvez.com
+pkgname=gdmutilities
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="a collection of utilities / scripts to customize gdm"
+arch=('x86_64')
+url="https://gitlab.com/jjgalvez/gdmutilities"
+license=('MIT')
+depends=('python'
+		'tk'
+		'python-click')
+provides=(gdmutilities)
+conflicts=()
+source=("git+https://gitlab.com/jjgalvez/gdmutilities.git")
+md5sums=("SKIP")
+
+package() {
+
+	mkdir -p ${pkgdir}/usr/bin
+
+	# install gdmutilities
+	install -D -m755 "${srcdir}/gdmutilities/gdmbackground.py" "${pkgdir}/usr/lib/${pkgname}/gdmbackground.py"
+	install -D -m755 "${srcdir}/gdmutilities/extractgst.sh" "${pkgdir}/usr/lib/${pkgname}/extractgst.sh"
+	install -D -m755 "${srcdir}/gdmutilities/gdmsettings.py" "${pkgdir}/usr/lib/${pkgname}/gdmsettings.py"
+
+	ln -s "/usr/lib/${pkgname}/gdmbackground.py" "${pkgdir}/usr/bin/gdmbackground"
+	ln -s "/usr/lib/${pkgname}/gdmsettings.py" "${pkgdir}/usr/bin/gdmsettings"
+	
+}
