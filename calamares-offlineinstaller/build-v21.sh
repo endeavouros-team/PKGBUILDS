@@ -30,7 +30,7 @@ case $CHOICE in
     1 )
     #### via clean chroot
 
-    CHROOT=$HOME/Daten/Dokumente/ENDEAVOUROS/chroot-endeavouros
+    CHROOT=$HOME/ENDEAVOUROS-CHROOT
     arch-nspawn $CHROOT/root pacman -Syu
     makechrootpkg -c -r $CHROOT
 
@@ -56,8 +56,8 @@ esac
 echo "Moving created files to repo"
 echo "###########################################################"
 echo
-mv $search*pkg.tar.xz ../../EndeavourOS-repository/
-mv $search*pkg.tar.xz.sig ../../EndeavourOS-repository/
+mv $search*pkg.tar.xz ~/EndeavourOS-repository/
+mv $search*pkg.tar.xz.sig ~/EndeavourOS-repository/
 
 echo "Cleaning up"
 echo "###########################################################"
