@@ -1,1 +1,26 @@
-empty
+# Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
+
+pkgbase=endeavouros-keyring
+pkgname=("$pkgbase")
+destdir=/usr/share/pacman/keyrings
+pkgver=1
+pkgrel=1
+pkgdesc="EndeavourOS keyring"
+arch=('any')
+url="https://github.com/endeavouros-team"
+license=('GPL3')
+source=("https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-keyring/endeavouros-keyring.install"
+        "https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-keyring/endeavouros.gpg")
+
+sha256sums=('SKIP'
+            'SKIP')
+
+install=$pkgbase.install
+
+package() {
+    mkdir -p ${pkgdir}/$destdir
+    cd ..
+    mv endeavouros.gpg ${pkgdir}/$destdir
+    install -dm 755 "${pkgdir}/$destdir"
+
+}
