@@ -1,0 +1,24 @@
+# Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
+
+pkgname=endeavouros-mirrorlist
+reponame=endeavouros-mirrorlist
+pkgver=1
+pkgrel=1
+destdir="/etc/pacman.d"
+pkgdesc="EndeavourOS mirrorlist"
+arch=('any')
+url="https://github.com/endeavouros-team"
+license=('GPL3')
+makedepends=('git')
+provides=("${pkgname}")
+options=(!strip !emptydirs)
+source=("https://github.com/endeavouros-team/endeavouros-mirrorlist/raw/master/endeavouros-mirrorlist")
+sha256sums=('SKIP')
+
+package() {
+    mkdir -p ${pkgdir}/$destdir
+    cd ..
+    mv $pkgname ${pkgdir}/$destdir
+    install -dm 755 "${pkgdir}/$destdir"
+
+}
