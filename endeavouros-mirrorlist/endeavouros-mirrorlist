@@ -2,7 +2,7 @@
 #       EndeavourOS Repository Mirrorlist       #
 ##                                          ##
 
-#[endeavour]
+#[endeavouros]
 #SigLevel = PackageRequired
 #Include = /etc/pacman.d/endeavouros-mirrorlist
 
