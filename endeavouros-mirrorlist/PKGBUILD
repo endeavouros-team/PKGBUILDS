@@ -3,7 +3,7 @@
 pkgname=endeavouros-mirrorlist
 reponame=endeavouros-mirrorlist
 pkgver=1
-pkgrel=1
+pkgrel=2
 destdir="/etc/pacman.d"
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -16,9 +16,7 @@ source=("https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mi
 sha256sums=('SKIP')
 
 package() {
-    mkdir -p ${pkgdir}/$destdir
-    cd ..
-    mv $pkgname ${pkgdir}/$destdir
-    install -dm 755 "${pkgdir}/$destdir"
-
+ mkdir -p "${pkgdir}/etc/pacman.d"
+ install -Dm644 "${srcdir}/endeavouros-mirrorlist" \
+ "${pkgdir}/etc/pacman.d/endeavouros-mirrorlist"
 }
