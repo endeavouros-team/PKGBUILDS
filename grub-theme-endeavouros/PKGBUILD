@@ -16,6 +16,6 @@ source=('git+https://github.com/endeavouros-team/grub2-theme-endeavouros')
 sha512sums=('SKIP')
 
 package() {
-    install -dm 755 $pkgdir/boot/grub/themes/endeavouros
+    install -dm 755 $pkgdir/boot/grub/themes/EndeavourOS
     cp -r --no-preserve=ownership grub2-theme-endeavouros/EndeavourOS $pkgdir/boot/grub/themes/
 }
