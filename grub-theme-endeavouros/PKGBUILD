@@ -12,7 +12,7 @@ depends=('grub')
 optdepends=('grub-customizer: GUI tool to configure grub')
 replaces=('vimix-grub' 'grub-theme-vimix' 'grub-themes-vimix')
 makedepends=('git')
-source=('git+https://github.com/endeavouros-team/grub2-theme-EndeavourOS')
+source=('git+https://github.com/endeavouros-team/grub2-theme-endeavouros')
 sha512sums=('SKIP')
 
 package() {
