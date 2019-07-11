@@ -1,0 +1,21 @@
+# Base Maintainer: Filipe Laíns (FFY00) <lains@archlinux.org>
+# Original Source: https://github.com/Se7endAY/grub2-theme-vimix
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+pkgname=grub2-theme-endeavouros
+pkgver=20190711
+pkgrel=1
+pkgdesc='EndeavourOS grub2 theme'
+arch=(any)
+url='https://github.com/endeavouros-team/'
+license=('GPL3')
+depends=('grub')
+optdepends=('grub-customizer: GUI tool to configure grub')
+replaces=('vimix-grub' 'grub-theme-vimix' 'grub-themes-vimix')
+makedepends=('git')
+source=('git+https://github.com/endeavouros-team/grub2-theme-EndeavourOS')
+sha512sums=('SKIP')
+
+package() {
+    install -dm 755 $pkgdir/boot/grub/themes/endeavouros
+    cp -r --no-preserve=ownership grub2-theme-endeavouros/EndeavourOS $pkgdir/boot/grub/themes/
+}
