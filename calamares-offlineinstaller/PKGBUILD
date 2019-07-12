@@ -2,19 +2,19 @@
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_offline
-reponame=calamares-offlineinstaller
+reponame=new_calamares_12_07_2019
 pkgver=1
-pkgrel=4
+pkgrel=1
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
-url="https://github.com/endeavouros-team"
+url="https://github.com/Portergos"
 license=('GPL3')
 makedepends=('git')
-conflicts=('endeavouros-calamares-git' 'endeavouros-calamares-dev-git')
+conflicts=('portergos-calamares-git' 'portergos-calamares-dev-git')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
-source=("git+https://github.com/endeavouros-team/$reponame.git")
+source=("git+https://github.com/Portergos/$reponame.git")
 sha256sums=('SKIP')
 
 build() {
