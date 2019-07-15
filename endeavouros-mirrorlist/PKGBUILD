@@ -3,7 +3,7 @@
 pkgname=endeavouros-mirrorlist
 reponame=endeavouros-mirrorlist
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url="https://github.com/endeavouros-team"
