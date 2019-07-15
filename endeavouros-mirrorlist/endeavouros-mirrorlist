@@ -6,8 +6,10 @@
 #SigLevel = PackageRequired
 #Include = /etc/pacman.d/endeavouros-mirrorlist
 
+# Sourceforge
+Server = https://sourceforge.net/projects/endeavouros-repository/files/repository/
+
 # Github
 Server = https://github.com/endeavouros-team/repository/releases/download/repository/
 
-# Sourceforge
-Server = https://sourceforge.net/projects/endeavour-repository/files/repository/
+
