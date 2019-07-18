@@ -1,65 +1,32 @@
+# shellcheck disable=SC2034
+# shellcheck disable=SC2154
+# Author: Patrick Brisbin <pbrisbin@gmail.com>
+
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-Preparations_for_pkgbuild()
-{
-    # Get the AUR PKGBUILD of $Pkgname and check if its pkgver matches the vendor version.
+pkgname=downgrade
+pkgver=6.2.1
+pkgrel=0
+pkgdesc="Bash script for downgrading one or more packages to a version in your cache or the A.L.A."
+arch=('any')
+url="https://github.com/pbrisbin/$pkgname"
+license=('GPL')
+source=("https://github.com/pbrisbin/$pkgname/archive/v$pkgver.tar.gz")
+depends=('pacman-contrib') # pacsort
+optdepends=('sudo: for installation via sudo')
 
-    local Pkgname=downgrade          # The AUR package name.
-    local Pkgbuild=PKGBUILD.$Pkgname
-    local xx
-    local Files=(PKGBUILD)           # List of AUR files needed by makepkg
-    local MAY_USE_VENDOR_VERSION=yes # yes = can use vendor version if it is newer than AUR version
-                                     # no  = use strictly the AUR version
+package() {
+  local po_file
 
-    yay -Ga $Pkgname                 # Get AUR files into folder $Pkgname
-    if [ $? -ne 0 ] ; then
-        return 1
-    fi
-    # Move all files needed by makepkg into current folder. Note: PKGBUILD must be renamed.
-    for xx in "${Files[@]}" ; do
-        case "$xx" in
-            PKGBUILD) mv $Pkgname/$xx $Pkgbuild ;;
-            *)        mv $Pkgname/$xx . ;;
-        esac
-    done
-    rm -rf $Pkgname                 # no more needed
+  cd "$pkgname-$pkgver" || exit 1
 
-    # check the vendor source whether AUR PKGBUILD has the latest version:
+  for po_file in locale/*.po; do
+    locale="$(basename "$po_file" .po)"
 
-    local VendorUrl="https://github.com/pbrisbin/downgrade/releases"         # the official code resides here
-    local VendorVer
-    local AurVer="$(grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2)"          # package version info from AUR PKGBUILD
-    local tmp=$(mktemp)
+    mkdir -p "$pkgdir/usr/share/locale/$locale/LC_MESSAGES/"
+    msgfmt "$po_file" -o "$pkgdir/usr/share/locale/$locale/LC_MESSAGES/$pkgname.mo"
+  done
 
-    wget -q --timeout=10 -O "$tmp" "$VendorUrl" || {
-        echo "ERROR: $Pkgname: could not check version info from $VendorUrl." >&2
-        rm -f $tmp
-        return 1
-    }
-    VendorVer="$(grep /downgrade/releases/tag/ $tmp | head -n 1 | sed -e 's|^.*/tag/v||' -e 's|".*$||')"
-    rm -f "$tmp"
-    if [ $(vercmp "$VendorVer" "$AurVer") -gt 0 ] ; then
-        if [ "$MAY_USE_VENDOR_VERSION" = "yes" ] ; then
-            echo "Info: $Pkgname: AUR PKGBUILD version is $AurVer, using verdor version $VendorVer." >&2
-            local Source="https://github.com/pbrisbin/$Pkgname/archive/v$VendorVer.tar.gz"
-            wget -q --timeout=10 $Source || {
-                echo "ERROR: downloading '$Source' failed." >&2
-                return 1
-            }
-            local Md5sum="$(md5sum "$(basename $Source)" | awk '{print $1}')"
-
-            # modifying AUR PKGBUILD:
-            sed -i $Pkgbuild \
-                -e 's|^source=(.*$|source=('"$Source"')|' \
-                -e 's|md5sums=(.*$|md5sums=('"$Md5sum"')|'
-        else
-            echo "Warning: $Pkgname: AUR PKGBUILD version is $AurVer, vendor version is $VendorVer." >&2
-        fi
-    elif [ "$VendorVer" != "$AurVer" ] ; then
-        echo "Warning: $Pkgname: AUR $AurVer, vendor $VendorVer." >&2
-    fi
-
-    source "$Pkgbuild"                   # Allow running now the (possibly modified!) AUR PKGBUILD
+  make PREFIX=/usr DESTDIR="$pkgdir" install
 }
-Preparations_for_pkgbuild
-unset -f Preparations_for_pkgbuild
+md5sums=('5fd0d700057191947fb745ead45ec24c')
