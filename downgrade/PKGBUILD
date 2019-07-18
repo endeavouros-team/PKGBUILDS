@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Maintainer: manuel (see forum.endeavouros.com)
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 Preparations_for_pkgbuild()
 {
