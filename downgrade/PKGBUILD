@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Maintainer: manuel (see forum.endeavouros.com)
+
+Preparations_for_pkgbuild()
+{
+    # Get the AUR PKGBUILD of $Pkgname and check if its pkgver matches the vendor version.
+
+    local Pkgname=downgrade          # The AUR package name.
+    local Pkgbuild=PKGBUILD.$Pkgname
+    local xx
+    local Files=(PKGBUILD)           # List of AUR files needed by makepkg
+    local MAY_USE_VENDOR_VERSION=yes # yes = can use vendor version if it is newer than AUR version
+                                     # no  = use strictly the AUR version
+
+    yay -Ga $Pkgname                 # Get AUR files into folder $Pkgname
+    if [ $? -ne 0 ] ; then
+        return 1
+    fi
+    # Move all files needed by makepkg into current folder. Note: PKGBUILD must be renamed.
+    for xx in "${Files[@]}" ; do
+        case "$xx" in
+            PKGBUILD) mv $Pkgname/$xx $Pkgbuild ;;
+            *)        mv $Pkgname/$xx . ;;
+        esac
+    done
+    rm -rf $Pkgname                 # no more needed
+
+    # check the vendor source whether AUR PKGBUILD has the latest version:
+
+    local VendorUrl="https://github.com/pbrisbin/downgrade/releases"         # the official code resides here
+    local VendorVer
+    local AurVer="$(grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2)"          # package version info from AUR PKGBUILD
+    local tmp=$(mktemp)
+
+    wget -q --timeout=10 -O "$tmp" "$VendorUrl" || {
+        echo "ERROR: $Pkgname: could not check version info from $VendorUrl." >&2
+        rm -f $tmp
+        return 1
+    }
+    VendorVer="$(grep /downgrade/releases/tag/ $tmp | head -n 1 | sed -e 's|^.*/tag/v||' -e 's|".*$||')"
+    rm -f "$tmp"
+    if [ $(vercmp "$VendorVer" "$AurVer") -gt 0 ] ; then
+        if [ "$MAY_USE_VENDOR_VERSION" = "yes" ] ; then
+            echo "Info: $Pkgname: AUR PKGBUILD version is $AurVer, using verdor version $VendorVer." >&2
+            local Source="https://github.com/pbrisbin/$Pkgname/archive/v$VendorVer.tar.gz"
+            wget -q --timeout=10 $Source || {
+                echo "ERROR: downloading '$Source' failed." >&2
+                return 1
+            }
+            local Md5sum="$(md5sum "$(basename $Source)" | awk '{print $1}')"
+
+            # modifying AUR PKGBUILD:
+            sed -i $Pkgbuild \
+                -e 's|^source=(.*$|source=('"$Source"')|' \
+                -e 's|md5sums=(.*$|md5sums=('"$Md5sum"')|'
+        else
+            echo "Warning: $Pkgname: AUR PKGBUILD version is $AurVer, vendor version is $VendorVer." >&2
+        fi
+    elif [ "$VendorVer" != "$AurVer" ] ; then
+        echo "Warning: $Pkgname: AUR $AurVer, vendor $VendorVer." >&2
+    fi
+
+    source "$Pkgbuild"                   # Allow running now the (possibly modified!) AUR PKGBUILD
+}
+Preparations_for_pkgbuild
+unset -f Preparations_for_pkgbuild
