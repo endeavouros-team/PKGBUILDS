@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# A workaround for grub-mkconfig's initrd line generation problem on some distros.
+# This modifies two files, see their names in the functions below.
+#
+# NOTE: to restore old behavior, simply reinstall packages 'grub' and 'os-prober'.
+
+_die() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+_grub_mod() {
+    local file=/etc/grub.d/30_os-prober
+
+    cp -f -a $file $file.bak || _die "$file backup failed."
+    chmod -x $file.bak       || _die "$file chmod failed."
+
+    sed -i $file \
+        -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|"
+
+    test "$(diff $file $file.bak)" != "" && echo "File $file modified." >&2
+}
+
+_os_prober_mod() {
+    local file=/usr/lib/linux-boot-probes/mounted/40grub2
+
+    cp -f -a $file $file.bak || _die "$file backup failed."
+    chmod -x $file.bak       || _die "$file chmod failed."
+
+    sed -i $file \
+        -e 's|initrd="\$(echo "\$2"|shift; initrd="\$(echo "\$\@"|' \
+        -e 's|initrd="/boot\$initrd"|initrd=($initrd); initrd=\${initrd[@]/#//boot}|'
+
+    test "$(diff $file $file.bak)" != "" && echo "File $file modified." >&2
+}
+
+_grub_mod
+_os_prober_mod

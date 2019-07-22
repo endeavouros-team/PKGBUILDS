@@ -1,0 +1,31 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=grub-tools
+pkgdesc="Fixes, additions and enhancements to grub and os-prober."
+pkgver=1.0
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(grub os-prober)
+
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+source=(
+  $url/grub-update-after-kernel.hook  # Automatically updates grub.cfg after a kernel is installed/uninstalled.
+  $url/grub-fix-initrd-generation     # Command modifies os-prober and grub to fix 'initrd' line generation;
+                                      # re-run if grub or os-prober is updated (but not fixed upstream!).
+)
+sha512sums=(
+  7d3d34d04a24c2e310c175cfd33c1d1f3f956f52246e988044f1c17e2905d2f93a57f92e1347fe6dd957b10899b9d1643c4c5033b23bda808996a5317129e594
+  d548e0759551003893d7491b9cae5bd9a1ed1a85a1d36bff174085bd15d4fc58275dff377fc40128d592748363281141e5e399d1ca2dfc2db9826d3cccaaac49
+)
+
+package() {
+  cd $srcdir
+
+  install -d $pkgdir/etc/pacman.d/hooks
+  install -Dm644 grub-update-after-kernel.hook $pkgdir/etc/pacman.d/hooks/grub-update-after-kernel.hook
+
+  install -d $pkgdir/usr/bin
+  install -Dm755 grub-fix-initrd-generation    $pkgdir/usr/bin/grub-fix-initrd-generation
+}

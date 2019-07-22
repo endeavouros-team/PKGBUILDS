@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Remove
+Type = Package
+Target = linux
+Target = linux-lts
+
+[Action]
+Description = Update grub after installing or removing a kernel.
+When = PostTransaction
+Depends = grub
+Exec = /bin/sh -c "/usr/bin/grub-mkconfig -o /boot/grub/grub.cfg"
