@@ -1,0 +1,26 @@
+#!/bin/bash
+
+_reflector_auto_die()
+{
+    local msg="$1"
+    local code="$2"
+    test -n "$msg" && echo "$msg" > /etc/reflector-auto.log
+    exit $code
+}
+
+_reflector_auto_main()
+{
+    # Info about the options:
+    #     reflector -h
+    #
+    # reflector-auto  configuration file: /etc/reflector-auto.conf
+
+    local system_config_file=/etc/reflector-auto.conf
+    local system_config="$(test -r $system_config_file && cat $system_config_file)"
+    local ml=/etc/pacman.d/mirrorlist
+
+    reflector $system_config "$@" \
+        || _reflector_auto_die "reflector-auto failed." 1
+}
+
+_reflector_auto_main "$@"

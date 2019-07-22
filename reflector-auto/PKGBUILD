@@ -1,0 +1,28 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=reflector-auto
+pkgdesc="Automates ranking of Arch mirrors with 'reflector'."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master"
+pkgver=1.0
+pkgrel=1
+arch=(any)
+license=(GPL)
+depends=(systemd reflector)
+
+source=(
+  "$url/$pkgname"
+  "$url/$pkgname.service"
+  "$url/$pkgname.timer"
+)
+sha512sums=(
+  709dd1f272630548f415db3e84b489096c2b61642364188d92af99d70d5da69e4c8b94dbcab54107c4ba9f651cf1cfb786e3891c8fd31e3503734bf365a8a5ab
+  e1d0dcfadd7fe0f2eecc0eab7b95f5887f7cafd820d977de7f734bbb39fad61ba1766b107cc463484424f5cabdf5662b5dd9ac260e35f395e558adef25303463
+  944dab8712fceda2ec870a25ed36baec934b45c347383588b8f41cacc0f116e6a300dbee3c5079778002ef3a90872f9280d007d2a8c3dc925d6316a496c63689
+)
+
+package() {
+  cd $srcdir
+  install -Dm755 ${pkgname}                 $pkgdir/usr/bin/$pkgname
+  install -Dm644 ${pkgname}.timer           $pkgdir/usr/lib/systemd/system/${pkgname}.timer
+  install -Dm644 ${pkgname}.service         $pkgdir/usr/lib/systemd/system/${pkgname}.service
+}

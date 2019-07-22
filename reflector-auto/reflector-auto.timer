@@ -1,0 +1,9 @@
+[Unit]
+Description=Run reflector-auto periodically
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+ 
+[Install]
+WantedBy=timers.target
