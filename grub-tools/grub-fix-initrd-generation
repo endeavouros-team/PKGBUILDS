@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # A workaround for grub-mkconfig's initrd line generation problem on some distros.
-# This modifies two files, see their names in the functions below.
+# This modifies two files, see their names (in "local file=...") in the functions below.
 #
 # NOTE: to restore old behavior, simply reinstall packages 'grub' and 'os-prober'.
 
@@ -10,29 +10,41 @@ _die() {
     exit 1
 }
 
+_backup() {
+    local file="$1"
+    rm -f $file.bak       || _die "$file.bak: delete failed."
+    cp -a $file $file.bak || _die "$file: backup failed."
+    chmod -x $file.bak    || _die "$file.bak: chmod failed."
+}
+
+_show_result() {
+    local file="$1"
+    local diffs="$(diff $file $file.bak)"
+
+    if [ "$diffs" != "" ] ; then
+        echo "Changes for $file:" >&2
+        echo "$diffs" >&2
+        echo "Backup to $file.bak." >&2
+    else
+        echo "$file not changed." >&2
+    fi
+}
+
 _grub_mod() {
     local file=/etc/grub.d/30_os-prober
-
-    cp -f -a $file $file.bak || _die "$file backup failed."
-    chmod -x $file.bak       || _die "$file chmod failed."
-
+    _backup $file
     sed -i $file \
         -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|"
-
-    test "$(diff $file $file.bak)" != "" && echo "File $file modified." >&2
+    _show_result $file
 }
 
 _os_prober_mod() {
     local file=/usr/lib/linux-boot-probes/mounted/40grub2
-
-    cp -f -a $file $file.bak || _die "$file backup failed."
-    chmod -x $file.bak       || _die "$file chmod failed."
-
+    _backup $file
     sed -i $file \
         -e 's|initrd="\$(echo "\$2"|shift; initrd="\$(echo "\$\@"|' \
         -e 's|initrd="/boot\$initrd"|initrd=($initrd); initrd=\${initrd[@]/#//boot}|'
-
-    test "$(diff $file $file.bak)" != "" && echo "File $file modified." >&2
+    _show_result $file
 }
 
 _grub_mod
