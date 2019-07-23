@@ -20,14 +20,16 @@ sha256sums=('SKIP')
 build() {
     mkdir -p $srcdir/$reponame/build/$pkgname
     cd $srcdir/$reponame/build
-	cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
-	export DESTDIR="$srcdir/$reponame/build/$pkgname" && make -j4 install
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
+    export DESTDIR="$srcdir/$reponame/build/$pkgname" && make -j4 install
 
   }
 
 package() {
-	cd $srcdir/$reponame/build/$pkgname
+    cd $srcdir/$reponame/build/$pkgname
     cp -r $srcdir/$reponame/src/modules/netinstall/netinstall.yaml ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+    cp -r $srcdir/$reponame/settings.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+    cp -r $srcdir/$reponame/settings.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 }
