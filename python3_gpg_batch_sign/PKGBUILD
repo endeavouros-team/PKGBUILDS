@@ -10,6 +10,7 @@ arch=(any)
 license=(GPL)
 url="https://xyne.archlinux.ca/projects/python3-gpg_batch_sign"
 depends=(python3)
+
 source=(
   $url/src/python3-gpg_batch_sign-2016.9.tar.xz
   $url/src/python3-gpg_batch_sign-2016.9.tar.xz.sig

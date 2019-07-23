@@ -10,6 +10,7 @@ arch=(any)
 license=(GPL)
 url="https://xyne.archlinux.ca/projects/repo-add_and_sign"
 depends=(pyalpm python3 python3-gpg_batch_sign)
+
 source=(
   $url/src/repo-add_and_sign-2016.2.tar.xz
   $url/src/repo-add_and_sign-2016.2.tar.xz.sig
