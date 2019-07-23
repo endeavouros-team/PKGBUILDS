@@ -4,7 +4,7 @@
 pkgname=calamares_offline
 reponame=Calamares-3.2.11
 pkgver=3.2.11
-pkgrel=3
+pkgrel=4
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
