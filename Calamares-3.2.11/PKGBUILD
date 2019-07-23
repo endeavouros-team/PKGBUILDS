@@ -28,5 +28,6 @@ build() {
 package() {
 	cd $srcdir/$reponame/build/$pkgname
     cp -r $srcdir/$reponame/src/modules/netinstall/netinstall.yaml ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+    cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 }
