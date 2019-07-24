@@ -31,8 +31,8 @@ package() {
     cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r $srcdir/$reponame/settings.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r $srcdir/$reponame/settings.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
-    cp -r $srcdir/$reponame/src/modules/packages/welcome.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
-    cp -r $srcdir/$reponame/src/modules/packages/welcome.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
+    cp -r $srcdir/$reponame/src/modules/welcome/welcome.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
+    cp -r $srcdir/$reponame/src/modules/welcome/welcome.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
     cp -r $srcdir/$reponame/src/modules/packages/packages.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
     cp -r $srcdir/$reponame/src/modules/packages/packages.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
     cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
