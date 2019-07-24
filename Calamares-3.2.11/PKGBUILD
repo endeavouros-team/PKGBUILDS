@@ -4,7 +4,7 @@
 pkgname=calamares_offline
 reponame=Calamares-3.2.11
 pkgver=3.2.11
-pkgrel=4
+pkgrel=5
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -31,5 +31,7 @@ package() {
     cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r $srcdir/$reponame/settings.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
     cp -r $srcdir/$reponame/settings.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+    cp -r $srcdir/$reponame/src/modules/packages/packages.conf_online ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
+    cp -r $srcdir/$reponame/src/modules/packages/packages.conf_offline ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
     cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 }
