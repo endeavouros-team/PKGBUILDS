@@ -4,7 +4,7 @@
 
 pkgname=kalu
 pkgver=4.3.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Upgrade notifier w/ AUR support, watched (AUR) packages, news"
 arch=('x86_64')
 url="https://jjacky.com/kalu"

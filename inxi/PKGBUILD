@@ -6,7 +6,7 @@
 
 pkgname=inxi
 pkgver=3.0.35
-pkgrel=2
+pkgrel=3
 pkgdesc="Full featured CLI system information tool"
 arch=(any)
 url="https://github.com/smxi/inxi"

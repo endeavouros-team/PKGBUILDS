@@ -4,7 +4,7 @@
 
 pkgname=repo-add_and_sign
 pkgver=2016.2
-pkgrel=1
+pkgrel=2
 pkgdesc='Easily create signed Pacman package repositories.'
 arch=(any)
 license=(GPL)

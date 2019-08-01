@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=grub2-theme-endeavouros
 pkgver=20190711
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS grub2 theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'

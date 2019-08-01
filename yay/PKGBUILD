@@ -4,7 +4,7 @@
 
 pkgname=yay
 pkgver=9.2.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Yet another yogurt. Pacman wrapper and AUR helper written in go."
 arch=('x86_64')
 url="https://github.com/Jguer/yay"
