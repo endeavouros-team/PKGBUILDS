@@ -3,7 +3,7 @@ Description=reflector-auto updates Arch mirror list in /etc/pacman.d
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/reflector-auto --save /etc/pacman.d/mirrorlist
+ExecStart=/usr/bin/reflector-auto
 
 [Install]
 WantedBy=remirror.timer

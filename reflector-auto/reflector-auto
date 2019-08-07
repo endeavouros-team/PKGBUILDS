@@ -14,12 +14,16 @@ _reflector_auto_main()
     #     reflector -h
     #
     # reflector-auto  configuration file: /etc/reflector-auto.conf
+    #
+    # Note: comment lines (first non-space char is #) or empty lines are skipped when reading the config file.
 
     local system_config_file=/etc/reflector-auto.conf
-    local system_config="$(test -r $system_config_file && cat $system_config_file)"
+    local system_config="$(test -r $system_config_file && cat $system_config_file | grep -P -v "^[ \t]*#|^$")"
     local ml=/etc/pacman.d/mirrorlist
 
-    reflector $system_config "$@" \
+    cp $ml $ml.bak  # backup current mirrorlist
+
+    reflector --save $ml $system_config "$@" \
         || _reflector_auto_die "reflector-auto failed." 1
 }
 
