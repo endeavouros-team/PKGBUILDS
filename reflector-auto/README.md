@@ -1,6 +1,6 @@
 # reflector-auto
 Automates ranking Arch mirrors, calls reflector periodically.<br>
-Currently performed once a week.
+Currently set to launch once a week.
 ## Notes
 Options for reflector (e.g. -c COUNTRY) can be added into file <b>/etc/reflector-auto.conf</b>.<br>
 See command:
