@@ -16,5 +16,5 @@ The reason is in packages **grub** and **os-prober** as they don't work well tog
 to generate the initrd line properly.
 *grub-fix-initrd-generation* fixes both 'grub' and 'os-prober' in order to produce correct 'initrd' generation.
 
-Run grub-fix-initrd-generation once, and always after updating 'grub' or 'os-prober',
-unless 'grub' and 'os-prober' have been fixed by upstream.
+Run grub-fix-initrd-generation once, and always after updating 'grub' or 'os-prober'
+until 'grub' and 'os-prober' have been fixed by upstream.
