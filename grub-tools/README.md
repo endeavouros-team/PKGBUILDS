@@ -7,7 +7,7 @@ grub-update-after-kernel.hook | Automatically updates grub.cfg after a kernel is
 grub-fix-initrd-generation | Fixes generation of 'initrd' lines in grub.cfg.
 
 ## grub-update-after-kernel.hook
-This pacman hook makes grub.cfg automatically update after a kernel is installed or uninstalled.
+This pacman hook automatically updates **/boot/grub/grub.cfg** after a kernel is installed or uninstalled.
 
 ## grub-fix-initrd-generation
 Command grub-mkconfig may not generate file **/boot/grub/grub.cfg** correctly for every operating system.
