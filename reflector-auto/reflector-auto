@@ -21,10 +21,37 @@ _reflector_auto_main()
     local system_config="$(test -r $system_config_file && cat $system_config_file | grep -P -v "^[ \t]*#|^$")"
     local ml=/etc/pacman.d/mirrorlist
 
-    cp $ml $ml.bak  # backup current mirrorlist
+    # If $system_config and "$@" has no --save option, then we use a temporary --save file
+    # to allow a user rank mirrors without using root permissions.
+    local they_have_save=0      # did user use the --save option
+    local saveoption=""
+    local savefile              # (temporary) new mirrorlist
+    local bakfile               # for backup of old mirrorlist
+    local rootcmds              # for storing possible root commands
+    local xx
 
-    reflector --save $ml $system_config "$@" \
-        || _reflector_auto_die "reflector-auto failed." 1
+    for xx in $system_config "$@" ; do
+        case "$xx" in
+            --save*) they_have_save=1 ; break ;;
+        esac
+    done
+
+    if [ $they_have_save -eq 0 ] ; then
+        bakfile=$(mktemp)
+        cp $ml $bakfile
+
+        savefile=$(mktemp)
+        saveoption="--save $savefile"
+
+        rootcmds="cp $bakfile $ml.bak ; cp $savefile $ml"
+    fi
+
+    reflector $saveoption $system_config "$@"  || _reflector_auto_die "reflector-auto failed." 1
+    
+    if [ $they_have_save -eq 0 ] ; then
+        sudo bash -c "$rootcmds"
+        rm -f $savefile $bakfile  # remove only after running the root commands
+    fi
 }
 
 _reflector_auto_main "$@"
