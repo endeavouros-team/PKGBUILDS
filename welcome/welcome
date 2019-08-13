@@ -1,0 +1,161 @@
+#!/bin/bash
+#
+# EndeavourSO greeter.
+#
+# Shows crucial info about the EndeavourOS and its usage.
+# Targeted for people new to EndeavourOS (but not new to Linux).
+#
+# Usage: EndeavourOS-greeter [-f]
+# where
+#    -f     Forces starting the greeter even if it is disabled in the config.
+#
+# The config is in file $HOME/.config/EOS-Greeter.conf.
+#
+
+_GeneralInfo() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=3 \
+      --image=dialog-question \
+      --text="<b>Find your way in EndeavourOS!</b>" --text-align=left \
+      --field="Web site!!The web site of EndeavourOS":fbtn                    "$_BROWSER https://www.endeavouros.com" \
+      --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
+      --field="Download!!How to download and verify.":fbtn                    "$_BROWSER https://endeavouros.com/download" \
+      --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
+      --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
+      --field="Donate!!Support the development!":fbtn                         "$_BROWSER https://endeavouros.com/donate" \
+      &> /dev/null &
+}
+
+_Details() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=3 \
+      --image=dialog-information \
+      --text="<b>Detailed tips</b>" --text-align=left \
+      --field="Installation tips!!Installation tips":fbtn             "$_BROWSER https://endeavouros.com/docs/installation" \
+      --field="Pacman package manager!!Package manager":fbtn          "$_BROWSER https://endeavouros.com/docs/pacman" \
+      --field="AUR considerations!!Arch User Repository":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+      --field="Hardware and Network!!Get your hardware working":fbtn  "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+      --field="Install VirtualBox into EOS!!VirtualBox tips":fbtn     "$_BROWSER https://endeavouros.com/docs/applications/how-to-install-virtualbox" \
+      --field="Install EOS into VirtualBox!!VirtualBox tips":fbtn     "$_BROWSER https://endeavouros.com/docs/installation/installing-endeavouros-on-virtualbox" \
+      --field="Kalu!!What is Kalu":fbtn                               "$_BROWSER https://endeavouros.com/docs/applications/kalu" \
+      --field="Forum tips!!Help us help you!":fbtn                    "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
+      --field="Troubleshoot!!System Rescue":fbtn                      "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+      &> /dev/null &
+}
+
+
+_GreeterSettings() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=1 \
+      --image=system-settings \
+      --text="<b>Greeter configuration</b>\nConfig file: $GREETER_CONFIG" --text-align=left \
+      --field="Do not show the greeter anymore!!Start again with $0":fbtn    'bash -c "RunGreeterSettings disabled"' \
+      --field="Keep showing the greeter!!I like it\!":fbtn                   'bash -c "RunGreeterSettings enabled"' \
+      &> /dev/null &    
+}
+
+
+# Fields explanation:
+# --field="ButtonName!IconName!Tooltip":fbtn "Command"
+
+### These variables are required:
+
+_NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
+_NOTEBOOK_TABS=(                             # names of functions above
+    _GeneralInfo
+    _Details
+    _GreeterSettings
+)
+
+####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
+
+DIE() { echo "Error: $1." >&2 ; exit 1 ; }
+
+SetBrowser() {
+    local xx
+    for xx in xdg-open exo-open firefox chromium ; do  # use one of these browser commands
+        if [ -x /usr/bin/$xx ] ; then
+            _BROWSER=/usr/bin/$xx        # for showing external links
+            return
+        fi
+    done
+    DIE "$FUNCNAME: cannot find a browser"
+}
+
+RunGreeterSettings() {
+    case "$1" in
+        enabled)
+            echo "Greeter=enabled"  > "$GREETER_CONFIG"
+            ;;
+        disabled)
+            echo "Greeter=disabled" > "$GREETER_CONFIG"
+            echo "Set 'Greeter=enabled' in file'$GREETER_CONFIG'. Alternatively, start $PROGRAM_NAME with option '-f'." | \
+                yad --text-info --image=dialog-information --text="Re-enable greeter in the config file:" \
+                    --title="How to re-enable greeter" \
+                    --geometry=500x200 --wrap \
+                    --fontname="Monospace Regular 12" \
+                    --button=" I remember!face-cool!I promise":0 >& /dev/null
+            ;;
+        check)
+            test -r "$GREETER_CONFIG" || { echo enabled ; return ; }              # enabled if config does not exist
+            grep "^Greeter=" "$GREETER_CONFIG" 2>/dev/null | cut -d '=' -f 2
+            ;;
+        *)
+            DIE "Error: $FUNCNAME: internal error! Please report at https://forum.endeavouros.com."
+            ;;
+    esac
+}
+
+# exports for use in the yad command:
+export -f RunGreeterSettings
+export PROGRAM_NAME="$0"
+export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
+
+
+PrepareTabs() {
+    local handle="$1"
+    local xx ix
+    ix=1
+    for xx in "${_NOTEBOOK_TABS[@]}" ; do
+        $xx "$handle" "$((ix++))"
+    done
+}
+
+StartHere() {
+    if [ "$1" != "-f" ] ; then
+        test "$(RunGreeterSettings check)" != "enabled" && return
+    fi
+
+    SetBrowser
+
+    local handle="$(shuf -i 800000-999999 -n 1)"
+    local tab
+    local notebook   # contains the main yad command
+
+    PrepareTabs "$handle" || DIE "PrepareTabs failed"
+
+    # Create the yad command gradually into an array 'notebook':
+
+    notebook=(yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
+    for tab in "${_NOTEBOOK_TABS[@]}" ; do
+        notebook+=(--tab="$tab")
+    done
+    if [ "$(RunGreeterSettings check)" != "enabled" ] ; then
+        notebook+=(--button=" So long!face-crying!Greeter is disabled in config":0)
+    else
+        notebook+=(--button=" See you later!face-cool!Greeter is enabled in config":0)
+    fi
+
+    "${notebook[@]}"
+}
+
+StartHere "$@"

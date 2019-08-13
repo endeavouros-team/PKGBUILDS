@@ -1,0 +1,28 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=welcome
+pkgdesc="Welcome greeter for new EndeavourOS users."
+pkgver=1.0
+pkgrel=0
+arch=('any')
+license=('GPL')
+depends=(bash yad)
+
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+source=(
+  $url/$pkgname
+  $url/$pkgname.desktop
+)
+sha512sums=(
+  808dc4f344a10101e45ac91533e45eeab69111a3b553707f661d02fb9367732f8e960c4839174a3b411d40d120fc5156781e5b6938ed22f0cef1c03a9e22b5ca
+  863917c2e7acb006bed5aca03843c0e561d511c21b805b5be0c3e64ddd171ec1ecaf62083f70e02748874177ff0902ac11ba5b054f8a4d69a36582f316fd4604
+)
+
+package() {
+  cd $srcdir
+
+  install -d $pkgdir/usr/share/endeavouros/scripts
+  install -Dm644 $pkgname         $pkgdir/usr/share/endeavouros/scripts/$pkgname
+  install -Dm644 $pkgname.desktop $pkgdir/etc/xdg/autostart/$pkgname.desktop
+}
