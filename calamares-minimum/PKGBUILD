@@ -18,7 +18,11 @@ options=(!strip !emptydirs)
 source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=minimum")
 sha256sums=('SKIP')
 
-source ./pack.sh
+FILE_NAME="pack.sh"
+URL="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/calamares-minimum/pack.sh"
+
+if [ ! -f $FILE_NAME ]; then wget $URL; chmod +x $FILE_NAME; fi
+source ./$FILE_NAME
 
 prepare() {
 
