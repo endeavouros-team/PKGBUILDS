@@ -4,7 +4,7 @@
 # Multipurpose installer for arch based distros
 
 FILE_NAME="pack.sh"
-URL=""
+URL="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/calamares-minimum/pack.sh"
 
 _prepare() {
 
