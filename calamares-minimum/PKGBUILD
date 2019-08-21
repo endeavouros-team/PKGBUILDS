@@ -1,7 +1,7 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
-pkgname=calamares
+pkgname=calamares_minimum
 reponame_clone=Calamares-3.2.11
 reponame=calamares
 pkgver=3.2.11
@@ -18,35 +18,22 @@ options=(!strip !emptydirs)
 source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=minimum")
 sha256sums=('SKIP')
 
+source ./pack.sh
+
 prepare() {
 
-    git clone https://github.com/calamares/calamares.git
-    rsync -va $srcdir/$reponame_clone/* $srcdir/$reponame
+_prepare
+
 }
 
 build() {
 
+_build
 
-    mkdir -p $srcdir/$reponame/build/$pkgname
-    cd $srcdir/$reponame/build
-    rm -r $srcdir/$reponame/src/modules/{packagechooser, tracking}
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
-    export DESTDIR="$srcdir/$reponame/build/$pkgname" && make -j4 install
-
-  }
+}
 
 package() {
-    cd $srcdir/$reponame/build/$pkgname
 
-    cp -r $srcdir/$reponame/src/modules/netinstall/netinstall.yaml ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+_package
 
-    cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
-
-    cp -r $srcdir/$reponame/{settings.conf_offline,settings.conf_online} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
-
-    cp -r $srcdir/$reponame/src/modules/welcome/{welcome.conf_online,welcome.conf_offline} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
-
-    cp -r $srcdir/$reponame/src/modules/packages/{packages.conf_online,packages.conf_offline} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
-
-    cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 }
