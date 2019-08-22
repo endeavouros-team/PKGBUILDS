@@ -114,7 +114,7 @@ RunGreeterSettings() {
             ;;
         disabled)
             echo "Greeter=disabled" > "$GREETER_CONFIG"
-            echo "To run the greeter again, start $PROGRAM_NAME with option '$FORCE_START'." | \
+            echo "To run the greeter again, start a terminal and run $PROGRAM_NAME with option '$FORCE_START'." | \
                 yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
                     --title="How to re-enable greeter" \
                     --geometry=500x200 --wrap \
