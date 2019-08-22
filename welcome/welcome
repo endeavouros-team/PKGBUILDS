@@ -12,7 +12,10 @@
 # The config is in file $HOME/.config/EOS-Greeter.conf.
 #
 
-_GeneralInfo() {
+EXCLAMATION='&#33;'   # '!'
+AND='&#38;'           # '&'
+
+GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
@@ -20,16 +23,16 @@ _GeneralInfo() {
       --columns=3 \
       --image=dialog-question \
       --text="<b>Find your way in EndeavourOS!</b>" --text-align=left \
-      --field="Web site!!The web site of EndeavourOS":fbtn                    "$_BROWSER https://www.endeavouros.com" \
-      --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
+      --field="Welcome to EndeavourOS!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
       --field="Download!!How to download and verify.":fbtn                    "$_BROWSER https://endeavouros.com/download" \
-      --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
       --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
+      --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
+      --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
       --field="Donate!!Support the development!":fbtn                         "$_BROWSER https://endeavouros.com/donate" \
       &> /dev/null &
 }
 
-_Details() {
+Details() {
   local handle="$1"
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
@@ -37,20 +40,18 @@ _Details() {
       --columns=3 \
       --image=dialog-information \
       --text="<b>Detailed tips</b>" --text-align=left \
-      --field="Installation tips!!Installation tips":fbtn             "$_BROWSER https://endeavouros.com/docs/installation" \
-      --field="Pacman package manager!!Package manager":fbtn          "$_BROWSER https://endeavouros.com/docs/pacman" \
-      --field="AUR considerations!!Arch User Repository":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
-      --field="Hardware and Network!!Get your hardware working":fbtn  "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-      --field="Install VirtualBox into EOS!!VirtualBox tips":fbtn     "$_BROWSER https://endeavouros.com/docs/applications/how-to-install-virtualbox" \
-      --field="Install EOS into VirtualBox!!VirtualBox tips":fbtn     "$_BROWSER https://endeavouros.com/docs/installation/installing-endeavouros-on-virtualbox" \
-      --field="Kalu!!What is Kalu":fbtn                               "$_BROWSER https://endeavouros.com/docs/applications/kalu" \
-      --field="Forum tips!!Help us help you!":fbtn                    "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
-      --field="Troubleshoot!!System Rescue":fbtn                      "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+      --field="Installation tips!!Installation tips":fbtn               "$_BROWSER https://endeavouros.com/docs/installation" \
+      --field="Install EOS into VirtualBox!!VirtualBox tips":fbtn       "$_BROWSER https://endeavouros.com/docs/installation/installing-endeavouros-on-virtualbox" \
+      --field="Troubleshoot!!System Rescue":fbtn                        "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+      --field="Package management!!Manage packages with 'pacman'":fbtn  "$_BROWSER https://endeavouros.com/docs/pacman" \
+      --field="AUR $AND yay$EXCLAMATION!!Arch User Repository":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+      --field="Kalu!!What is Kalu":fbtn                                 "$_BROWSER https://endeavouros.com/docs/applications/kalu" \
+      --field="Hardware and Network!!Get your hardware working":fbtn    "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+      --field="Forum tips!!Help us help you!":fbtn                      "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
 
-
-_GreeterSettings() {
+GreeterSettings() {
   local handle="$1"
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
@@ -63,6 +64,19 @@ _GreeterSettings() {
       &> /dev/null &    
 }
 
+GetInvolved() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=2 \
+      --image=face-cool \
+      --text="<b>Get involved!</b>" --text-align=left \
+      --field="Who we are!!Who we are":fbtn                      "$_BROWSER https://endeavouros.com/info" \
+      --field="Bug reports!!Report bugs":fbtn                    "$_BROWSER https://forum.endeavouros.com/c/Arch-based-related-questions/bug-reports" \
+      &> /dev/null &    
+}
+
 
 # Fields explanation:
 # --field="ButtonName!IconName!Tooltip":fbtn "Command"
@@ -71,9 +85,10 @@ _GreeterSettings() {
 
 _NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
 _NOTEBOOK_TABS=(                             # names of functions above
-    _GeneralInfo
-    _Details
-    _GreeterSettings
+    GeneralInfo
+    Details
+    GetInvolved
+    GreeterSettings
 )
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -98,7 +113,7 @@ RunGreeterSettings() {
             ;;
         disabled)
             echo "Greeter=disabled" > "$GREETER_CONFIG"
-            echo "Set 'Greeter=enabled' in file'$GREETER_CONFIG'. Alternatively, start $PROGRAM_NAME with option '-f'." | \
+            echo "Set 'Greeter=enabled' in file'$GREETER_CONFIG'. Alternatively, start $PROGRAM_NAME with option '$FORCE_START'." | \
                 yad --text-info --image=dialog-information --text="Re-enable greeter in the config file:" \
                     --title="How to re-enable greeter" \
                     --geometry=500x200 --wrap \
@@ -120,6 +135,8 @@ export -f RunGreeterSettings
 export PROGRAM_NAME="$0"
 export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
 
+export FORCE_START="-f"   # option to start greeter even if it is disabled by config
+
 
 PrepareTabs() {
     local handle="$1"
@@ -131,8 +148,12 @@ PrepareTabs() {
 }
 
 StartHere() {
-    if [ "$1" != "-f" ] ; then
-        test "$(RunGreeterSettings check)" != "enabled" && return
+
+    if [ "$1" != "$FORCE_START" ] ; then
+        test "$(RunGreeterSettings check)" != "enabled" && {
+            echo "$PROGRAM_NAME is disabled. To start it anyway, use option $FORCE_START"
+            return
+        }
     fi
 
     SetBrowser
@@ -149,10 +170,10 @@ StartHere() {
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         notebook+=(--tab="$tab")
     done
-    if [ "$(RunGreeterSettings check)" != "enabled" ] ; then
-        notebook+=(--button=" So long!face-crying!Greeter is disabled in config":0)
-    else
+    if [ "$(RunGreeterSettings check)" = "enabled" ] ; then
         notebook+=(--button=" See you later!face-cool!Greeter is enabled in config":0)
+    else
+        notebook+=(--button=" So long!face-crying!Greeter is disabled in config":0)
     fi
 
     "${notebook[@]}"
