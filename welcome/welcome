@@ -114,7 +114,7 @@ RunGreeterSettings() {
             ;;
         disabled)
             echo "Greeter=disabled" > "$GREETER_CONFIG"
-            echo "Set 'Greeter=enabled' in file'$GREETER_CONFIG'. Alternatively, start $PROGRAM_NAME with option '$FORCE_START'." | \
+            echo "To run the greeter again, start $PROGRAM_NAME with option '$FORCE_START'." | \
                 yad --text-info --image=dialog-information --text="Re-enable greeter in the config file:" \
                     --title="How to re-enable greeter" \
                     --geometry=500x200 --wrap \
