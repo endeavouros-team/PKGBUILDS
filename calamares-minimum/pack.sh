@@ -13,22 +13,13 @@ _prepare() {
     fi
 
     mkdir -p $srcdir/$reponame/build/$pkgname
-
     #rm -r $srcdir/$reponame/src/modules/{packagechooser}
-    
     rm -r $srcdir/$reponame/src/modules/{dummypythonqt,tracking,dummycpp,dummyprocess,dummypython,dummypythonqt,dracutlukscfg,plymouthcfg,dracut,initramfs,webview} ||true
-
-
     sed -i "s?configuration files\" OFF?configuration files\" ON?g" $srcdir/$reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"  $srcdir/$reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $srcdir/$reponame/src/modules/initcpio/InitcpioJob.cpp
-
     sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $srcdir/$reponame/src/modules/unpackfs/unpackfs.conf
-
-    sed -i "s?/usr/local/bin/slowloris?/usr/bin/cleaner_script.sh?g"  $srcdir/$reponame/src/modules/shellprocess/shellprocess.conf
-
-    sed -i "s?timeout: 10?timeout: 120?g"  $srcdir/$reponame/src/modules/shellprocess/shellprocess.conf
-
+   
 }
 
 _build() {
