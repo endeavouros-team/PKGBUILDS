@@ -15,6 +15,20 @@
 EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
+
+INSTALL() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=2 \
+      --image=gtk-save \
+      --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
+      --field="START THE INSTALLER!!Start the EndeavoudOS installer":fbtn    'yad --text="TODO!" --button=yad-quit:0' \
+      --field="Gparted (check partitions)!!Gparted partition editor":fbtn    'gparted' \
+      &> /dev/null &    
+}
+
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
@@ -23,28 +37,28 @@ GeneralInfo() {
       --columns=3 \
       --image=dialog-question \
       --text="<b>Find your way in EndeavourOS!</b>" --text-align=left \
-      --field="Welcome to EndeavourOS!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
-      --field="Download!!How to download and verify.":fbtn                    "$_BROWSER https://endeavouros.com/download" \
-      --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
+      --field="Web site!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
+      --field="Download!!Where to download from and how to verify.":fbtn                    "$_BROWSER https://endeavouros.com/download" \
       --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
+      --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
       --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
-      --field="Donate!!Support the development!":fbtn                         "$_BROWSER https://endeavouros.com/donate" \
       &> /dev/null &
+#      --field="Donate!!Support the development!":fbtn                         "$_BROWSER https://endeavouros.com/donate" \
 }
 
-Details() {
+TipsAndDetails() {
   local handle="$1"
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
       --form \
       --columns=3 \
       --image=dialog-information \
-      --text="<b>Detailed tips</b>" --text-align=left \
+      --text="<b>More details and tips</b>" --text-align=left \
       --field="Installation tips!!Installation tips":fbtn               "$_BROWSER https://endeavouros.com/docs/installation" \
       --field="Install EOS into VirtualBox!!VirtualBox tips":fbtn       "$_BROWSER https://endeavouros.com/docs/installation/installing-endeavouros-on-virtualbox" \
       --field="Troubleshoot!!System Rescue":fbtn                        "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       --field="Package management!!Manage packages with 'pacman'":fbtn  "$_BROWSER https://endeavouros.com/docs/pacman" \
-      --field="AUR $AND yay$EXCLAMATION!!Arch User Repository":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+      --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Kalu!!What is Kalu":fbtn                                 "$_BROWSER https://endeavouros.com/docs/applications/kalu" \
       --field="Hardware and Network!!Get your hardware working":fbtn    "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
       --field="Forum tips!!Help us help you!":fbtn                      "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
@@ -63,9 +77,7 @@ GetInvolved() {
       --field="Bug reports!!Report bugs":fbtn                    "$_BROWSER https://forum.endeavouros.com/c/Arch-based-related-questions/bug-reports" \
       &> /dev/null &    
 }
-
-
-GreeterSettings() {  # not needed anymore
+GreeterSettings() {  # not needed anymore; kept as a reference only of how to call bash functions
   local handle="$1"
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
@@ -86,10 +98,10 @@ GreeterSettings() {  # not needed anymore
 
 _NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
 _NOTEBOOK_TABS=(                             # names of functions above
+    INSTALL
     GeneralInfo
-    Details
-    GetInvolved
-    #GreeterSettings  # not needed anymore
+    TipsAndDetails
+    #GetInvolved
 )
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
