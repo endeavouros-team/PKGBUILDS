@@ -1,11 +1,11 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
-pkgname=calamares_minimum
-reponame_clone=Calamares-3.2.11
+pkgname=calamares_current
+reponame_clone=Calamares_current
 reponame=calamares
-pkgver=3.2.11
-pkgrel=2
+pkgver=3.2.12
+pkgrel=1
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -15,11 +15,11 @@ makedepends=('git')
 conflicts=('calamares_offline' 'calamares_netinstall_test')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
-source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=minimum")
+source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=master")
 sha256sums=('SKIP')
 
 FILE_NAME="pack.sh"
-URL="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/calamares-minimum/pack.sh"
+URL="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$reponame_clone/pack.sh"
 
 if [ ! -f $FILE_NAME ]; then wget $URL; chmod +x $FILE_NAME; fi
 source ./$FILE_NAME
