@@ -7,7 +7,11 @@ _prepare() {
 
     if [ ! -d $srcdir/$reponame ]
         then 
-            git clone https://github.com/calamares/calamares.git
+            #git clone https://github.com/calamares/calamares.git
+            wget https://github.com/calamares/calamares/releases/download/v$pkgver/$reponame-$pkgver.tar.gz
+            tar -zxvf $reponame-$pkgver.tar.gz
+            rm $reponame-$pkgver.tar.gz
+            mv $reponame-$pkgver $reponame
             rsync -va $srcdir/$reponame_clone/* $srcdir/$reponame
             rm -rf $srcdir/$reponame_clone
     fi
