@@ -21,6 +21,6 @@ package() {
   cd $srcdir
 
   install -d $pkgdir/usr/share/endeavouros/scripts
-  install -Dm644 $pkgname         $pkgdir/usr/share/endeavouros/scripts/$pkgname
+  install -Dm755 $pkgname         $pkgdir/usr/share/endeavouros/scripts/$pkgname
   install -Dm644 $pkgname.desktop $pkgdir/etc/xdg/autostart/$pkgname.desktop
 }
