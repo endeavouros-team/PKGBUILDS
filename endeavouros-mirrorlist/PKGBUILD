@@ -3,7 +3,7 @@
 pkgname=endeavouros-mirrorlist
 reponame=endeavouros-mirrorlist
 pkgver=1
-pkgrel=7
+pkgrel=8
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -13,6 +13,7 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist")
 sha256sums=('SKIP')
+backup=(etc/pacman.d/$pkgname)  # no leading "/"
 
 package() {
  mkdir -p "${pkgdir}/etc/pacman.d"
