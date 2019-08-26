@@ -1,5 +1,5 @@
 ##                                          ##
-#       EndeavourOS Repository Mirrorlist       #
+#       EndeavourOS Repository Mirrorlist    #
 ##                                          ##
 
 #[endeavouros]
@@ -9,11 +9,5 @@
 # Github
 Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/
 Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror2/
-
-# Sourceforge
-Server = https://sourceforge.net/projects/endeavouros-repository/files/mirror1/
-Server = https://sourceforge.net/projects/endeavouros-repository/files/mirror2/
-
-
 
 
