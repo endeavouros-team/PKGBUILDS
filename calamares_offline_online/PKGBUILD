@@ -13,7 +13,7 @@ arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 makedepends=('git' 'cmake' 'extra-cmake-modules')
-conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current')
+conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall')  #'calamares_current'
 depends=(
     qt5-svg
     qt5-webengine
