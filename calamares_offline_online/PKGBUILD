@@ -6,7 +6,7 @@ pkgname=calamares_current
 reponame_clone=Calamares_current
 reponame=calamares
 pkgver=3.2.12
-pkgrel=2
+pkgrel=4
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -15,7 +15,6 @@ license=('GPL3')
 makedepends=('git' 'cmake' 'extra-cmake-modules')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall')
 depends=(
-    gparted
     qt5-svg
     qt5-webengine
     yaml-cpp
@@ -26,7 +25,6 @@ depends=(
     boost
     networkmanager
     upower
-    partitionmanager
     kcoreaddons
     kconfig
     ki18n
@@ -42,7 +40,6 @@ depends=(
     gptfdisk
     hwinfo
     kparts
-    parted
     polkit-qt5
     python
     qt5ct
