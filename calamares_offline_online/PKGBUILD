@@ -12,6 +12,7 @@ pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
+optdepends=('update-mirrorlist')
 makedepends=('git' 'cmake' 'extra-cmake-modules')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current') 
 depends=(
