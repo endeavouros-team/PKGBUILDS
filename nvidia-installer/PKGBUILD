@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer
 pkgver=2.0
-pkgrel=4
+pkgrel=5
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
@@ -14,7 +14,8 @@ sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  install -Dm755 ${pkgname} ${pkgdir}/usr/bin/${pkgname}
+  install -Dm755 ${pkgname}      ${pkgdir}/usr/bin/${pkgname}
+  install -Dm755 ${pkgname}-dkms ${pkgdir}/usr/bin/${pkgname}-dkms
 
   install -d "${pkgdir}/var/lib/pci"
   for file in $(find pci/. -type f); do
