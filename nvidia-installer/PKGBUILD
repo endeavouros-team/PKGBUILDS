@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer
 pkgver=2.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
