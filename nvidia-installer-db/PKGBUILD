@@ -1,18 +1,21 @@
 # Original Maintainer: Gustau Castells <karasu@antergos.com>
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
-pkgname=nvidia-installer
+pkgname=nvidia-installer-db
 pkgver=2.1
 pkgrel=1
-pkgdesc="Script to setup nvidia drivers in EndeavourOS"
+pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
 license=('GPL2')
-depends=('python' 'nvidia-installer-db')
 source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
 sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  install -Dm755 ${pkgname}      ${pkgdir}/usr/bin/${pkgname}
+
+  install -d "${pkgdir}/var/lib/pci"
+  for file in $(find pci/. -type f); do
+        install -Dm644 ${file#./} "${pkgdir}/var/lib/pci/${file#pci/./}"
+  done
 }
