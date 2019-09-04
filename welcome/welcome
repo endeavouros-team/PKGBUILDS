@@ -16,6 +16,15 @@ EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
 
+calamares() {
+    if [ -x /usr/bin/calamares ] ; then
+        /usr/bin/calamares
+    else
+        yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:0
+    fi
+}
+export -f calamares
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -24,9 +33,9 @@ INSTALL() {
       --columns=1 \
       --image=gtk-save \
       --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-      --field="START THE INSTALLER!!Start the EndeavoudOS installer":fbtn    'yad --text="TODO!" --button=yad-quit:0' \
-      --field="Installation tips!!Installation tips":fbtn               "$_BROWSER https://endeavouros.com/docs/installation" \
-      --field="Troubleshoot!!System Rescue":fbtn                        "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+      --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c calamares' \
+      --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
+      --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
       &> /dev/null &    
 }
