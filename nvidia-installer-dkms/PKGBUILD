@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-dkms
 pkgver=2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
