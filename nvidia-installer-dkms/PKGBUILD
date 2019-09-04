@@ -10,10 +10,10 @@ arch=('any')
 license=('GPL2')
 depends=('python' 'linux-headers' 'nvidia-installer-db')
 
-pacman -Q linux-lts 2>/dev/null && {
-depends+=('linux-lts-headers')
+pacman -Q linux-lts >& /dev/null && {
+  depends+=('linux-lts-headers')
 } || {
-optdepends=('linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts')
+  optdepends=('linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts')
 }
 
 source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
