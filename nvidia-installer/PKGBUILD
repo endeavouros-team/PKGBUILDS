@@ -8,6 +8,7 @@ pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
 license=('GPL2')
+conflicts=(nvidia-installer-dkms)
 depends=('python' 'nvidia-installer-db')
 source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
 sha256sums=('SKIP')

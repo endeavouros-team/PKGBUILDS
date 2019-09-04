@@ -8,6 +8,7 @@ pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
 license=('GPL2')
+conflicts=(nvidia-installer)
 depends=('python' 'linux-headers' 'nvidia-installer-db')
 
 pacman -Q linux-lts >& /dev/null && {
