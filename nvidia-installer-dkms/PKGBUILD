@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-dkms
 pkgver=2.1
-pkgrel=4
+pkgrel=5
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
@@ -11,12 +11,8 @@ license=('GPL2')
 conflicts=(nvidia-installer)
 depends=('python' 'linux-headers' 'nvidia-installer-db' 'dkms')
 
-pacman -Q linux-lts >& /dev/null && {
-  depends+=('linux-lts-headers')
-} || {
-  optdepends=('linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts')
-}
-optdepends+=(
+optdepends=(
+  'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts')
   'nvidia-settings: tool for configuring the NVIDIA graphics driver'
   'nvidia-390xx-settings: tool for configuring the NVIDIA graphics driver'
 )
