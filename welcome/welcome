@@ -163,6 +163,16 @@ PrepareTabs() {
     done
 }
 
+SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
+    local tabname="$1"
+
+    if [ "$(echo "$tabname" | tr -d '[a-z]')" = "$tabname" ] ; then
+        echo "$tabname"           # all capital letters ==> don't change
+    else
+        echo "$tabname" | sed -e 's|\([A-Z]\)| \1|g' -e 's|^ ||'  # add space before capital letters
+    fi
+}
+
 StartHere() {
 
     if [ "$1" != "$FORCE_START" ] ; then
@@ -175,7 +185,7 @@ StartHere() {
     SetBrowser
 
     local handle="$(shuf -i 800000-999999 -n 1)"
-    local tab
+    local tab tabname
     local notebook   # contains the main yad command
 
     PrepareTabs "$handle" || DIE "PrepareTabs failed"
@@ -184,7 +194,8 @@ StartHere() {
 
     notebook=(yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
-        notebook+=(--tab="$tab")
+        tabname="$(SeparateWordsWithSpaces "$tab")"
+        notebook+=(--tab="$tabname")
     done
     notebook+=(--button=" See you later!face-cool!Greeter is enabled in config":0)
     notebook+=(--button=" Don't show me anymore!face-crying!Disabled the greeter":1)
