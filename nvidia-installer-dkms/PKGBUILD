@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-dkms
 pkgver=2.1
-pkgrel=7
+pkgrel=8
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
@@ -14,6 +14,8 @@ depends=('python' 'nvidia-installer-db' 'dkms')
 optdepends=(
   'linux-headers: for nvidia-installer-dkms with kernel linux'
   'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts'
+  'linux-hardened-headers: for nvidia-installer-dkms with kernel linux-hardened'
+  'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
   'nvidia-settings: tool for configuring the NVIDIA graphics driver'
   'nvidia-390xx-settings: tool for configuring the NVIDIA graphics driver'
 )
@@ -23,5 +25,7 @@ sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  sed -i $pkgname \
+      -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
   install -Dm755 $pkgname $pkgdir/usr/bin/$pkgname
 }

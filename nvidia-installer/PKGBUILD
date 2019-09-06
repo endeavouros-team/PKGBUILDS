@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer
 pkgver=2.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
@@ -20,5 +20,7 @@ sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  sed -i $pkgname \
+      -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
   install -Dm755 ${pkgname}      ${pkgdir}/usr/bin/${pkgname}
 }
