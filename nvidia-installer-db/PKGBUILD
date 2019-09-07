@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
@@ -13,6 +13,8 @@ sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
 
   install -d "${pkgdir}/var/lib/pci"
   for file in $(find pci/. -type f); do
