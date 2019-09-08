@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Definitions for the [endeavouros-testing] repo at 'mirrors'.
+
+# Note: this file will be sourced into a function,
+# so all variables are made 'local'.
+
+local REPONAME="endeavouros-testing-dev"
+local RELEASE_TAGS=(x86_64)
+
+# user that will sign packages
+local SIGNER="EndeavourOS"
+
+# local folders
+local ASSETSDIR="$PWD"
+local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
+local GITDIR="$ASSETSDIR/../repo-testing"           # not $REPONAME ...
+
+# package name specifications
+local PKGNAMES=(                                    # actually: dir names for packages
+    aur/b43-firmware
+    aur/ckbcomp
+    aur/mkinitcpio-openswap
+    aur/python3-gpg_batch_sign
+    aur/repo-add_and_sign
+
+    eos-pkgbuild-setup
+)
+
+_pkgbuilds_hook() {
+    # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
+
+    local dir_above_pkgbuilds="$PKGBUILD_ROOTDIR"/..
+    local conf=assets.conf
+
+    pushd "$dir_above_pkgbuilds" >/dev/null || {
+        echo "Error: $conf: cannot cd to '$dir_above_pkgbuilds'." >&2
+        exit 1
+    }
+    rm -rf "$PKGBUILD_ROOTDIR"
+    git clone https://github.com/endeavouros-team/PKGBUILDS.git >& /dev/null || {
+        echo "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed." >&2
+        exit 1
+    }
+    popd >/dev/null
+}
+
+# Hook functions are run in the beginning after RationalityTests in assets.make.
+# There may be several hook functions.
+local ASSET_HOOKS=(
+    _pkgbuilds_hook
+)
+
+_ckbcomp_hook_change_version() {
+    # change "$url" http to https
+    sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
+        -e 's|^url="http:|url="https:|'
+}
+
+_repo-add_and_sign_hook_change_rel() {
+    # change http to https
+    sed -i "$PKGBUILD_ROOTDIR"/repo-add_and_sign/PKGBUILD \
+        -e 's|http://|https://|'
+}
+
+declare -A ASSET_PACKAGE_HOOKS
+ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
+ASSET_PACKAGE_HOOKS["repo-add_and_sign"]=_repo-add_and_sign_hook_change_rel

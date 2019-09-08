@@ -1,0 +1,53 @@
+#!/bin/bash
+
+echo2() { echo "$@" >&2 ; }
+DIE()   { echo2 "Error: $1"  ; exit 1 ; }
+WARN()  { echo2 "Warning: $1" ; }
+
+Main() {
+    echo2 "Creating a 'release assets build environment' for the repo in the current (git) folder."
+    test -d .git || DIE "this folder ($PWD) does not have a .git subfolder." 
+
+    local gitdir="$PWD"
+    local builddirbase="$gitdir/../Build-${gitdir}"
+    local builddir
+    
+    local confurls="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"   # configs are here
+    local conf
+
+    local reponame=$(grep "url =" .git/config | awk '{print $NF}')
+    reponame="${reponame##*/}"  # remove head
+    reponame="${reponame%.*}"   # remove tail
+
+    local tags="$(hub release)"
+    local tag
+    local suffix
+    local dirscreated=()
+
+    for tag in $tags ; do
+        if [ "$reponame|$tag" = "mirrors|mirror2" ] ; then
+            continue         # create only one build env for mirror1 and mirror2 (assets are the same)
+        fi
+        suffix="$reponame.$tag"
+        builddir="$builddirbase.$suffix"
+        conf="${confurls}/assets.conf.$suffix"
+
+        mkdir -p "$builddir"
+
+        wget -q --timeout=10 -O "$builddir/assets.conf"        "$conf"        || WARN "file '$conf' not found."
+        wget -q --timeout=10 -O "$builddir/assets.conf".sha512 "$conf".sha512 || WARN "file '$conf.sha512' not found."
+        test -r "$builddir/assets.conf".sha512 && {
+            sha512sum -c "$builddir/assets.conf".sha512 || DIE "$builddir/assets.conf: checksum failed!"
+        }
+
+        dirscreated+=("$builddir")
+    done
+
+    echo2 "The following build folders were created:"
+    for builddir in "${dirscreated[@]}" ; do
+        echo2 "    $builddir"
+    done
+    echo2 "Assets can be built in them with these commands:"
+    echo2 "    cd <build-folder>"
+    echo2 "    assets.make"
+}
