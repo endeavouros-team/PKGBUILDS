@@ -29,7 +29,7 @@ Main() {
             continue         # create only one build env for mirror1 and mirror2 (assets are the same)
         fi
         suffix="$reponame.$tag"
-        builddir="$builddirbase.$suffix"
+        builddir="$builddirbase.$tag"             # uses local dirname, may not be reponame...
         conf="${confurls}/assets.conf.$suffix"
 
         mkdir -p "$builddir"
