@@ -25,7 +25,7 @@ Main() {
     local tag
     local suffix
     local dirscreated=()
-    local ff512
+    local sigfile sigend=sig
 
     for tag in $tags ; do
         if [ "$reponame|$tag" = "mirrors|mirror2" ] ; then
@@ -45,16 +45,16 @@ Main() {
             rmdir "$builddir"
             continue
         }
-        wget -q --timeout=10 "$conf".sha512 || {
+        wget -q --timeout=10 "$conf".$sigend || {
             Popd
-            WARN "file '$conf.sha512' not found."
+            WARN "file '$conf.$sigend' not found."
             rmdir "$builddir"
             continue
         }
-        ff512="$(basename "$conf.sha512")"
-        test -r "$ff512" && {
-            sha512sum -c $ff512 || DIE "$ff512: checksum failed!"
-            rm -f $ff512
+        sigfile="$(basename "$conf.$sigend")"
+        test -r "$sigfile" && {
+            gpg --verify "$sigfile" || DIE "$sigfile: signature check failed!"
+            rm -f "$sigfile"
             mv "assets.conf.$suffix" "assets.conf"
         }
         Popd
