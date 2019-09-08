@@ -39,8 +39,18 @@ Main() {
         
         Pushd "$builddir"
 
-        wget -q --timeout=10 "$conf"        || WARN "file '$conf' not found."
-        wget -q --timeout=10 "$conf".sha512 || WARN "file '$conf.sha512' not found."
+        wget -q --timeout=10 "$conf" || {
+            Popd
+            WARN "file '$conf' not found."
+            rmdir "$builddir"
+            continue
+        }
+        wget -q --timeout=10 "$conf".sha512 || {
+            Popd
+            WARN "file '$conf.sha512' not found."
+            rmdir "$builddir"
+            continue
+        }
         ff512="$(basename "$conf.sha512")"
         test -r "$ff512" && {
             sha512sum -c $ff512 || DIE "$ff512: checksum failed!"
