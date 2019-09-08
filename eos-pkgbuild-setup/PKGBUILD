@@ -3,7 +3,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup for building EOS packages."
 pkgver=1.0
-pkgrel=10
+pkgrel=11
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -15,10 +15,11 @@ source=(
 )
 sha512sums=(
     cf45c1972fb8705e86fa800492368140d9ab42a969e9c73408d877b7e1ed713a49de78146c2f99ed2237b856dc00322e39d7aeeb203bac3aed43d9da0508f120
-    093f15d063fb576c01b3466f91f96ac2af2e2675161f2da8d1391a0a85ddc1cd3125d4777dd19802a6c3392fe98418b8c67b994ed323901392a7da9b10a819ea
+    8fd71b297993d6ee549ba08a33253d724f61cb8006ba752dcd752c2f8b20884bebbcc228c0c933568d31ed4f59cb1f0ccfb8c2d963e1154445fda042b10bbdc1
 )
 
 package() {
     install -Dm755 $pkgname    $pkgdir/usr/bin/$pkgname
     install -Dm755 assets.make $pkgdir/usr/bin/assets.make
 }
+

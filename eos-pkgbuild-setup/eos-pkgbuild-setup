@@ -25,7 +25,7 @@ Main() {
     local tag
     local suffix
     local dirscreated=()
-    local ff ff512
+    local ff512
 
     for tag in $tags ; do
         if [ "$reponame|$tag" = "mirrors|mirror2" ] ; then
@@ -54,6 +54,7 @@ Main() {
         ff512="$(basename "$conf.sha512")"
         test -r "$ff512" && {
             sha512sum -c $ff512 || DIE "$ff512: checksum failed!"
+            rm -f $ff512
             mv "assets.conf.$suffix" "assets.conf"
         }
         Popd
