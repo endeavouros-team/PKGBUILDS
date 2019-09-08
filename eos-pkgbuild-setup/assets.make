@@ -189,8 +189,15 @@ IsEmptyString() {
 }
 DirExists() {
     local name="$1"
+    local docreate="$2"
     local value="${!name}"
-    test -d "$value" || DIE "variable '$name' has folder name value '$value' - the folder does not exist"
+
+    case "$docreate" in
+        yes) mkdir -p "$value" ;;
+        *)   test -d "$value" || {
+                 DIE "variable '$name' has folder name value '$value' - the folder does not exist"
+             } ;;
+    esac
 }
 
 ShowPrompt() {
@@ -209,7 +216,7 @@ RationalityTests()
     IsEmptyString RELEASE_TAGS
     IsEmptyString SIGNER
     DirExists ASSETSDIR
-    DirExists PKGBUILD_ROOTDIR
+    DirExists PKGBUILD_ROOTDIR yes  # silently create the dir
     DirExists GITDIR
 
     echo2 "done."
