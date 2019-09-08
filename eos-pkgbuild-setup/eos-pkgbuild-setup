@@ -3,8 +3,8 @@
 echo2() { echo "$@" >&2 ; }
 DIE()   { echo2 "Error: $1"  ; exit 1 ; }
 WARN()  { echo2 "Warning: $1" ; }
-Pushd() { pushd "$@" >/dev/null || DIE "'pushd $*' failed."}
-Popd()  { popd "$@" >/dev/null || DIE "'popd $*' failed."}
+Pushd() { pushd "$@" >/dev/null || DIE "'pushd $*' failed." ; }
+Popd()  { popd  "$@" >/dev/null || DIE "'popd $*' failed." ; }
 
 Main() {
     echo2 "Creating a 'release assets build environment' for the repo in the current (git) folder."
