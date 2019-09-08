@@ -1,25 +1,33 @@
 #!/bin/bash
 
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup for building EOS packages."
 pkgver=1.0
-pkgrel=12
+pkgrel=13
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
-depends=(git hub)
+depends=(git hub yay curl wget)
 
 source=(
     $url/assets.make
     $url/$pkgname
+    $url/add-release-assets
+    $url/delete-release-assets
 )
 sha512sums=(
     982ae16d6282a54f681a54e854dbb305b07b68d7af1da0a4012be5e3e4a30612ceaa96351fb4d3e851773435d9bc6737f608d5ba22edcd293fbdae6c5b83049c
     8fd71b297993d6ee549ba08a33253d724f61cb8006ba752dcd752c2f8b20884bebbcc228c0c933568d31ed4f59cb1f0ccfb8c2d963e1154445fda042b10bbdc1
+    f12403499bbb8b42e4942b1dd1f88f63e90f093ac56672d08abf6082effbb25405ad52fdfc73cc1ada5e8f22b33f334845667ca36c5401f4037afa10ac3fe4ed
+    e3040ba1d2601fa91e9eec5981653234486297223792f37e1a634cb6908d22df1ff710a16b75ba09dcf63eb7d60a898e22f0d11ff941c72bfbc43027d0f44e86
 )
 
 package() {
-    install -Dm755 $pkgname    $pkgdir/usr/bin/$pkgname
-    install -Dm755 assets.make $pkgdir/usr/bin/assets.make
+    install -Dm755 $pkgname               $pkgdir/usr/bin/$pkgname
+    install -Dm755 assets.make            $pkgdir/usr/bin/assets.make
+    install -Dm755 add-release-assets     $pkgdir/usr/bin/add-release-assets
+    install -Dm755 delete-release-assets  $pkgdir/usr/bin/delete-release-assets
 }
 
