@@ -3,6 +3,8 @@
 echo2() { echo "$@" >&2 ; }
 DIE()   { echo2 "Error: $1"  ; exit 1 ; }
 WARN()  { echo2 "Warning: $1" ; }
+Pushd() { pushd "$@" >/dev/null || DIE "'pushd $*' failed."}
+Popd()  { popd "$@" >/dev/null || DIE "'popd $*' failed."}
 
 Main() {
     echo2 "Creating a 'release assets build environment' for the repo in the current (git) folder."
@@ -37,7 +39,9 @@ Main() {
         wget -q --timeout=10 -O "$builddir/assets.conf.$suffix" "$conf"        || WARN "file '$conf' not found."
         wget -q --timeout=10 -O "$builddir/assets.conf".sha512  "$conf".sha512 || WARN "file '$conf.sha512' not found."
         test -r "$builddir/assets.conf".sha512 && {
-            sha512sum -c "$builddir/assets.conf".sha512 || DIE "$builddir/assets.conf: checksum failed!"
+            Pushd "$builddir"
+            sha512sum -c assets.conf.sha512 || DIE "$builddir/assets.conf: checksum failed!"
+            Popd
             mv "$builddir/assets.conf.$suffix" "$builddir/assets.conf"
         }
 
