@@ -9,7 +9,7 @@ Main() {
     test -d .git || DIE "this folder ($PWD) does not have a .git subfolder." 
 
     local gitdir="$PWD"
-    local builddirbase="$gitdir/../Build-${gitdir}"
+    local builddirbase="$gitdir/../Build-$(basename "$gitdir")"
     local builddir
     
     local confurls="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"   # configs are here
