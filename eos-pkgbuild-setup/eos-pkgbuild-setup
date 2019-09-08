@@ -51,3 +51,5 @@ Main() {
     echo2 "    cd <build-folder>"
     echo2 "    assets.make"
 }
+
+Main "$@"
