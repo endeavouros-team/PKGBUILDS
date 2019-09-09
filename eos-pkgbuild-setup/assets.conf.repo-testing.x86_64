@@ -42,6 +42,7 @@ _pkgbuilds_hook() {
         echo "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed." >&2
         exit 1
     }
+    rm -rf PKGBUILDS/.git
     popd >/dev/null
 }
 
