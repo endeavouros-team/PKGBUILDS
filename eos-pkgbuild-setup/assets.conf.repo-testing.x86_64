@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Definitions for the [endeavouros-testing] repo at 'mirrors'.
+# Definitions for the [endeavouros-testing-dev] repo at 'repo-testing'.
 
 # Note: this file will be sourced into a function,
 # so all variables are made 'local'.
@@ -27,18 +27,17 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-pkgbuild-setup
 )
 
-# Hook functions are run in the beginning after RationalityTests in assets.make.
-# There may be several hook functions.
+# Hook functions are run at the beginning of assets.make.
 local ASSET_HOOKS=(
     # currently none
 )
 
+# Hooks for AUR packages:
 _ckbcomp_hook_change_version() {
     # change "$url" http to https
     sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
         -e 's|^url="http:|url="https:|'
 }
-
 _repo-add_and_sign_hook_change_rel() {
     # change http to https
     sed -i "$PKGBUILD_ROOTDIR"/repo-add_and_sign/PKGBUILD \
