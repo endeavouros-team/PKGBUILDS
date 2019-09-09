@@ -237,8 +237,36 @@ Destructor()
     test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
 }
 
+_pkgbuilds_eos_hook()
+{
+    # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
+
+    local dir_above_pkgbuilds="$PKGBUILD_ROOTDIR"/..
+    local conf=assets.conf
+
+    pushd "$dir_above_pkgbuilds" >/dev/null || {
+        echo "Error: $conf: cannot cd to '$dir_above_pkgbuilds'." >&2
+        exit 1
+    }
+    rm -rf "$PKGBUILD_ROOTDIR"
+    git clone https://github.com/endeavouros-team/PKGBUILDS.git >& /dev/null || {
+        echo "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed." >&2
+        Popd
+        exit 1
+    }
+    rm -rf "$PKGBUILD_ROOTDIR"/.git
+    touch "$PKGBUILD_ROOTDIR"/NOTE-THIS-IS-A-TEMPORARY-FOLDER
+    popd >/dev/null
+}
+
+RunPreHooksEOS()
+{
+    test "$SIGNER" = "EndeavourOS" && _pkgbuilds_eos_hook
+}
+
 RunPreHooks()
 {
+    RunPreHooksEOS
     if [ -n "$ASSET_HOOKS" ] ; then
         ShowPrompt "Running asset hooks"
         local xx

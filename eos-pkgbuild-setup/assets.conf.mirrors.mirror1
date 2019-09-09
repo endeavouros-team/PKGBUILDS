@@ -32,29 +32,10 @@ local PKGNAMES=(                                    # actually: dir names for pa
     welcome
 )
 
-_pkgbuilds_hook() {
-    # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
-
-    local dir_above_pkgbuilds="$PKGBUILD_ROOTDIR"/..
-    local conf="$ASSETSDIR/assets.conf"
-
-    pushd "$dir_above_pkgbuilds" >/dev/null || {
-        echo "Error: $conf: cannot cd to '$dir_above_pkgbuilds'." >&2
-        exit 1
-    }
-    rm -rf "$PKGBUILD_ROOTDIR"
-    git clone https://github.com/endeavouros-team/PKGBUILDS.git >& /dev/null || {
-        echo "Error: $conf: 'git clone https://github.com/endeavouros-team/PKGBUILDS.git' failed." >&2
-        exit 1
-    }
-    rm -rf PKGBUILDS/.git
-    popd >/dev/null
-}
-
 # Hook functions are run in the beginning after RationalityTests in assets.make.
 # There may be several hook functions.
 local ASSET_HOOKS=(
-    _pkgbuilds_hook
+    # currently none
 )
 
 # Package hooks
