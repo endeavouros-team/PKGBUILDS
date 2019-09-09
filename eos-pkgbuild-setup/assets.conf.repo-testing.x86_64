@@ -8,13 +8,13 @@
 local REPONAME="endeavouros-testing-dev"
 local RELEASE_TAGS=(x86_64)
 
-# user that will sign packages
+# user to sign packages
 local SIGNER="EndeavourOS"
 
 # local folders
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
-local GITDIR="$ASSETSDIR/../repo-testing"           # not $REPONAME ...
+local GITDIR="$ASSETSDIR/../../repo-testing"        # not $REPONAME ...
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
