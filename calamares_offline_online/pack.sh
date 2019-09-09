@@ -18,12 +18,13 @@ _pkgname() {
 _offline_online() {
 
     # install the package accordingly
-    echo "Choose offline/online install:"
-    echo "   1   for offline install (default)"
-    echo "   2   for online install"
-    read -p "Number: " answer
-    if [ "$answer" != "2" ]; then answer="1"; fi
-    echo "$answer"
+    #echo "Choose offline/online install:"
+    #echo "   1   for offline install (default)"
+    #echo "   2   for online install"
+    #read -p "Number: " answer
+    #if [ "$answer" != "2" ]; then answer="1"; fi
+    #echo "$answer"
+    answer="1"
 
 }
 
