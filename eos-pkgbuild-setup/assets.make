@@ -151,17 +151,20 @@ Assets_clone()
     # echo2 "If so, you can delete your local assets and fetch assets from github now."
     # read -p "Delete local assets and fetch them from github now (y/N)? " xx >&2
 
-    printf2 "\n%s " "Fetch assets from github (Y/n)?"
-    read xx
+    if [ -n "$(ls -1 *.pkg.tar.xz 2> /dev/null)" ] ; then
 
-    case "$xx" in
-        [yY]*|"") ;;
-        *)
-            echo2 "Using local assets."
-            echo2 ""
-            return
-            ;;
-    esac
+        printf2 "\n%s " "Fetch assets from github (Y/n)?"
+        read xx
+
+        case "$xx" in
+            [yY]*|"") ;;
+            *)
+                echo2 "Using local assets."
+                echo2 ""
+                return
+                ;;
+        esac
+    fi
 
     Pushd "$ASSETSDIR"
 
