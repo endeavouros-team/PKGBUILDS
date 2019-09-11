@@ -53,7 +53,7 @@ source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=mast
 sha256sums=('SKIP')
 
 FILE_NAME="pack.sh"
-URL="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$reponame_clone/pack.sh"
+URL="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$reponame_clone/pack.sh"
 
 if [ ! -f $FILE_NAME ]; then wget $URL; chmod +x $FILE_NAME; fi
 source ./$FILE_NAME
