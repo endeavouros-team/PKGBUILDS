@@ -408,7 +408,7 @@ Main()
     #RunPostHooks                 # may update local PKGBUILDs
 
     # build if newer versions exist. When building, collect removables and builds.
-    buildsavedir=$(mktemp -d "$HOME/.tmpdir.XXXXX")
+    buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
@@ -498,6 +498,7 @@ Main()
         echo2 "Nothing to do."
     fi
 
+    rm -rf $buildsavedir
     Destructor
 }
 
