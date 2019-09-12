@@ -1,12 +1,11 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
-#pkgname=calamares_netinstall
 pkgname=calamares_current
 reponame_clone=Calamares_current
 reponame=calamares
 pkgver=3.2.12
-pkgrel=5
+pkgrel=6
 destdir="/usr"
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -52,27 +51,57 @@ options=(!strip !emptydirs)
 source=("git+https://github.com/endeavouros-team/$reponame_clone.git#branch=master")
 sha256sums=('SKIP')
 
-FILE_NAME="pack.sh"
-URL="https://github.com/endeavouros-team/PKGBUILDS/raw/master/calamares_offline_online/pack.sh"
-
-if [ ! -f $FILE_NAME ]; then wget $URL; chmod +x $FILE_NAME; fi
-source ./$FILE_NAME
-
 prepare() {
-#_pkgname
-_offline_online
-_prepare
+    # endeavouros' calamares is cloned at source variable, the original calamares is wget bellow
+    if [ ! -d $srcdir/$reponame ]
+        then 
+            wget https://github.com/calamares/calamares/releases/download/v$pkgver/$reponame-$pkgver.tar.gz
+            tar -zxvf $reponame-$pkgver.tar.gz
+            rm $reponame-$pkgver.tar.gz
+            mv $reponame-$pkgver $reponame
+            rsync -va $srcdir/$reponame_clone/* $srcdir/$reponame
+            rm -rf $srcdir/$reponame_clone
+    fi
+
+    # Build proccess can't understand our personal files, so we adjust here
+    cp -r ${srcdir}/${reponame}/src/modules/packages/packages.conf_offline ${srcdir}/${reponame}/src/modules/packages/packages.conf
+    cp -r ${srcdir}/${reponame}/settings.conf_offline ${srcdir}/${reponame}/settings.conf
+    cp -r ${srcdir}/${reponame}/src/modules/welcome/welcome.conf_offline ${srcdir}/${reponame}/src/modules/welcome/welcome.conf 
+
+    mkdir -p $srcdir/$reponame/build/$pkgname
+
+    # remove some calamares modules we don't need
+    rm -r $srcdir/$reponame/src/modules/{dummypythonqt,tracking,dummycpp,dummyprocess,dummypython,dummypythonqt,dracutlukscfg,plymouthcfg,dracut,initramfs,webview} ||true
+
+    # change some files on the go - distro-specific
+    sed -i "s?configuration files\" OFF?configuration files\" ON?g" $srcdir/$reponame/CMakeLists.txt
+    sed -i "s?username: live?username: liveuser?g"  $srcdir/$reponame/src/modules/removeuser/removeuser.conf
+    sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $srcdir/$reponame/src/modules/initcpio/InitcpioJob.cpp
+    sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $srcdir/$reponame/src/modules/unpackfs/unpackfs.conf
 
 }
 
 build() {
 
-_build
+    cd $srcdir/$reponame/build
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
+    export DESTDIR="$srcdir/$reponame/build/$pkgname" && make -j4 install
 
 }
 
 package() {
 
-_package
+    # Build proccess can't understand our personal files, so we explicitly copy them here to be packed along calamares files
+
+    cp -r $srcdir/$reponame/src/branding ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+
+    cp -r $srcdir/$reponame/{settings.conf_offline,settings.conf_online} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/
+
+    cp -r $srcdir/$reponame/src/modules/welcome/{welcome.conf_online,welcome.conf_offline} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
+
+    cp -r $srcdir/$reponame/src/modules/packages/{packages.conf_online,packages.conf_offline} ${srcdir}/${reponame}/build/$pkgname/usr/share/calamares/modules/
+
+    # Commom install -D doen't work
+    cp -r "${srcdir}/${reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 
 }
