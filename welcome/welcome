@@ -17,8 +17,10 @@ AND='&#38;'           # '&'
 
 
 calamares() {
-    if [ -x /usr/bin/calamares ] ; then
-        /usr/bin/calamares
+    local prog=/usr/bin/calamares_switcher
+
+    if [ -x $prog ] ; then
+        $prog
     else
         yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:0
     fi
