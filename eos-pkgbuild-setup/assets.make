@@ -491,7 +491,7 @@ Main()
             rm -f  "${removable[@]}"
             sleep 1
             for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets "$tag" "${removableassets[@]}" --quietly || WARN "removing assets with tag '$tag' failed"
+                delete-release-assets --quietly "$tag" "${removableassets[@]}" || WARN "removing assets with tag '$tag' failed"
             done
         fi
     else
