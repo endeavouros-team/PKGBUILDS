@@ -401,7 +401,7 @@ Main()
         tmpcurr="$(LocalVersion "$ASSETSDIR/$pkgname")"
         test -n "$tmpcurr" || DIE "LocalVersion for '$xx' failed"
         oldv["$pkgdirname"]="$tmpcurr"
-        test $(vercmp "$tmp" "$tmpcurr") -gt 0 && echo2 "update pending to $tmp" || echo2 "OK"
+        test $(vercmp "$tmp" "$tmpcurr") -gt 0 && echo2 "update pending to $tmp" || echo2 "OK ($tmpcurr)"
     done
     Popd
 
