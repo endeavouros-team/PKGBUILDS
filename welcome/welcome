@@ -16,16 +16,23 @@ EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
 
-calamares() {
-    local prog=/usr/bin/calamares_switcher
+yad_calamares() {
+    local progs=(
+        # order is significant here!
+        /usr/bin/calamares_switcher
+        /usr/bin/calamares
+    )
+    local prog
 
-    if [ -x $prog ] ; then
-        $prog
-    else
-        yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:0
-    fi
+    for prog in "${progs[@]}" ; do
+        if [ -x $prog ] ; then
+            $prog &
+            return
+        fi
+    done
+    yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:0
 }
-export -f calamares
+export -f yad_calamares
 
 INSTALL() {
   local handle="$1"
@@ -35,7 +42,7 @@ INSTALL() {
       --columns=1 \
       --image=gtk-save \
       --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-      --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c calamares' \
+      --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares' \
       --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
       --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
