@@ -14,11 +14,10 @@ local SIGNER="EndeavourOS"
 # local folders
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
-#local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
-local GITDIR="$ASSETSDIR/../../repo-testing"        # not $REPONAME...
+local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 # package name specifications
-local PKGNAMES=(                                    # actually: dir names for packages
+local PKGNAMES=(                                    # actually: dir names for packages (AUR pkgs must have "aur/" prefix here)
     aur/ckbcomp
     aur/mkinitcpio-openswap
     aur/python3-gpg_batch_sign
@@ -28,14 +27,15 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-developer-mirrorlist
 )
 
-# Hook functions are run in the beginning after RationalityTests in assets.make.
-# There may be several hook functions.
+# Hook functions for various purposes.
+
+# The hook functions in array ASSET_HOOKS are run in the beginning in assets.make.
 local ASSET_HOOKS=(
     # currently none
 )
 
-# Package hooks
-
+# Package hooks in array ASSET_PACKAGE_HOOKS are meant for AUR packages and are run before building them.
+# Typically these functions change the PKGBUILD file for a particular reason.
 _ckbcomp_hook_change_version() {
     # change "$url" http to https
     sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
@@ -48,5 +48,6 @@ _repo-add_and_sign_hook_change_rel() {
 }
 
 declare -A ASSET_PACKAGE_HOOKS
+
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["repo-add_and_sign"]=_repo-add_and_sign_hook_change_rel
