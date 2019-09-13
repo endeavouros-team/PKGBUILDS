@@ -19,9 +19,6 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages (AUR pkgs must have "aur/" prefix here)
     aur/ckbcomp
-    aur/mkinitcpio-openswap
-    aur/python3-gpg_batch_sign
-    aur/repo-add_and_sign
 
     calamares_offline_online
     endeavouros-developer-mirrorlist
@@ -41,13 +38,7 @@ _ckbcomp_hook_change_version() {
     sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
         -e 's|^url="http:|url="https:|'
 }
-_repo-add_and_sign_hook_change_rel() {
-    # change http to https
-    sed -i "$PKGBUILD_ROOTDIR"/repo-add_and_sign/PKGBUILD \
-        -e 's|http://|https://|'
-}
 
 declare -A ASSET_PACKAGE_HOOKS
 
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
-ASSET_PACKAGE_HOOKS["repo-add_and_sign"]=_repo-add_and_sign_hook_change_rel
