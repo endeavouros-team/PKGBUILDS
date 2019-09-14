@@ -28,18 +28,3 @@ build() {
 package() {
     echo Done.
 }
-
-_prepare()
-{
-    test -d src || return
-
-    local xx
-
-    echo "Removing previous build files:"
-    sudo rm -rf src
-    for xx in pkg $pkgname ; do
-	test -d $xx && rm -rf $xx
-    done
-    rm -f ${pkgname}-*.pkg.tar.xz
-}
-_prepare ; unset -f _prepare
