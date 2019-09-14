@@ -17,20 +17,13 @@ AND='&#38;'           # '&'
 
 
 yad_calamares() {
-    local progs=(
-        # order is significant here!
-        /usr/bin/calamares_switcher
-        /usr/bin/calamares
-    )
-    local prog
+    local prog=/usr/bin/calamares
 
-    for prog in "${progs[@]}" ; do
-        if [ -x $prog ] ; then
-            "$prog" &
-            return
-        fi
-    done
-    yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:0
+    if [ -x $prog ] ; then
+        pkexec "$prog" &
+    else
+        yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    fi
 }
 export -f yad_calamares
 
