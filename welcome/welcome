@@ -20,7 +20,7 @@ yad_calamares() {
     local prog=/usr/bin/calamares
 
     if [ -x $prog ] ; then
-        pkexec "$prog" &
+        sudo "$prog" &
     else
         yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
