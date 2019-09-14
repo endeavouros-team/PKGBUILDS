@@ -206,6 +206,9 @@ StartHere() {
         tabname="$(SeparateWordsWithSpaces "$tab")"
         notebook+=(--tab="$tabname")
     done
+
+    test -x /usr/bin/calamares || notebook+=(--active-tab=2)
+
     notebook+=(--button=" See you later!face-cool!Greeter is enabled in config":0)
     notebook+=(--button=" Don't show me anymore!face-crying!Disabled the greeter":1)
 
