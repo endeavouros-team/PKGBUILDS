@@ -19,7 +19,7 @@ AND='&#38;'           # '&'
 yad_calamares() {
     local progs=(
         # order is significant here!
-        #/usr/bin/calamares_switcher
+        /usr/bin/calamares_switcher
         /usr/bin/calamares
     )
     local prog
