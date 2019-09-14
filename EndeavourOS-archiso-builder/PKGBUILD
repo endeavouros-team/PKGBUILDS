@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=EndeavourOS-archiso
+pkgver=0.1
+pkgrel=1
+pkgdesc="Build EndeavourOS-archiso"
+
+arch=(any)
+depends=()
+makedepends=(archiso arch-install-scripts git)
+source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
+sha512sums=(SKIP)
+
+build() {
+    cd $pkgname
+
+    echo "Fixing permissions:"
+    sudo ./fix_permissions.sh
+
+    echo "Building:"
+    sudo ./build.sh -v
+
+    ls -1 $srcdir/$pkgname/out/*
+}
+
+package() {
+    echo Done.
+}
+
+_prepare()
+{
+    test -d src || return
+
+    local xx
+
+    echo "Removing previous build files:"
+    sudo rm -rf src
+    for xx in pkg $pkgname ; do
+	test -d $xx && rm -rf $xx
+    done
+    rm -f ${pkgname}-*.pkg.tar.xz
+}
+_prepare ; unset -f _prepare
