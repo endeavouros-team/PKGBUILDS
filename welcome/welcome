@@ -32,15 +32,17 @@ INSTALL() {
   local tabnum="$2"
   yad --plug="$handle" --tabnum="$tabnum" \
       --form \
-      --columns=1 \
+      --columns=2 \
       --image=gtk-save \
       --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
       --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares' \
+      --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
       --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
       --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
       &> /dev/null &    
 }
+# https://endeavouros.com/download
 
 GeneralInfo() {
   local handle="$1"
