@@ -20,7 +20,8 @@ yad_calamares() {
     local prog=/usr/bin/calamares
 
     if [ -x $prog ] ; then
-        sudo "$prog"
+        sh -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
+        # sudo "$prog"
     else
         yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
