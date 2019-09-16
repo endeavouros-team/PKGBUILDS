@@ -6,9 +6,7 @@ pkgname=EndeavourOS-archiso
 pkgver=0.1
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
-
 arch=(any)
-depends=()
 makedepends=(archiso arch-install-scripts git)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
 sha512sums=(SKIP)
