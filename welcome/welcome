@@ -98,7 +98,7 @@ GreeterSettings() {  # not needed anymore; kept as a reference only of how to ca
       --columns=1 \
       --image=system-settings \
       --text="<b>Greeter configuration</b>\nConfig file: $GREETER_CONFIG" --text-align=left \
-      --field="Do not show the greeter anymore!!Start again with $0":fbtn    'bash -c "RunGreeterSettings disabled"' \
+      --field="Do not show the greeter anymore!!Start again with $FULLPROGNAME":fbtn    'bash -c "RunGreeterSettings disabled"' \
       --field="Keep showing the greeter!!I like it\!":fbtn                   'bash -c "RunGreeterSettings enabled"' \
       &> /dev/null &    
 }
@@ -119,7 +119,11 @@ _NOTEBOOK_TABS=(                             # names of functions above
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
 
-DIE() { echo "Error: $1." >&2 ; exit 1 ; }
+DIE() {
+    echo "Error: $1." >&2
+    Usage
+    exit 1
+}
 
 SetBrowser() {
     local xx
@@ -139,7 +143,7 @@ RunGreeterSettings() {
             ;;
         disabled)
             echo "Greeter=disabled" > "$GREETER_CONFIG"
-            echo "To run the greeter again, start a terminal and run $PROGRAM_NAME with option '$FORCE_START'." | \
+            echo "To run the greeter again, start a terminal and run $FULLPROGNAME with option '-f'." | \
                 yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
                     --title="How to re-enable greeter" \
                     --geometry=500x200 --wrap \
@@ -158,11 +162,10 @@ RunGreeterSettings() {
 
 # exports for use in the yad command:
 export -f RunGreeterSettings
-export PROGRAM_NAME="$0"
 export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
+export FULLPROGNAME="$0"
 
-export FORCE_START="-f"   # option to start greeter even if it is disabled by config
-
+PROGNAME=welcome
 
 PrepareTabs() {
     local handle="$1"
@@ -183,13 +186,39 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
     fi
 }
 
+Usage() {
+    cat <<EOF >&2
+Usage: $PROGNAME [options]
+Options:
+    -f | --force         Re-enable starting the app even if it was disabled.
+    --startdelay=X       Wait before actually starting the app. X value is the same as in 'sleep'.
+EOF
+}
+
 StartHere() {
 
-    if [ "$1" != "$FORCE_START" ] ; then
+    local force_start=no
+    local start_delay=0
+
+    local arg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -f | --force)   force_start=yes ;;
+            --startdelay=*) start_delay="${arg:13}" ;;
+            -*) DIE "unsupported option '$arg'" ;;
+            *)  DIE "unsupported parameter '$arg'" ;;
+        esac
+    done
+
+    if [ "$force_start" = "no" ] ; then
         test "$(RunGreeterSettings check)" != "enabled" && {
-            echo "$PROGRAM_NAME is disabled. To start it anyway, use option $FORCE_START"
+            echo "$FULLPROGNAME is disabled. To start it anyway, use option $FORCE_START"
             return
         }
+    fi
+    if [ "$start_delay" != "0" ] ; then
+        sleep "$start_delay"
     fi
 
     SetBrowser
