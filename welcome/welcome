@@ -20,13 +20,24 @@ yad_calamares() {
     local prog=/usr/bin/calamares
 
     if [ -x $prog ] ; then
-        sh -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
-        # sudo "$prog"
+        bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
     else
-        yad --text="calamares: not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+        yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
 }
 export -f yad_calamares
+
+yad_SystemUpdate() {
+    local term=/usr/bin/xfce4-terminal
+    if [ -x $term ] ; then
+        $term -x bash -c \
+              "echo 'Checking updates...'; checkupdates >/dev/null ; yay -Qu && yay -Su --noconfirm || echo 'No updates.' ; read -p 'Press ENTER to close this window: '"
+    else
+        yad --text="Sorry, $(basename $term) is not installed." --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    fi
+}
+export -f yad_SystemUpdate
+
 
 INSTALL() {
   local handle="$1"
@@ -69,6 +80,7 @@ AfterInstall() {
       --columns=2 \
       --image=dialog-information \
       --text="<b>After install tasks</b>" --text-align=left \
+      --field="Update System!!Update System Software":fbtn               'bash -c yad_SystemUpdate' \
       --field="Package management!!Manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
