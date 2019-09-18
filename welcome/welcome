@@ -31,7 +31,7 @@ yad_SystemUpdate() {
     local term=/usr/bin/xfce4-terminal
     if [ -x $term ] ; then
         $term -x bash -c \
-              "echo 'Checking updates...'; checkupdates >/dev/null ; yay -Qu && yay -Su --noconfirm || echo 'No updates.' ; read -p 'Press ENTER to close this window: '"
+              "echo 'Checking updates...'; checkupdates >/dev/null ; pacman -Qu && yay -Su --noconfirm || echo 'No updates.' ; read -p 'Press ENTER to close this window: '"
     else
         yad --text="Sorry, $(basename $term) is not installed." --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
