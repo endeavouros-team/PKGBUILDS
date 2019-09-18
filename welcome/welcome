@@ -64,11 +64,12 @@ GeneralInfo() {
       --columns=3 \
       --image=dialog-question \
       --text="<b>Find your way at the EndeavourOS website!</b>" --text-align=left \
-      --field="Web site!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
-      --field="Download!!Where to download from and how to verify.":fbtn                    "$_BROWSER https://endeavouros.com/download" \
+      --field="Web site!!https://endeavouros.com":fbtn                        "$_BROWSER https://endeavouros.com" \
+      --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" \
       --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
       --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
       --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
+      --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
       &> /dev/null &
 }
 

@@ -3,6 +3,6 @@ Type=Application
 Encoding=UTF-8
 Name=welcome
 Comment=EndeavourOS welcome launcher
-Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=10
+Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3
 Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 Terminal=False
