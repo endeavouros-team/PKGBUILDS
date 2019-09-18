@@ -2,7 +2,7 @@
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_current
-_repositoryname_clone=Calamares_current
+_eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.12
 pkgrel=7
@@ -47,42 +47,48 @@ depends=(
 
 provides=("${pkgname}")
 options=(!strip !emptydirs)
-source=("git+https://github.com/endeavouros-team/$_repositoryname_clone.git#branch=master")
-sha256sums=('SKIP')
+source=(
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
+  "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
+)
+sha256sums=(
+'SKIP'
+'SKIP'
+)
 
 prepare() {
     # endeavouros' calamares is cloned at source variable, the original calamares is wget bellow
-    if [ ! -d $srcdir/$_reponame ]
+    if [ ! -d $_reponame ]
         then 
-            wget https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz
-            tar -zxvf $_reponame-$pkgver.tar.gz
-            rm $_reponame-$pkgver.tar.gz
+            # wget https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz
+            # tar -zxvf $_reponame-$pkgver.tar.gz
+            # rm $_reponame-$pkgver.tar.gz
             mv $_reponame-$pkgver $_reponame
-            rsync -va $srcdir/$_repositoryname_clone/* $srcdir/$_reponame
-            rm -rf $srcdir/$_repositoryname_clone
+            rsync -va $_eos_changes/* $_reponame
+            rm -rf $_eos_changes
     fi
 
     # Build proccess can't understand our personal files, so we adjust here
-    cp -r $srcdir/$_reponame/src/modules/packages/packages.conf_offline $srcdir/$_reponame/src/modules/packages/packages.conf
-    cp -r $srcdir/$_reponame/settings.conf_offline                      $srcdir/$_reponame/settings.conf
-    cp -r $srcdir/$_reponame/src/modules/welcome/welcome.conf_offline   $srcdir/$_reponame/src/modules/welcome/welcome.conf 
+    cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
+    cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
+    cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
 
-    mkdir -p $srcdir/$_reponame/build/$pkgname
+    mkdir -p $_reponame/build/$pkgname
 
     # remove some calamares modules we don't need
-    rm -r $srcdir/$_reponame/src/modules/{dummypythonqt,tracking,dummycpp,dummyprocess,dummypython,dracutlukscfg,plymouthcfg,dracut,initramfs,webview} ||true
+    rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview} ||true
 
     # change some files on the go - distro-specific
-    sed -i "s?configuration files\" OFF?configuration files\" ON?g" $srcdir/$_reponame/CMakeLists.txt
-    sed -i "s?username: live?username: liveuser?g"  $srcdir/$_reponame/src/modules/removeuser/removeuser.conf
-    sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $srcdir/$_reponame/src/modules/initcpio/InitcpioJob.cpp
-    sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $srcdir/$_reponame/src/modules/unpackfs/unpackfs.conf
+    sed -i "s?configuration files\" OFF?configuration files\" ON?g"               $_reponame/CMakeLists.txt
+    sed -i "s?username: live?username: liveuser?g"                                $_reponame/src/modules/removeuser/removeuser.conf
+    sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'           $_reponame/src/modules/initcpio/InitcpioJob.cpp
+    sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $_reponame/src/modules/unpackfs/unpackfs.conf
 
 }
 
 build() {
 
-    cd $srcdir/$_reponame/build
+    cd $_reponame/build
     cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
     export DESTDIR="$srcdir/$_reponame/build/$pkgname" && make -j4 install
 
@@ -93,10 +99,10 @@ package() {
 
     # Build proccess can't understand our personal files, so we explicitly copy them here to be packed along calamares files
 
-    cp -r $srcdir/$_reponame/src/branding                                    $srcdir/$_reponame/build/$pkgname/usr/share/calamares/
-    cp -r $srcdir/$_reponame/settings.conf_{on,off}line                      $srcdir/$_reponame/build/$pkgname/usr/share/calamares/
-    cp -r $srcdir/$_reponame/src/modules/welcome/welcome.conf_{on,off}line   $srcdir/$_reponame/build/$pkgname/usr/share/calamares/modules/
-    cp -r $srcdir/$_reponame/src/modules/packages/packages.conf_{on,off}line $srcdir/$_reponame/build/$pkgname/usr/share/calamares/modules/
+    cp -r $_reponame/src/branding                                    $_reponame/build/$pkgname/usr/share/calamares/
+    cp -r $_reponame/settings.conf_{on,off}line                      $_reponame/build/$pkgname/usr/share/calamares/
+    cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line   $_reponame/build/$pkgname/usr/share/calamares/modules/
+    cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line $_reponame/build/$pkgname/usr/share/calamares/modules/
 
     # Commom install -D doen't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
