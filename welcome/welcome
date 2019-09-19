@@ -30,8 +30,10 @@ export -f yad_calamares
 yad_SystemUpdate() {
     local term=/usr/bin/xfce4-terminal
     if [ -x $term ] ; then
-        $term -x bash -c \
-              "echo 'Checking updates...'; checkupdates >/dev/null ; pacman -Qu && yay -Su --noconfirm || echo 'No updates.' ; read -p 'Press ENTER to close this window: '"
+        local cmd=("echo 'Checking for updates...' ; ")
+        cmd+=("ping -c 1 8.8.8.8 >/dev/null && yay -Syyu --noconfirm ; ")
+        cmd+=("read -p 'Press ENTER to close this window: '")
+        $term -x bash -c "${cmd[*]}"
     else
         yad --text="Sorry, $(basename $term) is not installed." --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
