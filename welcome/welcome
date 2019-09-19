@@ -27,11 +27,27 @@ yad_calamares() {
 }
 export -f yad_calamares
 
+yad_hasupdates() {
+    # return value: 0=has updates, 1=no updates
+
+    ping -c 1 8.8.8.8 >/dev/null || return 1  # 1=no internet connection
+
+    local updates="$(checkupdates)"
+    if [ -n "$updates" ] ; then
+        echo "$updates"
+        return 0
+    else
+        echo "No updates."
+        return 1
+    fi
+}
+export -f yad_hasupdates
+
 yad_SystemUpdate() {
     local term=/usr/bin/xfce4-terminal
     if [ -x $term ] ; then
         local cmd=("echo 'Checking for updates...' ; ")
-        cmd+=("ping -c 1 8.8.8.8 >/dev/null && yay -Syyu --noconfirm ; ")
+        cmd+=("yad_hasupdates && yay -Syu --noconfirm ; ")
         cmd+=("read -p 'Press ENTER to close this window: '")
         $term -x bash -c "${cmd[*]}"
     else
