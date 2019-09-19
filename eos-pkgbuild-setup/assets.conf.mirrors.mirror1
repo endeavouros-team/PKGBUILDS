@@ -23,7 +23,6 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/downgrade
     aur/inxi
     aur/kalu
-    aur/yad
     aur/yay
     endeavouros-keyring
     endeavouros-mirrorlist
