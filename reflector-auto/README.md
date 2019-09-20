@@ -15,5 +15,5 @@ If a reflector call fails, a log file <b>/tmp/reflector-auto.log</b> is created.
 
 Date | Version | Description
 ---- | ------- | -----------
-2019-09-20 | 1.1.1-1 | Fixed a problem with whitespaces in the config file.<br>Log file location changed to /tmp/reflector-auto.log.
+2019-Sep-20 | 1.1.1-1 | Fixed a problem with whitespaces in the config file.<br>Log file location changed to /tmp/reflector-auto.log.
 
