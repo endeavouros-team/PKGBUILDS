@@ -6,8 +6,8 @@ Options for reflector (e.g. -c COUNTRY) can be added into file <b>/etc/reflector
 See command:
 <pre>
 reflector -h
-</pre
->for more info about the options.<br>
+</pre>
+for more info about the options.<br>
 <br>
 If a reflector call fails, a log file <b>/tmp/reflector-auto.log</b> is created.
 
@@ -17,11 +17,3 @@ Date | Version | Description
 ---- | ------- | -----------
 2019-09-20 | 1.1.1-1 | Fixed a problem with whitespaces in the config file. Log file location changed to /tmp/reflector-auto.log.
 
-
-
-
-## Changelog
-
-Date | Version | Description
----- | ------- | -----------
-2019-Sep-20 | 1.1.1-1 | Fixed a problem with whitespaces in the config file. Log file location changed to /tmp/reflector-auto.log.
