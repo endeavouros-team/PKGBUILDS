@@ -11,6 +11,12 @@ reflector -h
 <br>
 If a reflector call fails, a log file <b>/tmp/reflector-auto.log</b> is created.
 
+Name | Description
+---- | -----------
+grub-update-after-kernel.hook | Automatically updates grub.cfg after a kernel is installed/uninstalled.
+grub-fix-initrd-generation | Fixes generation of 'initrd' lines in grub.cfg.
+
+
 ## Changelog
 
 Date | Version | Description
