@@ -1,11 +1,58 @@
 #!/bin/bash
 
+export _REFLECTOR_AUTO_FAILURE=no
+
 _reflector_auto_die()
 {
     local msg="$1"
     local code="$2"
-    test -n "$msg" && echo "$msg" > /etc/reflector-auto.log
+    test -n "$msg" && { echo "Error: $msg" > /tmp/reflector-auto.log ; echo "Error: $msg" >&2 ; }
+    export _REFLECTOR_AUTO_FAILURE=yes
     exit $code
+}
+
+_contains_quotes() {
+    local param="$1"
+    local quote="$2"
+    local paramlen=${#param}
+    local new="$(echo "$param" | tr -d "$quote")"
+
+    echo "$((paramlen-${#new}))"
+}
+
+_make_options() {
+    local xx count
+    local store=""
+    local quote quotestop=""
+
+    for xx in "$@" ; do
+        quote='"'
+        count="$(_contains_quotes "$xx" "$quote")"
+        if [ $count -eq 0 ] ; then
+            quote="'"
+            count="$(_contains_quotes "$xx" "$quote")"
+        fi
+
+        if [ $count -eq 1 ] && [ -z "$quotestop" ] ; then
+            quotestop="$quote"
+        fi
+
+        if [ -z "$store" ] ; then
+            if [ $count -eq 1 ] ; then
+                store="$(echo "$xx" | tr -d "$quote")"
+            else
+                echo "$xx"
+            fi
+        else
+            store+=" $xx"
+            if [ $count -eq 1 ] ; then
+                test "$quote" = "$quotestop" || _reflector_auto_die "quoting problem with '$store'" 1
+                echo "$store" | tr -d "$quotestop"
+                store=""
+                quotestop=""
+            fi
+        fi
+    done
 }
 
 _reflector_auto_main()
@@ -17,8 +64,7 @@ _reflector_auto_main()
     #
     # Note: comment lines (first non-space char is #) or empty lines are skipped when reading the config file.
 
-    local system_config_file=/etc/reflector-auto.conf
-    local system_config="$(test -r $system_config_file && cat $system_config_file | grep -P -v "^[ \t]*#|^$")"
+    local system_config
     local ml=/etc/pacman.d/mirrorlist
 
     # If $system_config and "$@" has no --save option, then we use a temporary --save file
@@ -30,9 +76,16 @@ _reflector_auto_main()
     local rootcmds              # for storing possible root commands
     local xx
 
-    for xx in $system_config "$@" ; do
+    readarray -t system_config <<< "$(_make_options $(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))"
+
+    test "$_REFLECTOR_AUTO_FAILURE" = "yes" && {
+        echo "Problems with reading options, exit."
+        return 1
+    }
+
+    for xx in "${system_config[@]}" "$@" ; do
         case "$xx" in
-            --save*) they_have_save=1 ; break ;;
+            --save) they_have_save=1 ; break ;;
         esac
     done
 
@@ -46,7 +99,7 @@ _reflector_auto_main()
         rootcmds="cp $bakfile $ml.bak ; cp $savefile $ml"
     fi
 
-    reflector $saveoption $system_config "$@"  || _reflector_auto_die "reflector-auto failed." 1
+    reflector $saveoption "${system_config[@]}" "$@"  || _reflector_auto_die "reflector-auto failed." 1
     
     if [ $they_have_save -eq 0 ] ; then
         sudo bash -c "$rootcmds"

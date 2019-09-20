@@ -9,4 +9,4 @@ reflector -h
 </pre
 >for more info about the options.<br>
 <br>
-If a reflector call fails, a log file <b>/etc/reflector-auto.log</b> is created.<br>
+If a reflector call fails, a log file <b>/tmp/reflector-auto.log</b> is created.<br>
