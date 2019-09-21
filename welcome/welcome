@@ -265,7 +265,7 @@ StartHere() {
 
     if [ "$force_start" = "no" ] ; then
         test "$(RunGreeterSettings check)" != "enabled" && {
-            echo "$FULLPROGNAME is disabled. To start it anyway, use option $FORCE_START"
+            echo "$FULLPROGNAME is disabled. To start it anyway, use option -f"
             return
         }
     fi
