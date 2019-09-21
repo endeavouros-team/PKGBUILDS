@@ -71,8 +71,7 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 read -p 'Press ENTER to continue: '
 EOF
     chmod +x $tmpfile
-    $term -x bash -c "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile"
-    rm -f $tmpfile
+    $term -x bash -c "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
 }
 export -f yad_InitializePacmanMirroring
 
