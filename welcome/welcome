@@ -16,6 +16,26 @@ EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
 
+yad_terminal() {
+    if [ -z "$TERMINAL_PROG" ] ; then
+        # terminator, qterminal do not work!
+        local suitable_terminals="xfce4-terminal mate-terminal lxterminal gnome-terminal konsole termite xterm"
+        local arg
+        for arg in $suitable_terminals ; do
+            if [ -x "/usr/bin/$arg" ] ; then
+                export TERMINAL_PROG="/usr/bin/$arg"
+                break
+            fi
+        done
+        test -n "$TERMINAL_PROG" || \
+            echo "Sorry, none of the terminal programs [ $suitable_terminals ] is installed. Some features may not work as expected." \
+                | yad --text-info \
+                      --title="Warning" --height=200 --width=400 --wrap --button=yad-ok:0
+    fi
+    echo "$TERMINAL_PROG"
+}
+export -f yad_terminal
+
 yad_calamares() {
     local prog=/usr/bin/calamares
 
@@ -44,19 +64,20 @@ yad_hasupdates() {
 export -f yad_hasupdates
 
 yad_SystemUpdate() {
-    local term=/usr/bin/xfce4-terminal
-    test -x $term || yad --text="Sorry, $(basename $term) is not installed." --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    local term="$(yad_terminal)"
+    test -n "$term" || return 1
 
     local cmd=("echo 'Checking for updates...' ; ")
     cmd+=("yad_hasupdates && yay -Syu --noconfirm ; ")
     cmd+=("read -p 'Press ENTER to close this window: '")
-    $term -x bash -c "${cmd[*]}"
+    #$term -x bash -c "${cmd[*]}"
+    $term -e "bash -c \"${cmd[*]}\""
 }
 export -f yad_SystemUpdate
 
 yad_InitializePacmanMirroring() {
-    local term=/usr/bin/xfce4-terminal
-    test -x $term || yad --text="Sorry, $(basename $term) is not installed." --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    local term="$(yad_terminal)"
+    test -n "$term" || return 1
 
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
@@ -71,7 +92,8 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 read -p 'Press ENTER to continue: '
 EOF
     chmod +x $tmpfile
-    $term -x bash -c "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
+    #$term -x bash -c "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
+    $term -e "bash -c \"echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile\""
 }
 export -f yad_InitializePacmanMirroring
 
@@ -215,6 +237,7 @@ RunGreeterSettings() {
 export -f RunGreeterSettings
 export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
 export FULLPROGNAME="$0"
+export TERMINAL_PROG=""
 
 PROGNAME=welcome
 
@@ -250,8 +273,9 @@ StartHere() {
 
     local force_start=no
     local start_delay=0
-
     local arg
+
+    export TERMINAL_PROG="$(yad_terminal)"
 
     for arg in "$@" ; do
         case "$arg" in
