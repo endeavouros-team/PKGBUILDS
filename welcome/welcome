@@ -18,7 +18,11 @@ AND='&#38;'           # '&'
 
 yad_terminal() {
     if [ -z "$TERMINAL_PROG" ] ; then
-        # terminator, qterminal do not work!
+        # These terminal programs are known not to work with this program:
+        # - terminator, kitty (and other python based terminals ??)
+        # - qterminal
+
+        # The following terminals are known to work:
         local suitable_terminals="xfce4-terminal mate-terminal lxterminal gnome-terminal konsole termite xterm"
         local arg
         for arg in $suitable_terminals ; do
