@@ -154,7 +154,7 @@ AfterInstall() {
 }
 
 yad_install() {
-    local yadcmd="yad --text-info --title=Installer --wrap  --width=400 --height=300 --button=yad-quit:0"
+    local yadcmd="yad --text-info --title=Installer --wrap --tail --width=400 --height=300 --button=yad-quit:0"
 
     pacman -Q "$1" >& /dev/null && {
         echo "$1: already installed" | $yadcmd
