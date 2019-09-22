@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.5
-pkgrel=5
+pkgrel=6
 arch=('any')
 license=('GPL')
 depends=(bash yad)
@@ -14,7 +14,7 @@ source=(
   $url/$pkgname
   $url/$pkgname.desktop
 )
-sha512sums=('7ef5c2a0dfeb4fd739235a3cff7326d314876b9f041b869cdbaed2014f05f37cb0253022749941b5d93bee7cb3e344c499ca9e029eaa278fb2a42a3f76f417c6'
+sha512sums=('4362e30264dc2d3811b166a75317bbdf47e03c2f50ef72138790d065112f069d8e9944e0f26d76fe5dd5a7889771cb17ae1e2ef2bdcc8525cda988a7fbe299dc'
             'cd8f07aebf7f10abdef0ad98b0974fd6d0e843d76d5eb425253c76de08fbe9d403ad24a159a518227600916be745f7d8c1effddcd58e1991d8f742659dfb2ab3')
 
 package() {

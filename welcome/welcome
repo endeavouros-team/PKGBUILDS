@@ -23,7 +23,7 @@ yad_terminal() {
         # - qterminal
 
         # The following terminals are known to work:
-        local suitable_terminals="xfce4-terminal mate-terminal lxterminal gnome-terminal konsole termite xterm"
+        local suitable_terminals="xfce4-terminal konsole gnome-terminal mate-terminal lxterminal termite xterm"
         local arg
         for arg in $suitable_terminals ; do
             if [ -x "/usr/bin/$arg" ] ; then
@@ -32,9 +32,12 @@ yad_terminal() {
             fi
         done
         test -n "$TERMINAL_PROG" || \
-            echo "Sorry, none of the terminal programs [ $suitable_terminals ] is installed. Some features may not work as expected." \
+            printf "%s\n    %s\n%s" \
+                   "Sorry, none of the terminal programs:" \
+                   "$suitable_terminals" \
+                   "is installed. Some features may not work as expected." \
                 | yad --text-info \
-                      --title="Warning" --height=200 --width=400 --wrap --button=yad-ok:0
+                      --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
     fi
     echo "$TERMINAL_PROG"
 }
@@ -51,31 +54,27 @@ yad_calamares() {
 }
 export -f yad_calamares
 
-yad_hasupdates() {
-    # return value: 0=has updates, 1=no updates
-
-    ping -c 1 8.8.8.8 >/dev/null || return 1  # 1=no internet connection
-
-    local updates="$(checkupdates)"
-    if [ -n "$updates" ] ; then
-        echo "$updates"
-        return 0
-    else
-        echo "No updates."
-        return 1
-    fi
-}
-export -f yad_hasupdates
-
 yad_SystemUpdate() {
     local term="$(yad_terminal)"
     test -n "$term" || return 1
 
-    local cmd=("echo 'Checking for updates...' ; ")
-    cmd+=("yad_hasupdates && yay -Syu --noconfirm ; ")
-    cmd+=("read -p 'Press ENTER to close this window: '")
-    #$term -x bash -c "${cmd[*]}"
-    $term -e "bash -c \"${cmd[*]}\""
+    local tmpfile=$(mktemp)
+    cat <<EOF > $tmpfile
+#!/bin/bash
+_xx_main() {
+  local updates="\$(checkupdates)"
+  test -n "\$updates" && {
+      echo "\$updates"
+      yay -Syu --noconfirm
+  } || {
+      echo "No updates."
+  }
+  read -p "Press ENTER to close this window: "
+}
+_xx_main
+EOF
+    chmod +x $tmpfile
+    $term -e "bash -c \"echo Checking for software updates... ; $tmpfile ; rm -f $tmpfile\""
 }
 export -f yad_SystemUpdate
 
@@ -197,8 +196,11 @@ _NOTEBOOK_TABS=(                             # names of functions above
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
 
 DIE() {
-    echo "Error: $1." >&2
-    Usage
+    while true ; do
+        echo "Error: $1."
+        Usage
+        break
+    done | yad --text-info --title="Error" --wrap  --width=700 --height=300 --button=yad-quit:1
     exit 1
 }
 
@@ -265,21 +267,29 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
 }
 
 Usage() {
-    cat <<EOF >&2
+    cat <<EOF
+
 Usage: $PROGNAME [options]
 Options:
-    -f | --force         Re-enable starting the app even if it was disabled.
-    --startdelay=X       Wait before actually starting the app. X value is the same as in 'sleep'.
+  -f | --force      Re-enable starting the app even if it was disabled.
+  --startdelay=X    Wait before actually starting the app.
+                    X value syntax is the same as in 'sleep'.
 EOF
 }
 
 StartHere() {
+    ping -c 1 8.8.8.8 >/dev/null || {
+        echo "No internet connection! Cannot continue." | \
+            yad --text-info --title="Warning" \
+                --height=100 --width=300 --justify=center --wrap \
+                --button=yad-quit:1
+        return 1
+    }
+    export TERMINAL_PROG="$(yad_terminal)"  # No need to check, most things here work without terminal.
 
     local force_start=no
     local start_delay=0
     local arg
-
-    export TERMINAL_PROG="$(yad_terminal)"
 
     for arg in "$@" ; do
         case "$arg" in
