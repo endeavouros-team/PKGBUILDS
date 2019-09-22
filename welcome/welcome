@@ -153,6 +153,39 @@ AfterInstall() {
       &> /dev/null &
 }
 
+yad_install() {
+    local yadcmd="yad --text-info --title=Installer --wrap  --width=400 --height=300 --button=yad-quit:0"
+
+    pacman -Q "$1" >& /dev/null && {
+        echo "$1: already installed" | $yadcmd
+        return
+    }
+    while true ; do
+        echo "Installing $1 ..."
+        pkexec pacman -S --noconfirm "$1"
+        echo "Finished."
+        break
+    done |& $yadcmd
+}
+export -f yad_install
+
+AddMoreApps() {
+  local handle="$1"
+  local tabnum="$2"
+  yad --plug="$handle" --tabnum="$tabnum" \
+      --form \
+      --columns=3 \
+      --image=system-software-install \
+      --text="<b>Install popular apps</b>" --text-align=left \
+      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn                               'bash -c "yad_install libreoffice-fresh"' \
+      --field="Gimp!!Image manipulation":fbtn                                                    'bash -c "yad_install gimp"' \
+      --field="Chromium Web Browser!!Web Browser":fbtn                                           'bash -c "yad_install chromium"' \
+      --field="Thunderbird E-mail!!E-mail client":fbtn                                           'bash -c "yad_install thunderbird"' \
+      --field="Atom!!Text editor + IDE (https://github.com/atom/atom)":fbtn                      'bash -c "yad_install atom"' \
+      --field="Visual Studio Code!!Text editor + IDE (https://github.com/microsoft/vscode)":fbtn 'bash -c "yad_install code"' \
+      &> /dev/null &
+}
+
 GetInvolved() {         # disabled until the web site has more support
   local handle="$1"
   local tabnum="$2"
@@ -190,6 +223,7 @@ _NOTEBOOK_TABS=(                             # names of functions above
     INSTALL
     GeneralInfo
     AfterInstall
+    AddMoreApps
     #GetInvolved
 )
 
@@ -328,8 +362,8 @@ StartHere() {
 
     test -x /usr/bin/calamares || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" See you later!face-cool!Greeter is enabled in config":0)
-    notebook+=(--button=" Don't show me anymore!face-crying!Disabled the greeter":1)
+    notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
+    notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":1)
 
     "${notebook[@]}"
 
