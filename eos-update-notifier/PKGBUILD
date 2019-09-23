@@ -3,7 +3,7 @@
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier for EndeavourOS users."
 pkgver=0.2
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(bash yad)
@@ -25,5 +25,5 @@ package() {
   cd $srcdir
 
   install -Dm755 $pkgname    $pkgdir/usr/bin/$pkgname
-  install -Dm644 $pkgname    $pkgdir/etc/xdg/autostart/$pkgname
+  install -Dm644 $pkgname    $pkgdir/etc/xdg/autostart/$pkgname.desktop
 }
