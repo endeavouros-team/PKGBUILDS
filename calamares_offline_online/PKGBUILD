@@ -57,16 +57,11 @@ sha256sums=(
 )
 
 prepare() {
-    # endeavouros' calamares is cloned at source variable, the original calamares is wget bellow
-    #if [ ! -d $_reponame ]
-        #then 
-            # wget https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz
-            # tar -zxvf $_reponame-$pkgver.tar.gz
-            # rm $_reponame-$pkgver.tar.gz
-            mv $_reponame-$pkgver $_reponame
-            rsync -va $_eos_changes/* $_reponame
-            rm -rf $_eos_changes
-    #fi
+
+    mv $_reponame-$pkgver       $_reponame
+    rsync -va $_eos_changes/*   $_reponame
+    rm -rf $_eos_changes
+
 
     # Build proccess can't understand our personal files, so we adjust here
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
