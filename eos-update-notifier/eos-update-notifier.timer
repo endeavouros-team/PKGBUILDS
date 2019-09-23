@@ -2,8 +2,7 @@
 Description=Run EOS update notifier a few times a day
 
 [Timer]
-OnCalendar=11:10:00
-OnActiveSec=1h 59min
+OnCalendar=0/2:25:00
 Persistent=true
  
 [Install]
