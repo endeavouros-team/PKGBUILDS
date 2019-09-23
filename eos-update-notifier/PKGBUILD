@@ -1,0 +1,26 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-update-notifier
+pkgdesc="Software update notifier for EndeavourOS users."
+pkgver=0.1
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(bash yad)
+
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+source=(
+  $url/$pkgname
+  $url/$pkgname.timer
+  $url/$pkgname.service
+)
+sha512sums=('a33223363613470de2523bf3f378d587812769f00e9102beba69185c692f40c2aca530d2bc166dd0038d8b721f7d803500f8ca7c9a1b7315757fc9880cb85d79'
+            'c4478724ff11eec09a7f8dee103dae889e69f8970ca646ce7d922b987d4d6a4d54ec13046adc1951e6310f9be6609d4b317f7a5f46d83550f6a56ddaca7fcdf0'
+            'a7039e226db344b0fa2c6e608d081f4757d7aabde027ff4d16defa9bac28dde4a67b43477a613f218e4983fcb66b6e43ca1717be6550338660b0b2953e818199')
+
+package() {
+  cd $srcdir
+
+  install -Dm755 $pkgname    $pkgdir/usr/bin/$pkgname
+}

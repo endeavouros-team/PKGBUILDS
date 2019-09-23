@@ -162,7 +162,7 @@ Main()
                 if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ]
                 then
                     wget -q -O "$configdir"/$progname.service $url/$progname.service
-                    wget -q -O "$configdir"/$progname.service $url/$progname.timer
+                    wget -q -O "$configdir"/$progname.timer   $url/$progname.timer
                     systemctl --user enable $progname.timer
                     systemctl --user start  $progname.timer
                 fi
