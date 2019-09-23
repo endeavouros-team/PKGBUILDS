@@ -149,21 +149,28 @@ AfterInstall() {
       --field="Package management!!Manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+      --field="Bluetooth!!Bluetooth advice":fbtn                         "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
       --field="NVIDIA users$EXCLAMATION!!Use NVIDIA installer":fbtn      "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
       --field="Forum tips!!Help us help you!":fbtn                       "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
 
 yad_install() {
+    # Install one or more given packages. Does not reinstall any packages.
+
     local yadcmd="yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
 
-    pacman -Q "$1" >& /dev/null && {
-        echo "$1: already installed" | $yadcmd
+    local pkg pkgs=()
+    for pkg in "$@" ; do
+        pacman -Q "$1" >& /dev/null || pkgs+=("$pkg")
+    done
+    test -z "$pkgs" && {
+        echo "$*: already installed" | $yadcmd
         return
     }
     while true ; do
-        echo "Installing $1 ..."
-        pkexec pacman -S --noconfirm "$1"
+        echo "Installing ${pkgs[*]} ..."
+        pkexec pacman -S --noconfirm "${pkgs[@]}"
         echo "Finished."
         break
     done |& $yadcmd
@@ -179,11 +186,9 @@ AddMoreApps() {
       --image=system-software-install \
       --text="<b>Install popular apps</b>" --text-align=left \
       --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn                               'bash -c "yad_install libreoffice-fresh"' \
-      --field="Gimp!!Image manipulation":fbtn                                                    'bash -c "yad_install gimp"' \
       --field="Chromium Web Browser!!Web Browser":fbtn                                           'bash -c "yad_install chromium"' \
-      --field="Thunderbird E-mail!!E-mail client":fbtn                                           'bash -c "yad_install thunderbird"' \
-      --field="Atom!!Text editor + IDE (https://github.com/atom/atom)":fbtn                      'bash -c "yad_install atom"' \
-      --field="Visual Studio Code!!Text editor + IDE (https://github.com/microsoft/vscode)":fbtn 'bash -c "yad_install code"' \
+      --field="Firewall!!Gufw firewall":fbtn                                                     'bash -c "yad_install gufw"' \
+      --field="Bluetooth Manager for Xfce!!":fbtn                                                'bash -c "yad_install blueberry bluez-utils"' \
       &> /dev/null &
 }
 
