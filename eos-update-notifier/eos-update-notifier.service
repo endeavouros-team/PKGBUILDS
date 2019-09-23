@@ -1,0 +1,9 @@
+[Unit]
+Description=EOS update notifier service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/eos-update-notifier
+
+[Install]
+WantedBy=eos-update-notifier.timer

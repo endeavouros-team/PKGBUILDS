@@ -1,0 +1,9 @@
+[Unit]
+Description=Run EOS update notifier a few times a day
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+ 
+[Install]
+WantedBy=timers.target

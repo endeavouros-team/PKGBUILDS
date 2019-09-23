@@ -1,0 +1,209 @@
+#!/bin/bash
+#
+# EOS update notifier.
+#
+# Add files
+#   eos-update-notifier.timer
+#   eos-update-notifier.service
+# to
+#   ~/.config/systemd/user
+# and run commands
+#   systemctl --user enable eos-update-notifier.timer
+#   systemctl --user start  eos-update-notifier.timer
+#
+
+RET_QUIT=0
+RET_UPDATE=1
+
+DIE() {
+    local msg="Error: $@"
+    msg+="$(Usage)"
+    echo "$msg" | Yad --width=800
+    exit 1
+}
+
+WARN() {
+    local msg="Warning: $@"
+    msg+="$(Usage)"
+    echo "$msg" | Yad --width=800
+}
+
+Yad() {
+    local tool=""
+
+    case "$1" in
+        --eos_tooltype=*) tool=" ($(GetArgVal "$1"))" ; shift ;;
+    esac
+
+    /usr/bin/yad --text-info \
+        --title="EndeavourOS update notifier$tool" \
+        --height=300 --width=400 \
+        --theme="Classic" \
+        --button=yad-quit:$RET_QUIT      "$@"
+}
+
+RunCommand() {
+    local sudo="$1"
+    local cmd="$2"
+    local toolopt="$3"
+
+    $sudo bash -c "$cmd" | \
+        Yad $toolopt --height=500 --width=700 --tail
+}
+
+Update_common() {
+    local updates="$1"
+    local tool="$2"
+    local toolopt
+    local toolcmd
+    local sudo
+
+    case "$tool" in
+        pacman)
+            toolcmd="pacman -Syu --noconfirm"
+            toolopt="--eos_tooltype=$tool"
+            #sudo=sudo
+            sudo=pkexec
+            ;;
+        yay)
+            toolcmd="yay -Syua --noconfirm"
+            toolopt="--eos_tooltype=AUR"
+            sudo=""  # problem for non-sudoers ...
+            ;;
+    esac
+
+    echo "$updates" | \
+        Yad $toolopt --button=" Update $tool now!face-cool!Start $tool updater":$RET_UPDATE
+
+    test $? -eq $RET_UPDATE && {
+        RunCommand "$sudo" "$toolcmd ; printf '\n$tool done!\n'" "$toolopt"
+        return 0
+    }
+}
+
+GetArgVal() { echo "$1" | cut -d '=' -f 2 ; }
+
+Main2() {
+    local updates_pacman="$(checkupdates)"
+    local updates_aur="$(   yay -Qua)"
+
+    if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
+        test "$verbose" = "yes" && {
+            # Show the nothing-to-do window.
+            echo "No updates available." | \
+                Yad --height=100 \
+                    --timeout=$no_updates__indicator_wait_time \
+                    --timeout-indicator=left &
+        }
+    else
+        test "$EOS_UPDATER_WINDOW_ON" != "1" && {
+            export EOS_UPDATER_WINDOW_ON=1
+            # update pacman first!
+            test -n "$updates_pacman" && { Update_common "$updates_pacman" pacman || WARN "pacman update failed." ; }
+            test -n "$updates_aur"    && { Update_common "$updates_aur"    yay    || WARN "AUR update failed." ; }
+            export EOS_UPDATER_WINDOW_ON=0
+        }
+    fi
+}
+
+Usage() {
+    local iwt="$initial_waittime"
+    test -z "$iwt" && iwt="[none]"
+
+    local prog_name="$(basename $0)"
+
+    case "$mode" in
+        loop)
+            cat <<EOF
+
+
+Usage: $prog_name [options]
+
+Options:
+   -init       Initialize $prog_name systemd service for current user.
+   -iw=X       Initial sleep time. Value syntax from 'sleep' program. Default: $iwt.
+   -lwt=X      Loop wait time. X like in 'sleep'. Default: $loop_waittime.
+   -nw=X       Max time (seconds) to show the "No updates available" window. Default: $no_updates__indicator_wait_time.
+   -mode=X     Operation mode (onetimer or loop). Default: $mode.
+   -v          May show the window saying "No updates available.". Default: $verbose.
+EOF
+            ;;
+
+        onetimer | *)
+            cat <<EOF
+
+
+Usage: $prog_name [options]
+
+Options:
+   -init       Initialize $prog_name systemd service for current user.
+   -iw=X       Initial sleep time. Value syntax from 'sleep' program. Default: $iwt.
+EOF
+            ;;
+        esac
+}
+
+Main()
+{
+    local initial_waittime="5s"
+    local loop_waittime=60m
+    local no_updates__indicator_wait_time=10
+    local verbose=no
+    local mode=onetimer  # "onetimer" or "loop"
+    local arg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -init)
+                local progname=eos-update-notifier
+                local configdir="$HOME/.config/systemd/user"
+                local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
+                mkdir -p "$configdir"
+                if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ]
+                then
+                    wget -q -O "$configdir"/$progname.service $url/$progname.service
+                    wget -q -O "$configdir"/$progname.service $url/$progname.timer
+                    systemctl --user enable $progname.timer
+                    systemctl --user start  $progname.timer
+                fi
+                echo "$progname service initialized." >&2
+                return
+                ;;
+            -iw=*)
+                initial_waittime="$(GetArgVal "$arg")"
+                ;;
+            -lwt=*)
+                loop_waittime="$(GetArgVal "$arg")"
+                ;;
+            -nw=*)
+                no_updates__indicator_wait_time="$(GetArgVal "$arg")"
+                ;;
+            -v)
+                verbose=yes
+                ;;
+            -mode=*)
+                mode="$(GetArgVal "$arg")"
+                case "$mode" in
+                    onetimer | loop) ;;
+                    *) DIE "Warning: unsupported mode '$mode'." ; break ;;
+                esac
+                ;;
+            -*)
+                DIE "unsupported option '$arg'."
+                ;;
+            *)
+                DIE "unsupported parameter '$arg'."
+                ;;
+        esac
+    done
+
+    test -n "$initial_waittime" && sleep "$initial_waittime"
+
+    while true ; do
+        Main2
+        test "$mode" = "onetimer" && break
+        sleep "$loop_waittime"
+    done
+}
+
+Main "$@"
