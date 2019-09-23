@@ -1,15 +1,12 @@
 #!/bin/bash
 #
-# EOS update notifier.
+# EOS update notifier for the current user.
 #
-# Add files
-#   eos-update-notifier.timer
-#   eos-update-notifier.service
-# to
-#   ~/.config/systemd/user
-# and run commands
-#   systemctl --user enable eos-update-notifier.timer
-#   systemctl --user start  eos-update-notifier.timer
+# The package includes the following files:
+#     eos-update-notifier           (this file)
+#     eos-update-notifier.desktop   (initializes the systemd service for current user)
+#     eos-update-notifier.timer     (systemd timer)
+#     eos-update-notifier.service   (systemd service)
 #
 
 RET_QUIT=0
@@ -62,13 +59,12 @@ Update_common() {
         pacman)
             toolcmd="pacman -Syu --noconfirm"
             toolopt="--eos_tooltype=$tool"
-            #sudo=sudo
             sudo=pkexec
             ;;
         yay)
             toolcmd="yay -Syua --noconfirm"
             toolopt="--eos_tooltype=AUR"
-            sudo=""  # problem for non-sudoers ...
+            sudo=""                             # problem for non-sudoers ...
             ;;
     esac
 
@@ -85,10 +81,10 @@ GetArgVal() { echo "$1" | cut -d '=' -f 2 ; }
 
 Main2() {
     local updates_pacman="$(checkupdates)"
-    local updates_aur="$(   yay -Qua)"
+    local updates_aur="$(yay -Qua)"
 
     if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
-        test "$verbose" = "yes" && {
+        test "$verbosity" = "high" && {
             # Show the nothing-to-do window.
             echo "No updates available." | \
                 Yad --height=100 \
@@ -96,6 +92,7 @@ Main2() {
                     --timeout-indicator=left &
         }
     else
+        # prevent having many update sessions at the same time
         test "$EOS_UPDATER_WINDOW_ON" != "1" && {
             export EOS_UPDATER_WINDOW_ON=1
             # update pacman first!
@@ -112,35 +109,24 @@ Usage() {
 
     local prog_name="$(basename $0)"
 
-    case "$mode" in
-        loop)
-            cat <<EOF
+    cat <<EOF
 
 
 Usage: $prog_name [options]
 
 Options:
    -init       Initialize $prog_name systemd service for current user.
-   -iw=X       Initial sleep time. Value syntax from 'sleep' program. Default: $iwt.
-   -lwt=X      Loop wait time. X like in 'sleep'. Default: $loop_waittime.
-   -nw=X       Max time (seconds) to show the "No updates available" window. Default: $no_updates__indicator_wait_time.
-   -mode=X     Operation mode (onetimer or loop). Default: $mode.
-   -v          May show the window saying "No updates available.". Default: $verbose.
+   -iw=X       Initial sleep time. Value syntax from 'sleep' program.
+               Default: $iwt.
+   -mode=X     Operation mode (onetimer or loop).
+               Note that the loop mode is not designed for systemd.
+               Default: $mode.
+   -lwt=X      Loop wait time (only in loop mode). X value is like in 'sleep'.
+               Default: $loop_waittime.
+   -nw=X       Max time (seconds) to show the "No updates available" window.
+               Default: $no_updates__indicator_wait_time.
+   -q          Be quieter with dialogs.
 EOF
-            ;;
-
-        onetimer | *)
-            cat <<EOF
-
-
-Usage: $prog_name [options]
-
-Options:
-   -init       Initialize $prog_name systemd service for current user.
-   -iw=X       Initial sleep time. Value syntax from 'sleep' program. Default: $iwt.
-EOF
-            ;;
-        esac
 }
 
 Main()
@@ -148,8 +134,9 @@ Main()
     local initial_waittime="5s"
     local loop_waittime=60m
     local no_updates__indicator_wait_time=10
-    local verbose=no
+    local verbosity=high
     local mode=onetimer  # "onetimer" or "loop"
+    local systemd=0
     local arg
 
     for arg in "$@" ; do
@@ -178,8 +165,11 @@ Main()
             -nw=*)
                 no_updates__indicator_wait_time="$(GetArgVal "$arg")"
                 ;;
-            -v)
-                verbose=yes
+            -q)
+                verbosity=low
+                ;;
+            -systemd)
+                systemd=1
                 ;;
             -mode=*)
                 mode="$(GetArgVal "$arg")"
@@ -196,6 +186,11 @@ Main()
                 ;;
         esac
     done
+    if [ $systemd -eq 1 ] ; then
+        # make sure to have proper options when systemd called
+        verbosity=low
+        mode=onetimer
+    fi
 
     test -n "$initial_waittime" && sleep "$initial_waittime"
 

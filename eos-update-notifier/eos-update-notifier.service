@@ -3,7 +3,7 @@ Description=EOS update notifier service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/eos-update-notifier
+ExecStart=/usr/bin/eos-update-notifier -systemd
 
 [Install]
 WantedBy=eos-update-notifier.timer
