@@ -26,14 +26,18 @@ WARN() {
 }
 
 Yad() {
-    local tool=""
+    local title="EndeavourOS update notifier"
 
     case "$1" in
-        --eos_tooltype=*) tool=" ($(GetArgVal "$1"))" ; shift ;;
+        --eos_tooltype=*)
+            local source="$(GetArgVal "$1")"
+            title="Updates are available from $source"
+            shift
+            ;;
     esac
 
     /usr/bin/yad --text-info \
-        --title="EndeavourOS update notifier$tool" \
+        --title="$title" \
         --height=300 --width=400 \
         --theme="Classic" \
         --button=yad-quit:$RET_QUIT      "$@"
@@ -58,7 +62,7 @@ Update_common() {
     case "$tool" in
         pacman)
             toolcmd="pacman -Syu --noconfirm"
-            toolopt="--eos_tooltype=$tool"
+            toolopt="--eos_tooltype=upstream"
             sudo=pkexec
             ;;
         yay)
@@ -69,7 +73,7 @@ Update_common() {
     esac
 
     echo "$updates" | \
-        Yad $toolopt --button=" Update $tool now!face-cool!Start $tool updater":$RET_UPDATE
+        Yad $toolopt --button=" Update system with $tool!face-cool!Start $tool updater":$RET_UPDATE
 
     test $? -eq $RET_UPDATE && {
         RunCommand "$sudo" "$toolcmd ; printf '\n$tool done!\n'" "$toolopt"
