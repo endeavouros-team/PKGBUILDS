@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.6
-pkgrel=6
+pkgrel=7
 arch=('any')
 license=('GPL')
 depends=(bash yad)
@@ -23,4 +23,7 @@ package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname         $pkgdir/usr/share/endeavouros/scripts/$pkgname
   install -Dm644 $pkgname.desktop $pkgdir/etc/xdg/autostart/$pkgname.desktop
+
+  install -d $pkgdir/usr/bin
+  ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
 }
