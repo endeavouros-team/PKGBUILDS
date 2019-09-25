@@ -15,33 +15,19 @@
 EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
+EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
+EOS_SCRIPTS_YAD=eos-script-lib-yad
 
-yad_terminal() {
-    if [ -z "$TERMINAL_PROG" ] ; then
-        # These terminal programs are known not to work with this program:
-        # - qterminal
-        # - kitty
+if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
+    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
+elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
+    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
+else
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+    exit 1
+fi
 
-        # The following terminals are known to work:
-        local suitable_terminals="xfce4-terminal konsole gnome-terminal mate-terminal lxterminal terminator tilix termite xterm"
-        local arg
-        for arg in $suitable_terminals ; do
-            if [ -x "/usr/bin/$arg" ] ; then
-                export TERMINAL_PROG="/usr/bin/$arg"
-                break
-            fi
-        done
-        test -n "$TERMINAL_PROG" || \
-            printf "%s\n    %s\n%s" \
-                   "Sorry, none of the terminal programs:" \
-                   "$suitable_terminals" \
-                   "is installed. Some features may not work as expected." \
-                | yad --text-info \
-                      --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
-    fi
-    echo "$TERMINAL_PROG"
-}
-export -f yad_terminal
+export -f eos_yad_terminal
 
 yad_calamares() {
     local prog=/usr/bin/calamares
@@ -55,7 +41,7 @@ yad_calamares() {
 export -f yad_calamares
 
 yad_SystemUpdate() {
-    local term="$(yad_terminal)"
+    local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
     local tmpfile=$(mktemp)
@@ -79,7 +65,7 @@ EOF
 export -f yad_SystemUpdate
 
 yad_InitializePacmanMirroring() {
-    local term="$(yad_terminal)"
+    local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
     local tmpfile=$(mktemp)
@@ -95,7 +81,6 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 read -p 'Press ENTER to continue: '
 EOF
     chmod +x $tmpfile
-    #$term -x bash -c "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
     $term -e "bash -c \"echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile\""
 }
 export -f yad_InitializePacmanMirroring
@@ -283,7 +268,6 @@ RunGreeterSettings() {
 export -f RunGreeterSettings
 export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
 export FULLPROGNAME="$0"
-export TERMINAL_PROG=""
 
 PROGNAME=welcome
 
@@ -318,14 +302,7 @@ EOF
 }
 
 StartHere() {
-    ping -c 1 8.8.8.8 >/dev/null || {
-        echo "No internet connection! Cannot continue." | \
-            yad --text-info --title="Warning" \
-                --height=100 --width=300 --justify=center --wrap \
-                --button=yad-quit:1
-        return 1
-    }
-    export TERMINAL_PROG="$(yad_terminal)"  # No need to check, most things here work without terminal.
+    eos_yad_check_internet_connection || return 1
 
     local force_start=no
     local start_delay=0

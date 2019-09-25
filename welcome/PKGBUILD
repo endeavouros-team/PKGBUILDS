@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.6
-pkgrel=7
+pkgrel=8
 arch=('any')
 license=('GPL')
 depends=(bash yad)
@@ -13,16 +13,19 @@ url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 source=(
   $url/$pkgname
   $url/$pkgname.desktop
+  $url/eos-script-lib-yad
 )
-sha512sums=('150980ec728f06745ca2acc285bf841874d11b181b336791e636743deb44f9c35b0068ee00436e74d8f8acb3908b53d027da2f89b505a3c1757d33bcdaeeab76'
-            '6f3dd253488a207804f64125e567837288309f75b97bc35376a37be3df6193cae01dc38adfe4471ba1a662e6d1182fa2e921d5c2c376eae99762bc91c435e02f')
+sha512sums=('b0d5558be7209a5dc3a417f4a7faaa64412b7872ec7040a2ff3f94da3ffbe80b90b62e36440a22717feaa2196b533be90e17655843b328f023faba9eb13da0e5'
+            '6f3dd253488a207804f64125e567837288309f75b97bc35376a37be3df6193cae01dc38adfe4471ba1a662e6d1182fa2e921d5c2c376eae99762bc91c435e02f'
+            'e676262256847f29108941427af54568381ba145e17d8200dcfe2acf189f8f628df3e553bb9807e41221ae8989fad435b85f8901779c3454bb57348a900b8c7b')
 
 package() {
   cd $srcdir
 
   install -d $pkgdir/usr/share/endeavouros/scripts
-  install -Dm755 $pkgname         $pkgdir/usr/share/endeavouros/scripts/$pkgname
-  install -Dm644 $pkgname.desktop $pkgdir/etc/xdg/autostart/$pkgname.desktop
+  install -Dm755 $pkgname            $pkgdir/usr/share/endeavouros/scripts/$pkgname
+  install -Dm644 eos-script-lib-yad  $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
+  install -Dm644 $pkgname.desktop    $pkgdir/etc/xdg/autostart/$pkgname.desktop
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname

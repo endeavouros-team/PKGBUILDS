@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+# EndeavourOS bash scripts "library". Functions using 'yad'.
+#
+
+eos_yad_terminal() {
+    # Show a terminal that is capable of supporting option -e properly. Empty if not found.
+    # Requires: yad
+    #
+    # These terminal programs are known not to work with this program:
+    #     qterminal
+    #     kitty
+    # The following terminals are known to work:
+    local suitable_terminals="xfce4-terminal konsole gnome-terminal mate-terminal lxterminal terminator tilix termite xterm"
+    local EOS_TERMINAL_PROG=""
+    local xx
+
+    for xx in $suitable_terminals ; do
+        if [ -x "/usr/bin/$xx" ] ; then
+            EOS_TERMINAL_PROG="/usr/bin/$xx"
+            echo "$EOS_TERMINAL_PROG"
+            return 0
+        fi
+    done
+
+    printf "%s\n    %s\n%s" \
+           "Sorry, none of the terminal programs:" \
+           "$suitable_terminals" \
+           "is installed. Some features may not work as expected." \
+        | yad --text-info \
+              --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
+    return 1
+}
+
+eos_yad_check_internet_connection() {
+    local verbose="$1"
+
+    ping -c 1 8.8.8.8 >/dev/null || {
+        case "$verbose" in
+            [yY]*|1|true|TRUE|True|on|enable*)
+                echo "No internet connection!" | \
+                    yad --text-info --title="Warning" \
+                        --height=100 --width=300 --justify=center --wrap \
+                        --button=yad-quit:1
+                ;;
+        esac
+        return 1
+    }
+}
+
+eos_yad_GetArgVal() { echo "$1" | cut -d '=' -f 2 ; }
+
+eos_yad_RunCmdTermBash() {
+    local cmd="$1"
+    local prompt="$2"
+
+    local term="$(eos_yad_terminal)"
+    test -n "$term" || return 1
+
+    local tmpfile=$(mktemp)
+
+    echo "#!/bin/bash"                                   >> $tmpfile
+    echo "$cmd"                                          >> $tmpfile
+    echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
+
+    chmod +x $tmpfile
+    if [ -n "$prompt" ] ; then
+        $term -e "bash -c \"echo $prompt ; $tmpfile ; rm -f $tmpfile\""
+    else
+        $term -e "bash -c \"$tmpfile ; rm -f $tmpfile\""
+    fi
+}
+
+eos_yad_problem() {
+    local title="$1"
+    shift
+    yad --text-info --title="$title" --tail --wrap \
+        --width=700 --height=300 --button=yad-quit:0 "$@"
+}
+
+eos_yad_DIE() {
+    local msg="$1"
+    local title="Error"
+    shift
+    while true ; do
+        echo "$msg"
+        # run Usage function if available
+        test -n "$(declare -F | grep -w '^declare -f Usage$')" && Usage
+        break
+    done | eos_yad_problem "$title" "$@"
+    exit 1
+}
+
+eos_yad_WARN() {
+    local msg="$1"
+    local title="Warning"
+    shift
+    echo "$msg" | eos_yad_problem "$title" "$@"
+}
+
+DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
+WARN() { eos_yad_WARN "$@" ; }    # deprecated
+
+#SetBrowser() {
+#    local xx
+#    for xx in xdg-open exo-open firefox chromium ; do  # use one of these browser commands
+#        if [ -x /usr/bin/$xx ] ; then
+#            _BROWSER=/usr/bin/$xx        # for showing external links
+#            return
+#        fi
+#    done
+#    DIE "$FUNCNAME: cannot find a browser"
+#}
+

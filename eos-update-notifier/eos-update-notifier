@@ -9,79 +9,56 @@
 #     eos-update-notifier.service   (systemd service)
 #
 
+#######################################################################
+EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
+EOS_SCRIPTS_YAD=eos-script-lib-yad
+
+if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
+    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
+elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
+    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
+else
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+    exit 1
+fi
+#######################################################################
+
 RET_QUIT=0
 RET_UPDATE=1
 
-DIE() {
-    local msg="Error: $@"
-    msg+="$(Usage)"
-    echo "$msg" | Yad --width=800
-    exit 1
-}
-
-WARN() {
-    local msg="Warning: $@"
-    msg+="$(Usage)"
-    echo "$msg" | Yad --width=800
-}
-
 Yad() {
-    local title="EndeavourOS update notifier"
-
+    local title
     case "$1" in
-        --eos_tooltype=*)
-            local source="$(GetArgVal "$1")"
-            title="Updates are available from $source"
-            shift
-            ;;
+        --*) title="EndeavourOS update notifier" ;;
+        *) title="$1" ; shift ;;
     esac
 
     /usr/bin/yad --text-info \
         --title="$title" \
         --height=300 --width=400 \
-        --theme="Classic" \
+        --theme="Classic" --tail \
         --button=yad-quit:$RET_QUIT      "$@"
-}
-
-RunCommand() {
-    local sudo="$1"
-    local cmd="$2"
-    local toolopt="$3"
-
-    $sudo bash -c "$cmd" | \
-        Yad $toolopt --height=500 --width=700 --tail
 }
 
 Update_common() {
     local updates="$1"
-    local tool="$2"
-    local toolopt
+    local source="$2"
     local toolcmd
-    local sudo
 
-    case "$tool" in
-        pacman)
-            toolcmd="pacman -Syu --noconfirm"
-            toolopt="--eos_tooltype=upstream"
-            sudo=pkexec
-            ;;
-        yay)
-            toolcmd="yay -Syua --noconfirm"
-            toolopt="--eos_tooltype=AUR"
-            sudo=""                             # problem for non-sudoers ...
-            ;;
+    case "$source" in
+        upstream) toolcmd="pkexec pacman -Syu --noconfirm" ;;
+        AUR)      toolcmd="yay -Syua --noconfirm" ;;                             # problem for non-sudoers ...
     esac
 
     echo "$updates" | \
-        Yad $toolopt --button=" Update system with $tool!face-cool!Start $tool updater":$RET_UPDATE
+        Yad "Updates are available from $source" \
+            --button=" Update software from $source!face-cool!Start $source updater":$RET_UPDATE
 
     test $? -eq $RET_UPDATE && {
-        RunCommand "$sudo" "$toolcmd ; printf '\n$tool done!\n'" "$toolopt"
+        eos_yad_RunCmdTermBash "echo Updating from $source... ; $toolcmd && printf '\n$source update done!\n'"
         return 0
     }
 }
-
-GetArgVal() { echo "$1" | cut -d '=' -f 2 ; }
 
 Main2() {
     local updates_pacman="$(checkupdates)"
@@ -100,8 +77,8 @@ Main2() {
         test "$EOS_UPDATER_WINDOW_ON" != "1" && {
             export EOS_UPDATER_WINDOW_ON=1
             # update pacman first!
-            test -n "$updates_pacman" && { Update_common "$updates_pacman" pacman || WARN "pacman update failed." ; }
-            test -n "$updates_aur"    && { Update_common "$updates_aur"    yay    || WARN "AUR update failed." ; }
+            test -n "$updates_pacman" && { Update_common "$updates_pacman" upstream || eos_yad_WARN "upstream update failed." ; }
+            test -n "$updates_aur"    && { Update_common "$updates_aur"    AUR      || eos_yad_WARN "AUR update failed." ; }
             export EOS_UPDATER_WINDOW_ON=0
         }
     fi
@@ -161,13 +138,13 @@ Main()
                 return
                 ;;
             -iw=*)
-                initial_waittime="$(GetArgVal "$arg")"
+                initial_waittime="$(eos_yad_GetArgVal "$arg")"
                 ;;
             -lwt=*)
-                loop_waittime="$(GetArgVal "$arg")"
+                loop_waittime="$(eos_yad_GetArgVal "$arg")"
                 ;;
             -nw=*)
-                no_updates__indicator_wait_time="$(GetArgVal "$arg")"
+                no_updates__indicator_wait_time="$(eos_yad_GetArgVal "$arg")"
                 ;;
             -q)
                 verbosity=low
@@ -176,17 +153,17 @@ Main()
                 systemd=1
                 ;;
             -mode=*)
-                mode="$(GetArgVal "$arg")"
+                mode="$(eos_yad_GetArgVal "$arg")"
                 case "$mode" in
                     onetimer | loop) ;;
-                    *) DIE "Warning: unsupported mode '$mode'." ; break ;;
+                    *) eos_yad_DIE "Unsupported mode '$mode'." ; break ;;
                 esac
                 ;;
             -*)
-                DIE "unsupported option '$arg'."
+                eos_yad_DIE "Unsupported option '$arg'."
                 ;;
             *)
-                DIE "unsupported parameter '$arg'."
+                eos_yad_DIE "Unsupported parameter '$arg'."
                 ;;
         esac
     done
