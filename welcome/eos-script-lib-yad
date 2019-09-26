@@ -33,18 +33,18 @@ eos_yad_terminal() {
 }
 
 eos_yad_check_internet_connection() {
-    local verbose="$1"
+    local verbose="$1"                  # yes|verbose = show dialog, otherwise don't show dialog
 
     ping -c 1 8.8.8.8 >/dev/null || {
         case "$verbose" in
-            [yY]*|1|true|TRUE|True|on|enable*)
+            [yY]*|1|true|TRUE|True|on|enable*|verbose)
                 echo "No internet connection!" | \
                     yad --text-info --title="Warning" \
                         --height=100 --width=300 --justify=center --wrap \
-                        --button=yad-quit:1
+                        --button=yad-quit:1 \
+                        --button=" Continue anyway!go-next!Don't stop now":0
                 ;;
         esac
-        return 1
     }
 }
 

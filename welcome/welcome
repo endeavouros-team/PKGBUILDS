@@ -18,10 +18,10 @@ AND='&#38;'           # '&'
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
 EOS_SCRIPTS_YAD=eos-script-lib-yad
 
-if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
-    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
-elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
+if [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
     source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
+elif [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
+    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
 else
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
     exit 1
@@ -302,7 +302,7 @@ EOF
 }
 
 StartHere() {
-    eos_yad_check_internet_connection || return 1
+    eos_yad_check_internet_connection verbose || return 1
 
     local force_start=no
     local start_delay=0
