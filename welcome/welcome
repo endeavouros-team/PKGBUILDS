@@ -302,7 +302,7 @@ EOF
 }
 
 StartHere() {
-    eos_yad_check_internet_connection verbose || return 1
+    eos_yad_check_internet_connection verbose 10 || return 1
 
     local force_start=no
     local start_delay=0

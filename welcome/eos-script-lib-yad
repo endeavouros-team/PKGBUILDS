@@ -34,6 +34,15 @@ eos_yad_terminal() {
 
 eos_yad_check_internet_connection() {
     local verbose="$1"                  # yes|verbose = show dialog, otherwise don't show dialog
+    local waitsec="$2"                  # try max $waitsec seconds for a connection, test once per second
+    local ix
+
+    test -z "$waitsec" && waitsec=5
+
+    for ((ix=0; ix<waitsec; ix++)) ; do
+        ping -c 1 8.8.8.8 >/dev/null && return 0   # is connected
+        sleep 1s
+    done
 
     ping -c 1 8.8.8.8 >/dev/null || {
         case "$verbose" in
