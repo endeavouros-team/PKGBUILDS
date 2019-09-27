@@ -2,11 +2,11 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=1.6
-pkgrel=10
+pkgver=1.7
+pkgrel=1
 arch=('any')
 license=('GPL')
-depends=(bash yad)
+depends=(bash yad reflector)
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 
@@ -14,10 +14,12 @@ source=(
   $url/$pkgname
   $url/$pkgname.desktop
   $url/eos-script-lib-yad
+  $url/reflector-simple
 )
-sha512sums=('beb90b4d2df4d1e68338c06731aac037ca9983be546fa07ff78fa4ae3f5e95e0fd53b823fe22bf4deaf22073700139a65c157678572682d96c89057d00fce080'
+sha512sums=('6cc4a613304bd0969bb061117d7f5eca1103a582a68696f7c659b1691bc747875a2d8d1bd17399a37663784d7a2b2918f0977379b77612379416b6ec5d76d919'
             '6f3dd253488a207804f64125e567837288309f75b97bc35376a37be3df6193cae01dc38adfe4471ba1a662e6d1182fa2e921d5c2c376eae99762bc91c435e02f'
-            'cc8adc33a54310d341b0de6fb21c2598665403eef3c394e26ba9485bc34683b4974afd38fd89b9b118c44fb1a7d125aa0fceb6e01e33a7e187eea02fe85f8510')
+            'cc8adc33a54310d341b0de6fb21c2598665403eef3c394e26ba9485bc34683b4974afd38fd89b9b118c44fb1a7d125aa0fceb6e01e33a7e187eea02fe85f8510'
+            'd6858e0dbcbbc688af58df855f03370bea12ea5f61af8afff5de37f2bc9838336d5402545698522360cdbf3078037335e815ab4681801a07c7a31bdd83cdaa7f')
 
 package() {
   cd $srcdir
@@ -29,4 +31,5 @@ package() {
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
+  install -Dm755 reflector-simple               $pkgdir/usr/bin/reflector-simple
 }

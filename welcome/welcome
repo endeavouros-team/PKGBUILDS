@@ -119,7 +119,7 @@ GeneralInfo() {
       --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
       &> /dev/null &
 
-#     --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" \
+#     --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" 
 }
 
 AfterInstall() {
@@ -130,6 +130,7 @@ AfterInstall() {
       --columns=2 \
       --image=dialog-information \
       --text="<b>After install tasks</b>" --text-align=left \
+      --field="Update Mirrors!!Update list of mirrors before system update":fbtn              'reflector-simple' \
       --field="Update System!!Update System Software":fbtn               'bash -c yad_SystemUpdate' \
       --field="Package management!!Manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
