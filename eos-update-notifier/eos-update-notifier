@@ -64,6 +64,8 @@ Main2() {
     local updates_pacman="$(checkupdates)"
     local updates_aur="$(yay -Qua)"
 
+    test "$newsdays" -gt 0 && arch-news-for-you $newsdays
+
     if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
         test "$verbosity" = "high" && {
             # Show the nothing-to-do window.
@@ -106,6 +108,9 @@ Options:
                Default: $loop_waittime.
    -nw=X       Max time (seconds) to show the "No updates available" window.
                Default: $no_updates__indicator_wait_time.
+   -news=X     Show the 'Arch latest news for you' within the last X days.
+               If X is 0, then no news are displayed.
+               Default: X is $newsdays.
    -q          Be quieter with dialogs.
 EOF
 }
@@ -118,6 +123,7 @@ Main()
     local verbosity=high
     local mode=onetimer  # "onetimer" or "loop"
     local systemd=0
+    local newsdays=30
     local arg
 
     for arg in "$@" ; do
@@ -145,6 +151,9 @@ Main()
                 ;;
             -nw=*)
                 no_updates__indicator_wait_time="$(eos_yad_GetArgVal "$arg")"
+                ;;
+            -news=*)
+                newsdays="$(eos_yad_GetArgVal "$arg")"
                 ;;
             -q)
                 verbosity=low

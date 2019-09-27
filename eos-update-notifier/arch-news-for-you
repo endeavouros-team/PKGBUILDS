@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# Show only the latest Arch news headline.
+# Useful e.g. for 'kalu' news.conf.
+#
+# Usage: $0 [days]
+# where
+#     days    Show headlines that are no more that 'days' old AND
+#             the related package in the headline is currently installed.
+# Without 'days' show only the latest available headline.
+
+#######################################################################
+EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
+EOS_SCRIPTS_YAD=eos-script-lib-yad
+
+if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
+    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
+elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
+    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
+else
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+    exit 1
+fi
+#######################################################################
+
+LatestHeadlines() {
+    local infofile="$1"
+    grep 'title="View full article:' $infofile | sed -e 's|&gt;|>|g' -e 's|^.*">[ ]*||' -e 's|</a>$||'
+}
+
+LatestDates() {
+    local infofile="$1"
+    local tmp=$(mktemp)
+    grep "timestamp" $infofile | sed -e 's|^.*">||' -e 's|</p>$||'    >> $tmp
+    grep "</dt>"     $infofile | sed -e 's|^.*<dt>||' -e 's|</dt>$||' >> $tmp
+    cat $tmp
+    rm -f $tmp
+}
+
+LessThanDays() {
+    local latestdate="$1"        # 2020-01-01
+    local days="$2"              # nr of days
+
+    local days_in_sec=$((days * 24 * 3600))
+    local latestdate_in_sec=$(date --date="$latestdate" +%s)
+    local curdate_in_sec=$(date +%s)
+
+    if [ $((curdate_in_sec - days_in_sec)) -gt $latestdate_in_sec ] ; then
+        return 1  # too old
+    else
+        return 0  # within day range
+    fi
+}
+
+CheckHeadlines()  # show a headline only if the related package is installed and it is less than given days old
+{
+    local original="$1"
+    local days="$2"
+    local headlines headline
+    local dates     date latestdate
+    local pkgname ix matches
+    local news_contents=""
+    local hlinfo=$(mktemp)
+
+    wget -q -T 10 -O $hlinfo https://www.archlinux.org || eos_yad_DIE "fetching Arch news headlines failed"
+    readarray -t headlines <<< "$(LatestHeadlines $hlinfo)"
+    test "$original" = "yes" && {
+        echo "${headlines[0]}"      # meant for kalu
+        rm -f $hlinfo
+        return
+    }
+    readarray -t dates     <<< "$(LatestDates     $hlinfo)"
+    test ${#headlines[@]} -eq ${#dates[@]} || eos_yad_DIE "sorry, headlines do not match with their dates!!"
+
+    printf "" > $hlinfo
+
+    if [ -n "$headlines" ] ; then
+        ix=0
+        matches=0
+        for ((ix=0; ix < ${#headlines[@]}; ix++)) ; do
+            headline="${headlines[$ix]}"
+            date="${dates[$ix]}"
+            LessThanDays "$date" "$days" && {
+                pkgname="$(echo "$headline" | awk '{print $1}')"       # ASSUME: the first word is the package name!
+                pkgname="${pkgname%%>*}"                               # remove possible trailing ">=..."
+                pacman -Q "$pkgname" >& /dev/null && {
+                    echo "    $date : $headline"
+                    ((matches++))
+                }
+            }
+        done >> $hlinfo
+
+        if [ $matches -ne 0 ] ; then
+            cat $hlinfo | \
+                yad --text-info --title="Arch news for you" \
+                    --width=700 --height=500 --tail --wrap \
+                    --button=yad-quit:0 \
+                    --button=" See Arch news in the web!archlinux":1 || \
+                xdg-open https://www.archlinux.org >& /dev/null
+        else
+            echo "No news for you." >&2     # don't show a dialog
+        fi
+    fi
+    rm -f $hlinfo
+}
+
+Main()
+{
+    local days="$1"
+    local original=no
+
+    test -z "$days" && original=yes
+
+    CheckHeadlines "$original" "$days"
+}
+
+Main "$@"
