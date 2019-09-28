@@ -99,11 +99,14 @@ Main() {
         test "${countrycodes[$ix]}" = "$cc" && included=true || included=false
         command+=(--field="${countrynames[$ix]}:chk" $included)
     done
+    command+=(--separator=" ")
+    command+=(--window-icon="configure")
+    command+=(--image="preferences-system")
     command+=(--field="<b><i>Feature selections\:</i></b>:LBL" "")
     command+=(--field="Include https mirrors:chk" true)
     command+=(--field="Include http mirrors:chk" false)
 
-    result="$("${command[@]}" | tr '|' ' ')"
+    result="$("${command[@]}")"
     test -z "$(echo "$result" | tr -d ' ')" && return      # stop if $result has no words
     result=($(echo "$result"))
 
