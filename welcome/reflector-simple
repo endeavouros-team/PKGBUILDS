@@ -5,6 +5,8 @@
 
 REFLECTOR_COUNTRIES="$(reflector --list-countries)"
 
+REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
+
 CodeToCountry() {  # convert country code to country name
     local code="$1"
     echo "$REFLECTOR_COUNTRIES" | grep -w "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
@@ -65,6 +67,27 @@ ArgsYesNo() {
     echo "no"
 }
 
+_get_reflector_auto_configs() {
+    # Read reflector options from /etc/reflector-auto.conf
+    # and convert country names to country codes.
+    local name code ix
+    local tmpconf=$(mktemp)
+
+    cat $REFLECTOR_AUTO_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
+    
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        name="${countrynames[$ix]}"
+        if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
+            code="${countrycodes[$ix]}"
+            sed -i $tmpconf \
+                -e "s|'$name'|$code|g" \
+                -e "s|\"$name\"|$code|g"
+        fi
+    done
+    cat $tmpconf
+    rm -f $tmpconf
+}
+
 AskCountriesAndOptions() {
     local tips=(
         "Select countries to include in mirror ranking"
@@ -91,10 +114,8 @@ AskCountriesAndOptions() {
     command+=(--field="<b><i>Feature selection\:</i></b>:LBL" "")
     command+=(--field="Include https mirrors:chk" true)
     command+=(--field="Include http mirrors:chk" false)
-
-    if [ $testing_new -eq 1 ] ; then
-        # this does not look cool ...
-        command+=(--field="Exclude specific mirrors by adding a\nlist of their partial names\:":txt "")  # spaces not allowed!
+    if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
+        command+=(--field="Use $REFLECTOR_AUTO_CONF:chk" false)
     fi
 
     reflector_info="$("${command[@]}")"
@@ -106,10 +127,6 @@ BuildReflectorCommand() {
     local ix xx
 
     reflector_cmd=(reflector)
-    # first, add possible reflector-auto configs
-    test -r /etc/reflector-auto.conf && reflector_cmd+=($(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))
-    # then, add local configs
-    reflector_cmd+=(-a2 -phttps -f10 --sort age --save $tmpfile)
 
     # then, add countries
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
@@ -120,14 +137,12 @@ BuildReflectorCommand() {
     # finally, add feature selections
     test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(-p https)
     test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(-p http)
-
-    if [ $testing_new -eq 1 ] ; then
-        local yy="${reflector_info[$ix]}"
-        for xx in $(echo "$yy" | tr ',' ' ') ; do
-            reflector_cmd+=(-x $xx)
-        done
-        ((ix++))
+    if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
+        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(_get_reflector_auto_configs))
     fi
+    # First, we added possible reflector-auto configs above.
+    # Then, add local configs.
+    reflector_cmd+=(-a2 -phttps -f10 --sort age --save $tmpfile)
 }
 
 SaveMirrorlist() {
@@ -153,7 +168,6 @@ Main() {
     local reflector_cmd
     local ml=/etc/pacman.d/mirrorlist
     local tmpfile=$(mktemp)
-    local testing_new=0
 
     # Find countries with supported mirrors.
 
