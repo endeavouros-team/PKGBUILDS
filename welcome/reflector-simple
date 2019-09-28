@@ -93,7 +93,7 @@ Main() {
              )
     readarray -t result <<< \
               $(echo "$countries" | \
-                    yad --height=1000 --width=400 --list --checklist --title="Selecting pacman mirrors" \
+                    yad --height=600 --width=400 --list --checklist --title="Selecting pacman mirrors" \
                         --text="<b>Select mirror countries\n  - closest locations recommended\n  - one or more countries</b>" \
                         --column="Included" --column="Country name" \
                     | cut -d '|' -f 2
