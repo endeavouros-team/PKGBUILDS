@@ -74,41 +74,62 @@ Main() {
     local cc="$(GetYourCountryCode)"
     local countrynames
     local countrycodes
-    local xx ix=0
+    local xx ix included
     local result countries
-    local command tmpfile=$(mktemp)
+    local command
     local ml=/etc/pacman.d/mirrorlist
+    local tmpfile=$(mktemp)
 
     readarray -t countrynames <<< "$(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
     readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
 
-    countries=$(for xx in "${countrycodes[@]}" ; do
-                    case "$xx" in
-                        "$cc") echo "true"  ;;
-                        *)     echo "false" ;;
-                    esac
-                    echo "${countrynames[$ix]}"
-                    ((ix++))
-                done
-             )
-    readarray -t result <<< \
-              $(echo "$countries" | \
-                    yad --height=600 --width=400 --list --checklist --title="Selecting pacman mirrors" \
-                        --text="<b>Select mirror countries\n  - closest locations recommended\n  - one or more countries</b>" \
-                        --column="Included" --column="Country name" \
-                    | cut -d '|' -f 2
-              )
-    test -n "$result" || return
+    # Now we have info about supported countries.
+    # Next, we ask user to give some countries for mirror ranking.
+
+    command=(yad --form --columns=5 --title="Selecting Arch mirrors")
+    local tips=(
+        "Select countries to include in mirror ranking"
+        "  - select one on more countries"
+        "  - closest locations are usually the fastest"
+        "  - https is the preferred protocol"
+    )
+    command+=(--text="<b>${tips[0]}\n${tips[1]}\n${tips[2]}\n${tips[3]}\n\n</b>")
+
+    for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
+        test "${countrycodes[$ix]}" = "$cc" && included=true || included=false
+        command+=(--field="${countrynames[$ix]}:chk" $included)
+    done
+    command+=(--field="<b><i>Feature selections\:</i></b>:LBL" "")
+    command+=(--field="Include https mirrors:chk" true)
+    command+=(--field="Include http mirrors:chk" false)
+
+    result="$("${command[@]}" | tr '|' ' ')"
+    test -z "$(echo "$result" | tr -d ' ')" && return      # stop if $result has no words
+    result=($(echo "$result"))
+
+    # Now we know which countries to include in mirror ranking.
+    # Let's create a proper reflector command.
 
     command=(reflector)
+    # first, add possible reflector-auto configs
     test -r /etc/reflector-auto.conf && command+=($(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))
+    # then, add local configs
     command+=(-a2 -phttps -f10 --sort age --save $tmpfile)
-    for xx in "${result[@]}" ; do
-        command+=(-c $(CountryToCode "$xx"))
+
+    # then, add countries
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        xx="${result[$ix]}"
+        test "$xx" = TRUE && command+=(-c "${countrycodes[$ix]}")
     done
 
+    # finally, add feature selections
+    test "${result[$((ix++))]}" = "TRUE" && command+=(-p https)
+    test "${result[$((ix++))]}" = "TRUE" && command+=(-p http)
+
+    # Now all is ready, so just run the command
     "${command[@]}"
 
+    # Show the result and ask permission to save the mirrorlist
     cat $tmpfile | yad --text-info --tail --width=1000 --height=600 \
                        --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
         pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && \
@@ -116,6 +137,8 @@ Main() {
                                         --title="Success" --button=yad-quit:0 \
                                         --timeout=5 --timeout-indicator=left
     }
+
+    # cleanup
     rm -f $tmpfile
 }
 
