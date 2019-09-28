@@ -65,20 +65,97 @@ ArgsYesNo() {
     echo "no"
 }
 
+AskCountriesAndOptions() {
+    local tips=(
+        "Select countries to include in mirror ranking"
+        "  - select one on more countries"
+        "  - closest locations are usually the fastest"
+        "  - https is the preferred protocol"
+    )
+    local ix included
+    local command
+    local columns=5
+
+    command=(yad --form --columns=$columns --title="Selecting Arch mirrors")
+    command+=(--text="<b>${tips[0]}\n${tips[1]}\n${tips[2]}\n${tips[3]}\n\n</b>")
+
+    for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
+        test "${countrycodes[$ix]}" = "$local_country_code" && included=true || included=false
+        command+=(--field="${countrynames[$ix]}:chk" $included)
+    done
+    command+=(--separator=" ")                      # assumes all returned values lack spaces
+    command+=(--window-icon="configure")
+    command+=(--image="preferences-system")
+
+    #command+=(--field=":LBL" "")
+    command+=(--field="<b><i>Feature selection\:</i></b>:LBL" "")
+    command+=(--field="Include https mirrors:chk" true)
+    command+=(--field="Include http mirrors:chk" false)
+
+    if [ $testing_new -eq 1 ] ; then
+        # this does not look cool ...
+        command+=(--field="Exclude specific mirrors by adding a\nlist of their partial names\:":txt "")  # spaces not allowed!
+    fi
+
+    reflector_info="$("${command[@]}")"
+    test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
+    reflector_info=($(echo $reflector_info))                       # make it an array
+}
+
+BuildReflectorCommand() {
+    local ix xx
+
+    reflector_cmd=(reflector)
+    # first, add possible reflector-auto configs
+    test -r /etc/reflector-auto.conf && reflector_cmd+=($(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))
+    # then, add local configs
+    reflector_cmd+=(-a2 -phttps -f10 --sort age --save $tmpfile)
+
+    # then, add countries
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        xx="${reflector_info[$ix]}"
+        test "$xx" = TRUE && reflector_cmd+=(-c "${countrycodes[$ix]}")
+    done
+
+    # finally, add feature selections
+    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(-p https)
+    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(-p http)
+
+    if [ $testing_new -eq 1 ] ; then
+        local yy="${reflector_info[$ix]}"
+        for xx in $(echo "$yy" | tr ',' ' ') ; do
+            reflector_cmd+=(-x $xx)
+        done
+        ((ix++))
+    fi
+}
+
+SaveMirrorlist() {
+    cat $tmpfile | yad --text-info --wrap --width=700 --height=400 \
+                       --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
+        pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && \
+            echo "New $ml saved." | yad --text-info --width=300 --height=100 --align=center \
+                                        --title="Success" --button=yad-quit:0 \
+                                        --timeout=5 --timeout-indicator=left
+    }
+}
+
 Main() {
     local verbose=$(ArgsYesNo -v "$@")
     local showlist=$(ArgsYesNo -l "$@")
 
     test "$verbose" = "yes" && echo "Find your country ..." >&2
 
-    local cc="$(GetYourCountryCode)"
+    local local_country_code="$(GetYourCountryCode)"
     local countrynames
     local countrycodes
-    local xx ix included
-    local result countries
-    local command
+    local reflector_info
+    local reflector_cmd
     local ml=/etc/pacman.d/mirrorlist
     local tmpfile=$(mktemp)
+    local testing_new=0
+
+    # Find countries with supported mirrors.
 
     readarray -t countrynames <<< "$(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
     readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
@@ -86,60 +163,20 @@ Main() {
     # Now we have info about supported countries.
     # Next, we ask user to give some countries for mirror ranking.
 
-    command=(yad --form --columns=5 --title="Selecting Arch mirrors")
-    local tips=(
-        "Select countries to include in mirror ranking"
-        "  - select one on more countries"
-        "  - closest locations are usually the fastest"
-        "  - https is the preferred protocol"
-    )
-    command+=(--text="<b>${tips[0]}\n${tips[1]}\n${tips[2]}\n${tips[3]}\n\n</b>")
-
-    for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
-        test "${countrycodes[$ix]}" = "$cc" && included=true || included=false
-        command+=(--field="${countrynames[$ix]}:chk" $included)
-    done
-    command+=(--separator=" ")
-    command+=(--window-icon="configure")
-    command+=(--image="preferences-system")
-    command+=(--field="<b><i>Feature selections\:</i></b>:LBL" "")
-    command+=(--field="Include https mirrors:chk" true)
-    command+=(--field="Include http mirrors:chk" false)
-
-    result="$("${command[@]}")"
-    test -z "$(echo "$result" | tr -d ' ')" && return      # stop if $result has no words
-    result=($(echo "$result"))
+    AskCountriesAndOptions   # modifies $reflector_info
 
     # Now we know which countries to include in mirror ranking.
     # Let's create a proper reflector command.
 
-    command=(reflector)
-    # first, add possible reflector-auto configs
-    test -r /etc/reflector-auto.conf && command+=($(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))
-    # then, add local configs
-    command+=(-a2 -phttps -f10 --sort age --save $tmpfile)
+    BuildReflectorCommand    # uses $reflector_info and modifies $reflector_cmd
 
-    # then, add countries
-    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
-        xx="${result[$ix]}"
-        test "$xx" = TRUE && command+=(-c "${countrycodes[$ix]}")
-    done
+    # Now all is ready, so just run the command.
 
-    # finally, add feature selections
-    test "${result[$((ix++))]}" = "TRUE" && command+=(-p https)
-    test "${result[$((ix++))]}" = "TRUE" && command+=(-p http)
+    "${reflector_cmd[@]}"
 
-    # Now all is ready, so just run the command
-    "${command[@]}"
+    # Show the result and ask permission to save the mirrorlist.
 
-    # Show the result and ask permission to save the mirrorlist
-    cat $tmpfile | yad --text-info --tail --width=1000 --height=600 \
-                       --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
-        pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && \
-            echo "New $ml saved." | yad --text-info --width=300 --height=100 --align=center \
-                                        --title="Success" --button=yad-quit:0 \
-                                        --timeout=5 --timeout-indicator=left
-    }
+    SaveMirrorlist
 
     # cleanup
     rm -f $tmpfile
