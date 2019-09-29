@@ -5,27 +5,22 @@
 # Shows crucial info about the EndeavourOS and its usage.
 # Targeted for people new to EndeavourOS (but not new to Linux).
 #
-# Usage: EndeavourOS-greeter [-f]
-# where
-#    -f     Forces starting the greeter even if it is disabled in the config.
-#
-# The config is in file $HOME/.config/EOS-Greeter.conf.
-#
+
 
 EXCLAMATION='&#33;'   # '!'
 AND='&#38;'           # '&'
 
+#################################################################################
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
 EOS_SCRIPTS_YAD=eos-script-lib-yad
 
-if [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
-    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
-elif [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
+if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
     source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
 else
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
     exit 1
 fi
+#################################################################################
 
 export -f eos_yad_terminal
 
@@ -85,6 +80,28 @@ EOF
 }
 export -f yad_InitializePacmanMirroring
 
+yad_install() {
+    # Install one or more given packages. Does not reinstall any packages.
+
+    local yadcmd="yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+
+    local pkg pkgs=()
+    for pkg in "$@" ; do
+        pacman -Q "$1" >& /dev/null || pkgs+=("$pkg")
+    done
+    test -z "$pkgs" && {
+        echo "$*: already installed" | $yadcmd
+        return
+    }
+    while true ; do
+        echo "Installing ${pkgs[*]} ..."
+        pkexec pacman -S --noconfirm "${pkgs[@]}"
+        echo "Finished."
+        break
+    done |& $yadcmd
+}
+export -f yad_install
+
 
 INSTALL() {
   local handle="$1"
@@ -132,7 +149,7 @@ AfterInstall() {
       --text="<b>After install tasks</b>" --text-align=left \
       --field="Update Mirrors!!Update list of mirrors before system update":fbtn              'reflector-simple' \
       --field="Update System!!Update System Software":fbtn               'bash -c yad_SystemUpdate' \
-      --field="Package management!!Manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
+      --field="Package management!!How to manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
       --field="Bluetooth!!Bluetooth advice":fbtn                         "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
@@ -140,28 +157,6 @@ AfterInstall() {
       --field="Forum tips!!Help us help you!":fbtn                       "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
-
-yad_install() {
-    # Install one or more given packages. Does not reinstall any packages.
-
-    local yadcmd="yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
-
-    local pkg pkgs=()
-    for pkg in "$@" ; do
-        pacman -Q "$1" >& /dev/null || pkgs+=("$pkg")
-    done
-    test -z "$pkgs" && {
-        echo "$*: already installed" | $yadcmd
-        return
-    }
-    while true ; do
-        echo "Installing ${pkgs[*]} ..."
-        pkexec pacman -S --noconfirm "${pkgs[@]}"
-        echo "Finished."
-        break
-    done |& $yadcmd
-}
-export -f yad_install
 
 AddMoreApps() {
   local handle="$1"
@@ -171,37 +166,11 @@ AddMoreApps() {
       --columns=3 \
       --image=system-software-install \
       --text="<b>Install popular apps</b>" --text-align=left \
-      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn                               'bash -c "yad_install libreoffice-fresh"' \
-      --field="Chromium Web Browser!!Web Browser":fbtn                                           'bash -c "yad_install chromium"' \
-      --field="Firewall!!Gufw firewall":fbtn                                                     'bash -c "yad_install gufw"' \
-      --field="Bluetooth Manager for Xfce!!":fbtn                                                'bash -c "yad_install blueberry bluez-utils"' \
+      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_install libreoffice-fresh"' \
+      --field="Chromium Web Browser!!Web Browser":fbtn              'bash -c "yad_install chromium"' \
+      --field="Firewall!!Gufw firewall":fbtn                        'bash -c "yad_install gufw"' \
+      --field="Bluetooth Manager for Xfce!!Blueberry":fbtn          'bash -c "yad_install blueberry bluez-utils"' \
       &> /dev/null &
-}
-
-GetInvolved() {         # disabled until the web site has more support
-  local handle="$1"
-  local tabnum="$2"
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=2 \
-      --image=face-cool \
-      --text="<b>Get involved!</b>" --text-align=left \
-      --field="Who we are!!Who we are":fbtn                      "$_BROWSER https://endeavouros.com/info" \
-      --field="Bug reports!!Report bugs":fbtn                    "$_BROWSER https://forum.endeavouros.com/c/Arch-based-related-questions/bug-reports" \
-      &> /dev/null &    
-}
-
-GreeterSettings() {  # not needed anymore; kept as a reference only of how to call bash functions
-  local handle="$1"
-  local tabnum="$2"
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=1 \
-      --image=system-settings \
-      --text="<b>Greeter configuration</b>\nConfig file: $GREETER_CONFIG" --text-align=left \
-      --field="Do not show the greeter anymore!!Start again with $FULLPROGNAME":fbtn    'bash -c "RunGreeterSettings disabled"' \
-      --field="Keep showing the greeter!!I like it\!":fbtn                   'bash -c "RunGreeterSettings enabled"' \
-      &> /dev/null &    
 }
 
 
@@ -216,7 +185,6 @@ _NOTEBOOK_TABS=(                             # names of functions above
     GeneralInfo
     AfterInstall
     AddMoreApps
-    #GetInvolved
 )
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -241,37 +209,6 @@ SetBrowser() {
     DIE "$FUNCNAME: cannot find a browser"
 }
 
-RunGreeterSettings() {
-    case "$1" in
-        enabled)
-            echo "Greeter=enabled"  > "$GREETER_CONFIG"
-            ;;
-        disabled)
-            echo "Greeter=disabled" > "$GREETER_CONFIG"
-            echo "To run the greeter again, start a terminal and run $FULLPROGNAME with option '-f'." | \
-                yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
-                    --title="How to re-enable greeter" \
-                    --geometry=500x200 --wrap \
-                    --fontname="Monospace Regular 12" \
-                    --button=" I remember!face-angel!I promise":0 >& /dev/null
-            ;;
-        check)
-            test -r "$GREETER_CONFIG" || { echo enabled ; return ; }              # enabled if config does not exist
-            grep "^Greeter=" "$GREETER_CONFIG" 2>/dev/null | cut -d '=' -f 2
-            ;;
-        *)
-            DIE "Error: $FUNCNAME: internal error! Please report at https://forum.endeavouros.com."
-            ;;
-    esac
-}
-
-# exports for use in the yad command:
-export -f RunGreeterSettings
-export GREETER_CONFIG="$HOME/.config/EOS-Greeter.conf"
-export FULLPROGNAME="$0"
-
-PROGNAME=welcome
-
 PrepareTabs() {
     local handle="$1"
     local xx ix
@@ -292,11 +229,12 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
 }
 
 Usage() {
+    local PROGNAME=welcome
+
     cat <<EOF
 
 Usage: $PROGNAME [options]
 Options:
-  -f | --force      Re-enable starting the app even if it was disabled.
   --startdelay=X    Wait before actually starting the app.
                     X value syntax is the same as in 'sleep'.
 EOF
@@ -305,25 +243,17 @@ EOF
 StartHere() {
     eos_yad_check_internet_connection verbose 10 || return 1
 
-    local force_start=no
     local start_delay=0
     local arg
 
     for arg in "$@" ; do
         case "$arg" in
-            -f | --force)   force_start=yes ;;
             --startdelay=*) start_delay="${arg:13}" ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
     done
 
-    if [ "$force_start" = "no" ] ; then
-        test "$(RunGreeterSettings check)" != "enabled" && {
-            echo "$FULLPROGNAME is disabled. To start it anyway, use option -f"
-            return
-        }
-    fi
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
     fi
@@ -346,15 +276,9 @@ StartHere() {
 
     test -x /usr/bin/calamares || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
-    notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":1)
+    notebook+=(--button=" See you later!face-cool!":0)
 
     "${notebook[@]}"
-
-    case "$?" in
-        0) RunGreeterSettings enabled ;;
-        1) RunGreeterSettings disabled ;;
-    esac
 }
 
 StartHere "$@"
