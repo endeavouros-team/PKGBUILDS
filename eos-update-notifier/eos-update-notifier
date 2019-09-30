@@ -10,24 +10,30 @@
 #
 
 #######################################################################
-EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
-EOS_SCRIPTS_YAD=eos-script-lib-yad
-
-if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
-    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
-elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
-    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
-else
-    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
-fi
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
+
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
 #######################################################################
 
-RET_QUIT=0
-RET_UPDATE=1
 
 Yad() {
+    # NOTE: normal button return value is 0.
+    # If user wants other button return values, they MUST be != 0 !!!
+
     local title
+
     case "$1" in
         --*) title="EndeavourOS update notifier" ;;
         *) title="$1" ; shift ;;
@@ -37,7 +43,7 @@ Yad() {
         --title="$title" \
         --height=300 --width=400 \
         --theme="Classic" --tail \
-        --button=yad-quit:$RET_QUIT      "$@"
+        --button=yad-quit:0             "$@"
 }
 
 Update_common() {
@@ -52,9 +58,9 @@ Update_common() {
 
     echo "$updates" | \
         Yad "Updates are available from $source" \
-            --button=" Update software from $source!face-cool!Start $source updater":$RET_UPDATE
+            --button=" Update software from $source!face-cool!Start $source updater":1  # note: button value must be != 0
 
-    test $? -eq $RET_UPDATE && {
+    test $? -eq 1 && {
         eos_yad_RunCmdTermBash "echo Updating from $source... ; $toolcmd && printf '\n$source update done!\n'"
         return 0
     }

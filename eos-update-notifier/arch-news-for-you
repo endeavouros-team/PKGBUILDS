@@ -10,17 +10,21 @@
 # Without 'days' show only the latest available headline.
 
 #######################################################################
-EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
-EOS_SCRIPTS_YAD=eos-script-lib-yad
-
-if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
-    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
-elif [ -r  $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD ] ; then
-    source $HOME/EOS/PKGBUILDS/welcome/$EOS_SCRIPTS_YAD                               # TODO: remove this testing code !!!
-else
-    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
-fi
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
+
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
 #######################################################################
 
 LatestHeadlines() {
@@ -52,53 +56,73 @@ LessThanDays() {
     fi
 }
 
-CheckHeadlines()  # show a headline only if the related package is installed and it is less than given days old
+ExtractPackageNameFromHeadline() {
+    # ASSUME: the first word contains the package name!
+    # Remove possible trailing version comparison.
+    local headline="$1"
+    echo "$headline" | awk '{print $1}' | sed 's|[<>=].*$||'               
+}
+
+CheckHeadlines()
 {
-    local original="$1"
-    local days="$2"
+    # Show a headline only if the related package is installed and
+    # it is less than given days old.
+
+    local days="$1"
+    local kalu="$2"
     local headlines headline
-    local dates     date latestdate
+    local dates date latestdate
     local pkgname ix matches
     local news_contents=""
+    local news_source=https://www.archlinux.org
     local hlinfo=$(mktemp)
 
-    wget -q -T 10 -O $hlinfo https://www.archlinux.org || eos_yad_DIE "fetching Arch news headlines failed"
-    readarray -t headlines <<< "$(LatestHeadlines $hlinfo)"
-    test "$original" = "yes" && {
-        echo "${headlines[0]}"      # meant for kalu
-        rm -f $hlinfo
-        return
-    }
-    readarray -t dates     <<< "$(LatestDates     $hlinfo)"
-    test ${#headlines[@]} -eq ${#dates[@]} || eos_yad_DIE "sorry, headlines do not match with their dates!!"
+    wget -q -T 10 -O $hlinfo $news_source || \
+        eos_yad_DIE "fetching Arch news headlines failed"
 
-    printf "" > $hlinfo
+    readarray -t headlines <<< "$(LatestHeadlines $hlinfo)"
+
+    test "$kalu" = "yes" && {
+        echo "${headlines[0]}"
+        rm -f $hlinfo
+        return         # nothing more for 'kalu'
+    }
+
+    readarray -t dates <<< "$(LatestDates $hlinfo)"
+
+    test ${#headlines[@]} -eq ${#dates[@]} || {
+        rm -f $hlinfo
+        eos_yad_DIE "sorry, headlines do not match with their dates!!"
+    }
 
     if [ -n "$headlines" ] ; then
-        ix=0
         matches=0
         for ((ix=0; ix < ${#headlines[@]}; ix++)) ; do
             headline="${headlines[$ix]}"
             date="${dates[$ix]}"
+            # Check that the news line is recent enough.
             LessThanDays "$date" "$days" && {
-                pkgname="$(echo "$headline" | awk '{print $1}')"       # ASSUME: the first word is the package name!
-                pkgname="${pkgname%%>*}"                               # remove possible trailing ">=..."
+                # Yes, it is recent enough.
+                # Check if the package in the headline is installed.
+                pkgname="$(ExtractPackageNameFromHeadline "$headline")"
                 pacman -Q "$pkgname" >& /dev/null && {
+                    # Yes, the package is installed. This is news!
                     echo "    $date : $headline"
                     ((matches++))
                 }
             }
-        done >> $hlinfo
+        done > $hlinfo   # re-purposing tmp file...
 
         if [ $matches -ne 0 ] ; then
+            # Now there are news for you! Show them.
             cat $hlinfo | \
-                yad --text-info --title="Arch news for you" \
+                yad --text-info --title="Arch news headlines for you!" \
                     --width=700 --height=500 --tail --wrap \
                     --button=yad-quit:0 \
-                    --button=" See Arch news in the web!archlinux":1 || \
-                xdg-open https://www.archlinux.org >& /dev/null
+                    --button=" See details at Arch pages!archlinux!$news_source":1 || \
+                xdg-open $news_source >& /dev/null
         else
-            echo "No news for you." >&2     # don't show a dialog
+            echo "No news for you." >&2     # don't show a dialog, simple terminal line suffices
         fi
     fi
     rm -f $hlinfo
@@ -107,11 +131,11 @@ CheckHeadlines()  # show a headline only if the related package is installed and
 Main()
 {
     local days="$1"
-    local original=no
+    local kalu=no     # yes: show only the latest news line for 'kalu'. no: news for you
 
-    test -z "$days" && original=yes
+    test -z "$days" && kalu=yes
 
-    CheckHeadlines "$original" "$days"
+    CheckHeadlines "$days" "$kalu"
 }
 
 Main "$@"
