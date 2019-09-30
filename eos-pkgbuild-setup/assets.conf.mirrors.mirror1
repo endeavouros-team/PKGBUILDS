@@ -18,11 +18,12 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
-    aur/paper-icon-theme
     aur/arc-x-icons-theme
+    aur/ckbcomp
     aur/downgrade
     aur/inxi
     aur/kalu
+    aur/paper-icon-theme
     aur/yay
     endeavouros-keyring
     endeavouros-mirrorlist
@@ -42,11 +43,11 @@ local ASSET_HOOKS=(
 )
 
 # Package hooks
-_yad_hook_add_gspell() {
-    # add gspell to 'depends', and modify 'pkgver'
-    sed -i "$PKGBUILD_ROOTDIR"/yad/PKGBUILD \
-        -e 's|^depends=(\([^\)]*\))$|depends=(\1 gspell)|' \
-        -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
+
+_ckbcomp_hook_change_version() {
+    # change "$url" http to https
+    sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
+        -e 's|^url="http:|url="https:|'
 }
 
 _kalu_hook_fix_files() {
@@ -59,10 +60,17 @@ _kalu_hook_fix_files() {
         -e 's|chown 0:102|chown root:polkitd|' \
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
 }
+_yad_hook_add_gspell() {
+    # add gspell to 'depends', and modify 'pkgver'
+    sed -i "$PKGBUILD_ROOTDIR"/yad/PKGBUILD \
+        -e 's|^depends=(\([^\)]*\))$|depends=(\1 gspell)|' \
+        -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
+}
 
 declare -A ASSET_PACKAGE_HOOKS
-ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
+ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
+ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 
 
 # Special hooks. Implemented via package hooks.
