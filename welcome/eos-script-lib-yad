@@ -5,14 +5,14 @@
 # - ALL FUNCTIONS HERE START WITH "eos_yad_" AND ARE EXPORTED.
 # - NO GLOBAL VARIABLES ARE USED NOR PROVIDED.
 #
-# User MUST declare these in the *using* bash code too:
-export -f eos_yad_terminal
-export -f eos_yad_check_internet_connection
-export -f eos_yad_GetArgVal
-export -f eos_yad_RunCmdTermBash
-export -f eos_yad_problem
-export -f eos_yad_DIE
-export -f eos_yad_WARN
+# User MUST declare the following exports in the *using* bash code:
+# export -f eos_yad_terminal
+# export -f eos_yad_check_internet_connection
+# export -f eos_yad_GetArgVal
+# export -f eos_yad_RunCmdTermBash
+# export -f eos_yad_problem
+# export -f eos_yad_DIE
+# export -f eos_yad_WARN
 
 
 eos_yad_terminal() {
@@ -121,8 +121,6 @@ eos_yad_WARN() {
     shift
     echo "$msg" | eos_yad_problem "$title" "$@"
 }
-
-
 
 
 

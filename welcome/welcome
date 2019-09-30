@@ -8,6 +8,7 @@
 
 #################################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+#EOS_SCRIPTS_YAD=$HOME/EOS/PKGBUILDS/welcome/eos-script-lib-yad                         # TESTING !!! REMOVE THIS LINE !!!
 test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
@@ -243,7 +244,48 @@ Options:
 EOF
 }
 
+KillZombieYad() {
+    # There may be a zombie yad process, if so, kill it.
+
+    local yadlines yadline
+    local pid ppid lastword
+    local processes="$(ps -ef | grep -w yad | grep -v "grep -w yad" | grep -v "^root")"  # search 'yad' without 'root'
+    local problem_ppid=1
+    local answer
+
+    if [ "$(echo "$processes" | awk '{print $NF}')" = "yad" ] ; then
+        readarray -t yadlines <<< "$(echo "$processes")"
+        for yadline in "${yadlines[@]}" ; do
+            lastword="$(echo "$yadline" | awk '{print $NF}')"
+            ppid="$(echo "$yadline" | awk '{print $3}')"
+            if [ "$lastword" = "yad" ] && [ "$ppid" = "$problem_ppid" ] ; then
+                pid="$(echo "$yadline" | awk '{print $2}')"
+
+                if [ 0 -eq 1 ] ; then
+                    echo "Detected a potential zombie process, PID $pid. Check it with command:" >&2
+                    echo "    ps -ef | grep yad" >&2
+                    echo "The potential zombie yad process is shown on line" >&2
+                    echo "    $yadline" >&2
+                    read -p "Kill process with PID $pid (Y/n)? " >&2
+                else
+                    answer=y
+                fi
+                case "$answer" in
+                    [yY]*|"")
+                        echo "$yadline" > /tmp/yad-zombie-killed.log
+                        kill $pid
+                        ;;
+                esac
+
+                break   # shouldn't be more than one zombie ?!
+            fi
+        done
+    fi
+}
+
 StartHere() {
+    KillZombieYad
+
     eos_yad_check_internet_connection verbose 10 || return 1
 
     local start_delay=0
@@ -281,7 +323,9 @@ StartHere() {
 
     notebook+=(--button=" See you later!face-cool!":0)
 
-    "${notebook[@]}" &
+    "${notebook[@]}"
 }
 
 StartHere "$@"
+
+exit 0
