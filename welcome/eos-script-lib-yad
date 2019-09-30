@@ -2,6 +2,18 @@
 #
 # EndeavourOS bash scripts "library". Functions using 'yad'.
 #
+# - ALL FUNCTIONS HERE START WITH "eos_yad_" AND ARE EXPORTED.
+# - NO GLOBAL VARIABLES ARE USED NOR PROVIDED.
+#
+# User MUST declare these in the *using* bash code too:
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
+
 
 eos_yad_terminal() {
     # Show a terminal that is capable of supporting option -e properly. Empty if not found.
@@ -12,13 +24,13 @@ eos_yad_terminal() {
     #     kitty
     # The following terminals are known to work:
     local suitable_terminals="xfce4-terminal konsole gnome-terminal mate-terminal lxterminal terminator tilix termite xterm"
-    local EOS_TERMINAL_PROG=""
+    local eos_terminal_prog=""
     local xx
 
     for xx in $suitable_terminals ; do
         if [ -x "/usr/bin/$xx" ] ; then
-            EOS_TERMINAL_PROG="/usr/bin/$xx"
-            echo "$EOS_TERMINAL_PROG"
+            eos_terminal_prog="/usr/bin/$xx"
+            echo "$eos_terminal_prog"
             return 0
         fi
     done
@@ -51,13 +63,16 @@ eos_yad_check_internet_connection() {
                     yad --text-info --title="Warning" \
                         --height=100 --width=300 --justify=center --wrap \
                         --button=yad-quit:1 \
-                        --button=" Continue anyway!go-next!Don't stop now":0
+                        --button=" Continue anyway!go-next!Don't stop me now":0
                 ;;
         esac
     }
 }
 
-eos_yad_GetArgVal() { echo "$1" | cut -d '=' -f 2 ; }
+eos_yad_GetArgVal() {
+    echo "${1#*=}"
+    #e cho "$1" | cut -d '=' -f 2
+}
 
 eos_yad_RunCmdTermBash() {
     local cmd="$1"
@@ -107,8 +122,12 @@ eos_yad_WARN() {
     echo "$msg" | eos_yad_problem "$title" "$@"
 }
 
-DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
-WARN() { eos_yad_WARN "$@" ; }    # deprecated
+
+
+
+
+# DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
+# WARN() { eos_yad_WARN "$@" ; }    # deprecated
 
 #SetBrowser() {
 #    local xx

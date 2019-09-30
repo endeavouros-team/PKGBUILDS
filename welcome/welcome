@@ -2,27 +2,27 @@
 #
 # EndeavourOS greeter.
 #
-# Shows crucial info about the EndeavourOS and its usage.
+# Shows useful basic info about the EndeavourOS and its usage.
 # Targeted for people new to EndeavourOS (but not new to Linux).
 #
 
-
-EXCLAMATION='&#33;'   # '!'
-AND='&#38;'           # '&'
-
 #################################################################################
-EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
-EOS_SCRIPTS_YAD=eos-script-lib-yad
-
-if [ -r  $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD ] ; then
-    source $EOS_SCRIPTS_DIR/$EOS_SCRIPTS_YAD
-else
-    echo "ERROR: cannot find $EOS_SCRIPTS_YAD"
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
-fi
-#################################################################################
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
 
 export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
+#################################################################################
 
 yad_calamares() {
     local prog=/usr/bin/calamares
@@ -80,7 +80,7 @@ EOF
 }
 export -f yad_InitializePacmanMirroring
 
-yad_install() {
+yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
     local yadcmd="yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
@@ -100,7 +100,7 @@ yad_install() {
         break
     done |& $yadcmd
 }
-export -f yad_install
+export -f yad_Install
 
 
 INSTALL() {
@@ -119,7 +119,6 @@ INSTALL() {
       --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
       &> /dev/null &    
 }
-# https://endeavouros.com/download
 
 GeneralInfo() {
   local handle="$1"
@@ -142,6 +141,10 @@ GeneralInfo() {
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
+
+  local _exclamation='&#33;'   # '!'
+  local _and='&#38;'           # '&'
+
   yad --plug="$handle" --tabnum="$tabnum" \
       --form \
       --columns=2 \
@@ -150,10 +153,10 @@ AfterInstall() {
       --field="Update Mirrors!!Update list of mirrors before system update":fbtn              'reflector-simple' \
       --field="Update System!!Update System Software":fbtn               'bash -c yad_SystemUpdate' \
       --field="Package management!!How to manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
-      --field="AUR $AND yay$EXCLAMATION!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+      --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
       --field="Bluetooth!!Bluetooth advice":fbtn                         "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
-      --field="NVIDIA users$EXCLAMATION!!Use NVIDIA installer":fbtn      "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
+      --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn      "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
       --field="Forum tips!!Help us help you!":fbtn                       "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
@@ -166,10 +169,10 @@ AddMoreApps() {
       --columns=3 \
       --image=system-software-install \
       --text="<b>Install popular apps</b>" --text-align=left \
-      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_install libreoffice-fresh"' \
-      --field="Chromium Web Browser!!Web Browser":fbtn              'bash -c "yad_install chromium"' \
-      --field="Firewall!!Gufw firewall":fbtn                        'bash -c "yad_install gufw"' \
-      --field="Bluetooth Manager for Xfce!!Blueberry":fbtn          'bash -c "yad_install blueberry bluez-utils"' \
+      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
+      --field="Chromium Web Browser!!Web Browser":fbtn              'bash -c "yad_Install chromium"' \
+      --field="Firewall!!Gufw firewall":fbtn                        'bash -c "yad_Install gufw"' \
+      --field="Bluetooth Manager for Xfce!!Blueberry":fbtn          'bash -c "yad_Install blueberry bluez-utils"' \
       &> /dev/null &
 }
 
@@ -260,7 +263,7 @@ StartHere() {
 
     SetBrowser
 
-    local handle="$(shuf -i 800000-999999 -n 1)"
+    local handle="$(shuf -i 700000-999999 -n 1)"
     local tab tabname
     local notebook   # contains the main yad command
 
@@ -278,7 +281,7 @@ StartHere() {
 
     notebook+=(--button=" See you later!face-cool!":0)
 
-    "${notebook[@]}"
+    "${notebook[@]}" &
 }
 
 StartHere "$@"
