@@ -151,14 +151,14 @@ AfterInstall() {
       --columns=2 \
       --image=dialog-information \
       --text="<b>After install tasks</b>" --text-align=left \
-      --field="Update Mirrors!!Update list of mirrors before system update":fbtn              'reflector-simple' \
-      --field="Update System!!Update System Software":fbtn               'bash -c yad_SystemUpdate' \
-      --field="Package management!!How to manage packages with 'pacman'":fbtn   "$_BROWSER https://endeavouros.com/docs/pacman" \
-      --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn "$_BROWSER https://endeavouros.com/docs/aur/yay" \
-      --field="Hardware and Network!!Get your hardware working":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-      --field="Bluetooth!!Bluetooth advice":fbtn                         "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
-      --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn      "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
-      --field="Forum tips!!Help us help you!":fbtn                       "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
+      --field="Update Mirrors!!Update list of mirrors before system update":fbtn   'reflector-simple' \
+      --field="Update System!!Update System Software":fbtn                         'bash -c yad_SystemUpdate' \
+      --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
+      --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+      --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+      --field="Bluetooth!!Bluetooth advice":fbtn                                   "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
+      --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
+      --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
 
@@ -245,7 +245,13 @@ EOF
 }
 
 KillZombieYad() {
-    # There may be a zombie yad process, if so, kill it.
+    # There may be a zombie yad process. If so, kill it.
+
+    if [ -z "$(grep "^Legacy0_Command=yad" $HOME/.cache/sessions/xfce4-session-*:0)" ] ; then
+        return
+    fi
+
+    sleep 1
 
     local yadlines yadline
     local pid ppid lastword
