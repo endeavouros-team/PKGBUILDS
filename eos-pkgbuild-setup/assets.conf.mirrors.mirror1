@@ -23,6 +23,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/downgrade
     aur/inxi
     aur/kalu
+    aur/mkinitcpio-openswap
     aur/paper-icon-theme
     aur/yay
     endeavouros-keyring
