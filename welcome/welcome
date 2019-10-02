@@ -253,21 +253,17 @@ KillExtraYad() {
     #   - killing the extra "yad" process if it exists
 
     # Remove the extra "yad" command from the saved session.
-    local savefile="$(ls -1 "$HOME"/.cache/sessions/xfce4-session-* | grep -vP "\.bak$" | tail -n 1)"
-    local ix count endcount
+    local savefile="$(ls -1 "$HOME"/.cache/sessions/xfce4-session-* 2>/dev/null | grep -vP "\.bak$" | tail -n 1)"
     if [ -n "$savefile" ] ; then
-        #sed -i "$savefile" -e 's|_Command=yad$|_Command=eos-welcome|'   # 'yad' to 'eos-welcome'
-        count=$(grep ^LegacyCount= "$savefile" | cut -d '=' -f 2)
-        endcount=$count
-        for ((ix=0; ix<count; ix++)) ; do
-            if [ "$(grep "^Legacy${ix}_Command=yad$" "$savefile")" != "" ] ; then
-                ((endcount--))
-                sed -i "$savefile" \
-                    -e 's|^Legacy0_Screen=.*$||' \
-                    -e 's|^Legacy0_Command=.*$||' \
-                    -e 's|^Legacy0_ClientMachine=.*$||'
-            fi
-        done
+        local count=$(grep ^LegacyCount= "$savefile" | cut -d '=' -f 2)
+        local endcount=$count
+        if [ "$(grep "^Legacy0_Command=yad$" "$savefile")" != "" ] ; then
+            ((endcount--))
+            sed -i "$savefile" \
+                -e 's|^Legacy0_Screen=.*$||' \
+                -e 's|^Legacy0_Command=.*$||' \
+                -e 's|^Legacy0_ClientMachine=.*$||'
+        fi
         if [ $endcount -ne $count ] ; then
             sed -i "$savefile" -e 's|^LegacyCount=.*$|LegacyCount='$endcount'|'
         fi
