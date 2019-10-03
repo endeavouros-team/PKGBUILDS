@@ -8,7 +8,6 @@
 
 #################################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
-#EOS_SCRIPTS_YAD=$HOME/EOS/PKGBUILDS/welcome/eos-script-lib-yad                         # TESTING !!! REMOVE THIS LINE !!!
 test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
@@ -153,8 +152,8 @@ AfterInstall() {
       --columns=2 \
       --image=dialog-information \
       --text="<b>After install tasks</b>" --text-align=left \
-      --field="Update Mirrors!!Update list of mirrors before system update":fbtn   'reflector-simple' \
-      --field="Update System!!Update System Software":fbtn                         'bash -c yad_SystemUpdate' \
+      --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
+      --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
       --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
@@ -167,15 +166,21 @@ AfterInstall() {
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
+
+  local gufw=""            #=gufw
+  local libreoffice=""     #=libreoffice
+  local chromium=""        #=chromium-browser
+  local bluetooth=""       #=bluetooth
+
   yad --plug="$handle" --tabnum="$tabnum" \
       --form \
       --columns=3 \
       --image=system-software-install \
       --text="<b>Install popular apps</b>" --text-align=left \
-      --field="LibreOffice!!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
-      --field="Chromium Web Browser!!Web Browser":fbtn              'bash -c "yad_Install chromium"' \
-      --field="Firewall!!Gufw firewall":fbtn                        'bash -c "yad_Install gufw"' \
-      --field="Bluetooth Manager for Xfce!!Blueberry":fbtn          'bash -c "yad_Install blueberry bluez-utils"' \
+      --field=" LibreOffice!$libreoffice!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
+      --field=" Chromium Web Browser!$chromium!Web Browser":fbtn                 'bash -c "yad_Install chromium"' \
+      --field=" Firewall!$gufw!Gufw firewall":fbtn                               'bash -c "yad_Install gufw"' \
+      --field=" Bluetooth Manager for Xfce!$bluetooth!Blueberry":fbtn            'bash -c "yad_Install blueberry bluez-utils"' \
       &> /dev/null &
 }
 
@@ -203,7 +208,7 @@ _NOTEBOOK_TABS=(                             # names of functions above
     GeneralInfo
     AfterInstall
     AddMoreApps
-    About
+    #About
 )
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -234,6 +239,15 @@ To re-enable the app, use the terminal command
     $progname --enable
 EOF
 }
+export -f Usage
+
+WelcomeHelp() {
+    Usage | yad --text-info --width=600 --height=500 \
+                --text="<b>More info about the Welcome app</b>" \
+                --text-align=left \
+                --image=help-about --button=yad-ok:0
+}
+export -f WelcomeHelp
 
 DIE() {
     while true ; do
@@ -396,13 +410,18 @@ StartHere() {
 
     test -x /usr/bin/calamares || notebook+=(--active-tab=2)
 
-    notebook+=(--width=600 --height=500)  # for the About tab only!
+    notebook+=(--button=" Help!help!":"bash -c WelcomeHelp")
 
     case "$(eos_yad_GetDesktopName)" in
         KDE)
             notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
-            notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":1)
-            "${notebook[@]}" && GreeterSettings enable || GreeterSettings disable
+            notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":5)
+            "${notebook[@]}"
+            local result=$?
+            case "$result" in
+                5) GreeterSettings disable ;;
+                0|252) GreeterSettings enable ;;
+            esac
             ;;
         *)
             notebook+=(--button=" See you later!face-cool!":0)
