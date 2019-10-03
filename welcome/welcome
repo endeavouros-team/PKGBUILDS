@@ -209,10 +209,10 @@ _NOTEBOOK_TABS=(                             # names of functions above
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
 
 Usage() {
-    local PROGNAME=eos-welcome
+    local progname=eos-welcome
 
     cat <<EOF
-Usage: $PROGNAME [options]
+Usage: $progname [options]
 
 Options:
 --startdelay=X    Wait before actually starting the app.
@@ -228,7 +228,7 @@ To have Welcome app started when you log in, make sure
 On DEs that do not work well with Autostart:
 You may also disable the Welcome app from a button in the app itself.
 To re-enable the app, use the terminal command
-    $PROGNAME --enable
+    $progname --enable
 EOF
 }
 
@@ -333,7 +333,7 @@ GreeterSettings() {
         disable)
             echo "Greeter=$value" > "$GREETER_CONFIG"
 
-            echo "To run the greeter again, start a terminal and run '$progname'." | \
+            echo "To run the greeter again, start a terminal and run '$progname --enable'." | \
                 yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
                     --title="How to re-enable greeter" \
                     --geometry=500x200 --wrap \
