@@ -1,12 +1,11 @@
 [Desktop Entry]
-Encoding=UTF-8
-Version=0.9.4
 Type=Application
 Name=EOS update notifier
-Comment=
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 Exec=eos-update-notifier -init
-RunHook=0
-StartupNotify=false
-Terminal=false
+Comment=EndeavourOS update notifier
 Hidden=false
+X-GNOME-Autostart-enabled=true
+# StartupNotify=false
+# Terminal=false
 
