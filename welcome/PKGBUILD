@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=1.8
-pkgrel=9
+pkgver=1.9
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(bash yad reflector)
@@ -16,7 +16,7 @@ source=(
   $url/eos-script-lib-yad
   $url/reflector-simple
 )
-sha512sums=('0ce68026ff08aaa909e663ea060f6e2e3fce3e196324b02f72fc38b419cf4dcb63018565a524348aa0a3c5d01bd4660d08fb89580c6f7dc245e11ffef26bdc10'
+sha512sums=('418ff02f961861e6716e10df8c602cd398557f8fa05e9026cd1162e4aa19bb6e04a9684cc5904f6bc9a5cc8e4190c1fa187f21bfe0513607e7aaa73d85b4cbc0'
             '87a44d71b2d084aad1f9f3b66481c4cb54de147231fa0f10674e8d62904e5ec4bc096d077501794d0ea73db36f45122a84fb1f7233d260f0e4d4a37a2f85bb85'
             'f4ab1a107446a03810be4d7a4e4a1c8b92846df1aea5d5ade21d44d0503cad7a7ef5e5f1d364dd0eceb0b290cd3972931a3bb5832f09ad406c9ba98f7ed52f3b'
             'c270779a3254cfac40cade74cb23c8d8e13a7a79f352ec15fcbefffd178325800f00664bb7513682e3af7ee8e5c0e9d79d3448d55790af432978bc4a8164253e')
