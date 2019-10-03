@@ -23,6 +23,8 @@ export -f eos_yad_RunCmdTermBash
 export -f eos_yad_problem
 export -f eos_yad_DIE
 export -f eos_yad_WARN
+export -f eos_yad__detectDE
+export -f eos_yad_GetDesktopName
 #################################################################################
 
 yad_calamares() {
@@ -177,6 +179,18 @@ AddMoreApps() {
       &> /dev/null &
 }
 
+About() {
+  local handle="$1"
+  local tabnum="$2"
+
+  Usage | yad --plug="$handle" --tabnum="$tabnum" \
+              --text-info \
+              --text="<b>More info about the Welcome app</b>" \
+              --text-align=left \
+              --image=help-about \
+      &> /dev/null &
+}
+
 
 # Fields explanation:
 # --field="ButtonName!IconName!Tooltip":fbtn "Command"
@@ -189,9 +203,34 @@ _NOTEBOOK_TABS=(                             # names of functions above
     GeneralInfo
     AfterInstall
     AddMoreApps
+    About
 )
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
+
+Usage() {
+    local PROGNAME=eos-welcome
+
+    cat <<EOF
+Usage: $PROGNAME [options]
+
+Options:
+--startdelay=X    Wait before actually starting the app.
+                  X value syntax is the same as in 'sleep'.
+--enable | -f     Enable this Welcome app.
+--disable         Disable this Welcome app.
+
+To have Welcome app started when you log in, make sure
+- welcome app is selected in the Autostart feature of the DE
+    OR
+- "Hidden=false" is set in file /etc/xdg/autostart/welcome.desktop
+
+On DEs that do not work well with Autostart:
+You may also disable the Welcome app from a button in the app itself.
+To re-enable the app, use the terminal command
+    $PROGNAME --enable
+EOF
+}
 
 DIE() {
     while true ; do
@@ -230,18 +269,6 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
     else
         echo "$tabname" | sed -e 's|\([A-Z]\)| \1|g' -e 's|^ ||'  # add space before capital letters
     fi
-}
-
-Usage() {
-    local PROGNAME=welcome
-
-    cat <<EOF
-
-Usage: $PROGNAME [options]
-Options:
-  --startdelay=X    Wait before actually starting the app.
-                    X value syntax is the same as in 'sleep'.
-EOF
 }
 
 KillExtraYad() {
@@ -294,21 +321,55 @@ KillExtraYad() {
     fi
 }
 
+GreeterSettings() {
+    local value="$1"   # enable, disable, check
+    local GREETER_CONFIG="$HOME/.config/EOS-greeter.conf"
+    local progname="eos-welcome"
+
+    case "$value" in
+        enable)
+            echo "Greeter=$value"  > "$GREETER_CONFIG"
+            ;;
+        disable)
+            echo "Greeter=$value" > "$GREETER_CONFIG"
+
+            echo "To run the greeter again, start a terminal and run '$progname'." | \
+                yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
+                    --title="How to re-enable greeter" \
+                    --geometry=500x200 --wrap \
+                    --fontname="Monospace Regular 12" \
+                    --button=" I remember!face-angel!I promise":0 >& /dev/null
+            ;;
+        check)
+            test -r "$GREETER_CONFIG" || { echo enable ; return ; }              # enabled if config does not exist
+            grep "^Greeter=" "$GREETER_CONFIG" 2>/dev/null | cut -d '=' -f 2
+            ;;
+    esac
+}
+
 StartHere() {
     KillExtraYad
 
-    eos_yad_check_internet_connection verbose 10 || return 1
-
     local start_delay=0
+
     local arg
 
     for arg in "$@" ; do
         case "$arg" in
+            --enable|-f) GreeterSettings enable ;;
+            --disable)   GreeterSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
     done
+
+    test "$(GreeterSettings check)" != "enable" && {
+        echo "Welcome app is disabled. To start it anyway, use option --enable."
+        return
+    }
+
+    eos_yad_check_internet_connection verbose 10 || return 1
 
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
@@ -332,9 +393,19 @@ StartHere() {
 
     test -x /usr/bin/calamares || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" See you later!face-cool!":0)
+    notebook+=(--width=600 --height=500)  # for the About tab only!
 
-    "${notebook[@]}"
+    case "$(eos_yad_GetDesktopName)" in
+        KDE)
+            notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
+            notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":1)
+            "${notebook[@]}" && GreeterSettings enable || GreeterSettings disable
+            ;;
+        *)
+            notebook+=(--button=" See you later!face-cool!":0)
+            "${notebook[@]}"
+            ;;
+    esac
 }
 
 StartHere "$@"

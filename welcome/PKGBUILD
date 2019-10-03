@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.8
-pkgrel=6
+pkgrel=7
 arch=('any')
 license=('GPL')
 depends=(bash yad reflector)
