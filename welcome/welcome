@@ -242,7 +242,7 @@ EOF
 export -f Usage
 
 WelcomeHelp() {
-    Usage | yad --text-info --width=600 --height=500 \
+    Usage | yad --text-info --title="Welcome Help" --width=600 --height=500 \
                 --text="<b>More info about the Welcome app</b>" \
                 --text-align=left \
                 --image=help-about --button=yad-ok:0
