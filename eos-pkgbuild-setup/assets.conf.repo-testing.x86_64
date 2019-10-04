@@ -25,7 +25,6 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/archupdate-indicator
 
     eos-pkgbuild-setup
-    eos-update-notifier
 )
 
 # Hook functions are run at the beginning of assets.make.
