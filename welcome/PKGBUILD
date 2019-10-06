@@ -3,10 +3,10 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.9
-pkgrel=1.5
+pkgrel=1.6
 arch=('any')
 license=('GPL')
-depends=(bash yad reflector)
+depends=(bash yad reflector base)
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 
