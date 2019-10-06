@@ -304,7 +304,7 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
     echo2 "Comparing certain packages to AUR..."
     for xx in "${PKGNAMES[@]}" ; do
         test "${xx::4}" = "aur/" || continue
-        printf2 "    %-15s : " "$(JustPkgname "$xx")"
+        printf2 "    %-25s : " "$(JustPkgname "$xx")"
         pkgdirname="$(ListNameToPkgName "$xx" yes)"
         test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
 
