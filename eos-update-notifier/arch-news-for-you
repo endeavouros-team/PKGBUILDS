@@ -60,7 +60,7 @@ ExtractPackageNameFromHeadline() {
     # ASSUME: the first word contains the package name!
     # Remove possible trailing version comparison.
     local headline="$1"
-    echo "$headline" | awk '{print $1}' | sed 's|[<>=].*$||'               
+    echo "$headline" | awk '{print $1}' | sed -e 's|[<>=].*$||'  # -e 's|`||g'
 }
 
 CheckHeadlines()
@@ -107,6 +107,11 @@ CheckHeadlines()
                 pkgname="$(ExtractPackageNameFromHeadline "$headline")"
                 pacman -Q "$pkgname" >& /dev/null && {
                     # Yes, the package is installed. This is news!
+                    echo "    $date : $headline"
+                    ((matches++))
+                }
+                test "${pkgname::1}" = "\`" && {
+                    # A new required package? Make it news.
                     echo "    $date : $headline"
                     ((matches++))
                 }
