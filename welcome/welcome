@@ -241,6 +241,16 @@ EOF
 }
 export -f Usage
 
+DIE() {
+    local title="Error"
+    while true ; do
+        echo "Error: $1."
+        Usage
+        break
+    done | eos_yad_problem "$title" "$@"
+    exit 1
+}
+
 WelcomeHelp() {
     Usage | yad --text-info --title="Welcome Help" --width=600 --height=500 \
                 --text="<b>More info about the Welcome app</b>" \
@@ -257,7 +267,7 @@ SetBrowser() {
             return
         fi
     done
-    eos_yad_DIE "$FUNCNAME: cannot find a browser"
+    DIE "$FUNCNAME: cannot find a browser"
 }
 
 PrepareTabs() {
@@ -367,8 +377,8 @@ StartHere() {
             --enable|-f) GreeterSettings enable ;;
             --disable)   GreeterSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
-            -*) eos_yad_DIE "unsupported option '$arg'" ;;
-            *)  eos_yad_DIE "unsupported parameter '$arg'" ;;
+            -*) DIE "unsupported option '$arg'" ;;
+            *)  DIE "unsupported parameter '$arg'" ;;
         esac
     done
 
@@ -389,7 +399,7 @@ StartHere() {
     local tab tabname
     local notebook   # contains the main yad command
 
-    PrepareTabs "$handle" || eos_yad_DIE "PrepareTabs failed"
+    PrepareTabs "$handle" || DIE "PrepareTabs failed"
 
     # Create the yad command gradually into an array 'notebook':
 

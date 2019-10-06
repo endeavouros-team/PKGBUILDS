@@ -109,12 +109,17 @@ eos_yad_problem() {
 }
 
 eos_yad_DIE() {
+    # This function is only for small messages.
+    # The local Usage can be used only if it is
+    #  - defined before sourcing this file
+    #  - exported
+
     local msg="$1"
     local title="Error"
     shift
     while true ; do
         echo "$msg"
-        # run Usage function if available
+        # run Usage function if available (usually is not ...)
         test -n "$(declare -F | grep -w '^declare -f Usage$')" && Usage
         break
     done | eos_yad_problem "$title" "$@"
@@ -125,7 +130,7 @@ eos_yad_WARN() {
     local msg="$1"
     local title="Warning"
     shift
-    echo "$msg" | eos_yad_problem "$title" "$@"
+    echo "$msg" | eos_yad_problem "$title" --image=dialog-warning "$@"
 }
 
 # Function detectDE is copied from: https://cgit.freedesktop.org/xdg/xdg-utils/tree/scripts/xdg-utils-common.in
