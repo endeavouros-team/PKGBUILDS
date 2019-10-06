@@ -104,8 +104,8 @@ eos_yad_RunCmdTermBash() {
 eos_yad_problem() {
     local title="$1"
     shift
-    yad --text-info --title="$title" --tail --wrap \
-        --width=700 --height=300 --button=yad-quit:0 "$@"
+    yad --text-info --title="$title" --tail --wrap --image=error \
+        --width=700 --height=500 --button=yad-quit:0 "$@"
 }
 
 eos_yad_DIE() {
