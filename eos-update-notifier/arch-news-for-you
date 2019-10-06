@@ -63,6 +63,19 @@ ExtractPackageNameFromHeadline() {
     echo "$headline" | awk '{print $1}' | sed -e 's|[<>=].*$||'  # -e 's|`||g'
 }
 
+IsThisNews() {
+    local headline="$1"
+    local pkgname="$(ExtractPackageNameFromHeadline "$headline")"
+
+    test "${pkgname::1}" = "\`" && \
+        return 0  # A new required package? Make it news.
+
+    pacman -Q "$pkgname" >& /dev/null && \
+        return 0  # It is news if the package is installed.
+
+    return 1   # not news
+}
+
 CheckHeadlines()
 {
     # Show a headline only if the related package is installed and
@@ -71,9 +84,8 @@ CheckHeadlines()
     local days="$1"
     local kalu="$2"
     local headlines headline
-    local dates date latestdate
-    local pkgname ix matches
-    local news_contents=""
+    local dates date
+    local ix matches
     local news_source=https://www.archlinux.org
     local hlinfo=$(mktemp)
 
@@ -96,6 +108,14 @@ CheckHeadlines()
     }
 
     if [ -n "$headlines" ] ; then
+        if [ "$ignore_saved" = "no" ] ; then
+            if [ "$(cat "$EOS_NEWS_CONF")" = "${headlines[0]}" ] ; then
+                echo "You have already seen all news for you." >&2
+                return
+            fi
+        fi
+        echo "${headlines[0]}" > "$EOS_NEWS_CONF"
+
         matches=0
         for ((ix=0; ix < ${#headlines[@]}; ix++)) ; do
             headline="${headlines[$ix]}"
@@ -103,15 +123,7 @@ CheckHeadlines()
             # Check that the news line is recent enough.
             LessThanDays "$date" "$days" && {
                 # Yes, it is recent enough.
-                # Check if the package in the headline is installed.
-                pkgname="$(ExtractPackageNameFromHeadline "$headline")"
-                pacman -Q "$pkgname" >& /dev/null && {
-                    # Yes, the package is installed. This is news!
-                    echo "    $date : $headline"
-                    ((matches++))
-                }
-                test "${pkgname::1}" = "\`" && {
-                    # A new required package? Make it news.
+                IsThisNews "$headline" && {
                     echo "    $date : $headline"
                     ((matches++))
                 }
@@ -133,10 +145,54 @@ CheckHeadlines()
     rm -f $hlinfo
 }
 
+EOS_NEWS_CONF=$HOME/.config/EOS-arch-news-for-you.conf
+
+IsNumber() { test "$(echo "$1" | tr -d '0-9')" = "" ; }
+
+DIE() {
+    while true ; do
+        echo "Error: $1"
+        Usage
+        break
+    done | eos_yad_problem "Error" "$@"
+    exit 1
+}
+
+Usage() {
+    cat <<EOF
+
+Show the latest Arch news that affect this machine.
+
+Usage: $progname [-f] [days]
+
+Parameters:
+   <days>     Show only news that are newer than <days> days.
+   -f         Show the news even though have seen them before.
+
+Without any paramaters, show the latest news headline,
+even if it doesn't affect this machine.
+EOF
+}
+
 Main()
 {
-    local days="$1"
+    local days=""
     local kalu=no     # yes: show only the latest news line for 'kalu'. no: news for you
+    local ignore_saved=no
+
+    local progname=arch-news-for-you
+    local xx
+
+    for xx in "$@" ; do
+        case "$xx" in
+            -f) ignore_saved=yes ;;
+            -*) DIE "unsupported option '$xx'" ;;
+            *)  test -n "$days" && DIE "<days> already has a value '$days'"
+                days="$xx"
+                IsNumber "$days" || DIE "value '$days' for <days> is not a number"
+                ;;
+        esac
+    done
 
     test -z "$days" && kalu=yes
 
