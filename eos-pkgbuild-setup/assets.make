@@ -298,11 +298,12 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
     local pkgdirname pkgname
     local vaur vlocal
 
-    IsEmptyString AUR_PKGNAMES
+    IsEmptyString PKGNAMES
 
     Pushd "$PKGBUILD_ROOTDIR"
     echo2 "Comparing certain packages to AUR..."
-    for xx in "${AUR_PKGNAMES[@]}" ; do
+    for xx in "${PKGNAMES[@]}" ; do
+        test "${xx::4}" = "aur/" || continue
         printf2 "    %-15s : " "$(JustPkgname "$xx")"
         pkgdirname="$(ListNameToPkgName "$xx" yes)"
         test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
