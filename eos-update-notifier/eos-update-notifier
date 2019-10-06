@@ -96,7 +96,8 @@ Usage() {
     local iwt="$initial_waittime"
     test -z "$iwt" && iwt="[none]"
 
-    local prog_name="$(basename $0)"
+    local prog_name="$progname"
+    test -z "$prog_name" && prog_name="$(basename $0) [basename]"
 
     cat <<EOF
 
@@ -131,11 +132,11 @@ Main()
     local systemd=0
     local newsdays=30
     local arg
+    local progname=eos-update-notifier
 
     for arg in "$@" ; do
         case "$arg" in
             -init)
-                local progname=eos-update-notifier
                 local configdir="$HOME/.config/systemd/user"
                 local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
                 mkdir -p "$configdir"
