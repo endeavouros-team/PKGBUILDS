@@ -1,0 +1,16 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-base
+pkgdesc="Meta package for EndeavourOS."
+pkgver=1.0
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(
+  base
+)
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+package() {
+  echo Done.
+}
