@@ -1,13 +1,26 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-base
-pkgdesc="Meta package for EndeavourOS."
+pkgdesc="Required packages in EndeavourOS."
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
   base
+  dhcpcd
+  diffutils
+  e2fsprogs
+  inetutils
+  less
+  linux
+  linux-firmware
+  logrotate
+  man-pages
+  nano
+  netctl
+  usbutils
+  which
 )
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 
