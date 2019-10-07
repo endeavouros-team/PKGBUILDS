@@ -89,8 +89,10 @@ CheckHeadlines()
     local news_source=https://www.archlinux.org
     local hlinfo=$(mktemp)
 
-    wget -q -T 10 -O $hlinfo $news_source || \
+    wget -q -T 10 -O $hlinfo $news_source || {
+        rm -f $hlinfo
         eos_yad_DIE "fetching Arch news headlines failed"
+    }
 
     readarray -t headlines <<< "$(LatestHeadlines $hlinfo)"
 
@@ -112,6 +114,7 @@ CheckHeadlines()
             if [ -r "$EOS_NEWS_CONF" ] ; then
                 if [ "$(cat "$EOS_NEWS_CONF")" = "${headlines[0]}" ] ; then
                     echo "You have already seen all $eos_banner." >&2
+                    rm -f $hlinfo
                     return
                 fi
             fi
