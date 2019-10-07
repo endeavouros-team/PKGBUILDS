@@ -105,20 +105,21 @@ Usage() {
 Usage: $prog_name [options]
 
 Options:
-   -init       Initialize $prog_name systemd service for current user.
-   -iw=X       Initial sleep time. Value syntax from 'sleep' program.
-               Default: $iwt.
-   -mode=X     Operation mode (onetimer or loop).
-               Note that the loop mode is not designed for systemd.
-               Default: $mode.
-   -lwt=X      Loop wait time (only in loop mode). X value is like in 'sleep'.
-               Default: $loop_waittime.
-   -nw=X       Max time (seconds) to show the "No updates available" window.
-               Default: $no_updates__indicator_wait_time.
-   -news=X     Show the 'Arch latest news for you' within the last X days.
-               If X is 0, then no news are displayed.
-               Default: X is $newsdays.
-   -q          Be quieter with dialogs.
+   -init        Initialize $prog_name systemd service for current user.
+   -init-force  Same as -init, but may overwrite existing user service files.
+   -iw=X        Initial sleep time. Value syntax from 'sleep' program.
+                Default: $iwt.
+   -mode=X      Operation mode (onetimer or loop).
+                Note that the loop mode is not designed for systemd.
+                Default: $mode.
+   -lwt=X       Loop wait time (only in loop mode). X value is like in 'sleep'.
+                Default: $loop_waittime.
+   -nw=X        Max time (seconds) to show the "No updates available" window.
+                Default: $no_updates__indicator_wait_time.
+   -news=X      Show the 'Arch latest news for you' within the last X days.
+                If X is 0, then no news are displayed.
+                Default: X is $newsdays.
+   -q           Be quieter with dialogs.
 EOF
 }
 
@@ -136,18 +137,26 @@ Main()
 
     for arg in "$@" ; do
         case "$arg" in
-            -init)
+            -init | -init-force)
+                # initialize service and timer for the current user
                 local configdir="$HOME/.config/systemd/user"
                 local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
                 mkdir -p "$configdir"
-                if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ]
+                if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] || [ "$arg" = "-init-force" ]
                 then
+                    # -init-force may bring updated .service and .timer files
+                    if [ "$arg" = "-init-force" ] ; then
+                        systemctl --user status $progname.timer >/dev/null && {
+                            systemctl --user stop    $progname.timer
+                            systemctl --user disable $progname.timer
+                        }
+                    fi
                     wget -q -O "$configdir"/$progname.service $url/$progname.service
                     wget -q -O "$configdir"/$progname.timer   $url/$progname.timer
                     systemctl --user enable $progname.timer
                     systemctl --user start  $progname.timer
                 fi
-                echo "$progname service initialized." >&2
+                echo "$progname service initialized for user '$(basename "$HOME")'." >&2
                 return
                 ;;
             -iw=*)
