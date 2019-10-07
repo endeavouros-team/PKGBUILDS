@@ -111,7 +111,7 @@ CheckHeadlines()
         if [ "$ignore_saved" = "no" ] ; then
             if [ -r "$EOS_NEWS_CONF" ] ; then
                 if [ "$(cat "$EOS_NEWS_CONF")" = "${headlines[0]}" ] ; then
-                    echo "You have already seen all news for you." >&2
+                    echo "You have already seen all $eos_banner." >&2
                     return
                 fi
             fi
@@ -141,7 +141,7 @@ CheckHeadlines()
                     --button=" See details at Arch pages!archlinux!$news_source":1 || \
                 xdg-open $news_source >& /dev/null
         else
-            echo "No news for you." >&2     # don't show a dialog, simple terminal line suffices
+            echo "No $eos_banner." >&2     # don't show a dialog, simple terminal line suffices
         fi
     fi
     rm -f $hlinfo
@@ -183,6 +183,7 @@ Main()
     local ignore_saved=no
 
     local progname=arch-news-for-you
+    local eos_banner="Arch news for you"
     local xx
 
     for xx in "$@" ; do
