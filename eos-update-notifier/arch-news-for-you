@@ -109,9 +109,11 @@ CheckHeadlines()
 
     if [ -n "$headlines" ] ; then
         if [ "$ignore_saved" = "no" ] ; then
-            if [ "$(cat "$EOS_NEWS_CONF")" = "${headlines[0]}" ] ; then
-                echo "You have already seen all news for you." >&2
-                return
+            if [ -r "$EOS_NEWS_CONF" ] ; then
+                if [ "$(cat "$EOS_NEWS_CONF")" = "${headlines[0]}" ] ; then
+                    echo "You have already seen all news for you." >&2
+                    return
+                fi
             fi
         fi
         echo "${headlines[0]}" > "$EOS_NEWS_CONF"
