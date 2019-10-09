@@ -146,9 +146,9 @@ CheckSums() {
         eos_yad_DIE "checking sha512sums: wget failed."
     readarray -t sha512sums <<< $(grep -A5 "^sha512sums=" PKGBUILD | tail -n 2 | tr -d "'" | tr -d ')')
     rm -f PKGBUILD
-    echo "$progname.timer  ${sha512sums[0]}"   | sha512sum -c || \
+    echo "${sha512sums[0]}  $progname.timer"   | sha512sum -c || \
         eos_yad_DIE "checksum failed for $progname.timer"
-    echo "$progname.service  ${sha512sums[1]}" | sha512sum -c || \
+    echo "${sha512sums[1]}  $progname.service" | sha512sum -c || \
         eos_yad_DIE "checksum failed for $progname.service"
 
     popd >/dev/null
