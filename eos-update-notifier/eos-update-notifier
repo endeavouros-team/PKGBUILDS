@@ -67,10 +67,20 @@ Update_common() {
 }
 
 Main2() {
-    local updates_pacman="$(checkupdates)"
-    local updates_aur="$(yay -Qua)"
+    local CheckAurUpdates=yes
+    local CheckArchNewsForYou=yes
 
-    test "$newsdays" -gt 0 && arch-news-for-you $newsdays
+    local conf=/etc/eos-update-notifier.conf
+    test -r $conf && source $conf
+
+    if [ "$CheckArchNewsForYou" = "yes" ] ; then
+        test "$newsdays" -gt 0 && arch-news-for-you $newsdays
+    fi
+
+    local updates_pacman="$(checkupdates)"
+    local updates_aur=""
+
+    test "$CheckAurUpdates" = "yes" && updates_aur="$(yay -Qua)"
 
     if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
         test "$verbosity" = "high" && {
@@ -123,6 +133,27 @@ Options:
 EOF
 }
 
+CheckSums() {
+    local configdir="$1"
+    local progname="$2"
+    local url="$3"
+    local sha512sums
+
+    pushd "$configdir" >/dev/null
+
+    # Note: this checking assumes PKGBUILD has certain order in 'source' and 'sha52sums'.
+    wget -q --timeout=10 $url/PKGBUILD || \
+        eos_yad_DIE "checking sha512sums: wget failed."
+    readarray -t sha512sums <<< $(grep -A5 "^sha512sums=" PKGBUILD | tail -n 2 | tr -d "'" | tr -d ')')
+    rm -f PKGBUILD
+    echo "$progname.timer  ${sha512sums[0]}"   | sha512sum -c || \
+        eos_yad_DIE "checksum failed for $progname.timer"
+    echo "$progname.service  ${sha512sums[1]}" | sha512sum -c || \
+        eos_yad_DIE "checksum failed for $progname.service"
+
+    popd >/dev/null
+}
+
 Main()
 {
     local initial_waittime="5s"
@@ -153,6 +184,7 @@ Main()
                     fi
                     wget -q -O "$configdir"/$progname.service $url/$progname.service
                     wget -q -O "$configdir"/$progname.timer   $url/$progname.timer
+                    CheckSums "$configdir" "$progname" "$url"
                     systemctl --user enable $progname.timer
                     systemctl --user start  $progname.timer
                 fi
