@@ -30,6 +30,7 @@ yad_calamares() {
     local prog=/usr/bin/calamares
 
     if [ -x $prog ] ; then
+        /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
         bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
     else
         yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
@@ -74,7 +75,7 @@ pacman-key --populate
 pacman-key --refresh-keys
 pkill haveged
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-/usr/bin/update-mirrorlist || reflector --verbose -phttps -a2 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
+#/usr/bin/update-mirrorlist || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
 read -p 'Press ENTER to continue: '
 EOF
     chmod +x $tmpfile
