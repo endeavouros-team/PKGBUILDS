@@ -22,7 +22,7 @@ IsDEInstalled() {
 
 SelectDesktop() {
     local xx
-    local cmd=(yad --list --radiolist --title="Select Desktop Environment" --width=400 --height=300)
+    local cmd=(yad --list --radiolist --title="Install another Desktop Environment" --width=400 --height=300)
     cmd+=(--column="Select":rd --column="Installed" --column="DE name")
 
     for xx in "${des[@]}" ; do
