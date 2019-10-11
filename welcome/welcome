@@ -208,7 +208,7 @@ AfterInstall() {
       --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
       --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
       --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
-      --field=" Change Desktop Environment!desktop!Install another Desktop Environment":fbtn      'eos-install-de' \
+      --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de' \
       --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
