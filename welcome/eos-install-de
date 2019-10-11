@@ -40,9 +40,9 @@ yad_infomsg() {
 Main()
 {
     local des=(cinnamon deepin enlightenment gnome lxde lxqt mate plasma xfce)
-    local de="$(SelectDesktop)"
     local pkgs
     local xx
+    local de="$(SelectDesktop)"
 
     case "$de" in
 #       budgie)        pkgs=(budgie-desktop +gnome) ;;
@@ -65,6 +65,7 @@ Main()
                              xfce4-whiskermenu-plugin
                             )
                        ;;
+        "") return ;;
     esac
 
     # extra stuff
