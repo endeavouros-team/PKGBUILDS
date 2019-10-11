@@ -1,0 +1,86 @@
+#!/bin/bash
+
+WaylandSupport() {
+    echo "no"        # TODO!!
+}
+
+IsDEInstalled() {
+    local de="$1"
+    local pkg=""
+    case "$de" in
+        plasma) pkg=plasma-framework ;;
+        deepin) pkg=deepin-session-ui ;;
+        gnome)  pkg=gnome-session ;;
+        lxde)   pkg=lxde-common ;;
+        lxqt)   pkg=lxqt-session ;;
+        mate)   pkg=mate-session-manager ;;
+        xfce)   pkg=xfce4-session ;;
+        *)      pkg="$de" ;;
+    esac
+    pacman -Q "$pkg" >& /dev/null
+}
+
+SelectDesktop() {
+    local xx
+    local cmd=(yad --list --radiolist --title="Select Desktop Environment" --width=400 --height=300)
+    cmd+=(--column="Select":rd --column="Installed" --column="DE name")
+
+    for xx in "${des[@]}" ; do
+        IsDEInstalled "$xx" && cmd+=(false yes "$xx") || cmd+=(false no "$xx")
+    done
+    local de="$("${cmd[@]}")"
+    de="$(echo "$de" | cut -d '|' -f 3)"
+    echo "$de"
+}
+
+yad_infomsg() {
+    yad --text-info --title="Info" --width=400 --wrap  --height=300 --button=yad-ok:0 "$@"
+}
+
+Main()
+{
+    local des=(cinnamon deepin enlightenment gnome lxde lxqt mate plasma xfce)
+    local de="$(SelectDesktop)"
+    local pkgs
+    local xx
+
+    case "$de" in
+#       budgie)        pkgs=(budgie-desktop +gnome) ;;
+        cinnamon)      pkgs=(cinnamon) ;;
+        deepin)        pkgs=(deepin deepin-extra networkmanager) ;;
+        enlightenment) pkgs=(enlightenment terminology) ;;
+        gnome)         pkgs=(gnome gnome-extra) ;;
+        lxde)          pkgs=(lxde) ;;
+        lxqt)          pkgs=(lxqt sddm oxygen-icons) ;;
+        mate)          pkgs=(mate mate-extra) ;;
+        plasma)        pkgs=(plasma-meta kde-applications-meta) ;;
+        xfce)          pkgs=(xfce4 orage parole ristretto
+                             thunar-archive-plugin
+                             xfce4-battery-plugin
+                             xfce4-notifyd
+                             xfce4-pulseaudio-plugin
+                             xfce4-screenshooter
+                             xfce4-sensors-plugin
+                             xfce4-taskmanager
+                             xfce4-whiskermenu-plugin
+                            )
+                       ;;
+    esac
+
+    # extra stuff
+    case "$de" in
+        cinnamon)
+            xx="xf86-video-intel"
+            pacman -Q "$xx" >& /dev/null && {
+                echo "Recommended to uninstall package '$xx' for DE '$de'." | yad_infomsg
+            }
+            ;;
+        plasma)
+            test "$(WaylandSupport)" = "yes" && pkgs+=(plasma-wayland-session)
+            ;;
+    esac
+
+    su -c "pacman -S --needed ${pkgs[*]}"  # --noconfirm"
+}
+
+Main "$@"
