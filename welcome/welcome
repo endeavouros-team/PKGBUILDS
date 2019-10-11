@@ -74,7 +74,7 @@ pacman-key --init
 pacman-key --populate
 pacman-key --refresh-keys
 pkill haveged
-cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+#cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 #/usr/bin/update-mirrorlist || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
 read -p 'Press ENTER to continue: '
 EOF
@@ -105,6 +105,59 @@ yad_Install() {
 }
 export -f yad_Install
 
+yad_GetCurrentDM() {
+    local current=$(ls -l /etc/systemd/system/display-manager.service | awk '{print $NF}')
+    current="$(basename $current .service)"
+    echo "$current"
+}
+export -f yad_GetCurrentDM
+
+yad_ChangeDisplayManager() {
+    local cmd count
+    local dmlist="" dm
+    local dms=(gdm lightdm lxdm sddm)
+    local current=$(yad_GetCurrentDM)
+
+    count="${#dms[@]}"
+
+    cmd=(yad --list --radiolist --title="Select Display Manager" --width=300 --height=200)
+    cmd+=(--column="Selected":rd --column="DM name")
+
+    for ((ix=0; ix<count; ix++)) ; do
+        dm="${dms[$ix]}"
+        case "$dm" in
+            $current) cmd+=(true  "$dm") ;;
+            *)        cmd+=(false "$dm") ;;
+        esac
+    done
+
+    # selected new dm
+    dm="$("${cmd[@]}" | cut -d '|' -f 2)"
+
+    case "$dm" in
+        "$current" | "") return ;;
+    esac
+
+    cmd=""
+    pacman -Q "$dm" >& /dev/null || {
+        case "$dm" in
+            lightdm) cmd+="pacman -S ${dm}{,-gtk-greeter{,-settings}} --noconfirm >& /dev/null && ";;
+            *)       cmd+="pacman -S $dm --noconfirm >& /dev/null && " ;;
+        esac
+    }
+    cmd+="systemctl disable $current && systemctl enable $dm"
+    pkexec bash -c "$cmd"
+
+    if [ "$(yad_GetCurrentDM)" = "$dm" ] ; then
+        echo "Reboot is required for the changes to take effect." | \
+            yad --text-info --title="DM changed to $dm" --wrap --width=300 --height=200 --button=yad-quit:0
+    else
+        echo "Changing DM failed." | \
+            yad --text-info --title="Warning" --width=300 --height=200 --button=yad-quit:0
+    fi
+}
+
+export -f yad_ChangeDisplayManager
 
 INSTALL() {
   local handle="$1"
@@ -155,6 +208,7 @@ AfterInstall() {
       --text="<b>After install tasks</b>" --text-align=left \
       --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
       --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
+      --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
       --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
       --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
       --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
