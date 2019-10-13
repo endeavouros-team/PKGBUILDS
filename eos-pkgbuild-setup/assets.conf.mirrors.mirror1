@@ -28,6 +28,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/yay
     endeavouros-keyring
     endeavouros-mirrorlist
+    eos-base
     eos-update-notifier
     grub-theme-endeavouros
     grub-tools
