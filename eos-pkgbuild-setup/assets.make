@@ -133,7 +133,7 @@ ListNameToPkgName()
                 # AUR pkg files may need some changes:
                 hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
                 test -n "$hook" && {
-                    echo2 -n "hook[$hook] ... "
+                    echo2 -n "."    # echo2 -n "hook[$hook] ... "
                     "$hook"
                 }
                 ;;
