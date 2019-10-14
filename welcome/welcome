@@ -30,7 +30,7 @@ yad_calamares() {
     local prog=/usr/bin/calamares
 
     if [ -x $prog ] ; then
-        test ping -c 1 8.8.8.8 >/dev/null && {
+        ping -c 1 8.8.8.8 >/dev/null && {
             /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
         }
         bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
