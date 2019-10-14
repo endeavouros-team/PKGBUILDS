@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.10
-pkgrel=1.5
+pkgrel=1.6
 arch=('any')
 license=('GPL')
 depends=(bash yad reflector systemd)
@@ -16,7 +16,7 @@ source=(
   $url/eos-script-lib-yad
   $url/reflector-simple
 )
-sha512sums=('642245913573ce6059281311c3bd59bf590daff4f911211cff5f2e4977dc71c19ce535f57b5e2d369e0bc2a06cbccef30dbda640dce401d94fd3c902756b1811'
+sha512sums=('a7dce63585c612d96e06f35cd5d9c4dfdc81210445f5354f625f7c9f1339694710129712b6ea2300665b1dd86c91fb38dc2f6ef4fde84a894b22b1cae39f15e4'
             '87a44d71b2d084aad1f9f3b66481c4cb54de147231fa0f10674e8d62904e5ec4bc096d077501794d0ea73db36f45122a84fb1f7233d260f0e4d4a37a2f85bb85'
             'f202e1a2448da3155e489ef09552a28795d3d5da7f79c1b392fa1a14dcc40750c73b0a680f2483e740e8906f121ba6690440eb7c115f5177dd7342cc74e73c5d'
             '1ab2b1d31c73e9bef2557e83165956535b6f68ad8ee7e00e768ea26415cea1465a91f597426c38843d0dc15075c1f9af0bbea5fabfd9d2e7ec5ee53a2bc32dd0')
