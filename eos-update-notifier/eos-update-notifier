@@ -154,6 +154,22 @@ CheckSums() {
     popd >/dev/null
 }
 
+CheckInternetConnection() {
+    local wait_rounds=8
+    local one_wait=5s
+
+    # Wait for internet connection max "$wait_rounds * $one_wait" seconds.
+
+    eos_yad_check_internet_connection no_fail_dialog $wait_rounds $one_wait || {
+        if [ "$verbosity" = "high" ] ; then
+            echo "Internet connection is not available!" | \
+                eos_yad_problem "Error from eos-update-notifier" --width=400 --height=200 &
+        fi
+        echo "Error: eos-update-notifier: internet connection is not available!" >&2
+        return 1
+    }
+}
+
 Main()
 {
     local initial_waittime="10s"
@@ -165,6 +181,8 @@ Main()
     local newsdays=30
     local arg
     local progname=eos-update-notifier
+
+    CheckInternetConnection || return 1    # Internet connection is required.
 
     for arg in "$@" ; do
         case "$arg" in
