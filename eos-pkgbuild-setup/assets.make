@@ -3,6 +3,15 @@
 PROGNAME="$(basename "$0")"
 test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
 
+# pacman is changing compression!
+if [ "$(vercmp "$(pacman -Q pacman | awk '{print $2}' | sed 's|-.*$||')" "5.2")" -ge 0 ] ; then
+    _COMPRESSOR="zst"
+else
+    _COMPRESSOR="xz"
+fi
+_COMPRESSOR="xz"         # TODO: REMOVE THIS LINE AFTER TESTING "PACMAN 5.2" !!!
+
+
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
@@ -48,7 +57,7 @@ Build()
       Pushd "$pkgdirname"
         # now build, assume we have PKGBUILD
         makepkg -sc >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
-        pkg="$(ls -1 ${pkgname}-*.pkg.tar.xz)"
+        pkg="$(ls -1 ${pkgname}-*.pkg.tar.$_COMPRESSOR)"
         mv $pkg "$assetsdir"
         pkg="$assetsdir/$pkg"
       Popd
@@ -78,7 +87,7 @@ LocalVersion()
     
     Pkgname="$(basename "$Pkgname")"
 
-    pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.xz 2>/dev/null)"
+    pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR 2>/dev/null)"
 
     case "$(echo "$pkgs" | wc -l)" in
         0) echo "0" ; return ;;
@@ -151,7 +160,7 @@ Assets_clone()
     # echo2 "If so, you can delete your local assets and fetch assets from github now."
     # read -p "Delete local assets and fetch them from github now (y/N)? " xx >&2
 
-    if [ -n "$(ls -1 *.pkg.tar.xz 2> /dev/null)" ] ; then
+    if [ -n "$(ls -1 *.pkg.tar.$_COMPRESSOR 2> /dev/null)" ] ; then
 
         printf2 "\n%s " "Fetch assets from github (Y/n)?"
         read xx
@@ -171,8 +180,8 @@ Assets_clone()
     echo "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all possible packages.
-    rm -f *.pkg.tar.xz{,.sig}
-    rm -f "$REPONAME".{db,files}{,.tar.xz,.tar.xz.old}
+    rm -f *.pkg.tar.$_COMPRESSOR{,.sig}
+    rm -f "$REPONAME".{db,files}{,.tar.$_COMPRESSOR,.tar.$_COMPRESSOR.old}
 
     echo "Fetching all github assets..."
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
@@ -418,7 +427,7 @@ Main()
 
             # old pkg
             pkgname="$(PkgBuildName "$pkgdirname")"
-            pkg="$(ls -1 "$ASSETSDIR/$pkgname"-*.pkg.tar.xz 2> /dev/null)"
+            pkg="$(ls -1 "$ASSETSDIR/$pkgname"-*.pkg.tar.$_COMPRESSOR 2> /dev/null)"
             test -n "$pkg" && {
                 removable+=("$pkg")
                 removable+=("$pkg".sig)
@@ -467,11 +476,11 @@ Main()
         done
 
         # Put changed assets (built) to db.
-        repo-add "$ASSETSDIR/$REPONAME".db.tar.xz "${built[@]}"
-        rm -f "$ASSETSDIR/$REPONAME".{db,files}.tar.xz.old
+        repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
+        rm -f "$ASSETSDIR/$REPONAME".{db,files}.tar.$_COMPRESSOR.old
         rm -f "$ASSETSDIR/$REPONAME".{db,files}
-        cp -a "$ASSETSDIR/$REPONAME".db.tar.xz    "$ASSETSDIR/$REPONAME".db
-        cp -a "$ASSETSDIR/$REPONAME".files.tar.xz "$ASSETSDIR/$REPONAME".files
+        cp -a "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR    "$ASSETSDIR/$REPONAME".db
+        cp -a "$ASSETSDIR/$REPONAME".files.tar.$_COMPRESSOR "$ASSETSDIR/$REPONAME".files
 
         echo2 "Final stop before syncing with github!"
         read -p "Continue (Y/n)? " xx
@@ -483,7 +492,7 @@ Main()
         # transfer assets (built, signed and db) to github
         for tag in "${RELEASE_TAGS[@]}" ; do
             add-release-assets "$tag" \
-                               "${built[@]}" "${signed[@]}" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.xz} || \
+                               "${built[@]}" "${signed[@]}" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
                 DIE "adding assets with tag 'tag' failed"
         done
 
