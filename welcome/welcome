@@ -190,6 +190,7 @@ GeneralInfo() {
       --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
       --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
       --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
+      --field="About me!!More info about this app":fbtn                       "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
 
 #     --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" 
