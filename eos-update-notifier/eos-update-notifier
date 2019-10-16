@@ -156,7 +156,7 @@ CheckSums() {
 
 Main()
 {
-    local initial_waittime="5s"
+    local initial_waittime="10s"
     local loop_waittime=60m
     local no_updates__indicator_wait_time=10
     local verbosity=high
