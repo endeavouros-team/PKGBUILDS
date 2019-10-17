@@ -156,7 +156,7 @@ FetchAndCheck() {
 
     for xx in timer service ; do
         rm -f $progname.$xx.bak
-        mv $progname.$xx        $progname.$xx.bak
+        test -r $progname.$xx && mv $progname.$xx $progname.$xx.bak
         mv $progname.$xx.pacnew $progname.$xx
     done
 
@@ -214,8 +214,8 @@ Main()
                     systemctl --user start  $progname.timer
                     echo "New '$configdir/$progname.service' successfully set up." >&2
                     echo "New '$configdir/$progname.timer' successfully set up." >&2
+                    echo "$progname service initialized for user '$(basename "$HOME")'." >&2
                 fi
-                echo "$progname service initialized for user '$(basename "$HOME")'." >&2
                 return
                 ;;
             -iw=*)
