@@ -133,23 +133,32 @@ Options:
 EOF
 }
 
-CheckSums() {
+FetchAndCheck() {
     local configdir="$1"
     local progname="$2"
     local url="$3"
-    local sha512sums
+    local sha512sums xx
 
     pushd "$configdir" >/dev/null
 
-    # Note: this checking assumes PKGBUILD has certain order in 'source' and 'sha52sums'.
+    wget -q -O $progname.service.pacnew $url/$progname.service || eos_yad_DIE "$FUNCNAME: wget 'service' failed."
+    wget -q -O $progname.timer.pacnew   $url/$progname.timer   || eos_yad_DIE "$FUNCNAME: wget 'timer' failed."
+
+    # Note: this way of checking assumes PKGBUILD has certain order in 'source' and 'sha52sums'.
     wget -q --timeout=10 $url/PKGBUILD || \
-        eos_yad_DIE "checking sha512sums: wget failed."
+        eos_yad_DIE "$FUNCNAME: wget 'PKGBUILD' failed."
     readarray -t sha512sums <<< $(grep -A5 "^sha512sums=" PKGBUILD | tail -n 2 | tr -d "'" | tr -d ')')
     rm -f PKGBUILD
-    echo "${sha512sums[0]}  $progname.timer"   | sha512sum -c || \
-        eos_yad_DIE "checksum failed for $progname.timer"
-    echo "${sha512sums[1]}  $progname.service" | sha512sum -c || \
-        eos_yad_DIE "checksum failed for $progname.service"
+    echo "${sha512sums[0]}  $progname.timer.pacnew"   | sha512sum -c || \
+        eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.timer"
+    echo "${sha512sums[1]}  $progname.service.pacnew" | sha512sum -c || \
+        eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.service"
+
+    for xx in timer service ; do
+        rm -f $progname.$xx.bak
+        mv $progname.$xx        $progname.$xx.bak
+        mv $progname.$xx.pacnew $progname.$xx
+    done
 
     popd >/dev/null
 }
@@ -200,11 +209,11 @@ Main()
                             systemctl --user disable $progname.timer
                         }
                     fi
-                    wget -q -O "$configdir"/$progname.service $url/$progname.service
-                    wget -q -O "$configdir"/$progname.timer   $url/$progname.timer
-                    CheckSums "$configdir" "$progname" "$url"
+                    FetchAndCheck "$configdir" "$progname" "$url"
                     systemctl --user enable $progname.timer
                     systemctl --user start  $progname.timer
+                    echo "New '$configdir/$progname.service' successfully set up." >&2
+                    echo "New '$configdir/$progname.timer' successfully set up." >&2
                 fi
                 echo "$progname service initialized for user '$(basename "$HOME")'." >&2
                 return
