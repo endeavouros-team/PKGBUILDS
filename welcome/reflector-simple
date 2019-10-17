@@ -173,6 +173,11 @@ ShowMirrorlistSaved() {
 }
 
 SaveMirrorlist() {
+    grep "^Server = [hr]" $tmpfile >/dev/null || {
+        echo "$progname: no mirrors found!" | \
+            yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
+        return 1
+    }
     cat $tmpfile | yad --text-info --wrap --width=700 --height=400 \
                        --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
         pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
@@ -180,6 +185,8 @@ SaveMirrorlist() {
 }
 
 Main() {
+    local progname=reflector-simple
+
     local verbose=$(ArgsYesNo -v "$@")
     local showlist=$(ArgsYesNo -l "$@")
 
