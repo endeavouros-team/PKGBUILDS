@@ -3,19 +3,25 @@
 pkgname=eos-base
 pkgdesc="Required packages in EndeavourOS."
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 arch=('any')
 license=('GPL')
 depends=(
   base
+  base-devel
+  cryptsetup
+  device-mapper
   dhcpcd
   diffutils
   e2fsprogs
   inetutils
+  jfsutils
   less
   linux
   linux-firmware
   logrotate
+  lvm2
+  man-db
   man-pages
   nano
   netctl
@@ -27,3 +33,4 @@ url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 package() {
   echo Done.
 }
+

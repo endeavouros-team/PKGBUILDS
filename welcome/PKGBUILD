@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.10
-pkgrel=3
+pkgrel=4
 arch=('any')
 license=('GPL')
 depends=(bash yad reflector systemd)
@@ -19,7 +19,7 @@ source=(
 sha512sums=('9779adfe1c82c1272612e3c082b036d58870199778cfd9768630884a84b990b7e42cc1eed1d619efb84a2d09745d6955210a1f538afc12ad0428176bbdb48e37'
             '87a44d71b2d084aad1f9f3b66481c4cb54de147231fa0f10674e8d62904e5ec4bc096d077501794d0ea73db36f45122a84fb1f7233d260f0e4d4a37a2f85bb85'
             'f9f01f7ca8ba5d8aa80f51b5803bc59803102c5dec1550fa920feb1cdd42733a08835fd737f22c50c492d16719e86e5ef25ce09b67a760ec9c91601523419fdf'
-            '5373fd4520dfea3397c49f6d7d89305af82af709385887f2af9af2d846e9f5e9cfa0c6dd26b846c20f811b450e4e80fe64121436cf8e30bb1e3ba033b3eb2d2b')
+            'e7b2e002f482019e3108585476ce88ff2f3f6974ffd929c922cefa4526d2836b5972577e968f891fa8c254e1a9655ef99c465e05e93afc9a13d7b06fe3f597b1')
 
 package() {
   cd $srcdir

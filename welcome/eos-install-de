@@ -44,15 +44,17 @@ Main()
     local xx
     local de="$(SelectDesktop)"
 
+    # TODO: see EOS wiki !!
+
     case "$de" in
-#       budgie)        pkgs=(budgie-desktop +gnome) ;;
-        cinnamon)      pkgs=(cinnamon) ;;
+#       budgie)        pkgs=(budgie-desktop gnome) ;;
+        cinnamon)      pkgs=(cinnamon system-config-printer gnome-keyring blueberry cinnamon-translations) ;;
         deepin)        pkgs=(deepin deepin-extra networkmanager) ;;
         enlightenment) pkgs=(enlightenment terminology) ;;
         gnome)         pkgs=(gnome gnome-extra) ;;
         lxde)          pkgs=(lxde) ;;
         lxqt)          pkgs=(lxqt sddm oxygen-icons) ;;
-        mate)          pkgs=(mate mate-extra) ;;
+        mate)          pkgs=(mate mate-extra system-config-printer blueman) ;;
         plasma)        pkgs=(plasma-meta kde-applications-meta) ;;
         xfce)          pkgs=(xfce4 orage parole ristretto
                              thunar-archive-plugin
