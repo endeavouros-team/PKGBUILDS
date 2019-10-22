@@ -27,6 +27,12 @@ export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
 
+echo2() { echo "$@" >&2 ; }
+debug() {
+    local DEBUG=1
+    test "$verbosity" = "low" && DEBUG=0
+    test $DEBUG -eq 1 && echo2 "$@"
+}
 
 Yad() {
     # NOTE: normal button return value is 0.
@@ -52,8 +58,8 @@ Update_common() {
     local toolcmd
 
     case "$source" in
-        upstream) toolcmd="pkexec pacman -Syu --noconfirm" ;;
-        AUR)      toolcmd="yay -Syua --noconfirm" ;;                             # problem for non-sudoers ...
+        upstream) toolcmd="pkexec pacman -Syu" ;;
+        AUR)      toolcmd="yay -Syua" ;;                             # problem for non-sudoers ...
     esac
 
     echo "$updates" | \
@@ -66,21 +72,53 @@ Update_common() {
     }
 }
 
-Main2() {
-    local CheckAurUpdates=yes
+CheckArchNews() {
+    local conf=/etc/eos-update-notifier.conf
     local CheckArchNewsForYou=yes
 
-    local conf=/etc/eos-update-notifier.conf
     test -r $conf && source $conf
 
     if [ "$CheckArchNewsForYou" = "yes" ] ; then
-        test "$newsdays" -gt 0 && arch-news-for-you $newsdays
+        test "$newsdays" -gt 0 && {
+            if [ "$verbosity" = "high" ] ; then
+                arch-news-for-you $newsdays
+            else
+                arch-news-for-you $newsdays 2>/dev/null
+            fi
+        }
     fi
+}
 
-    local updates_pacman="$(checkupdates)"
+Main2() {
+    local CheckAurUpdates=yes
+    local updates_pacman=""
     local updates_aur=""
 
-    test "$CheckAurUpdates" = "yes" && updates_aur="$(yay -Qua)"
+    CheckArchNews
+
+    test "$EOS_UPDATER_WINDOW_ON" != "1" && {
+        export EOS_UPDATER_WINDOW_ON=1        # prevent having many update sessions at the same time
+
+        # update pacman first!
+
+        updates_pacman="$(checkupdates)"
+        if [ -n "$updates_pacman" ] ; then
+            Update_common "$updates_pacman" upstream || eos_yad_WARN "upstream update failed."
+        else
+            debug "No upstream updates."
+        fi
+
+        test "$CheckAurUpdates" = "yes" && updates_aur="$(yay -Qua)"
+        if [ -n "$updates_aur" ] ; then
+            Update_common "$updates_aur" upstream || eos_yad_WARN "AUR update failed."
+        else
+            debug "No AUR updates."
+        fi
+
+        export EOS_UPDATER_WINDOW_ON=0
+    } || {
+        debug "Sorry, another process is currently checking for updates."
+    }
 
     if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
         test "$verbosity" = "high" && {
@@ -89,15 +127,6 @@ Main2() {
                 Yad --height=100 \
                     --timeout=$no_updates__indicator_wait_time \
                     --timeout-indicator=left &
-        }
-    else
-        # prevent having many update sessions at the same time
-        test "$EOS_UPDATER_WINDOW_ON" != "1" && {
-            export EOS_UPDATER_WINDOW_ON=1
-            # update pacman first!
-            test -n "$updates_pacman" && { Update_common "$updates_pacman" upstream || eos_yad_WARN "upstream update failed." ; }
-            test -n "$updates_aur"    && { Update_common "$updates_aur"    AUR      || eos_yad_WARN "AUR update failed." ; }
-            export EOS_UPDATER_WINDOW_ON=0
         }
     fi
 }
@@ -133,8 +162,11 @@ FetchAndCheck() {
 }
 
 CheckInternetConnection() {
-    local wait_rounds=8
-    local one_wait=5s
+    local wait_rounds="$1"
+    local one_wait="$2"
+
+    test -z "$wait_rounds" && wait_rounds=8
+    test -z "$one_wait"    && one_wait=5s
 
     # Wait for internet connection max "$wait_rounds * $one_wait" seconds.
 
@@ -143,7 +175,7 @@ CheckInternetConnection() {
             echo "Internet connection is not available!" | \
                 eos_yad_problem "Error from eos-update-notifier" --width=400 --height=200 &
         fi
-        echo "Error: eos-update-notifier: internet connection is not available!" >&2
+        debug "Error: eos-update-notifier: internet connection is not available!"
         return 1
     }
 }
@@ -167,9 +199,9 @@ Initialize() {    # initialize service and timer for the current user
         FetchAndCheck "$configdir" "$progname" "$url"
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
-        echo "New '$configdir/$progname.service' successfully set up." >&2
-        echo "New '$configdir/$progname.timer' successfully set up." >&2
-        echo "$progname service initialized for user '$(basename "$HOME")'." >&2
+        debug "New '$configdir/$progname.service' successfully set up."
+        debug "New '$configdir/$progname.timer' successfully set up."
+        debug "$progname service initialized for user '$(basename "$HOME")'."
     fi
 }
 
@@ -204,9 +236,17 @@ Options:
 EOF
 }
 
+InitialWait() {
+    test -n "$initial_waittime" && {
+        debug -n "Initial wait for $initial_waittime ... " >&2
+        sleep "$initial_waittime"
+        debug "done." >&2
+    }
+}
+
 Main()
 {
-    local initial_waittime="10s"
+    local initial_waittime="5s"  # was 10s
     local loop_waittime=60m
     local no_updates__indicator_wait_time=10
     local verbosity=high
@@ -215,14 +255,12 @@ Main()
     local newsdays=30
     local arg
     local progname=eos-update-notifier
-
-    CheckInternetConnection || return 1    # Internet connection is required.
+    local initialize=""
 
     for arg in "$@" ; do
         case "$arg" in
             -init | -init-force)
-                Initialize
-                return
+                initialize="$arg"
                 ;;
             -iw=*)
                 initial_waittime="$(eos_yad_GetArgVal "$arg")"
@@ -263,7 +301,14 @@ Main()
         mode=onetimer
     fi
 
-    test -n "$initial_waittime" && sleep "$initial_waittime"
+    test "$initialize" != "-init-force" && InitialWait
+
+    # Now internet connection is required.
+    CheckInternetConnection || return 1
+
+    case "$initialize" in
+        -init-force | -init) Initialize ; return ;;
+    esac
 
     while true ; do
         Main2
