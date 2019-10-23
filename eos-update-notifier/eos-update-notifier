@@ -110,7 +110,7 @@ Main2() {
 
         test "$CheckAurUpdates" = "yes" && updates_aur="$(yay -Qua)"
         if [ -n "$updates_aur" ] ; then
-            Update_common "$updates_aur" upstream || eos_yad_WARN "AUR update failed."
+            Update_common "$updates_aur" AUR || eos_yad_WARN "AUR update failed."
         else
             debug "No AUR updates."
         fi
