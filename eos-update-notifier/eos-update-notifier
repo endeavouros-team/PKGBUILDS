@@ -3,10 +3,13 @@
 # EOS update notifier for the current user.
 #
 # The package includes the following files:
-#     eos-update-notifier           (this file)
-#     eos-update-notifier.desktop   (initializes the systemd service for current user)
-#     eos-update-notifier.timer     (systemd timer)
-#     eos-update-notifier.service   (systemd service)
+#     eos-update-notifier             (this file)
+#     eos-update-notifier.conf        (configuration file)
+#     eos-update-notifier.desktop     (initializes the systemd service for the current user)
+#     eos-update-notifier.service     (systemd service)
+#     eos-update-notifier.timer       (systemd timer)
+#     /tmp/eos-update-notifier.log.*  (temporary log file, re-created at every invocation)
+#     arch-news-for-you               (show Arch news relevant for you)
 #
 
 #######################################################################
@@ -27,11 +30,20 @@ export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
 
+eos_un_log() {
+    local date="$(date +%Y/%m/%d-%H:%M.%S)"
+    echo ""       >> $EOS_UPDATE_NOTIFIER_LOG
+    echo "$date"  >> $EOS_UPDATE_NOTIFIER_LOG
+    echo "$@"     >> $EOS_UPDATE_NOTIFIER_LOG
+}
+export -f eos_un_log
+
 echo2() { echo "$@" >&2 ; }
 debug() {
     local DEBUG=1
     test "$verbosity" = "low" && DEBUG=0
     test $DEBUG -eq 1 && echo2 "$@"
+    eos_un_log "$@"
 }
 
 Yad() {
@@ -53,23 +65,45 @@ Yad() {
 }
 
 Update_common() {
-    local updates="$1"
-    local source="$2"
-    local toolcmd
+    # Check upstream updates first.
 
-    case "$source" in
-        upstream) toolcmd="pkexec pacman -Syu" ;;
-        AUR)      toolcmd="yay -Syua" ;;                             # problem for non-sudoers ...
-    esac
+    local hasupdates=0
+    local source=""
+    local cmd=""
+    local updates=""
 
-    echo "$updates" | \
-        Yad "Updates are available from $source" \
-            --button=" Update software from $source!face-cool!Start $source updater":1  # note: button value must be != 0
+    updates="$(checkupdates)"
+    if [ -n "$updates" ] ; then
+        ((hasupdates++))
+        source=upstream
+        cmd="pkexec pacman -Syu"
+        eos_un_log "$source updates available: $updates"
+        eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || eos_un_log $source update failed."
+    fi
 
-    test $? -eq 1 && {
-        eos_yad_RunCmdTermBash "echo Updating from $source... ; $toolcmd && printf '\n$source update done!\n'"
-        return 0
-    }
+    # Check AUR updates.
+
+    test "$CheckAurUpdates" = "yes" && updates="$(yay -Qua)" || updates=""
+    if [ -n "$updates" ] ; then
+        ((hasupdates++))
+        cmd="yay -Syua"                                        # potential problem for non-sudoers ...
+        source=AUR
+        eos_un_log "$source updates available: $updates"
+        eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || eos_un_log $source update failed."
+    fi
+
+    if [ $hasupdates -eq 0 ] ; then
+        local msg="No updates available."
+        debug "$msg"
+        if [ "$verbosity" = "high" ] ; then
+            echo "$msg" | \
+                yad --text-info \
+                    --title="EndeavourOS update notifier" \
+                    --height=100 --width=300 --timeout=10 --timeout-indicator=left \
+                    --theme="Classic" --tail \
+                    --button=yad-quit:0
+        fi
+    fi
 }
 
 CheckArchNews() {
@@ -91,44 +125,24 @@ CheckArchNews() {
 
 Main2() {
     local CheckAurUpdates=yes
-    local updates_pacman=""
-    local updates_aur=""
+    local lockfile=/var/lib/pacman/db.lck
+    local msg
 
-    CheckArchNews
+    CheckArchNews   # also reads config file
+
+    test -e $lockfile && {
+        msg="Sorry, another program is currently using pacman databases."
+        debug "$msg"
+        return
+    }
 
     test "$EOS_UPDATER_WINDOW_ON" != "1" && {
         export EOS_UPDATER_WINDOW_ON=1        # prevent having many update sessions at the same time
-
-        # update pacman first!
-
-        updates_pacman="$(checkupdates)"
-        if [ -n "$updates_pacman" ] ; then
-            Update_common "$updates_pacman" upstream || eos_yad_WARN "upstream update failed."
-        else
-            debug "No upstream updates."
-        fi
-
-        test "$CheckAurUpdates" = "yes" && updates_aur="$(yay -Qua)"
-        if [ -n "$updates_aur" ] ; then
-            Update_common "$updates_aur" AUR || eos_yad_WARN "AUR update failed."
-        else
-            debug "No AUR updates."
-        fi
-
+        Update_common
         export EOS_UPDATER_WINDOW_ON=0
     } || {
         debug "Sorry, another process is currently checking for updates."
     }
-
-    if [ -z "$updates_pacman" ] && [ -z "$updates_aur" ] ; then
-        test "$verbosity" = "high" && {
-            # Show the nothing-to-do window.
-            echo "No updates available." | \
-                Yad --height=100 \
-                    --timeout=$no_updates__indicator_wait_time \
-                    --timeout-indicator=left &
-        }
-    fi
 }
 
 FetchAndCheck() {
@@ -238,9 +252,8 @@ EOF
 
 InitialWait() {
     test -n "$initial_waittime" && {
-        debug -n "Initial wait for $initial_waittime ... " >&2
+        #debug "Initial wait for $initial_waittime"
         sleep "$initial_waittime"
-        debug "done." >&2
     }
 }
 
@@ -256,6 +269,9 @@ Main()
     local arg
     local progname=eos-update-notifier
     local initialize=""
+
+    rm -f /tmp/$progname.log.*
+    export EOS_UPDATE_NOTIFIER_LOG=$(mktemp /tmp/$progname.log.XXXXXXXX)
 
     for arg in "$@" ; do
         case "$arg" in
