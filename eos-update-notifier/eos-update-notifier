@@ -21,6 +21,7 @@ test -r  $EOS_SCRIPTS_YAD || {
 source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
+export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_check_internet_connection
 export -f eos_yad_GetArgVal
@@ -29,6 +30,10 @@ export -f eos_yad_problem
 export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
+
+eos_yad2() { # TODO: VEKS
+    GDK_BACKEND=x11 /usr/bin/yad "$@"
+}
 
 eos_un_log() {
     local date="$(date +%Y/%m/%d-%H:%M.%S)"
@@ -44,24 +49,6 @@ debug() {
     test "$verbosity" = "low" && DEBUG=0
     test $DEBUG -eq 1 && echo2 "$@"
     eos_un_log "$@"
-}
-
-Yad() {
-    # NOTE: normal button return value is 0.
-    # If user wants other button return values, they MUST be != 0 !!!
-
-    local title
-
-    case "$1" in
-        --*) title="EndeavourOS update notifier" ;;
-        *) title="$1" ; shift ;;
-    esac
-
-    /usr/bin/yad --text-info \
-        --title="$title" \
-        --height=300 --width=400 \
-        --theme="Classic" --tail \
-        --button=yad-quit:0             "$@"
 }
 
 Update_common() {
@@ -97,11 +84,11 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
-                yad --text-info \
-                    --title="EndeavourOS update notifier" \
-                    --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                    --theme="Classic" --tail \
-                    --button=yad-quit:0
+                eos_yad2 --text-info \
+                        --title="EndeavourOS update notifier" \
+                        --height=100 --width=300 --timeout=10 --timeout-indicator=left \
+                        --theme="Classic" --tail \
+                        --button=yad-quit:0
         fi
     fi
 }
