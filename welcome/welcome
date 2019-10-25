@@ -361,7 +361,7 @@ KillExtraYad() {
     if [ -n "$savefile" ] ; then
         local count=$(grep ^LegacyCount= "$savefile" | cut -d '=' -f 2)
         local endcount=$count
-        if [ "$(grep "^Legacy0_Command=yad$" "$savefile")" != "" ] ; then
+        if [ "$(grep "^Legacy0_Command=yad$" "$savefile")" != "" ] || [ "$(grep "^Legacy0_Command=eos_yad$" "$savefile")" != "" ] ; then
             ((endcount--))
             sed -i "$savefile" \
                 -e 's|^Legacy0_Screen=.*$||' \

@@ -103,7 +103,7 @@ AskCountriesAndOptions() {
     local command
     local columns=5
 
-    command=(yad --form --columns=$columns --title="Selecting Arch mirrors")
+    command=(eos_yad --form --columns=$columns --title="Selecting Arch mirrors")
     command+=(--text="<b>${tips[0]}\n${tips[1]}\n${tips[2]}\n${tips[3]}\n\n</b>")
 
     for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
