@@ -15,6 +15,7 @@ test -r  $EOS_SCRIPTS_YAD || {
 source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
+export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_check_internet_connection
 export -f eos_yad_GetArgVal
@@ -35,7 +36,7 @@ yad_calamares() {
         }
         bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
     else
-        yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+        eos_yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
 }
 export -f yad_calamares
@@ -88,7 +89,7 @@ export -f yad_InitializePacmanMirroring
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd="eos_yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
 
     local pkg pkgs=()
     for pkg in "$@" ; do
@@ -122,7 +123,7 @@ yad_ChangeDisplayManager() {
 
     count="${#dms[@]}"
 
-    cmd=(yad --list --radiolist --title="Select Display Manager" --width=300 --height=200)
+    cmd=(eos_yad --list --radiolist --title="Select Display Manager" --width=300 --height=200)
     cmd+=(--column="Selected":rd --column="DM name")
 
     for ((ix=0; ix<count; ix++)) ; do
@@ -152,10 +153,10 @@ yad_ChangeDisplayManager() {
 
     if [ "$(yad_GetCurrentDM)" = "$dm" ] ; then
         echo "Reboot is required for the changes to take effect." | \
-            yad --text-info --title="DM changed to $dm" --wrap --width=300 --height=200 --button=yad-quit:0
+            eos_yad --text-info --title="DM changed to $dm" --wrap --width=300 --height=200 --button=yad-quit:0
     else
         echo "Changing DM failed." | \
-            yad --text-info --title="Warning" --width=300 --height=200 --button=yad-quit:0
+            eos_yad --text-info --title="Warning" --width=300 --height=200 --button=yad-quit:0
     fi
 }
 export -f yad_ChangeDisplayManager
@@ -163,34 +164,34 @@ export -f yad_ChangeDisplayManager
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=2 \
-      --image=gtk-save \
-      --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-      --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
-      --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares' \
-      --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
-      --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
-      --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
-      --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
+  eos_yad --plug="$handle" --tabnum="$tabnum" \
+          --form \
+          --columns=2 \
+          --image=gtk-save \
+          --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
+          --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
+          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares' \
+          --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
+          --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
+          --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+          --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
       &> /dev/null &    
 }
 
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=3 \
-      --image=dialog-question \
-      --text="<b>Find your way at the EndeavourOS website!</b>" --text-align=left \
-      --field="Web site!!https://endeavouros.com":fbtn                        "$_BROWSER https://endeavouros.com" \
-      --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
-      --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
-      --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
-      --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
-      --field="About me!!More info about this app":fbtn                       "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
+  eos_yad --plug="$handle" --tabnum="$tabnum" \
+          --form \
+          --columns=3 \
+          --image=dialog-question \
+          --text="<b>Find your way at the EndeavourOS website!</b>" --text-align=left \
+          --field="Web site!!https://endeavouros.com":fbtn                        "$_BROWSER https://endeavouros.com" \
+          --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
+          --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
+          --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
+          --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
+          --field="About me!!More info about this app":fbtn                       "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
 
 #     --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" 
@@ -203,20 +204,20 @@ AfterInstall() {
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
 
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=2 \
-      --image=dialog-information \
-      --text="<b>After install tasks</b>" --text-align=left \
-      --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
-      --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
-      --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
-      --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
-      --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
-      --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-      --field="Bluetooth!!Bluetooth advice":fbtn                                   "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
-      --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
-      --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
+  eos_yad --plug="$handle" --tabnum="$tabnum" \
+          --form \
+          --columns=2 \
+          --image=dialog-information \
+          --text="<b>After install tasks</b>" --text-align=left \
+          --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
+          --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
+          --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
+          --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
+          --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+          --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+          --field="Bluetooth!!Bluetooth advice":fbtn                                   "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
+          --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
+          --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 #      --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
 }
@@ -230,15 +231,15 @@ AddMoreApps() {
   local chromium=""        #=chromium-browser
   local bluetooth=""       #=bluetooth
 
-  yad --plug="$handle" --tabnum="$tabnum" \
-      --form \
-      --columns=3 \
-      --image=system-software-install \
-      --text="<b>Install popular apps</b>" --text-align=left \
-      --field=" LibreOffice!$libreoffice!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
-      --field=" Chromium Web Browser!$chromium!Web Browser":fbtn                 'bash -c "yad_Install chromium"' \
-      --field=" Firewall!$gufw!Gufw firewall":fbtn                               'bash -c "yad_Install gufw"' \
-      --field=" Bluetooth Manager for Xfce!$bluetooth!Blueberry":fbtn            'bash -c "yad_Install blueberry bluez-utils"' \
+  eos_yad --plug="$handle" --tabnum="$tabnum" \
+          --form \
+          --columns=3 \
+          --image=system-software-install \
+          --text="<b>Install popular apps</b>" --text-align=left \
+          --field=" LibreOffice!$libreoffice!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
+          --field=" Chromium Web Browser!$chromium!Web Browser":fbtn                 'bash -c "yad_Install chromium"' \
+          --field=" Firewall!$gufw!Gufw firewall":fbtn                               'bash -c "yad_Install gufw"' \
+          --field=" Bluetooth Manager for Xfce!$bluetooth!Blueberry":fbtn            'bash -c "yad_Install blueberry bluez-utils"' \
       &> /dev/null &
 }
 
@@ -246,11 +247,11 @@ About() {
   local handle="$1"
   local tabnum="$2"
 
-  Usage | yad --plug="$handle" --tabnum="$tabnum" \
-              --text-info \
-              --text="<b>More info about the Welcome app</b>" \
-              --text-align=left \
-              --image=help-about \
+  Usage | eos_yad --plug="$handle" --tabnum="$tabnum" \
+                  --text-info \
+                  --text="<b>More info about the Welcome app</b>" \
+                  --text-align=left \
+                  --image=help-about \
       &> /dev/null &
 }
 
@@ -310,10 +311,10 @@ DIE() {
 }
 
 WelcomeHelp() {
-    Usage | yad --text-info --title="Welcome Help" --width=600 --height=500 \
-                --text="<b>More info about the Welcome app</b>" \
-                --text-align=left \
-                --image=help-about --button=yad-ok:0
+    Usage | eos_yad --text-info --title="Welcome Help" --width=600 --height=500 \
+                    --text="<b>More info about the Welcome app</b>" \
+                    --text-align=left \
+                    --image=help-about --button=yad-ok:0
 }
 export -f WelcomeHelp
 
@@ -410,11 +411,11 @@ GreeterSettings() {
             echo "Greeter=$value" > "$GREETER_CONFIG"
 
             echo "To run the greeter again, start a terminal and run '$progname --enable'." | \
-                yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
-                    --title="How to re-enable greeter" \
-                    --geometry=500x200 --wrap \
-                    --fontname="Monospace Regular 12" \
-                    --button=" I remember!face-angel!I promise":0 >& /dev/null
+                eos_yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
+                        --title="How to re-enable greeter" \
+                        --geometry=500x200 --wrap \
+                        --fontname="Monospace Regular 12" \
+                        --button=" I remember!face-angel!I promise":0 >& /dev/null
             ;;
         check)
             test -r "$GREETER_CONFIG" || { echo enable ; return ; }              # enabled if config does not exist
@@ -461,7 +462,7 @@ StartHere() {
 
     # Create the yad command gradually into an array 'notebook':
 
-    notebook=(yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
+    notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(SeparateWordsWithSpaces "$tab")"
         notebook+=(--tab="$tabname")

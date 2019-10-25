@@ -3,6 +3,10 @@
 # Select pacman mirrors with a simple GUI.
 #
 
+eos_yad() {
+    GDK_BACKEND=x11 /usr/bin/yad "$@"
+}
+
 REFLECTOR_COUNTRIES="$(reflector --list-countries)"
 
 REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
@@ -168,19 +172,19 @@ ShowMirrorlistSaved() {
     return  # showing dialog not really needed...
 
     echo "New $ml saved." | \
-        yad --text-info --width=300 --height=100 --align=center \
-            --title="Success" --button=yad-quit:0 \
-            --timeout=5 --timeout-indicator=left
+        eos_yad --text-info --width=300 --height=100 --align=center \
+                --title="Success" --button=yad-quit:0 \
+                --timeout=5 --timeout-indicator=left
 }
 
 SaveMirrorlist() {
     grep "^Server = [hr]" $tmpfile >/dev/null || {
         echo "$progname: no mirrors found!" | \
-            yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
+            eos_yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
         return 1
     }
-    cat $tmpfile | yad --text-info --wrap --width=700 --height=400 \
-                       --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
+    cat $tmpfile | eos_yad --text-info --wrap --width=700 --height=400 \
+                           --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
         pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
     }
 }

@@ -7,6 +7,7 @@
 #
 # User MUST declare the following exports in the *using* bash code:
 #
+# export -f eos_yad
 # export -f eos_yad_terminal
 # export -f eos_yad_check_internet_connection
 # export -f eos_yad_GetArgVal
@@ -20,6 +21,11 @@
 #
 # The two last functions above do not use yad.
 
+
+eos_yad() {
+    GDK_BACKEND=x11 /usr/bin/yad "$@"
+}
+export -f eos_yad
 
 eos_yad_terminal() {
     # Show a terminal that is capable of supporting option -e properly. Empty if not found.
@@ -45,8 +51,8 @@ eos_yad_terminal() {
            "Sorry, none of the terminal programs:" \
            "$suitable_terminals" \
            "is installed. Some features may not work as expected." \
-        | yad --text-info \
-              --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
+        | eos_yad --text-info \
+                  --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
     return 1
 }
 
@@ -69,10 +75,10 @@ eos_yad_check_internet_connection() {
         case "$verbose" in
             [yY]*|1|true|TRUE|True|on|enable*|verbose)
                 echo "No internet connection!" | \
-                    yad --text-info --title="Warning" \
-                        --height=100 --width=300 --justify=center --wrap \
-                        --button=yad-quit:1 \
-                        --button=" Continue anyway!go-next!Don't stop me now":0
+                    eos_yad --text-info --title="Warning" \
+                            --height=100 --width=300 --justify=center --wrap \
+                            --button=yad-quit:1 \
+                            --button=" Continue anyway!go-next!Don't stop me now":0
                 ;;
             *)
                 return 1
@@ -110,8 +116,8 @@ eos_yad_RunCmdTermBash() {
 eos_yad_problem() {
     local title="$1"
     shift
-    yad --text-info --title="$title" --tail --wrap --image=error \
-        --width=700 --height=500 --button=yad-quit:0 "$@"
+    eos_yad --text-info --title="$title" --tail --wrap --image=error \
+            --width=700 --height=500 --button=yad-quit:0 "$@"
 }
 
 eos_yad_DIE() {
