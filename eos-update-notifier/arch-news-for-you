@@ -18,7 +18,7 @@ test -r  $EOS_SCRIPTS_YAD || {
 source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
-export -f eos_yad
+#export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_check_internet_connection
 export -f eos_yad_GetArgVal
