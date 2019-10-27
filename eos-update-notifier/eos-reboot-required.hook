@@ -1,0 +1,18 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = linux*
+Target = systemd*
+Target = xorg-*
+Target = xf86-*
+Target = nvidia*
+Target = mesa
+Target = *wayland*
+Target = intel-ucode
+Target = amd-ucode
+
+[Action]
+Description = Inform user to reboot after certain system package upgrades.
+When = PostTransaction
+Depends = yad
+Exec = /usr/bin/eos-reboot-required

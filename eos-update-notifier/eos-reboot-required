@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# To be called from /etc/pacman.d/hooks/eos-reboot-required.hook.
+
+/bin/yad --form --title='Reboot recommended' \
+         --width=500 --height=100 --image=dialog-info \
+         --text='Reboot is <b>recommended</b> because of recent system package upgrades.' \
+         --button=yad-close:0 >& /dev/null &
