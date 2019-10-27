@@ -161,6 +161,44 @@ yad_ChangeDisplayManager() {
 }
 export -f yad_ChangeDisplayManager
 
+yad_eos_default_theming() {
+    eos_yad --text="Not yet available!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    return
+
+    local de="$(eos_yad__detectDE)"
+    test -z "$de" || {
+        eos_yad_WARN "cannot detech Desktop Environment!"
+        return 1
+    }
+    local themer="$(mktemp "$HOME/.theming.$de.XXXXXXX.sh")"
+    local errors="$(mktemp "$HOME/.theming-errors.$de.XXXXXXX.sh")"
+    local retval=0
+
+    case "$de" in
+        xfce)
+            wget -q --timeout=5 -O "$themer" https://github.com/endeavouros-team/DE-theming/raw/master/$de.sh || {
+                eos_yad_WARN "cannot fetch theming file '$de.sh'"
+                retval=1
+            } && {
+                bash "$themer" 2> "$errors"
+                if [ "$(stat -c %s "$errors")" -ne 0 ] ; then
+                    eos_yad_WARN "$de.sh: theming failed. See error log in file '$errors'."
+                    retval=1
+                fi
+            }
+            ;;
+        cinnamon)
+            eos_yad --text="Coming soon for '$de'!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+            ;;
+        *)
+            eos_yad --text="Sorry, not yet for '$de'!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+            ;;
+    esac
+    rm -f "$themer"
+    test $retval -eq 0 && rm -f "$errors"
+}
+export -f yad_eos_default_theming
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -219,7 +257,8 @@ AfterInstall() {
           --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
-#      --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
+#          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
+#          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
 }
 
 AddMoreApps() {
