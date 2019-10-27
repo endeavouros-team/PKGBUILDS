@@ -2,7 +2,33 @@
 
 # To be called from /etc/pacman.d/hooks/eos-reboot-required.hook.
 
-/bin/yad --form --title='Reboot recommended' \
-         --width=500 --height=100 --image=dialog-info \
-         --text='Reboot is <b>recommended</b> because of recent system package upgrades.' \
-         --button=yad-close:0 >& /dev/null &
+if [ -x /usr/bin/notify-send ] ; then
+
+    # Implementation using libnotify.
+
+    _eos_reboot_required() {
+        local user userid cmd
+        local users="$(/usr/bin/users)"
+
+        for user in $users ; do
+            userid=$(/usr/bin/id -u $user)
+            cmd=(DISPLAY=:0 DBUS_SESSION_ADDRESS=unix:path=/run/user/$userid/bus /usr/bin/notify-send)
+            cmd+=(--icon=system-reboot --expire-time=20000)
+            cmd+=("\"Reboot recommended!\"")
+            cmd+=("\"Reboot is recommended because of recent core system package upgrades.\"")
+            /usr/bin/su $user -c "${cmd[*]}"
+        done
+    }
+    _eos_reboot_required
+    unset -f _eos_reboot_required
+
+elif [ -x /usr/bin/yad ] ; then
+
+    # Implementation using yad (dialog does not expire).
+
+    /usr/bin/yad --form --title='Reboot recommended' \
+                 --width=500 --height=100 --image=dialog-info \
+                 --text='Reboot is <b>recommended</b> because of recent system package upgrades.' \
+                 --button=yad-close:0 >& /dev/null &
+
+fi
