@@ -13,7 +13,7 @@ if [ -x /usr/bin/notify-send ] ; then
         for user in $users ; do
             userid=$(/usr/bin/id -u $user)
             cmd=(DISPLAY=:0 DBUS_SESSION_ADDRESS=unix:path=/run/user/$userid/bus /usr/bin/notify-send)
-            cmd+=(--icon=system-reboot --expire-time=20000)
+            cmd+=(--icon=system-reboot --urgency=critical)
             cmd+=("\"Reboot recommended!\"")
             cmd+=("\"Reboot is recommended because of recent core system package upgrades.\"")
             /usr/bin/su $user -c "${cmd[*]}"
@@ -24,7 +24,7 @@ if [ -x /usr/bin/notify-send ] ; then
 
 elif [ -x /usr/bin/yad ] ; then
 
-    # Implementation using yad (dialog does not expire).
+    # Implementation using yad.
 
     /usr/bin/yad --form --title='Reboot recommended' \
                  --width=500 --height=100 --image=dialog-info \
