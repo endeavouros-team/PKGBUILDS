@@ -3,7 +3,7 @@
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
 pkgver=0.5
-pkgrel=12
+pkgrel=13
 arch=('any')
 license=('GPL')
 depends=(bash yad welcome xdg-utils wget)
