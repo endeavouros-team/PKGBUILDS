@@ -137,20 +137,27 @@ FetchAndCheck() {
     local progname="$2"
     local url="$3"
     local sha512sums xx
+    local ixt ixs
 
     pushd "$configdir" >/dev/null
 
-    wget -q -O $progname.service.pacnew $url/$progname.service || eos_yad_DIE "$FUNCNAME: wget 'service' failed."
-    wget -q -O $progname.timer.pacnew   $url/$progname.timer   || eos_yad_DIE "$FUNCNAME: wget 'timer' failed."
+    wget -q --timeout=10 -O $progname.service.pacnew $url/$progname.service || eos_yad_DIE "$FUNCNAME: wget 'service' failed."
+    wget -q --timeout=10 -O $progname.timer.pacnew   $url/$progname.timer   || eos_yad_DIE "$FUNCNAME: wget 'timer' failed."
+    wget -q --timeout=10 $url/PKGBUILD                                      || eos_yad_DIE "$FUNCNAME: wget 'PKGBUILD' failed."
 
-    # Note: this way of checking assumes PKGBUILD has certain order in 'source' and 'sha52sums'.
-    wget -q --timeout=10 $url/PKGBUILD || \
-        eos_yad_DIE "$FUNCNAME: wget 'PKGBUILD' failed."
-    readarray -t sha512sums <<< $(grep -A5 "^sha512sums=" PKGBUILD | tail -n 2 | tr -d "'" | tr -d ')')
+    source PKGBUILD
     rm -f PKGBUILD
-    echo "${sha512sums[0]}  $progname.timer.pacnew"   | sha512sum -c || \
+
+    for ((xx=0; xx < ${#source[@]}; xx++)) ; do
+        case "${source[$xx]}" in
+            *.timer)   ixt=$xx ;;
+            *.service) ixs=$xx ;;
+        esac
+    done
+    
+    echo "${sha512sums[$ixt]}  $progname.timer.pacnew"   | sha512sum -c || \
         eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.timer"
-    echo "${sha512sums[1]}  $progname.service.pacnew" | sha512sum -c || \
+    echo "${sha512sums[$ixs]}  $progname.service.pacnew" | sha512sum -c || \
         eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.service"
 
     for xx in timer service ; do
