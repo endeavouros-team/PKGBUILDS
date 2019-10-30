@@ -192,25 +192,50 @@ Initialize() {    # initialize service and timer for the current user
 
     local configdir="$HOME/.config/systemd/user"
     local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
+    local modify_service=0
+    local fetch_files=0
 
     mkdir -p "$configdir"
 
-    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] || [ "$arg" = "-init-force" ]
+    case "$arg" in
+        -init-force | -conf) modify_service=1 ;;
+    esac
+    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
+        fetch_files=1
+    fi
+
+    if [ "$fetch_files" = "1" ] || [ "$modify_service" = "1" ]
     then
-        # -init-force may bring updated .service and .timer files
-        if [ "$arg" = "-init-force" ] ; then
-            systemctl --user status $progname.timer >/dev/null && {
-                systemctl --user stop    $progname.timer
-                systemctl --user disable $progname.timer
-            }
-        fi
-        FetchAndCheck "$configdir" "$progname" "$url"
+        systemctl --user status $progname.timer >/dev/null && {
+            systemctl --user stop    $progname.timer
+            systemctl --user disable $progname.timer
+        }
+        test "$fetch_files" = "1" && FetchAndCheck "$configdir" "$progname" "$url"
+        case "$arg" in
+            -conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$line"'|' ;;
+        esac
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
         debug "New '$configdir/$progname.service' successfully set up."
         debug "New '$configdir/$progname.timer' successfully set up."
         debug "$progname service initialized for user '$(basename "$HOME")'."
     fi
+}
+
+Configure() {
+    local result=$(
+        yad --form --title="Configure update check schedule" --width=400 \
+            --text="Tip:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n" \
+            --field="Interval in hours":num 2 \
+            --field="Initial hour":num 0 \
+            --field="Minute offset":num 25
+          )
+    test -n "$result" || return 1
+    local interval=$(     echo "$result" | cut -d '|' -f 1)
+    local initial_hour=$( echo "$result" | cut -d '|' -f 2)
+    local minute_offset=$(echo "$result" | cut -d '|' -f 3)
+    local line="$initial_hour/$interval:$minute_offset:00"
+    Initialize
 }
 
 Usage() {
@@ -228,6 +253,7 @@ Usage: $prog_name [options]
 Options:
    -init        Initialize $prog_name systemd service for current user.
    -init-force  Same as -init, but may overwrite existing user service files.
+   -conf        Configure the schedule of checking for the updates.
    -iw=X        Initial sleep time. Value syntax from 'sleep' program.
                 Default: $iwt.
    -mode=X      Operation mode (onetimer or loop).
@@ -271,6 +297,10 @@ Main()
         case "$arg" in
             -init | -init-force)
                 initialize="$arg"
+                ;;
+            -conf)
+                Configure
+                return
                 ;;
             -iw=*)
                 initial_waittime="$(eos_yad_GetArgVal "$arg")"
