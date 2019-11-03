@@ -51,6 +51,16 @@ debug() {
     eos_un_log "$@"
 }
 
+ShowNonFocused() {
+    # there are updates, but don't steal focus, just show there are updates
+    local source="$1"
+    local geom="400x100+20+20"   # 400x100+10+10
+
+    printf "$source updates are available.\nClose this window to start the update.\n" | \
+        yad --text-info --geometry=$geom --wrap --no-focus --title="Updates available" \
+            --formatted --button=yad-ok:0
+}
+
 Update_common() {
     # Check upstream updates first.
 
@@ -61,6 +71,10 @@ Update_common() {
 
     updates="$(checkupdates)"
     if [ -n "$updates" ] ; then
+        if [ $update_focused -eq 0 ] ; then
+            ShowNonFocused Upstream
+            updates="$(checkupdates)"    # may have been a long wait...
+        fi
         ((hasupdates++))
         source=upstream
         cmd='su -c "pacman -Syu"'
@@ -72,6 +86,10 @@ Update_common() {
 
     test "$CheckAurUpdates" = "yes" && updates="$(yay -Qua)" || updates=""
     if [ -n "$updates" ] ; then
+        if [ $update_focused -eq 0 ] ; then
+            ShowNonFocused AUR
+            updates="$(yay -Qua)"    # may have been a long wait...
+        fi
         ((hasupdates++))
         cmd="yay -Syua"                                        # potential problem for non-sudoers ...
         source=AUR
@@ -289,6 +307,7 @@ Main()
     local arg
     local progname=eos-update-notifier
     local initialize=""
+    local update_focused=0
 
     rm -f /tmp/$progname.log.*
     export EOS_UPDATE_NOTIFIER_LOG=$(mktemp /tmp/$progname.log.XXXXXXXX)
@@ -319,6 +338,10 @@ Main()
                 ;;
             -systemd)
                 systemd=1
+                ;;
+            -update-focused)
+                # this time we will steal focus (earlier we just showed there are updates)
+                update_focused=1
                 ;;
             -mode=*)
                 mode="$(eos_yad_GetArgVal "$arg")"
