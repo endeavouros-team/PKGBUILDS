@@ -10,6 +10,7 @@ Target = mesa
 Target = *wayland*
 Target = intel-ucode
 Target = amd-ucode
+Target = cryptsetup
 
 [Action]
 Description = Inform user to reboot after certain system package upgrades.
