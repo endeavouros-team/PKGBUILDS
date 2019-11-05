@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.13
-pkgrel=7
+pkgver=3.2.16
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -77,7 +77,7 @@ prepare() {
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"               $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                                $_reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'           $_reponame/src/modules/initcpio/InitcpioJob.cpp
-    sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $_reponame/src/modules/unpackfs/unpackfs.conf
+    #sed -i "s?./example.sqfs?\"/run/archiso/bootmnt/arch/x86_64/airootfs.sfs\"?g" $_reponame/src/modules/unpackfs/unpackfs.conf
 
 }
 
