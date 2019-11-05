@@ -208,12 +208,9 @@ CheckInternetConnection() {
 
 Initialize() {    # initialize service and timer for the current user
 
-    local configdir="$HOME/.config/systemd/user"
     local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
     local modify_service=0
     local fetch_files=0
-
-    mkdir -p "$configdir"
 
     case "$arg" in
         -init-force | -conf) modify_service=1 ;;
@@ -230,7 +227,7 @@ Initialize() {    # initialize service and timer for the current user
         }
         test "$fetch_files" = "1" && FetchAndCheck "$configdir" "$progname" "$url"
         case "$arg" in
-            -conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$line"'|' ;;
+            -conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
         esac
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
@@ -241,18 +238,54 @@ Initialize() {    # initialize service and timer for the current user
 }
 
 Configure() {
-    local result=$(
+    local current_value=$(grep "^OnCalendar=" $configdir/$progname.timer | cut -d '=' -f 2)
+
+    local current_interval=$(echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 2)
+    local current_initial=$( echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 1)
+    local current_minute=$(  echo $current_value | cut -d ':' -f 2)
+
+    local result retval
+    local tips="Tips:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n"
+    tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
+
+    result=$(
         yad --form --title="Configure update check schedule" --width=400 \
-            --text="Tip:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n" \
-            --field="Interval in hours":num 2 \
-            --field="Initial hour":num 0 \
-            --field="Minute offset":num 25
+            --text="$tips" \
+            --field="Interval in hours":num           $current_interval \
+            --field="Initial hour":num                $current_initial \
+            --field="Minute offset":ro                $current_minute \
+            --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
           )
-    test -n "$result" || return 1
-    local interval=$(     echo "$result" | cut -d '|' -f 1)
-    local initial_hour=$( echo "$result" | cut -d '|' -f 2)
-    local minute_offset=$(echo "$result" | cut -d '|' -f 3)
-    local line="$initial_hour/$interval:$minute_offset:00"
+    retval=$?
+    test $retval -eq 1 && return 1
+
+    local new_interval=$(echo "$result" | cut -d '|' -f 1)
+    local new_initial=$( echo "$result" | cut -d '|' -f 2)
+    local new_minute=$(shuf -i0-59 -n1)                      # try make users start at different times...
+
+    local oncalendar
+
+    case $retval in
+        10)
+            local default_interval=2
+            local default_initial=0
+            local default_minute=$(shuf -i0-59 -n1)          # try make users start at different times...
+
+            if [ $new_interval -eq $default_interval ] && [ $new_initial -eq $default_initial ] && [ $new_minute -eq $default_minute ]
+            then
+                return  # nothing to do
+            fi
+            oncalendar="$default_initial/$default_interval:$default_minute:00"
+            ;;
+        0)  
+            if [ $new_interval -eq $current_interval ] && [ $new_initial -eq $current_initial ] && [ $new_minute -eq $current_minute ]
+            then
+                return  # nothing to do
+            fi
+            oncalendar="$new_initial/$new_interval:$new_minute:00"
+            ;;
+    esac
+    echo2 "New OnCalendar value: $oncalendar"
     Initialize
 }
 
@@ -297,6 +330,7 @@ InitialWait() {
 
 Main()
 {
+    local configdir="$HOME/.config/systemd/user"
     local initial_waittime="5s"  # was 10s
     local loop_waittime=60m
     local no_updates__indicator_wait_time=10
@@ -308,6 +342,8 @@ Main()
     local progname=eos-update-notifier
     local initialize=""
     local update_focused=0
+
+    mkdir -p "$configdir"
 
     rm -f /tmp/$progname.log.*
     export EOS_UPDATE_NOTIFIER_LOG=$(mktemp /tmp/$progname.log.XXXXXXXX)
