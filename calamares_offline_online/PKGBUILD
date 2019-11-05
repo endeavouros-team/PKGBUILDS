@@ -61,6 +61,9 @@ prepare() {
     mv $_reponame-$pkgver       $_reponame
     rsync -va $_eos_changes/*   $_reponame
     rm -rf $_eos_changes
+    
+    # For testing EFI stuff
+    # mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
 
 
     # Build proccess can't understand our personal files, so we adjust here
