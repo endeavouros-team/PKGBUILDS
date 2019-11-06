@@ -51,14 +51,32 @@ debug() {
     eos_un_log "$@"
 }
 
+YadNonFocused() {
+    yad --text-info --wrap --no-focus --title="Updates available" \
+        --formatted --button=yad-ok:0 "$@"
+}
+
 ShowNonFocused() {
     # there are updates, but don't steal focus, just show there are updates
     local source="$1"
-    local geom="400x100+20+20"   # 400x100+10+10
+    local count="$(echo "$updates" | wc -l)"
+    local height limit=400
+    local tmp
 
-    printf "$source updates are available.\nClose this window to start the update.\n" | \
-        yad --text-info --geometry=$geom --wrap --no-focus --title="Updates available" \
-            --formatted --button=yad-ok:0
+    case "$ShowWhatAboutUpdates" in
+        packages)
+            tmp="$(echo "$updates" | sed 's|^|    |')"
+            height=$((10 * count + 100))
+            test $height -gt $limit && height=$limit
+            printf "$source updates are available:\n$tmp\nClose this window to start the update.\n" | \
+                YadNonFocused --geometry=400x${height}+20+20
+            ;;
+        number | *)
+            height=100
+            printf "$count $source updates are available.\nClose this window to start the update.\n" | \
+                YadNonFocused --geometry=400x${height}+20+20
+            ;;
+    esac
 }
 
 Update_common() {
