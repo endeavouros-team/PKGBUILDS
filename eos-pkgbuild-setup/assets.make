@@ -489,21 +489,22 @@ Main()
             *) Exit 0 ;;
         esac
 
+        # Remove old assets (removable) from github and local folder.
+        if [ -n "$removable" ] ; then
+            rm -f  "${removable[@]}"
+            for tag in "${RELEASE_TAGS[@]}" ; do
+                delete-release-assets --quietly "$tag" "${removableassets[@]}" "$REPONAME".{db,files} \
+                    || WARN "removing assets with tag '$tag' failed"
+            done
+            sleep 1
+        fi
+
         # transfer assets (built, signed and db) to github
         for tag in "${RELEASE_TAGS[@]}" ; do
             add-release-assets "$tag" \
                                "${built[@]}" "${signed[@]}" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
-                DIE "adding assets with tag 'tag' failed"
+                DIE "adding assets with tag '$tag' failed"
         done
-
-        # Remove old assets (removable) from github and local folder.
-        if [ -n "$removable" ] ; then
-            rm -f  "${removable[@]}"
-            sleep 1
-            for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets --quietly "$tag" "${removableassets[@]}" || WARN "removing assets with tag '$tag' failed"
-            done
-        fi
     else
         echo2 "Nothing to do."
     fi
