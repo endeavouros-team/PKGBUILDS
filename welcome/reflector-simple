@@ -3,16 +3,7 @@
 # Select pacman mirrors with a simple GUI.
 #
 
-#################################################################################
-EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
-if [ -r  $EOS_SCRIPTS_YAD ] ; then
-    source $EOS_SCRIPTS_YAD
-    export -f eos_yad
-else
-    eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
-fi
-unset EOS_SCRIPTS_YAD
-#################################################################################
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
 REFLECTOR_COUNTRIES="$(reflector --list-countries)"
 
