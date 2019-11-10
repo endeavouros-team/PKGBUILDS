@@ -187,7 +187,7 @@ yad_eos_default_theming() {
     }
 
     if [ $retval -eq 0 ] ; then
-        eos_yad_RunCmdTermBash "bash \"$themer\" $DE 2> \"$errors\" ; echo 'Press ENTER to continue:'"
+        eos_yad_RunCmdTermBash "bash \"$themer\" $DE 2> \"$errors\""
         if [ "$(stat -c %s "$errors")" -ne 0 ] ; then
             eos_yad_WARN "theming failed. See error log in file '$errors'."
             retval=1
