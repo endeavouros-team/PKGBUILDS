@@ -57,16 +57,26 @@ YadNonFocused() {
 }
 
 ShowNonFocused() {
-    # there are updates, but don't steal focus, just show there are updates
     local source="$1"
     local count="$(echo "$updates" | wc -l)"
+    local PREFER_TRAY=0
+
+    if [ "$PREFER_TRAY" = "1" ] ; then
+        # Tray notification cannot be used on EOS because it creates an unwarranted terminal window.
+        grep -i endeavouros /etc/*-release >/dev/null || {
+            yad --notification --image="system-software-update" --text="$count $source updates are available" --command=quit
+            return
+        }
+    fi
+    
+    # there are updates, but don't steal focus, just show there are updates
     local height limit=400
     local tmp
 
     case "$ShowWhatAboutUpdates" in
         packages)
             tmp="$(echo "$updates" | sed 's|^|    |')"
-            height=$((10 * count + 100))
+            height=$((16 * count + 100))
             test $height -gt $limit && height=$limit
             printf "$source updates are available:\n$tmp\nClose this window to start the update.\n" | \
                 YadNonFocused --geometry=400x${height}+20+20
@@ -148,24 +158,28 @@ CheckArchNews() {
 
 Main2() {
     local CheckAurUpdates=yes
-    local lockfile=/var/lib/pacman/db.lck
+    local lockfile
     local msg
 
     CheckArchNews   # also reads config file
 
-    test -e $lockfile && {
+    # check package manager lock
+    lockfile=/var/lib/pacman/db.lck
+    if [ -e $lockfile ] ; then
         msg="Sorry, another program is currently using pacman databases."
         debug "$msg"
         return
-    }
+    fi
+    # check notifier lock
+    lockfile="$HOME/.eos-update-notifier.lck"
+    if [ -e "$lockfile" ] ; then
+        debug "Sorry, $progname is already checking for updates."
+        return
+    fi
 
-    test "$EOS_UPDATER_WINDOW_ON" != "1" && {
-        export EOS_UPDATER_WINDOW_ON=1        # prevent having many update sessions at the same time
-        Update_common
-        export EOS_UPDATER_WINDOW_ON=0
-    } || {
-        debug "Sorry, another process is currently checking for updates."
-    }
+    touch "$lockfile"
+    Update_common
+    rm -f "$lockfile"
 }
 
 FetchAndCheck() {
