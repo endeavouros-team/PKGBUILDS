@@ -25,7 +25,7 @@
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
 }
-export -f eos_yad
+#export -f eos_yad
 
 eos_yad_terminal() {
     # Show a terminal that is capable of supporting option -e properly. Empty if not found.
