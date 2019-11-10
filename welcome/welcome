@@ -162,39 +162,33 @@ yad_ChangeDisplayManager() {
 export -f yad_ChangeDisplayManager
 
 yad_eos_default_theming() {
-    eos_yad --text="Not yet available!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
-    return
-
-    local de="$(eos_yad__detectDE)"
-    test -z "$de" || {
-        eos_yad_WARN "cannot detech Desktop Environment!"
-        return 1
-    }
-    local themer="$(mktemp "$HOME/.theming.$de.XXXXXXX.sh")"
-    local errors="$(mktemp "$HOME/.theming-errors.$de.XXXXXXX.sh")"
-    local retval=0
-
-    case "$de" in
-        xfce)
-            wget -q --timeout=5 -O "$themer" https://github.com/endeavouros-team/DE-theming/raw/master/$de.sh || {
-                eos_yad_WARN "cannot fetch theming file '$de.sh'"
-                retval=1
-            } && {
-                bash "$themer" 2> "$errors"
-                if [ "$(stat -c %s "$errors")" -ne 0 ] ; then
-                    eos_yad_WARN "$de.sh: theming failed. See error log in file '$errors'."
-                    retval=1
-                fi
-            }
-            ;;
-        cinnamon)
-            eos_yad --text="Coming soon for '$de'!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
-            ;;
-        *)
-            eos_yad --text="Sorry, not yet for '$de'!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+    local DE="$(eos_yad_GetDesktopName)"
+    case "$DE" in
+        XFCE | CINNAMON) ;;
+        "") eos_yad_WARN "unable to detect Desktop Environment!" ; return 1 ;;
+        *)  eos_yad --text="Sorry, theming not (yet) supported for '$DE'!" --title="Warning" \
+                    --height=100 --width=200 --button=yad-quit:1
+            return 1
             ;;
     esac
-    rm -f "$themer"
+
+    local themer="$(mktemp -u "$HOME/.eos-theming-$DE-XXXXXXX.sh")"              # eos-theming.sh !!!
+    local errors="$(mktemp "$HOME/.theming-errors-$DE-XXXXXXX.err")"
+    local retval=0
+
+    wget -q --timeout=10 -O "$themer" https://github.com/endeavouros-team/DE-theming/raw/master/eos-theming.sh || {
+        eos_yad_WARN "welcome: unable to fetch theming installer!"
+        retval=1
+    }
+
+    if [ $retval -eq 0 ] ; then
+        eos_yad_RunCmdTermBash "bash \"$themer\" $DE 2> \"$errors\" ; echo 'Press ENTER to continue:'"
+        if [ "$(stat -c %s "$errors")" -ne 0 ] ; then
+            eos_yad_WARN "theming failed. See error log in file '$errors'."
+            retval=1
+        fi
+    fi
+    test -e "$themer"  && rm -f "$themer"
     test $retval -eq 0 && rm -f "$errors"
 }
 export -f yad_eos_default_theming
@@ -249,6 +243,7 @@ AfterInstall() {
           --text="<b>After install tasks</b>" --text-align=left \
           --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
+          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
@@ -258,7 +253,6 @@ AfterInstall() {
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 #          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
-#          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
 }
 
 AddMoreApps() {
