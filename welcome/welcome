@@ -176,15 +176,15 @@ yad_eos_default_theming() {
             return 1
             ;;
     esac
-    local themer="$(mktemp -u "$HOME/.eos-theming-$DE-XXXXXXX.sh")"              # eos-theming.sh !!!
+    local themer="$(mktemp -u "$HOME/.eos-theming-$DE-XXXXXXX.sh")"
 
     wget -q --timeout=10 -O "$themer" https://github.com/endeavouros-team/DE-theming/raw/master/eos-theming.sh || {
         eos_yad_WARN "welcome: unable to fetch theming installer!"
         return 1
     }
 
-    eos_yad_RunCmdTermBash "bash \"$themer\" $DE"
-    rm -f "$themer"
+    eos_yad_RunCmdTermBash "bash \"$themer\" $DE ; rm -f \"$themer\""
+
 }
 export -f yad_eos_default_theming
 
