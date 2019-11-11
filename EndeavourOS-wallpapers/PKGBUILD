@@ -1,0 +1,25 @@
+# Maintainer: Alexandre Filgueira <faidoc@gmail.com>
+
+pkgname=EndeavourOS-wallpapers
+_pkgname=EndeavourOS-wallpapers
+pkgver=1
+pkgrel=1
+pkgdesc='Default wallpapers for EndeavourOS Linux'
+arch=('any')
+url='http://www.endeavouros.com'
+license=('CCPL:by-nc-sa')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${_pkgname}/archive/${pkgver}.tar.gz")
+md5sums=('xxx')
+
+
+package() {
+	cd "${srcdir}/${_pkgname}-${pkgver}"
+
+	install -d "${pkgdir}/usr/share/endeavouros/wallpapers"
+	install -m644 *.jpg "${pkgdir}/usr/share/endeavouros/wallpapers/"
+	install -m644 *.png "${pkgdir}/usr/share/endeavouros/wallpapers/"
+
+
+	mkdir -p "${pkgdir}/usr/share/backgrounds"
+	ln -sr "${pkgdir}/usr/share/endeavouros/wallpapers" "${pkgdir}/usr/share/backgrounds/endeavouros"
+}
