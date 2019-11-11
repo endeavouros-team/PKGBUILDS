@@ -183,7 +183,7 @@ yad_eos_default_theming() {
         return 1
     }
 
-    eos_yad_RunCmdTermBash "bash \"$themer\" $DE ; rm -f \"$themer\""
+    eos_yad_RunCmdTermBash "bash \"$themer\" $DE ; rm -f \"$themer\" ; echo 'Press ENTER to close this window:'"
 
 }
 export -f yad_eos_default_theming
