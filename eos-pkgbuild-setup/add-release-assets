@@ -54,6 +54,7 @@ Main() {
     for asset in "$@" ; do
         test -r "$asset" || DIE "asset '$asset' does not exist."
         assets+=("-a" "$asset")
+        echo "adding asset $(basename "$asset")" >&2
     done
 
     hub release edit "${assets[@]}" -m "" $TAG
