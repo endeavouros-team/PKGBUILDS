@@ -1,4 +1,4 @@
-# Maintainer: Alexandre Filgueira <faidoc@gmail.com>
+# Maintainer: Johannes Kamprad <joekamprad@endeavouros.com>
 
 pkgname=EndeavourOS-wallpapers
 _pkgname=EndeavourOS-wallpapers
@@ -9,7 +9,7 @@ arch=('any')
 url='http://www.endeavouros.com'
 license=('CCPL:by-nc-sa')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${_pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('5183e6dcb823fbad3092e99525ea1334')
+md5sums=('1e54169991593354516c033c6f006ae4')
 
 
 package() {
