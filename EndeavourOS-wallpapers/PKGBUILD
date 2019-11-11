@@ -2,7 +2,7 @@
 
 pkgname=EndeavourOS-wallpapers
 _pkgname=EndeavourOS-wallpapers
-pkgver=1
+pkgver=2
 pkgrel=1
 pkgdesc='Default wallpapers for EndeavourOS Linux'
 arch=('any')
