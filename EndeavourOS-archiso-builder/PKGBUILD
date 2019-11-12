@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-archiso
 pkgver=0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git)
@@ -12,15 +12,42 @@ source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
 sha512sums=(SKIP)
 
 build() {
+    local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
+    local _cmds=()
+    local cleanup=cleanup.bash
+
     cd $pkgname
 
-    echo "Fixing permissions:"
-    sudo ./fix_permissions.sh
+    _cmds+=(./fix_permissions.sh \;)
+    _cmds+=(./build.sh -v \;)
+    _cmds+=(cd "$build_rootdir" \;)
+    _cmds+=(mv "$srcdir/$pkgname"/out/*.iso . \;)
+    _cmds+=(chown $LOGNAME:$LOGNAME *.iso)
 
-    echo "Building:"
-    sudo ./build.sh -v
+    su -c "${_cmds[*]}"
+    sync
 
-    ls -1 $srcdir/$pkgname/out/*
+    cd "$build_rootdir"
+
+    cat <<EOF > $cleanup
+#!/bin/bash
+sudo rm -f  $build_rootdir/$pkgname-*.pkg.tar.*
+sudo rm -rf $build_rootdir/$pkgname
+sudo rm -rf $build_rootdir/pkg
+sudo rm -rf $build_rootdir/src
+EOF
+
+    echo ""
+    echo "#######################################################################"
+    echo ""
+    echo "The new ISO is here:"
+    ls -1 "$build_rootdir"/*.iso
+    echo ""
+    echo "To clean up all except the ISO, run command:"
+    echo "    bash $cleanup"
+    echo ""
+    echo "#######################################################################"
+    echo ""
 }
 
 package() {
