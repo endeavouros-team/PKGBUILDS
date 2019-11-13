@@ -14,7 +14,6 @@ package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
 
 	install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
-	install -m644 *.jpeg "${pkgdir}/usr/share/endeavouros/backgrounds/"
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds/"
 
 
