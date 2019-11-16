@@ -18,6 +18,8 @@ build() {
 
     cd $pkgname
 
+    _cmds+=(pacman -Syyu \;)       # make sure system is updated
+
     _cmds+=(./fix_permissions.sh \;)
     _cmds+=(./build.sh -v \;)
     _cmds+=(cd "$build_rootdir" \;)
