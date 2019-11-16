@@ -209,7 +209,7 @@ export -f yad_ChangeDisplayManager
 yad_eos_default_theming() {                        # TODO !!!
     local DE="$(eos_yad_GetDesktopName)"
     case "$DE" in
-        # XFCE | CINNAMON) ;;
+        XFCE | CINNAMON) ;;
         "") eos_yad_WARN "unable to detect Desktop Environment!"
             return 1
             ;;
