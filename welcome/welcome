@@ -207,6 +207,12 @@ yad_ChangeDisplayManager() {
 export -f yad_ChangeDisplayManager
 
 yad_eos_default_theming() {                        # TODO !!!
+    local theming_support_skip=1
+    if [ $theming_support_skip -eq 1 ] ; then
+        eos_yad --text="Sorry, theming not (yet) supported!" --title="Warning" \
+                --height=100 --width=300 --button=yad-quit:1
+        return 1
+    fi
     local DE="$(eos_yad_GetDesktopName)"
     case "$DE" in
         XFCE | CINNAMON) ;;
