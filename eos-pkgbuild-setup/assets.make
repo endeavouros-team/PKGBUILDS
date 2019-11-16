@@ -139,15 +139,17 @@ ListNameToPkgName()
                 rm -rf "$pkgname"
                 yay -Ga "$pkgname" >/dev/null || DIE "'yay -Ga $pkgname' failed."
                 rm -rf "$pkgname"/.git                          # not needed
-                # AUR pkg files may need some changes:
-                hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
-                test -n "$hook" && {
-                    echo2 -n "."    # echo2 -n "hook[$hook] ... "
-                    "$hook"
-                }
                 ;;
         esac
     fi
+
+    # A pkg may need some changes:
+    hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
+    test -n "$hook" && {
+        echo2 -n "."    # echo2 -n "hook[$hook] ... "
+        "$hook"
+    }
+
     echo "$pkgname"
 }
 
