@@ -105,7 +105,7 @@ Update_common() {
         fi
         ((hasupdates++))
         source=upstream
-        cmd='su -c "pacman -Syu"'
+        cmd='echo -n "Updating, root password required. " ; su -c "pacman -Syu"'
         eos_un_log "$source updates available: $updates"
         eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
     fi
@@ -231,9 +231,9 @@ CheckInternetConnection() {
     eos_yad_check_internet_connection no_fail_dialog $wait_rounds $one_wait || {
         if [ "$verbosity" = "high" ] ; then
             echo "Internet connection is not available!" | \
-                eos_yad_problem "Error from eos-update-notifier" --width=400 --height=200 &
+                eos_yad_problem "Warning from eos-update-notifier" --width=400 --height=200 &
         fi
-        debug "Error: eos-update-notifier: internet connection is not available!"
+        debug "Warning: eos-update-notifier: internet connection is not available!"
         return 1
     }
 }
