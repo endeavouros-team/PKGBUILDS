@@ -2,7 +2,7 @@
 Type=Application
 Name=EOS update notifier
 Icon=/usr/share/endeavouros/EndeavourOS-icon.png
-Exec=eos-update-notifier -init
+Exec=eos-update-notifier -init -q
 Comment=EndeavourOS update notifier
 Hidden=false
 X-GNOME-Autostart-enabled=true
