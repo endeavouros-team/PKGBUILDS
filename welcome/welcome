@@ -65,6 +65,7 @@ yad_calamares() {
             ping -c 1 8.8.8.8 >/dev/null && {
                 /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
             }
+            ;;
         *)
             echo "$PROGNAME: yad_calamares: unsupported mode '$mode'." >&2
             return 1
