@@ -245,7 +245,7 @@ INSTALL() {
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
           --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
-          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares offline' \
+          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares offline"' \
           --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
