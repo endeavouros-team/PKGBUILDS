@@ -27,19 +27,58 @@ export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 #################################################################################
 
+export PROGNAME=eos-welcome
+
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
 }
-#export -f eos_yad
+export -f eos_yad
 
 yad_calamares() {
-    local prog=/usr/bin/calamares
+    local mode="$1"                             # offline, online, choose
+    local prog
+
+    # 'mode' check
+    case "$mode" in
+        offline | online) ;;
+        choose)
+            local answer=$(eos_yad --list --radiolist --title="Choose installation method" --width=400 --height=100 \
+                                   --column="Selected" --column="Method" \
+                                   true "Offline (install live desktop)" false "Online (choose your desktop)"
+                  )
+            test -n "$answer" || return 1
+            mode=$(echo "$answer" | cut -d '|' -f 2 | awk '{print $1}' | tr [:upper:] [:lower:])
+            ;;
+        *)
+            echo "$PROGNAME: yad_calamares: unsupported mode '$mode'." >&2
+            return 1
+            ;;
+    esac
+
+    case "$mode" in
+        offline)
+            prog=/usr/bin/calamares
+            ;;
+        online)
+            prog=/usr/bin/calamares_switcher
+            # network needed only with online install
+            ping -c 1 8.8.8.8 >/dev/null && {
+                /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
+            }
+        *)
+            echo "$PROGNAME: yad_calamares: unsupported mode '$mode'." >&2
+            return 1
+            ;;
+    esac
 
     if [ -x $prog ] ; then
-        ping -c 1 8.8.8.8 >/dev/null && {
-            /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
-        }
+        sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
+        sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
+        sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
+
         bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
+
+        # test $netlog -eq 1 && cat /home/liveuser/endeavour-install.log | curl -F 'f:1=<-' ix.io
     else
         eos_yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
     fi
@@ -166,13 +205,15 @@ yad_ChangeDisplayManager() {
 }
 export -f yad_ChangeDisplayManager
 
-yad_eos_default_theming() {
+yad_eos_default_theming() {                        # TODO !!!
     local DE="$(eos_yad_GetDesktopName)"
     case "$DE" in
-        XFCE | CINNAMON) ;;
-        "") eos_yad_WARN "unable to detect Desktop Environment!" ; return 1 ;;
+        # XFCE | CINNAMON) ;;
+        "") eos_yad_WARN "unable to detect Desktop Environment!"
+            return 1
+            ;;
         *)  eos_yad --text="Sorry, theming not (yet) supported for '$DE'!" --title="Warning" \
-                    --height=100 --width=200 --button=yad-quit:1
+                    --height=100 --width=300 --button=yad-quit:1
             return 1
             ;;
     esac
@@ -197,7 +238,7 @@ INSTALL() {
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
           --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
-          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares' \
+          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c yad_calamares offline' \
           --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
@@ -301,10 +342,8 @@ _NOTEBOOK_TABS=(                             # names of functions above
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
 
 Usage() {
-    local progname=eos-welcome
-
     cat <<EOF
-Usage: $progname [options]
+Usage: $PROGNAME [options]
 
 Options:
 --startdelay=X    Wait before actually starting the app.
@@ -323,7 +362,7 @@ You may also disable the Welcome app from the app itself
 - with a button in the app (some DEs only)
 
 To re-enable the app, use the terminal command
-    $progname --enable
+    $PROGNAME --enable
 EOF
 }
 export -f Usage
@@ -429,7 +468,6 @@ KillExtraYad() {
 GreeterSettings() {
     local value="$1"   # enable, disable, check
     local GREETER_CONFIG="$HOME/.config/EOS-greeter.conf"
-    local progname="eos-welcome"
 
     case "$value" in
         enable)
@@ -438,7 +476,7 @@ GreeterSettings() {
         disable)
             echo "Greeter=$value" > "$GREETER_CONFIG"
 
-            echo "To run the greeter again, start a terminal and run '$progname --enable'." | \
+            echo "To run the greeter again, start a terminal and run '$PROGNAME --enable'." | \
                 eos_yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
                         --title="How to re-enable greeter" \
                         --geometry=500x200 --wrap \
@@ -456,6 +494,7 @@ StartHere() {
     KillExtraYad
 
     local start_delay=0
+    #local netlog=0
 
     local arg
 
@@ -464,6 +503,7 @@ StartHere() {
             --enable|-f) GreeterSettings enable ;;
             --disable)   GreeterSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
+            #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
@@ -474,7 +514,9 @@ StartHere() {
         return
     }
 
-    eos_yad_check_internet_connection verbose 10 || return 1
+    if [ ! -x /usr/bin/calamares ] ; then
+        eos_yad_check_internet_connection verbose 10 || return 1
+    fi
 
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
