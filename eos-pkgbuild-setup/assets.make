@@ -352,10 +352,12 @@ Exit()
 Main()
 {
     local cmd=""
+    local repoup=0
 
     # Check given parameters:
     case "$1" in
         --checkaur) cmd=checkaur ;;
+        --repoup) repoup=1 ;;
         "") ;;
         *) Usage 0  ;;
     esac
@@ -446,43 +448,46 @@ Main()
         fi
     done
 
-    if [ -n "$built" ] ; then
+    if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
 
-        # We have something built to be sent to github.
+        # We have something built to be sent to github, or we want to update repo to github.
         
-        echo2 "Signing and putting it all together..."
-
-        # sign built packages
-        for pkg in "${built[@]}" ; do
-            gpg --local-user "$SIGNER" \
-                --output "$pkg.sig" \
-                --detach-sign "$pkg" || DIE "signing '$pkg' failed"
-            signed+=("$pkg.sig")
-        done
-
         # now we have: removable (and removableassets), built and signed
 
         # Move built and signed to assets dir...
-        mv -i "${built[@]}" "${signed[@]}" "$ASSETSDIR"
+        if [ -n "$built" ] ; then
+            echo2 "Signing and putting it all together..."
 
-        # ...and fix the variables 'built' and 'signed' accordingly.
-        tmp=("${built[@]}")
-        built=()
-        for xx in "${tmp[@]}" ; do
-            built+=("$ASSETSDIR/$(basename "$xx")")
-        done
-        tmp=("${signed[@]}")
-        signed=()
-        for xx in "${tmp[@]}" ; do
-            signed+=("$ASSETSDIR/$(basename "$xx")")
-        done
+            # sign built packages
+            for pkg in "${built[@]}" ; do
+                gpg --local-user "$SIGNER" \
+                    --output "$pkg.sig" \
+                    --detach-sign "$pkg" || DIE "signing '$pkg' failed"
+                signed+=("$pkg.sig")
+            done
 
-        # Put changed assets (built) to db.
-        repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
-        rm -f "$ASSETSDIR/$REPONAME".{db,files}.tar.$_COMPRESSOR.old
-        rm -f "$ASSETSDIR/$REPONAME".{db,files}
-        cp -a "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR    "$ASSETSDIR/$REPONAME".db
-        cp -a "$ASSETSDIR/$REPONAME".files.tar.$_COMPRESSOR "$ASSETSDIR/$REPONAME".files
+            mv -i "${built[@]}" "${signed[@]}" "$ASSETSDIR"
+
+            # ...and fix the variables 'built' and 'signed' accordingly.
+            tmp=("${built[@]}")
+            built=()
+            for xx in "${tmp[@]}" ; do
+                built+=("$ASSETSDIR/$(basename "$xx")")
+            done
+            tmp=("${signed[@]}")
+            signed=()
+            for xx in "${tmp[@]}" ; do
+                signed+=("$ASSETSDIR/$(basename "$xx")")
+            done
+
+            # Put changed assets (built) to db.
+            repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
+
+            rm -f "$ASSETSDIR/$REPONAME".{db,files}.tar.$_COMPRESSOR.old
+            rm -f "$ASSETSDIR/$REPONAME".{db,files}
+            cp -a "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR    "$ASSETSDIR/$REPONAME".db
+            cp -a "$ASSETSDIR/$REPONAME".files.tar.$_COMPRESSOR "$ASSETSDIR/$REPONAME".files
+        fi
 
         echo2 "Final stop before syncing with github!"
         read -p "Continue (Y/n)? " xx
@@ -495,17 +500,27 @@ Main()
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets --quietly "$tag" "${removableassets[@]}" "$REPONAME".{db,files} \
-                    || WARN "removing assets with tag '$tag' failed"
+                delete-release-assets --quietly "$tag" "${removableassets[@]}" \
+                    || WARN "removing pkg assets with tag '$tag' failed"
             done
             sleep 1
         fi
+        for tag in "${RELEASE_TAGS[@]}" ; do
+            delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
+                || WARN "removing db assets with tag '$tag' failed"
+        done
+        sleep 1
 
         # transfer assets (built, signed and db) to github
+        if [ -n "$built" ] ; then
+            for tag in "${RELEASE_TAGS[@]}" ; do
+                add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
+                    DIE "adding pkg assets with tag '$tag' failed"
+            done
+        fi
         for tag in "${RELEASE_TAGS[@]}" ; do
-            add-release-assets "$tag" \
-                               "${built[@]}" "${signed[@]}" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
-                DIE "adding assets with tag '$tag' failed"
+            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
+                DIE "adding db assets with tag '$tag' failed"
         done
     else
         echo2 "Nothing to do."
