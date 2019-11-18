@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-archiso
 pkgver=0.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git)
@@ -15,26 +15,26 @@ build() {
     local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
     local _cmds=()
     local cleanup="$build_rootdir/cleanup.bash"
+    local basedir=${pkgname}-master
 
     # create a cleanup script
     cat <<EOF > "$cleanup"
 #!/bin/bash
 sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
 sudo rm -f  $build_rootdir/${pkgname}.zip
-sudo rm -rf $build_rootdir/$pkgname
 sudo rm -rf $build_rootdir/pkg
 sudo rm -rf $build_rootdir/src
 EOF
 
     # build
-    cd ${pkgname}-master
+    cd $basedir
 
     _cmds+=(pacman -Syyu \;)       # make sure system is updated
 
     _cmds+=(./fix_permissions.sh \;)
     _cmds+=(./build.sh -v \;)
     _cmds+=(cd "$build_rootdir" \;)
-    _cmds+=(mv "$srcdir/$pkgname"/out/*.iso . \;)
+    _cmds+=(mv "$srcdir/$basedir"/out/*.iso . \;)
     _cmds+=(chown $LOGNAME:$LOGNAME *.iso)
 
     su -c "${_cmds[*]}"
