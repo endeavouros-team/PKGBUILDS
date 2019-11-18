@@ -3,20 +3,31 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.1
-pkgrel=2
+pkgver=0.2
+pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git)
-source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
-sha512sums=(SKIP)
+source=($pkgname.zip::https://github.com/endeavouros-team/EndeavourOS-archiso/archive/master.zip)
+sha512sums=(29d391acb3d9698ffe5ea4b3d492110a4aaac208050ecaca871637934bb1e922b7289796c7128acb213c003b0b1e11bd0521aeea2c3f6756102aa7b5d395522d)
 
 build() {
     local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
     local _cmds=()
-    local cleanup=cleanup.bash
+    local cleanup="$build_rootdir/cleanup.bash"
 
-    cd $pkgname
+    # create a cleanup script
+    cat <<EOF > "$cleanup"
+#!/bin/bash
+sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
+sudo rm -f  $build_rootdir/${pkgname}.zip
+sudo rm -rf $build_rootdir/$pkgname
+sudo rm -rf $build_rootdir/pkg
+sudo rm -rf $build_rootdir/src
+EOF
+
+    # build
+    cd ${pkgname}-master
 
     _cmds+=(pacman -Syyu \;)       # make sure system is updated
 
@@ -29,15 +40,9 @@ build() {
     su -c "${_cmds[*]}"
     sync
 
-    cd "$build_rootdir"
+    # show the result
 
-    cat <<EOF > $cleanup
-#!/bin/bash
-sudo rm -f  $build_rootdir/$pkgname-*.pkg.tar.*
-sudo rm -rf $build_rootdir/$pkgname
-sudo rm -rf $build_rootdir/pkg
-sudo rm -rf $build_rootdir/src
-EOF
+    cd "$build_rootdir"
 
     echo ""
     echo "#######################################################################"
