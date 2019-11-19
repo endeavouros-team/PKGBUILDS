@@ -18,17 +18,6 @@ printf2() { printf "$@" >&2 ; }
 DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
 WARN()  { echo2 "Warning: $1." ; }
 
-Usage() {
-    cat <<EOF >&2
-$PROGNAME: Build packages and transfer results to github.
-
-$PROGNAME [--checkaur]
-where
-    --checkaur    Compare certain AUR PKGBUILDs to local counterparts.
-EOF
-    test -n "$1" && exit "$1"
-}
-
 Pushd() { pushd "$@" >/dev/null || DIE "${FUNCNAME[1]}: pushd $* failed" ; }
 
 Popd()  {
@@ -349,18 +338,34 @@ Exit()
     exit "$code"
 }
 
+Usage() {
+    cat <<EOF >&2
+$PROGNAME: Build packages and transfer results to github.
+
+$PROGNAME [--checkaur | --repoup ]
+where
+    --checkaur    Compare certain AUR PKGBUILDs to local counterparts.
+EOF
+    test -n "$1" && exit "$1"
+}
+
 Main()
 {
     local cmd=""
+    local xx
     local repoup=0
+    local reposig                                   # 1 = sign repo too, 0 = don't sign repo
 
     # Check given parameters:
-    case "$1" in
-        --checkaur) cmd=checkaur ;;
-        --repoup) repoup=1 ;;
-        "") ;;
-        *) Usage 0  ;;
-    esac
+    if [ -n "$1" ] ; then
+        for xx in "$@" ; do
+            case "$xx" in
+                --checkaur) cmd=checkaur ;;
+                --repoup)   repoup=1 ;;             # sync repo even when no packages are built
+                *) Usage 0  ;;
+            esac
+        done
+    fi
 
     test -r $ASSETS_CONF || DIE "cannot find local file $ASSETS_CONF"
 
@@ -392,7 +397,7 @@ Main()
     local signed=()             # collected
     declare -A newv oldv
     local tmp tmpcurr
-    local xx pkg
+    local pkg
     local pkgdirname            # dir name for a package
     local pkgname
     local buildsavedir          # tmp storage for built packages
@@ -448,6 +453,11 @@ Main()
         fi
     done
 
+    case "$SIGNER" in
+        EndeavourOS) reposig=0 ;;
+        *)           reposig=1 ;;
+    esac
+
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
 
         # We have something built to be sent to github, or we want to update repo to github.
@@ -458,36 +468,47 @@ Main()
         if [ -n "$built" ] ; then
             echo2 "Signing and putting it all together..."
 
-            # sign built packages
-            for pkg in "${built[@]}" ; do
-                gpg --local-user "$SIGNER" \
-                    --output "$pkg.sig" \
-                    --detach-sign "$pkg" || DIE "signing '$pkg' failed"
-                signed+=("$pkg.sig")
-            done
+            if [ -n "$built" ] ; then
+                # sign built packages
+                for pkg in "${built[@]}" ; do
+                    gpg --local-user "$SIGNER" \
+                        --output "$pkg.sig" \
+                        --detach-sign "$pkg" || DIE "signing '$pkg' failed"
+                    signed+=("$pkg.sig")
+                done
 
-            mv -i "${built[@]}" "${signed[@]}" "$ASSETSDIR"
+                mv -i "${built[@]}" "${signed[@]}" "$ASSETSDIR"
 
-            # ...and fix the variables 'built' and 'signed' accordingly.
-            tmp=("${built[@]}")
-            built=()
-            for xx in "${tmp[@]}" ; do
-                built+=("$ASSETSDIR/$(basename "$xx")")
-            done
-            tmp=("${signed[@]}")
-            signed=()
-            for xx in "${tmp[@]}" ; do
-                signed+=("$ASSETSDIR/$(basename "$xx")")
-            done
+                # ...and fix the variables 'built' and 'signed' accordingly.
+                tmp=("${built[@]}")
+                built=()
+                for xx in "${tmp[@]}" ; do
+                    built+=("$ASSETSDIR/$(basename "$xx")")
+                done
+                tmp=("${signed[@]}")
+                signed=()
+                for xx in "${tmp[@]}" ; do
+                    signed+=("$ASSETSDIR/$(basename "$xx")")
+                done
 
-            # Put changed assets (built) to db.
-            repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
-
-            rm -f "$ASSETSDIR/$REPONAME".{db,files}.tar.$_COMPRESSOR.old
-            rm -f "$ASSETSDIR/$REPONAME".{db,files}
-            cp -a "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR    "$ASSETSDIR/$REPONAME".db
-            cp -a "$ASSETSDIR/$REPONAME".files.tar.$_COMPRESSOR "$ASSETSDIR/$REPONAME".files
+                # Put changed assets (built) to db.
+                repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
+            fi
         fi
+
+        if [ $reposig -eq 1 ] ; then
+            echo2 "Signing repo $REPONAME ..."
+            repo-add --sign --key $SIGNER "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR >/dev/null
+        fi
+        for xx in db files ; do
+            rm -f "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR.old{,.sig}
+            rm -f "$ASSETSDIR/$REPONAME".$xx
+            cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR     "$ASSETSDIR/$REPONAME".$xx
+            if [ $reposig -eq 1 ] ; then
+                rm -f "$ASSETSDIR/$REPONAME".$xx.sig
+                cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR.sig "$ASSETSDIR/$REPONAME".$xx.sig
+            fi
+        done
 
         echo2 "Final stop before syncing with github!"
         read -p "Continue (Y/n)? " xx
@@ -506,6 +527,7 @@ Main()
             sleep 1
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
+            # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
         done
@@ -519,8 +541,13 @@ Main()
             done
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
-            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
-                DIE "adding db assets with tag '$tag' failed"
+            if [ $reposig -eq 1 ] ; then
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR}{,.sig} || \
+                    DIE "adding db assets with tag '$tag' failed"
+            else
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
+                    DIE "adding db assets with tag '$tag' failed"
+            fi
         done
     else
         echo2 "Nothing to do."
