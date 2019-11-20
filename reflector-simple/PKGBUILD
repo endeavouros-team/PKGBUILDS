@@ -1,0 +1,25 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=reflector-simple
+pkgdesc="Simple GUI wrapper for 'reflector'."
+pkgver=1.0
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(
+  bash yad reflector whois geoip bind-tools
+)
+
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+source=(
+  $url/$pkgname
+)
+sha512sums=('aa3fed032d3ce540cb81b035d9ce6220829f0ef3dac002a294ed2775607bf2f92b895ac50e7e7ec7f6ac5417885b75a1905ba9a9a0d7ce3cca5ed96feb8c1696')
+
+package() {
+  cd $srcdir
+
+  install -d $pkgdir/usr/bin
+  install -Dm755 $pkgname   $pkgdir/usr/bin/$pkgname
+}

@@ -1,0 +1,247 @@
+#!/bin/bash
+#
+# Select pacman mirrors with a simple GUI.
+#
+
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
+
+REFLECTOR_COUNTRIES="$(reflector --list-countries)"
+
+REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
+
+CodeToCountry() {  # convert country code to country name
+    local code="$1"
+    echo "$REFLECTOR_COUNTRIES" | grep -w "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
+}
+CountryToCode() {  # convert country name to country code
+    echo "$REFLECTOR_COUNTRIES" | grep -w "$1" | awk '{print $(NF-1)}'
+}
+
+
+CCCheck() {   # check validity of country code
+    case "$1" in
+        [A-Z][A-Z]) test -n "$(CodeToCountry "$1")" && return 0 ;;
+    esac
+    return 1  # fail
+}
+
+GetYourCountryCode() {
+    local IP code
+
+    IP="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
+    code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+
+    IP="$(dig -6 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv6 address
+    code="$(geoiplookup6 "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+
+    code="$(curl ipinfo.io 2>/dev/null | grep '"country":' | sed 's|^.*: "\([A-Z][A-Z]\)",$|\1|')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+
+    # net services failed, use local variables, but may be wrong
+    code="$(locale | grep ^LC_TIME | cut -d '"' -f 2 | sed 's|^.*_\([A-Z][A-Z]\)\..*$|\1|')"
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
+}
+
+ArgsYesNo() {
+    local searched="$1"
+    shift
+    for xx in "$@" ; do
+        test "$xx" = "$searched" && { echo "yes" ; return ; }
+    done
+    echo "no"
+}
+
+_get_reflector_auto_configs() {
+    # Read reflector options from /etc/reflector-auto.conf
+    # and convert country names to country codes.
+    local name code ix
+    local tmpconf=$(mktemp)
+
+    cat $REFLECTOR_AUTO_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
+    
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        name="${countrynames[$ix]}"
+        if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
+            code="${countrycodes[$ix]}"
+            sed -i $tmpconf \
+                -e "s|'$name'|$code|g" \
+                -e "s|\"$name\"|$code|g"
+        fi
+    done
+    cat $tmpconf
+    rm -f $tmpconf
+}
+
+OptTypeNeeded() {
+    case "$local_country_code" in
+        CH|DE|DK|FI|FR|HK|IE|IS|NL|NZ|SE|SG|UK|US)
+            echo "plain"
+            ;;
+        *)
+            echo "$local_country_code"
+            ;;
+    esac
+}
+
+AskCountriesAndOptions() {
+    local tips=(
+        "Select countries to include in mirror ranking"
+        "  - select one on more countries"
+        "  - closest locations are usually the fastest"
+        "  - https is the preferred protocol"
+    )
+    local ix included
+    local command
+    local columns=5
+    local default_age=2
+
+    case "$(OptTypeNeeded)" in
+        plain) ;;                         # no additional defaults
+        "")         default_age=1 ;;      # country not directly supported by Arch
+        [A-Z][A-Z]) default_age=8 ;;      # country may lack https mirrors
+    esac
+
+    command=(eos_yad --form --columns=$columns --title="Selecting Arch mirrors")
+    command+=(--text="<b>${tips[0]}\n${tips[1]}\n${tips[2]}\n${tips[3]}\n\n</b>")
+
+    for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
+        test "${countrycodes[$ix]}" = "$local_country_code" && included=true || included=false
+        command+=(--field="${countrynames[$ix]}:chk" $included)
+    done
+    command+=(--separator=" ")                      # assumes all returned values lack spaces
+    command+=(--window-icon="configure")
+    command+=(--image="preferences-system")
+
+    #command+=(--field=":LBL" "")
+    command+=(--field="<b><i>Feature selection\:</i></b>:LBL" "")
+    command+=(--field="Include https mirrors:chk" true)
+    command+=(--field="Include http mirrors:chk" false)
+    if [ "$rsync_supported" = "yes" ] ; then
+	command+=(--field="Include rsync mirrors:chk" false)
+    fi
+    if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
+        command+=(--field="Use $REFLECTOR_AUTO_CONF:chk" false)
+    fi
+    command+=(--field="Max hours from latest mirror sync":num $default_age)    # --age
+    command+=(--field="Sort by":cb 'age!^rate!country!score!delay')            # --sort
+    command+=(--field="Max number of mirrors":num 10)                          # --number
+
+    reflector_info="$("${command[@]}")"
+    test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
+    reflector_info=($(echo $reflector_info))                       # make it an array
+}
+
+BuildReflectorCommand() {
+    local ix xx
+
+    reflector_cmd=(reflector)
+
+    # then, add countries
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        xx="${reflector_info[$ix]}"
+        test "$xx" = TRUE && reflector_cmd+=(-c "${countrycodes[$ix]}")
+    done
+
+    # finally, add feature selections
+    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol https)
+    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol http)
+    test "$rsync_supported" = "yes" && {
+        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol rsync)
+    }
+    test -r "$REFLECTOR_AUTO_CONF" && {
+        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(_get_reflector_auto_configs))
+    }
+    reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
+    reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
+    ((ix++))
+    reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+}
+
+ShowMirrorlistSaved() {
+    echo "New $ml saved." >&2
+    return  # showing dialog not really needed...
+
+    echo "New $ml saved." | \
+        eos_yad --text-info --width=300 --height=100 --align=center \
+                --title="Success" --button=yad-quit:0 \
+                --timeout=5 --timeout-indicator=left
+}
+
+SaveMirrorlist() {
+    grep "^Server = [hr]" $tmpfile >/dev/null || {
+        echo "$progname: no mirrors found!" | \
+            eos_yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
+        return 1
+    }
+    cat $tmpfile | eos_yad --text-info --wrap --width=700 --height=400 \
+                           --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
+        pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
+    }
+}
+
+Main() {
+    local progname=reflector-simple
+    local rsync_supported=no   # yes or no
+
+    local verbose=$(ArgsYesNo -v "$@")
+    local showlist=$(ArgsYesNo -l "$@")
+
+    test "$verbose" = "yes" && echo "Find your country ..." >&2
+
+    local local_country_code="$(GetYourCountryCode)"
+    local countrynames
+    local countrycodes
+    local reflector_info
+    local reflector_cmd
+    local ml=/etc/pacman.d/mirrorlist
+
+    # Find countries with supported mirrors.
+
+    readarray -t countrynames <<< "$(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
+    readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
+
+    # Now we have info about supported countries.
+    # Next, we ask user to give some countries for mirror ranking.
+
+    AskCountriesAndOptions   # modifies $reflector_info
+
+    # Now we know which countries to include in mirror ranking.
+    # Let's create a proper reflector command.
+
+    BuildReflectorCommand    # uses $reflector_info and modifies $reflector_cmd
+
+    # Add the save option here!
+    local tmpfile=$(mktemp)
+    reflector_cmd+=(--save $tmpfile)
+
+    # Now all is ready, so just run the command.
+
+    "${reflector_cmd[@]}"
+
+    # Show the result and ask permission to save the mirrorlist.
+
+    SaveMirrorlist
+
+    # cleanup
+    rm -f $tmpfile
+}
+
+Main "$@"
