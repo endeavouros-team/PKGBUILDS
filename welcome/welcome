@@ -38,6 +38,8 @@ yad_calamares() {
     local mode="$1"                             # offline, online, choose
     local prog
 
+    mode=offline                                # temporary: assets.make hook may modify this value!
+
     # 'mode' check
     case "$mode" in
         offline | online) ;;
@@ -50,7 +52,7 @@ yad_calamares() {
             mode=$(echo "$answer" | cut -d '|' -f 2 | awk '{print $1}' | tr [:upper:] [:lower:])
             ;;
         *)
-            echo "$PROGNAME: yad_calamares: unsupported mode '$mode'." >&2
+            echo "$PROGNAME: $FUNCNAME: unsupported mode '$mode'." >&2
             return 1
             ;;
     esac
@@ -67,7 +69,7 @@ yad_calamares() {
             }
             ;;
         *)
-            echo "$PROGNAME: yad_calamares: unsupported mode '$mode'." >&2
+            echo "$PROGNAME: $FUNCNAME: unsupported mode '$mode'." >&2
             return 1
             ;;
     esac
@@ -245,7 +247,7 @@ INSTALL() {
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
           --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
-          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares offline"' \
+          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
           --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
@@ -286,7 +288,6 @@ AfterInstall() {
           --text="<b>After install tasks</b>" --text-align=left \
           --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
-          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
@@ -296,6 +297,7 @@ AfterInstall() {
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 #          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
+#          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
 }
 
 AddMoreApps() {
