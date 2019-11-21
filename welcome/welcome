@@ -36,15 +36,15 @@ export -f eos_yad
 
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
-    local prog
+    local prog=/usr/bin/calamares
 
-    mode=offline                                # temporary: assets.make hook may modify this value!
+    #mode=offline                                # temporary: assets.make hook may modify this value!
 
     # 'mode' check
     case "$mode" in
         offline | online) ;;
         choose)
-            local answer=$(eos_yad --list --radiolist --title="Choose installation method" --width=400 --height=100 \
+            local answer=$(eos_yad --list --radiolist --title="Choose installation method" --width=400 --height=120 \
                                    --column="Selected" --column="Method" \
                                    true "Offline (install live desktop)" false "Online (choose your desktop)"
                   )
@@ -59,10 +59,8 @@ yad_calamares() {
 
     case "$mode" in
         offline)
-            prog=/usr/bin/calamares
             ;;
         online)
-            prog=/usr/bin/calamares_switcher
             # network needed only with online install
             ping -c 1 8.8.8.8 >/dev/null && {
                 /usr/bin/reflector-simple || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
