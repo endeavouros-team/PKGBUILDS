@@ -231,7 +231,7 @@ INSTALL() {
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
           --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
           --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
-          --field="Release info!!Info about the latest release":fbtn             "$_BROWSER https://endeavouros.com/download" \
+          --field="Latest release info!!Info about the latest release":fbtn      "$_BROWSER https://endeavouros.com/latest-release" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
           --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
@@ -253,8 +253,6 @@ GeneralInfo() {
           --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
           --field="About me!!More info about this app":fbtn                       "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
-
-#     --field="Download!!Where to download from and how to verify.":fbtn      "$_BROWSER https://endeavouros.com/download" 
 }
 
 AfterInstall() {
