@@ -170,9 +170,8 @@ Assets_clone()
 
     echo "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
-    # so delete all possible packages.
-    rm -f *.pkg.tar.$_COMPRESSOR{,.sig}
-    rm -f "$REPONAME".{db,files}{,.tar.$_COMPRESSOR,.tar.$_COMPRESSOR.old}
+    # so delete all packages and databases.
+    rm -f *.{db,files,sig,old,$_COMPRESSOR}
 
     echo "Fetching all github assets..."
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
@@ -180,7 +179,7 @@ Assets_clone()
         hub release download $xx
         test -n "$hook" && { "$hook" && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
-    sleep 3
+    sleep 1
 
     Popd
 }
