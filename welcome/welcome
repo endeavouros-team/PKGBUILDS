@@ -83,6 +83,55 @@ yad_UpdateMe() {
 }
 export -f yad_UpdateMe
 
+yad_UpdateEOStoLatest() {    # try to update all relevant things in order to set any EOS install at the "latest level"
+    local removes=(kalu)
+    local installs=(eos-update-notifier reflector-simple)
+    local rem=() ins=()
+    local xx
+    for xx in "${removes[@]}" ; do
+        pacman -Q "$xx" >& /dev/null && rem+=("$xx")
+    done
+    for xx in "${installs[@]}" ; do
+        pacman -Q "$xx" >& /dev/null || ins+=("$xx")
+    done
+    
+    local t1="To have your EndeavourOS install on par with the latest and greatest, the following actions are needed:\n"
+    local t2="- uninstall packages: ${rem[*]}\n"
+    local t3="- install packages: ${ins[*]}\n"
+    local t="$t1"
+    test -n "$rem" && t+="$t2"
+    test -n "$ins" && t+="$t3"
+    test "$t" = "$t1" && t+="Your system is already at the latest level!"
+    eos_yad --text="$t" --title="Upgrading EndeavourOS level" --image=info --button=yad-ok:0
+}
+export -f yad_UpdateEOStoLatest
+
+yad_PkgConflicts() {
+    local cpu
+    local removes=()
+    local title="Package conflicts detection"
+
+    # having both amd and intel microcode packages are not needed and may cause issues with grub
+    pacman -Q amd-ucode >& /dev/null && {
+        pacman -Q intel-ucode >& /dev/null && {
+            cpu=$(grep -w "^vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
+            case "$cpu" in
+                GenuineIntel) removes+=(amd-ucode) ;;
+                *)            removes+=(intel-ucode) ;;
+            esac
+        }
+    }
+    if [ -n "$removes" ] ; then
+        local prompt="echo Package conflicts detected. Removing packages: ${removes[*]}"
+        local cmd="su -c 'pacman -Rsn ${removes[*]} && grub-mkconfig -o /boot/grub/grub.cfg'"
+        eos_yad_RunCmdTermBash "$prompt ; $cmd"
+    else
+        local t="No system package problems were detected in your machine."
+        eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
+    fi
+}
+export -f yad_PkgConflicts
+
 yad_SystemUpdate() {
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
@@ -286,6 +335,8 @@ AfterInstall() {
           --text="<b>After install tasks</b>" --text-align=left \
           --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
+          --field=" Upgrade EndeavourOS level!system-software-update!Upgrade EndeavourOS level":fbtn  'bash -c yad_UpdateEOStoLatest' \
+          --field=" Detect package conflicts!info!Detect system package problems":fbtn                'bash -c yad_PkgConflicts' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
