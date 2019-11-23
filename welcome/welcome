@@ -53,9 +53,9 @@ yad_calamares() {
 
         local answer=$( eos_yad --form --title="Choose installation method" --image=dialog-question \
                                 --text="$t1$t2$t3$t4" \
-                                --field="Method":CB "Offline!Online" )
+                                --field="Method":CB 'Offline!Online' )
         test -n "$answer" || return 1
-        mode=$(echo "$answer" | cut -d '|' -f 2 | awk '{print $1}' | tr [:upper:] [:lower:])
+        mode=$(echo "$answer" | cut -d '|' -f 1 | tr [:upper:] [:lower:])
     fi
     case "$mode" in
         offline) ;;
