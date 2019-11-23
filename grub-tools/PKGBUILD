@@ -3,7 +3,7 @@
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
 pkgver=1.0
-pkgrel=3
+pkgrel=4
 arch=('any')
 license=('GPL')
 depends=(grub os-prober)
@@ -15,10 +15,8 @@ source=(
   $url/grub-fix-initrd-generation     # Command modifies os-prober and grub to fix 'initrd' line generation;
                                       # re-run if grub or os-prober is updated (but not fixed upstream!).
 )
-sha512sums=(
-  7d3d34d04a24c2e310c175cfd33c1d1f3f956f52246e988044f1c17e2905d2f93a57f92e1347fe6dd957b10899b9d1643c4c5033b23bda808996a5317129e594
-  4cea76d94e947d770e2c1f3fb44c08144795c8b31981a8a8baeee866c662ddab20db88f4bd11c012d4287f307deb521d8d4fb74a3d525a0881d0b49cba4752f4
-)
+sha512sums=('b93dcdfc85ae8d97b1ceba2da2c6e1882ebce2c8aab7192f758f8a7840491cf8529dbd505555fe3891cab2ecd83519bf5c6b3513d5fe0f88ebaf5cbd98eb35f0'
+            '4cea76d94e947d770e2c1f3fb44c08144795c8b31981a8a8baeee866c662ddab20db88f4bd11c012d4287f307deb521d8d4fb74a3d525a0881d0b49cba4752f4')
 
 package() {
   cd $srcdir

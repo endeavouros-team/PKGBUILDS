@@ -4,9 +4,11 @@ Operation = Remove
 Type = Package
 Target = linux
 Target = linux-lts
+Target = amd-ucode
+Target = intel-ucode
 
 [Action]
-Description = Update grub after installing or removing a kernel.
+Description = Update grub after installing or removing a kernel or microcode.
 When = PostTransaction
 Depends = grub
 Exec = /bin/sh -c "/usr/bin/grub-mkconfig -o /boot/grub/grub.cfg"
