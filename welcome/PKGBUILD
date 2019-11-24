@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.13
-pkgrel=8.1
+pkgrel=9
 arch=('any')
 license=('GPL')
 depends=(
@@ -16,10 +16,12 @@ source=(
   $url/$pkgname
   $url/$pkgname.desktop
   $url/eos-script-lib-yad
+  $url/device-info
 )
 sha512sums=('65e67f6d6e9782948cfe5a1d851dd5fa4f551f142791d36040c5de3e0b38b583589f8eb87f831dba2a044856fe756edc6c8c9cfb6236e4bff30eaa2f6a791200'
             '87a44d71b2d084aad1f9f3b66481c4cb54de147231fa0f10674e8d62904e5ec4bc096d077501794d0ea73db36f45122a84fb1f7233d260f0e4d4a37a2f85bb85'
-            '0263e001047fab9cfdf16be68cb69fea938070495b0b0b5cf5eab286a7087ec1eb3ce48abed62e70886325eeea69e3b751320e9c355f1c3cd54ab71747bfdf7e')
+            '0263e001047fab9cfdf16be68cb69fea938070495b0b0b5cf5eab286a7087ec1eb3ce48abed62e70886325eeea69e3b751320e9c355f1c3cd54ab71747bfdf7e'
+            '525e80b44e04d6b17d0659c8b187811dbbf39beba6b0767ca7b76d75adec569d5e7959dfa9acc34c9a602d2dae05fb3d960954fb9b5cc9a4c6e301f4bc9acbf4')
 
 package() {
   cd $srcdir
