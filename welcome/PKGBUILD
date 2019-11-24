@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.13
-pkgrel=9
+pkgrel=9.1
 arch=('any')
 license=('GPL')
 depends=(
@@ -33,4 +33,5 @@ package() {
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
+  install device-info $pkgdir/usr/bin/device-info
 }
