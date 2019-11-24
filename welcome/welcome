@@ -28,18 +28,23 @@ export -f eos_yad_GetDesktopName
 #################################################################################
 
 export PROGNAME=eos-welcome
+export INSTALLER_PROGRAM=/usr/bin/calamares
 
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
 }
 export -f eos_yad
 
+IsInstalling() {
+    test -x $INSTALLER_PROGRAM
+}
+
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
-    local prog=/usr/bin/calamares
+    local prog=$INSTALLER_PROGRAM
 
     if [ ! -x $prog ] ; then
-        eos_yad --text="$(basename $prog) is not installed!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+        eos_yad --text="$(basename $prog) is not available!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
         return 1
     fi
 
@@ -59,7 +64,7 @@ yad_calamares() {
     fi
     case "$mode" in
         offline) ;;
-        online) ;;      # online needs a great /etc/pacman.d/mirrorlist
+        online) ;;
         *)  echo "$PROGNAME: $FUNCNAME: unsupported mode '$mode'." >&2
             return 1
             ;;
@@ -389,13 +394,20 @@ About() {
 ### These variables are required:
 
 _NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
-_NOTEBOOK_TABS=(                             # names of functions above
-    INSTALL
-    GeneralInfo
-    AfterInstall
-    AddMoreApps
-    #About
-)
+
+IsInstalling && {
+    _NOTEBOOK_TABS=(                             # names of functions above
+        INSTALL
+        GeneralInfo
+    )
+} || {
+    _NOTEBOOK_TABS=(                             # names of functions above
+        GeneralInfo
+        AfterInstall
+        AddMoreApps
+        #About
+    )
+}
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
 
@@ -572,9 +584,9 @@ StartHere() {
         return
     }
 
-    if [ ! -x /usr/bin/calamares ] ; then
+    test IsInstalling || {
         eos_yad_check_internet_connection verbose 10 || return 1
-    fi
+    }
 
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
@@ -596,7 +608,7 @@ StartHere() {
         notebook+=(--tab="$tabname")
     done
 
-    test -x /usr/bin/calamares || notebook+=(--active-tab=2)
+    IsInstalling || notebook+=(--active-tab=2)
 
     notebook+=(--button=" Help!help!":"bash -c WelcomeHelp")
 
