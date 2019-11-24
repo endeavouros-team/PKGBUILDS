@@ -82,7 +82,7 @@ export -f yad_calamares
 
 yad_UpdateMe() {
     local prompt="echo 'Updating EndeavourOS Greeter'"
-    local cmd="su -c 'pacman -Sy welcome --needed'"
+    local cmd="su -c 'pacman -Syy welcome --needed'"
     local msg="printf '\nClose the EndeavourOS Greeter and restart it by running a terminal command: $PROGNAME\n\n'"
     eos_yad_RunCmdTermBash "$prompt ; $cmd ; $msg"
 }
@@ -299,7 +299,7 @@ INSTALL() {
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
           --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
           --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
-          --field="Update Me$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe' \
+          --field="Update this app$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe' \
           --field="Latest release info!!Info about the latest release":fbtn      "$_BROWSER https://endeavouros.com/latest-release" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
