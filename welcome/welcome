@@ -36,7 +36,7 @@ eos_yad() {
 export -f eos_yad
 
 IsInstalling() {
-    test -x $INSTALLER_PROGRAM
+    test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "liveuser"
 }
 
 yad_calamares() {
