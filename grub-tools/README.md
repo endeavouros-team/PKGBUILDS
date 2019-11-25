@@ -8,6 +8,7 @@ grub-fix-initrd-generation | Fixes generation of 'initrd' lines in grub.cfg.
 
 ## grub-update-after-kernel.hook
 This pacman hook automatically updates **/boot/grub/grub.cfg** after a kernel is installed or uninstalled.
+Also microcode install (or uninstall) causes grub.cfg to be updated.
 
 ## grub-fix-initrd-generation
 Command grub-mkconfig may not generate file **/boot/grub/grub.cfg** correctly for every operating system.
