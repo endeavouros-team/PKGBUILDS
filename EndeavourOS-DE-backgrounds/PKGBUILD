@@ -18,5 +18,4 @@ package() {
 
 
 	mkdir -p "${pkgdir}/usr/share/backgrounds"
-	ln -sr "${pkgdir}/usr/share/endeavouros/backgrounds" "${pkgdir}/usr/share/backgrounds/endeavouros/desktops"
-}
+	ln -sr "${pkgdir}/usr/share/endeavouros/backgrounds" "${pkgdir}/usr/share/backgrounds/endeavouros"
