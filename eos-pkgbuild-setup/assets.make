@@ -172,6 +172,8 @@ Assets_clone()
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
     rm -f *.{db,files,sig,old,$_COMPRESSOR}
+    local leftovers="$(command ls *.{db,files,sig,old,$_COMPRESSOR} 2>/dev/null)"
+    test -z "$leftovers" || DIE "removing local assets failed!"
 
     echo "Fetching all github assets..."
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
