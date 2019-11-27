@@ -35,11 +35,22 @@ eos_yad_terminal() {
     #     qterminal
     #     kitty
     # The following terminals are known to work:
-    local suitable_terminals="xfce4-terminal konsole gnome-terminal mate-terminal lxterminal terminator tilix termite xterm"
+    local suitable_terminals=(
+        xfce4-terminal
+        konsole
+        gnome-terminal
+        mate-terminal
+        lxterminal
+        deepin-terminal
+        terminator
+        tilix
+        termite
+        xterm
+    )
     local eos_terminal_prog=""
     local xx
 
-    for xx in $suitable_terminals ; do
+    for xx in "${suitable_terminals[@]}" ; do
         if [ -x "/usr/bin/$xx" ] ; then
             eos_terminal_prog="/usr/bin/$xx"
             echo "$eos_terminal_prog"
@@ -49,7 +60,7 @@ eos_yad_terminal() {
 
     printf "%s\n    %s\n%s" \
            "Sorry, none of the terminal programs:" \
-           "$suitable_terminals" \
+           "${suitable_terminals[*]}" \
            "is installed. Some features may not work as expected." \
         | eos_yad --text-info \
                   --title="Warning" --height=200 --width=700 --wrap --button=yad-ok:0
@@ -102,15 +113,18 @@ eos_yad_RunCmdTermBash() {
     local tmpfile=$(mktemp)
 
     echo "#!/bin/bash"                                   >> $tmpfile
+    test -n "$prompt" && echo "echo $prompt"             >> $tmpfile
     echo "$cmd"                                          >> $tmpfile
-    echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
+    case "$term" in
+        */deepin-terminal) ;;
+        *)
+            echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
+            ;;
+    esac
+    echo "rm -f $tmpfile"                                >> $tmpfile
 
     chmod +x $tmpfile
-    if [ -n "$prompt" ] ; then
-        $term -e "bash -c \"echo $prompt ; $tmpfile ; rm -f $tmpfile\""
-    else
-        $term -e "bash -c \"$tmpfile ; rm -f $tmpfile\""
-    fi
+    $term -e $tmpfile
 }
 
 eos_yad_problem() {

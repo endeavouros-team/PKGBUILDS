@@ -138,9 +138,6 @@ yad_PkgConflicts() {
 export -f yad_PkgConflicts
 
 yad_SystemUpdate() {
-    local term="$(eos_yad_terminal)"
-    test -n "$term" || return 1
-
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
@@ -152,19 +149,15 @@ _xx_main() {
   } || {
       echo "No updates."
   }
-  read -p "Press ENTER to close this window: "
 }
 _xx_main
 EOF
     chmod +x $tmpfile
-    $term -e "bash -c \"echo Checking for software updates... ; $tmpfile ; rm -f $tmpfile\""
+    eos_yad_RunCmdTermBash "echo Checking for software updates... ; $tmpfile ; rm -f $tmpfile"
 }
 export -f yad_SystemUpdate
 
 yad_InitializePacmanMirroring() {
-    local term="$(eos_yad_terminal)"
-    test -n "$term" || return 1
-
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
@@ -173,12 +166,9 @@ pacman-key --init
 pacman-key --populate
 pacman-key --refresh-keys
 pkill haveged
-#cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-#/usr/bin/update-mirrorlist || reflector --verbose -phttps -phttp -a8 -l15 -f10 --sort age --save /etc/pacman.d/mirrorlist
-read -p 'Press ENTER to continue: '
 EOF
     chmod +x $tmpfile
-    $term -e "bash -c \"echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile\""
+    eos_yad_RunCmdTermBash "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
 }
 export -f yad_InitializePacmanMirroring
 
