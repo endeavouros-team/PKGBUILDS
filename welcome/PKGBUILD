@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.14
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -20,7 +20,7 @@ source=(
 )
 sha512sums=('91c0c5a8aa68d0a3f799648d8ae39434e0ad5c6703aeed6da354edabc90c43c5bd14a0c929e736b5337674dd75beb1a6ad9d4db3e7e1a91bef71cc0133f62712'
             '87a44d71b2d084aad1f9f3b66481c4cb54de147231fa0f10674e8d62904e5ec4bc096d077501794d0ea73db36f45122a84fb1f7233d260f0e4d4a37a2f85bb85'
-            '1e342dfc4e98d85957f522916fa5887d57509075528f9bdbf4cf589407c456bbc33df9fa3a1a9d0931f445acbcf97437cda5483076908e917afe85722edfc6ab'
+            '178f8fed61efee54378e1c51942a14f7bda8e3d021c43d45129c0dd6463f3732784db1ebf252f7cf8caf369e2728417cb406fe6b271f64690e6dcdbaa6c7dff4'
             '525e80b44e04d6b17d0659c8b187811dbbf39beba6b0767ca7b76d75adec569d5e7959dfa9acc34c9a602d2dae05fb3d960954fb9b5cc9a4c6e301f4bc9acbf4')
 
 package() {
