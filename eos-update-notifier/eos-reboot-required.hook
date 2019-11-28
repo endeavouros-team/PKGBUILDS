@@ -1,7 +1,11 @@
 [Trigger]
 Operation = Upgrade
 Type = Package
-Target = linux*
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = linux-hardened
+Target = linux-firmware
 Target = systemd*
 Target = xorg-*
 Target = xf86-*
