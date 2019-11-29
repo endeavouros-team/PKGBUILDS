@@ -28,6 +28,15 @@ eos_yad() {
 #export -f eos_yad
 
 eos_yad_terminal() {
+    local conf=/etc/eos-script-lib-yad.conf
+    if [ -r $conf ] ; then
+        source $conf
+        if [ -n "$EOS_YAD_TERMINAL" ] ; then
+            echo "$EOS_YAD_TERMINAL"
+            return
+        fi
+    fi
+
     # Show a terminal that is capable of supporting option -e properly. Empty if not found.
     # Requires: yad
     #
