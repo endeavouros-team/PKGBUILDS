@@ -5,6 +5,8 @@
 # Shows useful basic info about the EndeavourOS and its usage.
 # Targeted for people new to EndeavourOS (but not new to Linux).
 #
+# TODO:
+# - add icons to buttons once proper supported exists in yad
 
 #################################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -30,12 +32,14 @@ export -f eos_yad_GetDesktopName
 export PROGNAME=eos-welcome
 export INSTALLER_PROGRAM=/usr/bin/calamares
 
+
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
 }
 export -f eos_yad
 
 IsInstalling() {
+    test $show_installer -eq 1 && return 0
     test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "liveuser"
 }
 
@@ -88,7 +92,7 @@ yad_UpdateMe() {
 }
 export -f yad_UpdateMe
 
-yad_UpdateEOStoLatest() {    # try to update all relevant things in order to set any EOS install at the "latest level"
+yad_UpdateEOStoLatest() {    # Show what to update in order to set any EOS install at the "latest level".
     local removes=(kalu)
     local installs=(eos-update-notifier reflector-simple)
     local rem=() ins=()
@@ -287,16 +291,17 @@ INSTALL() {
           --columns=2 \
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-          --field="Initialize mirroring!!Initialize mirroring system":fbtn       'bash -c yad_InitializePacmanMirroring' \
-          --field="START THE INSTALLER!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
+          --field="START THE INSTALLER$_exclamation!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
           --field="Update this app$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe' \
+          --field="Initialize pacman keys!!Initialize pacman keys":fbtn          'bash -c yad_InitializePacmanMirroring' \
+          --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
           --field="Latest release info!!Info about the latest release":fbtn      "$_BROWSER https://endeavouros.com/latest-release" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
-          --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
       &> /dev/null &
 
-#          --field="Update Me$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe' 
+  #          --field="Update Me$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe'
+  # use 'gparted' as the icon for gparted!
 }
 
 GeneralInfo() {
@@ -330,8 +335,8 @@ AfterInstall() {
           --text="<b>After install tasks</b>" --text-align=left \
           --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
-          --field=" Upgrade EndeavourOS level!system-software-update!Upgrade EndeavourOS level":fbtn  'bash -c yad_UpdateEOStoLatest' \
-          --field=" Detect package conflicts!info!Detect system package problems":fbtn                'bash -c yad_PkgConflicts' \
+          --field=" Detect package issues!info!Detect any potential issues on system packages":fbtn                'bash -c yad_PkgConflicts' \
+          --field=' EndeavourOS to latest?!up!Show what to do to get the your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
@@ -385,18 +390,20 @@ About() {
 
 _NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
 
-IsInstalling && {
-    _NOTEBOOK_TABS=(                             # names of functions above
-        INSTALL
-        GeneralInfo
-    )
-} || {
-    _NOTEBOOK_TABS=(                             # names of functions above
-        GeneralInfo
-        AfterInstall
-        AddMoreApps
-        #About
-    )
+CreateNotebookCommands() {
+    IsInstalling && {
+        _NOTEBOOK_TABS=(                             # names of functions above
+            INSTALL
+            GeneralInfo
+        )
+    } || {
+        _NOTEBOOK_TABS=(                             # names of functions above
+            GeneralInfo
+            AfterInstall
+            AddMoreApps
+            #About
+        )
+    }
 }
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -553,6 +560,7 @@ GreeterSettings() {
 StartHere() {
     KillExtraYad
 
+    local show_installer=0    # explicitly show the installer, for testing only
     local start_delay=0
     #local netlog=0
 
@@ -563,11 +571,14 @@ StartHere() {
             --enable|-f) GreeterSettings enable ;;
             --disable)   GreeterSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
+            --installer) show_installer=1 ;;
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
     done
+
+    CreateNotebookCommands
 
     test "$(GreeterSettings check)" != "enable" && {
         echo "Welcome app is disabled. To start it anyway, use option --enable."
