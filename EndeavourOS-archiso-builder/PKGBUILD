@@ -4,12 +4,14 @@
 
 pkgname=EndeavourOS-archiso
 pkgver=0.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git)
 source=($pkgname.zip::https://github.com/endeavouros-team/EndeavourOS-archiso/archive/master.zip)
-sha512sums=(29d391acb3d9698ffe5ea4b3d492110a4aaac208050ecaca871637934bb1e922b7289796c7128acb213c003b0b1e11bd0521aeea2c3f6756102aa7b5d395522d)
+sha512sums=(
+    66998b176d3b57f3b1c16c6fd53ce1d3861a010d7e74042176730c7ce84e133d430adc01662083308060c93875c6a0cabb8ca1f0ea6476d1720eb42e23649438
+)
 
 build() {
     local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
