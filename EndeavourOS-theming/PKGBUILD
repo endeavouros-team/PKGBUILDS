@@ -12,10 +12,11 @@ md5sums=('XX')
 
 package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-  mkdir -p "${pkgdir}/usr/share/endeavouros"
-  install -d "${pkgdir}/usr/share/endeavouros"
-  cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
-  mkdir -p "${pkgdir}/usr/share/backgrounds"
+        mkdir -p "${pkgdir}/usr/share/endeavouros"
+        install -d "${pkgdir}/usr/share/endeavouros"
+	install endeavour-logo.svg "${pkgdir}/usr/share/pixmaps/endeavour-logo.svg
+        cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
+        mkdir -p "${pkgdir}/usr/share/backgrounds"
 	install -d "${pkgdir}/usr/share/backgrounds/endeavouros"
 	install -m644 *.png "${pkgdir}/usr/share/backgrounds/endeavouros"
 }
