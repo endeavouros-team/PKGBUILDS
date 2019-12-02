@@ -1,0 +1,21 @@
+# Maintainer: Johannes Kamprad <joekamprad@endeavouros.com>
+pkgname=EndeavourOS-theming
+pkgver=1
+pkgrel=1
+pkgdesc='Default EndeavourOS background images and icons for all different DE'
+arch=('any')
+url='https://www.endeavouros.com'
+license=('CCPL:by-nc-sa')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
+md5sums=('XX')
+
+
+package() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+  mkdir -p "${pkgdir}/usr/share/endeavouros"
+  install -d "${pkgdir}/usr/share/endeavouros"
+  cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
+  mkdir -p "${pkgdir}/usr/share/backgrounds"
+	install -d "${pkgdir}/usr/share/backgrounds/endeavouros"
+	install -m644 *.png "${pkgdir}/usr/share/backgrounds/endeavouros"
+}
