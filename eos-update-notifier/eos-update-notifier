@@ -337,6 +337,7 @@ Options:
    -init        Initialize $prog_name systemd service for current user.
    -init-force  Same as -init, but may overwrite existing user service files.
    -conf        Configure the schedule of checking for the updates.
+   -show-timer  Show the status of the systemd timer.
    -iw=X        Initial sleep time. Value syntax from 'sleep' program.
                 Default: $iwt.
    -mode=X      Operation mode (onetimer or loop).
@@ -387,6 +388,12 @@ Main()
                 ;;
             -conf)
                 Configure
+                return
+                ;;
+            -show-timer)
+                yad --form --text="$(systemctl --user status eos-update-notifier.timer)" \
+                    --title="EndeavourOS update notifier: timer status" \
+                    --width=800 --height=200 --wrap --button=yad-ok:0 --image=info
                 return
                 ;;
             -iw=*)
