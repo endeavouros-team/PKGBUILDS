@@ -7,7 +7,7 @@ arch=('any')
 url='https://www.endeavouros.com'
 license=('CCPL:by-nc-sa')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('XX')
+md5sums=('f72f170646dfc519961a6686c7077511')
 
 
 package() {
@@ -15,6 +15,7 @@ package() {
         mkdir -p "${pkgdir}/usr/share/endeavouros"
         install -d "${pkgdir}/usr/share/endeavouros"
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros"
+        mkdir -p "${pkgdir}/usr/share/pixmaps/"
 	install endeavour-logo.svg "${pkgdir}/usr/share/pixmaps/endeavour-logo.svg"
 	install -m644 *.svg "${pkgdir}/usr/share/pixmaps/endeavour-logo.svg"
         cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
