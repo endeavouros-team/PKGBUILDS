@@ -32,8 +32,12 @@ eos_yad_terminal() {
     if [ -r $conf ] ; then
         source $conf
         if [ -n "$EOS_YAD_TERMINAL" ] ; then
-            echo "$EOS_YAD_TERMINAL"
-            return
+            if [ -x /usr/bin/"$EOS_YAD_TERMINAL" ] || [ -x "$EOS_YAD_TERMINAL" ] ; then
+                echo "$EOS_YAD_TERMINAL"
+                return
+            fi
+            echo "Sorry, terminal program '$EOS_YAD_TERMINAL' is not available. Please check your configuration file $conf." | \
+                eos_yad --text-info --title=Warning --height=100 --width=500 --wrap --button=yad-ok:0
         fi
     fi
 
