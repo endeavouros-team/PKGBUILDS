@@ -86,7 +86,7 @@ export -f yad_calamares
 
 yad_UpdateMe() {
     local prompt="echo 'Updating EndeavourOS Greeter'"
-    local cmd="su -c 'pacman -Syy welcome --needed'"
+    local cmd="sudo pacman -Syy welcome --needed"
     local msg="printf '\nClose the EndeavourOS Greeter and restart it by running a terminal command: $PROGNAME\n\n'"
     eos_yad_RunCmdTermBash "$prompt ; $cmd ; $msg"
 }
