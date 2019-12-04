@@ -5,7 +5,7 @@
 
 eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
-REFLECTOR_COUNTRIES="$(reflector --list-countries)"
+REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
 
 REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
 
@@ -14,7 +14,8 @@ CodeToCountry() {  # convert country code to country name
     echo "$REFLECTOR_COUNTRIES" | grep -w "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
 }
 CountryToCode() {  # convert country name to country code
-    echo "$REFLECTOR_COUNTRIES" | grep -w "$1" | awk '{print $(NF-1)}'
+    local country="$1"
+    echo "$REFLECTOR_COUNTRIES" | grep -w "$country" | awk '{print $(NF-1)}'
 }
 
 
@@ -157,14 +158,21 @@ BuildReflectorCommand() {
     # then, add countries
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         xx="${reflector_info[$ix]}"
-        test "$xx" = TRUE && reflector_cmd+=(-c "${countrycodes[$ix]}")
+        test "$xx" = TRUE && {
+            selected_countries+=("${countrynames[$ix]}")
+            if [ "${countrynames[$ix]}" != "Worldwide" ] ; then
+                reflector_cmd+=(-c "${countrycodes[$ix]}")
+            else
+                worldwide_selected=1
+            fi
+        }
     done
 
     # finally, add feature selections
-    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol https)
-    test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol http)
+    test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol https) ; https_selected=1 ; }
+    test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol http) ; http_selected=1 ; }
     test "$rsync_supported" = "yes" && {
-        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=(--protocol rsync)
+        test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol rsync) ; rsync_selected=1 ; }
     }
     test -r "$REFLECTOR_AUTO_CONF" && {
         test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(_get_reflector_auto_configs))
@@ -185,12 +193,60 @@ ShowMirrorlistSaved() {
                 --timeout=5 --timeout-indicator=left
 }
 
+AddCountryNamesToMirrors() {
+    local full_list=$(mktemp)
+    wget -q -O $full_list https://www.archlinux.org/mirrorlist/all || {
+        echo "Warning: cannot fetch Arch mirror list." >&2
+        rm -f $full_list
+        return 1
+    }
+
+    local selected_mirrors=$(grep "^Server = " $tmpfile | awk '{print $3}')
+    local sel_mir
+    local cc xx
+    local country_mirrors country_and_mirror
+    local found
+
+    # save file headers in $tmpfile
+    xx="$(grep "^#" $tmpfile)"
+    echo "$xx" > $tmpfile
+
+
+    for sel_mir in $selected_mirrors ; do
+        found=0
+        for cc in "${selected_countries[@]}" ; do
+            country_mirrors="$(sed -n '/^## '"$cc"'$/,/^$/p' $full_list | sed '1d;$d' | awk '{print $3}')"
+            for xx in $country_mirrors ; do
+                if [ "$sel_mir" = "$xx" ] ; then
+                    found=1
+                    printf "\n## $cc\nServer = $sel_mir\n" >> $tmpfile
+                    break
+                fi
+                test "$found" = "1" && break
+            done
+        done
+    done
+    if [ "$worldwide_selected" = "1" ] ; then
+        country_mirrors="$(sed -n '/^## Worldwide$/,/^$/p' $full_list | sed '1d;$d' | awk '{print $3}')"
+        printf "\n## Worldwide\n" >> $tmpfile
+        for xx in $country_mirrors ; do
+            case "$xx" in
+                "https://"*) test $https_selected -eq 1 && echo "Server = $xx" >> $tmpfile ;;
+                "http://"*)  test $http_selected  -eq 1 && echo "Server = $xx" >> $tmpfile ;;
+                "rsync://"*) test $rsync_selected -eq 1 && echo "Server = $xx" >> $tmpfile ;;
+            esac
+        done
+    fi
+    rm -f $full_list
+}
+
 SaveMirrorlist() {
     grep "^Server = [hr]" $tmpfile >/dev/null || {
         echo "$progname: no mirrors found!" | \
             eos_yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
         return 1
     }
+    AddCountryNamesToMirrors
     cat $tmpfile | eos_yad --text-info --wrap --width=700 --height=400 \
                            --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
         pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
@@ -212,6 +268,11 @@ Main() {
     local reflector_info
     local reflector_cmd
     local ml=/etc/pacman.d/mirrorlist
+    local selected_countries
+    local worldwide_selected=0
+    local https_selected=0
+    local http_selected=0
+    local rsync_selected=0
 
     # Find countries with supported mirrors.
 
