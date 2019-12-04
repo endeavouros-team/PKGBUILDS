@@ -2,4 +2,4 @@
 
 Simple GUI for the `reflector` command.
 
-[Screenshot](reflector-simple.png)
+![Screenshot](reflector-simple.png)
