@@ -2,11 +2,11 @@
 
 # To be called from /etc/pacman.d/hooks/eos-reboot-required.hook.
 
-if [ -x /usr/bin/notify-send ] ; then
+if [ -z "$(/usr/bin/grep EndeavourOS /etc/lsb-release)" ] && [ -x /usr/bin/notify-send ] ; then
 
     # Implementation using libnotify.
 
-    _eos_reboot_required() {
+    _other_reboot_required() {
         local user userid cmd
         local users="$(/usr/bin/users)"
 
@@ -19,8 +19,8 @@ if [ -x /usr/bin/notify-send ] ; then
             /usr/bin/su $user -c "${cmd[*]}"
         done
     }
-    _eos_reboot_required
-    unset -f _eos_reboot_required
+    _other_reboot_required
+    unset -f _other_reboot_required
 
 elif [ -x /usr/bin/yad ] ; then
 
