@@ -612,22 +612,13 @@ StartHere() {
     IsInstalling || notebook+=(--active-tab=2)
 
     notebook+=(--button=" Help!help!":"bash -c WelcomeHelp")
-
-    case "$(eos_yad_GetDesktopName)" in
-        KDE)
-            notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
-            notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":5)
-            "${notebook[@]}"
-            local result=$?
-            case "$result" in
-                5) GreeterSettings disable ;;
-                0|252) GreeterSettings enable ;;
-            esac
-            ;;
-        *)
-            notebook+=(--button=" See you later!face-cool!":0)
-            "${notebook[@]}"
-            ;;
+    notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
+    notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":5)
+    "${notebook[@]}"
+    local result=$?
+    case "$result" in
+        5) GreeterSettings disable ;;
+        0|252) GreeterSettings enable ;;
     esac
 }
 
