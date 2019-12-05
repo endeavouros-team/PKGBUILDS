@@ -1,12 +1,7 @@
 #!/bin/bash
 
-WaylandSupport() {
-    echo "no"        # TODO!!
-}
-
 IsDEInstalled() {
-    local de="$1"
-    case "$de" in
+    case "$1" in
         plasma) pacman -Q plasma-framework >& /dev/null ;;
         deepin) pacman -Q deepin-session-ui >& /dev/null ;;
         gnome)  pacman -Q gnome-session >& /dev/null ;;
@@ -14,7 +9,7 @@ IsDEInstalled() {
         lxqt)   pacman -Q lxqt-session >& /dev/null ;;
         mate)   pacman -Q mate-session-manager >& /dev/null ;;
         xfce)   pacman -Q xfce4-session >& /dev/null ;;
-        *)       ;;
+        *)      pacman -Q $1 &>/dev/null ;;
     esac
 }
 
@@ -22,7 +17,7 @@ SelectDesktop() {
     local xx
     local cmd=(yad --list --radiolist --title="Install another Desktop Environment" --width=400 --height=300)
     cmd+=(--column="Select":rd --column="DE name")
-    for xx in plasma deepin enlightenment gnome lxde lxqt mate xfce ; do
+    for xx in plasma deepin enlightenment gnome lxde lxqt mate xfce i3 ; do
         IsDEInstalled "$xx" || cmd+=(false "$xx") # won't show the de either
     done
     echo "$( "${cmd[@]}" | cut -d '|' -f 2)"
@@ -35,10 +30,7 @@ yad_infomsg() {
 Main()
 {
     local pkgs
-    local xx
     local de="$(SelectDesktop)"
-
-    # TODO: see EOS wiki !!
 
     manual_select(){
         local _cmd="yad --list --checklist --title=\"Select one or more packages\" --width=400 --height=300 --column=\"Check\" --column=\"Package name\""
@@ -50,8 +42,6 @@ Main()
                 pacman -Q $_temp &>/dev/null || _cmd+=" true $_temp"
             done
             local _pkg="$(eval $_cmd | awk -F"|" '{print $2}')"
-        else
-            echo ${_pkg:-$1}
         fi
     }
 
@@ -71,6 +61,18 @@ Main()
                        pkgs+=" $(manual_select kde-applications)" ;;
         xfce)          pkgs="xfce4"
                        pkgs+=" $(manual_select xfce4-goodies)" ;;
+        i3)            tmpfile=$(mktemp) 
+cat <<EOF > $tmpfile
+echo "please wait while we set up i3 for you"
+git clone https://github.com/killajoe/i3-EndeavourOS.git /tmp/ 1>/dev/null
+cd /tmp/i3-EndeavourOS
+cp -R .config/i3 ~/.config/
+chmod -R +x ~/.config/i3/scripts
+cp .Xresources ~/
+su -c "sudo pacman -S --needed --noconfirm - < packages-repository.txt"
+EOF
+                       eos_yad_RunCmdTermBash "\"$tmpfile\"; rm -f \"$tmpfile\""
+                       exit $? ;;
         *) return ;;
     esac
 
@@ -87,7 +89,7 @@ Main()
         #     ;;
     esac
 
-    su -c "pacman -S --needed $pkgs --noconfirm"
+    eos_yad_RunCmdTermBash "su -c \"pacman -S --needed $pkgs --noconfirm\""
 }
 
 Main "$@"
