@@ -6,31 +6,26 @@ WaylandSupport() {
 
 IsDEInstalled() {
     local de="$1"
-    local pkg=""
     case "$de" in
-        plasma) pkg=plasma-framework ;;
-        deepin) pkg=deepin-session-ui ;;
-        gnome)  pkg=gnome-session ;;
-        lxde)   pkg=lxde-common ;;
-        lxqt)   pkg=lxqt-session ;;
-        mate)   pkg=mate-session-manager ;;
-        xfce)   pkg=xfce4-session ;;
-        *)      pkg="$de" ;;
+        plasma) pacman -Q plasma-framework >& /dev/null ;;
+        deepin) pacman -Q deepin-session-ui >& /dev/null ;;
+        gnome)  pacman -Q gnome-session >& /dev/null ;;
+        lxde)   pacman -Q lxde-common >& /dev/null ;;
+        lxqt)   pacman -Q lxqt-session >& /dev/null ;;
+        mate)   pacman -Q mate-session-manager >& /dev/null ;;
+        xfce)   pacman -Q xfce4-session >& /dev/null ;;
+        *)       ;;
     esac
-    pacman -Q "$pkg" >& /dev/null
 }
 
 SelectDesktop() {
     local xx
     local cmd=(yad --list --radiolist --title="Install another Desktop Environment" --width=400 --height=300)
-    cmd+=(--column="Select":rd --column="Installed" --column="DE name")
-
-    for xx in "${des[@]}" ; do
-        IsDEInstalled "$xx" && cmd+=(false yes "$xx") || cmd+=(false no "$xx")
+    cmd+=(--column="Select":rd --column="DE name")
+    for xx in plasma deepin enlightenment gnome lxde lxqt mate xfce ; do
+        IsDEInstalled "$xx" || cmd+=(false "$xx") # won't show the de either
     done
-    local de="$("${cmd[@]}")"
-    de="$(echo "$de" | cut -d '|' -f 3)"
-    echo "$de"
+    echo "$( "${cmd[@]}" | cut -d '|' -f 2)"
 }
 
 yad_infomsg() {
@@ -39,38 +34,47 @@ yad_infomsg() {
 
 Main()
 {
-    local des=(cinnamon deepin enlightenment gnome lxde lxqt mate plasma xfce)
     local pkgs
     local xx
     local de="$(SelectDesktop)"
 
     # TODO: see EOS wiki !!
 
+    manual_select(){
+        local _cmd="yad --list --checklist --title=\"Select one or more packages\" --width=400 --height=300 --column=\"Check\" --column=\"Package name\""
+        local _temp
+        yad --yesno --title="$1" --width=200 --height=100 --text="Do you want to manually select extra packages? Click cancel to install them all (recomended)"
+        if (( ! $? )); then
+            local _pkgs=("$(pacman -Sg $1 | cut -d' ' -f2)")
+            for _temp in ${_pkgs[@]}; do
+                pacman -Q $_temp &>/dev/null || _cmd+=" true $_temp"
+            done
+            local _pkg="$(eval $_cmd | awk -F"|" '{print $2}')"
+        else
+            echo ${_pkg:-$1}
+        fi
+    }
+
     case "$de" in
 #       budgie)        pkgs=(budgie-desktop gnome) ;;
-        cinnamon)      pkgs=(cinnamon system-config-printer gnome-keyring blueberry cinnamon-translations) ;;
-        deepin)        pkgs=(deepin deepin-extra networkmanager) ;;
-        enlightenment) pkgs=(enlightenment terminology) ;;
-        gnome)         pkgs=(gnome gnome-extra) ;;
-        lxde)          pkgs=(lxde) ;;
-        lxqt)          pkgs=(lxqt sddm oxygen-icons) ;;
-        mate)          pkgs=(mate mate-extra system-config-printer blueman) ;;
-        plasma)        pkgs=(plasma-meta kde-applications-meta) ;;
-        xfce)          pkgs=(xfce4 orage parole ristretto
-                             thunar-archive-plugin
-                             xfce4-battery-plugin
-                             xfce4-notifyd
-                             xfce4-pulseaudio-plugin
-                             xfce4-screenshooter
-                             xfce4-sensors-plugin
-                             xfce4-taskmanager
-                             xfce4-whiskermenu-plugin
-                            )
-                       ;;
-        "") return ;;
+        cinnamon)      pkgs="cinnamon system-config-printer gnome-keyring blueberry cinnamon-translations" ;;
+        deepin)        pkgs="deepin networkmanager"
+                       pkgs+=" $(manual_select deepin-extra)" ;;
+        enlightenment) pkgs="enlightenment terminology" ;;
+        gnome)         pkgs="gnome"
+                       pkgs+=" $(manual_select gnome-extra)" ;;
+        lxde)          pkgs="lxde" ;;
+        lxqt)          pkgs="lxqt sddm oxygen-icons" ;;
+        mate)          pkgs="mate system-config-printer blueman"
+                       pkgs+=" $(manual_select mate-extra)" ;;
+        plasma)        pkgs="plasma-meta"
+                       pkgs+=" $(manual_select kde-applications)" ;;
+        xfce)          pkgs="xfce4"
+                       pkgs+=" $(manual_select xfce4-goodies)" ;;
+        *) return ;;
     esac
 
-    # extra stuff
+    # extra stuff, leaving them for now. @Debdut Chakraborty
     case "$de" in
         cinnamon)
             xx="xf86-video-intel"
@@ -78,12 +82,12 @@ Main()
                 echo "Recommended to uninstall package '$xx' for DE '$de'." | yad_infomsg
             }
             ;;
-        plasma)
-            test "$(WaylandSupport)" = "yes" && pkgs+=(plasma-wayland-session)
-            ;;
+        # plasma)
+        #     test "$(WaylandSupport)" = "yes" && pkgs+=(plasma-wayland-session)
+        #     ;;
     esac
 
-    su -c "pacman -S --needed ${pkgs[*]}"  # --noconfirm"
+    su -c "pacman -S --needed $pkgs --noconfirm"
 }
 
 Main "$@"
