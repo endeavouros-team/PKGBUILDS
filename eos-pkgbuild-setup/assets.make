@@ -343,9 +343,11 @@ Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
 
-$PROGNAME [--checkaur | --repoup ]
+$PROGNAME [--checkaur | --dryrun | --repoup ]
 where
     --checkaur    Compare certain AUR PKGBUILDs to local counterparts.
+    --dryrun      Show what would be done, but do nothing.
+    --repoup      Force repo update (advanced).
 EOF
     test -n "$1" && exit "$1"
 }
@@ -361,6 +363,7 @@ Main()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
+                --dryrun)   cmd=dryrun ;;
                 --checkaur) cmd=checkaur ;;
                 --repoup)   repoup=1 ;;             # sync repo even when no packages are built
                 *) Usage 0  ;;
@@ -424,6 +427,12 @@ Main()
         test $(vercmp "$tmp" "$tmpcurr") -gt 0 && echo2 "update pending to $tmp" || echo2 "OK ($tmpcurr)"
     done
     Popd
+
+    case "$cmd" in
+        dryrun)
+            Exit 0
+            ;;
+    esac
 
     #RunPostHooks                 # may update local PKGBUILDs
 
