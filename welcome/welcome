@@ -344,7 +344,7 @@ AfterInstall() {
           --field="Bluetooth!!Bluetooth advice":fbtn                                   "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
           --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
-          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de' \
+          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     '/usr/share/endeavouros/scripts/eos-install-de' \
     &> /dev/null &
 #          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
 }
