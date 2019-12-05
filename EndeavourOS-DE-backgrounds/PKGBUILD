@@ -1,7 +1,7 @@
 # Maintainer: Johannes Kamprad <joekamprad@endeavouros.com>
 pkgname=EndeavourOS-DE-backgrounds
 pkgver=4
-pkgrel=1
+pkgrel=2
 pkgdesc='Default EndeavourOS background images for all different DE'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -21,6 +21,6 @@ package() {
         install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
         install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds/"
 
-        mkdir -p "${pkgdir}/usr/share/backgrounds"
-        ln -sr "${pkgdir}/usr/share/endeavouros/backgrounds" "${pkgdir}/usr/share/backgrounds/endeavouros"
+        install -d "${pkgdir}/usr/share/backgrounds"
+        ln -s "/usr/share/endeavouros/backgrounds" "${pkgdir}/usr/share/backgrounds/endeavouros"
 }
