@@ -18,7 +18,7 @@ SelectDesktop() {
     local cmd=(yad --list --radiolist --title="Install another Desktop Environment" --width=400 --height=300)
     cmd+=(--column="Select":rd --column="DE name")
     for xx in plasma deepin enlightenment gnome lxde lxqt mate xfce i3 ; do
-        IsDEInstalled "$xx" || cmd+=(false "$xx") # won't show the de either
+        IsDEInstalled "$xx" || cmd+=(false "$xx") # won't show the de
     done
     echo "$( "${cmd[@]}" | cut -d '|' -f 2)"
 }
@@ -27,7 +27,7 @@ yad_infomsg() {
     yad --text-info --title="Info" --width=400 --wrap  --height=300 --button=yad-ok:0 "$@"
 }
 
-Main()
+main()
 {
     local pkgs
     local de="$(SelectDesktop)"
@@ -64,15 +64,16 @@ Main()
         i3)            tmpfile=$(mktemp) 
 cat <<EOF > $tmpfile
 echo "please wait while we set up i3 for you"
-git clone https://github.com/killajoe/i3-EndeavourOS.git /tmp/ 1>/dev/null
-cd /tmp/i3-EndeavourOS
+git clone https://github.com/killajoe/i3-EndeavourOS.git /tmp/i3 1>/dev/null
+cd /tmp/i3
 cp -R .config/i3 ~/.config/
 chmod -R +x ~/.config/i3/scripts
 cp .Xresources ~/
 su -c "sudo pacman -S --needed --noconfirm - < packages-repository.txt"
 EOF
-                       eos_yad_RunCmdTermBash "\"$tmpfile\"; rm -f \"$tmpfile\""
-                       exit $? ;;
+                       eos_yad_RunCmdTermBash "chmod +x \"$tmpfile\"; \"$tmpfile\""
+                       exit $?
+                       rm -f "$tmpfile" ;;
         *) return ;;
     esac
 
@@ -92,4 +93,4 @@ EOF
     eos_yad_RunCmdTermBash "su -c \"pacman -S --needed $pkgs --noconfirm\""
 }
 
-Main "$@"
+main
