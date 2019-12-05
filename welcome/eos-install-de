@@ -41,7 +41,9 @@ main()
             for _temp in ${_pkgs[@]}; do
                 pacman -Q $_temp &>/dev/null || _cmd+=" true $_temp"
             done
-            local _pkg="$(eval $_cmd | awk -F"|" '{print $2}')"
+            eval $_cmd | awk -F"|" '{print $2}'
+        else
+            echo $1
         fi
     }
 
