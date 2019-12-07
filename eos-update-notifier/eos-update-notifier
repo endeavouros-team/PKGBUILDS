@@ -159,22 +159,29 @@ CheckArchNews() {
 Main2() {
     local CheckAurUpdates=yes
     local lockfile
-    local msg
+    local pids
 
     CheckArchNews   # also reads config file
 
     # check package manager lock
     lockfile=/var/lib/pacman/db.lck
     if [ -e $lockfile ] ; then
-        msg="Sorry, another program is currently using pacman databases."
-        debug "$msg"
+        debug "Sorry, another program is currently using pacman databases."
         return
     fi
     # check notifier lock
-    lockfile="$HOME/.eos-update-notifier.lck"
+    lockfile=/tmp/.eos-update-notifier.l
     if [ -e "$lockfile" ] ; then
-        debug "Sorry, $progname is already checking for updates."
-        return
+	pids=($(pidof -x $progname))
+	if [ "${#pids[@]}" = "1" ] ; then
+	    echo2 "Ignoring $progname lockfile (probably a leftover from a previous check)."
+	else
+            echo2 "Sorry, $progname lockfile exists, already checking for updates?"
+	    eos_yad --form --title="Warning: $progname blocked?" --image=warning \
+		    --text="Lockfile for $progname exists.\nIf no other $progname instance is currently checking for updates, you may continue.\nContinue checking?" \
+		    --button=yad-no:1 --button=yad-yes:0
+	    test $? -ne 0 && return 1
+	fi
     fi
 
     touch "$lockfile"
