@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Main()
+{
+    local file="$1"
+
+    test -n "$file" || DIE "give file name to sign."
+    test -r "$file" || DIE "file '$file' not found."
+
+    gpg -u EndeavourOS -o "$file".sig -b "$file"
+
+    # gpg --local-user EndeavourOS --output "$file".sig --detach-sign "$file"
+}
+
+Main "$@"

@@ -22,12 +22,13 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/ckbcomp
     aur/downgrade
     aur/inxi
-    aur/kalu
     aur/mkinitcpio-openswap
     aur/paper-icon-theme
     aur/yay
+    EndeavourOS-DE-backgrounds
     endeavouros-keyring
     endeavouros-mirrorlist
+    EndeavourOS-theming
     eos-base
     eos-update-notifier
     grub-theme-endeavouros
@@ -36,6 +37,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer
     nvidia-installer-dkms
     reflector-auto
+    reflector-simple
     welcome
 )
 
