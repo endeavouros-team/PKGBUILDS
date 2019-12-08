@@ -347,12 +347,12 @@ Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
 
-$PROGNAME [--checkaur | --dryrun | --repoup ]
+$PROGNAME [--checkaur | --dryrun | --dryrun-local | --repoup ]
 where
-    --checkaur    Compare certain AUR PKGBUILDs to local counterparts.
-    --dryrun      Show what would be done, but do nothing.
-    --dryrun2     Show what would be done, but do nothing. Use local assets.
-    --repoup      Force repo update (advanced).
+    --checkaur       Compare certain AUR PKGBUILDs to local counterparts.
+    --dryrun         Show what would be done, but do nothing.
+    --dryrun-local   Show what would be done, but do nothing. Use local assets.
+    --repoup         (Advanced) Force update of repository database files.
 EOF
     test -n "$1" && exit "$1"
 }
@@ -369,10 +369,10 @@ Main()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
-                --dryrun)   cmd=dryrun ;;
-                --dryrun2)  cmd=dryrun ; use_local_assets=1 ;;
-                --checkaur) cmd=checkaur ;;
-                --repoup)   repoup=1 ;;             # sync repo even when no packages are built
+                --dryrun-local) cmd=dryrun ; use_local_assets=1 ;;
+                --dryrun)       cmd=dryrun ;;
+                --checkaur)     cmd=checkaur ;;
+                --repoup)       repoup=1 ;;             # sync repo even when no packages are built
                 *) Usage 0  ;;
             esac
         done
