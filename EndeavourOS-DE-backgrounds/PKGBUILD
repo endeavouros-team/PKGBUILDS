@@ -4,6 +4,7 @@ pkgver=4
 pkgrel=2
 pkgdesc='Default EndeavourOS background images for all different DE'
 arch=('any')
+conflicts=('EndeavourOS-theming')
 url='https://www.endeavouros.com'
 license=('CCPL:by-nc-sa')
 
