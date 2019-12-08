@@ -144,6 +144,10 @@ ListNameToPkgName()
 
 Assets_clone()
 {
+    if [ $use_local_assets -eq 1 ] ; then
+        return
+    fi
+
     local xx hook
 
     # echo2 "It is possible that your local release assets in folder $ASSETSDIR"
@@ -347,6 +351,7 @@ $PROGNAME [--checkaur | --dryrun | --repoup ]
 where
     --checkaur    Compare certain AUR PKGBUILDs to local counterparts.
     --dryrun      Show what would be done, but do nothing.
+    --dryrun2     Show what would be done, but do nothing. Use local assets.
     --repoup      Force repo update (advanced).
 EOF
     test -n "$1" && exit "$1"
@@ -357,13 +362,15 @@ Main()
     local cmd=""
     local xx
     local repoup=0
-    local reposig                                   # 1 = sign repo too, 0 = don't sign repo
+    local reposig                    # 1 = sign repo too, 0 = don't sign repo
+    local use_local_assets=0         # 0 = offer to fetch assets
 
     # Check given parameters:
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
                 --dryrun)   cmd=dryrun ;;
+                --dryrun2)  cmd=dryrun ; use_local_assets=1 ;;
                 --checkaur) cmd=checkaur ;;
                 --repoup)   repoup=1 ;;             # sync repo even when no packages are built
                 *) Usage 0  ;;
