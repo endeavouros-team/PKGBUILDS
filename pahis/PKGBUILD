@@ -1,0 +1,26 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=pahis
+pkgdesc="Show history of package operations of one or all packages."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=0.1
+pkgrel=1
+
+arch=('any')
+license=('GPL')
+depends=('bash' 'pacman')
+
+install=pahis.install
+
+source=(
+    "$url/$pkgname"
+    "$url/$pkgname.completion"
+)
+sha512sums=('5cfd42b4accf8430b6842fc082d90552f73c757a425410eebd2b4a614e5b608e9e4e2e792482c55f0d8975cc8b4593ce0b6f714dfdad803571f9e8e9144dd67a'
+            '01ee459e2c15704f405b10622ce1d420328e62293487cc11fa2375d40a44f60d786529629832d8d7fc0302cb832df401be7e24eede1f6a829c904b56d276a6f6')
+
+package() {
+  cd $srcdir
+  install -Dm755 $pkgname             $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.completion  $pkgdir/usr/share/bash-completion/completions/$pkgname
+}

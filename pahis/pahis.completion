@@ -1,0 +1,70 @@
+# bash completion for ph        -*- shell-script -*-
+
+__pahis_pkgsInPacmanLog() {
+    grep "\] \[ALPM\] [a-z]*ed " /var/log/pacman.log | awk '{print $5}'| sort | uniq
+}
+
+__log() {
+    echo "${words[*]}" >> $HOME/pahis.log
+}
+
+__pahis_isPkgUsed() {
+    local xx
+    # __log
+    for xx in "$@" ; do
+        echo "$xx ? --no-pkgchk" >> $HOME/pahis.log
+        test "$xx" = "--no-pkgchk" && return 0
+    done
+    return 1
+}
+__pahis_isOperUsed() {
+    local xx yy
+    # __log
+    for xx in "$@" ; do
+        for yy in $opers ; do
+            #echo "$xx ? $yy" >> $HOME/pahis.log
+            test "$xx" = "$yy" && return 0
+        done
+    done
+    return 1
+}
+
+__pahis_() {
+    local cur prev words cword
+    _init_completion -s || return
+
+    local progname="pahis"
+    local options="$($progname --all-options)"
+    local pkgs="$(__pahis_pkgsInPacmanLog)"
+    local opers="--upgraded --downgraded --installed --removed --reinstalled"
+
+    case "$prev" in
+        "$progname")
+            COMPREPLY=( $(compgen -W "$options $pkgs" -- ${cur}) )
+            ;;
+        --operations | -h | --help | --all-options)
+            ;;
+        --upgraded | --downgraded | --installed | --removed | --reinstalled)
+            __pahis_isPkgUsed "${words[@]}" && {
+                #echo "chk used ${words[*]}" >> $HOME/pahis.log
+                COMPREPLY=( $(compgen -W "$pkgs" -- "$cur"))
+            } || {
+                #echo "chk not used ${words[*]}" >> $HOME/pahis.log
+                COMPREPLY=( $(compgen -W "$pkgs --no-pkgchk" -- "$cur"))
+            }
+            ;;
+        --no-pkgchk)
+            __pahis_isOperUsed "${words[@]}" && {
+                #echo "oper used ${words[*]}" >> $HOME/pahis.log
+                COMPREPLY=( $(compgen -W "$pkgs" -- "$cur"))
+            } || {
+                #echo "oper not used ${words[*]}" >> $HOME/pahis.log
+                COMPREPLY=( $(compgen -W "$pkgs $opers" -- "$cur"))
+            }
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+} &&
+complete -F __pahis_   pahis

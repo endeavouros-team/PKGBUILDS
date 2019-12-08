@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+# Show info about pacman history.
+#
+
+DIE()    { echo "Error: $@" >&2 ; Usage ; exit 1 ; }
+ArgVal() { echo "${1#*=}" ; }
+
+Usage() {
+    local progname="$(basename $0)"
+    cat <<EOF >&2
+
+$progname: shows history information about package operations.
+
+Usage: $progname [options] [operation] [package]
+
+    options:
+                   -h
+                    --help            This help.
+                    --no-pkgchk       Do not check if the given package exists.
+
+    operation      One of: $(Main --operations).
+                   Tip: press the Tab key to complete the word!
+
+    package        Package name (optional). If no package name is given,
+                   show all packages experienced the given operation.
+
+Note: bash command completion is available.
+
+Examples:
+    pahis --upgraded firefox
+    pahis --installed
+    pahis geany
+
+EOF
+}
+
+Main()
+{
+    local op
+    local pkg
+    local output
+    local line
+    local pacmanlog=/var/log/pacman.log
+    local pkgchk=1
+
+    test -z "$1" && {
+        Usage
+        return
+    }
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --all-options)   # supports bash command completion
+                line="--upgraded --downgraded --installed --removed --reinstalled"
+                line+=" --no-pkgchk -h --help --operations --all-options"
+                echo "$line"
+                return
+                ;;
+            --operations)
+                echo "--upgraded --downgraded --installed --removed --reinstalled"
+                return
+                ;;
+            -h | --help)
+                Usage
+                return
+                ;;
+
+            --upgraded | --downgraded | --installed | --removed | --reinstalled)
+                op="${arg:2}"   # not checking if operation is already given
+                ;;
+            --no-pkgchk)  # useful for packages that existed but no more!
+                pkgchk=0
+                ;;
+            -*)
+                DIE "unsupported parameter '$op'"
+                ;;
+            *)
+                # a pkg name; not checking if pkg is already given
+                pkg="$arg"
+                ;;
+        esac
+    done
+
+    test -n "$pkg" && {
+        if [ $pkgchk -eq 1 ] ; then
+            pacman -Si "$pkg" >& /dev/null || DIE "package '$pkg' does not exist."
+        fi
+    }
+
+    if [ -z "$pkg" ] ; then
+        output="$(grep " \[ALPM\] $op " $pacmanlog)"
+    else
+        if [ -z "$op" ] ; then
+            output="$(grep " \[ALPM\] [a-z]*ed $pkg " $pacmanlog)"
+        else
+            output="$(grep " \[ALPM\] $op $pkg " $pacmanlog)"
+        fi
+    fi
+
+    test -n "$output" && {
+        echo "$output" | tac | less
+    } || {
+        echo "Requested info is not available."
+        echo "Probable reasons:"
+        echo "  - '$pkg' was never installed"
+        if [ "$op" != "installed" ] ; then
+            echo "  - '$pkg' was never $op"
+        fi
+        echo "  - '$pkg' was installed while installing the system"
+    }
+}
+
+Main "$@"
