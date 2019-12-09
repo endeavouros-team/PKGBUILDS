@@ -27,6 +27,18 @@ export -f eos_yad_GetDesktopName
 
 eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
+eos_yad_infomsg() {
+    local msg="$1"
+    echo "$msg" >&2
+    eos_yad --form --text="$msg" --title="Message" --tail --wrap --image=info \
+            --button=yad-quit:0 "$@"
+}
+
+DIE() {
+    echo "$1" >&2
+    eos_yad_DIE "$1"
+}
+
 AssertPicture() {
     local fallback_picture="$1"
     local use_file_prefix="$2"
@@ -36,7 +48,7 @@ AssertPicture() {
     case "$pic" in
         file://*) pic="${pic:7}" ;;
     esac
-    test -r "$pic" || eos_yad_DIE "Picture file '$pic' does not exist."
+    test -r "$pic" || DIE "Picture file '$pic' does not exist."
 
     if [ "$use_file_prefix" = "no" ] ; then
         case "$pic" in
@@ -50,10 +62,19 @@ AssertPicture() {
     fi
 }
 
+XfceSetWallpaper() {
+    local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+    test -r "$conf" || DIE "Config file '$conf' does not exist."
+    sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
+    eos_yad_infomsg "Reboot is required for the changes to take effect."
+}
+
 Main()
 {
     local pic="$1"                            # filename without leading "file://"
     local DE="$(eos_yad_GetDesktopName)"
+
+    echo "Setting desktop wallpaper for '$DE' ..." >&2
 
     case "$DE" in
         BUDGIE)
@@ -66,7 +87,7 @@ Main()
             ;;
         DEEPIN)
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
-            dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"
+            dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
             ;;
         GNOME)
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-gnome.png
@@ -86,11 +107,10 @@ Main()
             ;;
         XFCE)
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-xfce4.png no
-            local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
-            test -r "$conf" || eos_yad_DIE "Config file '$conf' does not exist."
-            sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
-
-            echo "Reboot is required for the changes to take effect." >&2
+            XfceSetWallpaper
+            ;;
+        *)
+            DIE "Sorry, desktop '$DE' is not supported."
             ;;
     esac
 }
