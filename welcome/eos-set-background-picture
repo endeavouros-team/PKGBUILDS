@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Usage: eos-set-background-picture [filename]
+# where
+#    filename      Picture file name (optional).
+
+#################################################################################
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
+    exit 1
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
+
+#export -f eos_yad
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
+export -f eos_yad__detectDE
+export -f eos_yad_GetDesktopName
+#################################################################################
+
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
+
+AssertPicture() {
+    local fallback_picture="$1"
+    local use_file_prefix="$2"
+
+    test -n "$pic" || pic="$fallback_picture"
+
+    case "$pic" in
+        file://*) pic="${pic:7}" ;;
+    esac
+    test -r "$pic" || eos_yad_DIE "Picture file '$pic' does not exist."
+
+    if [ "$use_file_prefix" = "no" ] ; then
+        case "$pic" in
+            file://*) pic="${pic:7}" ;;
+        esac
+    else
+        case "$pic" in
+            file://*) ;;
+            *) pic="file://$pic" ;;
+        esac
+    fi
+}
+
+Main()
+{
+    local pic="$1"                            # filename without leading "file://"
+    local DE="$(eos_yad_GetDesktopName)"
+
+    case "$DE" in
+        BUDGIE)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-budgie.png
+            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            ;;
+        CINNAMON)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-cinnamon.png
+            gsettings set org.cinnamon.desktop.background picture-uri "$pic"
+            ;;
+        DEEPIN)
+            # TODO: this may not work, need to explore more!
+
+            #dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri \
+            #      /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
+            ;;
+        GNOME)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-gnome.png
+            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            ;;
+        KDE)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-plasma.png
+            python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
+            ;;
+        LXQT)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-lxqt.png no
+            pcmanfm --set-wallpaper="$pic"
+            ;;
+        MATE)
+            # TODO: testing!
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-mate.png no
+            gsettings set org.mate.background picture-filename "$pic"
+            ;;
+        XFCE)
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-xfce4.png no
+            local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+            test -r "$conf" || eos_yad_DIE "Config file '$conf' does not exist."
+            sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
+            ;;
+    esac
+
+    echo "Reboot is required for the changes to take effect." >&2
+}
+
+Main "$@"
