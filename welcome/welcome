@@ -336,7 +336,7 @@ AfterInstall() {
           --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
           --field=" Detect package issues!info!Detect any potential issues on system packages":fbtn                'bash -c yad_PkgConflicts' \
-          --field=' EndeavourOS to latest?!up!Show what to do to get the your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
+          --field=' EndeavourOS to latest?!up!Show what to do to get your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
