@@ -75,7 +75,7 @@ Main()
             gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
         KDE)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-plasma.png
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-plasma.png no
             python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
             ;;
         LXQT)
@@ -83,7 +83,6 @@ Main()
             pcmanfm --set-wallpaper="$pic"
             ;;
         MATE)
-            # TODO: testing!
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-mate.png no
             gsettings set org.mate.background picture-filename "$pic"
             ;;
