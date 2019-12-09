@@ -65,10 +65,8 @@ Main()
             gsettings set org.cinnamon.desktop.background picture-uri "$pic"
             ;;
         DEEPIN)
-            # TODO: this may not work, need to explore more!
-
-            #dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri \
-            #      /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
+            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
+            dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"
             ;;
         GNOME)
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-gnome.png
@@ -91,10 +89,10 @@ Main()
             local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
             test -r "$conf" || eos_yad_DIE "Config file '$conf' does not exist."
             sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
+
+            echo "Reboot is required for the changes to take effect." >&2
             ;;
     esac
-
-    echo "Reboot is required for the changes to take effect." >&2
 }
 
 Main "$@"
