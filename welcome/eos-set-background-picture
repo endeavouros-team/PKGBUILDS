@@ -89,7 +89,7 @@ Main()
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
             dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
             ;;
-        GNOME)
+        GNOME | GNOME3)
             AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-gnome.png
             gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
