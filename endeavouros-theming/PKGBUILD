@@ -7,7 +7,7 @@ arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('393536c610d2bfaa0bb977f03ec89b75')
+md5sums=('6abbb6944f5c142ad31f9a988a2b569b')
 
 
 package() {
