@@ -63,6 +63,8 @@ AssertPicture() {
 }
 
 XfceSetWallpaper() {
+    # Set all "last-image" values in file $conf to picture $pic
+
     local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
     test -r "$conf" || DIE "Config file '$conf' does not exist."
     sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
