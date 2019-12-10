@@ -65,10 +65,33 @@ AssertPicture() {
 XfceSetWallpaper() {
     # Set all "last-image" values in file $conf to picture $pic
 
-    local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
-    test -r "$conf" || DIE "Config file '$conf' does not exist."
-    sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
-    eos_yad_infomsg "Reboot is required for the changes to take effect."
+    local impl=2  # 2 = best
+
+    case "$impl" in
+        0)
+            local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+            test -r "$conf" || DIE "Config file '$conf' does not exist."
+            sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
+            eos_yad_infomsg "Reboot is required for the changes to take effect."
+            ;;
+        1)
+            local prop
+            for prop in $(xfconf-query --channel xfce4-desktop --list | grep /last-image$) ; do
+                xfconf-query --channel xfce4-desktop --property $prop --set "$pic"
+            done
+            eos_yad_infomsg "Reboot is required for the changes to take effect."
+            ;;
+        2)
+            local monitors=($(xrandr | grep -w connected | awk '{print $1}'))
+            local monitor mon prop
+
+            for monitor in "${monitors[@]}" ; do
+                mon=monitor${monitor}
+                prop=$(xfconf-query --channel xfce4-desktop --list | grep  /last-image$  | grep $mon)
+                xfconf-query --channel xfce4-desktop --property $prop --set "$pic"
+            done
+            ;;
+    esac
 }
 
 Main()
