@@ -96,12 +96,19 @@ Update_common() {
     local source=""
     local cmd=""
     local updates=""
+    local previous_check_time=$(date +%s)
 
+    echo2 "Checking for updates ..."
     updates="$(checkupdates)"
+
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream
-            updates="$(checkupdates)"    # may have been a long wait...
+            if [ $(( $(date +%s) - previous_check_time )) -gt 60 ] ; then
+                # Re-check for updates if more than 60 seconds elapsed from the first check.
+                echo2 "Re-checking for updates ..."
+                updates="$(checkupdates)"
+            fi
         fi
         ((hasupdates++))
         source=upstream
@@ -368,6 +375,14 @@ InitialWait() {
     }
 }
 
+yad_infomsg() {
+    local msg="$1"
+    local title="$2"
+    test -n "$title" || title="Info"
+    echo2 "$title: $msg"
+    yad --form --text="$msg" --title="$title" --button=yad-ok:0 --image=info
+}
+
 Main()
 {
     local configdir="$HOME/.config/systemd/user"
@@ -398,9 +413,7 @@ Main()
                 return
                 ;;
             -show-timer)
-                yad --form --text="$(systemctl --user status eos-update-notifier.timer)" \
-                    --title="EndeavourOS update notifier: timer status" \
-                    --width=800 --height=200 --wrap --button=yad-ok:0 --image=info
+                systemctl --user status eos-update-notifier.timer | cat -
                 return
                 ;;
             -iw=*)
