@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# EndeavourOS initial wallpaper installer for a user.
+#
+
+
+#################################################################################
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
+    exit 1
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
+
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
+export -f eos_yad__detectDE
+export -f eos_yad_GetDesktopName
+#################################################################################
+
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
+
+Main() {
+    local DE="$(eos_yad_GetDesktopName)"
+    local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
+
+    case "$1" in
+        -r) rm -f "$conf" ;;     # -r allows for re-installing the default wallpaper
+    esac
+
+    if [ ! -r "$conf" ] ; then
+        eos-set-background-picture
+        touch "$conf"
+    fi
+}
+
+Main "$@"
