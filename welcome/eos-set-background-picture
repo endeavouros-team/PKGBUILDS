@@ -60,6 +60,9 @@ AssertPicture() {
             *) pic="file://$pic" ;;
         esac
     fi
+    eos_yad --form --text="Want to change wallpaper to '$pic'?" \
+            --title="Changing wallpaper" --image=stock_dialog-question \
+            --button=yad-no:1 --button=yad-yes:0
 }
 
 XfceSetWallpaper() {
@@ -104,38 +107,38 @@ Main()
 
     case "$DE" in
         BUDGIE)
-            AssertPicture ${picprefix}budgie.png
-            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            AssertPicture ${picprefix}budgie.png && \
+                gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
         CINNAMON)
-            AssertPicture ${picprefix}cinnamon.png
-            gsettings set org.cinnamon.desktop.background picture-uri "$pic"
+            AssertPicture ${picprefix}cinnamon.png && \
+                gsettings set org.cinnamon.desktop.background picture-uri "$pic"
             ;;
         DEEPIN)
-            AssertPicture ${picprefix}deepin.png
-            dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
+            AssertPicture ${picprefix}deepin.png && \
+                dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
             ;;
         GNOME | GNOME3)
-            AssertPicture ${picprefix}gnome.png
-            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            AssertPicture ${picprefix}gnome.png && \
+                gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
         KDE)
-            AssertPicture ${picprefix}plasma.png no
-            python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
+            AssertPicture ${picprefix}plasma.png no && \
+                python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
             # see also:
             # https://www.kubuntuforums.net/showthread.php/66762-Right-click-wallpaper-changer?p=387392&viewfull=1#post387392
             ;;
         LXQT)
-            AssertPicture ${picprefix}lxqt.png no
-            pcmanfm --set-wallpaper="$pic"
+            AssertPicture ${picprefix}lxqt.png no && \
+                pcmanfm --set-wallpaper="$pic"
             ;;
         MATE)
-            AssertPicture ${picprefix}mate.png no
-            gsettings set org.mate.background picture-filename "$pic"
+            AssertPicture ${picprefix}mate.png no && \
+                gsettings set org.mate.background picture-filename "$pic"
             ;;
         XFCE)
-            AssertPicture ${picprefix}xfce4.png no
-            XfceSetWallpaper
+            AssertPicture ${picprefix}xfce4.png no && \
+                XfceSetWallpaper
             ;;
         *)
             DIE "Sorry, desktop '$DE' is not supported."
