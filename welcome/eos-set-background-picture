@@ -122,6 +122,8 @@ Main()
         KDE)
             AssertPicture ${picprefix}plasma.png no
             python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
+            # see also:
+            # https://www.kubuntuforums.net/showthread.php/66762-Right-click-wallpaper-changer?p=387392&viewfull=1#post387392
             ;;
         LXQT)
             AssertPicture ${picprefix}lxqt.png no
