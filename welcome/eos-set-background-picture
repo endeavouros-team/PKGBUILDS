@@ -98,40 +98,41 @@ Main()
 {
     local pic="$1"                            # filename without leading "file://"
     local DE="$(eos_yad_GetDesktopName)"
+    local picprefix=/usr/share/backgrounds/endeavouros/endeavouros_
 
     echo "Setting desktop wallpaper for '$DE' ..." >&2
 
     case "$DE" in
         BUDGIE)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-budgie.png
+            AssertPicture ${picprefix}budgie.png
             gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
         CINNAMON)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-cinnamon.png
+            AssertPicture ${picprefix}cinnamon.png
             gsettings set org.cinnamon.desktop.background picture-uri "$pic"
             ;;
         DEEPIN)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-deepin.png
+            AssertPicture ${picprefix}deepin.png
             dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
             ;;
         GNOME | GNOME3)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-gnome.png
+            AssertPicture ${picprefix}gnome.png
             gsettings set org.gnome.desktop.background picture-uri "$pic"
             ;;
         KDE)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-plasma.png no
+            AssertPicture ${picprefix}plasma.png no
             python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
             ;;
         LXQT)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-lxqt.png no
+            AssertPicture ${picprefix}lxqt.png no
             pcmanfm --set-wallpaper="$pic"
             ;;
         MATE)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-mate.png no
+            AssertPicture ${picprefix}mate.png no
             gsettings set org.mate.background picture-filename "$pic"
             ;;
         XFCE)
-            AssertPicture /usr/share/backgrounds/endeavouros/EndeavourOS-xfce4.png no
+            AssertPicture ${picprefix}xfce4.png no
             XfceSetWallpaper
             ;;
         *)
