@@ -3,13 +3,14 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=1.16
-pkgrel=4
+pkgrel=5
 arch=('any')
 license=('GPL')
 depends=(
   bash yad reflector-simple systemd
-  python-dbus   # for ksetwallpaper.py
-  xorg-xrandr   # for eos-set-background-picture
+  python-dbus           # for ksetwallpaper.py
+  xorg-xrandr           # for eos-set-background-picture
+  endeavouros-theming   # for eos-set-background-picture
 )
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
