@@ -52,13 +52,13 @@ yad_calamares() {
         return 1
     fi
 
-    mode=offline                                # temporary setting for assets.make, remove this line later!
+    #mode=offline                                # temporary setting for assets.make, remove this line later!
 
     if [ "$mode" = "choose" ] ; then
-        local t1="This is a public development release.\n"
+        local t1="This is a community release.\n"
         local t2="<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\n"
         local t3="<b>Online</b> method lets you choose your desktop, with vanilla theming.\n"
-        local t4="\nDISCLAIMER: no warranties whatsoever."
+        local t4="\nDISCLAIMER: This release is a beta release, please help us making it stable by reporting bugs."
 
         local answer=$( eos_yad --form --title="Choose installation method" --image=dialog-question \
                                 --text="$t1$t2$t3$t4" \
