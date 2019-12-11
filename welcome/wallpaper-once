@@ -35,7 +35,7 @@ Main() {
     esac
 
     if [ ! -r "$conf" ] ; then
-        eos-set-background-picture || return 1
+        eos-set-background-picture
         touch "$conf"
     fi
 }

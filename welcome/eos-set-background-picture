@@ -36,33 +36,10 @@ eos_yad_infomsg() {
 
 DIE() {
     echo "$1" >&2
-    eos_yad_DIE "$1"
-}
-
-AssertPicture() {
-    local fallback_picture="$1"
-    local use_file_prefix="$2"
-
-    test -n "$pic" || pic="$fallback_picture"
-
-    case "$pic" in
-        file://*) pic="${pic:7}" ;;
-    esac
-    test -r "$pic" || DIE "Picture file '$pic' does not exist."
-
-    if [ "$use_file_prefix" = "no" ] ; then
-        case "$pic" in
-            file://*) pic="${pic:7}" ;;
-        esac
-    else
-        case "$pic" in
-            file://*) ;;
-            *) pic="file://$pic" ;;
-        esac
-    fi
-    eos_yad --form --text="Want to change wallpaper to '$pic'?" \
-            --title="Changing wallpaper" --image=stock_dialog-question \
-            --button=yad-no:1 --button=yad-yes:0
+    echo "$1" | \
+        eos_yad --text-info --title="Error" --image=error --button=yad-ok:0 \
+                --width=500 --height=300
+    exit 1
 }
 
 XfceSetWallpaper() {
@@ -97,11 +74,63 @@ XfceSetWallpaper() {
     esac
 }
 
+AssertPicture() {
+    local fallback_picture="$1"
+    local use_file_prefix="$2"
+
+    test -n "$pic" || pic="$fallback_picture"
+
+    case "$pic" in
+        file://*) pic="${pic:7}" ;;
+    esac
+    test -r "$pic" || DIE "Picture file '$pic' does not exist."
+
+    if [ "$use_file_prefix" = "no" ] ; then
+        case "$pic" in
+            file://*) pic="${pic:7}" ;;
+        esac
+    else
+        case "$pic" in
+            file://*) ;;
+            *) pic="file://$pic" ;;
+        esac
+    fi
+    if [ "$force_change" = "no" ] ; then
+        eos_yad --form --text="Want to change wallpaper to '$pic'?" \
+                --title="Changing wallpaper" --image=stock_dialog-question \
+                --button=yad-no:1 --button=yad-yes:0
+    fi
+}
+
+Usage() {
+    echo "Usage: $(basename "$0") [-f | --force] wallpaper-file"
+    echo "where"
+    echo "   -f | --force       Do not ask for confirmation."
+    echo "   wallpaper-file     Wallpaper file name (with full path)."
+}
+
 Main()
 {
-    local pic="$1"                            # filename without leading "file://"
     local DE="$(eos_yad_GetDesktopName)"
     local picprefix=/usr/share/backgrounds/endeavouros/endeavouros_
+    local force_change=no
+    local arg
+    local pic=""
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -f | --force)
+                force_change=yes
+                ;;
+            -*)
+                local msg="$(printf "\n%s\n\n" "Unsupported option '$arg'." ; Usage)"
+                DIE "$msg"
+                ;;
+            *)
+                pic="$arg"    # filename with absolute path and with or without leading "file://"
+                ;;
+        esac
+    done
 
     echo "Setting desktop wallpaper for '$DE' ..." >&2
 
