@@ -69,10 +69,16 @@ yad_calamares() {
     case "$mode" in
         offline) ;;
         online) ;;
-        *)  echo "$PROGNAME: $FUNCNAME: unsupported mode '$mode'." >&2
+        *)  eos_yad_WARN "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
             return 1
             ;;
     esac
+
+    local file=/usr/share/calamares/settings.conf_$mode
+    if [ ! -r $file ] ; then
+        eos_yad_WARN "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
+        return 1
+    fi
 
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
