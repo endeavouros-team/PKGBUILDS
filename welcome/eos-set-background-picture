@@ -112,7 +112,8 @@ Usage() {
 Main()
 {
     local DE="$(eos_yad_GetDesktopName)"
-    local picprefix=/usr/share/backgrounds/endeavouros/endeavouros_
+    local picprefix=/usr/share/endeavouros/backgrounds/endeavouros_
+    local picprefix_std=$picprefix
     local force_change=no
     local arg
     local pic=""
@@ -131,6 +132,15 @@ Main()
                 ;;
         esac
     done
+
+    if [ ! -r ${picprefix}xfce4.png ] ; then
+        picprefix=/usr/share/backgrounds/endeavouros/endeavouros_
+        echo "Warning: EndeavourOS wallpapers not found at '$picprefix_std'!" >&2
+        echo "Trying '$picprefix' ..." >&2
+    fi
+    if [ ! -r ${picprefix}xfce4.png ] ; then
+        DIE "EndeavourOS wallpapers not found at '$picprefix_std'!"
+    fi
 
     echo "Setting desktop wallpaper for '$DE' ..." >&2
 
