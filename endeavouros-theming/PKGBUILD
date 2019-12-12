@@ -1,7 +1,7 @@
 # Maintainer: Johannes Kamprad <joekamprad@endeavouros.com>
 pkgname=endeavouros-theming
 pkgver=2
-pkgrel=2
+pkgrel=3
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
