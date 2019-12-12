@@ -13,19 +13,15 @@ md5sums=('6abbb6944f5c142ad31f9a988a2b569b')
 
 package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-        # mkdir -p "${pkgdir}/usr/share/endeavouros"
         install -d "${pkgdir}/usr/share/endeavouros"
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros"
 	install -m644 *.svg "${pkgdir}/usr/share/endeavouros"
-        # mkdir -p "${pkgdir}/usr/share/pixmaps/"
         install -d "${pkgdir}/usr/share/pixmaps"
 	install endeavouros.svg "${pkgdir}/usr/share/pixmaps/endeavouros.svg"
 	install -m644 endeavouros.svg "${pkgdir}/usr/share/pixmaps/endeavouros.svg"
 	install endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
 	install -m644 endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
         cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
-        # mkdir -p "${pkgdir}/usr/share/backgrounds"
-        install -d "${pkgdir}/usr/share/backgrounds"
-	install -d "${pkgdir}/usr/share/backgrounds/endeavouros"
-	install -m644 *.png "${pkgdir}/usr/share/backgrounds/endeavouros"
+	install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
+	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds"
 }
