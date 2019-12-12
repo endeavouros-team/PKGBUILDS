@@ -27,6 +27,8 @@ export -f eos_yad_GetDesktopName
 eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
 Main() {
+    test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
+
     local DE="$(eos_yad_GetDesktopName)"
     local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
 
