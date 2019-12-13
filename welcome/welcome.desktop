@@ -9,3 +9,5 @@ Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 # Terminal=False
 Hidden=false
 X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+
