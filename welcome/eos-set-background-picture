@@ -98,7 +98,7 @@ AssertPicture() {
     if [ "$force_change" = "no" ] ; then
         eos_yad --form --text="Want to change wallpaper to '$pic'?" \
                 --title="Changing wallpaper" --image=stock_dialog-question \
-                --button=yad-no:1 --button=yad-yes:0
+                --button=yad-no:1 --button=yad-yes:0 --geometry=+80+80
     fi
 }
 

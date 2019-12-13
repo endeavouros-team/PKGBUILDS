@@ -32,7 +32,7 @@ Main() {
     local DE="$(eos_yad_GetDesktopName)"
     local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
 
-    sleep 4s    # workaround for a silly (but not crucial) issue about overlapping windows
+    #sleep 4s    # workaround for a silly (but not crucial) issue about overlapping windows
 
     case "$1" in
         -r) rm -f "$conf" ;;     # -r allows for re-installing the default wallpaper
