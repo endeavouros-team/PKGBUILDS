@@ -1,14 +1,14 @@
 # Maintainer: Johannes Kamprad <joekamprad@endeavouros.com>
 pkgname=endeavouros-theming
-pkgver=2
-pkgrel=3
+pkgver=3
+pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('6abbb6944f5c142ad31f9a988a2b569b')
+md5sums=('341ad0f79f12361e39167b0fe0ac22a1')
 
 
 package() {
