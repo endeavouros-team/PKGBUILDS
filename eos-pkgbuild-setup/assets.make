@@ -353,6 +353,7 @@ where
     --dryrun         Show what would be done, but do nothing.
     --dryrun-local   Show what would be done, but do nothing. Use local assets.
     --repoup         (Advanced) Force update of repository database files.
+    --aurdiff        Show PKGBUILD diff for AUR packages.
 EOF
     test -n "$1" && exit "$1"
 }
@@ -364,6 +365,7 @@ Main()
     local repoup=0
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
     local use_local_assets=0         # 0 = offer to fetch assets
+    local aurdiff=0                  # 1 = show AUR diff
 
     # Check given parameters:
     if [ -n "$1" ] ; then
@@ -373,6 +375,7 @@ Main()
                 --dryrun)       cmd=dryrun ;;
                 --checkaur)     cmd=checkaur ;;
                 --repoup)       repoup=1 ;;             # sync repo even when no packages are built
+                --aurdiff)      aurdiff=1 ;;
                 *) Usage 0  ;;
             esac
         done
@@ -431,7 +434,16 @@ Main()
         tmpcurr="$(LocalVersion "$ASSETSDIR/$pkgname")"
         test -n "$tmpcurr" || DIE "LocalVersion for '$xx' failed"
         oldv["$pkgdirname"]="$tmpcurr"
-        test $(vercmp "$tmp" "$tmpcurr") -gt 0 && echo2 "update pending to $tmp" || echo2 "OK ($tmpcurr)"
+        if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
+            echo2 "update pending to $tmp"
+            if [ "$aurdiff" = "1" ] ; then
+                case "$xx" in
+                    aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
+                esac
+            fi
+        else
+            echo2 "OK ($tmpcurr)"
+        fi
     done
     Popd
 
