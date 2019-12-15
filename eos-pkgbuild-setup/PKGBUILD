@@ -9,7 +9,7 @@ pkgrel=1
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
-depends=(git hub yay curl wget xdg-open)
+depends=(git hub yay curl wget xdg-utils)
 
 source=(
     $url/assets.make
