@@ -564,6 +564,31 @@ GreeterSettings() {
     esac
 }
 
+UpdateInstallScripts() {
+    test IsInstalling || return
+
+    local URL=https://github.com/endeavouros-team/install-scripts/raw/master
+    local scripts=(                        # may need to adjust files ...
+        calamares_switcher
+        chrooted_cleaner_script.sh
+        cleaner_script.sh
+        pacstrap_calamares
+        update-mirrorlist
+    )
+    local script
+    local tmpdir=$(mktemp -d)
+
+    for script in "${scripts[@]}"; do
+        wget -q --timeout=10 -O "$tmpdir/$script" "$URL/$script" || DIE "cannot fetch script '$script'."
+        chmod +x "$tmpdir/$script"
+    done
+    for script in "${scripts[@]}"; do
+        sudo rm -f /usr/bin/"$script"
+        sudo mv "$tmpdir/$script" /usr/bin
+    done
+    rm -rf $tmpdir
+}
+
 StartHere() {
     KillExtraYad
 
@@ -595,6 +620,8 @@ StartHere() {
     test IsInstalling || {
         eos_yad_check_internet_connection verbose 10 || return 1
     }
+
+    # UpdateInstallScripts
 
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
