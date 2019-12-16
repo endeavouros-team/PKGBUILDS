@@ -366,6 +366,8 @@ Main()
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
     local use_local_assets=0         # 0 = offer to fetch assets
     local aurdiff=0                  # 1 = show AUR diff
+    local already_asked_diffs=0
+    local ask_timeout=60
 
     # Check given parameters:
     if [ -n "$1" ] ; then
@@ -436,11 +438,26 @@ Main()
         oldv["$pkgdirname"]="$tmpcurr"
         if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
             echo2 "update pending to $tmp"
-            if [ "$aurdiff" = "1" ] ; then
-                case "$xx" in
-                    aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
-                esac
-            fi
+            case "$xx" in
+                aur/*)
+                    if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
+                        already_asked_diffs=1
+                        read -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout >&2
+                        if [ $? -eq 0 ] ; then
+                            case "$REPLY" in
+                                ""|[yY]*) aurdiff=1 ;;
+                            esac
+                        else
+                            echo no.
+                        fi
+                    fi
+                    if [ "$aurdiff" = "1" ] ; then
+                        case "$xx" in
+                            aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
+                        esac
+                    fi
+                    ;;
+            esac
         else
             echo2 "OK ($tmpcurr)"
         fi
