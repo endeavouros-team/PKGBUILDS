@@ -344,7 +344,7 @@ AfterInstall() {
           --field=" Detect package issues!info!Detect any potential issues on system packages":fbtn                'bash -c yad_PkgConflicts' \
           --field=' EndeavourOS to latest?!up!Show what to do to get your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
           --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
-          --field=" Set default wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to default":fbtn                  'eos-set-background-picture' \
+          --field=" EndeavourOS wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to EOS default":fbtn                  'eos-set-background-picture' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
           --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
