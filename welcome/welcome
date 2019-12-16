@@ -155,7 +155,7 @@ _xx_main() {
   local updates="\$(checkupdates)"
   test -n "\$updates" && {
       echo "\$updates"
-      yay -Syu --noconfirm
+      yay -Syu # --noconfirm
   } || {
       echo "No updates."
   }

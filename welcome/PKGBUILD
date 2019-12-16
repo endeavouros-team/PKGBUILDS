@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=1.18
-pkgrel=3.1
+pkgver=2
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -26,7 +26,7 @@ source=(
   $url/wallpaper-once
   $url/wallpaper-once.desktop
 )
-sha512sums=('6a1b1e779083799ea4e7a0b718ac2219f05192fd060dc017aa04046ce607ac52932544919477c95c356ca74f9c64d4d4b7cce810b309fd9608fa10a00d366cc1'
+sha512sums=('b54f08e94fdd54c73a4c063c6e0720350bf1631f030240ea13e275efc40918d36dbe7b853d9c9fee51d650f0dfc81fdf5eccb28fa547a6ba6384e5a0633b608f'
             '6831dad3957c0d4c027190b8cd048f19140fc563d384fc1cc2af66dcf29e33e779889340b7f2a6699c9aba14ff546a2766091941694093a084a95dcfa1acf60b'
             '30729b193eefc6dc18f210ff2cdae531351e8cc6884c435471e1cee7f6c83dca108e49e9189a066976140da16b285423107ae8c8752f485fe41fdad9b4bd768f'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
