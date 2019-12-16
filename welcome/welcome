@@ -294,12 +294,12 @@ INSTALL() {
 
   eos_yad --plug="$handle" --tabnum="$tabnum" \
           --form \
-          --columns=2 \
+          --columns=3 \
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-          --field="START THE INSTALLER$_exclamation!!Start the EndeavourOS installer":fbtn    'bash -c "yad_calamares choose"' \
-          --field="Update this app$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe' \
-          --field="Initialize pacman keys!!Initialize pacman keys":fbtn          'bash -c yad_InitializePacmanMirroring' \
+          --field="START THE INSTALLER$_exclamation!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
+          --field="Update this app$_exclamation!!Update this app and restart it":fbtn       'bash -c yad_UpdateMe' \
+          --field="Initialize pacman keys!!Initialize pacman keys":fbtn                     'bash -c yad_InitializePacmanMirroring' \
           --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
           --field="Latest release info!!Info about the latest release":fbtn      "$_BROWSER https://endeavouros.com/latest-release" \
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
@@ -323,7 +323,7 @@ GeneralInfo() {
           --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
           --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
           --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
-          --field="About me!!More info about this app":fbtn                       "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
+          --field="About Greeter!!More info about this app":fbtn                  "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
 }
 
@@ -395,7 +395,7 @@ About() {
 
 ### These variables are required:
 
-_NOTEBOOK_TITLE="EndeavourOS Greeter"        # main window title
+_NOTEBOOK_TITLE="EndeavourOS Greeter v$(pacman -Q welcome | awk '{print $2}')"        # main window title
 
 CreateNotebookCommands() {
     IsInstalling && {
@@ -414,32 +414,6 @@ CreateNotebookCommands() {
 }
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
-
-Usage() {
-    cat <<EOF
-Usage: $PROGNAME [options]
-
-Options:
---startdelay=X    Wait before actually starting the app.
-                  X value syntax is the same as in 'sleep'.
---enable | -f     Enable this Welcome app.
---disable         Disable this Welcome app.
-
-To have Welcome app started when you log in, make sure
-- welcome app is selected in the Autostart feature of the DE
-    OR
-- "Hidden=false" is set in file /etc/xdg/autostart/welcome.desktop
-
-On DEs that do not work well with Autostart:
-You may also disable the Welcome app from the app itself
-- with the --disable option
-- with a button in the app (some DEs only)
-
-To re-enable the app, use the terminal command
-    $PROGNAME --enable
-EOF
-}
-export -f Usage
 
 DIE() {
     local title="Error"
@@ -589,6 +563,33 @@ UpdateInstallScripts() {
     rm -rf $tmpdir
 }
 
+Usage() {
+    cat <<EOF
+Usage: $PROGNAME [options]
+
+Options:
+--startdelay=X    Wait before actually starting the app.
+                  X value syntax is the same as in 'sleep'.
+--enable | -f     Enable this Welcome app.
+--disable         Disable this Welcome app.
+--version         Show the version of this app.
+
+To have Welcome app started when you log in, make sure
+- welcome app is selected in the Autostart feature of the DE
+    OR
+- "Hidden=false" is set in file /etc/xdg/autostart/welcome.desktop
+
+On DEs that do not work well with Autostart:
+You may also disable the Welcome app from the app itself
+- with the --disable option
+- with a button in the app (some DEs only)
+
+To re-enable the app, use the terminal command
+    $PROGNAME --enable
+EOF
+}
+export -f Usage
+
 StartHere() {
     KillExtraYad
 
@@ -604,6 +605,7 @@ StartHere() {
             --disable)   GreeterSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
             --installer) show_installer=1 ;;
+            --version) pacman -Q welcome | awk '{print $2}' ; return ;;
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
