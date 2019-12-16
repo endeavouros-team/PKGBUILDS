@@ -25,10 +25,9 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/mkinitcpio-openswap
     aur/paper-icon-theme
     aur/yay
-    EndeavourOS-DE-backgrounds
     endeavouros-keyring
     endeavouros-mirrorlist
-    EndeavourOS-theming
+    endeavouros-theming
     eos-base
     eos-update-notifier
     grub-theme-endeavouros
@@ -36,9 +35,10 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer-db
     nvidia-installer
     nvidia-installer-dkms
+    pahis
     reflector-auto
     reflector-simple
-    welcome
+    #welcome                      # temporarily removed!
 )
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
