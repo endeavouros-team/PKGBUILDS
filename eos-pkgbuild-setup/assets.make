@@ -103,6 +103,17 @@ JustPkgname()
     esac
 }
 
+HookIndicator() {
+    local mark="$1"
+    if [ "$fetch" = "yes" ] ; then
+        echo2 -n "$mark "
+    fi
+}
+
+ExplainHookMarks() {
+    printf2 "\nNote: mark %s above means a package hook from file %s was executed.\n\n" "$hook_yes" "$ASSETS_CONF"
+}
+
 ListNameToPkgName()
 {
     # PKGNAMES array (from $ASSETS_CONF) uses certain syntax for package names
@@ -134,10 +145,12 @@ ListNameToPkgName()
 
     # A pkg may need some changes:
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
-    test -n "$hook" && {
-        echo2 -n "."    # echo2 -n "hook[$hook] ... "
+    if [ -n "$hook" ] ; then
+        HookIndicator "$hook_yes"
         "$hook"
-    }
+    else
+        HookIndicator "$hook_no"
+    fi
 
     echo "$pkgname"
 }
@@ -325,11 +338,37 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
         # compare versions
         if [ $(vercmp "$vaur" "$vlocal") -gt 0 ] ; then
             echo2 "update (aur=$vaur local=$vlocal)"
+            WantAurDiffs "$xx"
         else
             test "$vaur" = "$vlocal" && echo2 "OK ($vaur)" || echo2 "OK (aur=$vaur local=$vlocal)"
         fi
     done
     Popd
+}
+
+WantAurDiffs() {
+    local xx="$1"
+
+    case "$xx" in
+        aur/*)
+            if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
+                already_asked_diffs=1
+                read -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout >&2
+                if [ $? -eq 0 ] ; then
+                    case "$REPLY" in
+                        ""|[yY]*) aurdiff=1 ;;
+                    esac
+                else
+                    echo no.
+                fi
+            fi
+            if [ "$aurdiff" = "1" ] ; then
+                case "$xx" in
+                    aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
+                esac
+            fi
+            ;;
+    esac
 }
 
 #### Global variables:
@@ -368,6 +407,12 @@ Main()
     local aurdiff=0                  # 1 = show AUR diff
     local already_asked_diffs=0
     local ask_timeout=60
+
+    local hook_yes="*"
+    local hook_no=""                 # will contain strlen(hook_yes) spaces
+    for xx in $(seq 1 ${#hook_yes}) ; do
+        hook_no+=" "
+    done
 
     # Check given parameters:
     if [ -n "$1" ] ; then
@@ -438,31 +483,14 @@ Main()
         oldv["$pkgdirname"]="$tmpcurr"
         if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
             echo2 "update pending to $tmp"
-            case "$xx" in
-                aur/*)
-                    if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
-                        already_asked_diffs=1
-                        read -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout >&2
-                        if [ $? -eq 0 ] ; then
-                            case "$REPLY" in
-                                ""|[yY]*) aurdiff=1 ;;
-                            esac
-                        else
-                            echo no.
-                        fi
-                    fi
-                    if [ "$aurdiff" = "1" ] ; then
-                        case "$xx" in
-                            aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
-                        esac
-                    fi
-                    ;;
-            esac
+            WantAurDiffs "$xx"
         else
             echo2 "OK ($tmpcurr)"
         fi
     done
     Popd
+
+    ExplainHookMarks
 
     case "$cmd" in
         dryrun)

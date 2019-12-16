@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup for building EOS packages."
-pkgver=1.4.2
+pkgver=1.4.3
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -18,7 +18,7 @@ source=(
     $url/delete-release-assets
     $url/eos-assets-sign
 )
-sha512sums=('7df38194263f759780cf4bbe3fd4eb740fc5eb169f261edc51a7dd175e1a8c24859ea005f52716bc94355b882b539f0514153401c87e0963b27200b738d86ad6'
+sha512sums=('d4cc02b54d4aa3a9fbe94ae6b3a6be440c583130fa0f350f1926c44c15e605ec5ec3fa47f583c550aff4767545f1cdff8cb1a9ca7f3914851f9a8ee71e325f21'
             'd8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23e2025a82a1fdcf29887d9ac6c57cb23bb3473e217e2daf61a000c4e5c54a8'
             'ee4c128add0bde5b3ee42fa41ad87ac53f2fb05250f967c9e8d09943b7403aaef17d72eb6cce652e5ee4fbcdff3ebd2be2d353159255a7229319ed480cb610d2'
             'e3040ba1d2601fa91e9eec5981653234486297223792f37e1a634cb6908d22df1ff710a16b75ba09dcf63eb7d60a898e22f0d11ff941c72bfbc43027d0f44e86'
