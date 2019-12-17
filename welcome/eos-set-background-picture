@@ -169,7 +169,7 @@ Main()
             ;;
         LXQT)
             AssertPicture ${picprefix}lxqt.png no && \
-                pcmanfm --set-wallpaper="$pic"
+                pcmanfm-qt --set-wallpaper="$pic"
             ;;
         MATE)
             AssertPicture ${picprefix}mate.png no && \
