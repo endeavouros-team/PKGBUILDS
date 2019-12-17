@@ -1,6 +1,10 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
+# HOW DIFFERENT IS THIS BUILD TO CURRENT VERSION OF CALAMARES?
+# Adds extra code to prevent installer from failling when installing on some EFI machines for testing
+# Adds @FLVAL branding work
+
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
