@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Kill yad processes that have no options ("--notebook" or "--plug" etc.).
+
+Main()
+{
+    sleep 0.1
+
+    local bad="$(pgrep -u "$LOGNAME" -a yad | grep -P "^[0-9]* /usr/bin/yad[ ]*$|^[0-9]* yad[ ]*$")"
+    if [ -n "$bad" ] ; then
+        printf "Killing yad zombies:\n%s\n" "$bad" >&2
+        kill $(echo "$bad" | awk '{print $1}')
+    else
+        echo "No yad zombies." >&2
+    fi
+}
+
+Main "$@"

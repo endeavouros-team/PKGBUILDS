@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -25,16 +25,18 @@ source=(
   $url/ksetwallpaper.py
   $url/wallpaper-once
   $url/wallpaper-once.desktop
+  $url/eos-kill-yad-zombies
 )
 sha512sums=('7e5f92f03aee541b3ac38db04830c772fe1b0d2fd10666332aec7449a7478dcac04a14a032e630cd61ac12f182628e92653850aff35344332c9efacd4e6091d5'
             '6831dad3957c0d4c027190b8cd048f19140fc563d384fc1cc2af66dcf29e33e779889340b7f2a6699c9aba14ff546a2766091941694093a084a95dcfa1acf60b'
             '30729b193eefc6dc18f210ff2cdae531351e8cc6884c435471e1cee7f6c83dca108e49e9189a066976140da16b285423107ae8c8752f485fe41fdad9b4bd768f'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
             '525e80b44e04d6b17d0659c8b187811dbbf39beba6b0767ca7b76d75adec569d5e7959dfa9acc34c9a602d2dae05fb3d960954fb9b5cc9a4c6e301f4bc9acbf4'
-            '28d8d7820f39d888f4b33b1fee42bcb6ec69f39fa7eb3f66744989cb539a4b947f0037c805d87e427f42e66f20e24e9faac333110561521cf412b6ffc7e66dcd'
+            '550213db5cd4d2068a7f72eaf2e29c30fe5c10a3905390e49294790c328e47ab70b2b52aac0ee966879f2eafa009f7d46b33b242c0d49c3ce3cfaf8b0fc8ae1b'
             '618ac5e0c681da0e0b8b59fbea215bc7fde70c5ae43d717aa0b16490172a17f5e8f507b386f7b398f02b3ce57c2ae3ada156557316060e6808fce633529ebf92'
             '4e62a6dbfac155c652e7f5fae307a75ea1648f88ec231adf03b7956ac0318306fc3c9d4def4eb42448d8a53732e2f23cf00692bbab932cee6a1ee7111e4f8d2b'
-            'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad')
+            'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad'
+            'd5d2876231269961340dcb3607d47215e74f8cd058b81def65f1dbf811bcca780af65189874e831de6e223de4d224f416ec669f1a88e58734e7df9990342b5ee')
 
 package() {
   cd $srcdir
@@ -49,6 +51,7 @@ package() {
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
   install device-info                           $pkgdir/usr/bin/device-info
   install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
+  install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
 
   install -d $pkgdir/etc/xdg/autostart
   install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop
