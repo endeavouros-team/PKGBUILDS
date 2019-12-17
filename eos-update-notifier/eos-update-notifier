@@ -52,8 +52,8 @@ debug() {
 }
 
 YadNonFocused() {
-    yad --text-info --wrap --no-focus --title="Updates available" \
-        --formatted --button=yad-ok:0 "$@"
+    eos_yad2 --text-info --wrap --no-focus --title="Updates available" \
+             --formatted --button="Dismiss":1 --button="Update":0 "$@"
 }
 
 ShowNonFocused() {
@@ -64,7 +64,8 @@ ShowNonFocused() {
     if [ "$PREFER_TRAY" = "1" ] ; then
         # Tray notification cannot be used on EOS because it creates an unwarranted terminal window.
         grep -i endeavouros /etc/*-release >/dev/null || {
-            yad --notification --image="system-software-update" --text="$count $source updates are available" --command=quit
+            eos_yad2 --notification --image="system-software-update" \
+                     --text="$count $source updates are available" --command=quit
             return
         }
     fi
@@ -103,7 +104,7 @@ Update_common() {
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
-            ShowNonFocused Upstream
+            ShowNonFocused Upstream || return 1
             if [ $(( $(date +%s) - previous_check_time )) -gt 60 ] ; then
                 # Re-check for updates if more than 60 seconds elapsed from the first check.
                 echo2 "Re-checking for updates ..."
@@ -122,7 +123,7 @@ Update_common() {
     test "$CheckAurUpdates" = "yes" && updates="$(yay -Qua)" || updates=""
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
-            ShowNonFocused AUR
+            ShowNonFocused AUR || return 1
             updates="$(yay -Qua)"    # may have been a long wait...
         fi
         ((hasupdates++))
@@ -137,11 +138,9 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
-                eos_yad2 --text-info \
-                        --title="EndeavourOS update notifier" \
-                        --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                        --theme="Classic" --tail \
-                        --button=yad-quit:0
+                eos_yad2 --text-info --title="EndeavourOS update notifier" \
+                         --height=100 --width=300 --timeout=10 --timeout-indicator=left \
+                         --theme="Classic" --tail --button=yad-quit:0
         fi
     fi
 }
@@ -184,8 +183,8 @@ Main2() {
 	    echo2 "Ignoring $progname lockfile (probably a leftover from a previous check)."
 	else
             echo2 "Sorry, $progname lockfile exists, already checking for updates?"
-	    eos_yad --form --title="Warning: $progname blocked?" --image=warning \
-		    --text="Lockfile for $progname exists.\nIf no other $progname instance is currently checking for updates, you may continue.\nContinue checking?" \
+	    eos_yad2 --form --title="Warning: $progname blocked?" --image=warning \
+		     --text="Lockfile for $progname exists.\nIf no other $progname instance is currently checking for updates, you may continue.\nContinue checking?" \
 		    --button=yad-no:1 --button=yad-yes:0
 	    test $? -ne 0 && return 1
 	fi
@@ -295,12 +294,12 @@ Configure() {
     tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
 
     result=$(
-        yad --form --title="Configure update check schedule" --width=400 \
-            --text="$tips" \
-            --field="Interval in hours":num           $current_interval \
-            --field="Initial hour":num                $current_initial \
-            --field="Minute offset":ro                $current_minute \
-            --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
+        eos_yad2 --form --title="Configure update check schedule" --width=400 \
+                 --text="$tips" \
+                 --field="Interval in hours":num           $current_interval \
+                 --field="Initial hour":num                $current_initial \
+                 --field="Minute offset":ro                $current_minute \
+                 --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
           )
     retval=$?
     test $retval -eq 1 && return 1
@@ -380,7 +379,7 @@ yad_infomsg() {
     local title="$2"
     test -n "$title" || title="Info"
     echo2 "$title: $msg"
-    yad --form --text="$msg" --title="$title" --button=yad-ok:0 --image=info
+    eos_yad2 --form --text="$msg" --title="$title" --button=yad-ok:0 --image=info
 }
 
 Main()
