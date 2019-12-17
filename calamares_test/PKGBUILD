@@ -41,7 +41,7 @@ prepare() {
     rm -rf $_eos_changes
 
     # New branding stuff from @FLVAL
-    rsync -va calamares_branding/*   $_reponame
+    rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
     
     
