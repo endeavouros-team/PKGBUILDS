@@ -1,0 +1,31 @@
+#!/bin/bash
+
+pre_upgrade() {
+    # Remove some files (possible leftovers from other packages).
+
+    local remove=(
+       /usr/share/endeavouros/EndeavourOS-icon.png
+       /usr/share/endeavouros/EndeavourOS-logo.png
+       /usr/share/endeavouros/splash.png
+       /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
+    )
+    local xx removed=()
+
+    # Test if the files to be removed really exist.
+    for xx in "${remove[@]}" ; do
+        test -r $xx && removed+=($xx)
+    done
+
+    # Now remove the ones that exist.
+    if [ -n "$removed" ] ; then
+        echo "Removing existing files:" >&2
+        for xx in "${removed[@]}" ; do
+            echo "    $xx" >&2
+            rm -f $xx
+        done
+    fi
+}
+
+pre_install() {
+    pre_upgrade
+}
