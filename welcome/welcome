@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# EndeavourOS greeter.
+# Welcome: the EndeavourOS greeter.
 #
 # Shows useful basic info about the EndeavourOS and its usage.
 # Targeted for people new to EndeavourOS (but not new to Linux).
@@ -30,6 +30,8 @@ export -f eos_yad_GetDesktopName
 #################################################################################
 
 export PROGNAME=eos-welcome
+export PRETTY_PROGNAME="Welcome"
+export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 
 
@@ -91,9 +93,9 @@ yad_calamares() {
 export -f yad_calamares
 
 yad_UpdateMe() {
-    local prompt="echo 'Updating EndeavourOS Greeter'"
-    local cmd="sudo pacman -Syy welcome --needed"
-    local msg="printf '\nClose the EndeavourOS Greeter and restart it by running a terminal command: $PROGNAME\n\n'"
+    local prompt="echo 'Updating $PRETTY_PROGNAME'"
+    local cmd="sudo pacman -Syy $PROG_PACKAGENAME --needed"
+    local msg="printf '\nClose $PRETTY_PROGNAME and restart it by running a terminal command: $PROGNAME\n\n'"
     eos_yad_RunCmdTermBash "$prompt ; $cmd ; $msg"
 }
 export -f yad_UpdateMe
@@ -257,36 +259,6 @@ yad_ChangeDisplayManager() {
 }
 export -f yad_ChangeDisplayManager
 
-yad_eos_default_theming() {                        # TODO !!!
-    local theming_support_skip=1
-    if [ $theming_support_skip -eq 1 ] ; then
-        eos_yad --text="Sorry, theming not (yet) supported!" --title="Warning" \
-                --height=100 --width=300 --button=yad-quit:1
-        return 1
-    fi
-    local DE="$(eos_yad_GetDesktopName)"
-    case "$DE" in
-        XFCE | CINNAMON) ;;
-        "") eos_yad_WARN "unable to detect Desktop Environment!"
-            return 1
-            ;;
-        *)  eos_yad --text="Sorry, theming not (yet) supported for '$DE'!" --title="Warning" \
-                    --height=100 --width=300 --button=yad-quit:1
-            return 1
-            ;;
-    esac
-    local themer="$(mktemp -u "$HOME/.eos-theming-$DE-XXXXXXX.sh")"
-
-    wget -q --timeout=10 -O "$themer" https://github.com/endeavouros-team/DE-theming/raw/master/eos-theming.sh || {
-        eos_yad_WARN "welcome: unable to fetch theming installer!"
-        return 1
-    }
-
-    eos_yad_RunCmdTermBash "bash \"$themer\" $DE ; rm -f \"$themer\""
-
-}
-export -f yad_eos_default_theming
-
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -306,7 +278,6 @@ INSTALL() {
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       &> /dev/null &
 
-  #          --field="Update Me$_exclamation!!Update this app and restart it":fbtn  'bash -c yad_UpdateMe'
   # use 'gparted' as the icon for gparted!
 }
 
@@ -323,7 +294,7 @@ GeneralInfo() {
           --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
           --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
           --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
-          --field="About Greeter!!More info about this app":fbtn                  "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
+          --field="About $PRETTY_PROGNAME!!More info about this app":fbtn         "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
 }
 
@@ -353,7 +324,6 @@ AfterInstall() {
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 #          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
-#          --field=" Change to default theming!preferences-desktop-tweaks!Change to default theming of the Desktop":fbtn     'bash -c yad_eos_default_theming' \
 }
 
 AddMoreApps() {
@@ -383,7 +353,7 @@ About() {
 
   Usage | eos_yad --plug="$handle" --tabnum="$tabnum" \
                   --text-info \
-                  --text="<b>More info about the Welcome app</b>" \
+                  --text="<b>More info about the $PRETTY_PROGNAME app</b>" \
                   --text-align=left \
                   --image=help-about \
       &> /dev/null &
@@ -395,7 +365,7 @@ About() {
 
 ### These variables are required:
 
-_NOTEBOOK_TITLE="EndeavourOS Greeter v$(pacman -Q welcome | awk '{print $2}')"        # main window title
+_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}' | cut -d '-' -f 1)"        # main window title
 
 CreateNotebookCommands() {
     IsInstalling && {
@@ -426,8 +396,8 @@ DIE() {
 }
 
 WelcomeHelp() {
-    Usage | eos_yad --text-info --title="Welcome Help" --width=600 --height=500 \
-                    --text="<b>More info about the Welcome app</b>" \
+    Usage | eos_yad --text-info --title="$PRETTY_PROGNAME Help" --width=600 --height=500 \
+                    --text="<b>More info about the $PRETTY_PROGNAME app</b>" \
                     --text-align=left \
                     --image=help-about --button=yad-ok:0
 }
@@ -513,27 +483,27 @@ KillExtraYad() {
     fi
 }
 
-GreeterSettings() {
+WelcomeSettings() {
     local value="$1"   # enable, disable, check
-    local GREETER_CONFIG="$HOME/.config/EOS-greeter.conf"
+    local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
 
     case "$value" in
         enable)
-            echo "Greeter=$value"  > "$GREETER_CONFIG"
+            echo "Greeter=$value"  > "$WELCOME_CONFIG"
             ;;
         disable)
-            echo "Greeter=$value" > "$GREETER_CONFIG"
+            echo "Greeter=$value" > "$WELCOME_CONFIG"
 
-            echo "To run the greeter again, start a terminal and run '$PROGNAME --enable'." | \
-                eos_yad --text-info --image=dialog-information --text="Re-enabling the greeter:" \
-                        --title="How to re-enable greeter" \
+            echo "To run $PRETTY_PROGNAME again, start a terminal and run '$PROGNAME --enable'." | \
+                eos_yad --text-info --image=dialog-information --text="Re-enabling $PRETTY_PROGNAME:" \
+                        --title="How to re-enable $PRETTY_PROGNAME" \
                         --geometry=500x200 --wrap \
                         --fontname="Monospace Regular 12" \
                         --button=" I remember!face-angel!I promise":0 >& /dev/null
             ;;
         check)
-            test -r "$GREETER_CONFIG" || { echo enable ; return ; }              # enabled if config does not exist
-            grep "^Greeter=" "$GREETER_CONFIG" 2>/dev/null | cut -d '=' -f 2
+            test -r "$WELCOME_CONFIG" || { echo enable ; return ; }              # enabled if config does not exist
+            grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
             ;;
     esac
 }
@@ -568,19 +538,19 @@ Usage() {
 Usage: $PROGNAME [options]
 
 Options:
---startdelay=X    Wait before actually starting the app.
+--startdelay=X    Wait before actually starting this app.
                   X value syntax is the same as in 'sleep'.
---enable | -f     Enable this Welcome app.
---disable         Disable this Welcome app.
+--enable | -f     Enable this $PRETTY_PROGNAME app.
+--disable         Disable this $PRETTY_PROGNAME app.
 --version         Show the version of this app.
 
-To have Welcome app started when you log in, make sure
-- welcome app is selected in the Autostart feature of the DE
+To have $PRETTY_PROGNAME app started when you log in, make sure
+- $PRETTY_PROGNAME app is selected in the Autostart feature of the DE
     OR
 - "Hidden=false" is set in file /etc/xdg/autostart/welcome.desktop
 
 On DEs that do not work well with Autostart:
-You may also disable the Welcome app from the app itself
+You may also disable the $PRETTY_PROGNAME app from the app itself
 - with the --disable option
 - with a button in the app (some DEs only)
 
@@ -601,11 +571,11 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
-            --enable|-f) GreeterSettings enable ;;
-            --disable)   GreeterSettings disable ; return ;;
+            --enable|-f) WelcomeSettings enable ;;
+            --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg:13}" ;;
             --installer) show_installer=1 ;;
-            --version) pacman -Q welcome | awk '{print $2}' ; return ;;
+            --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
@@ -614,8 +584,8 @@ StartHere() {
 
     CreateNotebookCommands
 
-    test "$(GreeterSettings check)" != "enable" && {
-        echo "Welcome app is disabled. To start it anyway, use option --enable."
+    test "$(WelcomeSettings check)" != "enable" && {
+        echo "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable."
         return
     }
 
@@ -651,13 +621,13 @@ StartHere() {
 
     case "$(eos_yad_GetDesktopName)" in
         KDE)
-            notebook+=(--button=" See you later!face-cool!Keep greeter enabled":0)
-            notebook+=(--button=" Don't show me anymore!face-crying!Disable the greeter":5)
+            notebook+=(--button=" See you later!face-cool!Keep $PRETTY_PROGNAME enabled":0)
+            notebook+=(--button=" Don't show me anymore!face-crying!Disable $PRETTY_PROGNAME":5)
             "${notebook[@]}"
             local result=$?
             case "$result" in
-                5) GreeterSettings disable ;;
-                0|252) GreeterSettings enable ;;
+                5) WelcomeSettings disable ;;
+                0|252) WelcomeSettings enable ;;
             esac
             ;;
         *)
