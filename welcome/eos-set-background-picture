@@ -82,6 +82,8 @@ AssertPicture() {
 
     case "$pic" in
         file://*) pic="${pic:7}" ;;
+        /*) ;;
+        *) test -r "$pic" && pic="$PWD/$pic" ;;
     esac
     test -r "$pic" || DIE "Picture file '$pic' does not exist."
 
