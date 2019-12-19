@@ -7,6 +7,10 @@ pre_upgrade() {
        /usr/share/endeavouros/EndeavourOS-icon.png
        /usr/share/endeavouros/EndeavourOS-logo.png
        /usr/share/endeavouros/splash.png
+       /usr/share/endeavouros/endeavour-logo-e.png
+       /usr/share/endeavouros/EndeavourOS-icon-fade.png
+       /usr/share/endeavouros/EndeavourOS-icon-E.png
+       /usr/share/endeavouros/endeavouros-wallpaper.png
        /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
     )
     local xx removed=()
