@@ -348,6 +348,8 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
 
 WantAurDiffs() {
     local xx="$1"
+    local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1"
+    local browser=/usr/bin/xdg-open   # firefox by default
 
     case "$xx" in
         aur/*)
@@ -364,7 +366,7 @@ WantAurDiffs() {
             fi
             if [ "$aurdiff" = "1" ] ; then
                 case "$xx" in
-                    aur/*) xdg-open "https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1" ;;
+                    aur/*) $browser "$diff_url" >& /dev/null ;;
                 esac
             fi
             ;;
