@@ -411,6 +411,8 @@ EOF
 
 Main()
 {
+    test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
+
     local cmd=""
     local xx
     local repoup=0
