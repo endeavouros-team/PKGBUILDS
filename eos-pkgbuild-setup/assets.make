@@ -3,14 +3,10 @@
 PROGNAME="$(basename "$0")"
 test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
 
-# pacman is changing compression!
-if [ "$(vercmp "$(pacman -Q pacman | awk '{print $2}' | sed 's|-.*$||')" "5.2")" -ge 0 ] ; then
-    _COMPRESSOR="zst"
-else
-    _COMPRESSOR="xz"
-fi
-_COMPRESSOR="xz"         # TODO: REMOVE THIS LINE AFTER TESTING "PACMAN 5.2" !!!
-
+# pacman is changing default compression!
+_COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
+#_COMPRESSOR="xz"
+#_COMPRESSOR="zst"
 
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
