@@ -39,16 +39,30 @@ Build()
     local pkgname
     local pkg
     local workdir=$(mktemp -d)
+    local log=$workdir/buildlog-"$pkgdirname".log
+    local missdeps="Missing dependencies:"
 
     Pushd "$workdir"
       cp -r "$pkgbuilddir" .
       pkgname="$(PkgBuildName "$pkgdirname")"
       Pushd "$pkgdirname"
-        # now build, assume we have PKGBUILD
-        makepkg -sc >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
-        pkg="$(ls -1 ${pkgname}-*.pkg.tar.$_COMPRESSOR)"
-        mv $pkg "$assetsdir"
-        pkg="$assetsdir/$pkg"
+
+      # now build, assume we have PKGBUILD
+      # special handling for missing dependencies
+      LANG=C makepkg --clean 2>/dev/null >"$log" || {
+          if [ -z "$(grep "$missdeps" "$log")" ] ; then
+              Popd -c2
+              DIE "makepkg for '$pkgname' failed"
+          fi
+          echo2 "Installing $(echo "$missdeps" | tr [:upper:] [:lower:])"
+          grep -A100 "$missdeps" "$log" | grep "^  -> " >&2
+          :
+          makepkg --syncdeps --clean >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
+      }
+      pkg="$(ls -1 ${pkgname}-*.pkg.tar.$_COMPRESSOR)"
+      mv $pkg "$assetsdir"
+      pkg="$assetsdir/$pkg"
+
       Popd
     Popd
     rm -rf "$workdir"
