@@ -620,7 +620,7 @@ StartHere() {
     notebook+=(--button=" Help!help!":"bash -c WelcomeHelp")
 
     case "$(eos_yad_GetDesktopName)" in
-        KDE)
+        KDE | GNOME | GNOME3)
             notebook+=(--button=" See you later!face-cool!Keep $PRETTY_PROGNAME enabled":0)
             notebook+=(--button=" Don't show me anymore!face-crying!Disable $PRETTY_PROGNAME":5)
             "${notebook[@]}"
