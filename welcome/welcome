@@ -496,12 +496,12 @@ WelcomeSettings() {
     # Make sure we have sensible initial values in the config file.
     if [ ! -r "$WELCOME_CONFIG" ] ; then
         cat <<EOF > "$WELCOME_CONFIG"
-## Configuration file for eos-welcome.
+## Configuration file for $PROGNAME.
 # Note: using bash syntax.
 #
 # 'Greeter'   values: enable or disable.
-# 'OnceDaily' values: no or yes; yes means eos-welcome is shown only once a day.
-# 'LastCheck' values: automatically filled by eos-welcome.
+# 'OnceDaily' values: no or yes; yes means $PROGNAME is shown only once a day.
+# 'LastCheck' values: automatically filled by $PROGNAME.
 
 EOF
     fi
