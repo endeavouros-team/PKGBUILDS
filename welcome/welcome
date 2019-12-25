@@ -483,17 +483,45 @@ KillExtraYad() {
     fi
 }
 
+
 WelcomeSettings() {
     local value="$1"   # enable, disable, check
-    local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
+    declare -A defaults
+    local xx
+
+    defaults[Greeter]="Greeter=enable"
+    defaults[LastCheck]="LastCheck=0"
+    defaults[OnceDaily]="OnceDaily=no"
+
+    # Make sure we have sensible initial values in the config file.
+    if [ ! -r "$WELCOME_CONFIG" ] ; then
+        cat <<EOF > "$WELCOME_CONFIG"
+## Configuration file for eos-welcome.
+# Note: using bash syntax.
+#
+# 'Greeter'   values: enable or disable.
+# 'OnceDaily' values: no or yes; yes means eos-welcome is shown only once a day.
+# 'LastCheck' values: automatically filled by eos-welcome.
+
+EOF
+    fi
+
+    for xx in Greeter OnceDaily LastCheck ; do
+        if [ -z "$(grep "^${xx}=" "$WELCOME_CONFIG" 2>/dev/null)" ] ; then
+            echo "${defaults[$xx]}" >> "$WELCOME_CONFIG"
+        fi
+    done
+
+    # Now the initial values are in order.
 
     case "$value" in
-        enable)
-            echo "Greeter=$value"  > "$WELCOME_CONFIG"
+        enable | disable)
+            sed -i "$WELCOME_CONFIG" -e sed 's|^Greeter=.*$|Greeter='$value'|'
             ;;
-        disable)
-            echo "Greeter=$value" > "$WELCOME_CONFIG"
+    esac
 
+    case "$value" in
+        disable)
             echo "To run $PRETTY_PROGNAME again, start a terminal and run '$PROGNAME --enable'." | \
                 eos_yad --text-info --image=dialog-information --text="Re-enabling $PRETTY_PROGNAME:" \
                         --title="How to re-enable $PRETTY_PROGNAME" \
@@ -502,14 +530,27 @@ WelcomeSettings() {
                         --button=" I remember!face-angel!I promise":0 >& /dev/null
             ;;
         check)
-            test -r "$WELCOME_CONFIG" || { echo enable ; return ; }              # enabled if config does not exist
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
+            ;;
+        continue)
+            # IsInstalling && { echo yes ; return ; }  # not needed, installer has default values
+            if [ "$(grep "^OnceDaily=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2)" = "no" ] ; then
+                echo yes
+                return
+            fi
+            local date="$(date +%Y%m%d)"
+            if [ "$(grep "^LastCheck=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2)" = "$date" ] ; then
+                echo no
+            else
+                echo yes
+            fi
+            sed -i "$WELCOME_CONFIG" -e 's|^LastCheck=.*$|LastCheck='"$date"'|'
             ;;
     esac
 }
 
 UpdateInstallScripts() {
-    test IsInstalling || return
+    IsInstalling || return
 
     local URL=https://github.com/endeavouros-team/install-scripts/raw/master
     local scripts=(                        # may need to adjust files ...
@@ -556,11 +597,14 @@ You may also disable the $PRETTY_PROGNAME app from the app itself
 
 To re-enable the app, use the terminal command
     $PROGNAME --enable
+
+Note: check also settings in the configuration file $WELCOME_CONFIG.
 EOF
 }
 export -f Usage
 
 StartHere() {
+    local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad
 
     local show_installer=0    # explicitly show the installer, for testing only
@@ -582,6 +626,10 @@ StartHere() {
         esac
     done
 
+    if [ "$(WelcomeSettings continue)" = "no" ] ; then
+        return
+    fi
+
     CreateNotebookCommands
 
     test "$(WelcomeSettings check)" != "enable" && {
@@ -589,7 +637,7 @@ StartHere() {
         return
     }
 
-    test IsInstalling || {
+    IsInstalling || {
         eos_yad_check_internet_connection verbose 10 || return 1
     }
 
