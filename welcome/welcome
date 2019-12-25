@@ -516,7 +516,7 @@ EOF
 
     case "$value" in
         enable | disable)
-            sed -i "$WELCOME_CONFIG" -e 's|^Greeter=.*$|Greeter=$value|'
+            sed -i "$WELCOME_CONFIG" -e 's|^Greeter=.*$|Greeter='"$value"'|'
             ;;
     esac
 
