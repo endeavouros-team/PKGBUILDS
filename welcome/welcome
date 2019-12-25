@@ -310,11 +310,11 @@ AfterInstall() {
           --columns=2 \
           --image=dialog-information \
           --text="<b>After install tasks</b>" --text-align=left \
-          --field=" Update Mirrors!network-server!Update list of mirrors before system update":fbtn   'reflector-simple' \
-          --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
+          --field=" Update Mirrors!object-merge!Update list of mirrors before system update":fbtn   'reflector-simple' \
+          --field=" Update System!system-upgrade!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
           --field=" Detect package issues!info!Detect any potential issues on system packages":fbtn                'bash -c yad_PkgConflicts' \
-          --field=' EndeavourOS to latest?!up!Show what to do to get your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
-          --field=" Change Display Manager!gdm!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
+          --field=' EndeavourOS to latest?!top!Show what to do to get your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
+          --field=" Change Display Manager!display!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
           --field=" EndeavourOS wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to EOS default":fbtn                  'eos-set-background-picture' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
@@ -665,7 +665,7 @@ StartHere() {
 
     IsInstalling || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" Help!help!":"bash -c WelcomeHelp")
+    notebook+=(--button=" Help!help-contents!":"bash -c WelcomeHelp")
 
     case "$(eos_yad_GetDesktopName)" in
         KDE | GNOME | GNOME3)
