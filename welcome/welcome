@@ -310,12 +310,13 @@ AfterInstall() {
           --columns=2 \
           --image=dialog-information \
           --text="<b>After install tasks</b>" --text-align=left \
-          --field=" Update Mirrors!applications-internet!Update list of mirrors before system update":fbtn   'reflector-simple' \
-          --field=" Update System!system-software-update!Update System Software":fbtn                 'bash -c yad_SystemUpdate' \
-          --field=" Detect package issues!face-glasses!Detect any potential issues on system packages":fbtn                'bash -c yad_PkgConflicts' \
-          --field=' EndeavourOS to latest?!system-software-install!Show what to do to get your system to the latest EndeavourOS "level"':fbtn  'bash -c yad_UpdateEOStoLatest' \
-          --field=" Change Display Manager!preferences-desktop-display!Use a different display manager":fbtn                  'bash -c yad_ChangeDisplayManager' \
-          --field=" EndeavourOS wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to EOS default":fbtn                  'eos-set-background-picture' \
+          --field=" Update Mirrors!applications-internet!Update list of mirrors before system update":fbtn             'reflector-simple' \
+          --field=" Update System!system-software-update!Update System Software":fbtn                                  'bash -c yad_SystemUpdate' \
+          --field=" Detect package issues!face-glasses!Detect any potential issues on system packages":fbtn            'bash -c yad_PkgConflicts' \
+          --field=' EndeavourOS to latest?!system-software-install!Show what to do to get your system to the latest EndeavourOS "level"':fbtn \
+                                                                                                                       'bash -c yad_UpdateEOStoLatest' \
+          --field=" Change Display Manager!preferences-desktop-display!Use a different display manager":fbtn           'bash -c yad_ChangeDisplayManager' \
+          --field=" EndeavourOS wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to EOS default":fbtn  'eos-set-background-picture' \
           --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
           --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
