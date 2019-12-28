@@ -123,10 +123,12 @@ yad_UpdateEOStoLatest() {    # Show what to update in order to set any EOS insta
 }
 export -f yad_UpdateEOStoLatest
 
-yad_PkgConflicts() {
+yad_PkgIssues() {
     local cpu
     local removes=()
     local title="Package issue detection"
+    local intel=0 nvidia=0 amd=0
+    local graphics
     local xx
 
     # having both amd and intel microcode packages are not needed and may cause issues with grub
@@ -139,14 +141,22 @@ yad_PkgConflicts() {
             esac
         }
     }
+
     # detecting unnecessary video drivers
-    local graphics="$(device-info --vga ; device-info --display)"
-    local intel=0 nvidia=0 amd=0
+    graphics="$(device-info --vga ; device-info --display)"
     test -n "$(echo "$graphics" | grep "Intel Corporation")" && intel=1
-    test -n "$(echo "$graphics" | grep "NVIDIA Corporation")" && nvidia=1
-    test -n "$(echo "$graphics" | grep "Advanced Micro Devices")" && amd=1
-    test -n "$(echo "$graphics" | grep "AMD/ATI")" && amd=1
-    test -n "$(echo "$graphics" | grep "Radeon")" && amd=1
+    if [ -n "$(echo "$graphics" | grep "NVIDIA Corporation")" ] ; then
+        nvidia=1
+    elif [ -n "$(echo "$graphics" | grep "GeForce")" ] ; then
+        nvidia=1
+    fi
+    if [ -n "$(echo "$graphics" | grep "Advanced Micro Devices")" ] ; then
+        amd=1
+    elif [ -n "$(echo "$graphics" | grep "AMD/ATI")" ] ; then
+        amd=1
+    elif [ -n "$(echo "$graphics" | grep "Radeon")" ] ; then
+        amd=1
+    fi
     if [ $intel -eq 0 ] ; then
         for xx in xf86-video-intel ; do
             pacman -Q $xx >& /dev/null && removes+=($xx)
@@ -163,6 +173,7 @@ yad_PkgConflicts() {
         done
     fi
 
+    # now remove potential unnecessary packages
     if [ -n "$removes" ] ; then
         local prompt="echo Package issues detected. Removing packages: ${removes[*]}"
         local cmd="su -c 'pacman -Rsn ${removes[*]} && grub-mkconfig -o /boot/grub/grub.cfg'"
@@ -172,7 +183,7 @@ yad_PkgConflicts() {
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
     fi
 }
-export -f yad_PkgConflicts
+export -f yad_PkgIssues
 
 yad_SystemUpdate() {
     local tmpfile=$(mktemp)
@@ -337,7 +348,7 @@ AfterInstall() {
           --text="<b>After install tasks</b>" --text-align=left \
           --field=" Update Mirrors!applications-internet!Update list of mirrors before system update":fbtn             'reflector-simple' \
           --field=" Update System!system-software-update!Update System Software":fbtn                                  'bash -c yad_SystemUpdate' \
-          --field=" Detect package issues!face-glasses!Detect any potential issues on system packages":fbtn            'bash -c yad_PkgConflicts' \
+          --field=" Detect package issues!face-glasses!Detect any potential issues on system packages":fbtn            'bash -c yad_PkgIssues' \
           --field=' EndeavourOS to latest?!system-software-install!Show what to do to get your system to the latest EndeavourOS "level"':fbtn \
                                                                                                                        'bash -c yad_UpdateEOStoLatest' \
           --field=" Change Display Manager!preferences-desktop-display!Use a different display manager":fbtn           'bash -c yad_ChangeDisplayManager' \
@@ -349,7 +360,6 @@ AfterInstall() {
           --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
           --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
-#          --field=" Install Desktop Environment!desktop!Install another Desktop Environment":fbtn     'eos-install-de'
 }
 
 AddMoreApps() {
