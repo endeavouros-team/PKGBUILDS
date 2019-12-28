@@ -93,6 +93,10 @@ yad_calamares() {
 EOF
     if [ "$debug" = "yes" ] ; then
         touch $INSTALL_LOG_FILE
+        local conf=/home/liveuser/.config/xfce4/terminal/terminalrc
+        if [ -r $conf ] ; then
+            echo "ScrollingUnlimited=TRUE" >> $conf
+        fi
         eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" &
     fi
 
@@ -100,7 +104,7 @@ EOF
 
     cat <<EOF >> $INSTALL_LOG_FILE
 
-############## Install finished: $(date "+%Y-%m-%d %H:%M")"
+############## Install finished: $(date "+%Y-%m-%d %H:%M")
 EOF
     # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
 }
