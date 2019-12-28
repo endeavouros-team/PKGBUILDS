@@ -33,7 +33,8 @@ export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
-
+export INSTALL_LOG_FILE=/home/liveuser/endeavour-install.log
+# $INSTALL_LOG_FILE
 
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
@@ -47,14 +48,13 @@ IsInstalling() {
 
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
+    local debug="$2"
     local prog=$INSTALLER_PROGRAM
 
     if [ ! -x $prog ] ; then
         eos_yad --text="$(basename $prog) is not available!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
         return 1
     fi
-
-    #mode=offline                                # temporary setting for assets.make, remove this line later!
 
     if [ "$mode" = "choose" ] ; then
         local t1="This is a community development release.\n"
@@ -86,11 +86,30 @@ yad_calamares() {
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
     sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
 
-    bash -c "pkexec $prog -d > /home/liveuser/endeavour-install.log"
+    cat <<EOF > $INSTALL_LOG_FILE
+############## $INSTALL_LOG_FILE
+############## Install started: $(date "+%Y-%m-%d %H:%M")
 
-    # test $netlog -eq 1 && cat /home/liveuser/endeavour-install.log | curl -F 'f:1=<-' ix.io
+EOF
+    if [ "$debug" = "yes" ] ; then
+        touch $INSTALL_LOG_FILE
+        eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" &
+    fi
+
+    bash -c "pkexec $prog -d > $INSTALL_LOG_FILE"
+
+    cat <<EOF >> $INSTALL_LOG_FILE
+
+############## Install finished: $(date "+%Y-%m-%d %H:%M")"
+EOF
+    # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
 }
 export -f yad_calamares
+
+yad_calamares_debug() {
+    yad_calamares "$1" yes
+}
+export -f yad_calamares_debug
 
 yad_UpdateMe() {
     local prompt="echo 'Updating $PRETTY_PROGNAME'"
@@ -302,10 +321,12 @@ INSTALL() {
 
   eos_yad --plug="$handle" --tabnum="$tabnum" \
           --form \
-          --columns=3 \
+          --columns=2 \
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-          --field="START THE INSTALLER$_exclamation!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
+          --field="<b>Start the Installer$_exclamation</b>!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
+          --field="<b>Start the Installer (debug)</b>!!Start the EndeavourOS installer along with a debug terminal":fbtn \
+                                                                                            'bash -c "yad_calamares_debug choose"' \
           --field="Update this app$_exclamation!!Update this app and restart it":fbtn       'bash -c yad_UpdateMe' \
           --field="Initialize pacman keys!!Initialize pacman keys":fbtn                     'bash -c yad_InitializePacmanMirroring' \
           --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
