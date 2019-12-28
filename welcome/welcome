@@ -95,12 +95,13 @@ EOF
         touch $INSTALL_LOG_FILE
         local conf=/home/liveuser/.config/xfce4/terminal/terminalrc
         if [ -r $conf ] ; then
+            echo "ScrollingLines=20000"    >> $conf
             echo "ScrollingUnlimited=TRUE" >> $conf
         fi
         eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" &
     fi
 
-    bash -c "pkexec $prog -d > $INSTALL_LOG_FILE"
+    bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"
 
     cat <<EOF >> $INSTALL_LOG_FILE
 
