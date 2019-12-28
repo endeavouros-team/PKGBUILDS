@@ -126,7 +126,8 @@ export -f yad_UpdateEOStoLatest
 yad_PkgConflicts() {
     local cpu
     local removes=()
-    local title="Package conflicts detection"
+    local title="Package issue detection"
+    local xx
 
     # having both amd and intel microcode packages are not needed and may cause issues with grub
     pacman -Q amd-ucode >& /dev/null && {
@@ -138,12 +139,36 @@ yad_PkgConflicts() {
             esac
         }
     }
+    # detecting unnecessary video drivers
+    local graphics="$(device-info --vga ; device-info --display)"
+    local intel=0 nvidia=0 amd=0
+    test -n "$(echo "$graphics" | grep "Intel Corporation")" && intel=1
+    test -n "$(echo "$graphics" | grep "NVIDIA Corporation")" && nvidia=1
+    test -n "$(echo "$graphics" | grep "Advanced Micro Devices")" && amd=1
+    test -n "$(echo "$graphics" | grep "AMD/ATI")" && amd=1
+    test -n "$(echo "$graphics" | grep "Radeon")" && amd=1
+    if [ $intel -eq 0 ] ; then
+        for xx in xf86-video-intel ; do
+            pacman -Q $xx >& /dev/null && removes+=($xx)
+        done
+    fi
+    if [ $nvidia -eq 0 ] ; then
+        for xx in xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings ; do
+            pacman -Q $xx >& /dev/null && removes+=($xx)
+        done
+    fi
+    if [ $amd -eq 0 ] ; then
+        for xx in xf86-video-amdgpu xf86-video-ati ; do
+            pacman -Q $xx >& /dev/null && removes+=($xx)
+        done
+    fi
+
     if [ -n "$removes" ] ; then
-        local prompt="echo Package conflicts detected. Removing packages: ${removes[*]}"
+        local prompt="echo Package issues detected. Removing packages: ${removes[*]}"
         local cmd="su -c 'pacman -Rsn ${removes[*]} && grub-mkconfig -o /boot/grub/grub.cfg'"
         eos_yad_RunCmdTermBash "$prompt ; $cmd"
     else
-        local t="No system package problems were detected in your machine."
+        local t="No system package issues were detected."
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
     fi
 }
