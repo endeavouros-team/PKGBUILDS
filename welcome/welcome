@@ -8,8 +8,10 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
+EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
+
 #################################################################################
-EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
 test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
@@ -70,7 +72,9 @@ yad_calamares() {
     fi
     case "$mode" in
         offline) ;;
-        online) ;;
+        online)
+            eos_yad_check_internet_connection verbose || return 1
+            ;;
         *)  eos_yad_WARN "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
             return 1
             ;;
@@ -671,6 +675,7 @@ StartHere() {
 
     local show_installer=0    # explicitly show the installer, for testing only
     local start_delay=0
+    local is_installing
     #local netlog=0
 
     local arg
@@ -699,9 +704,14 @@ StartHere() {
         return
     }
 
-    IsInstalling || {
+    IsInstalling
+    is_installing=$?
+
+    if [ $is_installing -eq 0 ] ; then
+        xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
+    else
         eos_yad_check_internet_connection verbose 10 || return 1
-    }
+    fi
 
     # UpdateInstallScripts
 

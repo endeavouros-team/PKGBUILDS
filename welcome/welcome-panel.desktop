@@ -1,13 +1,12 @@
 [Desktop Entry]
 Type=Application
 Encoding=UTF-8
-Name=Welcome
-Comment=EndeavourOS Welcome launcher
-Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3
+Name=Welcome (panel)
+Comment=EndeavourOS Welcome launcher on the panel
+Exec=/usr/share/endeavouros/scripts/welcome
 Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 # StartupNotify=false
 # Terminal=False
 Hidden=false
 X-GNOME-Autostart-enabled=true
 X-KDE-autostart-after=panel
-
