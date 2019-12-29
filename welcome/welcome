@@ -93,7 +93,7 @@ yad_calamares() {
 
     cat <<EOF > $INSTALL_LOG_FILE
 ############## $INSTALL_LOG_FILE
-############## Install started: $(date "+%Y-%m-%d %H:%M")
+############## Install started (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
 EOF
     if [ "$debug" = "yes" ] ; then
@@ -110,7 +110,7 @@ EOF
 
     cat <<EOF >> $INSTALL_LOG_FILE
 
-############## Install finished: $(date "+%Y-%m-%d %H:%M")
+############## Install finished (UTC): $(date -u "+%Y-%m-%d %H:%M")
 EOF
     # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
 }
