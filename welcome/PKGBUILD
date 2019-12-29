@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.0.5
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -59,4 +59,7 @@ package() {
   install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop
   install -Dm644 eos-script-lib-yad.conf  $pkgdir/etc/eos-script-lib-yad.conf
+
+  install -d $pkgdir/usr/share/applications
+  install -Dm644 $pkgname.desktop         $pkgdir/usr/share/applications/$pkgname.desktop
 }
