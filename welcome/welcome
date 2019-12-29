@@ -35,7 +35,8 @@ export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
-export INSTALL_LOG_FILE=/home/liveuser/endeavour-install.log
+export EOS_LIVEUSER=liveuser
+export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 # $INSTALL_LOG_FILE
 
 eos_yad() {
@@ -45,7 +46,7 @@ export -f eos_yad
 
 IsInstalling() {
     test $show_installer -eq 1 && return 0
-    test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "liveuser"
+    test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "$EOS_LIVEUSER"
 }
 
 yad_calamares() {
@@ -97,7 +98,7 @@ yad_calamares() {
 EOF
     if [ "$debug" = "yes" ] ; then
         touch $INSTALL_LOG_FILE
-        local conf=/home/liveuser/.config/xfce4/terminal/terminalrc
+        local conf=/home/$EOS_LIVEUSER/.config/xfce4/terminal/terminalrc
         if [ -r $conf ] ; then
             echo "ScrollingLines=20000"    >> $conf
             echo "ScrollingUnlimited=TRUE" >> $conf
@@ -708,7 +709,10 @@ StartHere() {
     is_installing=$?
 
     if [ $is_installing -eq 0 ] ; then
-        xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
+        :
+        #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
+        #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
+        #fi
     else
         eos_yad_check_internet_connection verbose 10 || return 1
     fi

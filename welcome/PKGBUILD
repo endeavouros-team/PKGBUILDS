@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.0.4
-pkgrel=2.1
+pkgrel=3
 arch=('any')
 license=('GPL')
 depends=(
@@ -18,7 +18,7 @@ url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 source=(
   $url/$pkgname
   $url/$pkgname.desktop
-  $url/${pkgname}-panel.desktop
+#  $url/${pkgname}-panel.desktop
   $url/eos-script-lib-yad
   $url/eos-script-lib-yad.conf
   $url/device-info
@@ -28,9 +28,8 @@ source=(
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
 )
-sha512sums=('ed8baaaad06eafe4f1dd8cfd43c6c9610c61140ea4d93e468e5325cc1bf8535be35471187893fe54e7add9a6b34eeb6cf5c65cab34979c9d7bfb9bf3e005bd8a'
+sha512sums=('f48ae43600c302e078ab267b769f46560ad7051b4ba23684338ee5e0e758a7489532909f4a5a6984bbf0a6039a20be4b0ea11b058f352d3662ba1463b0282066'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
-            'f076dbfd5ca40285761994d5d06bcdf6f326fd8bf96d96b4fbc742b3abe6d0344248c824a97baee7fcbcc92658ac3d6065ac86ed2f33e3a912c6455294871d2f'
             '30729b193eefc6dc18f210ff2cdae531351e8cc6884c435471e1cee7f6c83dca108e49e9189a066976140da16b285423107ae8c8752f485fe41fdad9b4bd768f'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
             '525e80b44e04d6b17d0659c8b187811dbbf39beba6b0767ca7b76d75adec569d5e7959dfa9acc34c9a602d2dae05fb3d960954fb9b5cc9a4c6e301f4bc9acbf4'
@@ -45,7 +44,7 @@ package() {
 
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
-  install -Dm755 ${pkgname}-panel.desktop $pkgdir/usr/share/endeavouros/scripts/${pkgname}-panel.desktop
+#  install -Dm755 ${pkgname}-panel.desktop $pkgdir/usr/share/endeavouros/scripts/${pkgname}-panel.desktop
   install -Dm755 ksetwallpaper.py         $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm644 eos-script-lib-yad       $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
