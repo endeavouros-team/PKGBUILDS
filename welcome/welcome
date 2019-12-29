@@ -122,10 +122,17 @@ yad_calamares_debug() {
 export -f yad_calamares_debug
 
 yad_UpdateMe() {
-    local prompt="echo 'Updating $PRETTY_PROGNAME'"
-    local cmd="sudo pacman -Syy $PROG_PACKAGENAME --needed"
-    local msg="printf '\nClose $PRETTY_PROGNAME and restart it by running a terminal command: $PROGNAME\n\n'"
-    eos_yad_RunCmdTermBash "$prompt ; $cmd ; $msg"
+    local tmpfile=$(mktemp)
+    cat <<EOF > $tmpfile
+#!/bin/bash
+pkexec pacman -Sy $PROG_PACKAGENAME --needed --noconfirm >& /dev/null
+pkill -f "eos-welcome"
+pkill -f "yad --plug"
+pkill -f "yad --notebook"
+eos-welcome &
+rm -f $tmpfile
+EOF
+    bash $tmpfile
 }
 export -f yad_UpdateMe
 
@@ -334,8 +341,7 @@ INSTALL() {
           --columns=2 \
           --image=gtk-save \
           --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-          --field="<b>Start the Installer$_exclamation</b>!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
-          --field="<b>Start the Installer (debug)</b>!!Start the EndeavourOS installer along with a debug terminal":fbtn \
+          --field="<b>Start the Installer</b>!!Start the EndeavourOS installer along with a debug terminal":fbtn \
                                                                                             'bash -c "yad_calamares_debug choose"' \
           --field="Update this app$_exclamation!!Update this app and restart it":fbtn       'bash -c yad_UpdateMe' \
           --field="Initialize pacman keys!!Initialize pacman keys":fbtn                     'bash -c yad_InitializePacmanMirroring' \
@@ -344,6 +350,8 @@ INSTALL() {
           --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
           --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       &> /dev/null &
+
+#          --field="<b>Start the Installer (no terminal)$_exclamation</b>!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
 
   # use 'gparted' as the icon for gparted!
 }
