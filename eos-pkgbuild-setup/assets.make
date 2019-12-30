@@ -348,7 +348,7 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
         # compare versions
         if [ $(vercmp "$vaur" "$vlocal") -gt 0 ] ; then
             echo2 "update (aur=$vaur local=$vlocal)"
-            WantAurDiffs "$xx"
+            #WantAurDiffs "$xx"
         else
             test "$vaur" = "$vlocal" && echo2 "OK ($vaur)" || echo2 "OK (aur=$vaur local=$vlocal)"
         fi
@@ -358,9 +358,9 @@ CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
 
 WantAurDiffs() {
     local xx="$1"
-#   local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1"
     local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/?h=$pkgdirname&context=1"
-    local browser=/usr/bin/xdg-open   # firefox by default
+#   local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/PKGBUILD?h=$pkgdirname&context=1"
+#   local browser=/usr/bin/xdg-open   # firefox by default
 
     case "$xx" in
         aur/*)
@@ -377,11 +377,26 @@ WantAurDiffs() {
             fi
             if [ "$aurdiff" = "1" ] ; then
                 case "$xx" in
-                    aur/*) $browser "$diff_url" >& /dev/null ;;
+                    aur/*)
+                        AUR_DIFFS+=("$diff_url")
+                        #$browser "$diff_url" >& /dev/null
+                        ;;
                 esac
             fi
             ;;
     esac
+}
+
+Browser() {
+    local browser
+    if [ -x /usr/bin/firefox ] ; then
+        browser=/usr/bin/firefox
+    elif [ -x /usr/bin/chromium ] ; then
+        browser=/usr/bin/chromium
+    else
+        browser=/usr/bin/xdg-open
+    fi
+    $browser "$@"
 }
 
 #### Global variables:
@@ -422,6 +437,7 @@ Main()
     local aurdiff=0                  # 1 = show AUR diff
     local already_asked_diffs=0
     local ask_timeout=60
+    local AUR_DIFFS=()
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -503,6 +519,9 @@ Main()
             echo2 "OK ($tmpcurr)"
         fi
     done
+    if [ -n "$AUR_DIFFS" ] ; then
+        Browser "${AUR_DIFFS[@]}" >& /dev/null   # xdg-open does not stop here...
+    fi
     Popd
 
     ExplainHookMarks
