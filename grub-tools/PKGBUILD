@@ -2,8 +2,8 @@
 
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
-pkgver=1.0
-pkgrel=5
+pkgver=1.1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(grub os-prober)
@@ -16,7 +16,7 @@ source=(
                                       # re-run if grub or os-prober is updated (but not fixed upstream!).
 )
 sha512sums=('2062e58ae2c903187d98c05df6986d2a1a400fa9c35ffc5f91e31d3da0e779edf0b3ba21404769295dc34138ca9f6d94f12830ab3e203a4386571b05d346b4b6'
-            '4cea76d94e947d770e2c1f3fb44c08144795c8b31981a8a8baeee866c662ddab20db88f4bd11c012d4287f307deb521d8d4fb74a3d525a0881d0b49cba4752f4')
+            '1f23b6dccdf901ada15fb52dac5cae7c675ec9ff3f1f71a9674b9849edffb953e94759e311ddefe81dbe93088931ad05051d2a8ab396f402849745215af4140c')
 
 package() {
   cd $srcdir

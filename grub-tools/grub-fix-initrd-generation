@@ -10,8 +10,25 @@ _die() {
     exit 1
 }
 
+_check_file_existence() {
+    local file="$1"
+    local pkg="$2"
+    if [ ! -r "$file" ] ; then
+        case "$pkg" in
+            grub)
+                _die "file '$file' from package '$pkg' does not exist. Note: if you have used grub-customizer, you may need to reinstall grub, but be careful!"
+                ;;
+            os-prober)
+                _die "file '$file' from package '$pkg' does not exist."
+                ;;
+        esac
+    fi
+}
+
 _backup() {
     local file="$1"
+    local pkg="$2"
+    _check_file_existence "$file" "$pkg"
     rm -f $file.bak       || _die "$file.bak: delete failed."
     cp -a $file $file.bak || _die "$file: backup failed."
     chmod -x $file.bak    || _die "$file.bak: chmod failed."
@@ -31,16 +48,16 @@ _show_result() {
 }
 
 _grub_mod() {
-    local file=/etc/grub.d/30_os-prober
-    _backup $file
+    local file=/etc/grub.d/30_os-prober  # from package 'grub'
+    _backup $file grub
     sed -i $file \
         -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|"
     _show_result $file
 }
 
 _os_prober_mod() {
-    local file=/usr/lib/linux-boot-probes/mounted/40grub2
-    _backup $file
+    local file=/usr/lib/linux-boot-probes/mounted/40grub2  # from package 'os-prober'
+    _backup $file os-prober
     sed -i $file \
         -e 's|initrd="\$(echo "\$2"|shift; initrd="\$(echo "\$\@"|' \
         -e 's|initrd="/boot\$initrd"|initrd=($initrd); initrd=\${initrd[@]/#//boot}|'
