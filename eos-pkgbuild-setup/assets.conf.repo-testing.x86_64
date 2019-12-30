@@ -24,7 +24,6 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/archupdate-indicator
 
     eos-pkgbuild-setup
-    welcome               # temporarily here!
 )
 
 # Hook functions are run at the beginning of assets.make.
@@ -64,7 +63,7 @@ _archupdate-indicator_fixes() {
 }
 
 declare -A ASSET_PACKAGE_HOOKS
-ASSET_PACKAGE_HOOKS["welcome"]=_welcome_hook_theming
+#ASSET_PACKAGE_HOOKS["welcome"]=_welcome_hook_theming
 ASSET_PACKAGE_HOOKS["repo-add_and_sign"]=_repo-add_and_sign_hook_change_rel
 ASSET_PACKAGE_HOOKS["archupdate-indicator"]=_archupdate-indicator_fixes
 
