@@ -103,7 +103,7 @@ EOF
             echo "ScrollingLines=20000"    >> $conf
             echo "ScrollingUnlimited=TRUE" >> $conf
         fi
-        eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" &
+        eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" "" "--geometry=120x20+20+20" &
     fi
 
     bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"

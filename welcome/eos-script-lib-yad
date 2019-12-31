@@ -120,6 +120,7 @@ eos_yad_GetArgVal() {
 eos_yad_RunCmdTermBash() {
     local cmd="$1"
     local prompt="$2"
+    local termopts="$3"
 
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
@@ -138,7 +139,7 @@ eos_yad_RunCmdTermBash() {
     echo "rm -f $tmpfile"                                >> $tmpfile
 
     chmod +x $tmpfile
-    $term -e $tmpfile
+    $term $termopts -e $tmpfile
 }
 
 eos_yad_problem() {
