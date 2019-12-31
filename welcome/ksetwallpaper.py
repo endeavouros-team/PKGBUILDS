@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-
-
-# Forked from: https://github.com/pashazz/ksetwallpaper/raw/master/ksetwallpaper.py
-
-
 import dbus
 import argparse
 
