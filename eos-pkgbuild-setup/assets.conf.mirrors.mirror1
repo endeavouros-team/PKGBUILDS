@@ -72,10 +72,44 @@ _yad_hook_add_gspell() {
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
 }
 
+_welcome_hook_check_ksetwallpaper_py() {
+    # Check if we have the latest version of file ksetwallpaper.py.
+    # See https://github.com/pashazz/ksetwallpaper/raw/master/ksetwallpaper.py
+
+    local file=ksetwallpaper.py
+    local url="https://github.com/pashazz/ksetwallpaper/raw/master/$file"
+    local current="$PKGBUILD_ROOTDIR"/welcome/$file
+    local new=$file.latest
+    local diffs answer
+
+    wget -q --timeout=10 -O $new "$url" || {
+        echo "Warning: cannot fetch '$url'." >&2
+        return 1
+    }
+    diffs="$(diff "$current" "$new")"
+    if [ -n "$diffs" ] ; then
+        echo "" >&2
+        echo "$diffs" >&2
+        echo "" >&2
+        read -p "welcome: file '$file' differs from current, update (Y/n)? " answer >&2
+        case "$answer" in
+            "" | [yY]*)
+                rm -f $current
+                mv $new $current
+                pushd "$(dirname "$current")" >/dev/null
+                updpkgsums 2>/dev/null
+                popd >/dev/null
+                ;;
+        esac
+    fi
+    rm -f "$new"
+}
+
 declare -A ASSET_PACKAGE_HOOKS
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
+ASSET_PACKAGE_HOOKS["welcome"]=_welcome_hook_check_ksetwallpaper_py
 
 
 # Special hooks. Implemented via package hooks.
