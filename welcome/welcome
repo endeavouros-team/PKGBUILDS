@@ -36,8 +36,6 @@ export PRETTY_PROGNAME="Welcome"
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
-export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
-# $INSTALL_LOG_FILE
 
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
@@ -48,6 +46,16 @@ IsInstalling() {
     test $show_installer -eq 1 && return 0
     test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "$EOS_LIVEUSER"
 }
+
+yad_tailer() {
+    local file="$1"
+
+    tail -f "$file" | \
+        eos_yad --text-info --title="$(basename "$file")" \
+                --width=$width --height=$height --tail --wrap --posx=$posx --posy=$posy \
+                >& /dev/null &
+}
+export -f yad_tailer
 
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
@@ -91,6 +99,9 @@ yad_calamares() {
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
     sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
 
+    local INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
+    local PACMAN_LOG="/tmp/calamares-root-*/var/log/pacman.log"
+
     cat <<EOF > $INSTALL_LOG_FILE
 ############## $INSTALL_LOG_FILE
 ############## Install started (UTC): $(date -u "+%Y-%m-%d %H:%M")
@@ -98,12 +109,23 @@ yad_calamares() {
 EOF
     if [ "$debug" = "yes" ] ; then
         touch $INSTALL_LOG_FILE
-        local conf=/home/$EOS_LIVEUSER/.config/xfce4/terminal/terminalrc
-        if [ -r $conf ] ; then
-            echo "ScrollingLines=20000"    >> $conf
-            echo "ScrollingUnlimited=TRUE" >> $conf
+        if [ 0 -eq 1 ] ; then
+            local conf=/home/$EOS_LIVEUSER/.config/xfce4/terminal/terminalrc
+            if [ -r $conf ] ; then
+                echo "ScrollingLines=20000"    >> $conf
+                echo "ScrollingUnlimited=TRUE" >> $conf
+            fi
+            eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" "" "--geometry=120x20+20+20" &
+        else
+            local posx=50
+            local posy=50
+            local width=600
+            local height=200
+            local inc=$(( height + 50 ))
+            yad_tailer $INSTALL_LOG_FILE
+            posy=$(( posy + inc ))
+            #yad_tailer $PACMAN_LOG
         fi
-        eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" "" "--geometry=120x20+20+20" &
     fi
 
     bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"
@@ -742,6 +764,8 @@ StartHere() {
     # Create the yad command gradually into an array 'notebook':
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
+    notebook+=(--window-icon=/usr/share/endeavouros/EndeavourOS-icon.png)
+
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(SeparateWordsWithSpaces "$tab")"
         notebook+=(--tab="$tabname")

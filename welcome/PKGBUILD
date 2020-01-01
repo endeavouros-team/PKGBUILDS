@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.1
-pkgrel=2
+pkgver=2.1.1
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -28,7 +28,7 @@ source=(
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
 )
-sha512sums=('ff8694f206a8baedcb66cd3e31b57c71453f3d70b2a4655aba0e454c19d5abbe85f40bd3194417431e53c538e843cca537d66b9be6fba0fa41664b1515e2b335'
+sha512sums=('536184d31d1f3d4792ce5b9009b22db4e4cb46882f4b324c6b3b4ca7dcfbb40923e354553f31909d451728687261e270593a1500f43a3a878836994fec3a53c2'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
             '7c41ea505388cf6d051737389faf6f4a66d6015d88a5c519da122291f34255f5fdc3fb708ef4a97681c25e3876b127770b681264aefed478367c4c45f6272f31'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
