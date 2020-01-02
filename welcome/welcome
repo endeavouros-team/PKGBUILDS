@@ -100,7 +100,6 @@ yad_calamares() {
     sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
 
     local INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
-    local PACMAN_LOG="/tmp/calamares-root-*/var/log/pacman.log"
 
     cat <<EOF > $INSTALL_LOG_FILE
 ############## $INSTALL_LOG_FILE
@@ -109,7 +108,7 @@ yad_calamares() {
 EOF
     if [ "$debug" = "yes" ] ; then
         touch $INSTALL_LOG_FILE
-        local how_to_show_terminal=0
+        local how_to_show_terminal=1
 
         case "$how_to_show_terminal" in
             0)
@@ -141,9 +140,22 @@ EOF
         esac
     fi
 
-    bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"
+    bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE" &
 
-    cat <<EOF >> $INSTALL_LOG_FILE
+    local PACMAN_LOG=""
+    while true
+    do
+        sleep 5
+        PACMAN_LOG="$(/usr/bin/ls -1 /tmp/calamares-root-*/var/log/pacman.log 2>/dev/null | tail -n 1)"
+        if [ -n "$PACMAN_LOG" ] ; then
+            # Houston, we have a pacman log!
+            break
+        fi
+    done
+    #eos_yad_RunCmdTermBash "tail -f $PACMAN_LOG" "" "--geometry=120x20+20+340" &
+    yad_tailer $PACMAN_LOG
+
+    # cat <<EOF >> $INSTALL_LOG_FILE
 
 ############## Install finished (UTC): $(date -u "+%Y-%m-%d %H:%M")
 EOF
