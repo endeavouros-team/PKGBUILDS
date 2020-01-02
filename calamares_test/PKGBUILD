@@ -9,7 +9,7 @@ pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.17.1
-pkgrel=11
+pkgrel=12
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -44,9 +44,13 @@ prepare() {
     rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
     
+    # test --needed option to modules/packages/main.py
+    mv -f $_reponame/src/modules/packages/main.py_test $_reponame/src/modules/packages/main.py
+
     # test autologin error for netinstall
     # mv -f $_reponame/settings.conf_online_test $_reponame/settings.conf_online 
-    # For testing EFI stuff
+
+    # For testing EFI stuff 
     mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
 
 
