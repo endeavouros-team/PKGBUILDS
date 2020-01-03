@@ -52,8 +52,9 @@ debug() {
 }
 
 YadNonFocused() {
-    eos_yad2 --text-info --wrap --no-focus --title="Updates available" \
-             --formatted --button="Dismiss":1 --button="Update":0 "$@"
+    eos_yad2 --text-info --wrap --no-focus --title="Updates available" --formatted \
+             --button="Dismiss!!Don't update, just close this window":1 \
+             --button="Update!!Close this window and update":0 "$@"
 }
 
 ShowNonFocused() {
@@ -79,12 +80,12 @@ ShowNonFocused() {
             tmp="$(echo "$updates" | sed 's|^|    |')"
             height=$((16 * count + 120))
             test $height -gt $limit && height=$limit
-            printf "$source updates are available:\n$tmp\n$count updates.\nClose this window to start the update.\n" | \
+            printf "$source updates are available:\n$tmp\n$count updates.\n" | \
                 YadNonFocused --geometry=400x${height}+20+20
             ;;
         number | *)
             height=100
-            printf "$count $source updates are available.\nClose this window to start the update.\n" | \
+            printf "$count $source updates are available.\n" | \
                 YadNonFocused --geometry=400x${height}+20+20
             ;;
     esac
@@ -104,7 +105,7 @@ Update_common() {
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
-            ShowNonFocused Upstream || return 1
+            ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
             if [ $(( $(date +%s) - previous_check_time )) -gt 60 ] ; then
                 # Re-check for updates if more than 60 seconds elapsed from the first check.
                 echo2 "Re-checking for updates ..."
