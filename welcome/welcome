@@ -51,7 +51,8 @@ yad_tailer() {
     local file="$1"
 
     tail -f "$file" | \
-        eos_yad --text-info --title="$(basename "$file")" --button=yad-close:0 \
+        eos_yad --text-info --title="$(basename "$file")" \
+                --button=' Close this window!dialog-close!Close only this window':0 \
                 --width=$width --height=$height --tail --wrap --posx=$posx --posy=$posy \
                 >& /dev/null &
 }
@@ -106,12 +107,14 @@ yad_calamares() {
 ############## Install started (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
 EOF
+    local only_one_output_window=yes   # yes=one, no=more than one
+
     if [ "$debug" = "yes" ] ; then
-        touch $INSTALL_LOG_FILE
-        local how_to_show_terminal=1
+        touch $INSTALL_LOG_FILE        # just making sure the file exists now
+        local how_to_show_terminal=a   # one of: a b c
 
         case "$how_to_show_terminal" in
-            0)
+            a)
                 local conf=/home/$EOS_LIVEUSER/.config/xfce4/terminal/terminalrc
                 if [ -r $conf ] ; then
                     echo "ScrollingLines=20000"    >> $conf
@@ -119,7 +122,7 @@ EOF
                 fi
                 eos_yad_RunCmdTermBash "tail -f $INSTALL_LOG_FILE" "" "--geometry=120x20+20+20" &
                 ;;
-            1)
+            b)
                 local posx=50
                 local posy=50
                 local width=600
@@ -129,7 +132,7 @@ EOF
                 posy=$(( posy + inc ))
                 #yad_tailer $PACMAN_LOG
                 ;;
-            2)
+            c)
                 local conf=/home/$EOS_LIVEUSER/.config/xfce4/terminal/terminalrc
                 if [ -r $conf ] ; then
                     echo "ScrollingLines=20000"    >> $conf
@@ -140,25 +143,25 @@ EOF
         esac
     fi
 
-    bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE" &
+    if [ "$only_one_output_window" = "yes" ] ; then
+        bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"  # calamares is running here till the end!
+        printf "\n%s\n" "############## Install finished (UTC): $(date -u '+%Y-%m-%d %H:%M')" >> $INSTALL_LOG_FILE
+    else
+        bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE" &   # calamares runs in the background
+        
+        local PACMAN_LOG=""
+        while true
+        do
+            sleep 5
+            PACMAN_LOG="$(/usr/bin/ls -1 /tmp/calamares-root-*/var/log/pacman.log 2>/dev/null | tail -n 1)"
+            if [ -n "$PACMAN_LOG" ] ; then
+                # Houston, we have a pacman log!
+                break
+            fi
+        done
+        yad_tailer $PACMAN_LOG
+    fi
 
-    local PACMAN_LOG=""
-    while true
-    do
-        sleep 5
-        PACMAN_LOG="$(/usr/bin/ls -1 /tmp/calamares-root-*/var/log/pacman.log 2>/dev/null | tail -n 1)"
-        if [ -n "$PACMAN_LOG" ] ; then
-            # Houston, we have a pacman log!
-            break
-        fi
-    done
-    #eos_yad_RunCmdTermBash "tail -f $PACMAN_LOG" "" "--geometry=120x20+20+340" &
-    yad_tailer $PACMAN_LOG
-
-    # cat <<EOF >> $INSTALL_LOG_FILE
-
-############## Install finished (UTC): $(date -u "+%Y-%m-%d %H:%M")
-EOF
     # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
 }
 export -f yad_calamares
