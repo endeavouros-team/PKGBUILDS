@@ -51,7 +51,7 @@ yad_tailer() {
     local file="$1"
 
     tail -f "$file" | \
-        eos_yad --text-info --title="$(basename "$file")" \
+        eos_yad --text-info --title="$(basename "$file")" --button=yad-close:0 \
                 --width=$width --height=$height --tail --wrap --posx=$posx --posy=$posy \
                 >& /dev/null &
 }
