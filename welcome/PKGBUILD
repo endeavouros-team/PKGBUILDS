@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.1.2
-pkgrel=4
+pkgver=2.2
+pkgrel=0.1
 arch=('any')
 license=('GPL')
 depends=(
@@ -27,8 +27,11 @@ source=(
   $url/wallpaper-once
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
+  $url/translations-${pkgname}.bash
+  $url/translations-${pkgname}-en.bash
+  $url/translations-${pkgname}-fi.bash
 )
-sha512sums=('5697b44b2e02232ed5e557b0c56e6a3f9127107a66d1c1ef69e4bf3ca2b6db04f68a2008616ca0d34fcf9ee91f147d6a93d812a82f5eb8bf42cbc0444fe4330a'
+sha512sums=('31b71a4a169e9cefda231983d717aab6ecb54753963eac82578609f3b6d89682c6ed24e57bbbe7a126306ddea967136ab9a4d5d672a71d5d28d8ac2d75e78b74'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
             '7c41ea505388cf6d051737389faf6f4a66d6015d88a5c519da122291f34255f5fdc3fb708ef4a97681c25e3876b127770b681264aefed478367c4c45f6272f31'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
@@ -37,7 +40,10 @@ sha512sums=('5697b44b2e02232ed5e557b0c56e6a3f9127107a66d1c1ef69e4bf3ca2b6db04f68
             'a3488dab4b65f215ee1513c5ff4c81b1d9e43346abb3a1e9571271c8e60e13184bd826a6206938c14c004fa5adb4f629ea832a535a51972657adb2de5bc30634'
             '4e62a6dbfac155c652e7f5fae307a75ea1648f88ec231adf03b7956ac0318306fc3c9d4def4eb42448d8a53732e2f23cf00692bbab932cee6a1ee7111e4f8d2b'
             'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad'
-            'd5d2876231269961340dcb3607d47215e74f8cd058b81def65f1dbf811bcca780af65189874e831de6e223de4d224f416ec669f1a88e58734e7df9990342b5ee')
+            'd5d2876231269961340dcb3607d47215e74f8cd058b81def65f1dbf811bcca780af65189874e831de6e223de4d224f416ec669f1a88e58734e7df9990342b5ee'
+            '30a364c73a7e9d64ce190035c0d2e1478b8921681231183d253f0ef52f20f657a142910a2987d32e86311c2af3e4fed5a1e5ee7d3cf418595912703a2108311f'
+            '523aeb9297fcf380811ae2057836500f7f21f767322fbe759f0b3f6bcd0e77dc7a5acc0ab64125f912ac50ae00d0c0e6ff22d5ebfc05168be420e5bb0bf4504a'
+            '9fbe49debd9aeba1fd4eced458e1a61978758aa6f86f200ed4ba24163c1569f7e5b9fb3a8d35e534645a3eab10067ac15aa06f0be96cbc7f08b4ae594ed46c40')
 
 package() {
   cd $srcdir
@@ -48,6 +54,10 @@ package() {
   install -Dm755 ksetwallpaper.py         $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm644 eos-script-lib-yad       $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
+
+  install -Dm644 translations-${pkgname}.bash     $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
+  install -Dm644 translations-${pkgname}-en.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-en.bash
+  install -Dm644 translations-${pkgname}-fi.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-fi.bash
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname

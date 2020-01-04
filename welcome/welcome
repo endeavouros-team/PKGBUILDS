@@ -8,7 +8,17 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
+export PROGNAME=eos-welcome
+export PRETTY_PROGNAME="Welcome"
+
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
+translations_dir=$EOS_SCRIPTS_DIR
+
+#translations_dir=$PWD                                          # TODO: remove this line!
+
+source $translations_dir/translations-welcome.bash
+
+_init_translations || { echo "language fail" >&2 ; exit 1 ; }
 
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
@@ -17,6 +27,7 @@ test -r  $EOS_SCRIPTS_YAD || {
     exit 1
 }
 source $EOS_SCRIPTS_YAD
+
 unset EOS_SCRIPTS_YAD
 
 #export -f eos_yad
@@ -31,11 +42,10 @@ export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 #################################################################################
 
-export PROGNAME=eos-welcome
-export PRETTY_PROGNAME="Welcome"
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
+
 
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad "$@"
@@ -439,13 +449,13 @@ GeneralInfo() {
           --form \
           --columns=3 \
           --image=dialog-question \
-          --text="<b>Find your way at the EndeavourOS website!</b>" --text-align=left \
-          --field="Web site!!https://endeavouros.com":fbtn                        "$_BROWSER https://endeavouros.com" \
-          --field="Wiki!!Featured articles":fbtn                                  "$_BROWSER https://endeavouros.com/wiki" \
-          --field="News!!News and articles":fbtn                                  "$_BROWSER https://endeavouros.com/posts" \
-          --field="Forum!!Ask, comment, and chat in our friendly forum!":fbtn     "$_BROWSER https://forum.endeavouros.com" \
-          --field="Donate!!Help us keep EndeavourOS running":fbtn                 "$_BROWSER https://endeavouros.com/donate" \
-          --field="About $PRETTY_PROGNAME!!More info about this app":fbtn         "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
+          --text="<b>$(ltr general_info_text)</b>" --text-align=left \
+          --field="$(ltr general_info_ws)!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
+          --field="$(ltr general_info_wi)!!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki" \
+          --field="$(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/posts" \
+          --field="$(ltr general_info_fo)!!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com" \
+          --field="$(ltr general_info_do)!!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate" \
+          --field="$(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
       &> /dev/null &
 }
 
@@ -453,27 +463,23 @@ AfterInstall() {
   local handle="$1"
   local tabnum="$2"
 
-  local _exclamation='&#33;'   # '!'
-  local _and='&#38;'           # '&'
-
   eos_yad --plug="$handle" --tabnum="$tabnum" \
           --form \
           --columns=2 \
           --image=dialog-information \
-          --text="<b>After install tasks</b>" --text-align=left \
-          --field=" Update Mirrors!applications-internet!Update list of mirrors before system update":fbtn             'reflector-simple' \
-          --field=" Update System!system-software-update!Update System Software":fbtn                                  'bash -c yad_SystemUpdate' \
-          --field=" Detect system issues!face-glasses!Detect any potential issues on system packages or elsewhere":fbtn            'bash -c yad_PkgIssues' \
-          --field=' EndeavourOS to latest?!system-software-install!Show what to do to get your system to the latest EndeavourOS "level"':fbtn \
-                                                                                                                       'bash -c yad_UpdateEOStoLatest' \
-          --field=" Change Display Manager!preferences-desktop-display!Use a different display manager":fbtn           'bash -c yad_ChangeDisplayManager' \
-          --field=" EndeavourOS wallpaper!preferences-desktop-wallpaper!Change desktop wallpaper to EOS default":fbtn  'eos-set-background-picture' \
-          --field="Package management!!How to manage packages with 'pacman'":fbtn      "$_BROWSER https://endeavouros.com/docs/pacman" \
-          --field="AUR $_and yay$_exclamation!!Arch User Repository info":fbtn         "$_BROWSER https://endeavouros.com/docs/aur/yay" \
-          --field="Hardware and Network!!Get your hardware working":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-          --field="Bluetooth!!Bluetooth advice":fbtn                                   "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
-          --field="NVIDIA users$_exclamation!!Use NVIDIA installer":fbtn               "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
-          --field="Forum tips!!Help us help you!":fbtn                                 "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
+          --text="<b>$(ltr after_install_text)</b>" --text-align=left \
+          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn          'reflector-simple' \
+          --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn         'bash -c yad_SystemUpdate' \
+          --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues' \
+          --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest' \
+          --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager' \
+          --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture' \
+          --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman" \
+          --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay" \
+          --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
+          --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
+          --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
+          --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
 }
 
@@ -490,11 +496,11 @@ AddMoreApps() {
           --form \
           --columns=3 \
           --image=system-software-install \
-          --text="<b>Install popular apps</b>" --text-align=left \
-          --field=" LibreOffice!$libreoffice!Office tools (libreoffice-fresh)":fbtn  'bash -c "yad_Install libreoffice-fresh"' \
-          --field=" Chromium Web Browser!$chromium!Web Browser":fbtn                 'bash -c "yad_Install chromium"' \
-          --field=" Firewall!$gufw!Gufw firewall":fbtn                               'bash -c "yad_Install gufw"' \
-          --field=" Bluetooth Manager for Xfce!$bluetooth!Blueberry":fbtn            'bash -c "yad_Install blueberry bluez-utils"' \
+          --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left \
+          --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"' \
+          --field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"' \
+          --field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"' \
+          --field=" $(ltr add_more_apps_bt)!$bluetooth!$(ltr add_more_apps_bttip)":fbtn  'bash -c "yad_Install blueberry bluez-utils"' \
       &> /dev/null &
 }
 
@@ -754,6 +760,11 @@ EOF
 }
 export -f Usage
 
+
+
+
+
+
 StartHere() {
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad
@@ -784,10 +795,10 @@ StartHere() {
 
     CreateNotebookCommands
 
-    test "$(WelcomeSettings check)" != "enable" && {
-        echo "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable."
+    if [ "$(WelcomeSettings check)" != "enable" ] ; then
+        ltr2 welcome_disabled
         return
-    }
+    fi
 
     IsInstalling
     is_installing=$?
@@ -821,18 +832,19 @@ StartHere() {
     notebook+=(--window-icon=/usr/share/endeavouros/EndeavourOS-icon.png)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
-        tabname="$(SeparateWordsWithSpaces "$tab")"
+        tabname="$(ltr nb_tab_$tab)"
+        tabname="$(SeparateWordsWithSpaces "$tabname")"
         notebook+=(--tab="$tabname")
     done
 
     IsInstalling || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" Help!help-contents!":"bash -c WelcomeHelp")
+    notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
 
     case "$(eos_yad_GetDesktopName)" in
         KDE | GNOME | GNOME3)
-            notebook+=(--button=" See you later!face-cool!Keep $PRETTY_PROGNAME enabled":0)
-            notebook+=(--button=" Don't show me anymore!face-crying!Disable $PRETTY_PROGNAME":5)
+            notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
+            notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
             "${notebook[@]}"
             local result=$?
             case "$result" in
@@ -841,7 +853,7 @@ StartHere() {
             esac
             ;;
         *)
-            notebook+=(--button=" See you later!face-cool!":0)
+            notebook+=(--button=" $(ltr butt_later)!face-cool!":0)
             "${notebook[@]}"
             ;;
     esac
