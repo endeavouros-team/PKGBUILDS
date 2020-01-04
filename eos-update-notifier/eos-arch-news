@@ -10,8 +10,16 @@ eos_yad() {
 ShowAll() {
     echo "Showing all Arch news..." >&2
     local latest="${dates[0]}"
-    echo "$latest" > "$latestfile"
-    xdg-open "$url" >& /dev/null
+    local browser
+
+    for browser in firefox chromium ; do
+        if [ -x /usr/bin/$browser ] ; then
+            /usr/bin/$browser "$url" >& /dev/null
+            echo "$latest" > "$latestfile"
+            return
+        fi
+    done
+    echo "Error: no browser found." >&2
 }
 
 ShowIfNotSeen() {
