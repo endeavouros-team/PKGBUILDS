@@ -29,7 +29,7 @@ ShowIfNotSeen() {
             echo "Later it is!" >&2
         }
     else
-        msg="$(printf "You've seen the latest Arch news at %s.\nUse option -f to show all Arch news.\n" "$latest_seen")"
+        msg="$(printf "You've seen the latest Arch news at %s.\n" "$latest_seen")"
         echo "$msg" >&2
     fi
 }
