@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Shows latest Arch news.
+# Keeps simple record of what you've already seen.
+
+eos_yad() {
+    GDK_BACKEND=x11 /usr/bin/yad "$@"
+}
+
+ShowAll() {
+    echo "Showing all Arch news..." >&2
+    local latest="${dates[0]}"
+    echo "$latest" > "$latestfile"
+    xdg-open "$url" >& /dev/null
+}
+
+ShowIfNotSeen() {
+    local latest="${dates[0]}"
+    local latest_seen="$(test -r "$latestfile" && cat "$latestfile" || echo "0")"
+    local msg
+
+    if [[ "$latest" > "$latest_seen" ]] ; then
+        msg="Important Arch news are available! Want to see them now?"
+        eos_yad --form --text="$msg" --title="$progname" --image=info --no-focus --geometry=+60+30 \
+                --window-icon=/usr/share/endeavouros/EndeavourOS-icon.png \
+                --button=" Later!calendar!Show it later, please.":1 --button=yad-yes:0 && {
+            ShowAll
+        } || {
+            echo "Later it is!" >&2
+        }
+    else
+        msg="$(printf "You've seen the latest Arch news at %s.\nUse option -f to show all Arch news.\n" "$latest_seen")"
+        echo "$msg" >&2
+    fi
+}
+
+Usage() {
+    cat <<EOF >&2
+Usage: $progname [options]
+Options:
+    -f | --force     Show all Arch news.
+    -r | --reset     Reset the file that knows the last news you've seen.
+EOF
+}
+
+Main() {
+    local progname="$(basename "$0")"
+    local latestfile="$HOME/.config/EOS-arch-news.conf"
+    local url=https://www.archlinux.org/news
+    local arg stop=no
+    local dates data="$(wget -q -O- $url)"
+
+    if [ -z "$data" ] ; then
+        echo "Sorry, cannot fetch Arch news. Please try again later." >&2
+        return 1
+    fi
+
+    readarray -t dates <<<  $(echo "$data" | grep '<td>20[0-9-]*</td>' | sed -e 's|^.*<td>||' -e 's|</td>$||')
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -f | --force)
+                ShowAll
+                stop=yes
+                ;;
+            -r | --reset)
+                rm -f "$latestfile"
+                stop=yes
+                ;;
+            -fr | -rf)                                   # the order is significant!
+                local ix
+                for ((ix=1; ix<${#arg}; ix++)) ; do
+                    $FUNCNAME -${arg:$ix:1}              # sets the 'stop' variable of the inner scope!
+                done
+                stop=yes
+                ;;
+            *)
+                Usage
+                return 1
+                ;;
+        esac
+    done
+    test "$stop" = "yes" && return
+
+    ShowIfNotSeen
+}
+
+Main "$@"

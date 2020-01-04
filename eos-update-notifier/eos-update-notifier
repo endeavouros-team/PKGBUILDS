@@ -10,6 +10,7 @@
 #     eos-update-notifier.timer       (systemd timer)
 #     /tmp/eos-update-notifier.log.*  (temporary log file, re-created at every invocation)
 #     arch-news-for-you               (show Arch news relevant for you)
+#     eos-arch-news                   (show Arch news; showing is based on date only)
 #
 
 #######################################################################
@@ -139,7 +140,7 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
-                eos_yad2 --text-info --title="EndeavourOS update notifier" \
+                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
                          --height=100 --width=300 --timeout=10 --timeout-indicator=left \
                          --theme="Classic" --tail --button=yad-quit:0
         fi
@@ -149,17 +150,33 @@ Update_common() {
 CheckArchNews() {
     local conf=/etc/eos-update-notifier.conf
     local CheckArchNewsForYou=yes
+    local ArchNewsProg=arch-news-for-you          # original default
 
     test -r $conf && source $conf
 
     if [ "$CheckArchNewsForYou" = "yes" ] ; then
-        test "$newsdays" -gt 0 && {
+        local tmpdays=hide
+        case "$ArchNewsProg" in
+            eos-arch-news)
+                # eos-arch-news does not (yet) use $newsdays ...
+                tmpdays=""
+                ;;
+            arch-news-for-you)
+                if [ "$newsdays" -gt 0 ] ; then
+                    tmpdays="$newsdays"
+                fi
+                ;;
+            *)
+                echo2 "Warning: configuration error with variable ArchNewsProg. Please check file '$conf'."
+                ;;
+        esac
+        if [ "$tmpdays" != "hide" ] ; then
             if [ "$verbosity" = "high" ] ; then
-                arch-news-for-you $newsdays
+                $ArchNewsProg $tmpdays
             else
-                arch-news-for-you $newsdays 2>/dev/null
+                $ArchNewsProg $tmpdays 2>/dev/null
             fi
-        }
+        fi
     fi
 }
 

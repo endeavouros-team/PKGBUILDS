@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=0.8.1
+pkgver=0.9
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -14,15 +14,17 @@ source=(
   $url/$pkgname
   $url/$pkgname.conf
   $url/arch-news-for-you
+  $url/eos-arch-news
   $url/eos-reboot-required
   $url/eos-reboot-required.hook
   $url/$pkgname.desktop
   $url/$pkgname.timer
   $url/$pkgname.service
 )
-sha512sums=('1b7d9fc4d89308062167eaf836dc1c9cb9c961f575a6bcdf3d2263611f7547dfcfc0d560d4bf621acb9c79e9111331bd76c67fe56170e66de704ab6370b845d1'
-            'a091a033b5e6b6a383290dd6e6e4e038deb40cf2f2fb2072be71f34f4c4c661b6256b7c4799b3be3fb43c5f982e3311126f4e29c0b84ecfc556dc0b1a252e55b'
+sha512sums=('c73a6b936bca96818c3f7d3be463d982ef31a89305229ef90cb3bcbd789d1f3dd2e5a45b720698dece562a8c007ed385d265c1baf1b94a105675ef544a28a1b8'
+            'e5fbd52963a5946079fb8ba9fd16297c7571e6faffb1311363b19e85f14a02486fb5153c7d24d01d1e85b993c0dff985a1b361072ce35d916dcc12db4f9a4e18'
             '97eed94588efa2fb0a824a92c2efaa484612033717795d1c0c7e72a7fe1352cc7b44c14c0f82748e1bbd00983d3ae5bc0ab8ca523db75b46c2a5002e5645fb2e'
+            '33af158a1eb8576092d69b87622ceec901a0dfe2fdbae56f0304c2cf0d42d08ccf0b7067da98993a1cc330d2da3a7f71342eebdb4adbfe0223a3cbd0631b4b66'
             '57f66c88f259b6648c23714c691511e1bbf981001ff6197c55a3fede255a7063c66c05dc640a4fe4ea4a3155eadd49b9c94d91277ff788a6b6f479c9762d0d54'
             '8a8c67321a92d5a78980e3bdd0b343259af409d0ae15cae410e71dcbc833848bd2ccfc1724f4a24002dda4b8948819cde22d0c41073a813d2f0c88439dc2d60b'
             'c57e8e41874daab18b57fe23949eee77c4b32f75a306f25ee4c3f641ddaef83aaa8cf50c2f8022f27f7faeecbbbe72c43e32310e66ed705b985ca3d4aa5a08cf'
@@ -36,6 +38,7 @@ package() {
   install -Dm644 $pkgname.conf             $pkgdir/etc/$pkgname.conf
   install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop
   install -Dm755 arch-news-for-you         $pkgdir/usr/bin/arch-news-for-you
+  install -Dm755 eos-arch-news             $pkgdir/usr/bin/eos-arch-news
 
   install -d $pkgdir/etc/pacman.d/hooks
   install -Dm644 eos-reboot-required.hook  $pkgdir/etc/pacman.d/hooks/eos-reboot-required.hook
