@@ -17,6 +17,20 @@ _tr_add() {
 
     tr_indexes+=("$ix")
 }
+_tr_add2() {
+    local ix="$1"
+    local str="$2"
+
+    # local lang="$_tr_lang"
+    # test -n "$lang" || lang="$SELECTED_LANGUAGE_WELCOME"
+
+    if [ -z "$_tr_lang" ] ; then
+        echo "Warning: variable '_tr_lang' is not set in the translation file!" >&2
+        _tr_lang=en
+    fi
+
+    _tr_add "$_tr_lang" "$ix" "$str"
+}
 
 ltr() {                                              # puts string to stdout
     local ix="$1"
