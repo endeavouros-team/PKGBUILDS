@@ -48,12 +48,12 @@ _init_translations() {
 
     source $trdir/translations-welcome-en.bash       # fallback language: English
 
+    export SELECTED_LANGUAGE_WELCOME=en
     if [ "$lang" != "en" ] ; then
         if [ -r $trdir/translations-welcome-"$lang".bash ] ; then
             export SELECTED_LANGUAGE_WELCOME="$lang"
             source $trdir/translations-welcome-"$lang".bash
         else
-            export SELECTED_LANGUAGE_WELCOME=en
             echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
             silent_lang_warnings=yes   # give no more warnings about this language...
         fi
