@@ -12,11 +12,10 @@ export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
-translations_dir=$EOS_SCRIPTS_DIR
+translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translations-welcome.bash !!
 
 source $translations_dir/translations-welcome.bash
 
-_init_translations || { echo "language fail" >&2 ; exit 1 ; }
 
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
@@ -739,6 +738,7 @@ Options:
 --enable | -f     Enable this $PRETTY_PROGNAME app.
 --disable         Disable this $PRETTY_PROGNAME app.
 --version         Show the version of this app.
+--lang=X          Use language X on the user interface.
 
 To have $PRETTY_PROGNAME app started when you log in, make sure
 - $PRETTY_PROGNAME app is selected in the Autostart feature of the DE
@@ -754,16 +754,28 @@ To re-enable the app, use the terminal command
     $PROGNAME --enable
 
 Note: check also settings in the configuration file $WELCOME_CONFIG.
+
+Option --lang=X is currently experimental and supports only a very small set
+of languages. The X should consist of two lowercase letters
+(like 'en' for English or 'de' for German).
+If option --lang is not given, the (default) value is extracted from
+the first two letters of the environment variable LANG.
 EOF
 }
 export -f Usage
 
 
-
-
-
-
 StartHere() {
+    local arg lang
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --lang=*) lang="${arg:7}" ;;
+        esac
+    done
+
+    _init_translations "$lang" || { echo "language fail" >&2 ; exit 1 ; }
+
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad
 
@@ -772,8 +784,6 @@ StartHere() {
     local is_installing
     #local netlog=0
 
-    local arg
-
     for arg in "$@" ; do
         case "$arg" in
             --enable|-f) WelcomeSettings enable ;;
@@ -781,6 +791,7 @@ StartHere() {
             --startdelay=*) start_delay="${arg:13}" ;;
             --installer) show_installer=1 ;;
             --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
+            --lang=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;

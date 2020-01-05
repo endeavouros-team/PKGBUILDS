@@ -33,7 +33,8 @@ _init_translations() {
     local lang="$1"
     local xx ix
     local trdir="$translations_dir"   # from Welcome app
-    local silent_lang_warnings=0
+    local silent_lang_warnings=no
+    local pname="$PRETTY_PROGNAME"
 
     if [ -z "$lang" ] ; then
         lang="$(echo "$LANG" | cut -d '_' -f 1)"
@@ -45,25 +46,29 @@ _init_translations() {
             ;;
     esac
 
-    export SELECTED_LANGUAGE_WELCOME="$lang"
-
     source $trdir/translations-welcome-en.bash       # fallback language: English
 
-    if [ -r $trdir/translations-welcome-$lang.bash ] ; then
-        source $trdir/translations-welcome-$lang.bash
-    else
-        echo "Warning: $FUNCNAME: no translations file for language '$lang' - fallback to 'en'." >&2
-        silent_lang_warnings=1   # no need to warn about this language anymore...
+    if [ "$lang" != "en" ] ; then
+        if [ -r $trdir/translations-welcome-"$lang".bash ] ; then
+            export SELECTED_LANGUAGE_WELCOME="$lang"
+            source $trdir/translations-welcome-"$lang".bash
+        else
+            export SELECTED_LANGUAGE_WELCOME=en
+            echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
+            silent_lang_warnings=yes   # give no more warnings about this language...
+        fi
     fi
 
-    # Check we have all strings translated.
-    for ix in "${tr_indexes[@]}" ; do
-        xx="${tr_strings["Lang_${lang}__$ix"]}"    # same as "$(ltr $ix)"
-        if [ -z "$xx" ] ; then
-            if [ "$silent_lang_warnings" = "0" ] ; then
-                echo "Warning: $FUNCNAME: translation for language '$lang' placeholder '$ix' is not found, fallback 'en' used." >&2
+    if [ "$SELECTED_LANGUAGE_WELCOME" != "en" ] ; then
+        # Check we have all strings translated. Copy the missing string from 'en'.
+        for ix in "${tr_indexes[@]}" ; do
+            xx="${tr_strings["Lang_${lang}__$ix"]}"
+            if [ -z "$xx" ] ; then
+                if [ "$silent_lang_warnings" = "no" ] ; then
+                    echo "Warning: $pname: translation for language '$lang' placeholder '$ix' is not found, fallback 'en' used." >&2
+                fi
+                tr_strings["Lang_${lang}__$ix"]="${tr_strings[Lang_en__$ix]}"
             fi
-            tr_strings["Lang_${lang}__$ix"]="${tr_strings["Lang_en__$ix"]}"
-        fi
-    done
+        done
+    fi
 }
