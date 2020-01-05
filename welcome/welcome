@@ -137,8 +137,6 @@ yad_calamares() {
         mode=$(echo "$answer" | cut -d '|' -f 1 | tr [:upper:] [:lower:])
     fi
 
-    return   # TODO: REMOVE THIS LINE !!
-
     case "$mode" in
         offline) ;;
         online)
