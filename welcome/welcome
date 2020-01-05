@@ -452,10 +452,10 @@ GeneralInfo() {
           --text="<b>$(ltr general_info_text)</b>" --text-align=left \
           --field="$(ltr general_info_ws)!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
           --field="$(ltr general_info_wi)!!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki" \
-          --field="$(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/posts" \
+          --field="$(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news" \
           --field="$(ltr general_info_fo)!!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com" \
           --field="$(ltr general_info_do)!!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate" \
-          --field="$(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome-greeter" \
+          --field="$(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome" \
       &> /dev/null &
 }
 
