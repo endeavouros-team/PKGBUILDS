@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.2
-pkgrel=0.4
+pkgrel=0.5
 arch=('any')
 license=('GPL')
 depends=(
@@ -32,7 +32,7 @@ source=(
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
 )
-sha512sums=('b70fd0c5699ebc458b6dc806fe1e4e95415bb2892761683e9705367e6133c3d57ee0c95f2474c5dfead68028a88ad9589313d6702755aa820bbabba4124f01cd'
+sha512sums=('53375b628c2ff50437ad5838fe416bdea323265cab8e3901b5c0ebba9b8e1a6b62ff9db1a370397471de7290f843f8bdc69444e4fe35a0df1b3fecb8c344b121'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
             '7c41ea505388cf6d051737389faf6f4a66d6015d88a5c519da122291f34255f5fdc3fb708ef4a97681c25e3876b127770b681264aefed478367c4c45f6272f31'
             'e3313448a51744e25f368a1d18ea8a90edf43c2c1f80872848342e82df925e2e3e4d0a300ea2654fadc6b055f22cf6e38f99e58a9f0d3dd8e0f583d23c1c2994'
@@ -48,6 +48,7 @@ sha512sums=('b70fd0c5699ebc458b6dc806fe1e4e95415bb2892761683e9705367e6133c3d57ee
             '9fbe49debd9aeba1fd4eced458e1a61978758aa6f86f200ed4ba24163c1569f7e5b9fb3a8d35e534645a3eab10067ac15aa06f0be96cbc7f08b4ae594ed46c40')
 
 package() {
+  local xx
   cd $srcdir
 
   install -d $pkgdir/usr/share/endeavouros/scripts
@@ -57,10 +58,10 @@ package() {
   install -Dm644 eos-script-lib-yad       $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
 
-  install -Dm644 translations-${pkgname}.bash     $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
-  install -Dm644 translations-${pkgname}-fi.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-de.bash
-  install -Dm644 translations-${pkgname}-en.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-en.bash
-  install -Dm644 translations-${pkgname}-fi.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-fi.bash
+  install -Dm644 translations-${pkgname}.bash        $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
+  for xx in de en fi ; do
+    install -Dm644 translations-${pkgname}-$xx.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-$xx.bash
+  done
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname

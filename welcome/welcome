@@ -14,8 +14,6 @@ export PRETTY_PROGNAME="Welcome"
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
 translations_dir=$EOS_SCRIPTS_DIR
 
-#translations_dir=$PWD                                          # TODO: remove this line!
-
 source $translations_dir/translations-welcome.bash
 
 _init_translations || { echo "language fail" >&2 ; exit 1 ; }
