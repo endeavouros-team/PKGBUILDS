@@ -38,9 +38,9 @@ _tr_add $_tr_lang butt_help             "Help"
 
 
 _tr_add $_tr_lang nb_tab_INSTALL        "INSTALL"
-_tr_add $_tr_lang nb_tab_GeneralInfo    "GeneralInfo"
-_tr_add $_tr_lang nb_tab_AfterInstall   "AfterInstall"
-_tr_add $_tr_lang nb_tab_AddMoreApps    "AddMoreApps"
+_tr_add $_tr_lang nb_tab_GeneralInfo    "General Info"
+_tr_add $_tr_lang nb_tab_AfterInstall   "After Install"
+_tr_add $_tr_lang nb_tab_AddMoreApps    "Add More Apps"
 
 
 _tr_add $_tr_lang after_install_text    "After install tasks"

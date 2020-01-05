@@ -833,7 +833,7 @@ StartHere() {
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"
-        tabname="$(SeparateWordsWithSpaces "$tabname")"
+        #tabname="$(SeparateWordsWithSpaces "$tabname")"
         notebook+=(--tab="$tabname")
     done
 

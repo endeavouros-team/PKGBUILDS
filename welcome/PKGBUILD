@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.2
-pkgrel=0.1
+pkgrel=0.2
 arch=('any')
 license=('GPL')
 depends=(
@@ -28,6 +28,7 @@ source=(
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
   $url/translations-${pkgname}.bash
+  $url/translations-${pkgname}-de.bash
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
 )
@@ -56,6 +57,7 @@ package() {
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
 
   install -Dm644 translations-${pkgname}.bash     $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
+  install -Dm644 translations-${pkgname}-fi.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-de.bash
   install -Dm644 translations-${pkgname}-en.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-en.bash
   install -Dm644 translations-${pkgname}-fi.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-fi.bash
 
