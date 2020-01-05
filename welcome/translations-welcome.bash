@@ -21,12 +21,12 @@ _tr_add() {
 ltr() {                                              # puts string to stdout
     local ix="$1"
     local str="${tr_strings["Lang_${SELECTED_LANGUAGE_WELCOME}__$ix"]}"
+    test -n "$2" && str+="$2"
     echo "$str"
 }
 ltr2() {                                             # puts string to stderr
-    ltr "$1" >&2
+    ltr "$@" >&2
 }
-
 
 # Initialize translations for the app:
 _init_translations() {

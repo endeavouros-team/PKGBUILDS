@@ -42,6 +42,50 @@ export -f eos_yad_GetDesktopName
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
+export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
+
+
+AfterTranslations() {
+    # Here we have definitions that require special treatment because of
+    # yad running in other processes...
+
+    export WH_BUTT_TITLE="$(ltr help_butt_title)"
+    export WH_BUTT_TEXT="$(ltr help_butt_text)"
+
+    export CAL_NOAVAIL="$(ltr cal_noavail)"
+    export CAL_WARN="$(ltr cal_warn)"
+    export CAL_INFO1="$(ltr cal_info1)"
+    export CAL_INFO2="$(ltr cal_info2)"
+    export CAL_INFO3="$(ltr cal_info3)"
+    export CAL_INFO4="$(ltr cal_info4)"
+    export CAL_CHOOSE="$(ltr cal_choose)"
+    export CAL_METHOD="$(ltr cal_method)"
+    export CAL_NOSUPPORT="$(ltr cal_nosupport)"
+    export CAL_NOFILE="$(ltr cal_nofile)"
+    export CAL_ISTARTED="$(ltr cal_istarted)"
+    export CAL_ISTOPPED="$(ltr cal_istopped)"
+    export ISSUES_TITLE="$(ltr issues_title)"
+    export ISSUES_FRUB="$(ltr issues_grub)"
+    export ISSUES_RUN="$(ltr issues_run)"
+    export ISSUES_NO="$(ltr issues_no)"
+    export SYSUP_NO="$(ltr sysup_no)"
+    export SYSUP_CHECK="$(ltr sysup_check)"
+    export INSTALL_INSTALLER="$(ltr install_installer)"
+    export INSTALL_ALREADY="$(ltr install_already)"
+    export INSTALL_ING="$(ltr install_ing)"
+    export INSTALL_DONE="$(ltr install_done)"
+    export DM_TITLE="$(ltr dm_title)"
+    export DM_COL_NAME1="$(ltr dm_col_name1)"
+    export DM_COL_NAME2="$(ltr dm_col_name2)"
+    export DM_REBOOT_REQUIRED="$(ltr dm_reboot_required)"
+    export DM_CHANGED="$(ltr dm_changed)"
+    export DM_FAILED="$(ltr dm_failed)"
+    export DM_WARNING_TITLE="$(ltr dm_warning_title)"
+}
+
+export -f ltr
+export tr_strings
+export SELECTED_LANGUAGE_WELCOME
 
 
 eos_yad() {
@@ -59,7 +103,7 @@ yad_tailer() {
 
     tail -f "$file" | \
         eos_yad --text-info --title="$(basename "$file")" \
-                --button=' Close this window!dialog-close!Close only this window':0 \
+                --button=" $(ltr tail_butt)!dialog-close!$(ltr tail_buttip)":0 \
                 --width=$width --height=$height --tail --wrap --posx=$posx --posy=$posy \
                 >& /dev/null &
 }
@@ -71,35 +115,43 @@ yad_calamares() {
     local prog=$INSTALLER_PROGRAM
 
     if [ ! -x $prog ] ; then
-        eos_yad --text="$(basename $prog) is not available!" --title="Warning" --height=100 --width=200 --button=yad-quit:1
+        eos_yad --text="$CAL_NOAVAIL $(basename $prog)" --title="$CAL_WARN" --height=100 --width=200 --button=yad-quit:1
         return 1
     fi
 
     if [ "$mode" = "choose" ] ; then
-        local t1="This is a community development release.\n"
-        local t2="<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\n"
-        local t3="<b>Online</b> method lets you choose your desktop, with vanilla theming.\n"
-        local t4="\nDISCLAIMER: This release is a work-in-progress, please help us making it stable by reporting bugs."
+        local t1="$CAL_INFO1"
+        local t2="$CAL_INFO2"
+        local t3="$CAL_INFO3"
+        local t4="$CAL_INFO4"
 
-        local answer=$( eos_yad --form --title="Choose installation method" --image=dialog-question \
+        echo "$t1"
+        echo "$t1"
+        echo "$t1"
+        echo "$t1"
+
+        local answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
                                 --text="$t1$t2$t3$t4" \
-                                --field="Method":CB 'Offline!Online' )
+                                --field="$CAL_METHOD":CB 'Offline!Online' )
         test -n "$answer" || return 1
         mode=$(echo "$answer" | cut -d '|' -f 1 | tr [:upper:] [:lower:])
     fi
+
+    return   # TODO: REMOVE THIS LINE !!
+
     case "$mode" in
         offline) ;;
         online)
             eos_yad_check_internet_connection verbose || return 1
             ;;
-        *)  eos_yad_WARN "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
+        *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode')"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
             return 1
             ;;
     esac
 
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
-        eos_yad_WARN "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
+        eos_yad_WARN "$CAL_NOFILE '$file')"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
         return 1
     fi
 
@@ -111,7 +163,7 @@ yad_calamares() {
 
     cat <<EOF > $INSTALL_LOG_FILE
 ############## $INSTALL_LOG_FILE
-############## Install started (UTC): $(date -u "+%Y-%m-%d %H:%M")
+############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
 EOF
     local only_one_output_window=yes   # yes=one, no=more than one
@@ -152,7 +204,7 @@ EOF
 
     if [ "$only_one_output_window" = "yes" ] ; then
         bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE"  # calamares is running here till the end!
-        printf "\n%s\n" "############## Install finished (UTC): $(date -u '+%Y-%m-%d %H:%M')" >> $INSTALL_LOG_FILE
+        printf "\n%s\n" "############## $CAL_ISTOPPED (UTC): $(date -u '+%Y-%m-%d %H:%M')" >> $INSTALL_LOG_FILE
     else
         bash -c "pkexec $prog -d >> $INSTALL_LOG_FILE" &   # calamares runs in the background
         
@@ -220,7 +272,7 @@ yad_PkgIssues() {
     local cpu
     local removes=()
     local commands=":"                            # These commands will be run as root.
-    local title="Package issue detection"
+    local title="$ISSUES_TITLE"
     local intel=0 nvidia=0 amd=0 recreate_grub_cfg=0
     local graphics
     local xx
@@ -276,7 +328,7 @@ yad_PkgIssues() {
             if [ -x /usr/bin/grub-mkconfig ] ; then
                 commands+=" ; grub-mkconfig -o /boot/grub/grub.cfg"
             else
-                eos_yad --text="IMPORTANT: re-creating boot menu manually will be needed." --title="$title" --image=info --button=yad-ok:0
+                eos_yad --text="$ISSUES_GRUB" --title="$title" --image=info --button=yad-ok:0
             fi
         fi
     fi
@@ -295,9 +347,9 @@ yad_PkgIssues() {
     local rooter="su"                                                # or: "pkexec bash"
 
     if [ "$commands" != ":" ] ; then
-        eos_yad_RunCmdTermBash "printf 'Running commands:\n%s\n' '$cmds_as_list' ; $rooter -c '$commands'"
+        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n' '$cmds_as_list' ; $rooter -c '$commands'"
     else
-        local t="No important system issues were detected."
+        local t="$ISSUES_NO"
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
     fi
 }
@@ -313,13 +365,13 @@ _xx_main() {
       echo "\$updates"
       yay -Syu # --noconfirm
   } || {
-      echo "No updates."
+      echo "$SYSUP_NO"
   }
 }
 _xx_main
 EOF
     chmod +x $tmpfile
-    eos_yad_RunCmdTermBash "echo Checking for software updates... ; $tmpfile ; rm -f $tmpfile"
+    eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
 }
 export -f yad_SystemUpdate
 
@@ -341,20 +393,20 @@ export -f yad_InitializePacmanMirroring
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="eos_yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd="eos_yad --text-info --title=INSTALL_INSTALLER --wrap --tail --width=600 --height=500 --button=yad-quit:0"
 
     local pkg pkgs=()
     for pkg in "$@" ; do
         pacman -Q "$1" >& /dev/null || pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
-        echo "$*: already installed" | $yadcmd
+        echo "$*: $INSTALL_ALREADY" | $yadcmd
         return
     }
     while true ; do
-        echo "Installing ${pkgs[*]} ..."
+        echo "$INSTALL_ING ${pkgs[*]} ..."
         pkexec pacman -S --noconfirm "${pkgs[@]}"
-        echo "Finished."
+        echo "$INSTALL_DONE"
         break
     done |& $yadcmd
 }
@@ -375,8 +427,8 @@ yad_ChangeDisplayManager() {
 
     count="${#dms[@]}"
 
-    cmd=(eos_yad --list --radiolist --title="Select Display Manager" --width=300 --height=200)
-    cmd+=(--column="Selected":rd --column="DM name")
+    cmd=(eos_yad --list --radiolist --title="$DM_TITLE" --width=300 --height=200)
+    cmd+=(--column="$DM_COL_NAME1":rd --column="$DM_COL_NAME2")
 
     for ((ix=0; ix<count; ix++)) ; do
         dm="${dms[$ix]}"
@@ -404,11 +456,11 @@ yad_ChangeDisplayManager() {
     pkexec bash -c "$cmd"
 
     if [ "$(yad_GetCurrentDM)" = "$dm" ] ; then
-        echo "Reboot is required for the changes to take effect." | \
-            eos_yad --text-info --title="DM changed to $dm" --wrap --width=300 --height=200 --button=yad-quit:0
+        echo "$DM_REBOOT_REQUIRED" | \
+            eos_yad --text-info --title="$DM_CHANGED $dm" --wrap --width=300 --height=200 --button=yad-quit:0
     else
-        echo "Changing DM failed." | \
-            eos_yad --text-info --title="Warning" --width=300 --height=200 --button=yad-quit:0
+        echo "$DM_FAILED" | \
+            eos_yad --text-info --title="$DM_WARNING_TITLE" --width=300 --height=200 --button=yad-quit:0
     fi
 }
 export -f yad_ChangeDisplayManager
@@ -423,20 +475,17 @@ INSTALL() {
           --form \
           --columns=2 \
           --image=$image \
-          --text="<b>Installing EndeavourOS to disk</b>" --text-align=left \
-          --field="<b>Start the Installer</b>!!Start the EndeavourOS installer along with a debug terminal":fbtn \
-                                                                                            'bash -c "yad_calamares_debug choose"' \
-          --field="Update this app$_exclamation!!Update this app and restart it":fbtn       'bash -c yad_UpdateMe' \
-          --field="Initialize pacman keys!!Initialize pacman keys":fbtn                     'bash -c yad_InitializePacmanMirroring' \
-          --field="Partition manager!!Gparted allows examining and managing disk partitions":fbtn    'gparted' \
-          --field="Latest release info!!Info about the latest release":fbtn      "$_BROWSER https://endeavouros.com/latest-release" \
-          --field="Installation tips!!Installation tips":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation" \
-          --field="Troubleshoot!!System Rescue":fbtn                             "$_BROWSER https://endeavouros.com/docs/system-rescue" \
+          --text="<b>$(ltr ins_text)</b>" --text-align=left \
+          --field="<b>$(ltr ins_start)</b>!!$(ltr ins_starttip)":fbtn            'bash -c "yad_calamares_debug choose"' \
+          --field="$(ltr ins_up)!!$(ltr ins_uptip)":fbtn                         'bash -c yad_UpdateMe' \
+          --field="$(ltr ins_keys)!!$(ltr ins_keystip)":fbtn                     'bash -c yad_InitializePacmanMirroring' \
+          --field="$(ltr ins_pm)!!$(ltr ins_pmtip)":fbtn                         'gparted' \
+          --field="$(ltr ins_rel)!!$(ltr ins_reltip)":fbtn                       "$_BROWSER https://endeavouros.com/latest-release" \
+          --field="$(ltr ins_tips)!!$(ltr ins_tipstip)":fbtn                     "$_BROWSER https://endeavouros.com/docs/installation" \
+          --field="$(ltr ins_trouble)!!$(ltr ins_troubletip)":fbtn               "$_BROWSER https://endeavouros.com/docs/system-rescue" \
       &> /dev/null &
 
-#          --field="<b>Start the Installer (no terminal)$_exclamation</b>!!Start the EndeavourOS installer":fbtn  'bash -c "yad_calamares choose"' \
-
-  # use 'gparted' as the icon for gparted!
+  # could use 'gparted' as the icon for gparted...
 }
 
 GeneralInfo() {
@@ -550,9 +599,9 @@ DIE() {
 }
 
 WelcomeHelp() {
-    Usage | eos_yad --text-info --title="$PRETTY_PROGNAME Help" --width=600 --height=500 \
-                    --text="<b>More info about the $PRETTY_PROGNAME app</b>" \
-                    --text-align=left \
+    Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=600 --height=500 \
+                    --text="<b>$WH_BUTT_TEXT</b>" \
+                    --text-align=left --window-icon=$EOS_WICON \
                     --image=help-about --button=yad-ok:0
 }
 export -f WelcomeHelp
@@ -676,12 +725,12 @@ EOF
 
     case "$value" in
         disable)
-            echo "To run $PRETTY_PROGNAME again, start a terminal and run '$PROGNAME --enable'." | \
-                eos_yad --text-info --image=dialog-information --text="Re-enabling $PRETTY_PROGNAME:" \
-                        --title="How to re-enable $PRETTY_PROGNAME" \
+            echo "$(ltr settings_dis_contents)" | \
+                eos_yad --text-info --image=dialog-information --text="$(ltr settings_dis_text)" \
+                        --title="$(ltr settings_dis_title)" \
                         --geometry=500x200 --wrap \
                         --fontname="Monospace Regular 12" \
-                        --button=" I remember!face-angel!I promise":0 >& /dev/null
+                        --button=" $(ltr settings_dis_butt)!face-angel!$(ltr settings_dis_buttip)":0 >& /dev/null
             ;;
         check)
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
@@ -704,7 +753,11 @@ EOF
 }
 
 UpdateInstallScripts() {
-    IsInstalling || return
+    # IsInstalling || return
+    if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] ; then
+        return
+        # the files below are needed only for installing
+    fi
 
     local URL=https://github.com/endeavouros-team/install-scripts/raw/master
     local scripts=(                        # may need to adjust files ...
@@ -776,6 +829,8 @@ StartHere() {
 
     _init_translations "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
+    AfterTranslations
+
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad
 
@@ -838,7 +893,7 @@ StartHere() {
     # Create the yad command gradually into an array 'notebook':
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
-    notebook+=(--window-icon=/usr/share/endeavouros/EndeavourOS-icon.png)
+    notebook+=(--window-icon=$EOS_WICON)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"

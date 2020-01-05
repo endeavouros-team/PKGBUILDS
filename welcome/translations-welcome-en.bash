@@ -116,3 +116,70 @@ _tr_add $_tr_lang add_more_apps_fwtip   "Gufw firewall"
 _tr_add $_tr_lang add_more_apps_bt      "Bluetooth Manager for Xfce"
 _tr_add $_tr_lang add_more_apps_bttip   "Blueberry"
 
+
+####################### NEW STUFF AFTER THIS LINE:
+
+_tr_add $_tr_lang settings_dis_contents   "To run $PRETTY_PROGNAME again, start a terminal and run: $PROGNAME --enable"
+_tr_add $_tr_lang settings_dis_text       "Re-enabling $PRETTY_PROGNAME:"
+_tr_add $_tr_lang settings_dis_title      "How to re-enable $PRETTY_PROGNAME"
+_tr_add $_tr_lang settings_dis_butt       "I remember"
+_tr_add $_tr_lang settings_dis_buttip     "I promise"
+
+_tr_add $_tr_lang help_butt_title         "$PRETTY_PROGNAME Help"
+_tr_add $_tr_lang help_butt_text          "More info about the $PRETTY_PROGNAME app"
+
+_tr_add $_tr_lang dm_title                "Select Display Manager"
+_tr_add $_tr_lang dm_col_name1            "Selected"
+_tr_add $_tr_lang dm_col_name2            "DM name"
+
+_tr_add $_tr_lang dm_reboot_required      "Reboot is required for the changes to take effect."
+_tr_add $_tr_lang dm_changed              "DM changed to: "
+_tr_add $_tr_lang dm_failed               "Changing DM failed."
+_tr_add $_tr_lang dm_warning_title        "Warning"
+
+_tr_add $_tr_lang install_installer       "Installer"
+_tr_add $_tr_lang install_already         "already installed"
+_tr_add $_tr_lang install_ing             "Installing"
+_tr_add $_tr_lang install_done            "Finished."
+
+_tr_add $_tr_lang sysup_no                "No updates."
+_tr_add $_tr_lang sysup_check             "Checking for software updates..."
+
+_tr_add $_tr_lang issues_title            "Package issue detection"
+_tr_add $_tr_lang issues_grub             "IMPORTANT: re-creating boot menu manually will be needed."
+_tr_add $_tr_lang issues_run              "Running commands:"
+_tr_add $_tr_lang issues_no               "No important system issues were detected."
+
+_tr_add $_tr_lang cal_noavail            "Not available: "        # installer program
+_tr_add $_tr_lang cal_warn               "Warning"
+_tr_add $_tr_lang cal_info1              "This is a community development release.\n"                                   # specials needed!
+_tr_add $_tr_lang cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\n"
+_tr_add $_tr_lang cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\n"
+_tr_add $_tr_lang cal_info4              "\nDISCLAIMER: This release is a work-in-progress, please help us making it stable by reporting bugs."
+_tr_add $_tr_lang cal_choose             "Choose installation method"
+_tr_add $_tr_lang cal_method             "Method"
+_tr_add $_tr_lang cal_nosupport          "$PROGNAME: unsupported mode: "
+_tr_add $_tr_lang cal_nofile             "$PROGNAME: required file does not exist: "
+_tr_add $_tr_lang cal_istarted           "Install started"
+_tr_add $_tr_lang cal_istopped           "Install finished"
+
+_tr_add $_tr_lang tail_butt              "Close this window"
+_tr_add $_tr_lang tail_buttip            "Close only this window"
+
+
+_tr_add $_tr_lang ins_text              "Installing EndeavourOS to disk"
+_tr_add $_tr_lang ins_start             "Start the Installer"
+_tr_add $_tr_lang ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
+_tr_add $_tr_lang ins_up                "Update this app$_exclamation"
+_tr_add $_tr_lang ins_uptip             "Updates this app and restarts it"
+_tr_add $_tr_lang ins_keys              "Initialize pacman keys"
+_tr_add $_tr_lang ins_keystip           "Initialize pacman keys"
+_tr_add $_tr_lang ins_pm                "Partition manager"
+_tr_add $_tr_lang ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
+_tr_add $_tr_lang ins_rel               "Latest release info"
+_tr_add $_tr_lang ins_reltip            "More info about the latest release"
+_tr_add $_tr_lang ins_tips              "Installation tips"
+_tr_add $_tr_lang ins_tipstip           "Installation tips"
+_tr_add $_tr_lang ins_trouble           "Troubleshoot"
+_tr_add $_tr_lang ins_troubletip        "System Rescue"
+

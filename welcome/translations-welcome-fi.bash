@@ -116,3 +116,70 @@ _tr_add $_tr_lang add_more_apps_fwtip   "Gufw-palomuuri"
 _tr_add $_tr_lang add_more_apps_bt      "Bluetooth-manageri Xfce:lle"
 _tr_add $_tr_lang add_more_apps_bttip   "Blueberry"
 
+
+####################### NEW STUFF AFTER THIS LINE:
+
+_tr_add $_tr_lang settings_dis_contents   "Saat $PRETTY_PROGNAME:n taas käyttöön kun ajat komennon: $PROGNAME --enable"
+_tr_add $_tr_lang settings_dis_text       "Ota uudestaan käyttöön $PRETTY_PROGNAME:"
+_tr_add $_tr_lang settings_dis_title      "Kuinka otat uudestaan käyttöön $PRETTY_PROGNAME:n"
+_tr_add $_tr_lang settings_dis_butt       "Selvä"
+_tr_add $_tr_lang settings_dis_buttip     "Minä lupaan"
+
+_tr_add $_tr_lang help_butt_title         "$PRETTY_PROGNAME apua"
+_tr_add $_tr_lang help_butt_text          "Lisätietoja ohjelmasta $PRETTY_PROGNAME"
+
+_tr_add $_tr_lang dm_title                "Valitse Display Manager"
+_tr_add $_tr_lang dm_col_name1            "Valittu"
+_tr_add $_tr_lang dm_col_name2            "DM nimi"
+
+_tr_add $_tr_lang dm_reboot_required      "Uudelleenkäynnistyksen jälkeen muutokset tulevat voimaan."
+_tr_add $_tr_lang dm_changed              "Uusi DM: "
+_tr_add $_tr_lang dm_failed               "DM:n vaihtaminen epäonnistui."
+_tr_add $_tr_lang dm_warning_title        "Varoitus"
+
+_tr_add $_tr_lang install_installer       "Asentaja"
+_tr_add $_tr_lang install_already         "jo asennettu"
+_tr_add $_tr_lang install_ing             "Asennan"
+_tr_add $_tr_lang install_done            "Valmis."
+
+_tr_add $_tr_lang sysup_no                "Ei päivityksiä."
+_tr_add $_tr_lang sysup_check             "Tarkistan päivitykset..."
+
+_tr_add $_tr_lang issues_title            "Tutkitaan mahdollisia korjauskohteita"
+_tr_add $_tr_lang issues_grub             "TÄRKEÄÄ: koneen käynnistyvalikko pitää luoda uudelleen."
+_tr_add $_tr_lang issues_run              "Ajetaan komennot:"
+_tr_add $_tr_lang issues_no               "Korjattavaa ei löydetty."
+
+_tr_add $_tr_lang cal_noavail            "Ei saatavilla: "        # installer program
+_tr_add $_tr_lang cal_warn               "Varoitus"
+_tr_add $_tr_lang cal_info1              "Tämä on Community Development -julkaisu.\n"                                   # specials needed!
+_tr_add $_tr_lang cal_info2              "<b>Offline</b> asentaa Xfce-työpöydän ja EndeavourOS-teeman.\n"
+_tr_add $_tr_lang cal_info3              "<b>Online</b> antaa valita asennettavan työpöydän, johon tulee oletusteema.\n"
+_tr_add $_tr_lang cal_info4              "\nHUOM: Tätä julkaisua kehitetään jatkuvasti. Ole hyvä ja auta tekemään siitä parempi raportoimalla mahdolliset virheet."
+_tr_add $_tr_lang cal_choose             "Valitse asennustapa"
+_tr_add $_tr_lang cal_method             "Tapa"
+_tr_add $_tr_lang cal_nosupport          "$PROGNAME: ei-tuettu tapa: "
+_tr_add $_tr_lang cal_nofile             "$PROGNAME: tarvittu tiedosto ei löydy: "
+_tr_add $_tr_lang cal_istarted           "Asennus alkoi"
+_tr_add $_tr_lang cal_istopped           "Asennus loppui"
+
+_tr_add $_tr_lang tail_butt              "Sulje tämä ikkuna"
+_tr_add $_tr_lang tail_buttip            "Sulje vain tämä ikkuna"
+
+
+_tr_add $_tr_lang ins_text              "Asenna EndeavourOS"
+_tr_add $_tr_lang ins_start             "Käynnistä asennus"
+_tr_add $_tr_lang ins_starttip          "Käynnistä asentaja (sekä lisätietoa antava pääteikkuna)"
+_tr_add $_tr_lang ins_up                "Päivitä tämä sovellus$_exclamation"
+_tr_add $_tr_lang ins_uptip             "Päivittää tämän sovelluksen ja käynnästää sen uudelleen (käytä jos niin ohjeistetaan)"
+_tr_add $_tr_lang ins_keys              "Alusta pacman-avaimet"
+_tr_add $_tr_lang ins_keystip           "Alustaa pacman-avaimet (ei yleensä välttämätöntä)"
+_tr_add $_tr_lang ins_pm                "Osioiden muokkaaja"
+_tr_add $_tr_lang ins_pmtip             "Gparted sallii levyn osioiden tutkimisen ja muokkaamisen (käytä tarvittaessa)"
+_tr_add $_tr_lang ins_rel               "Uusimman julkaisun tiedot"
+_tr_add $_tr_lang ins_reltip            "Lisätietoja uusimmasta julkaisusta"
+_tr_add $_tr_lang ins_tips              "Asennusohjeita"
+_tr_add $_tr_lang ins_tipstip           "Vinkkejä asentamiseen"
+_tr_add $_tr_lang ins_trouble           "Vinkkejä vianetsintään"
+_tr_add $_tr_lang ins_troubletip        "Järjestelmän korjausohjeita"
+
