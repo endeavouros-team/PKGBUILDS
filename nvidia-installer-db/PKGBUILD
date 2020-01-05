@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url="https://endeavouros.com"
 arch=('any')
