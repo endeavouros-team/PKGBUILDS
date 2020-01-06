@@ -53,7 +53,10 @@ debug() {
 }
 
 YadNonFocused() {
-    eos_yad2 --text-info --wrap --no-focus --title="Updates available" --formatted \
+    local date="$(date '+%Y-%m-%d %H:%M')"
+    eos_yad2 --form --text="$msg" \
+             --no-focus --title="Updates available at $date" \
+             --geometry=400x${height}+20+20 \
              --button="Dismiss!!Don't update, just close this window":1 \
              --button="Update!!Close this window and update":0 "$@"
 }
@@ -74,20 +77,20 @@ ShowNonFocused() {
     
     # there are updates, but don't steal focus, just show there are updates
     local height limit=400
-    local tmp
+    local tmp msg
 
     case "$ShowWhatAboutUpdates" in
         packages)
             tmp="$(echo "$updates" | sed 's|^|    |')"
-            height=$((16 * count + 120))
+            height=$((10 * count + 120))
             test $height -gt $limit && height=$limit
-            printf "$source updates are available:\n$tmp\n$count updates.\n" | \
-                YadNonFocused --geometry=400x${height}+20+20
+            msg="$(printf "$source updates are available:\n$tmp\n$count updates.\n")"
+            YadNonFocused
             ;;
         number | *)
             height=100
-            printf "$count $source updates are available.\n" | \
-                YadNonFocused --geometry=400x${height}+20+20
+            msg="$(printf "$count $source updates are available.\n")"
+            YadNonFocused
             ;;
     esac
 }
