@@ -53,7 +53,6 @@ debug() {
 }
 
 YadNonFocused() {
-    local date="$(date '+%Y-%m-%d %H:%M')"
     eos_yad2 --form --text="$msg" \
              --no-focus --title="Updates available at $date" \
              --geometry=400x${height}+20+20 \
@@ -62,35 +61,34 @@ YadNonFocused() {
 }
 
 ShowNonFocused() {
+    local date="$(date '+%x %X%p')"
     local source="$1"
     local count="$(echo "$updates" | wc -l)"
-    local PREFER_TRAY=0
 
-    if [ "$PREFER_TRAY" = "1" ] ; then
-        # Tray notification cannot be used on EOS because it creates an unwarranted terminal window.
-        grep -i endeavouros /etc/*-release >/dev/null || {
+    case "$ShowHowAboutUpdates" in
+        tray)
+            # Tray notification may fail on EOS...
             eos_yad2 --notification --image="system-software-update" \
-                     --text="$count $source updates are available" --command=quit
-            return
-        }
-    fi
-    
-    # there are updates, but don't steal focus, just show there are updates
-    local height limit=400
-    local tmp msg
-
-    case "$ShowWhatAboutUpdates" in
-        packages)
-            tmp="$(echo "$updates" | sed 's|^|    |')"
-            height=$((10 * count + 120))
-            test $height -gt $limit && height=$limit
-            msg="$(printf "$source updates are available:\n$tmp\n$count updates.\n")"
-            YadNonFocused
+                     --text="$count $source updates are available at $date"
             ;;
-        number | *)
-            height=100
-            msg="$(printf "$count $source updates are available.\n")"
-            YadNonFocused
+        window)
+            local height limit=400
+            local tmp msg
+
+            case "$ShowWhatAboutUpdates" in
+                packages)
+                    tmp="$(echo "$updates" | sed 's|^|    |')"
+                    height=$((10 * count + 120))
+                    test $height -gt $limit && height=$limit
+                    msg="$(printf "$source updates are available:\n$tmp\n$count updates.\n")"
+                    YadNonFocused
+                    ;;
+                number | *)
+                    height=100
+                    msg="$(printf "$count $source updates are available.\n")"
+                    YadNonFocused
+                    ;;
+            esac
             ;;
     esac
 }
