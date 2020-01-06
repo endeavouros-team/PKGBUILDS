@@ -67,8 +67,15 @@ _init_translations() {
         if [ -r $trdir/translations-welcome-"$lang".bash ] ; then
             export SELECTED_LANGUAGE_WELCOME="$lang"
             source $trdir/translations-welcome-"$lang".bash
+            case "$lang" in
+                "de") silent_lang_warnings=yes ;;   # de is not fully translated yet...
+            esac
         else
-            echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
+            case "$lang" in
+                "en"|"fi")
+                    echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
+                    ;;
+            esac
             silent_lang_warnings=yes   # give no more warnings about this language...
         fi
     fi
