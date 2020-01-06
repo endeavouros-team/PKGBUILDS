@@ -566,7 +566,7 @@ About() {
 
 ### These variables are required:
 
-_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}' | cut -d '-' -f 1)"        # main window title
+_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
 
 CreateNotebookCommands() {
     IsInstalling && {
