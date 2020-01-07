@@ -134,7 +134,7 @@ yad_calamares() {
         else
             answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
                               --text="$t1$t2$t3$t4" \
-                              --column="Selected":CHK --column="Method":CHK true "Offline" false "Online" )
+                              --column="Selected" --column="Method" true Offline false Online )
             field=2
         fi
 
