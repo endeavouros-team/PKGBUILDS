@@ -124,17 +124,22 @@ yad_calamares() {
         local t2="$CAL_INFO2"
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
+        local answer field
 
-        echo "$t1"
-        echo "$t1"
-        echo "$t1"
-        echo "$t1"
+        if [ 0 -eq 1 ] ; then
+            answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
+                              --text="$t1$t2$t3$t4" \
+                              --field="$CAL_METHOD":CB 'Offline!Online' )
+            field=1
+        else
+            answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
+                              --text="$t1$t2$t3$t4" \
+                              --column="Selected":CHK --column="Method":CHK true "Offline" false "Online" )
+            field=2
+        fi
 
-        local answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
-                                --text="$t1$t2$t3$t4" \
-                                --field="$CAL_METHOD":CB 'Offline!Online' )
         test -n "$answer" || return 1
-        mode=$(echo "$answer" | cut -d '|' -f 1 | tr [:upper:] [:lower:])
+        mode=$(echo "$answer" | cut -d '|' -f $field | tr [:upper:] [:lower:])
     fi
 
     case "$mode" in

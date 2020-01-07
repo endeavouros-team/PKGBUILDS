@@ -160,10 +160,10 @@ _tr_add2 issues_no               "No important system issues were detected."
 
 _tr_add2 cal_noavail            "Not available: "        # installer program
 _tr_add2 cal_warn               "Warning"
-_tr_add2 cal_info1              "This is a community development release.\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\n"
-_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\n"
-_tr_add2 cal_info4              "\nDISCLAIMER: This release is a work-in-progress, please help us making it stable by reporting bugs."
+_tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
+_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\nInternet connection is not needed.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
+_tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
 _tr_add2 cal_choose             "Choose installation method"
 _tr_add2 cal_method             "Method"
 _tr_add2 cal_nosupport          "$PROGNAME: unsupported mode: "
