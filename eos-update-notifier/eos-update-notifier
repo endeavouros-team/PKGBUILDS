@@ -33,6 +33,7 @@ export -f eos_yad_WARN
 #######################################################################
 
 export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
+export NOTIFIER_LOG_FILE=/tmp/eos-update-notifier.log
 
 eos_yad2() { # TODO: VEKS
     GDK_BACKEND=x11 /usr/bin/yad "$@"
@@ -52,6 +53,11 @@ debug() {
     test "$verbosity" = "low" && DEBUG=0
     test $DEBUG -eq 1 && echo2 "$@"
     eos_un_log "$@"
+}
+log2() {
+    local msg="$1"
+    echo2 "$msg"
+    echo "$(date '+%x %X%p'): $msg" >> $NOTIFIER_LOG_FILE
 }
 
 YadNonFocused() {
@@ -109,6 +115,14 @@ ShowNonFocused() {
                     YadNonFocused
                     ;;
             esac
+            ;;
+        "")
+            log2 "Warning: variable 'ShowHowAboutUpdates' in file $EOS_UPDATE_NOTIFIER_CONF has no value."
+            return 11
+            ;;
+        *)
+            log2 "Warning: value '$ShowHowAboutUpdates' for 'ShowHowAboutUpdates' in file $EOS_UPDATE_NOTIFIER_CONF is not supported."
+            return 11
             ;;
     esac
 }
@@ -169,11 +183,10 @@ Update_common() {
 }
 
 CheckArchNews() {
-    local conf=/etc/eos-update-notifier.conf
     local CheckArchNewsForYou=yes
     local ArchNewsProg=arch-news-for-you          # original default
 
-    test -r $conf && source $conf
+    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
 
     if [ "$CheckArchNewsForYou" = "yes" ] ; then
         local tmpdays=hide
@@ -188,7 +201,7 @@ CheckArchNews() {
                 fi
                 ;;
             *)
-                echo2 "Warning: configuration error with variable ArchNewsProg. Please check file '$conf'."
+                log2 "Warning: configuration problem with variable 'ArchNewsProg'. Please check file '$EOS_UPDATE_NOTIFIER_CONF'."
                 ;;
         esac
         if [ "$tmpdays" != "hide" ] ; then
@@ -435,6 +448,7 @@ Main()
     local progname=eos-update-notifier
     local initialize=""
     local update_focused=0
+    local EOS_UPDATE_NOTIFIER_CONF=/etc/eos-update-notifier.conf
 
     mkdir -p "$configdir"
 

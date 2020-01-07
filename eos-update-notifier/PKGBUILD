@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=0.9.7
+pkgver=0.9.8
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,7 +21,7 @@ source=(
   $url/$pkgname.timer
   $url/$pkgname.service
 )
-sha512sums=('d42c1394102111fb39c09a3f21d6bcf4e73c13819f73e760c5466d8766edb27c8f7012023de6de8469e651e46f3b4033929c71df042c328e5d1a20bcce45f141'
+sha512sums=('5e2f4513996956696fc45582cd91d2246e75097ae7d79d6a15cf444f309fb436c9580dbfd9a031ba68d9cea5da84ae6f7e06fa218dee419d71a1254bcb635054'
             'd489cf73b0267cf9edf88a3d5a914f614ce0dfd694a1c40b329f56efa2e73d0497d2e3af35a99f04dde2a32d153177d04f16ed7751a457f9640397b45074e6d3'
             '97eed94588efa2fb0a824a92c2efaa484612033717795d1c0c7e72a7fe1352cc7b44c14c0f82748e1bbd00983d3ae5bc0ab8ca523db75b46c2a5002e5645fb2e'
             'f30acaa30c556aeae5ddf96638d75afbf337ce37637d93abf568f83ceb454137d0b10b74f63d749f1c9c76f341a3f4a16f96ac1c1e56d14ed65afaecfa389375'
