@@ -32,6 +32,8 @@ export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
 
+export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
+
 eos_yad2() { # TODO: VEKS
     GDK_BACKEND=x11 /usr/bin/yad "$@"
 }
@@ -53,11 +55,23 @@ debug() {
 }
 
 YadNonFocused() {
-    eos_yad2 --form --text="$msg" \
+    eos_yad2 --form --text="$msg" --window-icon=$EOS_WICON \
              --no-focus --title="Updates available at $date" \
              --geometry=400x${height}+20+20 \
              --button="Dismiss!!Don't update, just close this window":1 \
              --button="Update!!Close this window and update":0 "$@"
+}
+
+ShowTray() {
+    # Tray notification may have issues on EOS...
+    eos_yad2 --notification --image="system-software-update" \
+             --text="$count $source updates are available at $date"
+}
+ShowNotify() {
+    local ms=15000
+    notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
+                "Updates available at $date" \
+                "$count $source updates are available"
 }
 
 ShowNonFocused() {
@@ -66,10 +80,16 @@ ShowNonFocused() {
     local count="$(echo "$updates" | wc -l)"
 
     case "$ShowHowAboutUpdates" in
+        notify)
+            ShowNotify
+            return 11   # don't start updating
+            ;;
         tray)
-            # Tray notification may fail on EOS...
-            eos_yad2 --notification --image="system-software-update" \
-                     --text="$count $source updates are available at $date"
+            ShowTray
+            ;;
+        "notify+tray")
+            ShowNotify
+            ShowTray
             ;;
         window)
             local height limit=400
@@ -141,7 +161,7 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
-                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
+                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus --window-icon=$EOS_WICON \
                          --height=100 --width=300 --timeout=10 --timeout-indicator=left \
                          --theme="Classic" --tail --button=yad-quit:0
         fi
@@ -202,7 +222,7 @@ Main2() {
 	    echo2 "Ignoring $progname lockfile (probably a leftover from a previous check)."
 	else
             echo2 "Sorry, $progname lockfile exists, already checking for updates?"
-	    eos_yad2 --form --title="Warning: $progname blocked?" --image=warning \
+	    eos_yad2 --form --title="Warning: $progname blocked?" --image=warning --window-icon=$EOS_WICON \
 		     --text="Lockfile for $progname exists.\nIf no other $progname instance is currently checking for updates, you may continue.\nContinue checking?" \
 		    --button=yad-no:1 --button=yad-yes:0
 	    test $? -ne 0 && return 1
@@ -314,7 +334,7 @@ Configure() {
 
     result=$(
         eos_yad2 --form --title="Configure update check schedule" --width=400 \
-                 --text="$tips" \
+                 --text="$tips" --window-icon=$EOS_WICON \
                  --field="Interval in hours":num           $current_interval \
                  --field="Initial hour":num                $current_initial \
                  --field="Minute offset":ro                $current_minute \
