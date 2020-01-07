@@ -521,7 +521,7 @@ AfterInstall() {
           --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay" \
           --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-          --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://wiki.archlinux.org/index.php/Bluetooth" \
+          --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth" \
           --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
           --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
