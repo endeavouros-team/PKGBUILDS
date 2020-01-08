@@ -19,6 +19,7 @@ test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
 }
+source /etc/eos-script-lib-yad.conf  # for EOS_ROOTER
 source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
@@ -148,7 +149,7 @@ Update_common() {
         fi
         ((hasupdates++))
         source=upstream
-        cmd='echo -n "Updating, root password required. " ; su -c "pacman -Syu"'
+        cmd='echo -n "Updating, root password required. " ; $EOS_ROOTER "pacman -Syu"'
         eos_un_log "$source updates available: $updates"
         eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
     fi
