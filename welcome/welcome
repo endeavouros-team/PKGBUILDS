@@ -23,6 +23,7 @@ test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
 }
+source /etc/eos-script-lib-yad.conf      # for EOS_ROOTER
 source $EOS_SCRIPTS_YAD
 
 unset EOS_SCRIPTS_YAD
@@ -42,8 +43,20 @@ export -f eos_yad_GetDesktopName
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
-export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
 
+eos_yad() {
+    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
+}
+export -f eos_yad
+
+
+# check the config:
+case "$EOS_ROOTER" in
+    "su -c" | "pkexec bash -c" | "sudo bash -c") ;;
+    *)
+        eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
+        ;;
+esac
 
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
@@ -87,11 +100,6 @@ export -f ltr
 export tr_strings
 export SELECTED_LANGUAGE_WELCOME
 
-
-eos_yad() {
-    GDK_BACKEND=x11 /usr/bin/yad "$@"
-}
-export -f eos_yad
 
 IsInstalling() {
     test $show_installer -eq 1 && return 0
@@ -347,10 +355,9 @@ yad_PkgIssues() {
     ## Now run all gathered commands.
 
     local cmds_as_list="$(echo "${commands[*]}" | sed -e 's|^: ; ||' -e 's| ; |\n|g')"
-    local rooter="su"                                                # or: "pkexec bash"
 
     if [ "$commands" != ":" ] ; then
-        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n' '$cmds_as_list' ; $rooter -c '$commands'"
+        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n' '$cmds_as_list' ; $EOS_ROOTER '$commands'"
     else
         local t="$ISSUES_NO"
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
@@ -359,6 +366,7 @@ yad_PkgIssues() {
 export -f yad_PkgIssues
 
 yad_SystemUpdate() {
+    echo "täällä ollaan" >$HOME/huuhaatavaab.txt
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash

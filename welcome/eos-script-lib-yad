@@ -21,9 +21,10 @@
 #
 # The two last functions above do not use yad.
 
+export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
 
 eos_yad() {
-    GDK_BACKEND=x11 /usr/bin/yad "$@"
+    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
 }
 #export -f eos_yad
 
