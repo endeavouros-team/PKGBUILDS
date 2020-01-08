@@ -140,6 +140,9 @@ eos_yad_RunCmdTermBash() {
 
     chmod +x $tmpfile
     $term $termopts -e $tmpfile
+
+    echo "Deleting '$tmpfile'."
+    rm -f $tmpfile
 }
 
 eos_yad_problem() {
