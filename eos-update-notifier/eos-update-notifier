@@ -33,14 +33,13 @@ export -f eos_yad_WARN
 #######################################################################
 
 export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
-export NOTIFIER_LOG_FILE=/tmp/eos-update-notifier.log
 
 eos_yad2() { # TODO: VEKS
-    GDK_BACKEND=x11 /usr/bin/yad "$@"
+    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
 }
 
 eos_un_log() {
-    local date="$(date +%Y/%m/%d-%H:%M.%S)"
+    local date="$(date '+%x %X%p')"
     echo ""       >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$date"  >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$@"     >> $EOS_UPDATE_NOTIFIER_LOG
@@ -55,9 +54,8 @@ debug() {
     eos_un_log "$@"
 }
 log2() {
-    local msg="$1"
-    echo2 "$msg"
-    echo "$(date '+%x %X%p'): $msg" >> $NOTIFIER_LOG_FILE
+    echo2 "$@"
+    eos_un_log "$@"
 }
 
 YadNonFocused() {
@@ -445,10 +443,12 @@ Main()
     local systemd=0
     local newsdays=30
     local arg
-    local progname=eos-update-notifier
     local initialize=""
     local update_focused=0
-    local EOS_UPDATE_NOTIFIER_CONF=/etc/eos-update-notifier.conf
+    local progname=eos-update-notifier
+    local EOS_UPDATE_NOTIFIER_CONF=/etc/$progname.conf
+    #local NOTIFIER_LOG_FILE=/tmp/$progname.log
+
 
     mkdir -p "$configdir"
 
