@@ -52,7 +52,9 @@ export -f eos_yad
 
 # check the config:
 case "$EOS_ROOTER" in
-    "su -c" | "pkexec bash -c" | "sudo bash -c") ;;
+    "su -c"          | "/usr/bin/su -c") ;;
+    "pkexec bash -c" | "/usr/bin/pkexec bash -c") ;;
+    "sudo bash -c"   | "/usr/bin/sudo bash -c") ;;
     *)
         eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
         ;;
