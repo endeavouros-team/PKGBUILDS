@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.2.10
+pkgver=2.2.11
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -12,7 +12,7 @@ depends=(
   xorg-xrandr           # for eos-set-background-picture
   endeavouros-theming   # for eos-set-background-picture
 )
-
+backup=(etc/eos-script-lib-yad.conf)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 
 source=(
