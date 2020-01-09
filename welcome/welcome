@@ -84,6 +84,11 @@ AfterTranslations() {
     export DM_CHANGED="$(ltr dm_changed)"
     export DM_FAILED="$(ltr dm_failed)"
     export DM_WARNING_TITLE="$(ltr dm_warning_title)"
+    export AFTER_INSTALL_US="$(ltr after_install_us)"
+    export AFTER_INSTALL_US_FROM="$(ltr after_install_us_from)"
+    export AFTER_INSTALL_US_EL="$(ltr after_install_us_el)"
+    export AFTER_INSTALL_US_DONE="$(ltr after_install_us_done)"
+    export AFTER_INSTALL_US_FAIL="$(ltr after_install_us_fail)"
 }
 
 export -f ltr
@@ -355,7 +360,7 @@ yad_PkgIssues() {
 }
 export -f yad_PkgIssues
 
-yad_SystemUpdate() {
+yad_SystemUpdate_old() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
@@ -372,6 +377,39 @@ _xx_main
 EOF
     chmod +x $tmpfile
     eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
+}
+yad_SystemUpdate() {
+    local cmd
+    local updates
+    local hasupdates=0
+    local source
+    local action
+
+    for source in upstream AUR ; do
+        case "$source" in
+            upstream)
+                updates="$(checkupdates)"
+                action="$EOS_ROOTER 'pacman -Syu'"
+                ;;
+            AUR)
+                updates="$(yay -Qua)"
+                action="yay -Syua"
+                ;;
+        esac
+        if [ -n "$updates" ] ; then
+            hasupdates=1
+            cmd="echo '$AFTER_INSTALL_US_FROM $source:'"
+            cmd+=" ; echo '$updates'"
+            test "$source" = "upstream" && cmd+=" ; echo -n '$AFTER_INSTALL_US_EL '"
+            cmd+=" ; $action && printf '\n$source $AFTER_INSTALL_US_DONE\n' || printf '\n$source $AFTER_INSTALL_US_FAIL\n'"
+            eos_yad_RunCmdTermBash "$cmd"
+        fi
+    done
+    if [ $hasupdates -eq 0 ] ; then
+        eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
+                --height=100 --width=300 --timeout=10 --timeout-indicator=left \
+                --button=yad-quit:0 --image=info
+    fi
 }
 export -f yad_SystemUpdate
 

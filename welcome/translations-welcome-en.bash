@@ -191,3 +191,7 @@ _tr_add2 ins_tipstip           "Installation tips"
 _tr_add2 ins_trouble           "Troubleshoot"
 _tr_add2 ins_troubletip        "System Rescue"
 
+_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Elevated privileges required."
+_tr_add2 after_install_us_done    "update done."
+_tr_add2 after_install_us_fail    "update failed!"

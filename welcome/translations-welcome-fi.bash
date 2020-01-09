@@ -191,3 +191,7 @@ _tr_add2 ins_tipstip           "Vinkkejä asentamiseen"
 _tr_add2 ins_trouble           "Vinkkejä vianetsintään"
 _tr_add2 ins_troubletip        "Järjestelmän korjausohjeita"
 
+_tr_add2 after_install_us_from    "Päivityslähde:"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Lisäoikeuksia tarvitaan."
+_tr_add2 after_install_us_done    "päivitys valmis."
+_tr_add2 after_install_us_fail    "päivitys epäonnistui!"
