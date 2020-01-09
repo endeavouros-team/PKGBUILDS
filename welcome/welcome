@@ -23,7 +23,6 @@ test -r  $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
 }
-source /etc/eos-script-lib-yad.conf      # for EOS_ROOTER
 source $EOS_SCRIPTS_YAD
 
 unset EOS_SCRIPTS_YAD
@@ -48,17 +47,6 @@ eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
 }
 export -f eos_yad
-
-
-# check the config:
-case "$EOS_ROOTER" in
-    "su -c"          | "/usr/bin/su -c") ;;
-    "pkexec bash -c" | "/usr/bin/pkexec bash -c") ;;
-    "sudo bash -c"   | "/usr/bin/sudo bash -c") ;;
-    *)
-        eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
-        ;;
-esac
 
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
@@ -368,7 +356,6 @@ yad_PkgIssues() {
 export -f yad_PkgIssues
 
 yad_SystemUpdate() {
-    echo "täällä ollaan" >$HOME/huuhaatavaab.txt
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
