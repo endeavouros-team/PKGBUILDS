@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# TODO:
+#   - check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
+
 PROGNAME="$(basename "$0")"
 test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
 
 # pacman is changing default compression!
 _COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
-#_COMPRESSOR="xz"
-#_COMPRESSOR="zst"
+REPO_COMPRESSOR=xz
 
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
@@ -83,10 +85,14 @@ LocalVersion()
 {
     local Pkgname="$1"
     local pkgs
+    local xx
     
     Pkgname="$(basename "$Pkgname")"
 
-    pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR 2>/dev/null)"
+    for xx in zst xz ; do         # order is important because of change to zstd!
+        pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$xx 2>/dev/null)"    # $_COMPRESSOR
+        test -n "$pkgs" && break
+    done
 
     case "$(echo "$pkgs" | wc -l)" in
         0) echo "0" ; return ;;
@@ -178,7 +184,7 @@ Assets_clone()
     # echo2 "If so, you can delete your local assets and fetch assets from github now."
     # read -p "Delete local assets and fetch them from github now (y/N)? " xx >&2
 
-    if [ -n "$(ls -1 *.pkg.tar.$_COMPRESSOR 2> /dev/null)" ] ; then
+    if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
 
         printf2 "\n%s " "Fetch assets from github (Y/n)?"
         read xx
@@ -198,8 +204,8 @@ Assets_clone()
     echo "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    rm -f *.{db,files,sig,old,$_COMPRESSOR}
-    local leftovers="$(command ls *.{db,files,sig,old,$_COMPRESSOR} 2>/dev/null)"
+    rm -f *.{db,files,sig,old,xz,zst}                                          # $_COMPRESSOR
+    local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"    # $_COMPRESSOR
     test -z "$leftovers" || DIE "removing local assets failed!"
 
     echo "Fetching all github assets..."
@@ -268,6 +274,26 @@ Destructor()
     test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
 }
 
+ShowOldCompressedPackages() {
+    # If we have *both* .zst and .xz package, show the .xz package.
+
+    local pkg pkgdir pkgname
+    local pkg2 pkg22
+
+    for pkg in $(ls "$ASSETSDIR"/*.pkg.tar.zst 2>/dev/null) ; do
+        pkgname="$(basename "$pkg")"
+        pkgdir="$(dirname "$pkg")"
+        pkg2="$pkgdir/$(echo "$pkgname" | sed 's|\-[0-9].*$||')"
+        pkg22="$(ls "$pkg2"-*.pkg.tar.xz 2>/dev/null)"
+        if [ -n "$pkg22" ] ; then
+            for pkg2 in $pkg22 ; do
+                printf "Remove old packages:\n    %s\n    %s\n" "$pkg2" "$pkg2.sig"
+                rm -i "$pkg2" "$pkg2.sig"
+            done
+        fi
+    done
+}
+
 _pkgbuilds_eos_hook()
 {
     # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
@@ -319,42 +345,6 @@ RunPreHooks()
 #        echo2 "done."
 #    fi
 #}
-
-CompareWithAUR()  # compare certain AUR PKGBUILDs to local counterparts
-{
-    local xx
-    local pkgdirname pkgname
-    local vaur vlocal
-
-    IsEmptyString PKGNAMES
-
-    Pushd "$PKGBUILD_ROOTDIR"
-    echo2 "Comparing certain packages to AUR..."
-    for xx in "${PKGNAMES[@]}" ; do
-        test "${xx::4}" = "aur/" || continue
-        printf2 "    %-25s : " "$(JustPkgname "$xx")"
-        pkgdirname="$(ListNameToPkgName "$xx" yes)"
-        test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
-
-        # get versions from latest AUR PKGBUILDs
-        vaur="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
-        test -n "$vaur" || DIE "PkgBuildVersion for '$pkgdirname' failed"
-
-        # get current versions from local asset files
-        pkgname="$(PkgBuildName "$pkgdirname")"
-        vlocal="$(LocalVersion "$ASSETSDIR/$pkgname")"
-        test -n "$vlocal" || DIE "LocalVersion for '$pkgname' failed"
-
-        # compare versions
-        if [ $(vercmp "$vaur" "$vlocal") -gt 0 ] ; then
-            echo2 "update (aur=$vaur local=$vlocal)"
-            #WantAurDiffs "$xx"
-        else
-            test "$vaur" = "$vlocal" && echo2 "OK ($vaur)" || echo2 "OK (aur=$vaur local=$vlocal)"
-        fi
-    done
-    Popd
-}
 
 WantAurDiffs() {
     local xx="$1"
@@ -414,14 +404,15 @@ Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
 
-$PROGNAME [--checkaur | --dryrun | --dryrun-local | --repoup ]
+$PROGNAME [ --dryrun | --dryrun-local | --repoup | --aurdiff ]
 where
-    --checkaur       Compare certain AUR PKGBUILDs to local counterparts.
     --dryrun         Show what would be done, but do nothing.
     --dryrun-local   Show what would be done, but do nothing. Use local assets.
     --repoup         (Advanced) Force update of repository database files.
     --aurdiff        Show PKGBUILD diff for AUR packages.
 EOF
+#   --versuffix=X    Append given suffix (X) to pkgver of PKGBUILD.
+
     test -n "$1" && exit "$1"
 }
 
@@ -430,8 +421,9 @@ Main()
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
 
     local cmd=""
-    local xx
+    local xx yy zz
     local repoup=0
+    local pkgver_suffix=""
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
     local use_local_assets=0         # 0 = offer to fetch assets
     local aurdiff=0                  # 1 = show AUR diff
@@ -449,11 +441,11 @@ Main()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
-                --dryrun-local) cmd=dryrun ; use_local_assets=1 ;;
-                --dryrun)       cmd=dryrun ;;
-                --checkaur)     cmd=checkaur ;;
-                --repoup)       repoup=1 ;;             # sync repo even when no packages are built
-                --aurdiff)      aurdiff=1 ;;
+                --dryrun)          cmd=dryrun ;;
+                --dryrun-local)    cmd=dryrun ; use_local_assets=1 ;;
+                --repoup)          repoup=1 ;;             # sync repo even when no packages are built
+                --aurdiff)         aurdiff=1 ;;
+                --versuffix=*)     pkgver_suffix="${xx#*=}" ;;  # currently not used!
                 *) Usage 0  ;;
             esac
         done
@@ -470,13 +462,6 @@ Main()
     RunPreHooks                 # may/should update local PKGBUILDs
     Assets_clone                # offer getting assets from github instead of using local ones
 
-    case "$cmd" in
-        checkaur)
-            CompareWithAUR      # Simply compare some packages with AUR. Build nothing.
-            Exit 0
-            ;;
-    esac
-
     # Check if we need to build new versions of packages.
     # To do that, we compare local asset versions to PKGBUILD versions.
     # Note that
@@ -487,6 +472,7 @@ Main()
     local removableassets=()    # collected
     local built=()              # collected
     local signed=()             # collected
+    local repo_removes=()
     declare -A newv oldv
     local tmp tmpcurr
     local pkg
@@ -544,13 +530,17 @@ Main()
 
             # old pkg
             pkgname="$(PkgBuildName "$pkgdirname")"
-            pkg="$(ls -1 "$ASSETSDIR/$pkgname"-*.pkg.tar.$_COMPRESSOR 2> /dev/null)"
-            test -n "$pkg" && {
-                removable+=("$pkg")
-                removable+=("$pkg".sig)
-                removableassets+=("$(basename "$pkg")")
-                removableassets+=("$(basename "$pkg")".sig)
-            }
+            for zz in zst xz ; do
+                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
+                test -n "$pkg" && {
+                    removable+=("$pkg")
+                    removable+=("$pkg".sig)
+
+                    yy="$(basename "$pkg")"
+                    removableassets+=("$yy")
+                    removableassets+=("$yy".sig)
+                }
+            done
 
             # new pkg
             pkg="$(Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname")"
@@ -599,22 +589,35 @@ Main()
                     signed+=("$ASSETSDIR/$(basename "$xx")")
                 done
 
+                for xx in "${built[@]}" ; do
+                    case "$xx" in
+                        *.pkg.tar.$_COMPRESSOR)
+                            pkgname="$(basename "$xx" | sed 's|\-[0-9].*$||')"
+                            repo_removes+=("$pkgname")
+                            ;;
+                    esac
+                done
+                if [ -n "$repo_removes" ] ; then
+                    repo-remove "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR "${repo_removes[@]}"
+                    sleep 1
+                fi
+
                 # Put changed assets (built) to db.
-                repo-add "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR "${built[@]}"
+                repo-add "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR "${built[@]}"
             fi
         fi
 
         if [ $reposig -eq 1 ] ; then
             echo2 "Signing repo $REPONAME ..."
-            repo-add --sign --key $SIGNER "$ASSETSDIR/$REPONAME".db.tar.$_COMPRESSOR >/dev/null
+            repo-add --sign --key $SIGNER "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR >/dev/null
         fi
         for xx in db files ; do
-            rm -f "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR.old{,.sig}
+            rm -f "$ASSETSDIR/$REPONAME".$xx.tar.$REPO_COMPRESSOR.old{,.sig}
             rm -f "$ASSETSDIR/$REPONAME".$xx
-            cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR     "$ASSETSDIR/$REPONAME".$xx
+            cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$REPO_COMPRESSOR     "$ASSETSDIR/$REPONAME".$xx
             if [ $reposig -eq 1 ] ; then
                 rm -f "$ASSETSDIR/$REPONAME".$xx.sig
-                cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$_COMPRESSOR.sig "$ASSETSDIR/$REPONAME".$xx.sig
+                cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$REPO_COMPRESSOR.sig "$ASSETSDIR/$REPONAME".$xx.sig
             fi
         done
 
@@ -650,10 +653,10 @@ Main()
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
             if [ $reposig -eq 1 ] ; then
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR}{,.sig} || \
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} || \
                     DIE "adding db assets with tag '$tag' failed"
             else
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$_COMPRESSOR} || \
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR} || \
                     DIE "adding db assets with tag '$tag' failed"
             fi
         done
@@ -663,6 +666,8 @@ Main()
 
     rm -rf $buildsavedir
     Destructor
+
+    ShowOldCompressedPackages   # should show nothing
 }
 
 Main "$@"
