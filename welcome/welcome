@@ -919,7 +919,13 @@ StartHere() {
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
         #fi
     else
-        eos_yad_check_internet_connection verbose 10 "" "Welcome" || return 1
+        local verbosity
+        if [ "$EOS_WELCOME_CONNECTION_WARNING" = "yes" ] ; then
+            verbosity=verbose
+        else
+            verbosity=none
+        fi
+        eos_yad_check_internet_connection $verbosity 10 "" "Welcome" || return 1
     fi
 
     # UpdateInstallScripts

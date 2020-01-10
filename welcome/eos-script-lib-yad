@@ -91,6 +91,11 @@ eos_yad_check_internet_connection() {
     local caller="$4"           # who is calling this function (often empty)
     local ix
     local title="Warning"
+    local checker="ping -c 1 8.8.8.8"
+
+    case "$EOS_CONNECTION_CHECKER" in
+        curl) checker="curl --silent --connect-timeout 8 https://8.8.8.8" ;;
+    esac
 
     test -z "$verbose"    && verbose=no
     test -z "$waitrounds" && waitrounds=5
@@ -101,11 +106,11 @@ eos_yad_check_internet_connection() {
     fi
 
     for ((ix=0; ix<waitrounds; ix++)) ; do
-        ping -c 1 8.8.8.8 >/dev/null && return 0   # is connected
+        $checker >/dev/null && return 0   # is connected
         sleep $onewait
     done
 
-    ping -c 1 8.8.8.8 >/dev/null || {
+    $checker >/dev/null || {
         case "$verbose" in
             [yY]*|1|true|TRUE|True|on|enable*|verbose)
                 echo "No internet connection!" | \
