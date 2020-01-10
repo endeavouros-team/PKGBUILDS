@@ -675,6 +675,10 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
 }
 
 KillExtraYad() {
+    sleep 0.2
+    eos-kill-yad-zombies $yad_zombie_log
+    return
+
     # There may be an extra "yad" process in vain because
     # the "save session" feature of Xfce has not stored the proper command for this app.
     #
@@ -781,6 +785,7 @@ EOF
             fi
             local date="$(date +%Y%m%d)"
             if [ "$(grep "^LastCheck=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2)" = "$date" ] ; then
+                echo "Info: Stopping because of setting OnceDaily=yes in file $WELCOME_CONFIG." >&2
                 echo no
             else
                 echo yes
@@ -858,6 +863,9 @@ export -f Usage
 
 StartHere() {
     local arg lang
+    local yad_zombie_log=/tmp/yad-zombies.log
+
+    touch $yad_zombie_log
 
     for arg in "$@" ; do
         case "$arg" in
@@ -911,7 +919,7 @@ StartHere() {
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
         #fi
     else
-        eos_yad_check_internet_connection verbose 10 || return 1
+        eos_yad_check_internet_connection verbose 10 "" "Welcome" || return 1
     fi
 
     # UpdateInstallScripts
@@ -959,6 +967,8 @@ StartHere() {
             "${notebook[@]}"
             ;;
     esac
+
+    rm -f $yad_zombie_log
 }
 
 StartHere "$@"

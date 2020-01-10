@@ -88,11 +88,17 @@ eos_yad_check_internet_connection() {
     local verbose="$1"          # yes|verbose = show dialog, otherwise don't show dialog
     local waitrounds="$2"       # try max $waitrounds times for a connection, test once per $onewait
     local onewait="$3"          # time to wait in one waiting round
+    local caller="$4"           # who is calling this function (often empty)
     local ix
+    local title="Warning"
 
     test -z "$verbose"    && verbose=no
     test -z "$waitrounds" && waitrounds=5
     test -z "$onewait"    && onewait=1s
+
+    if [ -n "$caller" ] ; then
+        title+=" at $caller"
+    fi
 
     for ((ix=0; ix<waitrounds; ix++)) ; do
         ping -c 1 8.8.8.8 >/dev/null && return 0   # is connected
@@ -103,7 +109,7 @@ eos_yad_check_internet_connection() {
         case "$verbose" in
             [yY]*|1|true|TRUE|True|on|enable*|verbose)
                 echo "No internet connection!" | \
-                    eos_yad --text-info --title="Warning" \
+                    eos_yad --text-info --title="$title" \
                             --height=100 --width=300 --justify=center --wrap \
                             --button=yad-quit:1 \
                             --button=" Continue anyway!go-next!Don't stop me now":0
@@ -144,8 +150,9 @@ eos_yad_RunCmdTermBash() {
     chmod +x $tmpfile
     $term $termopts -e $tmpfile
 
-    echo "Deleting '$tmpfile'."
-    rm -f $tmpfile
+    # The following DOES NOT WORK with gnome-terminal:
+    #echo "Deleting '$tmpfile'."
+    #rm -f $tmpfile
 }
 
 eos_yad_problem() {
