@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip   "Bluetooth Informationen"
 _tr_add2 after_install_nv      "NVIDIA Nutzer$_exclamation"
 _tr_add2 after_install_nvtip   "Wie funktioniert der Nvidia-Installer"
 
-_tr_add2 after_install_ft      "Forum tips"
+_tr_add2 after_install_ft      "Forum Tipps"
 _tr_add2 after_install_fttip   "Hilf uns dir zu helfen!"
 
 
