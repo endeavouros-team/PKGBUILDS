@@ -101,11 +101,11 @@ eos_yad_check_internet_connection() {
     fi
 
     for ((ix=0; ix<waitrounds; ix++)) ; do
-        ping -c 1 8.8.8.8 >/dev/null && return 0   # is connected
+        curl -s --connect-timeout 8 https://8.8.8.8 >/dev/null && return 0   # is connected
         sleep $onewait
     done
 
-    ping -c 1 8.8.8.8 >/dev/null || {
+    curl -s --connect-timeout 8 https://8.8.8.8 >/dev/null || {
         case "$verbose" in
             [yY]*|1|true|TRUE|True|on|enable*|verbose)
                 echo "No internet connection!" | \
