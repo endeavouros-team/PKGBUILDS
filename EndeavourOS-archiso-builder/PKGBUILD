@@ -9,9 +9,7 @@ pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git squashfs-tools)
 source=($pkgname.zip::https://github.com/endeavouros-team/EndeavourOS-archiso/archive/master.zip)
-sha512sums=(
-    66998b176d3b57f3b1c16c6fd53ce1d3861a010d7e74042176730c7ce84e133d430adc01662083308060c93875c6a0cabb8ca1f0ea6476d1720eb42e23649438
-)
+sha512sums=('1be963e94e1f1eb8af3479dbf4fdea8bb36c8a7fd0750a704396835723146fdf776866d5b4cb8fabba7322bdda42a0adec48977ecde49e257ea8fcdf4a4bd93c')
 
 build() {
     local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
