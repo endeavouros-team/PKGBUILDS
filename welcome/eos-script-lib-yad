@@ -319,13 +319,9 @@ eos_yad_GetDesktopName() {      # return DE name in uppercase letters
 
 # check the config:
 case "$EOS_ROOTER" in
-    "su -c"          | "/usr/bin/su -c") ;;
-    "pkexec bash -c" | "/usr/bin/pkexec bash -c") ;;
-    "sudo bash -c"   | "/usr/bin/sudo bash -c") ;;
-    "")
-        export EOS_ROOTER="su -c"
-        echo "Warning: no value for EOS_ROOTER in file /etc/eos-script-lib-yad.conf. Falling back to '$EOS_ROOTER'." >&2
-        ;;
+    su     | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;
+    sudo   | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="/usr/bin/sudo bash -c" ;;
+    pkexec | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
     *)
         eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
         ;;
