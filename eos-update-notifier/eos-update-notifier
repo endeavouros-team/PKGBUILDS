@@ -84,6 +84,11 @@ ShowNonFocused() {
     local source="$1"
     local count="$(echo "$updates" | wc -l)"
 
+    if [ "$pkgsonly" = "yes" ] ; then       # cmd line options override config file options
+        ShowHowAboutUpdates=window
+        ShowWhatAboutUpdates=packages
+    fi
+
     case "$ShowHowAboutUpdates" in
         notify)
             ShowNotify
@@ -182,10 +187,12 @@ Update_common() {
 }
 
 CheckArchNews() {
-    local CheckArchNewsForYou=yes
-    local ArchNewsProg=arch-news-for-you          # original default
+    local CheckArchNewsForYou
+    local ArchNewsProg
 
-    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
+    #test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
+    test -n "$CheckArchNewsForYou" || CheckArchNewsForYou=yes
+    test -n "$ArchNewsProg"        || ArchNewsProg=arch-news-for-you          # original default
 
     if [ "$CheckArchNewsForYou" = "yes" ] ; then
         local tmpdays=hide
@@ -218,7 +225,11 @@ Main2() {
     local lockfile
     local pids
 
-    CheckArchNews   # also reads config file
+    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
+
+    if [ "$pkgsonly" = "no" ] ; then
+        CheckArchNews   # also reads config file
+    fi
 
     # check package manager lock
     lockfile=/var/lib/pacman/db.lck
@@ -446,6 +457,7 @@ Main()
     local arg
     local initialize=""
     local update_focused=0
+    local pkgsonly=no
     local progname=eos-update-notifier
     local EOS_UPDATE_NOTIFIER_CONF=/etc/$progname.conf
     #local NOTIFIER_LOG_FILE=/tmp/$progname.log
@@ -483,6 +495,10 @@ Main()
                 ;;
             -q)
                 verbosity=low
+                ;;
+            --pkgsonly)
+                pkgsonly=yes
+                initial_waittime=0
                 ;;
             -systemd)
                 systemd=1
