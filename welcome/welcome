@@ -378,7 +378,7 @@ EOF
     chmod +x $tmpfile
     eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
 }
-yad_SystemUpdate() {
+yad_SystemUpdate_old2() {
     local cmd
     local updates
     local hasupdates=0
@@ -410,6 +410,9 @@ yad_SystemUpdate() {
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
                 --button=yad-quit:0 --image=info
     fi
+}
+yad_SystemUpdate() {
+    eos-update-notifier --pkgsonly  # code re-use!
 }
 export -f yad_SystemUpdate
 
