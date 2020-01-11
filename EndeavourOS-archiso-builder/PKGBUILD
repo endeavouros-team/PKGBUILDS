@@ -3,11 +3,11 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.2
-pkgrel=3
+pkgver=0.3
+pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
-makedepends=(archiso arch-install-scripts git)
+makedepends=(archiso arch-install-scripts git squashfs-tools)
 source=($pkgname.zip::https://github.com/endeavouros-team/EndeavourOS-archiso/archive/master.zip)
 sha512sums=(
     66998b176d3b57f3b1c16c6fd53ce1d3861a010d7e74042176730c7ce84e133d430adc01662083308060c93875c6a0cabb8ca1f0ea6476d1720eb42e23649438
