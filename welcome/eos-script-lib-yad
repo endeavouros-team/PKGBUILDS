@@ -153,9 +153,14 @@ eos_yad_RunCmdTermBash() {
     echo "rm -f $tmpfile"                                >> $tmpfile
 
     chmod +x $tmpfile
-    $term $termopts -e $tmpfile
+    case "$term" in
+        /usr/bin/gnome-terminal | gnome-terminal)
+            $term $termopts --wait -- $tmpfile ;;
+        *)
+            $term $termopts -e $tmpfile ;;
+    esac
 
-    # The following DOES NOT WORK with gnome-terminal:
+    # The following DOES NOT WORK with plain gnome-terminal:
     #echo "Deleting '$tmpfile'."
     #rm -f $tmpfile
 }
