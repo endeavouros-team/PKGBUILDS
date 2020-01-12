@@ -360,7 +360,7 @@ yad_PkgIssues() {
 }
 export -f yad_PkgIssues
 
-yad_SystemUpdate() {
+yad_SystemUpdate_old() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
@@ -378,7 +378,7 @@ EOF
     chmod +x $tmpfile
     eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
 }
-yad_SystemUpdate_old2() {
+yad_SystemUpdate() {
     local cmd
     local updates
     local hasupdates=0
