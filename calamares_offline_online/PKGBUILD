@@ -58,7 +58,10 @@ prepare() {
 build() {
 
     cd $_reponame/build
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_INSTALL_PREFIX=/usr
+    # Added
+    # -DBoost_NO_BOOST_CMAKE=ON
+    # bug https://github.com/calamares/calamares/issues/1257
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=/usr/lib -DBoost_NO_BOOST_CMAKE=ON -DCMAKE_INSTALL_PREFIX=/usr
     export DESTDIR="$srcdir/$_reponame/build/$pkgname" && make -j4 install
 
 }
