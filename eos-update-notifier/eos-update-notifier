@@ -139,6 +139,7 @@ Update_common() {
     local cmd=""
     local updates=""
     local previous_check_time=$(date +%s)
+    local secs=10
 
     echo2 "Checking for updates ..."
     updates="$(checkupdates)"
@@ -146,17 +147,19 @@ Update_common() {
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
-            if [ $(( $(date +%s) - previous_check_time )) -gt 60 ] ; then
-                # Re-check for updates if more than 60 seconds elapsed from the first check.
+            if [ $(( $(date +%s) - previous_check_time )) -gt $secs ] ; then
+                # Re-check for updates if more than $secs seconds elapsed from the first check.
                 echo2 "Re-checking for updates ..."
                 updates="$(checkupdates)"
             fi
         fi
-        ((hasupdates++))
-        source=upstream
-        cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER 'pacman -Syu'"
-        eos_un_log "$source updates available: $updates"
-        eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
+        if [ -n "$updates" ] ; then              # some other process may have updated!
+            ((hasupdates++))
+            source=upstream
+            cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER 'pacman -Syu'"
+            eos_un_log "$source updates available: $updates"
+            eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
+        fi
     fi
 
     # Check AUR updates.
@@ -167,11 +170,13 @@ Update_common() {
             ShowNonFocused AUR || return 1
             updates="$(yay -Qua)"    # may have been a long wait...
         fi
-        ((hasupdates++))
-        cmd="yay -Syua"                                        # potential problem for non-sudoers ...
-        source=AUR
-        eos_un_log "$source updates available: $updates"
-        eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
+        if [ -n "$updates" ] ; then              # some other process may have updated!
+            ((hasupdates++))
+            cmd="yay -Syua"                                        # potential problem for non-sudoers ...
+            source=AUR
+            eos_un_log "$source updates available: $updates"
+            eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
+        fi
     fi
 
     if [ $hasupdates -eq 0 ] ; then
