@@ -360,7 +360,7 @@ yad_PkgIssues() {
 }
 export -f yad_PkgIssues
 
-yad_SystemUpdate_old() {
+yad_SystemUpdate() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
@@ -411,7 +411,7 @@ yad_SystemUpdate_old2() {
                 --button=yad-quit:0 --image=info
     fi
 }
-yad_SystemUpdate() {
+yad_SystemUpdate_fails() {
     eos-update-notifier --pkgsonly  # code re-use!
 }
 export -f yad_SystemUpdate
