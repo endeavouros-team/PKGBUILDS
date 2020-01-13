@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.2.24
-pkgrel=1.1
+pkgver=2.2.25
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
