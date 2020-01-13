@@ -679,7 +679,7 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
 
 KillExtraYad() {
     sleep 0.2
-    eos-kill-yad-zombies $yad_zombie_log
+    eos-kill-yad-zombies
     return
 
     # There may be an extra "yad" process in vain because
@@ -868,8 +868,6 @@ StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
 
-    touch $yad_zombie_log
-
     for arg in "$@" ; do
         case "$arg" in
             --lang=*) lang="${arg:7}" ;;
@@ -881,7 +879,7 @@ StartHere() {
     AfterTranslations
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
-    KillExtraYad
+    KillExtraYad > $yad_zombie_log
 
     local show_installer=0    # explicitly show the installer, for testing only
     local start_delay=0
@@ -976,8 +974,6 @@ StartHere() {
             "${notebook[@]}"
             ;;
     esac
-
-    rm -f $yad_zombie_log
 }
 
 StartHere "$@"

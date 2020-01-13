@@ -4,21 +4,15 @@
 
 Main()
 {
-    local log="$1"
     sleep 0.1
 
     local bad="$(pgrep -u "$LOGNAME" -a yad | grep -P "^[0-9]* /usr/bin/yad[ ]*$|^[0-9]* yad[ ]*$")"
     if [ -n "$bad" ] ; then
-        printf "Killing yad zombies:\n%s\n" "$bad" >&2
+        printf "Killing yad zombies:\n%s\n" "$bad"
         kill $(echo "$bad" | awk '{print $1}')
-        if [ -n "$log" ] ; then
-            if [ -w "$log" ] ; then
-                # write log only if log exists and is writable
-                printf "%s: killed yad zombies:\n%s\n" "$(date '+%x %X%p')" "$bad" >> "$log"
-            fi
-        fi
+        printf "%s: killed yad zombies:\n%s\n" "$(date '+%x %X%p')" "$bad"
     else
-        echo "No yad zombies." >&2
+        echo "No yad zombies."
     fi
 }
 
