@@ -327,6 +327,19 @@ yad_PkgIssues() {
         done
     fi
 
+    # Remove Broadcom wifi driver if using another wifi card (some cards here only).
+    xx=broadcom-wl-dkms
+    pacman -Q $xx >& /dev/null && {
+        local wifi_info="$(lspci -k | grep -A9 " Network controller: " | grep "Kernel driver in use")"
+        if [ -n "$(echo "$wifi_info"   | grep -w iwlwifi)"] ; then
+            removes+=($xx)
+        elif [ -n "$(echo "$wifi_info" | grep -w ath9k)"] ; then
+            removes+=($xx)
+        elif [ -n "$(echo "$wifi_info" | grep -w r8169)"] ; then
+            removes+=($xx)
+        fi
+    }
+
     # Make package removals as a sequence of commands.
     if [ -n "$removes" ] ; then
         commands+=" ; pacman -Rsn ${removes[*]}"
