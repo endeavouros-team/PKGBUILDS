@@ -960,6 +960,15 @@ StartHere() {
             verbosity=none
         fi
         eos_yad_check_internet_connection $verbosity 10 "" "Welcome" || return 1
+
+        if [ -n "$TERMINAL_AT_START" ] ; then
+            arg="$(echo "$TERMINAL_AT_START" | awk '{print $1}')"
+            which "$arg" 2>/dev/null && {
+                $TERMINAL_AT_START &
+            } || {
+                echo "Warning: terminal '$arg' (setting TERMINAL_AT_START) in file /etc/eos-script-lib-yad.conf is not supported." >&2
+            }
+        fi
     fi
 
     # UpdateInstallScripts
