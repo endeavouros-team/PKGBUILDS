@@ -333,8 +333,7 @@ yad_PkgIssues() {
     esac
 
     if [ "$EOS_WIFIDEV_CHECK" = "yes" ] ; then
-        # Remove Broadcom wifi driver if using another wifi card (we check only some cards here).
-        # NOTE: currently: if usb "WLAN Adapter" devices are around, we do nothing.
+        # Remove Broadcom wifi driver if using another wifi card.
         while true ; do
             xx=broadcom-wl-dkms
             pacman -Q $xx >& /dev/null && {
