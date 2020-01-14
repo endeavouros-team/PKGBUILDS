@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.2.26
+pkgver=2.2.27
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -32,7 +32,7 @@ source=(
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
 )
-sha512sums=('89e0712e080e5e5443bb53cd9f802a2b2dfce80273f88ba44ab979a3ac94c4f81973618e277e8d08766fbaac9c43b9705174faef66990cf1bd2e17f92fcc2fa6'
+sha512sums=('889fa1d0c81d7cc571f94eb6a53386228053de242e807df3c7ac807c9003d3fc0152bdf2263091c4dbf4f0b92b74375252d8b67081506687d635995d01400d71'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
             '2a4f2798cfbc95d615740dbd92cca182c66629027861aca37ae1b23d14850402118802a824d670be0eb665a1a17f385e47445bfbd0be36a20f31c31a246dcab6'
             '4adcfa339cbce38b86f5290ad8754842b25418f3b324616924e1d1b99fd0a1c40baa322fecc2ce49269ac419af686652fb6290ccb8f3d294443eb98eda2913f8'

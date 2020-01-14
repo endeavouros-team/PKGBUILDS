@@ -335,21 +335,30 @@ yad_PkgIssues() {
     if [ "$EOS_WIFIDEV_CHECK" = "yes" ] ; then
         # Remove Broadcom wifi driver if using another wifi card (we check only some cards here).
         # NOTE: currently: if usb "WLAN Adapter" devices are around, we do nothing.
-        if [ -z "$(lsusb | grep "WLAN Adapter")" ] ; then
+        while true ; do
             xx=broadcom-wl-dkms
             pacman -Q $xx >& /dev/null && {
-                local wifi_info="$(lspci -k | grep -A9 " Network controller: " | grep "Kernel driver in use")"
-                if [ -z "$(echo "$wifi_info" | grep "in use: wl$")" ] ; then
-                    if [ -n "$(echo "$wifi_info"   | grep -w iwlwifi)"] ; then
-                        removes+=($xx)
-                    elif [ -n "$(echo "$wifi_info" | grep -w ath9k)"] ; then
-                        removes+=($xx)
-                    elif [ -n "$(echo "$wifi_info" | grep -w r8169)"] ; then
-                        removes+=($xx)
-                    fi
+                local wifi_pci="$(lspci -k | grep -A4 " Network controller: ")"
+                if [ -n "$(lsusb | grep " Broadcom ")" ] || [ -n "$(echo "$wifi_pci" | grep " Broadcom ")" ] ; then
+                    break
+                fi
+                local wifi_driver="$(echo "$wifi_pci" | grep "Kernel driver in use")"
+                if [ -n "$(echo "$wifi_driver" | grep "in use: wl$")" ] ; then
+                    break
+                fi
+                removes+=($xx)
+                break              # we should have all required info now!
+
+                if [ -n "$(echo "$wifi_driver"   | grep -w iwlwifi)"] ; then
+                    removes+=($xx)
+                elif [ -n "$(echo "$wifi_driver" | grep -w ath9k)"] ; then
+                    removes+=($xx)
+                elif [ -n "$(echo "$wifi_driver" | grep -w r8169)"] ; then
+                    removes+=($xx)
                 fi
             }
-        fi
+            break
+        done
     fi
 
     # Make package removals as a sequence of commands.
