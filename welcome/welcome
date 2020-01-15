@@ -42,6 +42,7 @@ export -f eos_yad_GetDesktopName
 export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
+export EOS_KEEP_PKGS
 
 eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
@@ -274,6 +275,26 @@ yad_UpdateEOStoLatest() {    # Show what to update in order to set any EOS insta
 }
 export -f yad_UpdateEOStoLatest
 
+yad_PkgsToLetGo() {
+    local xx yy
+    local pkgs2letgo
+
+    for xx in "$@" ; do
+        for yy in $EOS_KEEP_PKGS ; do
+            test "$xx" = "$yy" && break
+        done
+        if [ "$xx" != "$yy" ] ; then
+            if [ -z "$pkgs2letgo" ] ; then
+                pkgs2letgo="$xx"
+            else
+                pkgs2letgo+=" $xx"
+            fi
+        fi
+    done
+    echo "$pkgs2letgo"
+}
+export -f yad_PkgsToLetGo
+
 yad_PkgIssues() {
     local cpu
     local removes=()
@@ -281,22 +302,38 @@ yad_PkgIssues() {
     local title="$ISSUES_TITLE"
     local intel=0 nvidia=0 amd=0 recreate_grub_cfg=0
     local graphics
-    local xx
+    local xx pkg pkgs
+    local amd_ucode=0
+    local intel_ucode=0
 
     ## Check some "conflicting" packages.
 
     # Having both amd and intel microcode packages are not needed and may cause issues with grub.
-    pacman -Q amd-ucode >& /dev/null && {
-        pacman -Q intel-ucode >& /dev/null && {
-            cpu=$(grep -w "^vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
-            case "$cpu" in
-                GenuineIntel) removes+=(amd-ucode) ; recreate_grub_cfg=1 ;;
-                *)            removes+=(intel-ucode) ; recreate_grub_cfg=1 ;;
-            esac
-        }
-    }
+
+    pacman -Q amd-ucode   >& /dev/null && amd_ucode=1
+    pacman -Q intel-ucode >& /dev/null && intel_ucode=1
+    if [ $amd_ucode -eq 1 ] && [ $intel_ucode -eq 1 ] ; then
+        cpu=$(grep -w "^vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
+        case "$cpu" in
+            GenuineIntel)
+                pkg="$(yad_PkgsToLetGo amd-ucode)"
+                if [ -n "$pkg" ] ; then
+                    removes+=($pkg)
+                    recreate_grub_cfg=1
+                fi
+                ;;
+            *)
+                pkg="$(yad_PkgsToLetGo intel-ucode)"
+                if [ -n "$pkg" ] ; then
+                    removes+=($pkg)
+                    recreate_grub_cfg=1
+                fi
+                ;;
+        esac
+    fi
 
     # Detecting unnecessary video drivers.
+
     graphics="$(device-info --vga ; device-info --display)"
     test -n "$(echo "$graphics" | grep "Intel Corporation")" && intel=1
     if [ -n "$(echo "$graphics" | grep "NVIDIA Corporation")" ] ; then
@@ -311,21 +348,27 @@ yad_PkgIssues() {
     elif [ -n "$(echo "$graphics" | grep "Radeon")" ] ; then
         amd=1
     fi
+
     if [ $intel -eq 0 ] ; then
-        for xx in xf86-video-intel ; do
+        pkgs="$(yad_PkgsToLetGo xf86-video-intel)"
+        for xx in $pkgs ; do
             pacman -Q $xx >& /dev/null && removes+=($xx)
         done
     fi
     if [ $nvidia -eq 0 ] ; then
-        for xx in xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings ; do
+        pkgs="$(yad_PkgsToLetGo xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings)"
+        for xx in $pkgs ; do
             pacman -Q $xx >& /dev/null && removes+=($xx)
         done
     fi
     if [ $amd -eq 0 ] ; then
-        for xx in xf86-video-amdgpu xf86-video-ati ; do
+        pkgs="$(yad_PkgsToLetGo xf86-video-amdgpu xf86-video-ati)"
+        for xx in $pkgs ; do
             pacman -Q $xx >& /dev/null && removes+=($xx)
         done
     fi
+
+    # Remove Broadcom wifi driver if using another wifi card.
 
     case "$EOS_WIFIDEV_CHECK" in
         yes | no) ;;
@@ -333,7 +376,6 @@ yad_PkgIssues() {
     esac
 
     if [ "$EOS_WIFIDEV_CHECK" = "yes" ] ; then
-        # Remove Broadcom wifi driver if using another wifi card.
         while true ; do
             xx=broadcom-wl-dkms
             pacman -Q $xx >& /dev/null && {
@@ -345,22 +387,15 @@ yad_PkgIssues() {
                 if [ -n "$(echo "$wifi_driver" | grep "in use: wl$")" ] ; then
                     break
                 fi
-                removes+=($xx)
-                break              # we should have all required info now!
-
-                if [ -n "$(echo "$wifi_driver"   | grep -w iwlwifi)"] ; then
-                    removes+=($xx)
-                elif [ -n "$(echo "$wifi_driver" | grep -w ath9k)"] ; then
-                    removes+=($xx)
-                elif [ -n "$(echo "$wifi_driver" | grep -w r8169)"] ; then
-                    removes+=($xx)
-                fi
+                pkg="$(yad_PkgsToLetGo $xx)"
+                test -n "$pkg" && removes+=($xx)
             }
             break
         done
     fi
 
     # Make package removals as a sequence of commands.
+
     if [ -n "$removes" ] ; then
         commands+=" ; pacman -Rsn ${removes[*]}"
         if [ "$recreate_grub_cfg" = "1" ] ; then
