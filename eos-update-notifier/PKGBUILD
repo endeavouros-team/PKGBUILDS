@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=0.9.13
+pkgver=0.9.14
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,7 +17,7 @@ source=(
   $url/eos-arch-news
   $url/eos-reboot-required
   $url/eos-reboot-required.hook
-  $url/$pkgname.desktop
+#  $url/$pkgname.desktop
   $url/$pkgname.timer
   $url/$pkgname.service
 )
@@ -27,7 +27,6 @@ sha512sums=('10d626a0bdde5657024b1613d4daaed4b4d970054e68f8ec0d40f6778f570b4e4e0
             'f30acaa30c556aeae5ddf96638d75afbf337ce37637d93abf568f83ceb454137d0b10b74f63d749f1c9c76f341a3f4a16f96ac1c1e56d14ed65afaecfa389375'
             '57f66c88f259b6648c23714c691511e1bbf981001ff6197c55a3fede255a7063c66c05dc640a4fe4ea4a3155eadd49b9c94d91277ff788a6b6f479c9762d0d54'
             '443f99229ccd8567853fa93f65a267d7a40c97c76dce68aad85a956d0f5a93a31a277aa4e06d4f26ad05f6f2e2c85dbbafc04e704a9cd1238f3bb039ed4098bf'
-            'c57e8e41874daab18b57fe23949eee77c4b32f75a306f25ee4c3f641ddaef83aaa8cf50c2f8022f27f7faeecbbbe72c43e32310e66ed705b985ca3d4aa5a08cf'
             'e8de7b750624fb3b72f2128ac6e31a2cacd3bfc25cd71868789a5962986ca2a98e17fb42d8e3ebb7c791780935d79a388bd929525d065e1673b0ddaa67e8c512'
             '0bdcd09c69e1fb9d7e28a9155e90c6c632c506d619685b8a8a417dd737d240a96cce77b3231a4644e9f79de9e7b3a0048d299476ad0c78076528c5389641af31')
 
@@ -36,7 +35,7 @@ package() {
 
   install -Dm755 $pkgname                  $pkgdir/usr/bin/$pkgname
   install -Dm644 $pkgname.conf             $pkgdir/etc/$pkgname.conf
-  install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop
+#  install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop    # not needed because of systemd service
   install -Dm755 arch-news-for-you         $pkgdir/usr/bin/arch-news-for-you
   install -Dm755 eos-arch-news             $pkgdir/usr/bin/eos-arch-news
 
