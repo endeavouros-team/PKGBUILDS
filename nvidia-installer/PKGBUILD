@@ -5,7 +5,7 @@ pkgname=nvidia-installer
 pkgver=2.1
 pkgrel=4
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
-url="https://endeavouros.com"
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 arch=('any')
 license=('GPL2')
 conflicts=(nvidia-installer-dkms)
@@ -15,11 +15,12 @@ optdepends=(
   'nvidia-390xx-settings: tool for configuring the NVIDIA graphics driver'
 )
 
-source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
-sha256sums=('SKIP')
+source=(
+  $url/$pkgname
+)
+sha256sums=('a51f7f8e828beb1d158dbcf43270cfa1d9b855f820133009774714bd939144e5')
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
   sed -i $pkgname \
       -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
   install -Dm755 ${pkgname}      ${pkgdir}/usr/bin/${pkgname}
