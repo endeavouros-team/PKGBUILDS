@@ -57,7 +57,7 @@ Build()
           :
           makepkg --syncdeps --clean >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
       }
-      pkg="$(ls -1 ${pkgname}-*.pkg.tar.$_COMPRESSOR)"
+      pkg="$(ls -1 ${pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR)"
       mv $pkg "$assetsdir"
       pkg="$assetsdir/$pkg"
 
@@ -531,7 +531,7 @@ Main()
             # old pkg
             pkgname="$(PkgBuildName "$pkgdirname")"
             for zz in zst xz ; do
-                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
+                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
                 test -n "$pkg" && {
                     removable+=("$pkg")
                     removable+=("$pkg".sig)
