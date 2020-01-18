@@ -40,7 +40,7 @@ eos_yad2() { # TODO: VEKS
 }
 
 eos_un_log() {
-    local date="$(date '+%x %X%p')"
+    local date="$(/usr/bin/date '+%x %X%p')"
     echo ""       >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$date"  >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$@"     >> $EOS_UPDATE_NOTIFIER_LOG
@@ -74,13 +74,13 @@ ShowTray() {
 }
 ShowNotify() {
     local ms=15000
-    notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
-                "Updates available at $date" \
-                "$count $source updates are available"
+    /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
+                         "Updates available at $date" \
+                         "$count $source updates are available"
 }
 
 ShowNonFocused() {
-    local date="$(date '+%x %X%p')"
+    local date="$(/usr/bin/date '+%x %X%p')"
     local source="$1"
     local count="$(echo "$updates" | wc -l)"
 
@@ -138,25 +138,25 @@ Update_common() {
     local source=""
     local cmd=""
     local updates=""
-    local previous_check_time=$(date +%s)
+    local previous_check_time=$(/usr/bin/date +%s)
     local secs=10
 
     echo2 "Checking for updates ..."
-    updates="$(checkupdates)"
+    updates="$(/usr/bin/checkupdates)"
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
-            if [ $(( $(date +%s) - previous_check_time )) -gt $secs ] ; then
+            if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                 # Re-check for updates if more than $secs seconds elapsed from the first check.
                 echo2 "Re-checking for updates ..."
-                updates="$(checkupdates)"
+                updates="$(/usr/bin/checkupdates)"
             fi
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
             ((hasupdates++))
             source=upstream
-            cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER 'pacman -Syu'"
+            cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER '/usr/bin/pacman -Syu'"
             eos_un_log "$source updates available: $updates"
             eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
         fi
@@ -164,15 +164,15 @@ Update_common() {
 
     # Check AUR updates.
 
-    test "$CheckAurUpdates" = "yes" && updates="$(yay -Qua)" || updates=""
+    test "$CheckAurUpdates" = "yes" && updates="$(/usr/bin/yay -Qua)" || updates=""
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused AUR || return 1
-            updates="$(yay -Qua)"    # may have been a long wait...
+            updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
             ((hasupdates++))
-            cmd="yay -Syua"                                        # potential problem for non-sudoers ...
+            cmd="/usr/bin/yay -Syua"                                        # potential problem for non-sudoers ...
             source=AUR
             eos_un_log "$source updates available: $updates"
             eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
