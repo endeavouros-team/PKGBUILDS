@@ -420,7 +420,7 @@ yad_PkgIssues() {
     local cmds_as_list="$(echo "${commands[*]}" | sed -e 's|^: ; ||' -e 's| ; |\n|g')"
 
     if [ "$commands" != ":" ] ; then
-        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n' '$cmds_as_list' ; $EOS_ROOTER '$commands'"
+        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n%s\n' '$cmds_as_list' 'Elevated privileges required.' ; $EOS_ROOTER '$commands'"
     else
         local t="$ISSUES_NO"
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
