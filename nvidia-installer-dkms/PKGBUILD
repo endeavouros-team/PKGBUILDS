@@ -2,10 +2,10 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-dkms
-pkgver=2.1
-pkgrel=9
+pkgver=3
+pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
-url="https://endeavouros.com"
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 arch=('any')
 license=('GPL2')
 conflicts=(nvidia-installer)
@@ -18,11 +18,12 @@ optdepends=(
   'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
 )
 
-source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
-sha256sums=('SKIP')
+source=(
+  $url/$pkgname
+)
+sha256sums=('a0ffb982b871ebf1e8ab938e7d92d96335ae4d9e91735594a1e11fb51d59ead7')
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
   sed -i $pkgname \
       -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
   install -Dm755 $pkgname $pkgdir/usr/bin/$pkgname
