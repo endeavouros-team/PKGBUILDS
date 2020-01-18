@@ -3,21 +3,36 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
-url="https://endeavouros.com"
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 arch=('any')
 license=('GPL2')
-source=("${pkgname}-${pkgver}::git+https://github.com/endeavouros-team/${pkgname}.git")
-sha256sums=('SKIP')
+
+source=(
+  $url/nvidia-installer-update-db
+  $url/amdgpu_exp.ids
+  $url/amdgpu.ids
+  $url/ati.ids
+  $url/catalyst.ids
+  $url/nvidia-390xx.ids
+  $url/nvidia.ids
+)
+sha256sums=('eb1801ad849a12ed8d20e7c08a9f795e1471b9f33cd698cf2e58df50036bf141'
+            '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
+            '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
+            'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'
+            '246d9273fed6d232125476afc1a06dfceba4028fa3a6d6fd2c4c460187d3ee2f'
+            'a14436733d6cc6b7b30fc32e3ddf1adf537a632acecab06cee9df4d79a18267e'
+            '28db61a59b2b1f1beb469eadabab7180af5654383142341eac56700d431e9c22')
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
   install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
 
-  install -d "${pkgdir}/var/lib/pci"
-  for file in $(find pci/. -type f); do
-        install -Dm644 ${file#./} "${pkgdir}/var/lib/pci/${file#pci/./}"
+  local xx
+  for xx in "${source[@]}" ; do
+    case "$xx" in
+      *.ids) install -Dm644 "$(basename $xx)" "$pkgdir/var/lib/pci/$xx" ;;
+    esac
   done
 }
