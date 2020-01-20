@@ -3,7 +3,7 @@
 pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=0.2
+pkgver=0.2.1
 pkgrel=1
 
 arch=('any')
