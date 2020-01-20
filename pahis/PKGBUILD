@@ -3,7 +3,7 @@
 pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=0.2.1
+pkgver=0.2.2
 pkgrel=1
 
 arch=('any')
@@ -16,7 +16,7 @@ source=(
     "$url/$pkgname"
     "$url/$pkgname.completion"
 )
-sha512sums=('8672644336ddfa6cb05e19f53c1948c28c365bb3626894180a392ad957c462b9fd2afba39f2148dd56f89a72541e689c2458dedbe91777b3adf4565d3806153a'
+sha512sums=('1af4413ed277ba7c03ec5391d785d76daba152b570820c3e89e881b53084c30a628a5478bb86a41f40231700cafd45ee4823a2ea9cc258ef333f8c369d2c6b10'
             '8d6121338334798879bee60862c1faf9ecce16a83c59de0d7bb2d9c55c72e76c5b8fb046e2f5de3a339812807daa68d6f48f3624d5fddf73e4ef9bf6496f423c')
 
 package() {
