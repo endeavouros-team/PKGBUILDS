@@ -49,6 +49,7 @@ Main()
 
     if [ -z "$1" ] ; then
         Usage              # usage info doesn't hurt...
+        sleep 0.67
     fi
 
     for arg in "$@" ; do
