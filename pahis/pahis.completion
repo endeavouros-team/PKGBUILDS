@@ -1,4 +1,4 @@
-# bash completion for ph        -*- shell-script -*-
+# bash completion for pahis        -*- shell-script -*-
 
 __pahis_pkgsInPacmanLog() {
     grep "\] \[ALPM\] [a-z]*ed " /var/log/pacman.log | awk '{print $5}'| sort | uniq
@@ -33,10 +33,11 @@ __pahis_() {
     local cur prev words cword
     _init_completion -s || return
 
-    local progname="pahis"
-    local options="$($progname --all-options)"
+    local progname=pahis
+    local progpath=/usr/bin/$progname
+    local options="$($progpath --all-options)"
     local pkgs="$(__pahis_pkgsInPacmanLog)"
-    local opers="--upgraded --downgraded --installed --removed --reinstalled"
+    local opers="$($progpath --operations)"
 
     case "$prev" in
         "$progname")
@@ -44,7 +45,8 @@ __pahis_() {
             ;;
         --operations | -h | --help | --all-options)
             ;;
-        --upgraded | --downgraded | --installed | --removed | --reinstalled)
+        --upgraded | --downgraded | --installed | --removed | --reinstalled | \
+            -upgraded | -downgraded | -installed | -removed | -reinstalled)
             __pahis_isPkgUsed "${words[@]}" && {
                 #echo "chk used ${words[*]}" >> $HOME/pahis.log
                 COMPREPLY=( $(compgen -W "$pkgs" -- "$cur"))

@@ -14,16 +14,15 @@ $progname: shows history information about package operations.
 
 Usage: $progname [options] [operation] [package]
 
-    options:
-                   -h
-                    --help            This help.
-                    --no-pkgchk       Do not check if the given package exists.
+    options:       -h | --help       This help.
+                   --no-pkgchk       Do not pre-check the existence of the given package.
 
-    operation      One of: $(Main --operations).
+    operation:     One of: $(Main --operations).
+                   Default: all operations.
                    Tip: press the Tab key to complete the word!
 
-    package        Package name (optional). If no package name is given,
-                   show all packages experienced the given operation.
+    package:       Package name.
+                   Default: all packages.
 
 Note: bash command completion is available.
 
@@ -52,13 +51,15 @@ Main()
     for arg in "$@" ; do
         case "$arg" in
             --all-options)   # supports bash command completion
-                line="--upgraded --downgraded --installed --removed --reinstalled"
+                line="$(Main --operations)"
                 line+=" --no-pkgchk -h --help --operations --all-options"
                 echo "$line"
                 return
                 ;;
             --operations)
-                echo "--upgraded --downgraded --installed --removed --reinstalled"
+                line="--upgraded --downgraded --installed --removed --reinstalled"
+                line+=" -upgraded -downgraded -installed -removed -reinstalled"
+                echo "$line"
                 return
                 ;;
             -h | --help)
@@ -66,8 +67,9 @@ Main()
                 return
                 ;;
 
-            --upgraded | --downgraded | --installed | --removed | --reinstalled)
-                op="${arg:2}"   # not checking if operation is already given
+            --upgraded | --downgraded | --installed | --removed | --reinstalled | \
+                -upgraded | -downgraded | -installed | -removed | -reinstalled)
+                op="${arg##*-}"   # not checking if operation is already given
                 ;;
             --no-pkgchk)  # useful for packages that existed but no more!
                 pkgchk=0
