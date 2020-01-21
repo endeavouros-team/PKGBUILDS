@@ -423,16 +423,13 @@ Options:
    -show-timer  Show the status of the systemd timer.
    -iw=X        Initial sleep time. Value syntax from 'sleep' program.
                 Default: $iwt.
-   -mode=X      Operation mode (onetimer or loop).
-                Note that the loop mode is not designed for systemd.
-                Default: $mode.
-   -lwt=X       Loop wait time (only in loop mode). X value is like in 'sleep'.
-                Default: $loop_waittime.
    -nw=X        Max time (seconds) to show the "No updates available" window.
                 Default: $no_updates__indicator_wait_time.
    -news=X      Show the 'Arch latest news for you' within the last X days.
                 If X is 0, then no news are displayed.
                 Default: X is $newsdays.
+                Note: this has effect only if configuration ArchNewsProg is
+                'arch-news-for-you'.
    -q           Be quieter with dialogs.
 EOF
 }

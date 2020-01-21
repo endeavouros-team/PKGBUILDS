@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=0.9.17
+pkgver=0.9.18
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -12,6 +12,7 @@ backup=(etc/$pkgname.conf)
 
 source=(
   $url/$pkgname
+  $url/$pkgname.completion
   $url/$pkgname.conf
   $url/arch-news-for-you
   $url/eos-arch-news
@@ -21,7 +22,8 @@ source=(
   $url/$pkgname.timer
   $url/$pkgname.service
 )
-sha512sums=('d1d6c7e30270ad53835925e366e643887bd334a729213a27a5a2e7744ec920d7304f680ba0d7f19e6dcd6c98c7c5ae2f68a968c3981641693a16dc75599215f0'
+sha512sums=('ce7998cc8cb5d4d9419d5ad247b9631c77a7faa6d8b2f7d196dc2308872ad8d4744d6237d07a0117cdfa3aa9477f3ebf7ab68330e7987c50e4258cb65f59472a'
+            '4ab88d50af434b4592adc4f653e4336486d0b45831a0610e13244140d612723a719f5dd3842a9132271a652f833ecbf8dde20511f1d9ac4fd0a26a972f810335'
             'd489cf73b0267cf9edf88a3d5a914f614ce0dfd694a1c40b329f56efa2e73d0497d2e3af35a99f04dde2a32d153177d04f16ed7751a457f9640397b45074e6d3'
             '97eed94588efa2fb0a824a92c2efaa484612033717795d1c0c7e72a7fe1352cc7b44c14c0f82748e1bbd00983d3ae5bc0ab8ca523db75b46c2a5002e5645fb2e'
             'f30acaa30c556aeae5ddf96638d75afbf337ce37637d93abf568f83ceb454137d0b10b74f63d749f1c9c76f341a3f4a16f96ac1c1e56d14ed65afaecfa389375'
@@ -42,4 +44,7 @@ package() {
   install -d $pkgdir/etc/pacman.d/hooks
   install -Dm644 eos-reboot-required.hook  $pkgdir/etc/pacman.d/hooks/eos-reboot-required.hook
   install -Dm755 eos-reboot-required       $pkgdir/usr/bin/eos-reboot-required
+
+  install -d $pkgdir/usr/share/bash-completion/completions
+  install -Dm644 $pkgname.completion $pkgdir/usr/share/bash-completion/completions/$pkgname
 }

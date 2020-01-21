@@ -1,0 +1,24 @@
+# bash completion for eos-update-notifier        -*- shell-script -*-
+
+__eos_update_notifier_() {
+    local cur prev #words cword
+    _init_completion -s || return
+
+    local options="-init -init-force -conf -show-timer -q -iw= -nw= -news="
+
+    case "$prev" in
+        -init | -init-force | -conf | -show-timer | -q) return ;;
+    esac
+
+    case "$cur" in
+        "-iw=" | "-nw=" | "-news=")
+            COMPREPLY=( $(compgen -W "{0..9}") )
+            compopt -o nospace
+            ;;
+        -* | "")
+            COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+            compopt -o nospace
+            ;;
+    esac
+} &&
+complete -F __eos_update_notifier_   eos-update-notifier
