@@ -121,8 +121,8 @@ _tr_add2 add_more_apps_chtip   "Nettiselain"
 _tr_add2 add_more_apps_fw      "Palomuuri"
 _tr_add2 add_more_apps_fwtip   "Gufw-palomuuri"
 
-_tr_add2 add_more_apps_bt      "Bluetooth-manageri Xfce:lle"
-_tr_add2 add_more_apps_bttip   "Blueberry"
+_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) Xfce:lle"
+_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) Xfce:lle"
 
 
 ####################### NEW STUFF AFTER THIS LINE:

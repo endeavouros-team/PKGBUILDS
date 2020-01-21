@@ -121,8 +121,8 @@ _tr_add2 add_more_apps_chtip   "Web Browser"
 _tr_add2 add_more_apps_fw      "Firewall"
 _tr_add2 add_more_apps_fwtip   "Gufw firewall"
 
-_tr_add2 add_more_apps_bt      "Bluetooth Manager for Xfce"
-_tr_add2 add_more_apps_bttip   "Blueberry"
+_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) for Xfce"
+_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) for Xfce"
 
 
 ####################### NEW STUFF AFTER THIS LINE:
