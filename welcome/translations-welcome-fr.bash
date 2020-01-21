@@ -37,7 +37,7 @@ _question='&#63;'      # '?'
 _tr_add2 welcome_disabled        "$PRETTY_PROGNAME l'app. est désactivée. Pour la démarrer, utilisez l'option --enable."
 
 _tr_add2 butt_later              "À plus tard"
-_tr_add2 butt_latertip           "Keep $PRETTY_PROGNAME enabled"
+_tr_add2 butt_latertip           "Conserver $PRETTY_PROGNAME activé"
 
 _tr_add2 butt_noshow             "Ne plus me voir"
 _tr_add2 butt_noshowtip          "Désactiver $PRETTY_PROGNAME"
@@ -57,7 +57,7 @@ _tr_add2 after_install_um        "Mise à jour Miroirs"
 _tr_add2 after_install_umtip     "Mise à jour de la liste des miroirs avant celle du système"
 
 _tr_add2 after_install_us        "Mise à jour Système"
-_tr_add2 after_install_ustip     "Mise à jour des logiciels système"
+_tr_add2 after_install_ustip     "Mise à jour des logiciels du système"
 
 _tr_add2 after_install_dsi       "Détecter bugs Système"
 _tr_add2 after_install_dsitip    "Détecter tout problème potentiel sur les paquets du système ou ailleurs"
@@ -82,7 +82,7 @@ _tr_add2 after_install_hn        "Matériel et Réseau"
 _tr_add2 after_install_hntip     "Faites fonctionner votre matériel"
 
 _tr_add2 after_install_bt        "Bluetooth"
-_tr_add2 after_install_bttip     "Bluetooth conseils"
+_tr_add2 after_install_bttip     "Conseils pour le Bluetooth"
 
 _tr_add2 after_install_nv        "Utilisateurs NVIDIA $_exclamation"
 _tr_add2 after_install_nvtip     "Utiliser le gestionnaire d'installation NVIDIA"
@@ -113,16 +113,16 @@ _tr_add2 general_info_abtip      "Plus d'info au sujet de cette application"
 
 _tr_add2 add_more_apps_text      "Installer des applications populaires"
 
-_tr_add2 add_more_apps_lotip     "LibreOffice (libreoffice-fresh)"
+_tr_add2 add_more_apps_lotip     "Suite bureautique (libreoffice-fresh)"
 
 _tr_add2 add_more_apps_ch        "Chromium"
-_tr_add2 add_more_apps_chtip     "Navigateur"
+_tr_add2 add_more_apps_chtip     "Navigateur web"
 
 _tr_add2 add_more_apps_fw        "Pare-feu"
-_tr_add2 add_more_apps_fwtip     "Gufw Pare-feu"
+_tr_add2 add_more_apps_fwtip     "Pare-feu Gufw"
 
-_tr_add2 add_more_apps_bt	 "Bluetooth (blueberry) Xfce"
-_tr_add2 add_more_apps_bt_bm	 "Bluetooth (blueman) Xfce"
+_tr_add2 add_more_apps_bt        "Bluetooth (blueberry) Xfce"
+_tr_add2 add_more_apps_bt_bm     "Bluetooth (blueman) Xfce"
 
 
 ####################### NOUVELLES CHOSES APRÈS CETTE LIGNE :
@@ -136,13 +136,13 @@ _tr_add2 settings_dis_buttip     "Je promets"
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Aide"
 _tr_add2 help_butt_text          "Plus d'info à propos de l'appli. $PRETTY_PROGNAME"
 
-_tr_add2 dm_title                "Sélectionnez le gestionnaire d'affichage DM"
-_tr_add2 dm_col_name1            "Activé"
+_tr_add2 dm_title                "Sélectionnez le gestionnaire d'affichage"
+_tr_add2 dm_col_name1            "Sélectionné"
 _tr_add2 dm_col_name2            "Nom DM"
 
 _tr_add2 dm_reboot_required      "Un redémarrage est nécessaire pour que les changements prennent effet."
-_tr_add2 dm_changed              "DM a changé en : "
-_tr_add2 dm_failed               "Le changement DM a échoué."
+_tr_add2 dm_changed              "Le DM a été changé par : "
+_tr_add2 dm_failed               "Échec du changement de DM."
 _tr_add2 dm_warning_title        "Avertissement"
 
 _tr_add2 install_installer       "Installeur"
@@ -150,8 +150,8 @@ _tr_add2 install_already         "Déjà installé"
 _tr_add2 install_ing             "En train d'installer"
 _tr_add2 install_done            "Terminé."
 
-_tr_add2 sysup_no                "Pas de Mise à jour."
-_tr_add2 sysup_check             "Vérification des mises à jour logiciel..."
+_tr_add2 sysup_no                "Pas de mise à jour."
+_tr_add2 sysup_check             "Vérification des mises à jour des logiciels..."
 
 _tr_add2 issues_title            "Détection des problèmes de paquets"
 _tr_add2 issues_grub             "IMPORTANT: recréer manuellement le menu de démarrage sera nécessaire."
@@ -162,7 +162,7 @@ _tr_add2 cal_noavail             "Non disponible : "        # programme d'instal
 _tr_add2 cal_warn                "Avertissement"
 _tr_add2 cal_info1               "C'est une version de développement communautaire.\n\n"		# besoins spéciaux !
 _tr_add2 cal_info2               "<b>Horsligne</b> ce mode vous donne un bureau Xfce avec le thème EndeavourOS.\nUne connexion Internet n'est pas nécessaire.\n\n"
-_tr_add2 cal_info3               "<b>Enligne</b> ce mode vous laisse choisir votre bureau, avec le thèeme d'origine (vanilla).\nUne connexion Internet est requise.\n\n"
+_tr_add2 cal_info3               "<b>Enligne</b> ce mode vous laisse choisir votre bureau, avec le thème d'origine (vanilla).\nUne connexion Internet est requise.\n\n"
 _tr_add2 cal_info4               "Veuillez noter : Cette version est un travail en cours, veuillez nous aider à la rendre stable en signalant les bogues.\n"
 _tr_add2 cal_choose              "Choisir le mode d'installation"
 _tr_add2 cal_method              "Mode"
@@ -184,7 +184,7 @@ _tr_add2 ins_keys                "Initialiser les clés pacman"
 _tr_add2 ins_keystip             "Initialiser les clés pacman"
 _tr_add2 ins_pm                  "Gestionnaire de Partitions"
 _tr_add2 ins_pmtip               "Gparted examine et gère les partitions et la structure des disques"
-_tr_add2 ins_rel                 "Info dernière version"
+_tr_add2 ins_rel                 "Info sur la dernière version"
 _tr_add2 ins_reltip              "Plus d'info à propos de la dernière version"
 _tr_add2 ins_tips                "Conseils d'installation"
 _tr_add2 ins_tipstip             "Conseils d'installation"
@@ -193,5 +193,5 @@ _tr_add2 ins_troubletip          "Sauvetage du système"
 
 _tr_add2 after_install_us_from   "Mises à jour de"                            # AUR ou en amont
 _tr_add2 after_install_us_el     "Privilèges élevés requis."
-_tr_add2 after_install_us_done   "mise à jour effectuée."
-_tr_add2 after_install_us_fail   "la mise à jour a échoué !"
+_tr_add2 after_install_us_done   "Mise à jour effectuée."
+_tr_add2 after_install_us_fail   "La mise à jour a échoué !"
