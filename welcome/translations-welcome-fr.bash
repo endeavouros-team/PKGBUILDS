@@ -51,28 +51,28 @@ _tr_add2 nb_tab_AfterInstall   "Après Installation"
 _tr_add2 nb_tab_AddMoreApps    "Ajouter Applications."
 
 
-_tr_add2 after_install_text    "Tâches d'Après Installation"
+_tr_add2 after_install_text    "Tâches Après Installation"
 
-_tr_add2 after_install_um      "Mise à jour des Mirroirs"
+_tr_add2 after_install_um      "Mise à jour Mirroirs"
 _tr_add2 after_install_umtip   "Mise à jour de la liste des mirroirs avant la M.à.j. du système"
 
-_tr_add2 after_install_us      "Mise à jour système"
+_tr_add2 after_install_us      "Mise à jour Système"
 _tr_add2 after_install_ustip   "Mise à jour du logiciel système"
 
-_tr_add2 after_install_dsi     "Détecter bug système"
+_tr_add2 after_install_dsi     "Détecter bugs Système"
 _tr_add2 after_install_dsitip  "Détecter tout problème potentiel sur les paquets du système ou ailleurs"
 
-_tr_add2 after_install_etl     "EndeavourOS le + récent $_question"
+_tr_add2 after_install_etl     "EndeavourOS à jour $_question"
 _tr_add2 after_install_etltip  "Montrez ce qu'il faut faire pour que votre système atteigne le dernier niveau d'EndeavourOS"
 
-_tr_add2 after_install_cdm     "Modifier gestionnaire d'affichage"
+_tr_add2 after_install_cdm     "Changer gestion Affichage"
 _tr_add2 after_install_cdmtip  "Utiliser un gestionnaire d'affichage différent"
 
-_tr_add2 after_install_ew      "EndeavourOS fond d'écran"
+_tr_add2 after_install_ew      "Fond d'écran EndeavourOS"
 _tr_add2 after_install_ewtip   "Remplacer le fond d'écran du bureau par celui d'EOS"
 
 
-_tr_add2 after_install_pm      "Gestion des paquets"
+_tr_add2 after_install_pm      "Gestion Paquets"
 _tr_add2 after_install_pmtip   "Comment gérer les paquets avec pacman"
 
 _tr_add2 after_install_ay      "AUR $_and yay $_exclamation"
@@ -107,7 +107,7 @@ _tr_add2 general_info_fotip    "Demandez, commentez et discutez sur notre forum 
 _tr_add2 general_info_do       "Don"
 _tr_add2 general_info_dotip    "Aidez-nous à maintenir le fonctionnement d'EndeavourOS"
 
-_tr_add2 general_info_ab       "À propos de $PRETTY_PROGNAME"
+_tr_add2 general_info_ab       "À propos de"
 _tr_add2 general_info_abtip    "Plus d'info au sujet de cette app."
 
 
@@ -115,13 +115,13 @@ _tr_add2 add_more_apps_text    "Installer des applications populaires"
 
 _tr_add2 add_more_apps_lotip   "Office outils (libreoffice-fresh)"
 
-_tr_add2 add_more_apps_ch      "Chromium Navigateur"
+_tr_add2 add_more_apps_ch      "Chromium"
 _tr_add2 add_more_apps_chtip   "Navigateur"
 
 _tr_add2 add_more_apps_fw      "Pare-feu"
 _tr_add2 add_more_apps_fwtip   "Gufw Pare-feu"
 
-_tr_add2 add_more_apps_bt      "Bluetooth Gestionnaire pour Xfce"
+_tr_add2 add_more_apps_bt      "Bluetooth Gestion Xfce"
 _tr_add2 add_more_apps_bttip   "Blueberry"
 
 
