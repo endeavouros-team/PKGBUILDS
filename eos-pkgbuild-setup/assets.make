@@ -163,7 +163,7 @@ ListNameToPkgName()
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
     if [ -n "$hook" ] ; then
         HookIndicator "$hook_yes"
-        "$hook"
+        $hook
     else
         HookIndicator "$hook_no"
     fi
@@ -212,7 +212,7 @@ Assets_clone()
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
         hub release download $xx
-        test -n "$hook" && { "$hook" && break ; }  # we need assets from only one tag since assets in other tags are the same
+        test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
     sleep 1
 
