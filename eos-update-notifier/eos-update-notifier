@@ -327,6 +327,9 @@ Initialize() {    # initialize service and timer for the current user
     case "$arg" in
         -init-force | -conf) modify_service=1 ;;
     esac
+    case "$arg" in
+        -init-force) fetch_files=1 ;;
+    esac
     if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
         fetch_files=1
     fi
