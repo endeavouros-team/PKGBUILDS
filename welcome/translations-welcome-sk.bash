@@ -175,8 +175,8 @@ _tr_add2 tail_butt              "Zavrieť toto okno"
 _tr_add2 tail_buttip            "Zavrieť iba toto okno"
 
 
-_tr_add2 ins_text              "Installing EndeavourOS to disk"
-_tr_add2 ins_start             "Start the Installer"
+_tr_add2 ins_text              "Inštalovanie EndeavourOS na disk"
+_tr_add2 ins_start             "Spustiť inštalátor"
 _tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
 _tr_add2 ins_up                "Aktualizuj túto aplikáciu$_exclamation"
 _tr_add2 ins_uptip             "Updates this app and restarts it"
