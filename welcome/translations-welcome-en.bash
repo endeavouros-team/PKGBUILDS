@@ -23,7 +23,7 @@
 
 ### First some useful definitions:
 
-_tr_lang=en            # required helper variable for _tr_add2
+_tr_lang=sk            # required helper variable for _tr_add2
 
 # Help with some special characters (HTML). Yad has problems without them:
 _exclamation='&#33;'   # '!'
@@ -34,36 +34,36 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable."
+_tr_add2 welcome_disabled      "Program $PRETTY_PROGNAME je vypnutý. Ak ho ale aj tak chcete spustiť, použite príkaz --enable."
 
-_tr_add2 butt_later            "See you later"
-_tr_add2 butt_latertip         "Keep $PRETTY_PROGNAME enabled"
+_tr_add2 butt_later            "Vidíme sa neskôr"
+_tr_add2 butt_latertip         "Ponechať $PRETTY_PROGNAME zapnutý"
 
-_tr_add2 butt_noshow           "Don't show me anymore"
-_tr_add2 butt_noshowtip        "Disable $PRETTY_PROGNAME"
+_tr_add2 butt_noshow           "Už viac neukazovať"
+_tr_add2 butt_noshowtip        "Vypnúť $PRETTY_PROGNAME"
 
-_tr_add2 butt_help             "Help"
-
-
-_tr_add2 nb_tab_INSTALL        "INSTALL"
-_tr_add2 nb_tab_GeneralInfo    "General Info"
-_tr_add2 nb_tab_AfterInstall   "After Install"
-_tr_add2 nb_tab_AddMoreApps    "Add More Apps"
+_tr_add2 butt_help             "Pomoc"
 
 
-_tr_add2 after_install_text    "After install tasks"
+_tr_add2 nb_tab_INSTALL        "INŠTALOVAŤ"
+_tr_add2 nb_tab_GeneralInfo    "Všeobecné informácie"
+_tr_add2 nb_tab_AfterInstall   "Po inštalácii"
+_tr_add2 nb_tab_AddMoreApps    "Pridať dalšie aplikácie"
 
-_tr_add2 after_install_um      "Update Mirrors"
-_tr_add2 after_install_umtip   "Update list of mirrors before system update"
 
-_tr_add2 after_install_us      "Update System"
-_tr_add2 after_install_ustip   "Update System Software"
+_tr_add2 after_install_text    "Úlohy po doinštalovaní"
 
-_tr_add2 after_install_dsi     "Detect system issues"
-_tr_add2 after_install_dsitip  "Detect any potential issues on system packages or elsewhere"
+_tr_add2 after_install_um      "Upraviť mirory"
+_tr_add2 after_install_umtip   "Aktualizovať zoznam mirorov pred aktualizovaním systému"
 
-_tr_add2 after_install_etl     "EndeavourOS to latest$_question"
-_tr_add2 after_install_etltip  "Show what to do to get your system to the latest EndeavourOS level"
+_tr_add2 after_install_us      "Aktualizovať systém"
+_tr_add2 after_install_ustip   "Aktualizovať systémové aplikácie"
+
+_tr_add2 after_install_dsi     "Zistiť problémy zo systémom"
+_tr_add2 after_install_dsitip  "Skontrolovať akékoľvek možné problémy so systémovými balíčkami, alebo inde"
+
+_tr_add2 after_install_etl     "EndeavourOS na latest$_question"
+_tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dostal na najnovšiu verziu EndeavourOS"
 
 _tr_add2 after_install_cdm     "Change Display Manager"
 _tr_add2 after_install_cdmtip  "Use a different display manager"
@@ -72,20 +72,20 @@ _tr_add2 after_install_ew      "EndeavourOS wallpaper"
 _tr_add2 after_install_ewtip   "Change desktop wallpaper to EOS default"
 
 
-_tr_add2 after_install_pm      "Package management"
-_tr_add2 after_install_pmtip   "How to manage packages with pacman"
+_tr_add2 after_install_pm      "Spravovanie balíčkov"
+_tr_add2 after_install_pmtip   "Ako spravovať balíčky s pacmanom"
 
 _tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip   "Arch User Repository and yay info"
 
-_tr_add2 after_install_hn      "Hardware and Network"
+_tr_add2 after_install_hn      "Hardvér a sieť"
 _tr_add2 after_install_hntip   "Get your hardware working"
 
 _tr_add2 after_install_bt      "Bluetooth"
-_tr_add2 after_install_bttip   "Bluetooth advice"
+_tr_add2 after_install_bttip   "Rady ohľadom Bluetooth"
 
-_tr_add2 after_install_nv      "NVIDIA users$_exclamation"
-_tr_add2 after_install_nvtip   "Use NVIDIA installer"
+_tr_add2 after_install_nv      "Užívatelia kariet NVIDIA users$_exclamation"
+_tr_add2 after_install_nvtip   "Použiť NVIDIA inštalátor"
 
 _tr_add2 after_install_ft      "Forum tips"
 _tr_add2 after_install_fttip   "Help us help you!"
@@ -98,24 +98,24 @@ _tr_add2 general_info_ws       "Web site"
 _tr_add2 general_info_wi       "Wiki"
 _tr_add2 general_info_witip    "Featured articles"
 
-_tr_add2 general_info_ne       "News"
-_tr_add2 general_info_netip    "News and articles"
+_tr_add2 general_info_ne       "Novinky"
+_tr_add2 general_info_netip    "Novinky a články"
 
-_tr_add2 general_info_fo       "Forum"
+_tr_add2 general_info_fo       "Fórum"
 _tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
 
-_tr_add2 general_info_do       "Donate"
+_tr_add2 general_info_do       "Prispieť"
 _tr_add2 general_info_dotip    "Help us keep EndeavourOS running"
 
-_tr_add2 general_info_ab       "About $PRETTY_PROGNAME"
-_tr_add2 general_info_abtip    "More info about this app"
+_tr_add2 general_info_ab       "O $PRETTY_PROGNAME"
+_tr_add2 general_info_abtip    "Viac informácií o tejto aplikácii"
 
 
-_tr_add2 add_more_apps_text    "Install popular apps"
+_tr_add2 add_more_apps_text    "Inštalovať populárne aplikácie"
 
-_tr_add2 add_more_apps_lotip   "Office tools (libreoffice-fresh)"
+_tr_add2 add_more_apps_lotip   "Kancelársky balík (libreoffice-fresh)"
 
-_tr_add2 add_more_apps_ch      "Chromium Web Browser"
+_tr_add2 add_more_apps_ch      "prehliadač Chromium"
 _tr_add2 add_more_apps_chtip   "Web Browser"
 
 _tr_add2 add_more_apps_fw      "Firewall"
@@ -130,68 +130,68 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) for Xfce"
 _tr_add2 settings_dis_contents   "To run $PRETTY_PROGNAME again, start a terminal and run: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Re-enabling $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "How to re-enable $PRETTY_PROGNAME"
-_tr_add2 settings_dis_butt       "I remember"
-_tr_add2 settings_dis_buttip     "I promise"
+_tr_add2 settings_dis_butt       "Pamätám si"
+_tr_add2 settings_dis_buttip     "Sľubujem"
 
-_tr_add2 help_butt_title         "$PRETTY_PROGNAME Help"
-_tr_add2 help_butt_text          "More info about the $PRETTY_PROGNAME app"
+_tr_add2 help_butt_title         "$PRETTY_PROGNAME Pomoc"
+_tr_add2 help_butt_text          "Viac informácií o aplikácii $PRETTY_PROGNAME"
 
 _tr_add2 dm_title                "Select Display Manager"
-_tr_add2 dm_col_name1            "Selected"
-_tr_add2 dm_col_name2            "DM name"
+_tr_add2 dm_col_name1            "Vybraný"
+_tr_add2 dm_col_name2            "názov DM"
 
-_tr_add2 dm_reboot_required      "Reboot is required for the changes to take effect."
+_tr_add2 dm_reboot_required      "Aby sa zmeny prejavili, je potrebný reštart."
 _tr_add2 dm_changed              "DM changed to: "
 _tr_add2 dm_failed               "Changing DM failed."
-_tr_add2 dm_warning_title        "Warning"
+_tr_add2 dm_warning_title        "Varovanie"
 
-_tr_add2 install_installer       "Installer"
-_tr_add2 install_already         "already installed"
-_tr_add2 install_ing             "Installing"
-_tr_add2 install_done            "Finished."
+_tr_add2 install_installer       "Inštalátor"
+_tr_add2 install_already         "už nainštalovaný"
+_tr_add2 install_ing             "Inštalovanie"
+_tr_add2 install_done            "Dokončené."
 
-_tr_add2 sysup_no                "No updates."
-_tr_add2 sysup_check             "Checking for software updates..."
+_tr_add2 sysup_no                "Žiadné aktualizácie."
+_tr_add2 sysup_check             "Hľadajú sa aktualizácie softvéru..."
 
-_tr_add2 issues_title            "Package issue detection"
-_tr_add2 issues_grub             "IMPORTANT: re-creating boot menu manually will be needed."
+_tr_add2 issues_title            "Zistenie problémov s balíčkami"
+_tr_add2 issues_grub             "DÔLEŽITÉ: bude potrebné ručne prerobiť boot menu."
 _tr_add2 issues_run              "Running commands:"
 _tr_add2 issues_no               "No important system issues were detected."
 
-_tr_add2 cal_noavail            "Not available: "        # installer program
-_tr_add2 cal_warn               "Warning"
+_tr_add2 cal_noavail            "Nedostupný: "        # installer program
+_tr_add2 cal_warn               "Varovanie"
 _tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
 _tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\nInternet connection is not needed.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
 _tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
-_tr_add2 cal_choose             "Choose installation method"
-_tr_add2 cal_method             "Method"
-_tr_add2 cal_nosupport          "$PROGNAME: unsupported mode: "
-_tr_add2 cal_nofile             "$PROGNAME: required file does not exist: "
-_tr_add2 cal_istarted           "Install started"
-_tr_add2 cal_istopped           "Install finished"
+_tr_add2 cal_choose             "Vyberte spôsob inštalácie"
+_tr_add2 cal_method             "Spôsob"
+_tr_add2 cal_nosupport          "$PROGNAME: nepodporovaný režim: "
+_tr_add2 cal_nofile             "$PROGNAME: požadovaný súbor neexistuje: "
+_tr_add2 cal_istarted           "Inštalácia začatá"
+_tr_add2 cal_istopped           "Inštalácia dokončená"
 
-_tr_add2 tail_butt              "Close this window"
-_tr_add2 tail_buttip            "Close only this window"
+_tr_add2 tail_butt              "Zavri toto okno"
+_tr_add2 tail_buttip            "Zavri iba toto okno"
 
 
 _tr_add2 ins_text              "Installing EndeavourOS to disk"
 _tr_add2 ins_start             "Start the Installer"
 _tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
-_tr_add2 ins_up                "Update this app$_exclamation"
+_tr_add2 ins_up                "Aktualizuj túto aplikáciu$_exclamation"
 _tr_add2 ins_uptip             "Updates this app and restarts it"
 _tr_add2 ins_keys              "Initialize pacman keys"
 _tr_add2 ins_keystip           "Initialize pacman keys"
 _tr_add2 ins_pm                "Partition manager"
 _tr_add2 ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
-_tr_add2 ins_rel               "Latest release info"
-_tr_add2 ins_reltip            "More info about the latest release"
-_tr_add2 ins_tips              "Installation tips"
+_tr_add2 ins_rel               "Informácie o najnovšom vydaní"
+_tr_add2 ins_reltip            "Viac informácií o najnovšom vydaní"
+_tr_add2 ins_tips              "Rady pre inštaláciu"
 _tr_add2 ins_tipstip           "Installation tips"
 _tr_add2 ins_trouble           "Troubleshoot"
-_tr_add2 ins_troubletip        "System Rescue"
+_tr_add2 ins_troubletip        "Záchrana systému"
 
-_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
-_tr_add2 after_install_us_el      "Elevated privileges required."
-_tr_add2 after_install_us_done    "update done."
-_tr_add2 after_install_us_fail    "update failed!"
+_tr_add2 after_install_us_from    "Aktualizácie od"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Sú potrebné vyššie privilégiá"
+_tr_add2 after_install_us_done    "aktualizácia dokončená."
+_tr_add2 after_install_us_fail    "aktualizácia zlyhala!"
