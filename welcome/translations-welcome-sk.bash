@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Neboli zistené žiadné dôležité problémy
 _tr_add2 cal_noavail            "Nedostupný: "        # installer program
 _tr_add2 cal_warn               "Varovanie"
 _tr_add2 cal_info1              "Toto je komunitné, vývojové vydanie.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> spôsob vám dá Xfce prostredie otémované pre EndeavourOS.\nInternetové pripojenie nieje potrebné.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> spôsob vám dá Xfce prostredie otémované pre EndeavourOS.\nNieje potrebné internetové pripojenie.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> spôsob vám umožňuje vybrať si uživateľské prostredie, so základnou témou.\nJe potrebné internetové pripojenie.\n\n"
 _tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
 _tr_add2 cal_choose             "Vyberte spôsob inštalácie"
 _tr_add2 cal_method             "Spôsob"
