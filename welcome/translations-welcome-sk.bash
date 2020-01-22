@@ -136,13 +136,13 @@ _tr_add2 settings_dis_buttip     "Sľubujem"
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Pomoc"
 _tr_add2 help_butt_text          "Viac informácií o aplikácii $PRETTY_PROGNAME"
 
-_tr_add2 dm_title                "Select Display Manager"
+_tr_add2 dm_title                "Vyber Display Manager"
 _tr_add2 dm_col_name1            "Vybraný"
 _tr_add2 dm_col_name2            "názov DM"
 
 _tr_add2 dm_reboot_required      "Aby sa zmeny prejavili, je potrebný reštart."
-_tr_add2 dm_changed              "DM changed to: "
-_tr_add2 dm_failed               "Changing DM failed."
+_tr_add2 dm_changed              "DM zmenený na: "
+_tr_add2 dm_failed               "Menenie DM zlyhalo."
 _tr_add2 dm_warning_title        "Varovanie"
 
 _tr_add2 install_installer       "Inštalátor"
