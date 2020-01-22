@@ -79,7 +79,7 @@ _tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
-_tr_add2 after_install_hntip   "Sprevoznite si váš hardvér"
+_tr_add2 after_install_hntip   "Sprevoznite si svoj hardvér"
 
 _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Rady ohľadom Bluetooth"
@@ -88,15 +88,15 @@ _tr_add2 after_install_nv      "Užívatelia kariet NVIDIA users$_exclamation"
 _tr_add2 after_install_nvtip   "Použiť NVIDIA inštalátor"
 
 _tr_add2 after_install_ft      "Rady ohľadom fóra"
-_tr_add2 after_install_fttip   "Pomôž nám pomôcť ti!"
+_tr_add2 after_install_fttip   "Pomôžte nám pomôcť vám!"
 
 
-_tr_add2 general_info_text     "Nájdi svoju cestu na stránke EndeavourOS$_exclamation"
+_tr_add2 general_info_text     "Nájdite svoju cestu na stránke EndeavourOS$_exclamation"
 
 _tr_add2 general_info_ws       "Webová stránka"
 
 _tr_add2 general_info_wi       "Wiki"
-_tr_add2 general_info_witip    "Featured articles"
+_tr_add2 general_info_witip    "Zvýraznené články"
 
 _tr_add2 general_info_ne       "Novinky"
 _tr_add2 general_info_netip    "Novinky a články"
@@ -105,7 +105,7 @@ _tr_add2 general_info_fo       "Fórum"
 _tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
 
 _tr_add2 general_info_do       "Prispieť"
-_tr_add2 general_info_dotip    "Help us keep EndeavourOS running"
+_tr_add2 general_info_dotip    "Pomôžte nám udržať EndeavourOS v prevoze"
 
 _tr_add2 general_info_ab       "O $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip    "Viac informácií o tejto aplikácii"
@@ -128,7 +128,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) pre Xfce"
 ####################### NEW STUFF AFTER THIS LINE:
 
 _tr_add2 settings_dis_contents   "Ak chcete znova spustiť $PRETTY_PROGNAME, zapnite terminál a zadajte: $PROGNAME --enable"
-_tr_add2 settings_dis_text       "Re-enabling $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_text       "Znova spustiť $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Ako znova spustiť $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Pamätám si"
 _tr_add2 settings_dis_buttip     "Sľubujem"
@@ -182,13 +182,13 @@ _tr_add2 ins_up                "Aktualizuj túto aplikáciu$_exclamation"
 _tr_add2 ins_uptip             "Updates this app and restarts it"
 _tr_add2 ins_keys              "Initialize pacman keys"
 _tr_add2 ins_keystip           "Initialize pacman keys"
-_tr_add2 ins_pm                "Partition manager"
+_tr_add2 ins_pm                "Správca diskových oddielov"
 _tr_add2 ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
 _tr_add2 ins_rel               "Informácie o najnovšom vydaní"
 _tr_add2 ins_reltip            "Viac informácií o najnovšom vydaní"
-_tr_add2 ins_tips              "Rady pre inštaláciu"
-_tr_add2 ins_tipstip           "Installation tips"
-_tr_add2 ins_trouble           "Troubleshoot"
+_tr_add2 ins_tips              "Tipy pre inštaláciu"
+_tr_add2 ins_tipstip           "Tipy k inštalácii"
+_tr_add2 ins_trouble           "Riešenie problémov"
 _tr_add2 ins_troubletip        "Záchrana systému"
 
 _tr_add2 after_install_us_from    "Aktualizácie od"                            # AUR or upstream
