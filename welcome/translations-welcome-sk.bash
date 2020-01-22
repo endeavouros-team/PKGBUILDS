@@ -87,13 +87,13 @@ _tr_add2 after_install_bttip   "Rady ohľadom Bluetooth"
 _tr_add2 after_install_nv      "Užívatelia kariet NVIDIA users$_exclamation"
 _tr_add2 after_install_nvtip   "Použiť NVIDIA inštalátor"
 
-_tr_add2 after_install_ft      "Forum tips"
-_tr_add2 after_install_fttip   "Help us help you!"
+_tr_add2 after_install_ft      "Rady ohľadom fóra"
+_tr_add2 after_install_fttip   "Pomôž nám pomôcť ti!"
 
 
 _tr_add2 general_info_text     "Find your way at the EndeavourOS website$_exclamation"
 
-_tr_add2 general_info_ws       "Web site"
+_tr_add2 general_info_ws       "Webová stránka"
 
 _tr_add2 general_info_wi       "Wiki"
 _tr_add2 general_info_witip    "Featured articles"
@@ -115,14 +115,14 @@ _tr_add2 add_more_apps_text    "Inštalovať populárne aplikácie"
 
 _tr_add2 add_more_apps_lotip   "Kancelársky balík (libreoffice-fresh)"
 
-_tr_add2 add_more_apps_ch      "prehliadač Chromium"
-_tr_add2 add_more_apps_chtip   "Web Browser"
+_tr_add2 add_more_apps_ch      "Prehliadač Chromium"
+_tr_add2 add_more_apps_chtip   "Webový prehliadač"
 
 _tr_add2 add_more_apps_fw      "Firewall"
 _tr_add2 add_more_apps_fwtip   "Gufw firewall"
 
-_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) for Xfce"
-_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) for Xfce"
+_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) pre Xfce"
+_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) pre Xfce"
 
 
 ####################### NEW STUFF AFTER THIS LINE:
@@ -154,9 +154,9 @@ _tr_add2 sysup_no                "Žiadné aktualizácie."
 _tr_add2 sysup_check             "Hľadajú sa aktualizácie softvéru..."
 
 _tr_add2 issues_title            "Zistenie problémov s balíčkami"
-_tr_add2 issues_grub             "DÔLEŽITÉ: bude potrebné ručne prerobiť boot menu."
-_tr_add2 issues_run              "Running commands:"
-_tr_add2 issues_no               "No important system issues were detected."
+_tr_add2 issues_grub             "DÔLEŽITÉ: bude potrebné ručne prerobiť bootovaciu ponuku."
+_tr_add2 issues_run              "Spúštanie príkazov:"
+_tr_add2 issues_no               "Neboli zistené žiadné dôležité problémy so systémom."
 
 _tr_add2 cal_noavail            "Nedostupný: "        # installer program
 _tr_add2 cal_warn               "Varovanie"
@@ -171,8 +171,8 @@ _tr_add2 cal_nofile             "$PROGNAME: požadovaný súbor neexistuje: "
 _tr_add2 cal_istarted           "Inštalácia začatá"
 _tr_add2 cal_istopped           "Inštalácia dokončená"
 
-_tr_add2 tail_butt              "Zavri toto okno"
-_tr_add2 tail_buttip            "Zavri iba toto okno"
+_tr_add2 tail_butt              "Zavrieť toto okno"
+_tr_add2 tail_buttip            "Zavrieť iba toto okno"
 
 
 _tr_add2 ins_text              "Installing EndeavourOS to disk"
