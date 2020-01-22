@@ -91,7 +91,7 @@ _tr_add2 after_install_ft      "Rady ohľadom fóra"
 _tr_add2 after_install_fttip   "Pomôž nám pomôcť ti!"
 
 
-_tr_add2 general_info_text     "Find your way at the EndeavourOS website$_exclamation"
+_tr_add2 general_info_text     "Nájdi svoju cestu na stránke EndeavourOS$_exclamation"
 
 _tr_add2 general_info_ws       "Webová stránka"
 
