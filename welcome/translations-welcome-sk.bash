@@ -59,14 +59,14 @@ _tr_add2 after_install_umtip   "Aktualizovať zoznam mirorov pred aktualizovaní
 _tr_add2 after_install_us      "Aktualizovať systém"
 _tr_add2 after_install_ustip   "Aktualizovať systémové aplikácie"
 
-_tr_add2 after_install_dsi     "Zistiť problémy zo systémom"
+_tr_add2 after_install_dsi     "Zistiť problémy so systémom"
 _tr_add2 after_install_dsitip  "Skontrolovať akékoľvek možné problémy so systémovými balíčkami, alebo inde"
 
 _tr_add2 after_install_etl     "EndeavourOS na latest$_question"
 _tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dostal na najnovšiu verziu EndeavourOS"
 
-_tr_add2 after_install_cdm     "Change Display Manager"
-_tr_add2 after_install_cdmtip  "Use a different display manager"
+_tr_add2 after_install_cdm     "Zmeniť Display Manager"
+_tr_add2 after_install_cdmtip  "Použiť iný display manager"
 
 _tr_add2 after_install_ew      "EndeavourOS pozadie"
 _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
