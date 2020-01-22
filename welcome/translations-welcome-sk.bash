@@ -127,9 +127,9 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) pre Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "To run $PRETTY_PROGNAME again, start a terminal and run: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Ak chcete znova spustiť $PRETTY_PROGNAME, zapnite terminál a zadajte: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Re-enabling $PRETTY_PROGNAME:"
-_tr_add2 settings_dis_title      "How to re-enable $PRETTY_PROGNAME"
+_tr_add2 settings_dis_title      "Ako znova spustiť $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Pamätám si"
 _tr_add2 settings_dis_buttip     "Sľubujem"
 
