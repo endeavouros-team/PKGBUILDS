@@ -19,7 +19,7 @@
 #    <placeholder>   A pre-defined name that identifies the place in the Welcome app where this string is used.
 #    "string"        The translated string for the Welcome app.
 
-# English:
+# Slovak:
 
 ### First some useful definitions:
 
@@ -160,7 +160,7 @@ _tr_add2 issues_no               "Neboli zistené žiadné dôležité problémy
 
 _tr_add2 cal_noavail            "Nedostupný: "        # installer program
 _tr_add2 cal_warn               "Varovanie"
-_tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
+_tr_add2 cal_info1              "Toto je komunitné, vývojové vydanie.\n\n"                                   # specials needed!
 _tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\nInternet connection is not needed.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
 _tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
