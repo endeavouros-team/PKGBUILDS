@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.2.32
+pkgver=2.2.33
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -31,6 +31,7 @@ source=(
   $url/translations-${pkgname}-de.bash
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
+  $url/translations-${pkgname}-fr.bash
 )
 sha512sums=('ebe5e694ac67b062eadf99435bf0984d5930ecb187d981148399577c5eff70416827ed81e902400418f9c0ec888fb1559cbea629174128602ff4a4e942732fc2'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
@@ -45,21 +46,23 @@ sha512sums=('ebe5e694ac67b062eadf99435bf0984d5930ecb187d981148399577c5eff7041682
             'db0556fbc3db88d5b5f75744fc3dc85b4f4b448b5d804d5b2d6b5489e464a24f3e54a09bdcf6d1e13ddba53fa343d6c30cddb89fb6d3238228e1a40a278f67d7'
             '7f2b542c5854630a4b13e44cf756b93a28960230feaa705e7cf45fc754921ae32f931f561e94ca4387f3062a4c426fd506fa642ba61fd1955360df20554d7ced'
             'e5cb9f31ae8a18051833b1cb14512770558217cc5734633f2bb8bbedbac7d9cd63728e3e80f48dfb1e5c080345ca39310de52cbc2b24a15e2a61c4e6ad71de26'
-            'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3')
+            'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
+            '335de4fbe4e155ee61f0cfd0c83d47ed86bfd7c796895243f076510de33d84b30edf2d6d6b280409850bb278f0f2692bfb389b1b3a4ac8a0bce9cac0ae0816a0')
 
 package() {
+  local languages="de en fi fr"   # Update this list when new languages are added.
   local xx
+
   cd $srcdir
 
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
-#  install -Dm755 ${pkgname}-panel.desktop $pkgdir/usr/share/endeavouros/scripts/${pkgname}-panel.desktop
   install -Dm755 ksetwallpaper.py         $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm644 eos-script-lib-yad       $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
 
   install -Dm644 translations-${pkgname}.bash        $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
-  for xx in de en fi ; do
+  for xx in $languages ; do
     install -Dm644 translations-${pkgname}-$xx.bash  $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}-$xx.bash
   done
 
