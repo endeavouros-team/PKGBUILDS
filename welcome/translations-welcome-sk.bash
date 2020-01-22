@@ -62,7 +62,7 @@ _tr_add2 after_install_ustip   "Aktualizovať systémové aplikácie"
 _tr_add2 after_install_dsi     "Zistiť problémy so systémom"
 _tr_add2 after_install_dsitip  "Skontrolovať akékoľvek možné problémy so systémovými balíčkami, alebo inde"
 
-_tr_add2 after_install_etl     "EndeavourOS na latest$_question"
+_tr_add2 after_install_etl     "EndeavourOS na poslednej verzii$_question"
 _tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dostal na najnovšiu verziu EndeavourOS"
 
 _tr_add2 after_install_cdm     "Zmeniť Display Manager"
@@ -79,7 +79,7 @@ _tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
-_tr_add2 after_install_hntip   "Get your hardware working"
+_tr_add2 after_install_hntip   "Sprevoznite si váš hardvér"
 
 _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Rady ohľadom Bluetooth"
