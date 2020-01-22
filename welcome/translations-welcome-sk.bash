@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "Program $PRETTY_PROGNAME je vypnutý. Ak ho ale aj tak chcete spustiť, použite príkaz --enable."
+_tr_add2 welcome_disabled      "Aplikácia $PRETTY_PROGNAME je vypnutá. Ak ju ale aj tak chcete spustiť, použite príkaz --enable."
 
 _tr_add2 butt_later            "Vidíme sa neskôr"
 _tr_add2 butt_latertip         "Ponechať $PRETTY_PROGNAME zapnutý"
@@ -133,7 +133,7 @@ _tr_add2 settings_dis_title      "Ako znova spustiť $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Pamätám si"
 _tr_add2 settings_dis_buttip     "Sľubujem"
 
-_tr_add2 help_butt_title         "$PRETTY_PROGNAME Pomoc"
+_tr_add2 help_butt_title         "$PRETTY_PROGNAME pomoc"
 _tr_add2 help_butt_text          "Viac informácií o aplikácii $PRETTY_PROGNAME"
 
 _tr_add2 dm_title                "Vyber Display Manager"
@@ -161,7 +161,7 @@ _tr_add2 issues_no               "Neboli zistené žiadné dôležité problémy
 _tr_add2 cal_noavail            "Nedostupný: "        # installer program
 _tr_add2 cal_warn               "Varovanie"
 _tr_add2 cal_info1              "Toto je komunitné, vývojové vydanie.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\nInternet connection is not needed.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> spôsob vám dá Xfce prostredie otémované pre EndeavourOS.\nInternetové pripojenie nieje potrebné.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
 _tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
 _tr_add2 cal_choose             "Vyberte spôsob inštalácie"
