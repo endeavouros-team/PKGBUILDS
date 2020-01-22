@@ -68,15 +68,15 @@ _tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dosta
 _tr_add2 after_install_cdm     "Change Display Manager"
 _tr_add2 after_install_cdmtip  "Use a different display manager"
 
-_tr_add2 after_install_ew      "EndeavourOS wallpaper"
-_tr_add2 after_install_ewtip   "Change desktop wallpaper to EOS default"
+_tr_add2 after_install_ew      "EndeavourOS pozadie"
+_tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
 
 
 _tr_add2 after_install_pm      "Spravovanie balíčkov"
 _tr_add2 after_install_pmtip   "Ako spravovať balíčky s pacmanom"
 
-_tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
-_tr_add2 after_install_aytip   "Arch User Repository and yay info"
+_tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
+_tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
 _tr_add2 after_install_hntip   "Get your hardware working"
