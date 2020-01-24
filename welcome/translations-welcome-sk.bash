@@ -1,4 +1,4 @@
-# Translations for the Welcome app.
+# Preklad uvítacej aplikácie.
 #
 # Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
 # - in the Welcome app
@@ -11,7 +11,7 @@
 #          or
 #    _tr_add2 <placeholder> "string"
 #
-# where
+# kde
 #
 #    _tr_add         A bash function that adds a "string" to the strings database.
 #    _tr_add2        Same as _tr_add but knows the language from the _tr_lang variable (below).
@@ -21,7 +21,7 @@
 
 # Slovak:
 
-### First some useful definitions:
+### Najskôr nejaké užitočné definície:
 
 _tr_lang=sk            # required helper variable for _tr_add2
 
