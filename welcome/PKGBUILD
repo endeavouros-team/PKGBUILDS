@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.2.33
-pkgrel=1
+pkgrel=1.1
 arch=('any')
 license=('GPL')
 depends=(
@@ -28,12 +28,13 @@ source=(
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
   $url/translations-${pkgname}.bash
+  $url/translations-${pkgname}-reference.bash
   $url/translations-${pkgname}-de.bash
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
   $url/translations-${pkgname}-fr.bash
 )
-sha512sums=('ebe5e694ac67b062eadf99435bf0984d5930ecb187d981148399577c5eff70416827ed81e902400418f9c0ec888fb1559cbea629174128602ff4a4e942732fc2'
+sha512sums=('1fcd26bfc4e2836ddad1a7e3ae505a162c22e7ecddb93f96c3f5b6620e1ae3e165d76c74b3a82fd10ccb28963853d2c685b6ab078bdcf3b9b976aa518b6992c2'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
             '2a4f2798cfbc95d615740dbd92cca182c66629027861aca37ae1b23d14850402118802a824d670be0eb665a1a17f385e47445bfbd0be36a20f31c31a246dcab6'
             'a65ebb01507f8fcef46052d282d32f8461d80b6e62799cbf1a4affb3188679f7df8a705b93c612e2655336343cc6411802ff613c22dd66b7bce8ceb1849d3ea2'
@@ -43,14 +44,15 @@ sha512sums=('ebe5e694ac67b062eadf99435bf0984d5930ecb187d981148399577c5eff7041682
             '4e62a6dbfac155c652e7f5fae307a75ea1648f88ec231adf03b7956ac0318306fc3c9d4def4eb42448d8a53732e2f23cf00692bbab932cee6a1ee7111e4f8d2b'
             'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad'
             '94395d17c28456a26edc1f4859cc382970a3a75d8c257e50721a25cceb8224a9019c43372af447f9c6800fda4f2a519e2797a4d9ad764fb736ac6e411e8d4a46'
-            'db0556fbc3db88d5b5f75744fc3dc85b4f4b448b5d804d5b2d6b5489e464a24f3e54a09bdcf6d1e13ddba53fa343d6c30cddb89fb6d3238228e1a40a278f67d7'
+            '5714b80b83224dadae9e4906b0157cc858bc9cddd4a3bf8441aa6009ed205769530a6577c4fab11a5e311c58c7dcaf81a36c12b997948c4426b3084e448a62ac'
+            '0110ca2ffcf7a3e54262ce42881716ded25b5e8aa785eb2cc5295f5f8bb5ddb312cb0f3afefa06bddee2bb34a4ab96ca25ff978db112f072262515c64aed3c89'
             '7f2b542c5854630a4b13e44cf756b93a28960230feaa705e7cf45fc754921ae32f931f561e94ca4387f3062a4c426fd506fa642ba61fd1955360df20554d7ced'
             'e5cb9f31ae8a18051833b1cb14512770558217cc5734633f2bb8bbedbac7d9cd63728e3e80f48dfb1e5c080345ca39310de52cbc2b24a15e2a61c4e6ad71de26'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
             '335de4fbe4e155ee61f0cfd0c83d47ed86bfd7c796895243f076510de33d84b30edf2d6d6b280409850bb278f0f2692bfb389b1b3a4ac8a0bce9cac0ae0816a0')
 
 package() {
-  local languages="de en fi fr"   # Update this list when new languages are added.
+  local languages="reference de en fi fr"   # Update this list when new languages are added.
   local xx
 
   cd $srcdir

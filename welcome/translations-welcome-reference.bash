@@ -1,0 +1,197 @@
+# Translations for the Welcome app.
+#
+# Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
+# - in the Welcome app
+# - globally
+#
+#
+# Any string should be defined like:
+#
+#    _tr_add <language> <placeholder> "string"
+#          or
+#    _tr_add2 <placeholder> "string"
+#
+# where
+#
+#    _tr_add         A bash function that adds a "string" to the strings database.
+#    _tr_add2        Same as _tr_add but knows the language from the _tr_lang variable (below).
+#    <language>      An acronym for the language, e.g. "en" for English (check the LANG variable!).
+#    <placeholder>   A pre-defined name that identifies the place in the Welcome app where this string is used.
+#    "string"        The translated string for the Welcome app.
+
+# English:
+
+### First some useful definitions:
+
+_tr_lang=en            # required helper variable for _tr_add2
+
+# Help with some special characters (HTML). Yad has problems without them:
+_exclamation='&#33;'   # '!'
+_and='&#38;'           # '&'
+_question='&#63;'      # '?'
+
+
+###################### Now the actual strings to be translated: ######################
+# func   <placeholder>         "string"
+
+_tr_add2 welcome_disabled      "<pre1>$PRETTY_PROGNAME</pre1> app is disabled. To start it anyway, use option <pre2>--enable</pre2>."
+
+_tr_add2 butt_later            "See you later"
+_tr_add2 butt_latertip         "Keep <pre1>$PRETTY_PROGNAME</pre1> enabled"
+
+_tr_add2 butt_noshow           "Don't show me anymore"
+_tr_add2 butt_noshowtip        "Disable <pre1>$PRETTY_PROGNAME</pre1>"
+
+_tr_add2 butt_help             "Help"
+
+
+_tr_add2 nb_tab_INSTALL        "INSTALL"
+_tr_add2 nb_tab_GeneralInfo    "General Info"
+_tr_add2 nb_tab_AfterInstall   "After Install"
+_tr_add2 nb_tab_AddMoreApps    "Add More Apps"
+
+
+_tr_add2 after_install_text    "After install tasks"
+
+_tr_add2 after_install_um      "Update Mirrors"
+_tr_add2 after_install_umtip   "Update list of mirrors before system update"
+
+_tr_add2 after_install_us      "Update System"
+_tr_add2 after_install_ustip   "Update System Software"
+
+_tr_add2 after_install_dsi     "Detect system issues"
+_tr_add2 after_install_dsitip  "Detect any potential issues on system packages or elsewhere"
+
+_tr_add2 after_install_etl     "<pre1>EndeavourOS</pre1> to latest$_question"
+_tr_add2 after_install_etltip  "Show what to do to get your system to the latest <pre1>EndeavourOS</pre1> level"
+
+_tr_add2 after_install_cdm     "Change Display Manager"
+_tr_add2 after_install_cdmtip  "Use a different display manager"
+
+_tr_add2 after_install_ew      "EndeavourOS wallpaper"
+_tr_add2 after_install_ewtip   "Change desktop wallpaper to EndeavourOS default"
+
+
+_tr_add2 after_install_pm      "Package management"
+_tr_add2 after_install_pmtip   "How to manage packages with pacman"
+
+_tr_add2 after_install_ay      "<pre1>AUR</pre1> $_and <pre2>yay</pre2>$_exclamation"
+_tr_add2 after_install_aytip   "Arch User Repository and yay info"
+
+_tr_add2 after_install_hn      "Hardware and Network"
+_tr_add2 after_install_hntip   "Get your hardware working"
+
+_tr_add2 after_install_bt      "Bluetooth"
+_tr_add2 after_install_bttip   "Bluetooth advice"
+
+_tr_add2 after_install_nv      "NVIDIA users$_exclamation"
+_tr_add2 after_install_nvtip   "Use NVIDIA installer"
+
+_tr_add2 after_install_ft      "Forum tips"
+_tr_add2 after_install_fttip   "Help us help you!"
+
+
+_tr_add2 general_info_text     "Find your way at the <pre1>EndeavourOS</pre1> website$_exclamation"
+
+_tr_add2 general_info_ws       "Web site"
+
+_tr_add2 general_info_wi       "Wiki"
+_tr_add2 general_info_witip    "Featured articles"
+
+_tr_add2 general_info_ne       "News"
+_tr_add2 general_info_netip    "News and articles"
+
+_tr_add2 general_info_fo       "Forum"
+_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
+
+_tr_add2 general_info_do       "Donate"
+_tr_add2 general_info_dotip    "Help us keep <pre1>EndeavourOS</pre1> running"
+
+_tr_add2 general_info_ab       "About <pre1>$PRETTY_PROGNAME</pre1>"
+_tr_add2 general_info_abtip    "More info about this app"
+
+
+_tr_add2 add_more_apps_text    "Install popular apps"
+
+_tr_add2 add_more_apps_lotip   "Office tools (<pre1>libreoffice-fresh</pre1>)"
+
+_tr_add2 add_more_apps_ch      "<pre1>Chromium</pre1> Web Browser"
+_tr_add2 add_more_apps_chtip   "Web Browser"
+
+_tr_add2 add_more_apps_fw      "Firewall"
+_tr_add2 add_more_apps_fwtip   "<pre1>Gufw</pre1> firewall"
+
+_tr_add2 add_more_apps_bt      "<pre1>Bluetooth</pre1> (<pre2>blueberry</pre2>) for <pre3>Xfce</pre3>"
+_tr_add2 add_more_apps_bt_bm   "<pre1>Bluetooth</pre1> (<pre2>blueman</pre2>) for <pre3>Xfce</pre3>"
+
+
+####################### NEW STUFF AFTER THIS LINE:
+
+_tr_add2 settings_dis_contents   "To run <pre1>$PRETTY_PROGNAME</pre1> again, start a terminal and run: <pre2>$PROGNAME --enable</pre2>"
+_tr_add2 settings_dis_text       "Re-enabling <pre1>$PRETTY_PROGNAME</pre1>:"
+_tr_add2 settings_dis_title      "How to re-enable <pre1>$PRETTY_PROGNAME</pre1>"
+_tr_add2 settings_dis_butt       "I remember"
+_tr_add2 settings_dis_buttip     "I promise"
+
+_tr_add2 help_butt_title         "<pre1>$PRETTY_PROGNAME</pre1> Help"
+_tr_add2 help_butt_text          "More info about the <pre1>$PRETTY_PROGNAME</pre1> app"
+
+_tr_add2 dm_title                "Select Display Manager"
+_tr_add2 dm_col_name1            "Selected"
+_tr_add2 dm_col_name2            "DM name"
+
+_tr_add2 dm_reboot_required      "Reboot is required for the changes to take effect."
+_tr_add2 dm_changed              "DM changed to: "
+_tr_add2 dm_failed               "Changing DM failed."
+_tr_add2 dm_warning_title        "Warning"
+
+_tr_add2 install_installer       "Installer"
+_tr_add2 install_already         "already installed"
+_tr_add2 install_ing             "Installing"
+_tr_add2 install_done            "Finished."
+
+_tr_add2 sysup_no                "No updates."
+_tr_add2 sysup_check             "Checking for software updates..."
+
+_tr_add2 issues_title            "Package issue detection"
+_tr_add2 issues_grub             "IMPORTANT: re-creating boot menu manually will be needed."
+_tr_add2 issues_run              "Running commands:"
+_tr_add2 issues_no               "No important system issues were detected."
+
+_tr_add2 cal_noavail            "Not available: "        # installer program
+_tr_add2 cal_warn               "Warning"
+_tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
+_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with <pre1>EndeavourOS</pre1> theming.\nInternet connection is not needed.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
+_tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
+_tr_add2 cal_choose             "Choose installation method"
+_tr_add2 cal_method             "Method"
+_tr_add2 cal_nosupport          "<pre1>$PROGNAME</pre1>: unsupported mode: "
+_tr_add2 cal_nofile             "<pre1>$PROGNAME</pre1>: required file does not exist: "
+_tr_add2 cal_istarted           "Install started"
+_tr_add2 cal_istopped           "Install finished"
+
+_tr_add2 tail_butt              "Close this window"
+_tr_add2 tail_buttip            "Close only this window"
+
+
+_tr_add2 ins_text              "Installing <pre1>EndeavourOS</pre1> to disk"
+_tr_add2 ins_start             "Start the Installer"
+_tr_add2 ins_starttip          "Start the <pre1>EndeavourOS</pre1> installer along with a debug terminal"
+_tr_add2 ins_up                "Update this app$_exclamation"
+_tr_add2 ins_uptip             "Updates this app and restarts it"
+_tr_add2 ins_keys              "Initialize <pre1>pacman</pre1> keys"
+_tr_add2 ins_keystip           "Initialize <pre1>pacman</pre1> keys"
+_tr_add2 ins_pm                "Partition manager"
+_tr_add2 ins_pmtip             "<pre1>Gparted</pre1> allows examining and managing disk partitions and structure"
+_tr_add2 ins_rel               "Latest release info"
+_tr_add2 ins_reltip            "More info about the latest release"
+_tr_add2 ins_tips              "Installation tips"
+_tr_add2 ins_tipstip           "Installation tips"
+_tr_add2 ins_trouble           "Troubleshoot"
+_tr_add2 ins_troubletip        "System Rescue"
+
+_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Elevated privileges required."
+_tr_add2 after_install_us_done    "update done."
+_tr_add2 after_install_us_fail    "update failed!"

@@ -936,10 +936,17 @@ export -f Usage
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
+    local tr_engine=bing
 
     for arg in "$@" ; do
         case "$arg" in
-            --lang=*) lang="${arg:7}" ;;
+            --lang=*) lang="${arg#*=}" ;;
+            --tr-engine=*) tr_engine="${arg#*=}" ;;
+            --genlang=*)
+                lang="${arg#*=}"
+                _init_translations --tr-engine="$tr_engine" --generate "$lang"
+                return
+                ;;
         esac
     done
 
@@ -959,7 +966,7 @@ StartHere() {
         case "$arg" in
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
-            --startdelay=*) start_delay="${arg:13}" ;;
+            --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) show_installer=1 ;;
             --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
             --lang=*) ;; # already handled!
