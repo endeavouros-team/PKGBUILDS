@@ -34,13 +34,13 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "<pre1>$PRETTY_PROGNAME</pre1> app is disabled. To start it anyway, use option <pre2>--enable</pre2>."
+_tr_add2 welcome_disabled      "<eos1($PRETTY_PROGNAME)> app is disabled. To start it, use switch <eos2(--enable)>."
 
 _tr_add2 butt_later            "See you later"
-_tr_add2 butt_latertip         "Keep <pre1>$PRETTY_PROGNAME</pre1> enabled"
+_tr_add2 butt_latertip         "Keep <eos1($PRETTY_PROGNAME)> enabled"
 
 _tr_add2 butt_noshow           "Don't show me anymore"
-_tr_add2 butt_noshowtip        "Disable <pre1>$PRETTY_PROGNAME</pre1>"
+_tr_add2 butt_noshowtip        "Disable <eos1($PRETTY_PROGNAME)>"
 
 _tr_add2 butt_help             "Help"
 
@@ -62,8 +62,8 @@ _tr_add2 after_install_ustip   "Update System Software"
 _tr_add2 after_install_dsi     "Detect system issues"
 _tr_add2 after_install_dsitip  "Detect any potential issues on system packages or elsewhere"
 
-_tr_add2 after_install_etl     "<pre1>EndeavourOS</pre1> to latest$_question"
-_tr_add2 after_install_etltip  "Show what to do to get your system to the latest <pre1>EndeavourOS</pre1> level"
+_tr_add2 after_install_etl     "EndeavourOS to latest$_question"
+_tr_add2 after_install_etltip  "Show what to do to get your system to the latest EndeavourOS level"
 
 _tr_add2 after_install_cdm     "Change Display Manager"
 _tr_add2 after_install_cdmtip  "Use a different display manager"
@@ -75,11 +75,11 @@ _tr_add2 after_install_ewtip   "Change desktop wallpaper to EndeavourOS default"
 _tr_add2 after_install_pm      "Package management"
 _tr_add2 after_install_pmtip   "How to manage packages with pacman"
 
-_tr_add2 after_install_ay      "<pre1>AUR</pre1> $_and <pre2>yay</pre2>$_exclamation"
-_tr_add2 after_install_aytip   "Arch User Repository and yay info"
+_tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
+_tr_add2 after_install_aytip   "<eos1(Arch User Repository)> and <eos2(yay)> info"
 
 _tr_add2 after_install_hn      "Hardware and Network"
-_tr_add2 after_install_hntip   "Get your hardware working"
+_tr_add2 after_install_hntip   "Tips for your hardware"
 
 _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Bluetooth advice"
@@ -91,7 +91,7 @@ _tr_add2 after_install_ft      "Forum tips"
 _tr_add2 after_install_fttip   "Help us help you!"
 
 
-_tr_add2 general_info_text     "Find your way at the <pre1>EndeavourOS</pre1> website$_exclamation"
+_tr_add2 general_info_text     "Find your way at the EndeavourOS website$_exclamation"
 
 _tr_add2 general_info_ws       "Web site"
 
@@ -105,36 +105,36 @@ _tr_add2 general_info_fo       "Forum"
 _tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
 
 _tr_add2 general_info_do       "Donate"
-_tr_add2 general_info_dotip    "Help us keep <pre1>EndeavourOS</pre1> running"
+_tr_add2 general_info_dotip    "Help us keep EndeavourOS running"
 
-_tr_add2 general_info_ab       "About <pre1>$PRETTY_PROGNAME</pre1>"
+_tr_add2 general_info_ab       "About <eos1($PRETTY_PROGNAME)>"
 _tr_add2 general_info_abtip    "More info about this app"
 
 
 _tr_add2 add_more_apps_text    "Install popular apps"
 
-_tr_add2 add_more_apps_lotip   "Office tools (<pre1>libreoffice-fresh</pre1>)"
+_tr_add2 add_more_apps_lotip   "Office tools (<eos1(libreoffice-fresh)>)"
 
-_tr_add2 add_more_apps_ch      "<pre1>Chromium</pre1> Web Browser"
+_tr_add2 add_more_apps_ch      "<eos1(Chromium)> Web Browser"
 _tr_add2 add_more_apps_chtip   "Web Browser"
 
 _tr_add2 add_more_apps_fw      "Firewall"
-_tr_add2 add_more_apps_fwtip   "<pre1>Gufw</pre1> firewall"
+_tr_add2 add_more_apps_fwtip   "<eos1(Gufw)> firewall"
 
-_tr_add2 add_more_apps_bt      "<pre1>Bluetooth</pre1> (<pre2>blueberry</pre2>) for <pre3>Xfce</pre3>"
-_tr_add2 add_more_apps_bt_bm   "<pre1>Bluetooth</pre1> (<pre2>blueman</pre2>) for <pre3>Xfce</pre3>"
+_tr_add2 add_more_apps_bt      "<eos1(Bluetooth)> [<eos2(blueberry)>] for <eos3(Xfce)>"
+_tr_add2 add_more_apps_bt_bm   "<eos1(Bluetooth)> [<eos2(blueman)>] for <eos3(Xfce)>"
 
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "To run <pre1>$PRETTY_PROGNAME</pre1> again, start a terminal and run: <pre2>$PROGNAME --enable</pre2>"
-_tr_add2 settings_dis_text       "Re-enabling <pre1>$PRETTY_PROGNAME</pre1>:"
-_tr_add2 settings_dis_title      "How to re-enable <pre1>$PRETTY_PROGNAME</pre1>"
+_tr_add2 settings_dis_contents   "To run <eos1($PRETTY_PROGNAME)> again, start a terminal and run: <eos2($PROGNAME --enable)>"
+_tr_add2 settings_dis_text       "Enabling <eos1($PRETTY_PROGNAME:)>"
+_tr_add2 settings_dis_title      "How to enable <eos1($PRETTY_PROGNAME)>"
 _tr_add2 settings_dis_butt       "I remember"
 _tr_add2 settings_dis_buttip     "I promise"
 
-_tr_add2 help_butt_title         "<pre1>$PRETTY_PROGNAME</pre1> Help"
-_tr_add2 help_butt_text          "More info about the <pre1>$PRETTY_PROGNAME</pre1> app"
+_tr_add2 help_butt_title         "<eos1($PRETTY_PROGNAME)> Help"
+_tr_add2 help_butt_text          "More info about the <eos1($PRETTY_PROGNAME)> app"
 
 _tr_add2 dm_title                "Select Display Manager"
 _tr_add2 dm_col_name1            "Selected"
@@ -160,14 +160,14 @@ _tr_add2 issues_no               "No important system issues were detected."
 
 _tr_add2 cal_noavail            "Not available: "        # installer program
 _tr_add2 cal_warn               "Warning"
-_tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with <pre1>EndeavourOS</pre1> theming.\nInternet connection is not needed.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
-_tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
+_tr_add2 cal_info1              "This is a community development release.<eos1(<br><br>)>"                                   # specials needed!
+_tr_add2 cal_info2              "<eos1(<b>Offline</b>)> method gives you an Xfce desktop with EndeavourOS theming.<eos2(\n)>Internet connection is not needed.<eos3(<br><br>)>"
+_tr_add2 cal_info3              "<eos1(<b>Online</b>)> method lets you choose your desktop, with vanilla theming.<eos2(\n)>Internet connection is required.<eos3(<br><br>)>"
+_tr_add2 cal_info4              "Please Note: This release is a work in progress, please help us making it stable by reporting bugs.<eos1(\n)>"
 _tr_add2 cal_choose             "Choose installation method"
 _tr_add2 cal_method             "Method"
-_tr_add2 cal_nosupport          "<pre1>$PROGNAME</pre1>: unsupported mode: "
-_tr_add2 cal_nofile             "<pre1>$PROGNAME</pre1>: required file does not exist: "
+_tr_add2 cal_nosupport          "<eos1($PROGNAME)>: unsupported mode: "
+_tr_add2 cal_nofile             "<eos1($PROGNAME)>: required file does not exist: "
 _tr_add2 cal_istarted           "Install started"
 _tr_add2 cal_istopped           "Install finished"
 
@@ -175,15 +175,15 @@ _tr_add2 tail_butt              "Close this window"
 _tr_add2 tail_buttip            "Close only this window"
 
 
-_tr_add2 ins_text              "Installing <pre1>EndeavourOS</pre1> to disk"
+_tr_add2 ins_text              "Installing EndeavourOS to disk"
 _tr_add2 ins_start             "Start the Installer"
-_tr_add2 ins_starttip          "Start the <pre1>EndeavourOS</pre1> installer along with a debug terminal"
+_tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
 _tr_add2 ins_up                "Update this app$_exclamation"
 _tr_add2 ins_uptip             "Updates this app and restarts it"
-_tr_add2 ins_keys              "Initialize <pre1>pacman</pre1> keys"
-_tr_add2 ins_keystip           "Initialize <pre1>pacman</pre1> keys"
+_tr_add2 ins_keys              "Initialize <eos1(pacman)> keys"
+_tr_add2 ins_keystip           "Initialize <eos1(pacman)> keys"
 _tr_add2 ins_pm                "Partition manager"
-_tr_add2 ins_pmtip             "<pre1>Gparted</pre1> allows examining and managing disk partitions and structure"
+_tr_add2 ins_pmtip             "<eos1(Gparted)> allows examining and managing disk partitions and structure"
 _tr_add2 ins_rel               "Latest release info"
 _tr_add2 ins_reltip            "More info about the latest release"
 _tr_add2 ins_tips              "Installation tips"

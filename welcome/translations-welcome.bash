@@ -56,26 +56,34 @@ _translate_with_fixes() {
     # The N in <preN> must be an ordinal number 1...M. Do not bypass numbers, e.g. 1 2 3 5 fails after 3!
 
     # First, translate the given string.
-    local eng="$1"
-    local to="$(trans -e $tr_engine -no-autocorrect -no-auto -b "en:$lang" "$eng")"
+    local eng2="$1"
+    local to="$(echo "$eng2" | sed 's|&#\([0-9]*\);|<eoscd\1>|g')"
+    local to="$(trans -e $tr_engine -no-autocorrect -no-auto -b "en:$lang" "$to")"
 
     if [ -z "$to" ] ; then
-        echo "$eng"           # translation failed!
-        echo "Warning: translating ix '$ix' failed." >&2
+        echo "$eng2"           # translation failed!
+        echo "Warning: translating ix '$ix' failed." > "$HOME/.welcome-translation-${lang}-issue.log"
         return 1
     fi
 
     # Then fix those parts that weren't supposed to be modified.
-    local preN ix=0
+    local eosN ix=0
     while true ; do
         ((ix++))
-        preN="$(echo "$eng" | sed 's|.*<pre'$ix'>\(.*\)</pre'$ix'>.*|\1|')"
-        if [ "$preN" != "$eng" ] ; then
-            to="$(echo "$to" | sed -e 's|<pre'$ix'>.*</pre'$ix'>|'"$preN"'|')"
+        eosN="$(echo "$eng2" | sed 's|.*<eos'$ix'(\([^)]*\))>.*|\1|')"
+        if [ "$eosN" != "$eng2" ] ; then
+            to="$(echo "$to" | sed -e 's|<[ ]*eos'$ix'[ ]*([^)]*)[ ]*>|'"$eosN"'|g')"  # e.g. every pre1 stuff is changed
         else
             break
         fi
     done
+    to="$(echo "$to" | sed 's|<eoscd38>|\&#38;|g')"                 # '&'
+    to="$(echo "$to" | sed 's|[ ]*<eoscd\([0-9]*\)>|\&#\1;|g')"     # '!' and '?'
+
+    #to="$(echo "$to" | sed 's|<eosb>|<b>|g')"
+    #to="$(echo "$to" | sed 's|</eosb>|</b>|g')"
+    #to="$(echo "$to" | sed 's|<eosbr>|<br>|g')"
+
     echo "$to"
 }
 
@@ -123,11 +131,14 @@ _init_translations() {
     local generate=no
     local arg
     local tr_engine=""
+    local tr_prefer=manual    # or generated
+    local trlist trfile
 
     for arg in "$@" ; do
         case "$arg" in
             --generate) generate=yes ;;
             --tr-engine=*) tr_engine="${arg#*=}" ;;
+            --tr-prefer=*) tr_prefer="${arg#*=}" ;;
             -*) echo "Error: $FUNCNAME: unsupported option '$arg'." >&2 ; return 1 ;;
             *) lang="$arg" ;;
         esac
@@ -143,7 +154,7 @@ _init_translations() {
 
     local trdir="$translations_dir"   # from Welcome app
     local trdir2="$HOME/.config/EOS-generated-translations"              # generated translations go here
-    local target_gen="$trdir2/translations-welcome-${lang}-genenerated.bash"
+    local target_gen="$trdir2/translations-welcome-${lang}-generated.bash"
 
     if [ "$generate" = "yes" ] ; then
         if [ -z "$tr_engine" ] ; then
@@ -154,35 +165,72 @@ _init_translations() {
         return
     fi
 
-    if [ -r "$trdir2/translations-welcome-en-genenerated.bash" ] ; then
-        echo "en generated" >&2
-        source "$trdir2/translations-welcome-en-genenerated.bash"
-    else
-        echo "en manual" >&2
-        source $trdir/translations-welcome-en.bash       # fallback language: English
-    fi
+    case "$tr_prefer" in
+        manual)
+            trlist=(
+                "$trdir/translations-welcome-en.bash"
+                "$trdir2/translations-welcome-en-generated.bash"
+            )
+            ;;
+        generated)
+            trlist=(
+                "$trdir2/translations-welcome-en-generated.bash"
+                "$trdir/translations-welcome-en.bash"
+            )
+            ;;
+        *)
+            echo "option --tr-prefer has unsupported value '$tr_prefer'." >&2
+            return 1
+            ;;
+    esac
+
+    for trfile in "${trlist[@]}" ; do
+        if [ -r "$trfile" ] ; then
+            echo "$trfile" >&2
+            source "$trfile"
+            break
+        fi
+    done
 
     local xx ix
     local silent_lang_warnings=no
     local pname="$PRETTY_PROGNAME"
+    local selected=0
 
     export SELECTED_LANGUAGE_WELCOME=en
     if [ "$lang" != "en" ] ; then
-        if [ -r $trdir/translations-welcome-"$lang".bash ] ; then
-            export SELECTED_LANGUAGE_WELCOME="$lang"
-            source $trdir/translations-welcome-"$lang".bash
-            case "$lang" in
-                "de") silent_lang_warnings=yes ;;   # de is not fully translated yet...
-            esac
-        elif [ -r $target_gen ] ; then
-            export SELECTED_LANGUAGE_WELCOME="$lang"
-            source $target_gen
-        else
-            case "$lang" in
-                "en"|"fi")
-                    echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
-                    ;;
-            esac
+        case "$tr_prefer" in
+            manual)
+                trlist=(
+                    "$trdir/translations-welcome-"$lang".bash"
+                    "$trdir2/translations-welcome-"$lang"-generated.bash"
+                )
+                ;;
+            generated)
+                trlist=(
+                    "$trdir2/translations-welcome-"$lang"-generated.bash"
+                    "$trdir/translations-welcome-"$lang".bash"
+                )
+                ;;
+        esac
+
+        for trfile in "${trlist[@]}" ; do
+            if [ -r "$trfile" ] ; then
+                echo "$trfile" >&2
+                export SELECTED_LANGUAGE_WELCOME="$lang"
+                source "$trfile"
+                selected=1
+                if [ "$tr_prefer" = "manual" ] ; then
+                    case "$lang" in
+                        "de") silent_lang_warnings=yes ;;   # de is not fully translated yet...
+                    esac
+                fi
+                break
+            fi
+        done
+
+        if [ $selected -eq 0 ] ; then
+            echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
             silent_lang_warnings=yes   # give no more warnings about this language...
         fi
     fi

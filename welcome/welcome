@@ -937,11 +937,13 @@ StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
+    local tr_prefer=manual
 
     for arg in "$@" ; do
         case "$arg" in
             --lang=*) lang="${arg#*=}" ;;
             --tr-engine=*) tr_engine="${arg#*=}" ;;
+            --tr-prefer=*) tr_prefer="${arg#*=}" ;;
             --genlang=*)
                 lang="${arg#*=}"
                 _init_translations --tr-engine="$tr_engine" --generate "$lang"
@@ -950,7 +952,7 @@ StartHere() {
         esac
     done
 
-    _init_translations "$lang" || { echo "language fail" >&2 ; exit 1 ; }
+    _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
     AfterTranslations
 
@@ -969,7 +971,7 @@ StartHere() {
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) show_installer=1 ;;
             --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
-            --lang=*) ;; # already handled!
+            --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
