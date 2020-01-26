@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Helper for the 'su -c' command
+# (understands spaces in command parameters).
+
+Usage() {
+    echo "Usage: $(basename $0) command-with-parameters" >&2
+}
+
+DIE() {
+    Usage
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Main() {
+    local command=()
+    local xx
+
+    test -z "$1" && DIE "command missing"
+
+    # command and parameters containing spaces: surround each with single quotes
+    for xx in "$@" ; do
+        command+=("'$xx'")
+    done
+
+    # run max 3 times
+    for xx in {2..0} ; do
+        printf "Root "
+        /usr/bin/su -c "${command[*]}" && break
+        if [ $xx -ne 0 ] ; then
+            echo "Sorry, try again ($xx)." >&2
+        else
+            echo "Fail." >&2
+        fi
+    done
+}
+
+Main "$@"
