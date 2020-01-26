@@ -228,6 +228,15 @@ EOF
         yad_tailer $PACMAN_LOG
     fi
 
+    # Copy install log to /var/log of the installed system.
+    # Note: if $only_one_output_window != yes, this fails.
+
+    local varlog="$(/usr/bin/ls -d /tmp/calamares-root-*/var/log)"
+    if [ -d "$varlog" ] ; then
+        echo "Copying install log to /var/log/$(/usr/bin/basename $INSTALL_LOG_FILE) of the new install." >&2
+        cp $INSTALL_LOG_FILE $varlog
+    fi
+
     # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
 }
 export -f yad_calamares
