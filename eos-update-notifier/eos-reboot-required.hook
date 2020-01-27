@@ -1,14 +1,14 @@
 [Trigger]
 Operation = Upgrade
 Type = Package
+Target = amd-ucode
+Target = intel-ucode
+Target = cryptsetup
 Target = linux
+Target = linux-hardened
 Target = linux-lts
 Target = linux-zen
-Target = linux-hardened
 Target = linux-firmware
-Target = systemd*
-Target = xorg-*
-Target = xf86-*
 Target = nvidia
 Target = mvidia-dkms
 Target = mvidia-*xx-dkms
@@ -16,10 +16,11 @@ Target = nvidia-*xx
 Target = mvidia-*lts-dkms
 Target = nvidia*-lts
 Target = mesa
-Target = *wayland*
-Target = intel-ucode
-Target = amd-ucode
-Target = cryptsetup
+Target = systemd*
+Target = wayland
+Target = egl-wayland
+Target = xf86-*
+Target = xorg-*
 
 [Action]
 Description = Inform user to reboot after certain system package upgrades.
