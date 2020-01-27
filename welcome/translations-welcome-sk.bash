@@ -62,11 +62,11 @@ _tr_add2 after_install_ustip   "Aktualizovať systémové aplikácie"
 _tr_add2 after_install_dsi     "Zistiť problémy so systémom"
 _tr_add2 after_install_dsitip  "Skontrolovať akékoľvek možné problémy so systémovými balíčkami, alebo inde"
 
-_tr_add2 after_install_etl     "EndeavourOS na poslednej verzii$_question"
+_tr_add2 after_install_etl     "Je EndeavourOS na poslednej verzii$_question"
 _tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dostal na najnovšiu verziu EndeavourOS"
 
 _tr_add2 after_install_cdm     "Zmeniť Display Manager"
-_tr_add2 after_install_cdmtip  "Použiť iný display manager"
+_tr_add2 after_install_cdmtip  "Použiť iného správcu zobrazovania"
 
 _tr_add2 after_install_ew      "EndeavourOS pozadie"
 _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
@@ -75,7 +75,7 @@ _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
 _tr_add2 after_install_pm      "Spravovanie balíčkov"
 _tr_add2 after_install_pmtip   "Ako spravovať balíčky s pacmanom"
 
-_tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
+_tr_add2 after_install_ay      "AUR $_ a yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "Novinky"
 _tr_add2 general_info_netip    "Novinky a články"
 
 _tr_add2 general_info_fo       "Fórum"
-_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
+_tr_add2 general_info_fotip    "Opýtajte sa, komentujte a diskutujte na našom priateľskom fóre!"
 
 _tr_add2 general_info_do       "Prispieť"
 _tr_add2 general_info_dotip    "Pomôžte nám udržať EndeavourOS v prevoze"
