@@ -34,6 +34,7 @@ source=(
   $url/translations-${pkgname}-en.bash
   $url/translations-${pkgname}-fi.bash
   $url/translations-${pkgname}-fr.bash
+  $url/translations-${pkgname}-sk.bash
 )
 sha512sums=('847b5ecfdfdbddb0d16ec41bb9ae7024c3f7e0cbd37fbe2f4d1a7999895487d8a9db7b1d249f9dd469da60f620713b6bf1a2c2cdb578ee4292fb755be992b152'
             'd5ad5c9fe382f1614094e6677b406c059a3b6efbb56e8c8f6dcb2aa64e0bcc158fcab1b511951d0b360b07b1a491b0c36763abbb848474f2c22f71c8ec7f15e1'
@@ -51,10 +52,11 @@ sha512sums=('847b5ecfdfdbddb0d16ec41bb9ae7024c3f7e0cbd37fbe2f4d1a7999895487d8a9d
             '7f2b542c5854630a4b13e44cf756b93a28960230feaa705e7cf45fc754921ae32f931f561e94ca4387f3062a4c426fd506fa642ba61fd1955360df20554d7ced'
             'e5cb9f31ae8a18051833b1cb14512770558217cc5734633f2bb8bbedbac7d9cd63728e3e80f48dfb1e5c080345ca39310de52cbc2b24a15e2a61c4e6ad71de26'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
-            '335de4fbe4e155ee61f0cfd0c83d47ed86bfd7c796895243f076510de33d84b30edf2d6d6b280409850bb278f0f2692bfb389b1b3a4ac8a0bce9cac0ae0816a0')
+            'a795e487a1effa00310348cd657cc3175f7f3a494b0314b6e907d4246d8f5fcd4163d61824042fdac501913f1f8debba423c1bfcfd7d2e4938c2771e0668f234'
+            '37838cadeb58a0068345a217ceb448764affb47b6a68bf2ba135ae9952160d2de256911ce0c6a73eab96431440f8f3acdc830f76e766496a77c62be3e8732dbe')
 
 package() {
-  local languages="reference de en fi fr"   # Update this list when new languages are added.
+  local languages="reference de en fi fr sk"   # Update this list when new languages are added.
   local xx
 
   cd $srcdir
