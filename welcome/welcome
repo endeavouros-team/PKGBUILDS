@@ -917,6 +917,12 @@ Options:
 --version         Show the version of this app.
 --lang=X          Use language X on the user interface.
 
+Experimental options:
+--genlang=X       Generate language X support for the user interface of the Welcome app.
+                  X is a shorthand of two lowercase letters, like de, en, or fr.
+                  Note: requires package 'translate-shell' to be already installed.
+                  Try command 'trans -R' to see a list of available languages.
+
 To have $PRETTY_PROGNAME app started when you log in, make sure
 - $PRETTY_PROGNAME app is selected in the Autostart feature of the DE
     OR
@@ -940,6 +946,9 @@ the first two letters of the environment variable LANG.
 EOF
 }
 export -f Usage
+# --tr-prefer=X     Prefer either 'manual' or 'generated' language on the user interface.
+#                   Note: value 'generated' is meaningful only after option --genlang has
+#                   been used at least once.
 
 
 StartHere() {
