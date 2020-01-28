@@ -1,8 +1,8 @@
 # Preklad uvítacej aplikácie.
 #
 # Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
-# - in the Welcome app
-# - globally
+# - v uvítacej aplikácii
+# - globálne
 #
 #
 # Any string should be defined like:
@@ -180,8 +180,8 @@ _tr_add2 ins_start             "Spustiť inštalátor"
 _tr_add2 ins_starttip          "Spustiť EndeavourOS inštalátor, spolu s debugovou konzolou"
 _tr_add2 ins_up                "Aktualizuj túto aplikáciu$_exclamation"
 _tr_add2 ins_uptip             "Aktualizuje túto aplikáciu, a spustí ju znova"
-_tr_add2 ins_keys              "Inicializuj pacman kľúče"
-_tr_add2 ins_keystip           "Inicializuj pacman kľúče"
+_tr_add2 ins_keys              "Inicializovať pacman kľúče"
+_tr_add2 ins_keystip           "Inicializovať pacman kľúče"
 _tr_add2 ins_pm                "Správca diskových oddielov"
 _tr_add2 ins_pmtip             "Gparted umožňuje prezerať a spravovať diskové oddiely a štruktúru"
 _tr_add2 ins_rel               "Informácie o najnovšom vydaní"
