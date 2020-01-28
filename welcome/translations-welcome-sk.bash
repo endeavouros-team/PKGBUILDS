@@ -1,8 +1,8 @@
 # Preklad uvítacej aplikácie.
 #
 # Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
-# - in the Welcome app
-# - globally
+# - v uvítacej aplikácii
+# - globálne
 #
 #
 # Any string should be defined like:
@@ -62,11 +62,11 @@ _tr_add2 after_install_ustip   "Aktualizovať systémové aplikácie"
 _tr_add2 after_install_dsi     "Zistiť problémy so systémom"
 _tr_add2 after_install_dsitip  "Skontrolovať akékoľvek možné problémy so systémovými balíčkami, alebo inde"
 
-_tr_add2 after_install_etl     "EndeavourOS na poslednej verzii$_question"
+_tr_add2 after_install_etl     "Je EndeavourOS najnovší$_question"
 _tr_add2 after_install_etltip  "Ukázať, čo treba robiť, aby sa systém dostal na najnovšiu verziu EndeavourOS"
 
 _tr_add2 after_install_cdm     "Zmeniť Display Manager"
-_tr_add2 after_install_cdmtip  "Použiť iný display manager"
+_tr_add2 after_install_cdmtip  "Použiť iného správcu zobrazovania"
 
 _tr_add2 after_install_ew      "EndeavourOS pozadie"
 _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
@@ -75,7 +75,7 @@ _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
 _tr_add2 after_install_pm      "Spravovanie balíčkov"
 _tr_add2 after_install_pmtip   "Ako spravovať balíčky s pacmanom"
 
-_tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
+_tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "Novinky"
 _tr_add2 general_info_netip    "Novinky a články"
 
 _tr_add2 general_info_fo       "Fórum"
-_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
+_tr_add2 general_info_fotip    "Opýtajte sa, komentujte a diskutujte na našom priateľskom fóre!"
 
 _tr_add2 general_info_do       "Prispieť"
 _tr_add2 general_info_dotip    "Pomôžte nám udržať EndeavourOS v prevoze"
@@ -179,9 +179,9 @@ _tr_add2 ins_text              "Inštalovanie EndeavourOS na disk"
 _tr_add2 ins_start             "Spustiť inštalátor"
 _tr_add2 ins_starttip          "Spustiť EndeavourOS inštalátor, spolu s debugovou konzolou"
 _tr_add2 ins_up                "Aktualizuj túto aplikáciu$_exclamation"
-_tr_add2 ins_uptip             "Aktualizuje túto aplikáciu a spustí ju znova"
-_tr_add2 ins_keys              "Initialize pacman keys"
-_tr_add2 ins_keystip           "Initialize pacman keys"
+_tr_add2 ins_uptip             "Aktualizuje túto aplikáciu, a spustí ju znova"
+_tr_add2 ins_keys              "Inicializovať pacman kľúče"
+_tr_add2 ins_keystip           "Inicializovať pacman kľúče"
 _tr_add2 ins_pm                "Správca diskových oddielov"
 _tr_add2 ins_pmtip             "Gparted umožňuje prezerať a spravovať diskové oddiely a štruktúru"
 _tr_add2 ins_rel               "Informácie o najnovšom vydaní"

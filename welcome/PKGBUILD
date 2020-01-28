@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.4
+pkgver=2.4.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -54,7 +54,7 @@ sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c12
             'e5cb9f31ae8a18051833b1cb14512770558217cc5734633f2bb8bbedbac7d9cd63728e3e80f48dfb1e5c080345ca39310de52cbc2b24a15e2a61c4e6ad71de26'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
             'a795e487a1effa00310348cd657cc3175f7f3a494b0314b6e907d4246d8f5fcd4163d61824042fdac501913f1f8debba423c1bfcfd7d2e4938c2771e0668f234'
-            '37838cadeb58a0068345a217ceb448764affb47b6a68bf2ba135ae9952160d2de256911ce0c6a73eab96431440f8f3acdc830f76e766496a77c62be3e8732dbe')
+            'da9afb31e33b8cf8cfc2a47ee5e2b0365c664d3f076f5d661a97046a7af28290aab1e2ab25c75382ae2bcab8f2b0c602a081e06964cf052f3b6ae56237adc7e7')
 
 package() {
   local languages="reference de en fi fr sk"   # Update this list when new languages are added.
