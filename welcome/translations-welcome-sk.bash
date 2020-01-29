@@ -1,6 +1,6 @@
 # Preklad uvítacej aplikácie.
 #
-# Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
+# Poznámka: premenné (ako $PRETTY_PROGNAME nižšie), môžu byť použité ak už boli definované buď
 # - v uvítacej aplikácii
 # - globálne
 #
@@ -84,7 +84,7 @@ _tr_add2 after_install_hntip   "Sprevoznite si svoj hardvér"
 _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Rady ohľadom Bluetooth"
 
-_tr_add2 after_install_nv      "Užívatelia kariet NVIDIA users$_exclamation"
+_tr_add2 after_install_nv      "Užívatelia NVIDIA kariet$_exclamation"
 _tr_add2 after_install_nvtip   "Použiť NVIDIA inštalátor"
 
 _tr_add2 after_install_ft      "Rady ohľadom fóra"
@@ -163,7 +163,7 @@ _tr_add2 cal_warn               "Varovanie"
 _tr_add2 cal_info1              "Toto je komunitné, vývojové vydanie.\n\n"                                   # specials needed!
 _tr_add2 cal_info2              "<b>Offline</b> spôsob vám dá Xfce prostredie otémované pre EndeavourOS.\nNieje potrebné internetové pripojenie.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> spôsob vám umožňuje vybrať si uživateľské prostredie, so základnou témou.\nJe potrebné internetové pripojenie.\n\n"
-_tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
+_tr_add2 cal_info4              "Dbajte: Toto vydanie je v rozpracovanom štádiu, prosíme vás, pomôžte nám ho zostabilizovať nahlasovaním chýb.\n"
 _tr_add2 cal_choose             "Vyberte spôsob inštalácie"
 _tr_add2 cal_method             "Spôsob"
 _tr_add2 cal_nosupport          "$PROGNAME: nepodporovaný režim: "
