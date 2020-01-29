@@ -75,7 +75,7 @@ _tr_add2 after_install_ewtip   "Zmeniť pozadie na východiskové pre EOS"
 _tr_add2 after_install_pm      "Spravovanie balíčkov"
 _tr_add2 after_install_pmtip   "Ako spravovať balíčky s pacmanom"
 
-_tr_add2 after_install_ay      "AUR $_a yay$_exclamation"
+_tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o Arch User Repository a yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
