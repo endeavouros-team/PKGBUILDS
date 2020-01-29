@@ -49,6 +49,30 @@ local ASSET_HOOKS=(
 
 # Package hooks
 
+# do this for: downgrade, inxi, and icon-themes?
+
+_yay_hook_check_latest() {
+    # check if AUR PKGBUILD has the latest version of yay from the developer
+    local tool=yay
+    local url=https://github.com/Jguer/$tool/releases/latest
+    local tmpfile=$(mktemp)
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
+    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local netversion
+
+    wget -q --timeout=10 -O $tmpfile $url || {
+        echo "cannot fetch info about $tool" >&2
+        rm -f $tmpfile
+        return 1
+    }
+    netversion="$(grep "Release v[0-9]" $tmpfile | sed 's|^.*Release v\([0-9\.]*\).*$|\1|')"
+
+    if [ "$localversion" != "$netversion" ] ; then
+        echo "$tool: local='$localversion' net='$netversion'" >&2
+    fi
+    rm -f $tmpfile
+}
+
 _ckbcomp_hook_change_version() {
     # change "$url" http to https
     sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
@@ -108,8 +132,9 @@ _welcome_hook_check_ksetwallpaper_py() {
 declare -A ASSET_PACKAGE_HOOKS
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
-ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["welcome"]=_welcome_hook_check_ksetwallpaper_py
+ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
+ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 
 
 # Special hooks. Implemented via package hooks.
