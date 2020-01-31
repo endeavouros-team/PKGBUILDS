@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Nie wykryto istotnych błędów w systemie."
 _tr_add2 cal_noavail             "Nie dostępne : "        # program nastawczy
 _tr_add2 cal_warn                "Uwaga"
 _tr_add2 cal_info1               "To jest deweloperskie wydanie społeczności.\n\n"		# unikalne potrzeby !
-_tr_add2 cal_info2               "<b>Horsligne</b> Metoda Offline oferuje Ci pulpit XFCE z motywami EndeavourOS.\nPołącznie z internetem nie jest wymagane.\n\n"
-_tr_add2 cal_info3               "<b>Enligne</b> Metoda Online pozwala Ci wybrać pulpit z minimalnym motywem.\nPołączenie z internetem jest wymagane.\n\n"
+_tr_add2 cal_info2               "<b>Offline</b> Metoda Offline oferuje Ci pulpit XFCE z motywami EndeavourOS.\nPołącznie z internetem nie jest wymagane.\n\n"
+_tr_add2 cal_info3               "<b>Online</b> Metoda Online pozwala Ci wybrać pulpit z minimalnym motywem.\nPołączenie z internetem jest wymagane.\n\n"
 _tr_add2 cal_info4               "Zwróć uwagę : prace nad tym wydaniem nadal trwają, pomóż nam je poprawić zgłaszając błędy.\n"
 _tr_add2 cal_choose              "Wybierz metodę instalacji"
 _tr_add2 cal_method              "Metoda"
