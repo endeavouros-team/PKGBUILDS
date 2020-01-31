@@ -19,7 +19,7 @@
 #    <placeholder>   A pre-defined name that identifies the place in the Welcome app where this string is used.
 #    "string"        The translated string for the Welcome app.
 
-# English :
+# Polish :
 
 ### First some useful definitions :
 
