@@ -1,6 +1,6 @@
 # Traducciones para la aplicación Welcome
 #
-# Nota: variables (como $PRETTY_PROGNAME abajo) pueden utilizarse si ya están definidos, ya sea
+# Nota : variables (como $PRETTY_PROGNAME abajo) pueden utilizarse si ya están definidos, ya sea
 # - en el Welcome aplicación
 # - globalmente
 #
@@ -15,13 +15,13 @@
 #
 #    _tr_add         Es una función bash que añade una "cadena" a la base de datos de palabras.
 #    _tr_add2        Igual que _tr_add pero define el idioma usando la variable _tr_lang (abajo).
-#    <language>      Un acrónimo para el idioma, por ejemplo "en" para el inglés (¡comprueba las variable LANG!).
+#    <language>      Un acrónimo para el idioma, por ejemplo "en" para el inglés (¡comprueba las variable LANG !).
 #    <placeholder>   Un nombre predefinido que identifica el lugar en la aplicación de bienvenida donde se utiliza esta cadena.
 #    "string"        La cadena traducida para la aplicación Welcome.
 
-# Español:
+# Español :
 
-### Primero algunas definiciones útiles:
+### Primero algunas definiciones útiles :
 
 _tr_lang=es            # variable de ayuda requerida para _tr_add2
 
@@ -31,7 +31,7 @@ _and='&#38;'           # '&'
 _question='&#63;'      # '?'
 
 
-###################### Ahora las cadenas reales a ser traducidas: ######################
+###################### Ahora las cadenas reales a ser traducidas ######################
 # func   <placeholder>            "string"
 
 _tr_add2 welcome_disabled         "$PRETTY_PROGNAME La aplicación está desactivada. Para iniciarla de todas formas, usa la opción --enable."
@@ -88,7 +88,7 @@ _tr_add2 after_install_nv         "Usuarios NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip      "Utilice el instalador de NVIDIA"
 
 _tr_add2 after_install_ft         "Consejos Foro"
-_tr_add2 after_install_fttip      "Ayúdanos a ayudarte!"
+_tr_add2 after_install_fttip      "Ayúdanos a ayudarte$_exclamation"
 
 
 _tr_add2 general_info_text        "Encuentra tu camino en el sitio EndeavourOS$_exclamation"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne          "Noticias"
 _tr_add2 general_info_netip       "Noticias y artículos"
 
 _tr_add2 general_info_fo          "Foro"
-_tr_add2 general_info_fotip       "Pregunte, comente y charle en nuestro amigable foro!"
+_tr_add2 general_info_fotip       "Pregunte, comente y charle en nuestro amigable foro$_exclamation"
 
 _tr_add2 general_info_do          "Donar"
 _tr_add2 general_info_dotip       "Ayúdanos a mantener el EndeavourOS funcionando"
@@ -125,10 +125,10 @@ _tr_add2 add_more_apps_bt         "Bluetooth (blueberry) Xfce"
 _tr_add2 add_more_apps_bt_bm      "Bluetooth (blueman) Xfce"
 
 
-####################### COSAS NUEVAS DESPUÉS DE ESTA LÍNEA:
+####################### COSAS NUEVAS DESPUÉS DE ESTA LÍNEA  ######################
 
-_tr_add2 settings_dis_contents    "Para ejecutar $PRETTY_PROGNAME de nuevo, inicia una terminal y ejecuta: $PROGNAME --enable"
-_tr_add2 settings_dis_text        "Reactivación $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_contents    "Para ejecutar $PRETTY_PROGNAME de nuevo, inicia una terminal y ejecuta : $PROGNAME --enable"
+_tr_add2 settings_dis_text        "Reactivación $PRETTY_PROGNAME :"
 _tr_add2 settings_dis_title       "Cómo volver a reactivar $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt        "Lo recuerdo"
 _tr_add2 settings_dis_buttip      "Lo prometo"
@@ -154,20 +154,20 @@ _tr_add2 sysup_no                 "No hay actualizaciones."
 _tr_add2 sysup_check              "Buscando actualizaciones de software..."
 
 _tr_add2 issues_title             "Detección de errores en los paquetes"
-_tr_add2 issues_grub              "IMPORTANTE: será necesario volver a crear el menú de arranque manualmente."
-_tr_add2 issues_run               "Comandos de ejecución:"
+_tr_add2 issues_grub              "IMPORTANTE : será necesario volver a crear el menú de arranque manualmente."
+_tr_add2 issues_run               "Comandos de ejecución :"
 _tr_add2 issues_no                "No se detectaron problemas importantes del sistema."
 
-_tr_add2 cal_noavail              "No está disponible: "        # programa de instalación
+_tr_add2 cal_noavail              "No está disponible : "        # programa de instalación
 _tr_add2 cal_warn                 "Alerta"
-_tr_add2 cal_info1                "Este es un lanzamiento de desarrollo comunitario.\n\n"                                   # specials needed!
+_tr_add2 cal_info1                "Este es un lanzamiento de desarrollo comunitario.\n\n"                                   # specials needed !
 _tr_add2 cal_info2                "<b>Fuera de línea</b> Este método te da un escritorio Xfce con temas de EndeavourOS.\nNo es necesario tener conexión a internet.\n\n"
 _tr_add2 cal_info3                "<b>En línea</b> Este método te permite elegir tu escritorio, con temas sin personalización.\nEs necesario tener conexión a internet.\n\n"
-_tr_add2 cal_info4                "Por favor tenga en cuenta: Este lanzamiento es un trabajo en progreso, por favor ayúdenos a estabilizarlo reportando errores..\n"
+_tr_add2 cal_info4                "Por favor tenga en cuenta : Este lanzamiento es un trabajo en progreso, por favor ayúdenos a estabilizarlo reportando errores..\n"
 _tr_add2 cal_choose               "Elija el método de instalación"
 _tr_add2 cal_method               "Método"
-_tr_add2 cal_nosupport            "$PROGNAME: modo no soportado: "
-_tr_add2 cal_nofile               "$PROGNAME: el archivo requerido no existe: "
+_tr_add2 cal_nosupport            "$PROGNAME : modo no soportado : "
+_tr_add2 cal_nofile               "$PROGNAME : el archivo requerido no existe : "
 _tr_add2 cal_istarted             "La instalación comenzó"
 _tr_add2 cal_istopped             "La instalación terminó"
 
@@ -194,4 +194,4 @@ _tr_add2 ins_troubletip           "Recuperar el sistema"
 _tr_add2 after_install_us_from    "Actualizar desde"                            # AUR o upstream
 _tr_add2 after_install_us_el      "Se requieren privilegios elevados."
 _tr_add2 after_install_us_done    "Actualización finalizada."
-_tr_add2 after_install_us_fail    "La actualización falló!"
+_tr_add2 after_install_us_fail    "La actualización falló$_exclamation"
