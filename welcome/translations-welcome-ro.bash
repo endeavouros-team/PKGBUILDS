@@ -125,7 +125,7 @@ _tr_add2 add_more_apps_bt        "Bluetooth (blueberry) Xfce"
 _tr_add2 add_more_apps_bt_bm     "Bluetooth (blueman) Xfce"
 
 
-###################### NOUĂ CHESTIE ACEASTA LINIE ######################
+###################### CHESTII NOI DUPĂ ACEASTĂ LINIE ######################
 
 _tr_add2 settings_dis_contents   "Pentru a executa $PRETTY_PROGNAME din nou, deschide un terminal și rulează comanda: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Re-activare $PRETTY_PROGNAME: "
