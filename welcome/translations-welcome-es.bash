@@ -30,6 +30,9 @@ _exclamation='&#33;'   # '!'
 _and='&#38;'           # '&'
 _question='&#63;'      # '?'
 
+_exclamation_down='&#161;'   # '¡'
+_question_down='&#191;'      # '¿'
+
 
 ###################### Ahora las cadenas reales a ser traducidas ######################
 # func   <placeholder>            "string"
@@ -62,7 +65,7 @@ _tr_add2 after_install_ustip      "Actualizar el software del sistema"
 _tr_add2 after_install_dsi        "Detectar bug Sistema"
 _tr_add2 after_install_dsitip     "Detectar cualquier problema potencial en los paquetes del sistema o en otro lugar"
 
-_tr_add2 after_install_etl        "¿EndeavourOS más reciente$_question"
+_tr_add2 after_install_etl        "${_question_down}EndeavourOS más reciente$_question"
 _tr_add2 after_install_etltip     "Mostrar qué hacer para que tu sistema llegue al último nivel de EndeavourOS"
 
 _tr_add2 after_install_cdm        "Cambiar Gestor Pantalla"
@@ -75,7 +78,7 @@ _tr_add2 after_install_ewtip      "Cambiar el fondo de pantalla al que trae Ende
 _tr_add2 after_install_pm         "Gestor Paquetes"
 _tr_add2 after_install_pmtip      "Cómo manejar los paquetes con pacman"
 
-_tr_add2 after_install_ay         "¡AUR $_and yay$_exclamation"
+_tr_add2 after_install_ay         "${_exclamation_down}AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip      "Información de AUR y yay"
 
 _tr_add2 after_install_hn         "Hardware y Red"
@@ -84,14 +87,14 @@ _tr_add2 after_install_hntip      "Ponga a funcionar su hardware"
 _tr_add2 after_install_bt         "Bluetooth"
 _tr_add2 after_install_bttip      "Consejo de bluetooth"
 
-_tr_add2 after_install_nv         "¡Usuarios NVIDIA$_exclamation"
+_tr_add2 after_install_nv         "${_exclamation_down}Usuarios NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip      "Utilice el instalador de NVIDIA"
 
 _tr_add2 after_install_ft         "Consejos Foro"
-_tr_add2 after_install_fttip      "¡Ayúdanos a ayudarte$_exclamation"
+_tr_add2 after_install_fttip      "${_exclamation_down}Ayúdanos a ayudarte$_exclamation"
 
 
-_tr_add2 general_info_text        "¡Encuentra tu camino en el sitio EndeavourOS$_exclamation"
+_tr_add2 general_info_text        "${_exclamation_down}Encuentra tu camino en el sitio EndeavourOS$_exclamation"
 
 _tr_add2 general_info_ws          "Sitio web"
 
@@ -102,10 +105,10 @@ _tr_add2 general_info_ne          "Noticias"
 _tr_add2 general_info_netip       "Noticias y artículos"
 
 _tr_add2 general_info_fo          "Foro"
-_tr_add2 general_info_fotip       "¡Pregunte, comente y charle en nuestro amigable foro$_exclamation"
+_tr_add2 general_info_fotip       "${_exclamation_down}Pregunte, comente y charle en nuestro amigable foro$_exclamation"
 
 _tr_add2 general_info_do          "Donar"
-_tr_add2 general_info_dotip       "¡Ayúdanos a mantener el EndeavourOS funcionando"
+_tr_add2 general_info_dotip       "${_exclamation_down}Ayúdanos a mantener el EndeavourOS funcionando"
 
 _tr_add2 general_info_ab          "Acerca de $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip       "Más información sobre esta aplicación"
@@ -178,7 +181,7 @@ _tr_add2 tail_buttip              "Cerrar sólo esta ventana"
 _tr_add2 ins_text                 "Instalando EndeavourOS en el disco"
 _tr_add2 ins_start                "Inicie el instalador"
 _tr_add2 ins_starttip             "Inicie el instalador del EndeavourOS junto con una terminal de debug"
-_tr_add2 ins_up                   "¡Actualizar esta aplicación$_exclamation"
+_tr_add2 ins_up                   "${_exclamation_down}Actualizar esta aplicación$_exclamation"
 _tr_add2 ins_uptip                "Actualiza esta aplicación y reiniciarla"
 _tr_add2 ins_keys                 "Iniciar las teclas del pacman"
 _tr_add2 ins_keystip              "Iniciar las teclas del pacman"
@@ -194,4 +197,4 @@ _tr_add2 ins_troubletip           "Recuperar el sistema"
 _tr_add2 after_install_us_from    "Actualizar desde"                            # AUR o upstream
 _tr_add2 after_install_us_el      "Se requieren privilegios elevados."
 _tr_add2 after_install_us_done    "Actualización finalizada."
-_tr_add2 after_install_us_fail    "¡La actualización falló$_exclamation"
+_tr_add2 after_install_us_fail    "${_exclamation_down}La actualización falló$_exclamation"
