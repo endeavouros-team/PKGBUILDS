@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=2.4.2
-pkgrel=1
+pkgrel=1.1
 arch=('any')
 license=('GPL')
 depends=(
@@ -33,8 +33,10 @@ source=(
   $url/translations-${pkgname}-reference.bash
   $url/translations-${pkgname}-de.bash
   $url/translations-${pkgname}-en.bash
+  $url/translations-${pkgname}-es.bash
   $url/translations-${pkgname}-fi.bash
   $url/translations-${pkgname}-fr.bash
+  $url/translations-${pkgname}-pl.bash
   $url/translations-${pkgname}-sk.bash
 )
 sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c123841eba5854feead389d7b92f02823843f086979b88333a59e1a13712885f'
@@ -52,12 +54,14 @@ sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c12
             '394ac7527470178e33c655e6804c62389140bacd3dee0b8846d46c4fd6e70401e92a16182e981ef1ff7085df4d9e3d04483c7a974a435c76ff07f4134965bed7'
             '7f2b542c5854630a4b13e44cf756b93a28960230feaa705e7cf45fc754921ae32f931f561e94ca4387f3062a4c426fd506fa642ba61fd1955360df20554d7ced'
             'e5cb9f31ae8a18051833b1cb14512770558217cc5734633f2bb8bbedbac7d9cd63728e3e80f48dfb1e5c080345ca39310de52cbc2b24a15e2a61c4e6ad71de26'
+            '060e412684d320ae4b49d08faa6084755087e3b828df194437f4836397e3a2db5172bff0c4aad57a893b1b5be3c23a11dbf3bd6b4c3e91a74efee7fb48902780'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
-            'a795e487a1effa00310348cd657cc3175f7f3a494b0314b6e907d4246d8f5fcd4163d61824042fdac501913f1f8debba423c1bfcfd7d2e4938c2771e0668f234'
+            '4cfcee03e0efa1c2e000e27986bbe8256d00da2dd2bdfb9bbb8dcdfd6e67901e17c73110b957db13ac8ff01df982e95d70eb815e9ee9b5afbab6c0aa60da9525'
+            '75ae63c9ed6d3dc9f7c0848c91197129edb1173b0bf55750aab83515d76cfb00224cc67698dc48a1cd452c8d617c7de749450982d9d1c4b805ad4e897feb6c9a'
             '7040fab762e4bb57f822b961a573a50832474e31022995cce53204bae020ce59a8262c9b0823c9352ac233b69271dd4c2acc9bd2f1b0daff24f202af68c5d119')
 
 package() {
-  local languages="reference de en fi fr sk"   # Update this list when new languages are added.
+  local languages="reference de en es fi fr pl sk"   # Update this list when new languages are added.
   local xx
 
   cd $srcdir
