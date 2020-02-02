@@ -1,6 +1,6 @@
 # Welcome
 
-Name | Description | Additional info
+File name | Description | Additional info
 ---- | ------- | ------
 eos-kill-yad-zombies | Kills possible yad processes left by the session save feature | -
 eos-script-lib-yad | Common bash code for various EOS apps | -
