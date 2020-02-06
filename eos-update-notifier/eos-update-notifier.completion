@@ -5,9 +5,11 @@ __eos_update_notifier_() {
     _init_completion -s || return
 
     local options="-init -init-force -conf -show-timer -q -iw= -nw= -news="
+    options+=" --init --init-force --conf --show-timer --quiet"
 
     case "$prev" in
-        -init | -init-force | -conf | -show-timer | -q) return ;;
+        -init | -init-force | -conf | -show-timer | -q)  return ;;
+        --init | --init-force | --conf | --show-timer | --quiet) return ;;
     esac
 
     case "$cur" in

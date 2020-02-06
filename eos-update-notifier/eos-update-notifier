@@ -325,10 +325,10 @@ Initialize() {    # initialize service and timer for the current user
     local fetch_files=0
 
     case "$arg" in
-        -init-force | -conf) modify_service=1 ;;
+        -init-force | --init-force | -conf | --conf) modify_service=1 ;;
     esac
     case "$arg" in
-        -init-force) fetch_files=1 ;;
+        -init-force | --init-force) fetch_files=1 ;;
     esac
     if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
         fetch_files=1
@@ -342,7 +342,7 @@ Initialize() {    # initialize service and timer for the current user
         }
         test "$fetch_files" = "1" && FetchAndCheck "$configdir" "$progname" "$url"
         case "$arg" in
-            -conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
+            -conf | --conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
         esac
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
@@ -475,14 +475,14 @@ Main()
 
     for arg in "$@" ; do
         case "$arg" in
-            -init | -init-force)
+            -init | --init | -init-force | --init-force)
                 initialize="$arg"
                 ;;
-            -conf)
+            -conf | --conf)
                 Configure
                 return
                 ;;
-            -show-timer)
+            -show-timer | --show-timer)
                 systemctl --user status eos-update-notifier.timer | cat -
                 return
                 ;;
@@ -498,17 +498,17 @@ Main()
             -news=*)
                 newsdays="$(eos_yad_GetArgVal "$arg")"
                 ;;
-            -q)
+            -q | --quiet)
                 verbosity=low
                 ;;
             --pkgsonly)
                 pkgsonly=yes
                 initial_waittime=0
                 ;;
-            -systemd)
+            -systemd | --systemd)
                 systemd=1
                 ;;
-            -update-focused)
+            -update-focused | --update-focused)
                 # this time we will steal focus (earlier we just showed there are updates)
                 update_focused=1
                 ;;
@@ -533,13 +533,16 @@ Main()
         mode=onetimer
     fi
 
-    test "$initialize" != "-init-force" && InitialWait
+    case "$initialize" in
+        -init-force | --init-force) ;;
+        *) InitialWait ;;
+    esac
 
     # Now internet connection is required.
     CheckInternetConnection || return 1
 
     case "$initialize" in
-        -init-force | -init) Initialize ; return ;;
+        -init-force | --init-force | -init | --init) Initialize ; return ;;
     esac
 
     while true ; do
