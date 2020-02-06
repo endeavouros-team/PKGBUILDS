@@ -46,33 +46,33 @@ _tr_add2 butt_help               "Pomoc"
 
 
 _tr_add2 nb_tab_INSTALL          "INSTALACJA"
-_tr_add2 nb_tab_GeneralInfo      "Informacje Ogólne"
-_tr_add2 nb_tab_AfterInstall     "Po Instalacji"
-_tr_add2 nb_tab_AddMoreApps      "Dodaj Aplikacji"
+_tr_add2 nb_tab_GeneralInfo      "Informacje ogólne"
+_tr_add2 nb_tab_AfterInstall     "Po instalacji"
+_tr_add2 nb_tab_AddMoreApps      "Dodaj aplikacje"
 
 
 _tr_add2 after_install_text      "Zadania po instalacji"
 
-_tr_add2 after_install_um        "Zaktualizuj Lustrzane"
+_tr_add2 after_install_um        "Zaktualizuj serwery lustrzane"
 _tr_add2 after_install_umtip     "Zaktualizuj listę serwerów lustrzanych przed aktualizacją systemu"
 
 _tr_add2 after_install_us        "Zaktualizuj System"
 _tr_add2 after_install_ustip     "Zaktualizuj oprogramowanie systemu"
 
-_tr_add2 after_install_dsi       "Wykryj problemy Systemem"
+_tr_add2 after_install_dsi       "Wykryj problemy z systemem"
 _tr_add2 after_install_dsitip    "Wykryj potencjalne problemy z pakietami systemowymi lub inne"
 
 _tr_add2 after_install_etl       "Najświeższy EndeavourOS$_question"
 _tr_add2 after_install_etltip    "Pokaż co zrobić aby podnieść Twój system do ostatniej wersji EndeavourOS"
 
-_tr_add2 after_install_cdm       "Zmień menedżer Wyświetlania"
-_tr_add2 after_install_cdmtip    "użyj innego menedżera wyświetlania"
+_tr_add2 after_install_cdm       "Zmień menedżer wyświetlania"
+_tr_add2 after_install_cdmtip    "Użyj innego menedżera wyświetlania"
 
 _tr_add2 after_install_ew        "Tapeta EndeavourOS"
 _tr_add2 after_install_ewtip     "Zmień tło pulpitu na domyślne EndeavourOS"
 
 
-_tr_add2 after_install_pm        "Zarządzanie Pakietami"
+_tr_add2 after_install_pm        "Zarządzanie pakietami"
 _tr_add2 after_install_pmtip     "Jak zarządzać pakietami z pacmanem"
 
 _tr_add2 after_install_ay        "AUR $_and yay $_exclamation"
@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip     "Porady Bluetooth"
 _tr_add2 after_install_nv        "Użytkownicy NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip     "Użyj instalatora NVIDIA"
 
-_tr_add2 after_install_ft        "Wskazówki Forum"
+_tr_add2 after_install_ft        "Wskazówki do forum"
 _tr_add2 after_install_fttip     "Pomóż nam pomóc sobie$_exclamation"
 
 
