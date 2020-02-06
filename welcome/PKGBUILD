@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.4.5
+pkgver=2.4.6
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -57,8 +57,8 @@ sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c12
             '53e7623a8561783e1470eece1257514447e138885e7ebfb0c0cf1da554faf342e81959b8ca0328f809cee12f3fd7e2252e795abaad8d9b21ab295a8c8605c702'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
             '4cfcee03e0efa1c2e000e27986bbe8256d00da2dd2bdfb9bbb8dcdfd6e67901e17c73110b957db13ac8ff01df982e95d70eb815e9ee9b5afbab6c0aa60da9525'
-            '75ae63c9ed6d3dc9f7c0848c91197129edb1173b0bf55750aab83515d76cfb00224cc67698dc48a1cd452c8d617c7de749450982d9d1c4b805ad4e897feb6c9a'
-            '7040fab762e4bb57f822b961a573a50832474e31022995cce53204bae020ce59a8262c9b0823c9352ac233b69271dd4c2acc9bd2f1b0daff24f202af68c5d119')
+            '059470680fa82160c54d652e892454d442d7fb29ac0e07251e1ebc22cd5c51c7f09788d52eb8ef721f25305741a264dbc14664d61d16046148e279455d708bde'
+            '01ec448bbf63914e06addc42000a250c68e80863800622337089555231ef115fae778a7f10374ca43f42bc7fc5e1b709f7ed6a8b5cbb27deac4b7c922c11cdc3')
 
 package() {
   local languages="reference de en es fi fr pl sk"   # Update this list when new languages are added.
