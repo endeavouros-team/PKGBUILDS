@@ -3,7 +3,10 @@
 # Select pacman mirrors with a simple GUI.
 #
 
-eos_yad() { GDK_BACKEND=x11 /usr/bin/yad --window-icon=configure "$@" ; }
+eos_yad() {
+    local icon=/usr/share/endeavouros/EndeavourOS-icon.png  # always use EndeavourOS icon
+    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$icon "$@"
+}
 
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
 
