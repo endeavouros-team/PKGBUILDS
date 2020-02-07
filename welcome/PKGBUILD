@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.4.6
+pkgver=2.4.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -36,7 +36,9 @@ source=(
   $url/translations-${pkgname}-es.bash
   $url/translations-${pkgname}-fi.bash
   $url/translations-${pkgname}-fr.bash
+  $url/translations-${pkgname}-it.bash
   $url/translations-${pkgname}-pl.bash
+  $url/translations-${pkgname}-ro.bash
   $url/translations-${pkgname}-sk.bash
 )
 sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c123841eba5854feead389d7b92f02823843f086979b88333a59e1a13712885f'
@@ -57,11 +59,13 @@ sha512sums=('97a07e54002164da9c22c90d01eb90e6dbd85bcad58c6dec50bf968ebead7971c12
             '53e7623a8561783e1470eece1257514447e138885e7ebfb0c0cf1da554faf342e81959b8ca0328f809cee12f3fd7e2252e795abaad8d9b21ab295a8c8605c702'
             'bbcfdaf9bbce64b083d487039c7805a42a350bde6fd4a8dab98c1c016248836079146f7d4730205f229136b1565faa6a8885fe897973b0ab1660ffb6e63f2de3'
             '4cfcee03e0efa1c2e000e27986bbe8256d00da2dd2bdfb9bbb8dcdfd6e67901e17c73110b957db13ac8ff01df982e95d70eb815e9ee9b5afbab6c0aa60da9525'
+            'a6b90f529dc96b29638edd21c8d68208bc5ea308f6993b70e6ab3b942bc3b59a147be64228ca77f7696c28a50879ae7ed3db5e8c2cf3d8ae4941acf8d694621b'
             '059470680fa82160c54d652e892454d442d7fb29ac0e07251e1ebc22cd5c51c7f09788d52eb8ef721f25305741a264dbc14664d61d16046148e279455d708bde'
+            'f847db78936307b8eaffa8466d11d49a70311ebe3a33c777473a0575b9746aa57ccfacce12c584ebbb6c15c8803070c06643890090c1af0c7c97c8465b40325a'
             '01ec448bbf63914e06addc42000a250c68e80863800622337089555231ef115fae778a7f10374ca43f42bc7fc5e1b709f7ed6a8b5cbb27deac4b7c922c11cdc3')
 
 package() {
-  local languages="reference de en es fi fr pl sk"   # Update this list when new languages are added.
+  local languages="reference de en es fi fr it pl ro sk"   # Update this list when new languages are added.
   local xx
 
   cd $srcdir
