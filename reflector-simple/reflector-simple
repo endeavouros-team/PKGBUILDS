@@ -3,7 +3,7 @@
 # Select pacman mirrors with a simple GUI.
 #
 
-eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad --window-icon=configure "$@" ; }
 
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
 
@@ -128,7 +128,6 @@ AskCountriesAndOptions() {
         command+=(--field="${countrynames[$ix]}:chk" $included)
     done
     command+=(--separator=" ")                      # assumes all returned values lack spaces
-    command+=(--window-icon="configure")
     command+=(--image="preferences-system")
 
     #command+=(--field=":LBL" "")
@@ -247,8 +246,8 @@ SaveMirrorlist() {
         return 1
     }
     AddCountryNamesToMirrors
-    cat $tmpfile | eos_yad --text-info --wrap --width=700 --height=400 \
-                           --title="New $ml" --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
+    eos_yad --form --text="$(cat $tmpfile)" --title="$New $ml" --scroll \
+            --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
         pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
     }
 }
