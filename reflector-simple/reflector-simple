@@ -249,9 +249,14 @@ SaveMirrorlist() {
         return 1
     }
     AddCountryNamesToMirrors
-    eos_yad --form --text="$(cat $tmpfile)" --title="$New $ml" --scroll \
-            --button=yad-quit:1 --button=" Save to $ml!gtk-save":0 && {
-        pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
+
+    local opts=(--width=750 --height=450 --title="New $ml")
+    opts+=(--button=yad-quit:1 --button=" Save to $ml!gtk-save":0)
+
+    cat $tmpfile | eos_yad --text-info "${opts[@]}" && {
+        if [ 1 -eq 1 ] ; then
+            pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved
+        fi
     }
 }
 
