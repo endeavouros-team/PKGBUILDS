@@ -8,51 +8,41 @@ _reflector_auto_die()
     local code="$2"
     test -n "$msg" && { echo "Error: $msg" > /tmp/reflector-auto.log ; echo "Error: $msg" >&2 ; }
     export _REFLECTOR_AUTO_FAILURE=yes
+    if [ $they_have_save -eq 0 ] ; then
+        rm -f $savefile $bakfile
+    fi
     exit $code
 }
 
-_contains_quotes() {
-    local param="$1"
-    local quote="$2"
-    local paramlen=${#param}
-    local new="$(echo "$param" | tr -d "$quote")"
+_get_reflector_auto_configs() {
+    # Read reflector options from /etc/reflector-auto.conf
+    # and convert country names to country codes.
+    local REFLECTOR_AUTO_CONF="$1"
+    local name code ix
+    local countrynames
+    local countrycodes
+    local REFLECTOR_COUNTRIES="$(reflector --list-countries)"
 
-    echo "$((paramlen-${#new}))"
-}
+    test -n "$REFLECTOR_COUNTRIES" || _reflector_auto_die "'reflector --list-countries' failed" 1
+    REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_COUNTRIES")"
 
-_make_options() {
-    local xx count
-    local store=""
-    local quote quotestop=""
+    readarray -t countrynames <<< "$(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
+    readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
 
-    for xx in "$@" ; do
-        quote='"'
-        count="$(_contains_quotes "$xx" "$quote")"
-        if [ $count -eq 0 ] ; then
-            quote="'"
-            count="$(_contains_quotes "$xx" "$quote")"
-        fi
-
-        if [ $count -eq 1 ] && [ -z "$quotestop" ] ; then
-            quotestop="$quote"
-        fi
-
-        if [ -z "$store" ] ; then
-            if [ $count -eq 1 ] ; then
-                store="$(echo "$xx" | tr -d "$quote")"
-            else
-                echo "$xx"
-            fi
-        else
-            store+=" $xx"
-            if [ $count -eq 1 ] ; then
-                test "$quote" = "$quotestop" || _reflector_auto_die "quoting problem with '$store'" 1
-                echo "$store" | tr -d "$quotestop"
-                store=""
-                quotestop=""
-            fi
+    local tmpconf=$(mktemp)
+    cat $REFLECTOR_AUTO_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
+    
+    for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
+        name="${countrynames[$ix]}"
+        if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
+            code="${countrycodes[$ix]}"
+            sed -i $tmpconf \
+                -e "s|'$name'|$code|g" \
+                -e "s|\"$name\"|$code|g"
         fi
     done
+    cat $tmpconf
+    rm -f $tmpconf
 }
 
 _reflector_auto_main()
@@ -64,8 +54,9 @@ _reflector_auto_main()
     #
     # Note: comment lines (first non-space char is #) or empty lines are skipped when reading the config file.
 
-    local system_config
+    local system_config=""
     local ml=/etc/pacman.d/mirrorlist
+    local conf=/etc/reflector-auto.conf
 
     # If $system_config and "$@" has no --save option, then we use a temporary --save file
     # to allow a user rank mirrors without using root permissions.
@@ -76,14 +67,16 @@ _reflector_auto_main()
     local rootcmds              # for storing possible root commands
     local xx
 
-    readarray -t system_config <<< "$(_make_options $(cat /etc/reflector-auto.conf | grep -P -v "^[ \t]*#|^$"))"
+    if [ -r $conf ] ; then
+        system_config="$(_get_reflector_auto_configs $conf)"
+    fi
 
     test "$_REFLECTOR_AUTO_FAILURE" = "yes" && {
         echo "Problems with reading options, exit."
         return 1
     }
 
-    for xx in "${system_config[@]}" "$@" ; do
+    for xx in $system_config "$@" ; do
         case "$xx" in
             --save) they_have_save=1 ; break ;;
         esac
@@ -99,7 +92,7 @@ _reflector_auto_main()
         rootcmds="cp $bakfile $ml.bak ; cp $savefile $ml"
     fi
 
-    reflector $saveoption "${system_config[@]}" "$@"  || _reflector_auto_die "reflector-auto failed." 1
+    /usr/bin/reflector $saveoption $system_config "$@" || _reflector_auto_die "reflector-auto failed." 1
     
     if [ $they_have_save -eq 0 ] ; then
         sudo bash -c "$rootcmds"

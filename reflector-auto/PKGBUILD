@@ -3,7 +3,7 @@
 pkgname=reflector-auto
 pkgdesc="Automates ranking of Arch mirrors with 'reflector'."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=1.1.1
+pkgver=1.3
 pkgrel=1
 arch=(any)
 license=(GPL)
@@ -14,7 +14,7 @@ source=(
   "$url/$pkgname.service"
   "$url/$pkgname.timer"
 )
-sha512sums=('73cf81790478e1154442c6377bd32a6b3ca7236ce5cad1539aebfbffbfc2447625f6383fb7c982025d3fc2a5bfabe4b868a1be6b9410a50f1aa6154dd55bfad9'
+sha512sums=('0586badab01737891d6a98b4f37e65ae2e9c671004de3e59ee0cc6c52648e4248d1549695ca5ceae5c8d124091701e80feb1ebdd71a8e12d13a4415ff9eb562a'
             '3abb665dda95fabe89d2671e5c9c690e8ee25178528d2efa88e998cf95fc5842d5fabb588fe1884c56f28529643d312088e5220922cee1976140ef74c3fd7635'
             '944dab8712fceda2ec870a25ed36baec934b45c347383588b8f41cacc0f116e6a300dbee3c5079778002ef3a90872f9280d007d2a8c3dc925d6316a496c63689')
 
