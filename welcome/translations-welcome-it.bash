@@ -88,7 +88,7 @@ _tr_add2 after_install_nv         "Utenti NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip      "Utilizzare il programma di installazione NVIDIA"
 
 _tr_add2 after_install_ft         "Suggerimenti Forum"
-_tr_add2 after_install_fttip      "Aiutaci ad aiutarti_exclamation"
+_tr_add2 after_install_fttip      "Aiutaci ad aiutarti$_exclamation"
 
 
 _tr_add2 general_info_text        "Trova la tua strada sul sito web di EndeavourOS$_exclamation"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne          "Notizie"
 _tr_add2 general_info_netip       "Notizie e articoli"
 
 _tr_add2 general_info_fo          "Forum"
-_tr_add2 general_info_fotip       "Chiedi, commenta e chatta nel nostro amichevole forum_exclamation"
+_tr_add2 general_info_fotip       "Chiedi, commenta e chatta nel nostro amichevole forum$_exclamation"
 
 _tr_add2 general_info_do          "Donazione"
 _tr_add2 general_info_dotip       "Aiutaci a far funzionare EndeavourOS"
@@ -194,4 +194,4 @@ _tr_add2 ins_troubletip           "System Rescue"
 _tr_add2 after_install_us_from    "Aggiornamenti da"                            		# AUR or upstream
 _tr_add2 after_install_us_el      "Sono richiesti privilegi elevati."
 _tr_add2 after_install_us_done    "Aggiornamento fatto."
-_tr_add2 after_install_us_fail    "Aggiornamento non riuscito_exclamation"
+_tr_add2 after_install_us_fail    "Aggiornamento non riuscito$_exclamation"
