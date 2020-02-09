@@ -8,14 +8,14 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.17.1
-pkgrel=13
+pkgver=3.2.18
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 optdepends=('update-mirrorlist')
-makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules')
+makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current' 'calamares_test') 
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager'
 'upower' 'qt5-webengine' 'yaml-cpp' 'boost' 'networkmanager'
