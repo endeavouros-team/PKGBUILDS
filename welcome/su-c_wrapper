@@ -15,7 +15,7 @@ DIE() {
 
 Main() {
     local command=()
-    local xx
+    local xx error
 
     test -z "$1" && DIE "command missing"
 
@@ -27,7 +27,14 @@ Main() {
     # run max 3 times
     for xx in {2..0} ; do
         printf "Root "
-        /usr/bin/su -c "${command[*]}" && break
+        /usr/bin/su -c "${command[*]}"
+        error=$?
+        case $error in
+            0) break ;;                # OK
+            127|126) break ;;          # command is erroneous or can't be executed
+            1) ;;                      # probably wrong password
+            *) ;;                      # signal killed command
+        esac
         if [ $xx -ne 0 ] ; then
             echo "Sorry, try again ($xx)." >&2
         else
