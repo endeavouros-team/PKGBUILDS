@@ -4,7 +4,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=ckbcomp
-pkgver=1.192
+pkgver=1.194
 pkgrel=1
 pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or kbdcontrol"
 arch=(any)
@@ -12,10 +12,10 @@ url="https://anonscm.debian.org/cgit/d-i/console-setup.git/"
 license=('GPL2')
 depends=('perl')
 source=("http://ftp.de.debian.org/debian/pool/main/c/console-setup/console-setup_${pkgver}.tar.xz")
-sha512sums=('2a59b43d9e157034390c8a275752c39eee648cb87ccef4e4507e4a79a75adbb5c6b83aacd93b669b577fa896cef75821f54ce966177879aaec57c5d6759335c8')
+sha512sums=('fe71480b45e8c88c9e46264f734d0eb21023a6afedfa6412551bb40f7525f14823befe726efc37f152a36d9a8de3aba00cd41f9fe42bcea2780c5cf8764a6b80')
 
 package() {
-    cd console-setup
+    cd console-setup-${pkgver}
     install -d ${pkgdir}/usr/bin/
     install -m755 Keyboard/ckbcomp ${pkgdir}/usr/bin/
 }
