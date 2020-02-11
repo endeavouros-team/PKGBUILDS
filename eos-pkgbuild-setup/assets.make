@@ -401,6 +401,44 @@ Exit()
     exit "$code"
 }
 
+_SleepSeconds() {
+    local sec="$1"
+    local xx
+    for ((xx=sec; xx>0; xx--)) ; do
+        printf "\r%s   " "$xx"
+        sleep 1
+    done
+    printf "\r%s\n" "$xx"
+}
+
+MirrorCheck() {
+    local checker="./mirrorcheck"
+    local mirror_check="Alpix mirror check"
+    local timeout
+
+    if [ -n "$built" ] ; then
+        timeout=180
+    else
+        timeout=3
+    fi
+
+    if [ -x "$checker" ] && [ -r endeavouros.db ] ; then
+        if [ $timeout -eq 180 ] ; then
+            read -p "Do $mirror_check (Y/n)?" >&2
+        fi
+        case "$REPLY" in
+            ""|[yY]*)
+                echo2 "Starting $mirror_check after countdown, please wait..."
+                _SleepSeconds $timeout
+                $checker .
+                ;;
+        esac
+    else
+        echo2 "Sorry, checker $checker not found."
+        echo2 "Cannot do $mirror_check."
+    fi
+}
+
 Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
@@ -671,6 +709,8 @@ Main()
     Destructor
 
     ShowOldCompressedPackages   # should show nothing
+
+    MirrorCheck
 }
 
 Main "$@"

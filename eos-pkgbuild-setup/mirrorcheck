@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Check that Alpix repo has the same package and db files as the given local folder.
+# Note: only a file name check.
+#
+
+echo2() { echo "$@" >&2 ; }
+
+DIE() {
+    echo2 "Error: $1"
+    exit 1
+}
+
+Main()
+{
+    local folder="$1"
+    local repo=endeavouros
+    local arch=x86_64
+    local who=alpix
+    local remoteurl=https://mirror.$who.eu/endeavouros/repo/$repo/$arch/
+    local remotefiles
+    local localfiles
+    local problemfiles=""
+    local xx yy
+
+    if [ -z "$folder" ] ; then
+        if [ -r endeavouros.db ] ; then
+            folder=.
+        fi
+    fi
+
+    test -n "$folder" || DIE "no local folder!"
+    test -d "$folder" || DIE "folder $folder does not exist!"
+
+    pushd "$folder" >/dev/null
+
+    echo2 "Fetching $who package info..."
+    remotefiles="$(curl -s "$remoteurl" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
+
+    localfiles="$(ls -1 *.pkg.tar.* $repo.{db{,.tar.xz},files{,.tar.xz}})"
+
+    for xx in $localfiles ; do
+        for yy in $remotefiles ; do
+            test "$xx" = "$yy" && break
+        done
+        if [ "$xx" != "$yy" ] ; then
+            echo2 "file $xx missing from $who !"
+            problemfiles+="$xx "
+        else
+            echo2 "    OK: $xx"
+        fi
+    done
+
+    if [ -z "$problemfiles" ] ; then
+        echo2 "No issues."
+    else
+        echo2 -n "Missing files: "
+        echo -n $problemfiles
+        echo $repo.{db{,.tar.xz},files{,.tar.xz}}
+    fi
+    popd >/dev/null
+}
+
+Main "$@"
