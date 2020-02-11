@@ -8,7 +8,7 @@
 # Akýkoľvek reťazec má byť definovaný ako:
 #
 #    _tr_add <language> <placeholder> "string"
-#          or
+#          alebo
 #    _tr_add2 <placeholder> "string"
 #
 # kde
