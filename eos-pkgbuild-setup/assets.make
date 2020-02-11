@@ -412,6 +412,9 @@ _SleepSeconds() {
 }
 
 MirrorCheck() {
+    if [ ! -r endeavouros.db ] ; then
+        return
+    fi
     local checker="./mirrorcheck"
     local mirror_check="Alpix mirror check"
     local timeout
@@ -421,8 +424,7 @@ MirrorCheck() {
     else
         timeout=3
     fi
-
-    if [ -x "$checker" ] && [ -r endeavouros.db ] ; then
+    if [ -x "$checker" ] ; then
         if [ $timeout -eq 180 ] ; then
             read -p "Do $mirror_check (Y/n)?" >&2
         fi
