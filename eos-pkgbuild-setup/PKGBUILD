@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2.3
+pkgver=2.3.1
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -39,7 +39,7 @@ package() {
     install -d                                      $pkgdir/usr/share/endeavouros/scripts
     install -Dm755 eos-assets-sign                  $pkgdir/usr/share/endeavouros/scripts/eos-assets-sign
     install -Dm755 mirrorcheck                      $pkgdir/usr/share/endeavouros/scripts/mirrorcheck
-    install -Dm755 assets.conf.mirrors.mirror1      $pkgdir/usr/share/endeavouros/scripts/assets.conf.mirrors.mirror1
-    install -Dm755 assets.conf.repo-testing.x86_64  $pkgdir/usr/share/endeavouros/scripts/assets.conf.repo-testing.x86_64
+    install -Dm644 assets.conf.mirrors.mirror1      $pkgdir/usr/share/endeavouros/scripts/assets.conf.mirrors.mirror1
+    install -Dm644 assets.conf.repo-testing.x86_64  $pkgdir/usr/share/endeavouros/scripts/assets.conf.repo-testing.x86_64
 }
 
