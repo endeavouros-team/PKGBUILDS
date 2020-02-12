@@ -37,8 +37,10 @@ Main()
     echo2 "Fetching $who package info..."
     remotefiles="$(curl -s "$remoteurl" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
 
-    localfiles="$(ls -1 *.pkg.tar.* $repo.{db{,.tar.xz},files{,.tar.xz}})"
+    #localfiles="$(ls -1 *.pkg.tar.* $repo.{db{,.tar.xz},files{,.tar.xz}})"
+    localfiles="$(ls -1 *.pkg.tar.*)"
 
+    # Only name check for package files.
     for xx in $localfiles ; do
         for yy in $remotefiles ; do
             test "$xx" = "$yy" && break
@@ -51,12 +53,28 @@ Main()
         fi
     done
 
+    # Contents check for db files.
+    local tmpdir=$(mktemp -d)
+    for xx in $repo.{db,files}{,.tar.xz} ; do
+        wget -q --timeout=10 -O $tmpdir/$xx $remoteurl/$xx || {
+            echo2 "Error: fetching $xx failed."
+            problemfiles+="$xx "
+            continue
+        }
+        cmp $xx $tmpdir/$xx >/dev/null || {
+            echo2 "file $xx is different !"
+            problemfiles+="$xx "
+            continue
+        }
+        echo2 "    OK: $xx"
+    done
+    rm -rf $tmpdir
+
     if [ -z "$problemfiles" ] ; then
         echo2 "No issues."
     else
-        echo2 -n "Missing files: "
-        echo -n $problemfiles
-        echo $repo.{db{,.tar.xz},files{,.tar.xz}}
+        echo2 -n "Problematic files: "
+        echo $problemfiles
     fi
     popd >/dev/null
 }
