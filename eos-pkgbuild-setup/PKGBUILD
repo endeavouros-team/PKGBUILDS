@@ -4,12 +4,13 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2.3.2
+pkgver=2.4
 pkgrel=1
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
 depends=(git hub yay curl wget xdg-utils)
+backup=(etc/eos-mirrorcheck.conf)
 
 source=(
     $url/$pkgname
@@ -18,6 +19,7 @@ source=(
     $url/delete-release-assets
     $url/eos-assets-sign
     $url/mirrorcheck
+    $url/eos-mirrorcheck.conf
     $url/assets.conf.mirrors.mirror1
     $url/assets.conf.repo-testing.x86_64
 )
@@ -26,7 +28,8 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             'ee4c128add0bde5b3ee42fa41ad87ac53f2fb05250f967c9e8d09943b7403aaef17d72eb6cce652e5ee4fbcdff3ebd2be2d353159255a7229319ed480cb610d2'
             'e3040ba1d2601fa91e9eec5981653234486297223792f37e1a634cb6908d22df1ff710a16b75ba09dcf63eb7d60a898e22f0d11ff941c72bfbc43027d0f44e86'
             '2f9b6bb737bf1dd1e39f63af8b8cefdeaa66aa6a01eae31136613e68ac8f6fb91035d67796d1c0b6e37a603c6a6529cd3931415ac1c805c8db8fb901b6baa3e9'
-            'e63851490c54ba305407ec2deedf93137e719affd7d07c3aab6feffd13a720237ba0dae67b0ce54a02529ee2f6f46e4bf1ab12a15acfcb1ff6f5305ca3e16442'
+            '240264b2e78e3223b10a42eff8804a34a5a5653cb96f9ee9a2ac7460e3a38ed7f0aec8e25d3d8e1f0ca845f9a9ab1cd4b26162e469d72700403a5b93ec5bcd81'
+            '37e3afc691091fd05018d3a55f2c09f02e960014d2fa6eb0990743d17a937ee0d2107e512922234675b519908d8f5574e05661d5a2a8cf15e1bd90b89d336cf8'
             '55c227d766e0f92b71300e9f36d9a0203ac68b5e0c3668748d215731d1b9878940ee70ada75643a81d0d155f0583eb173621bdb422d30f376556ab53d390fffa'
             'cf9c65ac086bbefc424590185247ab804853bdfb2d37d5ce6fd6279c095045d8ccf3cf6c83a4592fbbe1893382bb812197fd8d0778b696398a50dea0db7be498')
 
@@ -41,5 +44,6 @@ package() {
     install -Dm755 mirrorcheck                      $pkgdir/usr/share/endeavouros/scripts/mirrorcheck
     install -Dm644 assets.conf.mirrors.mirror1      $pkgdir/usr/share/endeavouros/scripts/assets.conf.mirrors.mirror1
     install -Dm644 assets.conf.repo-testing.x86_64  $pkgdir/usr/share/endeavouros/scripts/assets.conf.repo-testing.x86_64
-}
 
+    install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
+}

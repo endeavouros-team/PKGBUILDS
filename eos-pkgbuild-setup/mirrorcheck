@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Check that Alpix repo has the same package and db files as the given local folder.
+# Check that a mirror repo has the same package and db files as the given local folder.
 #
 
 echo2() { echo "$@" >&2 ; }
@@ -17,7 +17,7 @@ NameCheck() {
             test "$xx" = "$yy" && break
         done
         if [ "$xx" != "$yy" ] ; then
-            echo2 "file $xx missing from $who !"
+            echo2 "file $xx missing from $MIRROR_NAME !"
             problemfiles+="$xx "
         else
             echo2 "    OK: $xx"
@@ -29,7 +29,7 @@ ContentsCheck() {
     local tmpdir=$(mktemp -d)
     local xx
     for xx in "$@" ; do
-        wget -q --timeout=10 -O $tmpdir/$xx $remoteurl/$xx || {
+        wget -q --timeout=10 -O $tmpdir/$xx $MIRROR_URL/$xx || {
             echo2 "Error: fetching $xx failed."
             problemfiles+="$xx "
             continue
@@ -47,7 +47,7 @@ ContentsCheck() {
 Usage() {
     local progname="$(basename $0)"
     cat <<EOF >&2
-$progname: Check the validity of EndeavourOS packages in the Alpix mirror.
+$progname: Check the validity of EndeavourOS packages in the $MIRROR_NAME mirror.
 
 Usage: $progname [parameters]
 parameters:
@@ -59,11 +59,13 @@ EOF
 
 Main()
 {
+    local conf=/etc/eos-mirrorcheck.conf
+    test -r $conf || DIE "configuration file $conf is required but not found."
+    source $conf
+    test -n "$MIRROR_URL"  || DIE "variable MIRROR_URL has no value, check file $conf."
+    test -n "$MIRROR_NAME" || DIE "variable MIRROR_NAME has no value, check file $conf."
+
     local folder=""
-    local repo=endeavouros
-    local arch=x86_64
-    local who=alpix
-    local remoteurl=https://mirror.$who.eu/endeavouros/repo/$repo/$arch/
     local remotefilelist
     local packages repofiles
     local problemfiles=""
@@ -85,14 +87,14 @@ Main()
         return
     }
 
-    echo2 "Fetching $who package info..."
-    remotefilelist="$(curl -s "$remoteurl" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
-    test -n "$remotefilelist" || DIE "cannot fetch package info from $remoteurl."
+    echo2 "Fetching $MIRROR_NAME package info..."
+    remotefilelist="$(curl -s "$MIRROR_URL" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
+    test -n "$remotefilelist" || DIE "cannot fetch package info from $MIRROR_URL."
 
     pushd "$folder" >/dev/null
 
     packages="$(ls -1 *.pkg.tar.*)"
-    repofiles="$(echo $repo.{db,files}{,.tar.xz})"
+    repofiles="$(echo endeavouros.{db,files}{,.tar.xz})"
 
     case "$mode" in
         full)
