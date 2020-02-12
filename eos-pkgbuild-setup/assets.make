@@ -204,7 +204,7 @@ Assets_clone()
     echo "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    rm -f *.{db,files,sig,old,xz,zst}                                          # $_COMPRESSOR
+    rm -f *.{db,files,sig,old,xz,zst,txt}                                      # $_COMPRESSOR
     local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"    # $_COMPRESSOR
     test -z "$leftovers" || DIE "removing local assets failed!"
 
@@ -694,12 +694,20 @@ Main()
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
         done
+
+        # create a list of package and db files that should be also on the mirror
+        pushd "$ASSETSDIR" >/dev/null
+        pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
+        echo "$pkg" > "$ASSETSDIR"/repofiles.txt
+        popd >/dev/null
+
+        # wait a bit
         sleep 1
 
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
             for tag in "${RELEASE_TAGS[@]}" ; do
-                add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
+                add-release-assets "$tag" "${built[@]}" "${signed[@]}" "$ASSETSDIR"/repofiles.txt || \
                     DIE "adding pkg assets with tag '$tag' failed"
             done
         fi
