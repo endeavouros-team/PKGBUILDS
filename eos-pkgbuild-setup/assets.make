@@ -420,7 +420,7 @@ MirrorCheck() {
     local timeout
 
     if [ -n "$built" ] ; then
-        timeout=180
+        timeout="$mirror_check_wait"
     else
         timeout=3
     fi
@@ -445,12 +445,13 @@ Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
 
-$PROGNAME [ --dryrun | --dryrun-local | --repoup | --aurdiff ]
-where
-    --dryrun         Show what would be done, but do nothing.
-    --dryrun-local   Show what would be done, but do nothing. Use local assets.
-    --repoup         (Advanced) Force update of repository database files.
-    --aurdiff        Show PKGBUILD diff for AUR packages.
+$PROGNAME [ options ]
+Options:
+    -n  | -nl | --dryrun-local  Show what would be done, but do nothing. Use local assets.
+    -nn | -nr | --dryrun        Show what would be done, but do nothing.
+    --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
+    --repoup                    (Advanced) Force update of repository database files.
+    --aurdiff                   Show PKGBUILD diff for AUR packages.
 EOF
 #   --versuffix=X    Append given suffix (X) to pkgver of PKGBUILD.
 
@@ -471,6 +472,7 @@ Main()
     local already_asked_diffs=0
     local ask_timeout=60
     local AUR_DIFFS=()
+    local mirror_check_wait=180
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -482,11 +484,18 @@ Main()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
-                --dryrun)          cmd=dryrun ;;
-                --dryrun-local)    cmd=dryrun ; use_local_assets=1 ;;
-                --repoup)          repoup=1 ;;             # sync repo even when no packages are built
-                --aurdiff)         aurdiff=1 ;;
-                --versuffix=*)     pkgver_suffix="${xx#*=}" ;;  # currently not used!
+                --dryrun-local | -nl | -n)
+                    cmd=dryrun ; use_local_assets=1 ;;
+                --dryrun | -nr | -nn)
+                    cmd=dryrun ;;
+                --mirrorcheck=*)
+                    mirror_check_wait="${xx#*=}";;
+                --repoup)
+                    repoup=1 ;;                  # sync repo even when no packages are built
+                --aurdiff)
+                    aurdiff=1 ;;
+                --versuffix=*)
+                    pkgver_suffix="${xx#*=}" ;;  # currently not used!
                 *) Usage 0  ;;
             esac
         done
