@@ -12,7 +12,7 @@ license=('unknown')
 url="https://aur.archlinux.org/packages/mkinitcpio-openswap/"
 depends=(mkinitcpio)
 backup=('etc/openswap.conf')
-install="usage.install"
+# install="usage.install" # Just messages echoing
 source=('openswap.hook'
         'openswap.install'
         'openswap.conf')
