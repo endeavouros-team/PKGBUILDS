@@ -98,11 +98,11 @@ Main()
 
     case "$mode" in
         full)
-            ContentsCheck $packages $repofiles
+            ContentsCheck $packages $repofiles repofiles.txt
             ;;
         optimized)
             NameCheck $packages
-            ContentsCheck $repofiles
+            ContentsCheck $repofiles repofiles.txt
             ;;
     esac
 

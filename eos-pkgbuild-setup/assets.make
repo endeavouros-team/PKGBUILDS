@@ -684,7 +684,7 @@ Main()
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets --quietly "$tag" "${removableassets[@]}" \
+                delete-release-assets --quietly "$tag" "${removableassets[@]}" repofiles.txt \
                     || WARN "removing pkg assets with tag '$tag' failed"
             done
             sleep 1
