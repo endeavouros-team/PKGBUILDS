@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup for building EOS packages."
-pkgver=2.2
+pkgver=2.2.1
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -24,7 +24,7 @@ sha512sums=('7c142992a47aa407de239f3b090beb61f3372f68b3b84f35e2bb86e616d5e760b5a
             'ee4c128add0bde5b3ee42fa41ad87ac53f2fb05250f967c9e8d09943b7403aaef17d72eb6cce652e5ee4fbcdff3ebd2be2d353159255a7229319ed480cb610d2'
             'e3040ba1d2601fa91e9eec5981653234486297223792f37e1a634cb6908d22df1ff710a16b75ba09dcf63eb7d60a898e22f0d11ff941c72bfbc43027d0f44e86'
             '2f9b6bb737bf1dd1e39f63af8b8cefdeaa66aa6a01eae31136613e68ac8f6fb91035d67796d1c0b6e37a603c6a6529cd3931415ac1c805c8db8fb901b6baa3e9'
-            '332bd006334f4822ea5c7fe524b2168b17e4dc6af0cf56396e6b308d82716856f78ab26deb847437af40e3d9a0424c617cb684751d398fe3c33cbca2a274dcbd')
+            'e63851490c54ba305407ec2deedf93137e719affd7d07c3aab6feffd13a720237ba0dae67b0ce54a02529ee2f6f46e4bf1ab12a15acfcb1ff6f5305ca3e16442')
 
 package() {
     install -Dm755 $pkgname               $pkgdir/usr/bin/$pkgname

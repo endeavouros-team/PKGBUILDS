@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Check that Alpix repo has the same package and db files as the given local folder.
-# Note: only a file name check.
 #
 
 echo2() { echo "$@" >&2 ; }
@@ -11,38 +10,10 @@ DIE() {
     exit 1
 }
 
-Main()
-{
-    local folder="$1"
-    local repo=endeavouros
-    local arch=x86_64
-    local who=alpix
-    local remoteurl=https://mirror.$who.eu/endeavouros/repo/$repo/$arch/
-    local remotefiles
-    local localfiles
-    local problemfiles=""
+NameCheck() {
     local xx yy
-
-    if [ -z "$folder" ] ; then
-        if [ -r endeavouros.db ] ; then
-            folder=.
-        fi
-    fi
-
-    test -n "$folder" || DIE "no local folder!"
-    test -d "$folder" || DIE "folder $folder does not exist!"
-
-    pushd "$folder" >/dev/null
-
-    echo2 "Fetching $who package info..."
-    remotefiles="$(curl -s "$remoteurl" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
-
-    #localfiles="$(ls -1 *.pkg.tar.* $repo.{db{,.tar.xz},files{,.tar.xz}})"
-    localfiles="$(ls -1 *.pkg.tar.*)"
-
-    # Only name check for package files.
-    for xx in $localfiles ; do
-        for yy in $remotefiles ; do
+    for xx in "$@" ; do
+        for yy in $remotefilelist ; do
             test "$xx" = "$yy" && break
         done
         if [ "$xx" != "$yy" ] ; then
@@ -52,10 +23,12 @@ Main()
             echo2 "    OK: $xx"
         fi
     done
+}
 
-    # Contents check for db files.
+ContentsCheck() {
     local tmpdir=$(mktemp -d)
-    for xx in $repo.{db,files}{,.tar.xz} ; do
+    local xx
+    for xx in "$@" ; do
         wget -q --timeout=10 -O $tmpdir/$xx $remoteurl/$xx || {
             echo2 "Error: fetching $xx failed."
             problemfiles+="$xx "
@@ -69,6 +42,67 @@ Main()
         echo2 "    OK: $xx"
     done
     rm -rf $tmpdir
+}
+
+Usage() {
+    local progname="$(basename $0)"
+    cat <<EOF >&2
+$progname: Check the validity of EndeavourOS packages in the Alpix mirror.
+
+Usage: $progname [parameters]
+parameters:
+    --full        Check contents of each file (slow) instead of just the name (fast).
+    folder-name   Name of the local folder that contains package files.
+                  If not given, current folder is used.
+EOF
+}
+
+Main()
+{
+    local folder=""
+    local repo=endeavouros
+    local arch=x86_64
+    local who=alpix
+    local remoteurl=https://mirror.$who.eu/endeavouros/repo/$repo/$arch/
+    local remotefilelist
+    local packages repofiles
+    local problemfiles=""
+    local mode=optimized
+    local arg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --full) mode=full ;;
+            -*) Usage ; return ;;
+            *) folder="$arg" ;;
+        esac
+    done
+
+    test -n "$folder" || folder=.
+    test -d "$folder" || DIE "folder $folder does not exist!"
+    test -r "$folder/endeavouros.db" || {
+        echo2 "$(basename $0): nothing to see here."
+        return
+    }
+
+    echo2 "Fetching $who package info..."
+    remotefilelist="$(curl -s "$remoteurl" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
+    test -n "$remotefilelist" || DIE "cannot fetch package info from $remoteurl."
+
+    pushd "$folder" >/dev/null
+
+    packages="$(ls -1 *.pkg.tar.*)"
+    repofiles="$(echo $repo.{db,files}{,.tar.xz})"
+
+    case "$mode" in
+        full)
+            ContentsCheck $packages $repofiles
+            ;;
+        optimized)
+            NameCheck $packages
+            ContentsCheck $repofiles
+            ;;
+    esac
 
     if [ -z "$problemfiles" ] ; then
         echo2 "No issues."
