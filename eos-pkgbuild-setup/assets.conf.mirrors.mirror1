@@ -19,9 +19,9 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
     aur/arc-x-icons-theme
-    aur/ckbcomp
+#    aur/ckbcomp           moved to another repo
     aur/downgrade
-    aur/inxi                           # temporary problem with inxi in AUR...
+    aur/inxi
     aur/mkinitcpio-openswap
     aur/paper-icon-theme
     aur/yay
@@ -175,7 +175,7 @@ _welcome_hook_check_ksetwallpaper_py() {
 }
 
 declare -A ASSET_PACKAGE_HOOKS
-ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
+#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
