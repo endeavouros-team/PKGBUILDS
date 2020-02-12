@@ -415,7 +415,7 @@ MirrorCheck() {
     if [ ! -r endeavouros.db ] ; then
         return
     fi
-    local checker="./mirrorcheck"
+    local checker="/usr/share/endeavouros/scripts/mirrorcheck"
     local mirror_check="Alpix mirror check"
     local timeout
 
