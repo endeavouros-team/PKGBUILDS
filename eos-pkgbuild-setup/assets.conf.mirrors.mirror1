@@ -11,6 +11,9 @@ local RELEASE_TAGS=(mirror1 mirror2)
 # user to sign packages
 local SIGNER="EndeavourOS"
 
+# general options
+local USE_GENERATED_FILELIST="no"                   # may generate 'repofiles.txt' into the repo
+
 # local folders
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten

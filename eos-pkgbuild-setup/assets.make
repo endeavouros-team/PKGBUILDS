@@ -418,6 +418,9 @@ MirrorCheck() {
     local checker="/usr/share/endeavouros/scripts/mirrorcheck"
     local mirror_check="Alpix mirror check"
     local timeout
+    local opt="--no-filelist"
+
+    test "$use_filelist" = "yes" && opt=""
 
     if [ -n "$built" ] ; then
         timeout="$mirror_check_wait"
@@ -432,7 +435,7 @@ MirrorCheck() {
             ""|[yY]*)
                 echo2 "Starting $mirror_check after countdown, please wait..."
                 _SleepSeconds $timeout
-                $checker .
+                $checker $opt .
                 ;;
         esac
     else
@@ -470,6 +473,8 @@ Main()
     local use_local_assets=0         # 0 = offer to fetch assets
     local aurdiff=0                  # 1 = show AUR diff
     local already_asked_diffs=0
+    local filelist_txt
+    local use_filelist               # yes or no
     local ask_timeout=60
     local AUR_DIFFS=()
     local mirror_check_wait=180
@@ -504,6 +509,10 @@ Main()
     test -r $ASSETS_CONF || DIE "cannot find local file $ASSETS_CONF"
 
     source $ASSETS_CONF         # local variables (with CAPITAL letters)
+
+    filelist_txt="$ASSETS_DIR/repofiles.txt"
+    use_filelist="$USE_GENERATED_FILELIST"
+    test -n "$use_filelist" || use_filelist="no"
 
     RationalityTests            # check validity of values in $ASSETS_CONF
 
@@ -684,9 +693,14 @@ Main()
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets --quietly "$tag" "${removableassets[@]}" repofiles.txt \
+                delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                     || WARN "removing pkg assets with tag '$tag' failed"
+                if [ -r "$filelist_txt" ] ; then
+                    delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
+                        || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
+                fi
             done
+            rm -f $filelist_txt
             sleep 1
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
@@ -695,11 +709,15 @@ Main()
                 || WARN "removing db assets with tag '$tag' failed"
         done
 
-        # create a list of package and db files that should be also on the mirror
-        pushd "$ASSETSDIR" >/dev/null
-        pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
-        echo "$pkg" > "$ASSETSDIR"/repofiles.txt
-        popd >/dev/null
+        if [ "$use_filelist" = "yes" ] ; then
+            # create a list of package and db files that should be also on the mirror
+            pushd "$ASSETSDIR" >/dev/null
+            pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
+            if [ -n "$filelist_txt" ] ; then
+                echo "$pkg" > "$filelist_txt"
+            fi
+            popd >/dev/null
+        fi
 
         # wait a bit
         sleep 1
@@ -707,8 +725,12 @@ Main()
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
             for tag in "${RELEASE_TAGS[@]}" ; do
-                add-release-assets "$tag" "${built[@]}" "${signed[@]}" "$ASSETSDIR"/repofiles.txt || \
+                add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
+                if [ -r "$filelist_txt" ] ; then
+                    add-release-assets "$tag" "$filelist_txt" || \
+                        DIE "adding $filelist_txt with tag '$tag' failed"
+                fi
             done
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
