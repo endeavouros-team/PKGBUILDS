@@ -53,6 +53,7 @@ parameters:
     --slow        Check contents of each file.
     --fast        Check just the name of all package files.
     --optimized   Check contents of some files, and names of other files.
+    --no-filelist Don't generate list of latest files into the repo.
     folder-name   Name of the local folder that contains package files.
                   If not given, current folder is used.
 EOF
@@ -70,14 +71,18 @@ Main()
     local remotefilelist
     local packages repofiles
     local problemfiles=""
-    local mode=fast   # show, optimized, fast
     local arg
+
+    # options
+    local mode=fast   # show, optimized, fast
+    local has_filelist=yes
 
     for arg in "$@" ; do
         case "$arg" in
             --slow) mode=slow ;;
             --fast) mode=fast ;;
             --optimized) mode=optimized ;;
+            --no-filelist) has_filelist=no ;;   # no repofiles.txt
             -*) Usage ; return ;;
             *) folder="$arg" ;;
         esac
@@ -101,13 +106,17 @@ Main()
 
     # Check files. 'NameCheck' is very fast but unreliable. 'ContentsCheck' is quite slow but reliable.
     local tmpdir=$(mktemp -d)
+    ContentsCheck $repofiles                 # This should make sure all is OK ! (?)
+    if [ "$has_filelist" = "yes" ] ; then
+        ContentsCheck repofiles.txt
+    fi
+
     case "$mode" in
         fast)
             NameCheck $packages
-            ContentsCheck $repofiles repofiles.txt
             ;;
         slow)
-            ContentsCheck $packages $repofiles repofiles.txt
+            ContentsCheck $packages
             ;;
         optimized)
             for arg in $packages ; do
@@ -120,8 +129,6 @@ Main()
                         ContentsCheck "$arg" ;;
                 esac
             done
-            # NameCheck $packages
-            ContentsCheck $repofiles repofiles.txt
             ;;
     esac
     rm -rf $tmpdir
