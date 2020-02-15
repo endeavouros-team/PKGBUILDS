@@ -26,7 +26,6 @@ NameCheck() {
 }
 
 ContentsCheck() {
-    local tmpdir=$(mktemp -d)
     local xx
     for xx in "$@" ; do
         wget -q --timeout=10 -O $tmpdir/$xx $MIRROR_URL/$xx || {
@@ -39,9 +38,9 @@ ContentsCheck() {
             problemfiles+="$xx "
             continue
         }
+        rm -f $tmpdir/$xx
         echo2 "    OK: $xx"
     done
-    rm -rf $tmpdir
 }
 
 Usage() {
@@ -51,7 +50,9 @@ $progname: Check the validity of EndeavourOS packages in the $MIRROR_NAME mirror
 
 Usage: $progname [parameters]
 parameters:
-    --full        Check contents of each file (slow) instead of just the name (fast).
+    --slow        Check contents of each file.
+    --fast        Check just the name of all package files.
+    --optimized   Check contents of some files, and names of other files.
     folder-name   Name of the local folder that contains package files.
                   If not given, current folder is used.
 EOF
@@ -69,12 +70,14 @@ Main()
     local remotefilelist
     local packages repofiles
     local problemfiles=""
-    local mode=optimized
+    local mode=fast   # show, optimized, fast
     local arg
 
     for arg in "$@" ; do
         case "$arg" in
-            --full) mode=full ;;
+            --slow) mode=slow ;;
+            --fast) mode=fast ;;
+            --optimized) mode=optimized ;;
             -*) Usage ; return ;;
             *) folder="$arg" ;;
         esac
@@ -96,15 +99,32 @@ Main()
     packages="$(ls -1 *.pkg.tar.*)"
     repofiles="$(echo endeavouros.{db,files}{,.tar.xz})"
 
+    # Check files. 'NameCheck' is very fast but unreliable. 'ContentsCheck' is quite slow but reliable.
+    local tmpdir=$(mktemp -d)
     case "$mode" in
-        full)
-            ContentsCheck $packages $repofiles repofiles.txt
-            ;;
-        optimized)
+        fast)
             NameCheck $packages
             ContentsCheck $repofiles repofiles.txt
             ;;
+        slow)
+            ContentsCheck $packages $repofiles repofiles.txt
+            ;;
+        optimized)
+            for arg in $packages ; do
+                case "$arg" in
+                    # icon theme packages are very big
+                    paper-icon-theme-*.pkg.tar.xz | paper-icon-theme-*.pkg.tar.zst | \
+                    arc-x-icons-theme-*.pkg.tar.xz | arc-x-icons-theme-*.pkg.tar.zst)
+                        NameCheck "$arg" ;;
+                    *)
+                        ContentsCheck "$arg" ;;
+                esac
+            done
+            # NameCheck $packages
+            ContentsCheck $repofiles repofiles.txt
+            ;;
     esac
+    rm -rf $tmpdir
 
     if [ -z "$problemfiles" ] ; then
         echo2 "No issues."
