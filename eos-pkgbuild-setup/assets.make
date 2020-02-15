@@ -700,9 +700,9 @@ Main()
                         || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
                 fi
             done
-            rm -f $filelist_txt
             sleep 1
         fi
+        rm -f $filelist_txt
         for tag in "${RELEASE_TAGS[@]}" ; do
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
