@@ -9,7 +9,7 @@ pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.18
-pkgrel=2
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -46,6 +46,8 @@ prepare() {
     # For testing EFI stuff 
     #mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
 
+    # For testing LUKS partition bug
+     cp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob_patch.cpp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob.cpp   
 
     # Build proccess can't understand our personal files, so we adjust here
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
