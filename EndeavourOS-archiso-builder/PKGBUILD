@@ -3,25 +3,43 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.3
+pkgver=0.4
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git squashfs-tools)
-source=($pkgname.zip::https://github.com/endeavouros-team/EndeavourOS-archiso/archive/master.zip)
-sha512sums=('1be963e94e1f1eb8af3479dbf4fdea8bb36c8a7fd0750a704396835723146fdf776866d5b4cb8fabba7322bdda42a0adec48977ecde49e257ea8fcdf4a4bd93c')
+source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
+sha512sums=(SKIP)
 
 build() {
-    local build_rootdir="$(dirname "$PWD")"   # $srcdir/..
+    # check we have calamares repo properly set up
+    local reponame="endeavouros_calamares"
+    if [ -z "$(grep "^\[$reponame\]$" /etc/pacman.conf)" ] ; then
+        cat <<EOF >&2
+
+Error: repo [$reponame] is missing from file /etc/pacman.conf.
+
+Please add the following lines in the end of file /etc/pacman.conf:
+
+   [endeavouros_calamares]
+   Server = https://github.com/endeavouros-team/mirrors/releases/download/endeavouros_calamares
+
+Then run: 'sudo pacman -Syyu' before trying again.
+
+EOF
+        return 1
+    fi
+
+    local build_rootdir="$srcdir/.."
     local _cmds=()
     local cleanup="$build_rootdir/cleanup.bash"
-    local basedir=${pkgname}-master
+    local basedir=$srcdir/$pkgname
 
     # create a cleanup script
     cat <<EOF > "$cleanup"
 #!/bin/bash
 sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
-sudo rm -f  $build_rootdir/${pkgname}.zip
+sudo rm -rf $build_rootdir/${pkgname}
 sudo rm -rf $build_rootdir/pkg
 sudo rm -rf $build_rootdir/src
 EOF
@@ -34,7 +52,7 @@ EOF
     _cmds+=(./fix_permissions.sh \;)
     _cmds+=(./build.sh -v \;)
     _cmds+=(cd "$build_rootdir" \;)
-    _cmds+=(mv "$srcdir/$basedir"/out/*.iso . \;)
+    _cmds+=(mv "$basedir"/out/*.iso . \;)
     _cmds+=(chown $LOGNAME:$LOGNAME *.iso)
 
     su -c "${_cmds[*]}"

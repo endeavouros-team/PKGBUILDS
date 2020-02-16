@@ -186,7 +186,7 @@ _init_translations() {
 
     for trfile in "${trlist[@]}" ; do
         if [ -r "$trfile" ] ; then
-            echo "$trfile" >&2
+            #echo "$trfile" >&2
             source "$trfile"
             break
         fi
@@ -216,7 +216,7 @@ _init_translations() {
 
         for trfile in "${trlist[@]}" ; do
             if [ -r "$trfile" ] ; then
-                echo "$trfile" >&2
+                #echo "$trfile" >&2
                 export SELECTED_LANGUAGE_WELCOME="$lang"
                 source "$trfile"
                 selected=1

@@ -21,7 +21,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/b43-firmware
     aur/python3-gpg_batch_sign
     aur/repo-add_and_sign
-    aur/archupdate-indicator
+#    aur/archupdate-indicator
 
     eos-pkgbuild-setup
 )

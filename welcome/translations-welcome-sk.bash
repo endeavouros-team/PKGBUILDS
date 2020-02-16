@@ -5,10 +5,10 @@
 # - globálne
 #
 #
-# Any string should be defined like:
+# Akýkoľvek reťazec má byť definovaný ako:
 #
 #    _tr_add <language> <placeholder> "string"
-#          or
+#          alebo
 #    _tr_add2 <placeholder> "string"
 #
 # kde
@@ -136,7 +136,7 @@ _tr_add2 settings_dis_buttip     "Sľubujem"
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME pomoc"
 _tr_add2 help_butt_text          "Viac informácií o aplikácii $PRETTY_PROGNAME"
 
-_tr_add2 dm_title                "Vyber Display Manager"
+_tr_add2 dm_title                "Vybrať Display Manager"
 _tr_add2 dm_col_name1            "Vybraný"
 _tr_add2 dm_col_name2            "názov DM"
 

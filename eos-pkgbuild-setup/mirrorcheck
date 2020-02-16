@@ -1,0 +1,145 @@
+#!/bin/bash
+#
+# Check that a mirror repo has the same package and db files as the given local folder.
+#
+
+echo2() { echo "$@" >&2 ; }
+
+DIE() {
+    echo2 "Error: $1"
+    exit 1
+}
+
+NameCheck() {
+    local xx yy
+    for xx in "$@" ; do
+        for yy in $remotefilelist ; do
+            test "$xx" = "$yy" && break
+        done
+        if [ "$xx" != "$yy" ] ; then
+            echo2 "file $xx missing from $MIRROR_NAME !"
+            problemfiles+="$xx "
+        else
+            echo2 "    OK: $xx"
+        fi
+    done
+}
+
+ContentsCheck() {
+    local xx
+    for xx in "$@" ; do
+        wget -q --timeout=10 -O $tmpdir/$xx $MIRROR_URL/$xx || {
+            echo2 "Error: fetching $xx failed."
+            problemfiles+="$xx "
+            continue
+        }
+        cmp $xx $tmpdir/$xx >/dev/null || {
+            echo2 "file $xx is different !"
+            problemfiles+="$xx "
+            continue
+        }
+        rm -f $tmpdir/$xx
+        echo2 "    OK: $xx"
+    done
+}
+
+Usage() {
+    local progname="$(basename $0)"
+    cat <<EOF >&2
+$progname: Check the validity of EndeavourOS packages in the $MIRROR_NAME mirror.
+
+Usage: $progname [parameters]
+parameters:
+    --slow        Check contents of each file.
+    --fast        Check just the name of all package files.
+    --optimized   Check contents of some files, and names of other files.
+    --no-filelist Don't generate list of latest files into the repo.
+    folder-name   Name of the local folder that contains package files.
+                  If not given, current folder is used.
+EOF
+}
+
+Main()
+{
+    local conf=/etc/eos-mirrorcheck.conf
+    test -r $conf || DIE "configuration file $conf is required but not found."
+    source $conf
+    test -n "$MIRROR_URL"  || DIE "variable MIRROR_URL has no value, check file $conf."
+    test -n "$MIRROR_NAME" || DIE "variable MIRROR_NAME has no value, check file $conf."
+
+    local folder=""
+    local remotefilelist
+    local packages repofiles
+    local problemfiles=""
+    local arg
+
+    # options
+    local mode=fast   # show, optimized, fast
+    local has_filelist=yes
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --slow) mode=slow ;;
+            --fast) mode=fast ;;
+            --optimized) mode=optimized ;;
+            --no-filelist) has_filelist=no ;;   # no repofiles.txt
+            -*) Usage ; return ;;
+            *) folder="$arg" ;;
+        esac
+    done
+
+    test -n "$folder" || folder=.
+    test -d "$folder" || DIE "folder $folder does not exist!"
+    test -r "$folder/endeavouros.db" || {
+        echo2 "$(basename $0): nothing to see here."
+        return
+    }
+
+    echo2 "Fetching $MIRROR_NAME package info..."
+    remotefilelist="$(curl -s "$MIRROR_URL" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
+    test -n "$remotefilelist" || DIE "cannot fetch package info from $MIRROR_URL."
+
+    pushd "$folder" >/dev/null
+
+    packages="$(ls -1 *.pkg.tar.*)"
+    repofiles="$(echo endeavouros.{db,files}{,.tar.xz})"
+
+    # Check files. 'NameCheck' is very fast but unreliable. 'ContentsCheck' is quite slow but reliable.
+    local tmpdir=$(mktemp -d)
+    ContentsCheck $repofiles                 # This should make sure all is OK ! (?)
+    if [ "$has_filelist" = "yes" ] ; then
+        ContentsCheck repofiles.txt
+    fi
+
+    case "$mode" in
+        fast)
+            NameCheck $packages
+            ;;
+        slow)
+            ContentsCheck $packages
+            ;;
+        optimized)
+            for arg in $packages ; do
+                case "$arg" in
+                    # icon theme packages are very big
+                    paper-icon-theme-*.pkg.tar.xz | paper-icon-theme-*.pkg.tar.zst | \
+                    arc-x-icons-theme-*.pkg.tar.xz | arc-x-icons-theme-*.pkg.tar.zst)
+                        NameCheck "$arg" ;;
+                    *)
+                        ContentsCheck "$arg" ;;
+                esac
+            done
+            ;;
+    esac
+    rm -rf $tmpdir
+
+    if [ -z "$problemfiles" ] ; then
+        echo2 "No issues."
+    else
+        echo2 -n "Problematic files: "
+        echo $problemfiles
+    fi
+    popd >/dev/null
+}
+
+Main "$@"

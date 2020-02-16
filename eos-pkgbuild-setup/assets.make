@@ -204,7 +204,7 @@ Assets_clone()
     echo "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    rm -f *.{db,files,sig,old,xz,zst}                                          # $_COMPRESSOR
+    rm -f *.{db,files,sig,old,xz,zst,txt}                                      # $_COMPRESSOR
     local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"    # $_COMPRESSOR
     test -z "$leftovers" || DIE "removing local assets failed!"
 
@@ -272,6 +272,7 @@ Constructor()
 Destructor()
 {
     test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
+    test -n "$buildsavedir" && rm -rf "$buildsavedir"
 }
 
 ShowOldCompressedPackages() {
@@ -400,16 +401,60 @@ Exit()
     exit "$code"
 }
 
+_SleepSeconds() {
+    local sec="$1"
+    local xx
+    for ((xx=sec; xx>0; xx--)) ; do
+        printf "\r%s   " "$xx"
+        sleep 1
+    done
+    printf "\r%s\n" "$xx"
+}
+
+MirrorCheck() {
+    if [ ! -r endeavouros.db ] ; then
+        return
+    fi
+    local checker="/usr/share/endeavouros/scripts/mirrorcheck"
+    local mirror_check="Alpix mirror check"
+    local timeout
+    local opt="--no-filelist"
+
+    test "$use_filelist" = "yes" && opt=""
+
+    if [ -n "$built" ] ; then
+        timeout="$mirror_check_wait"
+    else
+        timeout=3
+    fi
+    if [ -x "$checker" ] ; then
+        if [ $timeout -eq 180 ] ; then
+            read -p "Do $mirror_check (Y/n)?" >&2
+        fi
+        case "$REPLY" in
+            ""|[yY]*)
+                echo2 "Starting $mirror_check after countdown, please wait..."
+                _SleepSeconds $timeout
+                $checker $opt .
+                ;;
+        esac
+    else
+        echo2 "Sorry, checker $checker not found."
+        echo2 "Cannot do $mirror_check."
+    fi
+}
+
 Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
 
-$PROGNAME [ --dryrun | --dryrun-local | --repoup | --aurdiff ]
-where
-    --dryrun         Show what would be done, but do nothing.
-    --dryrun-local   Show what would be done, but do nothing. Use local assets.
-    --repoup         (Advanced) Force update of repository database files.
-    --aurdiff        Show PKGBUILD diff for AUR packages.
+$PROGNAME [ options ]
+Options:
+    -n  | -nl | --dryrun-local  Show what would be done, but do nothing. Use local assets.
+    -nn | -nr | --dryrun        Show what would be done, but do nothing.
+    --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
+    --repoup                    (Advanced) Force update of repository database files.
+    --aurdiff                   Show PKGBUILD diff for AUR packages.
 EOF
 #   --versuffix=X    Append given suffix (X) to pkgver of PKGBUILD.
 
@@ -428,8 +473,11 @@ Main()
     local use_local_assets=0         # 0 = offer to fetch assets
     local aurdiff=0                  # 1 = show AUR diff
     local already_asked_diffs=0
+    local filelist_txt
+    local use_filelist               # yes or no
     local ask_timeout=60
     local AUR_DIFFS=()
+    local mirror_check_wait=180
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -441,11 +489,18 @@ Main()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
-                --dryrun)          cmd=dryrun ;;
-                --dryrun-local)    cmd=dryrun ; use_local_assets=1 ;;
-                --repoup)          repoup=1 ;;             # sync repo even when no packages are built
-                --aurdiff)         aurdiff=1 ;;
-                --versuffix=*)     pkgver_suffix="${xx#*=}" ;;  # currently not used!
+                --dryrun-local | -nl | -n)
+                    cmd=dryrun ; use_local_assets=1 ;;
+                --dryrun | -nr | -nn)
+                    cmd=dryrun ;;
+                --mirrorcheck=*)
+                    mirror_check_wait="${xx#*=}";;
+                --repoup)
+                    repoup=1 ;;                  # sync repo even when no packages are built
+                --aurdiff)
+                    aurdiff=1 ;;
+                --versuffix=*)
+                    pkgver_suffix="${xx#*=}" ;;  # currently not used!
                 *) Usage 0  ;;
             esac
         done
@@ -454,6 +509,10 @@ Main()
     test -r $ASSETS_CONF || DIE "cannot find local file $ASSETS_CONF"
 
     source $ASSETS_CONF         # local variables (with CAPITAL letters)
+
+    filelist_txt="$ASSETSDIR/repofiles.txt"
+    use_filelist="$USE_GENERATED_FILELIST"
+    test -n "$use_filelist" || use_filelist="no"
 
     RationalityTests            # check validity of values in $ASSETS_CONF
 
@@ -521,7 +580,9 @@ Main()
     #RunPostHooks                 # may update local PKGBUILDs
 
     # build if newer versions exist. When building, collect removables and builds.
+
     buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
+
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
@@ -634,14 +695,34 @@ Main()
             for tag in "${RELEASE_TAGS[@]}" ; do
                 delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                     || WARN "removing pkg assets with tag '$tag' failed"
+                if [ -r "$filelist_txt" ] ; then
+                    delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
+                        || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
+                fi
             done
             sleep 1
+        fi
+        if [ -r "$filelist_txt" ] ; then
+            echo2 "deleting file $filelist_txt ..."
+            rm -f $filelist_txt
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
         done
+
+        if [ "$use_filelist" = "yes" ] ; then
+            # create a list of package and db files that should be also on the mirror
+            pushd "$ASSETSDIR" >/dev/null
+            pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
+            if [ -n "$filelist_txt" ] ; then
+                echo "$pkg" > "$filelist_txt"
+            fi
+            popd >/dev/null
+        fi
+
+        # wait a bit
         sleep 1
 
         # transfer assets (built, signed and db) to github
@@ -649,6 +730,10 @@ Main()
             for tag in "${RELEASE_TAGS[@]}" ; do
                 add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
+                if [ -r "$filelist_txt" ] ; then
+                    add-release-assets "$tag" "$filelist_txt" || \
+                        DIE "adding $filelist_txt with tag '$tag' failed"
+                fi
             done
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
@@ -668,6 +753,8 @@ Main()
     Destructor
 
     ShowOldCompressedPackages   # should show nothing
+
+    MirrorCheck
 }
 
 Main "$@"

@@ -8,18 +8,17 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.17.1
-pkgrel=13
+pkgver=3.2.18
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 optdepends=('update-mirrorlist')
-makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules')
+makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current' 'calamares_test') 
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager'
-'upower' 'qt5-webengine' 'yaml-cpp' 'boost' 'networkmanager'
-'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'qt5ct' 'solid' 'qt5-tools')
+'boost' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'qt5ct' 'solid' 'qt5-tools')
 
 provides=("${pkgname}")
 options=(!strip !emptydirs)
@@ -44,15 +43,11 @@ prepare() {
     rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
     
-    # test --needed option to modules/packages/main.py
-    mv -f $_reponame/src/modules/packages/main.py_test $_reponame/src/modules/packages/main.py
-
-    # test autologin error for netinstall
-    # mv -f $_reponame/settings.conf_online_test $_reponame/settings.conf_online 
-
     # For testing EFI stuff 
-    mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
+    #mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
 
+    # For testing LUKS partition bug
+     cp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob_patch.cpp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob.cpp   
 
     # Build proccess can't understand our personal files, so we adjust here
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
