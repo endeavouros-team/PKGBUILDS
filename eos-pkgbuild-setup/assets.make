@@ -510,7 +510,7 @@ Main()
 
     source $ASSETS_CONF         # local variables (with CAPITAL letters)
 
-    filelist_txt="$ASSETS_DIR/repofiles.txt"
+    filelist_txt="$ASSETSDIR/repofiles.txt"
     use_filelist="$USE_GENERATED_FILELIST"
     test -n "$use_filelist" || use_filelist="no"
 
@@ -702,7 +702,10 @@ Main()
             done
             sleep 1
         fi
-        rm -f $filelist_txt
+        if [ -r "$filelist_txt" ] ; then
+            echo2 "deleting file $filelist_txt ..."
+            rm -f $filelist_txt
+        fi
         for tag in "${RELEASE_TAGS[@]}" ; do
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
