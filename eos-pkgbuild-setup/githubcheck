@@ -106,14 +106,14 @@ Main()
 
     # options
     local mode=fast   # show, optimized, fast
-    local has_filelist=yes
+    local has_filelist=no
 
     for arg in "$@" ; do
         case "$arg" in
             --slow) mode=slow ;;
             --fast) mode=fast ;;
             --optimized) mode=optimized ;;
-            --no-filelist) has_filelist=no ;;   # no repofiles.txt
+            --filelist) has_filelist=yes ;;   # use repofiles.txt
             -*) Usage ; return ;;
             *) folder="$arg" ;;
         esac
