@@ -131,6 +131,7 @@ def check_device():
                 for driver in DEVICES:
                     if product_id in DEVICES[driver]:
                         drivers.append(driver)
+                        return drivers
     return drivers
 
 
@@ -230,6 +231,18 @@ def add_user_to_group(user, group):
             msg = "Cannot add user {0} to the {1} group: {2}"
             log_warning(msg.format(user, group, err.output.decode()))
 
+def update_nvidia_cards_database():
+    """ Update Nvidia cards database """
+    log_info("Updating Nvidia graphics cards database...")
+    cmd = ["nvidia-installer-update-db"]
+    if TEST:
+        log_info(" ".join(cmd))
+    else:
+        try:
+            subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as err:
+            return False
+    return True
 
 def get_user():
     """ Gets current username """
@@ -524,6 +537,9 @@ def main():
 
     if TEST:
         log_info("Running the installer in testing mode...")
+
+    if update_nvidia_cards_database() != True:
+        log_warning("Cannot update Nvidia cards database in /var/lib/pci")
 
     try:
         load_ids()

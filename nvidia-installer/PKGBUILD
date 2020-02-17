@@ -2,8 +2,8 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer
-pkgver=2.1
-pkgrel=5
+pkgver=3
+pkgrel=1
 pkgdesc="Script to setup nvidia drivers in EndeavourOS"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 arch=('any')
@@ -18,7 +18,7 @@ optdepends=(
 source=(
   $url/$pkgname
 )
-sha256sums=('a51f7f8e828beb1d158dbcf43270cfa1d9b855f820133009774714bd939144e5')
+sha256sums=('f1b9f4c28db77650017a64cebe6388895a83c995e5889e7938d9571a3a61c2bd')
 
 package() {
   sed -i $pkgname \
