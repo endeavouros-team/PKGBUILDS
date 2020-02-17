@@ -16,30 +16,45 @@ NameCheck() {
         for yy in $remotefilelist ; do
             test "$xx" = "$yy" && break
         done
-        if [ "$xx" != "$yy" ] ; then
+        if [ "$xx" = "$yy" ] ; then
+            echo2 "    OK: $xx"
+        else
             echo2 "file $xx missing from $MIRROR_NAME !"
             problemfiles+="$xx "
-        else
-            echo2 "    OK: $xx"
         fi
     done
 }
 
 ContentsCheck() {
-    local xx
+    local xx remfiles=""
+    local fail=0
+
+    sleep 1      # github has problems if fetching fast and repeatedly ???
+
     for xx in "$@" ; do
-        wget -q --timeout=10 -O $tmpdir/$xx $MIRROR_URL/$xx || {
-            echo2 "Error: fetching $xx failed."
-            problemfiles+="$xx "
-            continue
-        }
-        cmp $xx $tmpdir/$xx >/dev/null || {
+        remfiles+="$MIRROR_URL/$xx "
+    done
+
+    pushd $tmpdir >/dev/null
+    wget -q --timeout=20 --show-progress $remfiles || {
+        echo2 "Error: fetching github files failed."
+        problemfiles+="$remfiles "
+        fail=1
+    }
+    popd >/dev/null
+    if [ $fail -ne 0 ] ; then
+        return $fail
+    fi
+
+    for xx in "$@" ; do
+        cmp $xx $tmpdir/$xx >/dev/null
+        if [ $? -eq 0 ] ; then
+            echo2 "    OK: $xx"
+        else
             echo2 "file $xx is different !"
             problemfiles+="$xx "
-            continue
-        }
+        fi
         rm -f $tmpdir/$xx
-        echo2 "    OK: $xx"
     done
 }
 
@@ -110,6 +125,10 @@ Main()
 
     for arg in "$@" ; do
         case "$arg" in
+            --2)           # check mirror2 instead of mirror1
+                MIRROR_URL=https://github.com/endeavouros-team/mirrors/releases/tag/"${RELEASE_TAGS[1]}"
+                findpart=/endeavouros-team/mirrors/releases/download/"${RELEASE_TAGS[1]}"/
+                ;;
             --slow) mode=slow ;;
             --fast) mode=fast ;;
             --optimized) mode=optimized ;;
