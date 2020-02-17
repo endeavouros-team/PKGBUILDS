@@ -27,7 +27,7 @@ NameCheck() {
 
 ContentsCheck() {
     local xx remfiles=""
-    local fail=0
+    local failcode=0
 
     sleep 1      # github has problems if fetching fast and repeatedly ???
 
@@ -36,14 +36,17 @@ ContentsCheck() {
     done
 
     pushd $tmpdir >/dev/null
-    wget -q --timeout=20 --show-progress $remfiles || {
-        echo2 "Error: fetching github files failed."
-        problemfiles+="$remfiles "
-        fail=1
-    }
+    if [ 0 -eq 1 ] ; then
+        wget -q --timeout=20 --show-progress $remfiles || failcode=$?
+    else
+        curl --location --remote-time --max-time 20 --remote-name-all --progress-bar --fail $remfiles || failcode=$?
+    fi
     popd >/dev/null
-    if [ $fail -ne 0 ] ; then
-        return $fail
+
+    if [ $failcode -ne 0 ] ; then
+        echo2 "Error: fetching github files failed (code $failcode)."
+        problemfiles+="$remfiles "
+        return $failcode
     fi
 
     for xx in "$@" ; do
@@ -147,7 +150,7 @@ Main()
 
     echo2 "Fetching $MIRROR_NAME package info..."
     remotefilelist="$(curl -s "$MIRROR_URL" | grep $findpart | sed -e 's|^.*'$findpart'||' -e 's|" rel=.*$||')"
-    test -n "$remotefilelist" || DIE "cannot fetch package info from $MIRROR_URL."
+    test -n "$remotefilelist" || DIE "cannot fetch package info from '$MIRROR_URL'."
     MIRROR_URL="$(echo "$MIRROR_URL" | sed 's|/tag/|/download/|')"
 
     pushd "$folder" >/dev/null
