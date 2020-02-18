@@ -659,8 +659,19 @@ Main()
                     esac
                 done
                 if [ -n "$repo_removes" ] ; then
-                    repo-remove "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR "${repo_removes[@]}"
-                    sleep 1
+                    # check if repo db contains any of the packages to be removed
+                    yy="$(tar --list --exclude */desc -f "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR | sed 's|-[0-9].*$||')"
+                    zz=()
+                    for xx in "${repo_removes[@]}" ; do
+                        if [ -n "$(echo "$yy" | grep "^$xx$")" ] ; then
+                            zz+=("$xx")
+                        fi
+                    done
+                    if [ -n "$zz" ] ; then
+                        # packages found in the repo db, so remove them
+                        repo-remove "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR "${zz[@]}"
+                        sleep 1
+                    fi
                 fi
 
                 # Put changed assets (built) to db.
