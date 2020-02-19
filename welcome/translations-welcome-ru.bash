@@ -62,7 +62,7 @@ _tr_add2 after_install_ustip       "Обновление системных мо
 _tr_add2 after_install_dsi         "Поиск ошибок"
 _tr_add2 after_install_dsitip      "Обнаружение любых потенциальных проблем в системе и программах"
 
-_tr_add2 after_install_etl         "EndeavourOS to latest$_question"
+_tr_add2 after_install_etl         "Обновить EndeavourOS$_question"
 _tr_add2 after_install_etltip      "Переход на следующий уровень EndeavourOS"
 
 _tr_add2 after_install_cdm         "Изменить Display Manager"
@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip       "Советы по использованию
 _tr_add2 after_install_nv          "Пользователям NVIDIA"
 _tr_add2 after_install_nvtip       "Работа с NVIDIA installer"
 
-_tr_add2 after_install_ft          "Рекомендации по форуму"
+_tr_add2 after_install_ft          "Советы по форуму"
 _tr_add2 after_install_fttip       "Обратитесь к нам за помощью$_exclamation"
 
 
