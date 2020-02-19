@@ -73,9 +73,12 @@ Main()
     local problemfiles=""
     local arg
 
+    local assets_conf=./assets.conf
+    test -r $assets_conf || DIE "cannot find local file $assets_conf."
+
     # options
     local mode=fast   # show, optimized, fast
-    local has_filelist=yes
+    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
 
     for arg in "$@" ; do
         case "$arg" in
