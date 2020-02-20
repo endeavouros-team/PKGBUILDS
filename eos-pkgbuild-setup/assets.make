@@ -706,12 +706,13 @@ Main()
             for tag in "${RELEASE_TAGS[@]}" ; do
                 delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                     || WARN "removing pkg assets with tag '$tag' failed"
+                sleep 2
                 if [ -r "$filelist_txt" ] ; then
                     delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
                         || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
+                    sleep 2
                 fi
             done
-            sleep 1
         fi
         if [ -r "$filelist_txt" ] ; then
             echo2 "deleting file $filelist_txt ..."
@@ -721,6 +722,7 @@ Main()
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
+            sleep 2
         done
 
         if [ "$use_filelist" = "yes" ] ; then
@@ -734,16 +736,18 @@ Main()
         fi
 
         # wait a bit
-        sleep 1
+        sleep 2
 
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
             for tag in "${RELEASE_TAGS[@]}" ; do
                 add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
+                sleep 2
                 if [ -r "$filelist_txt" ] ; then
                     add-release-assets "$tag" "$filelist_txt" || \
                         DIE "adding $filelist_txt with tag '$tag' failed"
+                    sleep 2
                 fi
             done
         fi
@@ -755,6 +759,7 @@ Main()
                 add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR} || \
                     DIE "adding db assets with tag '$tag' failed"
             fi
+            sleep 2
         done
     else
         echo2 "Nothing to do."
