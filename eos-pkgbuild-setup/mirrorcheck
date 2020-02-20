@@ -99,7 +99,7 @@ Main()
     }
 
     echo2 "Fetching $MIRROR_NAME package info..."
-    remotefilelist="$(curl -s "$MIRROR_URL" | grep '^<a href="' | sed -e 's|^<a href="||' -e 's|">.*$||')"
+    remotefilelist="$(curl -s "$MIRROR_URL" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
     test -n "$remotefilelist" || DIE "cannot fetch package info from $MIRROR_URL."
 
     pushd "$folder" >/dev/null
