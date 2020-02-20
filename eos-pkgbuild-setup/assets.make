@@ -701,6 +701,13 @@ Main()
         esac
 
         # Remove old assets (removable) from github and local folder.
+
+        for tag in "${RELEASE_TAGS[@]}" ; do
+            # delete-release-assets does not need the whole file name, only unique start!
+            delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
+                || WARN "removing db assets with tag '$tag' failed"
+            sleep 2
+        done
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
@@ -718,12 +725,6 @@ Main()
             echo2 "deleting file $filelist_txt ..."
             rm -f $filelist_txt
         fi
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            # delete-release-assets does not need the whole file name, only unique start!
-            delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
-                || WARN "removing db assets with tag '$tag' failed"
-            sleep 2
-        done
 
         if [ "$use_filelist" = "yes" ] ; then
             # create a list of package and db files that should be also on the mirror
