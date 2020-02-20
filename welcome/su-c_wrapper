@@ -16,6 +16,7 @@ DIE() {
 Main() {
     local command=()
     local xx error
+    local file
 
     test -z "$1" && DIE "command missing"
 
@@ -24,15 +25,27 @@ Main() {
         command+=("'$xx'")
     done
 
+    file=$(mktemp)
+
     # run max 3 times
     for xx in {2..0} ; do
-        printf "Root "
-        /usr/bin/su -c "${command[*]}"
+        printf "Root " >&2
+
+	set -o pipefail
+        LANG=C /usr/bin/su -c "${command[*]}" |& tee -a $file
         error=$?
+	set +o pipefail
+
         case $error in
             0) break ;;                # OK
             127|126) break ;;          # command is erroneous or can't be executed
-            1) ;;                      # probably wrong password
+            1)
+		if [ -n "$(tail -n 1 $file | grep "^su: Authentication failure$")" ] ; then
+		    : # wrong password, try again 2 times
+		else
+		    break
+		fi
+		;;
             *) ;;                      # signal killed command
         esac
         if [ $xx -ne 0 ] ; then
@@ -41,6 +54,7 @@ Main() {
             echo "Fail." >&2
         fi
     done
+    rm -f $file
 }
 
 Main "$@"
