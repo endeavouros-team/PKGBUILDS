@@ -2,21 +2,26 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=1
-pkgrel=10
+pkgver=1.1
+pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 options=(!strip !emptydirs)
+backup=("etc/pacman.d/$pkgname")
 
 # https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
-source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
-
-sha512sums=(3f2349ccd7d7b449b0e813f7041f3af0de6c8a393160d1643919acc4300b53e1a4cf43bbecf161c3d1d4fd4fd52aa0434e994bee29360d39c6d2b1a5172143ca)
-# backup=("etc/pacman.d/$pkgname")  # no leading "/"
+source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname"
+        "$url/PKGBUILDS/raw/master/$_reponame/eos-rankmirrors"
+)
+sha512sums=('3f2349ccd7d7b449b0e813f7041f3af0de6c8a393160d1643919acc4300b53e1a4cf43bbecf161c3d1d4fd4fd52aa0434e994bee29360d39c6d2b1a5172143ca'
+            '06dcfca5fc2f1ff09c4ec9a63b74e0f4a3a2cb2694ad7c6bd0317551d589cc08dc3a584d483730ad138afcd865be9a9adc971285efa968593c247022f8fac81b')
 
 package() {
  mkdir -p "$pkgdir/etc/pacman.d"
  install -Dm644 "$srcdir/$pkgname" "$pkgdir/etc/pacman.d/$pkgname"
+
+ install -d $pkgdir/usr/bin
+ install -Dm755 eos-rankmirrors $pkgdir/usr/bin/eos-rankmirrors
 }

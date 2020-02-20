@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Simple ranking of mirrors for the EndeavourOS mirrorlist.
+#
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Main()
+{
+    local pkgname=endeavouros-mirrorlist
+    local eos_ml=/etc/pacman.d/$pkgname
+    if [ ! -r "$eos_ml" ] ; then
+        DIE "no mirrorlist found, please install package '$pkgname'."
+    fi
+    if [ ! -x /usr/bin/rankmirrors ] ; then
+        DIE "ranking failed because package 'pacman-contrib' is not installed."
+    fi
+    local new_ml=$(mktemp)
+    local cur_ml=$(mktemp)
+    local url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname/$pkgname"
+
+    wget -q --timeout=5 -O $cur_ml $url
+    rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new_ml
+    rm -f $cur_ml
+
+    echo "RESULT OF RANKING:" >&2
+    cat $new_ml | sed 's|^|    |' >&2
+    echo "" >&2
+
+    if [ -z "$(grep "^Server = https://" $new_ml)" ] ; then
+        DIE "ranking failed, no mirrors found!"
+    fi
+
+    echo "Writing new mirrorlist to $eos_ml." >&2
+    
+    pkexec bash -c "rm -f $eos_ml ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0755 $eos_ml"
+}
+
+Main "$@"
