@@ -271,7 +271,7 @@ Constructor()
 
 Destructor()
 {
-    test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
+    #test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
     test -n "$buildsavedir" && rm -rf "$buildsavedir"
 }
 
@@ -737,8 +737,10 @@ Main()
         fi
 
         # wait a bit
-        local deletion_wait=20
-        echo2 "Wait $deletion_wait seconds before adding new assets..."
+        local deletion_wait=1
+        if [ $deletion_wait -gt 2 ] ; then
+            echo2 "Wait $deletion_wait seconds before adding new assets..."
+        fi
         sleep $deletion_wait
 
         # transfer assets (built, signed and db) to github

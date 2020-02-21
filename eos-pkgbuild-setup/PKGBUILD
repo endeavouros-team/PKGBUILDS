@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2.5.9
+pkgver=2.5.10
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -25,7 +25,7 @@ source=(
     $url/assets.conf.repo-testing.x86_64
 )
 sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23e2025a82a1fdcf29887d9ac6c57cb23bb3473e217e2daf61a000c4e5c54a8'
-            'a1b711fd8c4d0b27bcef3bc1f30cc0f0ee20b3aec4c31a0df6fe9cf63aa37e9576dd64f44ed1b6607ee7ef9cecae13dd7b58813b7106892568b048efa8dbe837'
+            '97209a927ede8a7e9c3ffb382948de3bb48858606f3537a9270ff65de8b6b4821536b66d930b042d42b10ccd36888e3cdc687a946f280be8b7b373f5c3b8f831'
             'ee4c128add0bde5b3ee42fa41ad87ac53f2fb05250f967c9e8d09943b7403aaef17d72eb6cce652e5ee4fbcdff3ebd2be2d353159255a7229319ed480cb610d2'
             'e3040ba1d2601fa91e9eec5981653234486297223792f37e1a634cb6908d22df1ff710a16b75ba09dcf63eb7d60a898e22f0d11ff941c72bfbc43027d0f44e86'
             '2f9b6bb737bf1dd1e39f63af8b8cefdeaa66aa6a01eae31136613e68ac8f6fb91035d67796d1c0b6e37a603c6a6529cd3931415ac1c805c8db8fb901b6baa3e9'
