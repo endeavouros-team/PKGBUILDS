@@ -37,7 +37,7 @@ Main()
 
     echo "Writing new mirrorlist to $eos_ml." >&2
     
-    pkexec bash -c "rm -f $eos_ml.bak ; mv $eos_ml $eos_ml.bak ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0755 $eos_ml"
+    pkexec bash -c "rm -f $eos_ml.bak ; mv $eos_ml $eos_ml.bak ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0644 $eos_ml"
 }
 
 Main "$@"

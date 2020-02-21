@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=1.2
+pkgver=1.2.1
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -16,7 +16,7 @@ source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname"
         "$url/PKGBUILDS/raw/master/$_reponame/eos-rankmirrors"
 )
 sha512sums=('3f2349ccd7d7b449b0e813f7041f3af0de6c8a393160d1643919acc4300b53e1a4cf43bbecf161c3d1d4fd4fd52aa0434e994bee29360d39c6d2b1a5172143ca'
-            '38c3c45927ea865593942ff329319679ace95658d847a1ac97e17d2a05509c0d624ce4a8e51a481e51a3cc9e0ae27f1370be69cb824a3fb927d9213b899a3f11')
+            '5e81a088f07130513684952f2ce19a5367643a6d5eda4a34c9ccf4e6b1326b1f206fe16d7f478e7bdf0d2d374baf9f774293530c1e485b6e71413606edbc3080')
 
 package() {
  mkdir -p "$pkgdir/etc/pacman.d"
