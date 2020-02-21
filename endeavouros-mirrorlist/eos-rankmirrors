@@ -12,8 +12,9 @@ Main()
 {
     local pkgname=endeavouros-mirrorlist
     local eos_ml=/etc/pacman.d/$pkgname
-    if [ ! -r "$eos_ml" ] ; then
-        DIE "no mirrorlist found, please install package '$pkgname'."
+
+    if [ ! -r "$eos_ml" ] ; then            # this test is not really needed...
+        DIE "no local mirrorlist found, please install package '$pkgname'."
     fi
     if [ ! -x /usr/bin/rankmirrors ] ; then
         DIE "ranking failed because package 'pacman-contrib' is not installed."
@@ -22,7 +23,7 @@ Main()
     local cur_ml=$(mktemp)
     local url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname/$pkgname"
 
-    wget -q --timeout=5 -O $cur_ml $url
+    wget -q --timeout=5 -O $cur_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
     rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new_ml
     rm -f $cur_ml
 
@@ -36,7 +37,7 @@ Main()
 
     echo "Writing new mirrorlist to $eos_ml." >&2
     
-    pkexec bash -c "rm -f $eos_ml ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0755 $eos_ml"
+    pkexec bash -c "rm -f $eos_ml.bak ; mv $eos_ml $eos_ml.bak ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0755 $eos_ml"
 }
 
 Main "$@"
