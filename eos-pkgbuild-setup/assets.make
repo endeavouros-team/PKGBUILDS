@@ -737,7 +737,9 @@ Main()
         fi
 
         # wait a bit
-        sleep 2
+        local deletion_wait=20
+        echo2 "Wait $deletion_wait seconds before adding new assets..."
+        sleep $deletion_wait
 
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
