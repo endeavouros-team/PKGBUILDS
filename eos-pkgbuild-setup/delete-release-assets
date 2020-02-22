@@ -133,7 +133,7 @@ GetReleaseInfoToFile()
         curl -o /dev/null -sH "$AUTH" $GH_REPO || DIE "Invalid repo, token or network issue!" "$asset_info_file"
 
         # Read asset info into the file.
-        curl -sH "$AUTH" $GH_TAG > $asset_info_file
+        curl -sH "$AUTH" $GH_TAG > $asset_info_file || DIE "failed to fetch assets info from '$GH_TAG'."
     fi
 }
 
@@ -144,9 +144,9 @@ DeleteAsset()
     local quietly="$3"       # if yes, then no questions are asked about deletion
 
     local asset_id="$(GetAssetIdFromFile "$asset_info_file" "$asset_name")"
-    local repo="${GITHUB_INFO["reponame"]}"
-    local owner="${GITHUB_INFO["owner"]}"
-    local oauth_token="${GITHUB_INFO["oauth_token"]}"
+    #local repo="${GITHUB_INFO["reponame"]}"
+    #local owner="${GITHUB_INFO["owner"]}"
+    #local oauth_token="${GITHUB_INFO["oauth_token"]}"
     local answer
 
     if [ "$asset_id" = "" ]; then
@@ -168,10 +168,11 @@ DeleteAsset()
             ;;
     esac
 
-    local GITHUB_OAUTH_BASIC=""  # ??
+    hub api -t -X "DELETE" "https://api.github.com/repos/{owner}/{repo}/releases/assets/$asset_id"
 
-    curl $GITHUB_OAUTH_BASIC -X "DELETE" -H "Authorization: token $oauth_token" \
-         "https://api.github.com/repos/$owner/$repo/releases/assets/$asset_id"
+#    local GITHUB_OAUTH_BASIC=""  # ??
+#    curl $GITHUB_OAUTH_BASIC -X "DELETE" -H "Authorization: token $oauth_token" \
+#         "https://api.github.com/repos/$owner/$repo/releases/assets/$asset_id"
 }
 
 Main()  # parameters: [--quietly] TAG assetname...
@@ -239,6 +240,7 @@ Main()  # parameters: [--quietly] TAG assetname...
     # Now delete given assets from github.
     for asset in "${matched_assets[@]}" ; do
         DeleteAsset "$asset_info_file" "$asset" "$quietly" || DIE "Failed to delete asset '$asset'." "$asset_info_file"
+        sleep 0.5
     done
 
     rm -f "$asset_info_file"  # file no more needed
