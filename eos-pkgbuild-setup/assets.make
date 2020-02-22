@@ -12,6 +12,7 @@ REPO_COMPRESSOR=xz
 
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
+read2()   { read "$@" >&2 ; }
 
 DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
 WARN()  { echo2 "Warning: $1." ; }
@@ -357,7 +358,7 @@ WantAurDiffs() {
         aur/*)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
-                read -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout >&2
+                read2 -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
                 if [ $? -eq 0 ] ; then
                     case "$REPLY" in
                         ""|[yY]*) aurdiff=1 ;;
@@ -429,7 +430,7 @@ MirrorCheck() {
     fi
     if [ -x "$checker" ] ; then
         if [ $timeout -eq 180 ] ; then
-            read -p "Do $mirror_check (Y/n)?" >&2
+            read2 -p "Do $mirror_check (Y/n)?"
         fi
         case "$REPLY" in
             ""|[yY]*)
@@ -442,6 +443,13 @@ MirrorCheck() {
         echo2 "Sorry, checker $checker not found."
         echo2 "Cannot do $mirror_check."
     fi
+}
+
+SettleDown() {
+    #sleep 1
+    echo2 "Info: $1"
+    echo2 ""
+    read2 -p "Wait, let things settle down, then press ENTER to continue: "
 }
 
 Usage() {
@@ -638,6 +646,8 @@ Main()
 
                 mv -i "${built[@]}" "${signed[@]}" "$ASSETSDIR"
 
+                rm -rf $buildsavedir
+
                 # ...and fix the variables 'built' and 'signed' accordingly.
                 tmp=("${built[@]}")
                 built=()
@@ -694,7 +704,7 @@ Main()
         done
 
         echo2 "Final stop before syncing with github!"
-        read -p "Continue (Y/n)? " xx
+        read2 -p "Continue (Y/n)? " xx
         case "$xx" in
             [yY]*|"") ;;
             *) Exit 0 ;;
@@ -706,25 +716,28 @@ Main()
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
-            sleep 2
+            SettleDown "Github repo $REPONAME database files deleted at tag $tag."
         done
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
                 delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                     || WARN "removing pkg assets with tag '$tag' failed"
-                sleep 2
+                SettleDown "Github repo $REPONAME package files deleted at tag $tag."
                 if [ -r "$filelist_txt" ] ; then
                     delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
                         || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
-                    sleep 2
+                    SettleDown "Github repo $REPONAME file $(basename "$filelist_txt") deleted at tag $tag."
                 fi
             done
         fi
+
         if [ -r "$filelist_txt" ] ; then
             echo2 "deleting file $filelist_txt ..."
             rm -f $filelist_txt
         fi
+
+        # Now manage new assets.
 
         if [ "$use_filelist" = "yes" ] ; then
             # create a list of package and db files that should be also on the mirror
@@ -736,23 +749,16 @@ Main()
             popd >/dev/null
         fi
 
-        # wait a bit
-        local deletion_wait=1
-        if [ $deletion_wait -gt 2 ] ; then
-            echo2 "Wait $deletion_wait seconds before adding new assets..."
-        fi
-        sleep $deletion_wait
-
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
             for tag in "${RELEASE_TAGS[@]}" ; do
                 add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
-                sleep 2
+                SettleDown "Github repo $REPONAME package files added at tag $tag."
                 if [ -r "$filelist_txt" ] ; then
                     add-release-assets "$tag" "$filelist_txt" || \
                         DIE "adding $filelist_txt with tag '$tag' failed"
-                    sleep 2
+                    SettleDown "Github repo $REPONAME file $(basename "$filelist_txt") added at tag $tag."
                 fi
             done
         fi
@@ -764,18 +770,17 @@ Main()
                 add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR} || \
                     DIE "adding db assets with tag '$tag' failed"
             fi
-            sleep 2
+            SettleDown "Github repo $REPONAME database files added at tag $tag."
         done
     else
         echo2 "Nothing to do."
     fi
 
-    rm -rf $buildsavedir
     Destructor
 
     ShowOldCompressedPackages   # should show nothing
 
-    MirrorCheck
+    #MirrorCheck
 }
 
 Main "$@"
