@@ -11,33 +11,33 @@ DIE() {
 Main()
 {
     local pkgname=endeavouros-mirrorlist
-    local eos_ml=/etc/pacman.d/$pkgname
+    local eos=/etc/pacman.d/$pkgname
 
-    if [ ! -r "$eos_ml" ] ; then            # this test is not really needed...
+    if [ ! -r "$eos" ] ; then            # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
     fi
     if [ ! -x /usr/bin/rankmirrors ] ; then
         DIE "ranking failed because package 'pacman-contrib' is not installed."
     fi
-    local new_ml=$(mktemp)
+    local new=$(mktemp)
     local cur_ml=$(mktemp)
     local url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname/$pkgname"
 
     wget -q --timeout=5 -O $cur_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
-    rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new_ml
+    rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new
     rm -f $cur_ml
 
     echo "RESULT OF RANKING:" >&2
-    cat $new_ml | sed 's|^|    |' >&2
+    cat $new | sed 's|^|    |' >&2
     echo "" >&2
 
-    if [ -z "$(grep "^Server = https://" $new_ml)" ] ; then
+    if [ -z "$(grep "^Server = https://" $new)" ] ; then
         DIE "ranking failed, no mirrors found!"
     fi
 
-    echo "Writing new mirrorlist to $eos_ml." >&2
+    echo "Writing new mirrorlist to $eos." >&2
     
-    pkexec bash -c "rm -f $eos_ml.bak ; mv $eos_ml $eos_ml.bak ; mv $new_ml $eos_ml ; chown root:root $eos_ml ; chmod 0644 $eos_ml"
+    pkexec bash -c "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
 
 Main "$@"
