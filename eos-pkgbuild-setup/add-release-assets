@@ -61,9 +61,13 @@ Main() {
     else
         for asset in "$@" ; do
             test -r "$asset" || DIE "asset '$asset' does not exist."
-            echo "adding asset $(basename "$asset") to '$TAG'" >&2
-            hub release edit -a "$asset" -m "" "$TAG"
-            sleep 1
+            if [ -z "$(release-asset-names "$asset")" ] ; then
+                echo "adding asset $(basename "$asset") to '$TAG'" >&2
+                hub release edit -a "$asset" -m "" "$TAG"
+                sleep 0.5
+            else
+                DIE "asset '$asset' already exists at github!?"
+            fi
         done
     fi
 }
