@@ -51,13 +51,21 @@ Main() {
     done
     test "$TAG" = "$xx" || DIE "TAG '$TAG' is not in existing tags [$existing_tags]"
 
-    for asset in "$@" ; do
-        test -r "$asset" || DIE "asset '$asset' does not exist."
-        assets+=("-a" "$asset")
-        echo "adding asset $(basename "$asset")" >&2
-    done
-
-    hub release edit "${assets[@]}" -m "" $TAG
+    if [ 0 -eq 1 ] ; then
+        for asset in "$@" ; do
+            test -r "$asset" || DIE "asset '$asset' does not exist."
+            assets+=("-a" "$asset")
+            echo "adding asset $(basename "$asset")" >&2
+        done
+        hub release edit "${assets[@]}" -m "" $TAG
+    else
+        for asset in "$@" ; do
+            test -r "$asset" || DIE "asset '$asset' does not exist."
+            echo "adding asset $(basename "$asset") to '$TAG'" >&2
+            hub release edit -a "$asset" -m "" "$TAG"
+            sleep 1
+        done
+    fi
 }
 
 Main "$@"
