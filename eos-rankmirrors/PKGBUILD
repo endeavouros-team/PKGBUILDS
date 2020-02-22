@@ -1,0 +1,18 @@
+# Maintainer: EndeavourOS <info@endeavouros.com>
+
+pkgname=eos-rankmirrors
+pkgver=1
+pkgrel=1
+pkgdesc="EndeavourOS mirror ranking tool"
+arch=('any')
+url="https://github.com/endeavouros-team"
+license=(GPL3)
+options=(!strip !emptydirs)
+
+source=("$url/PKGBUILDS/raw/master/$pkgname/$pkgname")
+sha512sums=('5e81a088f07130513684952f2ce19a5367643a6d5eda4a34c9ccf4e6b1326b1f206fe16d7f478e7bdf0d2d374baf9f774293530c1e485b6e71413606edbc3080')
+
+package() {
+ install -d $pkgdir/usr/bin
+ install -Dm755 eos-rankmirrors $pkgdir/usr/bin/eos-rankmirrors
+}
