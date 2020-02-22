@@ -13,7 +13,7 @@ Main()
     local pkgname=endeavouros-mirrorlist
     local eos=/etc/pacman.d/$pkgname
 
-    if [ ! -r "$eos" ] ; then            # this test is not really needed...
+    if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
     fi
     if [ ! -x /usr/bin/rankmirrors ] ; then
