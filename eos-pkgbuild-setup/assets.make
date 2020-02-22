@@ -446,10 +446,22 @@ MirrorCheck() {
 }
 
 SettleDown() {
-    #sleep 1
-    echo2 "Info: $1"
+    local arg
+    local ask=yes
+    local msg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --no-ask) ask=no ;;
+            -*) echo2 "Warning: $FUNCNAME: unsupported parameter '$arg'." ;;
+            *) msg="$arg" ;;
+        esac
+    done
+    echo2 "Info: $msg"
+    if [ "$ask" = "yes" ] ; then
+        read2 -p "Wait, let things settle down, then press ENTER to continue: "
+    fi
     echo2 ""
-    read2 -p "Wait, let things settle down, then press ENTER to continue: "
 }
 
 Usage() {
@@ -716,18 +728,18 @@ Main()
             # delete-release-assets does not need the whole file name, only unique start!
             delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
                 || WARN "removing db assets with tag '$tag' failed"
-            SettleDown "Github repo $REPONAME database files deleted at tag $tag."
+            SettleDown "'$REPONAME' db files deleted at tag '$tag'."
         done
         if [ -n "$removable" ] ; then
             rm -f  "${removable[@]}"
             for tag in "${RELEASE_TAGS[@]}" ; do
                 delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                     || WARN "removing pkg assets with tag '$tag' failed"
-                SettleDown "Github repo $REPONAME package files deleted at tag $tag."
+                SettleDown "'$REPONAME' pkg files deleted at tag '$tag'."
                 if [ -r "$filelist_txt" ] ; then
                     delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
                         || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
-                    SettleDown "Github repo $REPONAME file $(basename "$filelist_txt") deleted at tag $tag."
+                    SettleDown "'$REPONAME' file $(basename "$filelist_txt") deleted at tag '$tag'."
                 fi
             done
         fi
@@ -754,11 +766,11 @@ Main()
             for tag in "${RELEASE_TAGS[@]}" ; do
                 add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
-                SettleDown "Github repo $REPONAME package files added at tag $tag."
+                SettleDown "'$REPONAME' package files added at tag '$tag'."
                 if [ -r "$filelist_txt" ] ; then
                     add-release-assets "$tag" "$filelist_txt" || \
                         DIE "adding $filelist_txt with tag '$tag' failed"
-                    SettleDown "Github repo $REPONAME file $(basename "$filelist_txt") added at tag $tag."
+                    SettleDown "'$REPONAME' file $(basename "$filelist_txt") added at tag '$tag'."
                 fi
             done
         fi
@@ -770,7 +782,7 @@ Main()
                 add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR} || \
                     DIE "adding db assets with tag '$tag' failed"
             fi
-            SettleDown "Github repo $REPONAME database files added at tag $tag."
+            SettleDown "'$REPONAME' database files added at tag '$tag'." --no-ask
         done
     else
         echo2 "Nothing to do."
