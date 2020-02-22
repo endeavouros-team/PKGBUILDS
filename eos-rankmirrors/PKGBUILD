@@ -2,7 +2,7 @@
 
 pkgname=eos-rankmirrors
 pkgver=1
-pkgrel=2.4
+pkgrel=2.5
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
 url="https://github.com/endeavouros-team"
