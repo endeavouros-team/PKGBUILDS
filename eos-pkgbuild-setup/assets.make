@@ -447,7 +447,7 @@ MirrorCheck() {
 
 SettleDown() {
     local arg
-    local ask=yessir
+    local ask=yes
     local msg
 
     for arg in "$@" ; do
