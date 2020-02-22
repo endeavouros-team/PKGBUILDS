@@ -764,7 +764,7 @@ Main()
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
             for tag in "${RELEASE_TAGS[@]}" ; do
-                add-release-assets "$tag" "${built[@]}" "${signed[@]}" || \
+                add-release-assets "$tag" "${signed[@]}" "${built[@]}" || \
                     DIE "adding pkg assets with tag '$tag' failed"
                 SettleDown "'$REPONAME' package files added at tag '$tag'."
                 if [ -r "$filelist_txt" ] ; then
@@ -776,13 +776,13 @@ Main()
         fi
         for tag in "${RELEASE_TAGS[@]}" ; do
             if [ $reposig -eq 1 ] ; then
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} || \
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,} || \
                     DIE "adding db assets with tag '$tag' failed"
             else
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR} || \
+                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,} || \
                     DIE "adding db assets with tag '$tag' failed"
             fi
-            SettleDown "'$REPONAME' database files added at tag '$tag'." --no-ask
+            SettleDown "'$REPONAME' database files added at tag '$tag'."
         done
     else
         echo2 "Nothing to do."
