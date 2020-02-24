@@ -498,6 +498,7 @@ Main()
     local ask_timeout=60
     local AUR_DIFFS=()
     local mirror_check_wait=180
+    local use_release_assets         # currently only for [endeavouros] repo
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -533,6 +534,8 @@ Main()
     filelist_txt="$ASSETSDIR/repofiles.txt"
     use_filelist="$USE_GENERATED_FILELIST"
     test -n "$use_filelist" || use_filelist="no"
+    use_release_assets="$USE_RELEASE_ASSETS"
+    test -n "$use_release_assets" || use_release_assets=yes
 
     RationalityTests            # check validity of values in $ASSETS_CONF
 
@@ -715,75 +718,17 @@ Main()
             fi
         done
 
-        echo2 "Final stop before syncing with github!"
-        read2 -p "Continue (Y/n)? " xx
-        case "$xx" in
-            [yY]*|"") ;;
-            *) Exit 0 ;;
+        case "$REPONAME" in
+            endeavouros)
+                case "$use_release_assets" in
+                     yes) ManageGithubReleaseAssets ;;
+                     *)   ManageGithubNormalFiles ;;
+                esac
+                ;;
+            *)
+                ManageGithubReleaseAssets
+                ;;
         esac
-
-        # Remove old assets (removable) from github and local folder.
-
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            # delete-release-assets does not need the whole file name, only unique start!
-            delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
-                || WARN "removing db assets with tag '$tag' failed"
-            SettleDown "'$REPONAME' db files deleted at tag '$tag'."
-        done
-        if [ -n "$removable" ] ; then
-            rm -f  "${removable[@]}"
-            for tag in "${RELEASE_TAGS[@]}" ; do
-                delete-release-assets --quietly "$tag" "${removableassets[@]}" \
-                    || WARN "removing pkg assets with tag '$tag' failed"
-                SettleDown "'$REPONAME' pkg files deleted at tag '$tag'."
-                if [ -r "$filelist_txt" ] ; then
-                    delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
-                        || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
-                    SettleDown "'$REPONAME' file $(basename "$filelist_txt") deleted at tag '$tag'."
-                fi
-            done
-        fi
-
-        if [ -r "$filelist_txt" ] ; then
-            echo2 "deleting file $filelist_txt ..."
-            rm -f $filelist_txt
-        fi
-
-        # Now manage new assets.
-
-        if [ "$use_filelist" = "yes" ] ; then
-            # create a list of package and db files that should be also on the mirror
-            pushd "$ASSETSDIR" >/dev/null
-            pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
-            if [ -n "$filelist_txt" ] ; then
-                echo "$pkg" > "$filelist_txt"
-            fi
-            popd >/dev/null
-        fi
-
-        # transfer assets (built, signed and db) to github
-        if [ -n "$built" ] ; then
-            for tag in "${RELEASE_TAGS[@]}" ; do
-                add-release-assets "$tag" "${signed[@]}" "${built[@]}" || \
-                    DIE "adding pkg assets with tag '$tag' failed"
-                SettleDown "'$REPONAME' package files added at tag '$tag'."
-                if [ -r "$filelist_txt" ] ; then
-                    add-release-assets "$tag" "$filelist_txt" || \
-                        DIE "adding $filelist_txt with tag '$tag' failed"
-                    SettleDown "'$REPONAME' file $(basename "$filelist_txt") added at tag '$tag'."
-                fi
-            done
-        fi
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            if [ $reposig -eq 1 ] ; then
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,} || \
-                    DIE "adding db assets with tag '$tag' failed"
-            else
-                add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,} || \
-                    DIE "adding db assets with tag '$tag' failed"
-            fi
-            SettleDown "'$REPONAME' database files added at tag '$tag'."
-        done
     else
         echo2 "Nothing to do."
     fi
@@ -793,6 +738,104 @@ Main()
     ShowOldCompressedPackages   # should show nothing
 
     #MirrorCheck
+}
+
+ManageGithubReleaseAssets() {
+    echo2 "Final stop before syncing with github!"
+    read2 -p "Continue (Y/n)? " xx
+    case "$xx" in
+        [yY]*|"") ;;
+        *) Exit 0 ;;
+    esac
+
+    # Remove old assets (removable) from github and local folder.
+
+    for tag in "${RELEASE_TAGS[@]}" ; do
+        # delete-release-assets does not need the whole file name, only unique start!
+        delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
+            || WARN "removing db assets with tag '$tag' failed"
+        SettleDown "'$REPONAME' db files deleted at tag '$tag'."
+    done
+    if [ -n "$removable" ] ; then
+        rm -f  "${removable[@]}"
+        for tag in "${RELEASE_TAGS[@]}" ; do
+            delete-release-assets --quietly "$tag" "${removableassets[@]}" \
+                || WARN "removing pkg assets with tag '$tag' failed"
+            SettleDown "'$REPONAME' pkg files deleted at tag '$tag'."
+            if [ -r "$filelist_txt" ] ; then
+                delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
+                    || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
+                SettleDown "'$REPONAME' file $(basename "$filelist_txt") deleted at tag '$tag'."
+            fi
+        done
+    fi
+
+    if [ -r "$filelist_txt" ] ; then
+        echo2 "deleting file $filelist_txt ..."
+        rm -f $filelist_txt
+    fi
+
+    # Now manage new assets.
+
+    if [ "$use_filelist" = "yes" ] ; then
+        # create a list of package and db files that should be also on the mirror
+        pushd "$ASSETSDIR" >/dev/null
+        pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
+        if [ -n "$filelist_txt" ] ; then
+            echo "$pkg" > "$filelist_txt"
+        fi
+        popd >/dev/null
+    fi
+
+    # transfer assets (built, signed and db) to github
+    if [ -n "$built" ] ; then
+        for tag in "${RELEASE_TAGS[@]}" ; do
+            add-release-assets "$tag" "${signed[@]}" "${built[@]}" || \
+                DIE "adding pkg assets with tag '$tag' failed"
+            SettleDown "'$REPONAME' package files added at tag '$tag'."
+            if [ -r "$filelist_txt" ] ; then
+                add-release-assets "$tag" "$filelist_txt" || \
+                    DIE "adding $filelist_txt with tag '$tag' failed"
+                SettleDown "'$REPONAME' file $(basename "$filelist_txt") added at tag '$tag'."
+            fi
+        done
+    fi
+    for tag in "${RELEASE_TAGS[@]}" ; do
+        if [ $reposig -eq 1 ] ; then
+            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,} || \
+                DIE "adding db assets with tag '$tag' failed"
+        else
+            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,} || \
+                DIE "adding db assets with tag '$tag' failed"
+        fi
+        SettleDown "'$REPONAME' database files added at tag '$tag'."
+    done
+}
+
+ManageGithubNormalFiles() {
+    case "$REPONAME" in
+        endeavouros) ;;
+        endeavouros-testing-dev) return ;;   # TODO: remove 'return' when the repo exists!
+        *) return ;;
+    esac
+
+    local workdir="$HOME/EOS/repo"
+    local targetdir="$workdir/$REPONAME"
+    local cp_output
+
+    test -d "$workdir"       || DIE "work folder $workdir does not exist."
+    test -d "$targetdir"     || DIE "target folder $targetdir does not exist."
+
+    Pushd "$workdir"
+    cp_output="$(cp -uv "$ASSETSDIR"/*.{db,files,xz,zst,sig} "$targetdir")"
+    Popd
+
+    if [ -n "$cp_output" ] ; then
+        echo2 "$cp_output"
+        printf2 "\nFiles were updated. Goto $workdir and transfer changes to github (with git commands).\n"
+    else
+        echo2 "Nothing more to do."
+    fi
 }
 
 Main "$@"
