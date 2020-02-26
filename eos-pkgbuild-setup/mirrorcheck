@@ -17,7 +17,7 @@ NameCheck() {
             test "$xx" = "$yy" && break
         done
         if [ "$xx" != "$yy" ] ; then
-            echo2 "file $xx missing from $MIRROR_NAME !"
+            echo2 "file $xx missing from $reponame !"
             problemfiles+="$xx "
         else
             echo2 "    OK: $xx"
@@ -28,7 +28,7 @@ NameCheck() {
 ContentsCheck() {
     local xx
     for xx in "$@" ; do
-        wget -q --timeout=10 -O $tmpdir/$xx $MIRROR_URL/$xx || {
+        wget -q --timeout=10 -O $tmpdir/$xx $mirror_url/$xx || {
             echo2 "Error: fetching $xx failed."
             problemfiles+="$xx "
             continue
@@ -46,13 +46,14 @@ ContentsCheck() {
 Usage() {
     local progname="$(basename $0)"
     cat <<EOF >&2
-$progname: Check the validity of EndeavourOS packages in the $MIRROR_NAME mirror.
+$progname: Check the validity of EndeavourOS packages in the $reponame mirror.
 
 Usage: $progname [parameters]
 parameters:
     --slow        Check contents of each file.
     --fast        Check just the name of all package files.
     --optimized   Check contents of some files, and names of other files.
+    --reponame=X  Use given name as the mirror name.
     --no-filelist Don't generate list of latest files into the repo.
     folder-name   Name of the local folder that contains package files.
                   If not given, current folder is used.
@@ -61,27 +62,29 @@ EOF
 
 Main()
 {
+    # use assets.conf
+    local assets_conf=./assets.conf
+    test -r $assets_conf || DIE "cannot find local file $assets_conf."
+    local mode=fast   # show, optimized, fast
+    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
+
     local conf=/etc/eos-mirrorcheck.conf
     test -r $conf || DIE "configuration file $conf is required but not found."
+    local repo=endeavouros
+    local arch=x86_64
     source $conf
-    test -n "$MIRROR_URL"  || DIE "variable MIRROR_URL has no value, check file $conf."
-    test -n "$MIRROR_NAME" || DIE "variable MIRROR_NAME has no value, check file $conf."
 
     local folder=""
     local remotefilelist
     local packages repofiles
     local problemfiles=""
+    local reponame="${MIRROR_NAMES[0]}"
+    local mirror_url
     local arg
-
-    local assets_conf=./assets.conf
-    test -r $assets_conf || DIE "cannot find local file $assets_conf."
-
-    # options
-    local mode=fast   # show, optimized, fast
-    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
 
     for arg in "$@" ; do
         case "$arg" in
+            --reponame=*) reponame="${arg#*=}" ;;
             --slow) mode=slow ;;
             --fast) mode=fast ;;
             --optimized) mode=optimized ;;
@@ -91,6 +94,10 @@ Main()
         esac
     done
 
+    test -n "$reponame" || DIE "MIRROR_NAMES[0] is empty! Check file $conf."
+    mirror_url="${MIRROR_URLS[$reponame]}"
+    test -n "$mirror_url" || DIE "MIRROR_URLS[$reponame] is empty! Check file $conf."
+
     test -n "$folder" || folder=.
     test -d "$folder" || DIE "folder $folder does not exist!"
     test -r "$folder/endeavouros.db" || {
@@ -98,9 +105,9 @@ Main()
         return
     }
 
-    echo2 "Fetching $MIRROR_NAME package info..."
-    remotefilelist="$(curl -s "$MIRROR_URL" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
-    test -n "$remotefilelist" || DIE "cannot fetch package info from $MIRROR_URL."
+    echo2 "Fetching $reponame package info..."
+    remotefilelist="$(curl -s "$mirror_url" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
+    test -n "$remotefilelist" || DIE "cannot fetch package info from $mirror_url."
 
     pushd "$folder" >/dev/null
 
