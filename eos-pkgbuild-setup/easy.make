@@ -10,7 +10,7 @@
 #    *.pkg.tar.xz
 #
 # Example usage:
-#    easy.make eos-pkgbuild*.zst
+#    easy.make /path/to/eos-pkgbuild*.zst
 #
 
 echo2()   { echo "$@" >&2 ; }
@@ -55,11 +55,13 @@ git_commands() {
 
 Main()
 {
-    local pkgs="$*"
+    local pkgs="$*"                 # has path; no .sig files
+
     test -n "$pkgs" || STOP "no packages given."
+    local pkgs2
     local reponame=$(basename "$PWD")
     local dbend=xz
-    local pkg xx oldnames oldpkgnames newpkgname oldpkgname oldpkgs
+    local pkg xx oldpkgnames="" oldpkgname oldpkgs=()
 
     for pkg in $pkgs ; do
         test -r "$pkg"     || DIE "file not found: '$pkg'"
@@ -68,30 +70,33 @@ Main()
 
     # Find old packages, they must be removed from github.
     for pkg in $pkgs ; do
-        newpkgname="$(echo "$pkg" | sed 's|-[0-9].*$||')"
-        xx="$(ls -1 ${newpkgname}-*.pkg.tar.xz ${newpkgname}-*.pkg.tar.zst 2>/dev/null)"
+        oldpkgname="$(basename "$pkg" | sed 's|-[0-9].*$||')"
+        xx="$(ls -1 ${oldpkgname}-*.pkg.tar.xz ${oldpkgname}-*.pkg.tar.zst 2>/dev/null)"
         if [ -n "$xx" ] ; then
-            oldpkgs+=("$xx")
+            oldpkgs+=("$xx" "$xx".sig)       # this old package will be replaced by new
         fi
     done
 
-    # Remove old packages from the db.
-    oldpkgnames="$(echo "${oldpkgs[@]}" | sed 's|-[0-9].*$||')"
-    for pkg in $pkgs ; do
-        newpkgname="$(echo "$pkg" | sed 's|-[0-9].*$||')"
-        for oldpkgname in $oldpkgnames ; do
-            if [ "$newpkgname" = "$oldpkgname" ] ; then
-                oldnames+=("$oldpkgname")
-                break
-            fi
-        done
+    # Remove old package names from the db.
+    for xx in "${oldpkgs[@]}" ; do
+        case "$xx" in
+            *.sig) ;;
+            *) oldpkgnames+="$(echo "$xx" | sed 's|-[0-9].*$||') " ;;
+        esac
     done
-    if [ -n "$oldnames" ] ; then
-        Repo_remove $reponame.db.tar.$dbend "${oldnames[@]}"    # old packages found, remove
+    if [ -n "$oldpkgnames" ] ; then
+        Repo_remove $reponame.db.tar.$dbend "${oldpkgnames[@]}"    # old packages found, remove
     fi
 
+    # Delete old packages and copy new packages here.
+    rm -f "${oldpkgs[@]}"
+    for xx in $pkgs ; do
+        cp -a $xx $xx.sig .
+        pkgs2+="$(basename "$xx") "
+    done
+
     # Add new packages to the db.
-    Repo_add $reponame.db.tar.$dbend $pkgs || DIE "repo-add failed."
+    Repo_add $reponame.db.tar.$dbend $pkgs2 || DIE "repo-add failed."
 
     # Remove the .old db files.
     rm -f $reponame.{db,files}.tar.$dbend.old
