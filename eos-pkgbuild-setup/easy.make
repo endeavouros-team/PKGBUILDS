@@ -85,18 +85,22 @@ Main()
         esac
     done
     if [ -n "$oldpkgnames" ] ; then
-        Repo_remove $reponame.db.tar.$dbend "${oldpkgnames[@]}"    # old packages found, remove
+        Repo_remove $reponame.db.tar.$dbend $oldpkgnames    # old packages found, remove
     fi
 
     # Delete old packages and copy new packages here.
     rm -f "${oldpkgs[@]}"
     for xx in $pkgs ; do
         cp -a $xx $xx.sig .
-        pkgs2+="$(basename "$xx") $(basename "$xx".sig) "
+        pkgs2+="$(basename "$xx") "
     done
 
     # Add new packages to the db.
     Repo_add $reponame.db.tar.$dbend $pkgs2 || DIE "repo-add failed."
+
+    for xx in $pkgs ; do
+        pkgs2+="$(basename "$xx".sig) "
+    done
 
     # Remove the .old db files.
     rm -f $reponame.{db,files}.tar.$dbend.old
