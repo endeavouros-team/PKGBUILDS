@@ -44,7 +44,7 @@ run_git_command() {
 git_commands() {
     local git_add=(git add)
     git_add+=(${oldpkgs[*]})                    # Set old git files to be removed.
-    git_add+=($pkgs)
+    git_add+=($pkgs2)
     git_add+=($reponame.{db,files}{,.tar.xz})
 
     run_git_command "git pull"
