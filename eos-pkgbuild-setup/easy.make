@@ -92,7 +92,7 @@ Main()
     rm -f "${oldpkgs[@]}"
     for xx in $pkgs ; do
         cp -a $xx $xx.sig .
-        pkgs2+="$(basename "$xx") "
+        pkgs2+="$(basename "$xx") $(basename "$xx".sig) "
     done
 
     # Add new packages to the db.
