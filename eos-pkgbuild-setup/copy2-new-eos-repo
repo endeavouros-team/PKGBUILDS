@@ -3,9 +3,17 @@
 # Copy EOS repo asset files from the old repo to the new repo.
 #
 
+echo2() { echo "$@" >&2 ; }
+read2() { read "$@" >&2 ; }
+
 DIE() {
-    echo "Error: $1" >&2
+    echo2 "Error: $1"
     exit 1
+}
+
+Cmd() {
+    echo2 "$@"
+    "$@"
 }
 
 Main()
@@ -19,15 +27,15 @@ Main()
     test "$PWD" = "$dstdir" || DIE "wrong work dir, goto $dstdir !"
     test -r "$srcdir"/$reponame.db || DIE " repo db $srcdir/$reponame.db does not exist."
 
-    read -p "Do 'git pull' now (y/N)? "
+    read2 -p "Do 'git pull' now (y/N)? "
     case "$REPLY" in
         [yY]*) git pull ;;
     esac
-    echo ""
+    echo2 ""
 
-    echo "Diffs between old and new:"
-    diff $dstdir $srcdir | grep -vP 'assets\.conf|PKGBUILDS|\.git|\.vscode' | sed 's|^|    |'
-    echo ""
+    echo2 "Diffs between old and new:"
+    diff $dstdir $srcdir | grep -vP 'assets\.conf|PKGBUILDS|\.git|\.vscode' | sed 's|^|    |' >&2
+    echo2 ""
 
     # remove all asset files from here
     rm -f *.pkg.tar.{xz,zst}{,.sig} $reponame.{db,files}{,.tar.xz}
@@ -35,11 +43,21 @@ Main()
     # copy all assets files from the local repo
     cp -a "$srcdir"/*.pkg.tar.{xz,zst}{,.sig} "$srcdir"/$reponame.{db,files}{,.tar.xz} .
 
-    echo "Do commands manually:"
-    echo "    cd $newrepodir"
-    echo "    git add $reponame"
-    echo "    git commit -m '???'"
-    echo "    git push"
+    while true ; do
+        read2 -p "Put files to Github now (y/n)? "
+        case "$REPLY" in
+            [yY]*) break ;;
+            [nN]*) return ;;
+        esac
+    done
+
+    pushd "$newrepodir" >/dev/null
+
+    Cmd git add $reponame
+    Cmd git commit -m "$(date --utc '+%Y-%m-%d %H:%M') (UTC)"
+    Cmd git push
+
+    popd >/dev/null
 }
 
 Main "$@"
