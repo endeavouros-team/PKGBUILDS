@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# Copy EOS repo asset files from the old repo to the new repo.
+#
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Main()
+{
+    local EOSDIR="$HOME/EOS"
+    local reponame=endeavouros
+    local newrepodir="$EOSDIR/repo"
+    local srcdir="$EOSDIR/_BUILD_/mirrors.mirror1"
+    local dstdir="$newrepodir/$reponame/x86_64"
+
+    test "$PWD" = "$dstdir" || DIE "wrong work dir, goto $dstdir !"
+    test -r "$srcdir"/$reponame.db || DIE " repo db $srcdir/$reponame.db does not exist."
+
+    read -p "Do 'git pull' now (y/N)? "
+    case "$REPLY" in
+        [yY]*) git pull ;;
+    esac
+    echo ""
+
+    echo "Diffs between old and new:"
+    diff $dstdir $srcdir | grep -vP 'assets\.conf|PKGBUILDS|\.git|\.vscode' | sed 's|^|    |'
+    echo ""
+
+    # remove all asset files from here
+    rm -f *.pkg.tar.{xz,zst}{,.sig} $reponame.{db,files}{,.tar.xz}
+
+    # copy all assets files from the local repo
+    cp -a "$srcdir"/*.pkg.tar.{xz,zst}{,.sig} "$srcdir"/$reponame.{db,files}{,.tar.xz} .
+
+    echo "Do commands manually:"
+    echo "    cd $newrepodir"
+    echo "    git add $reponame"
+    echo "    git commit -m '???'"
+    echo "    git push"
+}
+
+Main "$@"
