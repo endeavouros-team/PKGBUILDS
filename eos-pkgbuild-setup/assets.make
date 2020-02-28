@@ -683,6 +683,11 @@ Main()
                             ;;
                     esac
                 done
+
+                if [ -n "$removable" ] ; then
+                    rm -f  "${removable[@]}"
+                fi
+                
                 if [ -n "$repo_removes" ] ; then
                     # check if repo db contains any of the packages to be removed
                     yy="$(tar --list --exclude */desc -f "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR | sed 's|-[0-9].*$||')"
@@ -726,7 +731,10 @@ Main()
                 esac
                 ;;
             *)
-                ManageGithubReleaseAssets
+                case "$SIGNER" in
+                    EndeavourOS) ManageGithubReleaseAssets ;;
+                    *) ;;
+                esac
                 ;;
         esac
     else
@@ -757,7 +765,7 @@ ManageGithubReleaseAssets() {
         SettleDown "'$REPONAME' db files deleted at tag '$tag'."
     done
     if [ -n "$removable" ] ; then
-        rm -f  "${removable[@]}"
+        #rm -f  "${removable[@]}"
         for tag in "${RELEASE_TAGS[@]}" ; do
             delete-release-assets --quietly "$tag" "${removableassets[@]}" \
                 || WARN "removing pkg assets with tag '$tag' failed"
