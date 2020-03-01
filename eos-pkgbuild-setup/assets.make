@@ -814,6 +814,7 @@ ManageGithubReleaseAssets() {
 
         # Now manage new assets.
 
+        echo2 "Sleeping 5 seconds ..."
         sleep 5   # give some additional time to github...
 
         assets=()
