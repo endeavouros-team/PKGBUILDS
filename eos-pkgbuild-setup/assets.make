@@ -785,6 +785,7 @@ ManageGithubReleaseAssets() {
     esac
 
     local last_tag=$((${#RELEASE_TAGS[@]} - 1))
+    local assets
 
     # Remove old assets (removable) from github and local folder.
 
@@ -824,13 +825,16 @@ ManageGithubReleaseAssets() {
                 AssetCmd add-release-assets "$tag" "$filelist_txt"
             fi
         fi
+
+        # Github has issues with some file orders ?? Cache issues ??
+        assets=(
+            "$REPONAME".{db,files}
+            "$REPONAME".{db,files}.tar.$REPO_COMPRESSOR
+        )
         if [ $reposig -eq 1 ] ; then
-            AssetCmdLast add-release-assets "$tag" "$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
-            #AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
-        else
-            AssetCmdLast add-release-assets "$tag" "$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
-            #AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
+            assets+=("$REPONAME".{db,files}.tar.$REPO_COMPRESSOR.sig)
         fi
+        AssetCmdLast add-release-assets "$tag" "${assets[@]}"
     done
 }
 
