@@ -445,25 +445,6 @@ MirrorCheck() {
     fi
 }
 
-SettleDown() {
-    local arg
-    local ask=yes
-    local msg
-
-    for arg in "$@" ; do
-        case "$arg" in
-            --no-ask) ask=no ;;
-            -*) echo2 "Warning: $FUNCNAME: unsupported parameter '$arg'." ;;
-            *) msg="$arg" ;;
-        esac
-    done
-    echo2 "Info: $msg"
-    if [ "$ask" = "yes" ] ; then
-        read2 -p "Wait, let things settle down, then press ENTER to continue: "
-    fi
-    echo2 ""
-}
-
 Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
@@ -748,6 +729,47 @@ Main()
     #MirrorCheck
 }
 
+SettleDown() {
+    local arg
+    local ask=yes
+    local msg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --no-ask) ask=no ;;
+            -*) echo2 "Warning: $FUNCNAME: unsupported parameter '$arg'." ;;
+            *) msg="$arg" ;;
+        esac
+    done
+    test -n "$msg" && echo2 "Info: $msg"
+    if [ "$ask" = "yes" ] ; then
+        read2 -p "Wait, let things settle down, then press ENTER to continue: "
+    fi
+    echo2 ""
+}
+
+AssetCmd() {
+    local arg=""
+    case "$1" in
+        --no-ask) arg="$1" ; shift ;;
+    esac
+
+    echo2 "$@"
+    "$@"
+    if [ $? -ne 0 ] ; then
+        DIE "command '$*' failed!"
+    fi
+
+    SettleDown $arg
+}
+AssetsCmdLast() {
+    local arg=""
+    if [ "$tag" = "${RELEASE_TAGS[$last_tag]}" ] ; then
+        arg="--no-ask"
+    fi
+    AssetCmd $arg "$@"
+}
+
 ManageGithubReleaseAssets() {
     echo2 "Final stop before syncing with github!"
     read2 -p "Continue (Y/n)? " xx
@@ -756,67 +778,51 @@ ManageGithubReleaseAssets() {
         *) Exit 0 ;;
     esac
 
+    local last_tag=$((${#RELEASE_TAGS[@]} - 1))
+
     # Remove old assets (removable) from github and local folder.
 
     for tag in "${RELEASE_TAGS[@]}" ; do
         # delete-release-assets does not need the whole file name, only unique start!
-        delete-release-assets --quietly "$tag" "$REPONAME".{db,files} \
-            || WARN "removing db assets with tag '$tag' failed"
-        SettleDown "'$REPONAME' db files deleted at tag '$tag'."
-    done
-    if [ -n "$removable" ] ; then
-        #rm -f  "${removable[@]}"
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            delete-release-assets --quietly "$tag" "${removableassets[@]}" \
-                || WARN "removing pkg assets with tag '$tag' failed"
-            SettleDown "'$REPONAME' pkg files deleted at tag '$tag'."
+        AssetCmd delete-release-assets --quietly "$tag" "$REPONAME".{db,files} 
+
+        if [ -n "$removableassets" ] ; then
+            AssetCmd delete-release-assets --quietly "$tag" "${removableassets[@]}"
+
             if [ -r "$filelist_txt" ] ; then
-                delete-release-assets --quietly "$tag" $(basename "$filelist_txt") \
-                    || WARN "removing $(basename "$filelist_txt") with tag '$tag' failed"
-                SettleDown "'$REPONAME' file $(basename "$filelist_txt") deleted at tag '$tag'."
+                AssetCmd delete-release-assets --quietly "$tag" "$(basename "$filelist_txt")"
             fi
-        done
-    fi
-
-    if [ -r "$filelist_txt" ] ; then
-        echo2 "deleting file $filelist_txt ..."
-        rm -f $filelist_txt
-    fi
-
-    # Now manage new assets.
-
-    if [ "$use_filelist" = "yes" ] ; then
-        # create a list of package and db files that should be also on the mirror
-        pushd "$ASSETSDIR" >/dev/null
-        pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
-        if [ -n "$filelist_txt" ] ; then
-            echo "$pkg" > "$filelist_txt"
         fi
-        popd >/dev/null
-    fi
 
-    # transfer assets (built, signed and db) to github
-    if [ -n "$built" ] ; then
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            add-release-assets "$tag" "${signed[@]}" "${built[@]}" || \
-                DIE "adding pkg assets with tag '$tag' failed"
-            SettleDown "'$REPONAME' package files added at tag '$tag'."
-            if [ -r "$filelist_txt" ] ; then
-                add-release-assets "$tag" "$filelist_txt" || \
-                    DIE "adding $filelist_txt with tag '$tag' failed"
-                SettleDown "'$REPONAME' file $(basename "$filelist_txt") added at tag '$tag'."
+        if [ -r "$filelist_txt" ] ; then
+            echo2 "deleting file $filelist_txt ..."
+            rm -f $filelist_txt
+        fi
+
+        # Now manage new assets.
+
+        if [ "$use_filelist" = "yes" ] ; then
+            # create a list of package and db files that should be also on the mirror
+            pushd "$ASSETSDIR" >/dev/null
+            pkg="$(ls -1 *.pkg.tar.* "$REPONAME".{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig} 2>/dev/null)"
+            if [ -n "$filelist_txt" ] ; then
+                echo "$pkg" > "$filelist_txt"
             fi
-        done
-    fi
-    for tag in "${RELEASE_TAGS[@]}" ; do
+            popd >/dev/null
+        fi
+
+        # transfer assets (built, signed and db) to github
+        if [ -n "$built" ] ; then
+            AssetCmd add-release-assets "$tag" "${signed[@]}" "${built[@]}"
+            if [ -r "$filelist_txt" ] ; then
+                AssetCmd add-release-assets "$tag" "$filelist_txt"
+            fi
+        fi
         if [ $reposig -eq 1 ] ; then
-            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,} || \
-                DIE "adding db assets with tag '$tag' failed"
+            AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
         else
-            add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,} || \
-                DIE "adding db assets with tag '$tag' failed"
+            AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
         fi
-        SettleDown "'$REPONAME' database files added at tag '$tag'."
     done
 }
 
