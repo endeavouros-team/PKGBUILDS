@@ -194,7 +194,7 @@ CheckArchNews() {
     local CheckArchNewsForYou
     local ArchNewsProg
 
-    #test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
+    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
     test -n "$CheckArchNewsForYou" || CheckArchNewsForYou=yes
     test -n "$ArchNewsProg"        || ArchNewsProg=arch-news-for-you          # original default
 
