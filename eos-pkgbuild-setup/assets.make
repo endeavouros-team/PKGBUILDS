@@ -603,7 +603,7 @@ Main()
 
                     yy="$(basename "$pkg")"
                     removableassets+=("$yy")
-                    removableassets+=("$yy".sig)
+                    #removableassets+=("$yy".sig)
                 }
             done
 
@@ -793,7 +793,6 @@ ManageGithubReleaseAssets() {
         assets=()
 
         # delete-release-assets does not need the whole file name, only unique start!
-        #AssetCmd delete-release-assets --quietly "$tag" "$REPONAME".{db,files}
         assets+=("$REPONAME".{db,files})
 
         if [ -n "$removableassets" ] ; then
