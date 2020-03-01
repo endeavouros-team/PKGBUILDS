@@ -60,7 +60,7 @@ log2() {
 }
 
 YadNonFocused() {
-    local opts=(--no-focus --geometry=500x${height}+20+20 --title="Updates available at $date")
+    local opts=(--no-focus --geometry=500x${height}+20+20 --title="Updates available!")
     opts+=(--button="Dismiss!!Don't update, just close this window":1 --button="Update!!Close this window and update":0)
 
     echo "$msg" | eos_yad2 --text-info "${opts[@]}" "$@"
@@ -109,12 +109,12 @@ ShowNonFocused() {
                     tmp="$(echo "$updates" | sed 's|^|    |')"
                     height=$((10 * count + 120))
                     test $height -gt $limit && height=$limit
-                    msg="$(printf "$source updates are available:\n$tmp\n$count updates.\n")"
+                    msg="$(printf "$count $source updates available at $date:\n$tmp\n")"
                     YadNonFocused
                     ;;
                 number | *)
                     height=100
-                    msg="$(printf "$count $source updates are available.\n")"
+                    msg="$(printf "$count $source updates available at $date.\n")"
                     YadNonFocused
                     ;;
             esac
