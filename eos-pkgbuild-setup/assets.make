@@ -825,9 +825,11 @@ ManageGithubReleaseAssets() {
             fi
         fi
         if [ $reposig -eq 1 ] ; then
-            AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
+            AssetCmdLast add-release-assets "$tag" "$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
+            #AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}{.sig,}
         else
-            AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
+            AssetCmdLast add-release-assets "$tag" "$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
+            #AssetCmdLast add-release-assets "$tag" "$ASSETSDIR/$REPONAME".{files,db}{.tar.$REPO_COMPRESSOR,}
         fi
     done
 }
