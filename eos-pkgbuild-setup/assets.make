@@ -762,7 +762,7 @@ AssetCmd() {
 
     SettleDown $arg
 }
-AssetsCmdLast() {
+AssetCmdLast() {
     local arg=""
     if [ "$tag" = "${RELEASE_TAGS[$last_tag]}" ] ; then
         arg="--no-ask"
