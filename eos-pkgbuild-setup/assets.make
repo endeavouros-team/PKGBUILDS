@@ -787,6 +787,10 @@ ManageGithubReleaseAssets() {
     local last_tag=$((${#RELEASE_TAGS[@]} - 1))
     local assets
 
+    # Github seems to have issues with some files:
+    # - too long paths when adding release assets to github ??
+    # - file orders --> cache issues ??
+
     # Remove old assets (removable) from github and local folder.
 
     for tag in "${RELEASE_TAGS[@]}" ; do
@@ -839,7 +843,6 @@ ManageGithubReleaseAssets() {
             fi
         fi
 
-        # Github has issues with some file orders ?? Cache issues ??
         assets+=(
             "$REPONAME".{db,files}
             "$REPONAME".{db,files}.tar.$REPO_COMPRESSOR
