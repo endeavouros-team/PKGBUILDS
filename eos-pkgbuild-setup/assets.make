@@ -805,7 +805,7 @@ ManageGithubReleaseAssets() {
             fi
         fi
 
-        AssetCmd delete-release-assets --quietly "$tag" "${assets[@]}"
+        AssetCmd --no-ask delete-release-assets --quietly "$tag" "${assets[@]}"
 
         if [ -r "$filelist_txt" ] ; then
             echo2 "deleting file $filelist_txt ..."
@@ -813,6 +813,8 @@ ManageGithubReleaseAssets() {
         fi
 
         # Now manage new assets.
+
+        sleep 5   # give some additional time to github...
 
         assets=()
 
