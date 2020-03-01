@@ -627,6 +627,10 @@ Main()
         
         # now we have: removable (and removableassets), built and signed
 
+        if [ "$PWD" != "$ASSETSDIR" ] ; then
+            DIE "wrong directory: $PWD != $ASSETSDIR"
+        fi
+
         # Move built and signed to assets dir...
         if [ -n "$built" ] ; then
             echo2 "Signing and putting it all together..."
@@ -648,12 +652,14 @@ Main()
                 tmp=("${built[@]}")
                 built=()
                 for xx in "${tmp[@]}" ; do
-                    built+=("$ASSETSDIR/$(basename "$xx")")
+                    built+=("$(basename "$xx")")
+                    #built+=("$ASSETSDIR/$(basename "$xx")")
                 done
                 tmp=("${signed[@]}")
                 signed=()
                 for xx in "${tmp[@]}" ; do
-                    signed+=("$ASSETSDIR/$(basename "$xx")")
+                    signed+=("$(basename "$xx")")
+                    #signed+=("$ASSETSDIR/$(basename "$xx")")
                 done
 
                 for xx in "${built[@]}" ; do
