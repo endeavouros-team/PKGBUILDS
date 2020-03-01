@@ -790,16 +790,23 @@ ManageGithubReleaseAssets() {
     # Remove old assets (removable) from github and local folder.
 
     for tag in "${RELEASE_TAGS[@]}" ; do
+        assets=()
+
         # delete-release-assets does not need the whole file name, only unique start!
-        AssetCmd delete-release-assets --quietly "$tag" "$REPONAME".{db,files} 
+        #AssetCmd delete-release-assets --quietly "$tag" "$REPONAME".{db,files}
+        assets+=("$REPONAME".{db,files})
 
         if [ -n "$removableassets" ] ; then
-            AssetCmd delete-release-assets --quietly "$tag" "${removableassets[@]}"
+            #AssetCmd delete-release-assets --quietly "$tag" "${removableassets[@]}"
+            assets+=("${removableassets[@]}")
 
             if [ -r "$filelist_txt" ] ; then
-                AssetCmd delete-release-assets --quietly "$tag" "$(basename "$filelist_txt")"
+                #AssetCmd delete-release-assets --quietly "$tag" "$(basename "$filelist_txt")"
+                assets+=("$(basename "$filelist_txt")")
             fi
         fi
+
+        AssetCmd delete-release-assets --quietly "$tag" "$assets{[@]}"
 
         if [ -r "$filelist_txt" ] ; then
             echo2 "deleting file $filelist_txt ..."
@@ -807,6 +814,8 @@ ManageGithubReleaseAssets() {
         fi
 
         # Now manage new assets.
+
+        assets=()
 
         if [ "$use_filelist" = "yes" ] ; then
             # create a list of package and db files that should be also on the mirror
@@ -820,20 +829,26 @@ ManageGithubReleaseAssets() {
 
         # transfer assets (built, signed and db) to github
         if [ -n "$built" ] ; then
-            AssetCmd add-release-assets "$tag" "${signed[@]}" "${built[@]}"
+            #AssetCmd add-release-assets "$tag" "${signed[@]}" "${built[@]}"
+            assets+=("${built[@]}")
             if [ -r "$filelist_txt" ] ; then
-                AssetCmd add-release-assets "$tag" "$filelist_txt"
+                #AssetCmd add-release-assets "$tag" "$filelist_txt"
+                assets+=("$filelist_txt")
             fi
         fi
 
         # Github has issues with some file orders ?? Cache issues ??
-        assets=(
+        assets+=(
             "$REPONAME".{db,files}
             "$REPONAME".{db,files}.tar.$REPO_COMPRESSOR
         )
         if [ $reposig -eq 1 ] ; then
             assets+=("$REPONAME".{db,files}.tar.$REPO_COMPRESSOR.sig)
         fi
+        if [ -n "$built" ] ; then
+            assets+=("${signed[@]}")
+        fi
+
         AssetCmdLast add-release-assets "$tag" "${assets[@]}"
     done
 }
