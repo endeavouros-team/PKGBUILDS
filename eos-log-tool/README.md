@@ -1,2 +1,2 @@
 # eos-log-tool
-A GUI tool for taking various system logs to the internet.
+A GUI tool for copying various system logs to the internet.
