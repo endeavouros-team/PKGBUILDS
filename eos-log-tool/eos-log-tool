@@ -32,7 +32,12 @@ SendToInternet() {
 
     local url="$(cat $FILE_OF_LOGS | curl -F 'f:1=<-' ix.io)"
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
-    echo "$url" | eos_yad --text-info --width=300 --title="Result URL"
+    if [[ -x /usr/bin/xclip ]]; then
+        eos_yad --text="$url" --button="cancel":1 --button="copy":0 --title="Result URL" --width=300
+        test $? -eq 0 && echo "$url" | xclip -i -selection clipboard
+    else
+        echo "$url" | eos_yad --text-info --width=300 --title="Result URL"
+    fi
     rm -f $FILE_OF_LOGS $FILE_OF_LOGS.bak
 }
 

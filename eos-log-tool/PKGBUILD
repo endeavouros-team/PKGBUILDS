@@ -3,18 +3,17 @@
 pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=0.1.1
+pkgver=0.2
 pkgrel=1
 
 arch=('any')
 license=('GPL')
 depends=(bash)
-#optdepends=(
-#    'inxi: for inxi logs'
-#    'pciutils: for lspci logs'
-#    'usbutils: for lsusb logs'
-#    'systemd: for journalctl logs'
-#)
+
+optdepends=(
+    'xclip: for automatic copying the returned URL to clipboard'
+    'inxi: for inxi logs'
+)
 
 source=(
     "$url/$pkgname"
