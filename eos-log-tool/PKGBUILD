@@ -1,0 +1,28 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-log-tool
+pkgdesc="Gathers selected system logs and sends them to the internet."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=0.1
+pkgrel=1
+
+arch=('any')
+license=('GPL')
+depends=(bash)
+#optdepends=(
+#    'inxi: for inxi logs'
+#    'pciutils: for lspci logs'
+#    'usbutils: for lsusb logs'
+#    'systemd: for journalctl logs'
+#)
+
+source=(
+    "$url/$pkgname"
+)
+sha512sums=('dae3f6b64ae8fd5d21bde2a60fc916ab44b30afe09f894b5150c05ccfc0ec4ed3c346b470699d1191c5347e890ba82f963193452243ad29e74b117a9627ea8d8'
+            '8d6121338334798879bee60862c1faf9ecce16a83c59de0d7bb2d9c55c72e76c5b8fb046e2f5de3a339812807daa68d6f48f3624d5fddf73e4ef9bf6496f423c')
+
+package() {
+  cd $srcdir
+  install -Dm755 $pkgname             $pkgdir/usr/bin/$pkgname
+}

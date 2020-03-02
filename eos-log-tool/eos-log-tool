@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# Tool for generating various logs and sending them to the internet.
+#
+# Note: logs may contain some personal information, thus the user may
+#       create an additional filter for removing personal data from the logs.
+#       See function RemovePersonalData below.
+#
+
+eos_yad() {
+    local icon=/usr/share/endeavouros/EndeavourOS-icon.png
+    if [ -r "$icon" ] ; then
+        GDK_BACKEND=x11 /usr/bin/yad --window-icon="$icon" "$@"
+    else
+        GDK_BACKEND=x11 /usr/bin/yad "$@"
+    fi
+}
+
+Cmd() {
+    local cmd="$1"
+    printf "%s\n\n" "#################### $* ########################" >> $FILE_OF_LOGS
+    if [ -n "$cmd" ] && [ -x /usr/bin/"$cmd" ] ; then
+        "$@" >> $FILE_OF_LOGS
+    else
+        echo "Sorry, command '$1' not found." >> $FILE_OF_LOGS
+    fi
+    printf "\n\n" >> $FILE_OF_LOGS
+}
+
+SendToInternet() {
+    RemovePersonalData  # always before sending logs to the internet
+
+    local url="$(cat $FILE_OF_LOGS | curl -F 'f:1=<-' ix.io)"
+    echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
+    echo "$url" | eos_yad --text-info --width=300 --title="Result URL"
+    rm -f $FILE_OF_LOGS $FILE_OF_LOGS.bak
+}
+
+RemovePersonalData() {
+    cp -a $FILE_OF_LOGS $FILE_OF_LOGS.bak
+    sed -i $FILE_OF_LOGS \
+        -e 's| '$LOGNAME' | _logname_ |g' \
+        -e 's| '$USER' | _user_ |g' \
+        -e 's| '$HOSTNAME' | _hostname_ |g'
+
+    # User may create an additional filter
+    # for removing personal data from the logs.
+    local filter="$DIR_OF_CONFIG"/eos-log-tool-filter.bash
+    if [ -r "$filter" ] ; then
+        bash "$filter" $FILE_OF_LOGS
+    fi
+}
+
+export -f eos_yad
+export -f Cmd
+export -f SendToInternet
+export -f RemovePersonalData
+
+export FILE_OF_LOGS=/tmp/eos-log-tool.logs
+export DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
+
+Main()
+{
+    mkdir -p "$DIR_OF_CONFIG"
+
+    rm -f $FILE_OF_LOGS
+
+    local text=""
+    text+="Clicking any of the buttons below (except the last two)\n"
+    text+="will append that particular log to a common log file ($FILE_OF_LOGS).\n"
+    text+="Once you have clicked the desired buttons, click the last button\n"
+    text+="to send all logs to the internet, and you will receive a URL\n"
+    text+="that tells the address of the logs.\n\n"
+    text+="Note1: personal data is automatically removed from logs before sending to internet.\n"
+    text+="Note2: to remove personal data from the logs, use button 'Remove personal data'.\n"
+    text+="Note3: please give each button a bit time to finish!\n"
+
+    local rdbut=" Remove personal data from logs"
+    local rdtip="Rename personal names to generic names"
+    local rdico="preferences-system-privacy"
+
+    local slbut=" Send logs to internet"
+    local sltip="Send gathered logs to the internet"
+    local slico="mail-send"
+
+    eos_yad --form --title="Log tools" --columns=2 --image=dialog-question \
+            --text="$text" --button=yad-quit:0 \
+            --field="journalctl -b -0":fbtn         'bash -c "Cmd pkexec journalctl -b -0"' \
+            --field="journalctl -b -1":fbtn         'bash -c "Cmd pkexec journalctl -b -1"' \
+            --field="journalctl -b -2":fbtn         'bash -c "Cmd pkexec journalctl -b -2"' \
+            --field="~/.xsession-errors":fbtn       'bash -c "Cmd cat $HOME/.xsession-errors"' \
+            --field="Xorg.0.log":fbtn               'bash -c "Cmd cat /var/log/Xorg.0.log"' \
+            --field="lightdm.log":fbtn              'bash -c "Cmd pkexec cat /var/log/lightdm/lightdm.log"' \
+            --field="x-0.log":fbtn                  'bash -c "Cmd pkexec cat /var/log/lightdm/x-0.log"' \
+            --field="EndeavourOS install log":fbtn  'bash -c "Cmd cat /var/log/Calamares.log"' \
+            --field="lspci":fbtn                    'bash -c "Cmd lspci"' \
+            --field="lsusb":fbtn                    'bash -c "Cmd lsusb"' \
+            --field="inxi -Fxxc0":fbtn              'bash -c "Cmd inxi -Fxxc0"' \
+            --field="$rdbut!$rdico!$rdtip":fbtn     'bash -c RemovePersonalData' \
+            --field="$slbut!$slico!$sltip":fbtn     'bash -c SendToInternet' \
+            >& /dev/null
+}
+
+Main "$@"
