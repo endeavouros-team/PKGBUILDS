@@ -33,6 +33,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-mirrorlist
     endeavouros-theming
     eos-base
+    eos-log-tool
     eos-rankmirrors
     eos-update-notifier
     grub-theme-endeavouros
