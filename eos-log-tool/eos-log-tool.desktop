@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=EndeavourOS log tool
+Comment=Log tool to send selected system logs to the internet
+Exec=/usr/bin/eos-log-tool
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
+# StartupNotify=false
+# Terminal=False
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
