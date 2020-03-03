@@ -2,9 +2,12 @@
 #
 # Tool for generating various logs and sending them to the internet.
 #
-# Note: logs may contain some personal information, thus the user may
-#       create an additional filter for removing personal data from the logs.
-#       See function RemovePersonalData below.
+# NOTE: Even though much effort for removing personal information
+#       has been made, logs may still contain some personal information.
+#       Thus the user may create an additional filter for removing
+#       personal data from the logs.
+#       See the end of function "RemovePersonalData"
+#       and file "$DIR_OF_CONFIG/eos-log-tool-filter.bash" below.
 #
 
 eos_yad() {
@@ -16,21 +19,58 @@ eos_yad() {
     fi
 }
 
+Msg() {
+    local msg="$1"
+    local title="$2"
+    shift 2
+    local width=$((${#msg} * 10))
+    local highlimit=650
+    local lowlimit=200
+
+    test $width -gt $highlimit && width=$highlimit
+    test $width -lt $lowlimit  && width=$lowlimit
+
+    echo "$msg" | eos_yad --text-info --title="$title" --formatted --wrap \
+                          --width=$width --height=100 --button=yad-quit "$@"
+}
+ErrorMsg() {
+    local msg="$1"
+    Msg "$msg" "Error"
+}
+WarningMsg() {
+    local msg="$1"
+    Msg "$msg" "Warning"
+}
+
+Header() { printf "%s\n\n" "#################### $* ########################" ; }
+Footer() { printf "\n\n" ; }
+
 Cmd() {
     local cmd="$1"
-    printf "%s\n\n" "#################### $* ########################" >> $FILE_OF_LOGS
+    case "$cmd" in
+        pkexec)
+            shift
+            SUDO_CMDS+=" ; echo '$(Header "$@")' >> $FILE_OF_LOGS"
+            SUDO_CMDS+=" ; $* >> $FILE_OF_LOGS"
+            SUDO_CMDS+=" ; echo '$(Footer)' >> $FILE_OF_LOGS"
+            return
+            ;;
+    esac
+
+    Header "$@" >> "$FILE_OF_LOGS"
     if [ -n "$cmd" ] && [ -x /usr/bin/"$cmd" ] ; then
-        "$@" >> $FILE_OF_LOGS
+        "$@" >> "$FILE_OF_LOGS"
     else
-        echo "Sorry, command '$1' not found." >> $FILE_OF_LOGS
+        WarningMsg "Command '$cmd' not found."
+        echo "Sorry, command '$cmd' not found." >> "$FILE_OF_LOGS"
     fi
-    printf "\n\n" >> $FILE_OF_LOGS
+    Footer >> "$FILE_OF_LOGS"
 }
 
 SendToInternet() {
     RemovePersonalData  # always before sending logs to the internet
 
-    local url="$(cat $FILE_OF_LOGS | curl -F 'f:1=<-' ix.io)"
+    local url="$(cat "$FILE_OF_LOGS" | curl -F 'f:1=<-' ix.io)"
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
     if [[ -x /usr/bin/xclip ]]; then
         eos_yad --text="$url" --button="cancel":1 --button="copy":0 --title="Result URL" --width=300
@@ -38,72 +78,183 @@ SendToInternet() {
     else
         echo "$url" | eos_yad --text-info --width=300 --title="Result URL"
     fi
-    rm -f $FILE_OF_LOGS $FILE_OF_LOGS.bak
+    rm -f "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
+    sendToInternet=yes
+}
+
+UserNames() {
+    local low="$1"     # lowest  user id number
+    local high="$2"    # highest user id number
+    local nr
+    local user users=""
+
+    for nr in $(cat /etc/passwd | cut -d ':' -f 3) ; do
+        if [ $nr -ge $low ] && [ $nr -le $high ] ; then
+            user=$(grep ":$nr:" /etc/passwd | cut -d ':' -f 1)
+            if [ -z "$users" ] ; then
+                users="$user"
+            else
+                users+=" $user"
+            fi
+        fi
+    done
+    echo "$users"
 }
 
 RemovePersonalData() {
-    cp -a $FILE_OF_LOGS $FILE_OF_LOGS.bak
-    sed -i $FILE_OF_LOGS \
-        -e 's| '$LOGNAME' | _logname_ |g' \
-        -e 's| '$USER' | _user_ |g' \
-        -e 's| '$HOSTNAME' | _hostname_ |g'
+    if [ ! -r "$FILE_OF_LOGS" ] ; then
+        ErrorMsg "No logs!"
+        exit 1
+    fi
+    cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
 
-    # User may create an additional filter
-    # for removing personal data from the logs.
+    # hide real user names (that are found in /etc/passwd) from logs
+    for user in $(UserNames 1000 50000) ; do
+        sed -i "$FILE_OF_LOGS" \
+            -e 's| '$user' | _user_ |g' \
+            -e 's|/'$user'/|/_user_/|g' \
+            -e 's|"'$user'"|"_user_"|g' \
+            -e 's|'$user:$user'|_user_:_user_|g' \
+            -e 's|/'$user'|/_user_|g' \
+            -e 's| '$user'$| _user_|g' \
+            -e 's| '$user':| _user_:|g' \
+            -e "s|'"$user"'|'_user_'|g" \
+            -e 's| '$user'\.| _user_.|g' \
+            -e 's|:'$user' |:_user_ |g' \
+            -e 's|:'$user')|:_user_)|g' \
+            -e 's| '$user')| _user_)|g' \
+            -e 's|'$user'"|_user_"|g'
+    done
+
+    # hide hostname from logs
+    sed -i "$FILE_OF_LOGS" \
+        -e 's| '$HOSTNAME' | _hostname_ |g' \
+        -e 's|"'$HOSTNAME'"|"_hostname_"|g' \
+        -e 's|<'$HOSTNAME'>|<_hostname_>|g' \
+        -e 's|='$HOSTNAME' |=_hostname_ |g' \
+        -e 's| '$HOSTNAME'\.| _hostname_.|g' \
+        -e 's| '$HOSTNAME'"| _hostname_"|g' \
+        -e 's|-'$HOSTNAME':|-_hostname_:|g' \
+        -e "s|'"$HOSTNAME"'|'_hostname_'|g"
+
+    # User may create an additional filter for removing
+    # any remaining personal data from the logs.
     local filter="$DIR_OF_CONFIG"/eos-log-tool-filter.bash
     if [ -r "$filter" ] ; then
-        bash "$filter" $FILE_OF_LOGS
+        # $filter refers to user's own bash script
+        # $FILE_OF_LOGS is the file containing all gathered logs
+        bash "$filter" "$FILE_OF_LOGS"
     fi
+    removePersonalInfo=yes
 }
-
-export -f eos_yad
-export -f Cmd
-export -f SendToInternet
-export -f RemovePersonalData
-
-export FILE_OF_LOGS=/tmp/eos-log-tool.logs
-export DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
 
 Main()
 {
+    local FILE_OF_LOGS=$HOME/eos-log-tool.logs
+    local DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
+    local SUDO_CMDS=":"
+
     mkdir -p "$DIR_OF_CONFIG"
 
-    rm -f $FILE_OF_LOGS
+    rm -f "$FILE_OF_LOGS"
 
-    local text=""
-    text+="Clicking any of the buttons below (except the last two)\n"
-    text+="will append that particular log to a common log file ($FILE_OF_LOGS).\n"
-    text+="Once you have clicked the desired buttons, click the last button\n"
-    text+="to send all logs to the internet, and you will receive a URL\n"
-    text+="that tells the address of the logs.\n\n"
-    text+="Note1: personal data is automatically removed from logs before sending to internet.\n"
-    text+="Note2: to remove personal data from the logs, use button 'Remove personal data'.\n"
-    text+="Note3: please give each button a bit time to finish!\n"
-
-    local rdbut=" Remove personal data from logs"
     local rdtip="Rename personal names to generic names"
-    local rdico="preferences-system-privacy"
+    local sltip="Send gathered logs to the internet (personal info always removed)"
 
-    local slbut=" Send logs to internet"
-    local sltip="Send gathered logs to the internet"
-    local slico="mail-send"
+    local journal0="journalctl -b -0"
+    local journal1="journalctl -b -1"
+    local journal2="journalctl -b -2"
+    local xsession="~/.xsession-errors"
+    local Xorg="Xorg.0.log"
+    local lightdm="lightdm.log"
+    local lightdm2="x-0.log"
+    local install="EndeavourOS install log"
+    local lspci="lspci"
+    local lsusb="lsusb"
+    local inxi="inxi -Fxxc0"
+    local rdbut="<i>Remove personal data from logs</i>"
+    local slbut="<i>Send logs to internet</i>"
+    local save="Save this log"
 
-    eos_yad --form --title="Log tools" --columns=2 --image=dialog-question \
-            --text="$text" --button=yad-quit:0 \
-            --field="journalctl -b -0":fbtn         'bash -c "Cmd pkexec journalctl -b -0"' \
-            --field="journalctl -b -1":fbtn         'bash -c "Cmd pkexec journalctl -b -1"' \
-            --field="journalctl -b -2":fbtn         'bash -c "Cmd pkexec journalctl -b -2"' \
-            --field="~/.xsession-errors":fbtn       'bash -c "Cmd cat $HOME/.xsession-errors"' \
-            --field="Xorg.0.log":fbtn               'bash -c "Cmd cat /var/log/Xorg.0.log"' \
-            --field="lightdm.log":fbtn              'bash -c "Cmd pkexec cat /var/log/lightdm/lightdm.log"' \
-            --field="x-0.log":fbtn                  'bash -c "Cmd pkexec cat /var/log/lightdm/x-0.log"' \
-            --field="EndeavourOS install log":fbtn  'bash -c "Cmd cat /var/log/Calamares.log"' \
-            --field="lspci":fbtn                    'bash -c "Cmd lspci"' \
-            --field="lsusb":fbtn                    'bash -c "Cmd lsusb"' \
-            --field="inxi -Fxxc0":fbtn              'bash -c "Cmd inxi -Fxxc0"' \
-            --field="$rdbut!$rdico!$rdtip":fbtn     'bash -c RemovePersonalData' \
-            --field="$slbut!$slico!$sltip":fbtn     'bash -c SendToInternet' \
-            >& /dev/null
+    local cmds
+    local sendToInternet=no
+    local removePersonalInfo=no
+    local xx
+    local helptext=""
+
+    helptext+="Selecting any of the boxes below (except the last two)\n"
+    helptext+="will add that particular log to a common log file (<b>$FILE_OF_LOGS</b>).\n"
+    helptext+="Once you have selected the desired boxes, including '$slbut',\n"
+    helptext+="click the OK button and you will receive a URL\n"
+    helptext+="that tells the internet address of the logs.\n\n"
+    helptext+="Note1: personal data is automatically removed from logs before sending to internet.\n"
+    helptext+="Note2: remove personal data can be removed from the log file by selecting '$rdbut'.\n"
+    helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
+
+    local result=$(
+        eos_yad --list --checklist --width=750 --height=600 --text="$helptext" \
+                --image=dialog-question --title="EndeavourOS log tools" \
+                --no-click --multiple \
+                --column=Select --column="Log" --column="Description" \
+                false "$journal0" "$save" \
+                false "$journal1" "$save" \
+                false "$journal2" "$save" \
+                false "$xsession" "$save" \
+                false "$Xorg"     "$save" \
+                false "$lightdm"  "$save" \
+                false "$lightdm2" "$save" \
+                false "$install"  "$save" \
+                false "$lspci"    "$save" \
+                false "$lsusb"    "$save" \
+                false "$inxi"     "$save" \
+                false "$rdbut"    "$rdtip" \
+                false "$slbut"    "$sltip"
+          )
+
+    ##################################################################
+    # 'inxi' does not work properly when eos-log-tool is started as
+    # ./eos-log-tool and /usr/bin/eos-log-tool exists !!!
+    ##################################################################
+
+    if [ -z "$result" ] ; then
+        return
+    fi
+    
+    readarray -t cmds <<< "$(echo "$result" | cut -d '|' -f 2)"
+
+    for xx in "${cmds[@]}" ; do
+        case "$xx" in
+            "$journal0") Cmd pkexec $xx ;;
+            "$journal1") Cmd pkexec $xx ;;
+            "$journal2") Cmd pkexec $xx ;;
+            "$xsession") cd $HOME ; Cmd cat .xsession-errors ;;
+            "$Xorg")     Cmd cat /var/log/$xx ;;
+            "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
+            "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
+            "$install")  Cmd cat /var/log/Calamares.log ;;
+            "$lspci")    Cmd $xx ;;
+            "$lsusb")    Cmd $xx ;;
+            "$inxi")     Cmd $xx ;;
+        esac
+    done
+    if [ "$SUDO_CMDS" != ":" ] ; then
+        pkexec bash -c "$SUDO_CMDS"
+    fi
+
+    for xx in "${cmds[@]}" ; do
+        case "$xx" in
+            "$rdbut") RemovePersonalData ;;
+            "$slbut") SendToInternet ; break ;;
+        esac
+    done
+
+    if [ "$sendToInternet" = "no" ] ; then
+        if [ "$removePersonalInfo" = "yes" ] ; then
+            Msg "Log file $FILE_OF_LOGS created. Personal data was removed." "Info"
+        else
+            Msg "Log file $FILE_OF_LOGS created. Personal data was <b>not</b> removed." "Info"
+        fi
+    fi
 }
 
 Main "$@"
