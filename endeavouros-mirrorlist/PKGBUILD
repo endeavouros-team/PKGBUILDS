@@ -2,18 +2,18 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=1.3
+pkgver=1.4
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 options=(!strip !emptydirs)
-backup=("etc/pacman.d/$pkgname")
+backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
 
 # https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
 source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
-sha512sums=('3f2349ccd7d7b449b0e813f7041f3af0de6c8a393160d1643919acc4300b53e1a4cf43bbecf161c3d1d4fd4fd52aa0434e994bee29360d39c6d2b1a5172143ca')
+sha512sums=('79b98318e02b619d841fd4aad699cbc4273a2b8a3ce92826e3985050e790869a96e71ba3f5fdc15d3f3d0f33befcf3292eb1a838d981630f1528801410facaa0')
 
 package() {
  mkdir -p "$pkgdir/etc/pacman.d"

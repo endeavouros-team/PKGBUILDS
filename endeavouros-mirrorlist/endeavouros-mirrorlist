@@ -1,13 +1,14 @@
-##                                          ##
-#       EndeavourOS Repository Mirrorlist    #
-##                                          ##
+######################################################
+####                                              ####
+###        EndeavourOS Repository Mirrorlist       ###
+####                                              ####
+######################################################
+#### Entry in file /etc/pacman.conf:
+###     [endeavouros]
+###     SigLevel = PackageRequired
+###     Include = /etc/pacman.d/endeavouros-mirrorlist
+######################################################
 
-#[endeavouros]
-#SigLevel = PackageRequired
-#Include = /etc/pacman.d/endeavouros-mirrorlist
-
-# Github
+## Github
+Server = https://github.com/endeavouros-team/repo/raw/master/$repo/$arch
 Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/
-Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror2/
-
-
