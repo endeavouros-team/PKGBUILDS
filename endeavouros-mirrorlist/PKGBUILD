@@ -2,14 +2,14 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=1.4
+pkgver=1.5
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 options=(!strip !emptydirs)
-backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
+#backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
 
 # https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
 source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
