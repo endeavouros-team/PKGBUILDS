@@ -3,13 +3,13 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.4
+pkgver=0.5
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
-sha512sums=(SKIP)
+sha512sums=('SKIP')
 
 build() {
     # check we have calamares repo properly set up
@@ -21,7 +21,7 @@ Error: repo [$reponame] is missing from file /etc/pacman.conf.
 
 Please add the following lines in the end of file /etc/pacman.conf:
 
-   [endeavouros_calamares]
+   [$reponame]
    Server = https://github.com/endeavouros-team/mirrors/releases/download/endeavouros_calamares
 
 Then run: 'sudo pacman -Syyu' before trying again.
