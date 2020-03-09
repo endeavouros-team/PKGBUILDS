@@ -3,13 +3,13 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.5
+pkgver=0.6
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso arch-install-scripts git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
-sha512sums=('SKIP')
+sha512sums=(SKIP)
 
 build() {
     # check we have calamares repo properly set up
@@ -31,7 +31,6 @@ EOF
     fi
 
     local build_rootdir="$srcdir/.."
-    local _cmds=()
     local cleanup="$build_rootdir/cleanup.bash"
     local basedir=$srcdir/$pkgname
 
@@ -47,15 +46,13 @@ EOF
     # build
     cd $basedir
 
-    _cmds+=(pacman -Syyu \;)       # make sure system is updated
+    sudo pacman -Syyu
+    sudo ./fix_permissions.sh
+    sudo ./build.sh -v
+    sudo cd "$build_rootdir"
+    sudo mv "$basedir"/out/*.iso .
+    sudo chown $LOGNAME *.iso
 
-    _cmds+=(./fix_permissions.sh \;)
-    _cmds+=(./build.sh -v \;)
-    _cmds+=(cd "$build_rootdir" \;)
-    _cmds+=(mv "$basedir"/out/*.iso . \;)
-    _cmds+=(chown $LOGNAME:$LOGNAME *.iso)
-
-    su -c "${_cmds[*]}"
     sync
 
     # show the result
