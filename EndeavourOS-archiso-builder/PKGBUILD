@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.6
+pkgver=0.7
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
@@ -49,8 +49,10 @@ EOF
     sudo pacman -Syyu
     sudo ./fix_permissions.sh
     sudo ./build.sh -v
-    sudo cd "$build_rootdir"
-    sudo mv "$basedir"/out/*.iso .
+    cd ../..
+    sudo mv $srcdir/$pkgname/out/*.iso .
+    #sudo cd "$build_rootdir"
+    #sudo mv "$basedir"/out/*.iso .
     sudo chown $LOGNAME *.iso
 
     sync
