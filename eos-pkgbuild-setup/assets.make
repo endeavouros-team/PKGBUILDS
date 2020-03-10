@@ -462,7 +462,7 @@ EOF
     test -n "$1" && exit "$1"
 }
 
-Main()
+Main2()
 {
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
 
@@ -882,6 +882,47 @@ ManageGithubNormalFiles() {
     else
         echo2 "Nothing more to do."
     fi
+}
+
+Main() {
+    local conf=assets.conf   # This file must exist in the current folder when building packages.
+    test -r $conf || { echo "Error: file '$PWD/$conf' does not exist." >&2 ; return 1 ; }
+    local signer="$(  grep "^local SIGNER="   $conf | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
+    local reponame="$(grep "^local REPONAME=" $conf | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
+    local packager
+    local fail=0
+
+    if [ -z "$(grep ^PKGEXT /etc/makepkg.conf | grep zst)" ] ; then
+        echo "/etc/makepkg.conf: use zst in PKGEXT" >&2
+        fail=1
+    fi
+    if [ -z "$(grep ^COMPRESSZST /etc/makepkg.conf | grep T0)" ] ; then
+        echo "/etc/makepkg.conf: add -T0 -10 into COMPRESSZST" >&2
+        fail=1
+    fi
+    test $fail -eq 1 && return
+
+    local tmpdir=$(mktemp -d FOOBAR.XXXXX)
+    Pushd "$tmpdir" || { echo "Error: cannot create a temporary folder." ; return 1 ; }
+    tar xvf ../$reponame.db.tar.xz > /dev/null
+    case "$reponame" in
+        endeavouros)
+            export PACKAGER="$(grep -A1 PACKAGER $(ls endeavouros-mirrorlist-*/desc) | tail -n 1)"
+            ;;
+        endeavouros-testing-dev)
+            export PACKAGER="$(grep -A1 PACKAGER $(ls eos-pkgbuild-setup-*/desc) | tail -n 1)"
+            ;;
+        *)
+            cd "$(ls -1d * | head -n 1)"
+            export PACKAGER="$(grep -A1 PACKAGER desc | tail -n 1)"
+            cd ..
+            ;;
+    esac
+    Popd
+    rm -rf $tmpdir
+    echo "PACKAGER: $PACKAGER" >&2
+
+    Main2 "$@"
 }
 
 Main "$@"
