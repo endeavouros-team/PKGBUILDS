@@ -726,7 +726,7 @@ Main2()
             *)
                 case "$SIGNER" in
                     EndeavourOS) ManageGithubReleaseAssets ;;
-                    *) ;;
+                    *) ManageGithubReleaseAssets ;;
                 esac
                 ;;
         esac
