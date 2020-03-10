@@ -129,6 +129,7 @@ yad_calamares() {
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
         local answer field
+        local heightopt="--height=200"
 
         if [ 0 -eq 1 ] ; then
             answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
@@ -137,7 +138,7 @@ yad_calamares() {
             field=1
         else
             answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
-                              --text="$t1$t2$t3$t4" \
+                              --text="$t1$t2$t3$t4" $heightopt \
                               --column="Selected" --column="Method" true Offline false Online )
             field=2
         fi
