@@ -338,9 +338,11 @@ RunPreHooks()
 
 RunPostHooks()
 {
-    if [ -r "$GITDIR/GitUpdate" ] ; then
-        cd "$GITDIR"
-        ./GitUpdate
+    if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
+        if [ -r "$GITDIR/GitUpdate" ] ; then
+            cd "$GITDIR"
+            ./GitUpdate
+        fi
     fi
     return
     
