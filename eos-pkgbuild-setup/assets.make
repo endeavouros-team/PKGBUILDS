@@ -338,6 +338,12 @@ RunPreHooks()
 
 RunPostHooks()
 {
+    if [ -r "$GITDIR/GitUpdate" ] ; then
+        cd "$GITDIR"
+        ./GitUpdate
+    fi
+    return
+    
     if [ -n "$ASSET_POST_HOOKS" ] ; then
         ShowPrompt "Running asset post hooks"
         local xx
