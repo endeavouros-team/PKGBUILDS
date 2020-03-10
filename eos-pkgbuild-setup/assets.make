@@ -336,17 +336,17 @@ RunPreHooks()
     fi
 }
 
-#RunPostHooks()
-#{
-#    if [ -n "$ASSET_POST_HOOKS" ] ; then
-#        ShowPrompt "Running asset post hooks"
-#        local xx
-#        for xx in "${ASSET_POST_HOOKS[@]}" ; do
-#            $xx
-#        done
-#        echo2 "done."
-#    fi
-#}
+RunPostHooks()
+{
+    if [ -n "$ASSET_POST_HOOKS" ] ; then
+        ShowPrompt "Running asset post hooks"
+        local xx
+        for xx in "${ASSET_POST_HOOKS[@]}" ; do
+            $xx
+        done
+        echo2 "done."
+    fi
+}
 
 WantAurDiffs() {
     local xx="$1"
@@ -581,8 +581,6 @@ Main2()
             ;;
     esac
 
-    #RunPostHooks                 # may update local PKGBUILDs
-
     # build if newer versions exist. When building, collect removables and builds.
 
     buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
@@ -733,6 +731,8 @@ Main2()
     ShowOldCompressedPackages   # should show nothing
 
     #MirrorCheck
+
+    RunPostHooks
 }
 
 SettleDown() {
