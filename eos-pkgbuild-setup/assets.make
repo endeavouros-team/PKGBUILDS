@@ -857,6 +857,7 @@ ManageGithubReleaseAssets() {
         )
         if [ $reposig -eq 1 ] ; then
             assets+=("$REPONAME".{db,files}.tar.$REPO_COMPRESSOR.sig)
+            assets+=("$REPONAME".{db,files}.sig)
         fi
         if [ -n "$built" ] ; then
             assets+=("${signed[@]}")
