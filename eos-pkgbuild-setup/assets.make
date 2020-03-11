@@ -338,9 +338,14 @@ RunPreHooks()
 
 RunPostHooks()
 {
+    local newrepodir
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
-        if [ -r "$GITDIR/GitUpdate" ] ; then
-            cd "$GITDIR"
+        case "$REPONAME" in
+            endeavouros) newrepodir="$ASSETSDIR/../../repo" ;;
+            *)           newrepodir="$GITDIR" ;;
+        esac
+        if [ -r "$newrepodir/GitUpdate" ] ; then
+            cd "$newrepodir"
             ./GitUpdate
         fi
     fi
@@ -789,12 +794,13 @@ ManuelCheckOfAssets() {
     while true ; do
         hub release show -f %as%n $tag | sed 's|^.*/||' >&2
         echo2 ""
-        read2 -p "Remote asset list above is OK (y/n)"
+        read2 -p "Remote asset list above is OK (y/n) "
         case "$REPLY" in
             [yY]*) break ;;
             *) ;;
         esac
     done
+    echo2 ""
 }
 
 ManageGithubReleaseAssets() {
