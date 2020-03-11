@@ -784,6 +784,19 @@ AssetCmdLast() {
     AssetCmd $arg "$@"
 }
 
+ManuelCheckOfAssets() {
+    sleep 1
+    while true ; do
+        hub release show -f %as%n $tag | sed 's|^.*/||' >&2
+        echo2 ""
+        read2 -p "Remote asset list above is OK (y/n)"
+        case "$REPLY" in
+            [yY]*) break ;;
+            *) ;;
+        esac
+    done
+}
+
 ManageGithubReleaseAssets() {
     echo2 "Final stop before syncing with github!"
     read2 -p "Continue (Y/n)? " xx
@@ -824,10 +837,9 @@ ManageGithubReleaseAssets() {
             rm -f $filelist_txt
         fi
 
-        # Now manage new assets.
+        ManuelCheckOfAssets
 
-        echo2 "Sleeping 5 seconds ..."
-        sleep 5   # give some additional time to github...
+        # Now manage new assets.
 
         assets=()
 
@@ -864,6 +876,8 @@ ManageGithubReleaseAssets() {
         fi
 
         AssetCmdLast add-release-assets "$tag" "${assets[@]}"
+
+        ManuelCheckOfAssets
     done
 }
 
