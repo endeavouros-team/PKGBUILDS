@@ -768,9 +768,18 @@ SettleDown() {
 }
 
 AssetCmdShow() {
-    local xx
-    echo2 "$1:"
-    shift
+    local xx shifts=0
+    local line="$1 for $2"   # cmd and tag
+
+    shift 2
+    for xx in "$@" ; do
+        case "$xx" in
+            -*) line+=" $xx" ; ((shifts++)) ;;
+        esac
+    done
+    shift $shifts
+    line+=":"
+    echo2 "$line"
     for xx in "$@" ; do
         echo2 "    $xx"
     done
