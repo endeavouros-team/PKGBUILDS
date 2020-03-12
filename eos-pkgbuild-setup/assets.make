@@ -767,13 +767,22 @@ SettleDown() {
     echo2 ""
 }
 
+AssetCmdShow() {
+    local xx
+    echo2 "$1:"
+    shift
+    for xx in "$@" ; do
+        echo2 "    $xx"
+    done
+}
+
 AssetCmd() {
     local arg=""
     case "$1" in
         --no-ask) arg="$1" ; shift ;;
     esac
 
-    echo2 "$@"
+    AssetCmdShow "$@"
     "$@"
     if [ $? -ne 0 ] ; then
         DIE "command '$*' failed!"
