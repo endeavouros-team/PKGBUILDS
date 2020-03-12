@@ -179,12 +179,14 @@ Main()  # parameters: [--quietly] TAG assetname...
 {
     local xx
     local quietly=no
+    local shifts=0
 
     for xx in "$@" ; do
         case "$xx" in
-            --quietly) quietly=yes ; shift ;;
+            --quietly) quietly=yes ; ((shifts++)) ;;
         esac
     done
+    shift $shifts
     local tag="$1"
     shift              # other parameters are asset names, i.e. file names without any path
     local github_asset

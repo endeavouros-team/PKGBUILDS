@@ -768,17 +768,17 @@ SettleDown() {
 }
 
 AssetCmdShow() {
-    local xx shifts=0
-    local line="$1 for $2"   # cmd and tag
+    local xx
+    local line="$1"            # cmd
+    shift
 
-    shift 2
-    for xx in "$@" ; do
-        case "$xx" in
-            -*) line+=" $xx" ; ((shifts++)) ;;
-        esac
-    done
-    shift $shifts
-    line+=":"
+    case "$1" in
+        -*) shift ;;           # option --quietly for delete-release-assets
+    esac
+
+    line+=" for $1:"           # tag
+    shift
+
     echo2 "$line"
     for xx in "$@" ; do
         echo2 "    $xx"
