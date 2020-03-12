@@ -129,7 +129,7 @@ yad_calamares() {
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
         local answer field
-        local heightopt="--height=350"
+        local heightopt="--height=316"
 
         if [ 0 -eq 1 ] ; then
             answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
