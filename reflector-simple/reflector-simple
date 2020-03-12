@@ -74,24 +74,30 @@ ArgsYesNo() {
 }
 
 _get_reflector_auto_configs() {
-    # Read reflector options from /etc/reflector-auto.conf
-    # and convert country names to country codes.
+    # Read reflector options from /etc/reflector-auto.conf,
+    # convert country names to country codes, and put all options
+    # into file '$tmpconf'.
     local name code ix
-    local tmpconf=$(mktemp)
 
     cat $REFLECTOR_AUTO_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
     
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         name="${countrynames[$ix]}"
-        if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
+        #if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
             code="${countrycodes[$ix]}"
             sed -i $tmpconf \
                 -e "s|'$name'|$code|g" \
-                -e "s|\"$name\"|$code|g"
-        fi
+                -e "s|\"$name\"|$code|g" \
+                -e 's|'"$name"'|'$code'|g'                    # country name without quotes!
+        #fi
     done
-    cat $tmpconf
-    rm -f $tmpconf
+
+    local xx
+    for xx in $(cat $tmpconf) ; do
+        case "$xx" in
+            [A-Z][A-Z]) selected_countries+=("$(CodeToCountry "$xx")") ;;
+        esac
+    done
 }
 
 OptTypeNeeded() {
@@ -177,7 +183,10 @@ BuildReflectorCommand() {
         test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol rsync) ; rsync_selected=1 ; }
     }
     test -r "$REFLECTOR_AUTO_CONF" && {
-        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(_get_reflector_auto_configs))
+        local tmpconf=$(mktemp)
+        _get_reflector_auto_configs
+        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(cat $tmpconf))
+        rm -f $tmpconf
     }
     reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
     reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
