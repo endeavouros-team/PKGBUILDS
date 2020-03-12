@@ -307,11 +307,11 @@ Main() {
 
     # Add the save option here!
     local tmpfile=$(mktemp)
-    reflector_cmd+=(--save $tmpfile)
+    #reflector_cmd+=(--save $tmpfile)
 
     # Now all is ready, so just run the command.
 
-    "${reflector_cmd[@]}"
+    "${reflector_cmd[@]}" > $tmpfile
 
     # Show the result and ask permission to save the mirrorlist.
 
