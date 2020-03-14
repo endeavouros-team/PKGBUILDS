@@ -5,7 +5,7 @@ pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.18
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -21,9 +21,11 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
+  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=(
+'SKIP'
 'SKIP'
 'SKIP'
 )
@@ -33,6 +35,10 @@ prepare() {
     mv $_reponame-$pkgver       $_reponame
     rsync -va $_eos_changes/*   $_reponame
     rm -rf $_eos_changes
+    
+    # New branding stuff from @FLVAL
+    rsync -va calamares_branding/*   $_reponame/src
+    rm -rf calamares_branding
     
     # For testing EFI stuff
     # mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
