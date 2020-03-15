@@ -951,7 +951,12 @@ Main() {
 
     local tmpdir=$(mktemp -d FOOBAR.XXXXX)
     Pushd "$tmpdir" || { echo "Error: cannot create a temporary folder." ; return 1 ; }
-    tar xvf ../$reponame.db.tar.xz > /dev/null
+    local xx="$(ls -1 ../$reponame.db.tar.{xz,zst} 2>/dev/null)"
+    case "$xx" in
+        *.zst) REPO_COMPRESSOR=zst ;;
+        *.xz)  REPO_COMPRESSOR=xz ;;
+    esac
+    tar xvf ../$reponame.db.tar.$REPO_COMPRESSOR > /dev/null
     case "$reponame" in
         endeavouros)
             export PACKAGER="$(grep -A1 PACKAGER $(ls endeavouros-mirrorlist-*/desc) | tail -n 1)"
