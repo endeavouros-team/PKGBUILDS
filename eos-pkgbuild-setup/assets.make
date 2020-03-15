@@ -970,6 +970,9 @@ Main() {
             cd ..
             ;;
     esac
+    case "$PACKAGER" in
+        "Unknown Packager") export PACKAGER="EndeavourOS <info@endeavouros.com>" ;;
+    esac
     Popd
     rm -rf $tmpdir
     echo "PACKAGER: $PACKAGER" >&2
