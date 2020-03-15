@@ -140,12 +140,14 @@ Update_common() {
     local previous_check_time=$(/usr/bin/date +%s)
     local secs=10
 
+    SystemLockActive || return
     echo2 "Checking for updates ..."
     updates="$(/usr/bin/checkupdates)"
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
+            SystemLockActive || return
             if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                 # Re-check for updates if more than $secs seconds elapsed from the first check.
                 echo2 "Re-checking for updates ..."
@@ -163,10 +165,16 @@ Update_common() {
 
     # Check AUR updates.
 
-    test "$CheckAurUpdates" = "yes" && updates="$(/usr/bin/yay -Qua)" || updates=""
+    if [ "$CheckAurUpdates" = "yes" ] ; then
+        SystemLockActive || return
+        updates="$(/usr/bin/yay -Qua)"
+    else
+        updates=""
+    fi
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused AUR || return 1
+            SystemLockActive || return
             updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
@@ -224,9 +232,18 @@ CheckArchNews() {
     fi
 }
 
+SystemLockActive() {
+    if [ -e $system_lockfile ] ; then
+        debug "Sorry, another program is currently using pacman databases."
+        return 1
+    else
+        return 0   # OK
+    fi
+}
+
 Main2() {
     local CheckAurUpdates=yes
-    local lockfile
+    local system_lockfile=/var/lib/pacman/db.lck
     local pids
 
     test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
@@ -236,29 +253,9 @@ Main2() {
     fi
 
     # check package manager lock
-    lockfile=/var/lib/pacman/db.lck
-    if [ -e $lockfile ] ; then
-        debug "Sorry, another program is currently using pacman databases."
-        return
-    fi
-    # check notifier lock
-    lockfile=/tmp/.eos-update-notifier.l
-    if [ -e "$lockfile" ] ; then
-	pids=($(pidof -x $progname))
-	if [ "${#pids[@]}" = "1" ] ; then
-	    echo2 "Ignoring $progname lockfile (probably a leftover from a previous check)."
-	else
-            echo2 "Sorry, $progname lockfile exists, already checking for updates?"
-	    eos_yad2 --form --title="Warning: $progname blocked?" --image=warning --window-icon=$EOS_WICON \
-		     --text="Lockfile for $progname exists.\nIf no other $progname instance is currently checking for updates, you may continue.\nContinue checking?" \
-		    --button=yad-no:1 --button=yad-yes:0
-	    test $? -ne 0 && return 1
-	fi
-    fi
+    SystemLockActive || return
 
-    touch "$lockfile"
     Update_common
-    rm -f "$lockfile"
 }
 
 FetchAndCheck() {
