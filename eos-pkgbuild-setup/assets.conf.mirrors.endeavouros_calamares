@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Definitions for the [endeavouros_calamares] repo at 'mirrors'.
+
+# Note: this file will be sourced into a function,
+# so all variables are made 'local'.
+
+local REPONAME="endeavouros_calamares"
+local RELEASE_TAGS=(endeavouros_calamares)
+
+# user to sign packages
+local SIGNER="EndeavourOS"
+
+# general options
+local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
+
+# local folders
+local ASSETSDIR="$PWD"
+local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
+local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
+
+# package name specifications
+local PKGNAMES=(                                    # actually: dir names for packages
+    openswap
+    ckbcomp
+    calamares_offline_online
+    calamares_test
+)
+
+# Hook functions are run in the beginning after RationalityTests in assets.make.
+# There may be several hook functions.
+local ASSET_HOOKS=(
+    # currently none
+)
+
+# Package hooks
+
+_ckbcomp_hook_change_version() {
+    # change "$url" http to https
+    sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
+        -e 's|^url="http:|url="https:|'
+}
+
+_openswap_change_pkgrel() {
+    # Change 'pkgrel' from 3 to 4.
+    # NOTE: changing 'pkgrel' should be removed asap!
+
+    local Dirname=openswap
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$Dirname/PKGBUILD
+    local Pkgrel="$(grep ^pkgrel= "$Pkgbuild" | cut -d '=' -f 2)"
+    case "$Pkgrel" in
+        3) Pkgrel=4 ;;
+    esac
+    sed -i "$Pkgbuild" \
+        -e "s|^pkgrel=.*$|pkgrel=$Pkgrel|"
+}
+
+
+declare -A ASSET_PACKAGE_HOOKS
+ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
+ASSET_PACKAGE_HOOKS["openswap"]=_openswap_change_pkgrel

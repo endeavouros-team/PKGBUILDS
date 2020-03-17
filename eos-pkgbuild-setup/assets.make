@@ -188,7 +188,7 @@ Assets_clone()
     if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
 
         printf2 "\n%s " "Fetch assets from github (Y/n)?"
-        read xx
+        read2 xx
 
         case "$xx" in
             [yY]*|"") ;;
