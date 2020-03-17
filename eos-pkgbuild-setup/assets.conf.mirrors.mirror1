@@ -30,7 +30,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/paper-icon-theme
     aur/yay
     endeavouros-keyring
-    endeavouros-mirrorlist
+#    endeavouros-mirrorlist        # temporarily not updating
     endeavouros-theming
     eos-base
     eos-log-tool
@@ -57,6 +57,12 @@ local ASSET_HOOKS=(
 
 # do this for: icon-themes?
 
+_common_show_version() {
+    if [ "$localversion" != "$dev_version" ] ; then
+        echo -n "[dev=$dev_version] " >&2
+    fi
+}
+
 _yay_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of yay from the developer
     local tool=yay
@@ -74,9 +80,7 @@ _yay_hook_check_latest() {
     #dev_version="$(grep "Release v[0-9]" $tmpfile | sed 's|^.*Release v\([0-9\.]*\).*$|\1|')"
     dev_version="$(grep /Jguer/yay/tree/v $tmpfile | head -n 1 | sed 's|^.*/tree/v\([0-9\.]*\)" .*$|\1|')"
 
-    if [ "$localversion" != "$dev_version" ] ; then
-        echo "$tool: local='$localversion' net='$dev_version'" >&2
-    fi
+    _common_show_version
     rm -f $tmpfile
 }
 
@@ -96,9 +100,7 @@ _inxi_hook_check_latest() {
     }
     dev_version="$(grep /smxi/inxi/releases/tag/ $tmpfile | head -n 1 | sed 's|^.*/tag/\([0-9\.]*\)-.*$|\1|')"
 
-    if [ "$localversion" != "$dev_version" ] ; then
-        echo "$tool: local='$localversion' net='$dev_version'" >&2
-    fi
+    _common_show_version
     rm -f $tmpfile
 }
 
@@ -118,9 +120,7 @@ _downgrade_hook_check_latest() {
     }
     dev_version="$(grep /pbrisbin/downgrade/releases/tag/v $tmpfile | head -n 1 | sed 's|^.*/tag/v\([0-9\.]*\).*$|\1|')"
 
-    if [ "$localversion" != "$dev_version" ] ; then
-        echo "$tool: local='$localversion' net='$dev_version'" >&2
-    fi
+    _common_show_version
     rm -f $tmpfile
 }
 
