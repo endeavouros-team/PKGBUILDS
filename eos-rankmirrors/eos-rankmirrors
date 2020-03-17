@@ -36,8 +36,14 @@ Main()
     fi
 
     echo "Writing new mirrorlist to $eos." >&2
-    
-    pkexec bash -c "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+
+    local libhelper=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    local cmd="pkexec bash -c"
+    if [ -r $libhelper ] ; then
+        source $libhelper
+        cmd="$EOS_ROOTER"
+    fi
+    $cmd "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
 
 Main "$@"
