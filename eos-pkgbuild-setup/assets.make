@@ -12,7 +12,19 @@ REPO_COMPRESSOR=xz
 
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
-read2()   { read "$@" >&2 ; }
+
+read2()   {
+    # Always put the answer to REPLY !!
+    local ix="$1"
+    shift
+    if [ "$code_debug" = "yes" ] ; then
+        echo -n "==> $ix: read $*" >&2
+        REPLY="$(echo "${PREDEFINED_ANSWERS["$ix"]}")"
+        echo "$REPLY" >&2
+    else
+        read "$@" >&2
+    fi
+}
 
 DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
 WARN()  { echo2 "Warning: $1." ; }
@@ -188,9 +200,9 @@ Assets_clone()
     if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
 
         printf2 "\n%s " "Fetch assets from github (Y/n)?"
-        read2 xx
+        read2 ASSETS_FROM_GITHUB
 
-        case "$xx" in
+        case "$REPLY" in
             [yY]*|"") ;;
             *)
                 echo2 "Using local assets."
@@ -371,7 +383,7 @@ WantAurDiffs() {
         aur/*)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
-                read2 -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
+                read2 WANT_AUR_DIFFS -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
                 if [ $? -eq 0 ] ; then
                     case "$REPLY" in
                         ""|[yY]*) aurdiff=1 ;;
@@ -443,7 +455,7 @@ MirrorCheck() {
     fi
     if [ -x "$checker" ] ; then
         if [ $timeout -eq 180 ] ; then
-            read2 -p "Do $mirror_check (Y/n)?"
+            read2 MIRROR_CHECK -p "Do $mirror_check (Y/n)?"
         fi
         case "$REPLY" in
             ""|[yY]*)
@@ -493,6 +505,7 @@ Main2()
     local AUR_DIFFS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
+    local code_debug=no
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -512,6 +525,9 @@ Main2()
                     mirror_check_wait="${xx#*=}";;
                 --repoup)
                     repoup=1 ;;                  # sync repo even when no packages are built
+                --code)
+                    code_debug=yes
+                    source "$HOME"/.config/assets.make.conf ;;
                 --aurdiff)
                     aurdiff=1 ;;
                 --versuffix=*)
@@ -762,7 +778,7 @@ SettleDown() {
     done
     test -n "$msg" && echo2 "Info: $msg"
     if [ "$ask" = "yes" ] ; then
-        read2 -p "Wait, let things settle down, then press ENTER to continue: "
+        read2 SETTLE_DOWN -p "Wait, let things settle down, then press ENTER to continue: "
     fi
     echo2 ""
 }
@@ -812,7 +828,7 @@ ManuelCheckOfAssets() {
     while true ; do
         hub release show -f %as%n $tag | sed 's|^.*/||' >&2
         echo2 ""
-        read2 -p "Remote asset list above is OK (y/n) "
+        read2 ASSET_LIST_OK -p "Remote asset list above is OK (y/n) "
         case "$REPLY" in
             [yY]*) break ;;
             *) ;;
@@ -823,8 +839,8 @@ ManuelCheckOfAssets() {
 
 ManageGithubReleaseAssets() {
     echo2 "Final stop before syncing with github!"
-    read2 -p "Continue (Y/n)? " xx
-    case "$xx" in
+    read2 BEFORE_SYNC -p "Continue (Y/n)? "
+    case "$REPLY" in
         [yY]*|"") ;;
         *) Exit 0 ;;
     esac
