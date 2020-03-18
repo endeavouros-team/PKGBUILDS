@@ -47,9 +47,6 @@ prepare() {
     # For testing EFI stuff 
     #mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
 
-    # For testing LUKS partition bug
-     #cp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob_patch.cpp $_reponame/src/modules/partition/jobs/FillGlobalStorageJob.cpp   
-
     # Build proccess can't understand our personal files, so we adjust here
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
