@@ -5,8 +5,18 @@
 #
 # NOTE: to restore old behavior, simply reinstall packages 'grub' and 'os-prober'.
 
+_log2() {
+    echo "$@" >&2
+}
+
+_log() {
+    _log2 "$@"
+    echo "$@" >> $log
+}
+
 _die() {
-    echo "Error: $1" >&2
+    _log "Error: $@"
+    rm -f $lock
     exit 1
 }
 
@@ -16,7 +26,8 @@ _check_file_existence() {
     if [ ! -r "$file" ] ; then
         case "$pkg" in
             grub)
-                _die "file '$file' from package '$pkg' does not exist. Note: if you have used grub-customizer, you may need to reinstall grub, but be careful!"
+                _die "file '$file' from package '$pkg' does not exist." \
+                     "Note: if you have used grub-customizer, you may need to reinstall grub, but be careful!"
                 ;;
             os-prober)
                 _die "file '$file' from package '$pkg' does not exist."
@@ -39,11 +50,11 @@ _show_result() {
     local diffs="$(diff $file $file.bak)"
 
     if [ "$diffs" != "" ] ; then
-        echo "Changes for $file:" >&2
-        echo "$diffs" >&2
-        echo "Backup to $file.bak." >&2
+        _log "Changes for $file:"
+        _log "$diffs"
+        _log "Backup to $file.bak."
     else
-        echo "$file not changed." >&2
+        _log "$file not changed."
     fi
 }
 
@@ -64,5 +75,26 @@ _os_prober_mod() {
     _show_result $file
 }
 
-_grub_mod
-_os_prober_mod
+Main() {
+    local lock=/var/log/grub-fix-initrd-generation.lck
+    local log=/var/log/grub-fix-initrd-generation.log
+
+    if [ -r $lock ] ; then
+        _log2 "$0 is already running!"
+        return
+    fi
+    if [ $EUID -ne 0 ] ; then
+        _log2 "Elevated privileges required!"
+        return 1
+    fi
+    touch $lock
+
+    rm -f $log
+
+    _grub_mod
+    _os_prober_mod
+
+    rm -f $lock
+}
+
+Main "$@"
