@@ -9,8 +9,8 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.18
-pkgrel=9
+pkgver=3.2.20
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
