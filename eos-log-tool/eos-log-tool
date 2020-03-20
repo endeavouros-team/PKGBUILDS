@@ -193,7 +193,7 @@ Main()
     helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
 
     local result=$(
-        eos_yad --list --checklist --width=750 --height=600 --text="$helptext" \
+        eos_yad --list --checklist --width=750 --height=655 --text="$helptext" \
                 --image=dialog-question --title="EndeavourOS log tools" \
                 --no-click --multiple \
                 --column=Select --column="Log" --column="Description" \
