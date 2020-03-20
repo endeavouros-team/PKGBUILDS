@@ -8,3 +8,7 @@ For up to date details regarding your NVIDIA GPU:
     - optionally: Latest Short Lived Branch Version
   - Latest Legacy GPU version
 - click the **SUPPORTED PRODUCTS** tab
+
+## Changelog
+2020-Mar-20, version 2.2-1:
+- using the latest NVIDIA driver database
