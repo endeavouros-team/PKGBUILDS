@@ -33,8 +33,13 @@ NvidiaIdsCommon() {
 }
 
 NvidiaIdsLatest() {
-    local ids="$(NvidiaIdsCommon "Latest Short Lived Branch")"
-    test -n "$ids" || DIE "$FUNCNAME: NvidiaIdsCommon failed."
+    local ids="$(NvidiaIdsCommon "Latest Long Lived Branch")"
+    if [ -z "$ids" ] ; then
+        ids="$(NvidiaIdsCommon "Latest Short Lived Branch")"
+        if [ -z "$ids" ] ; then
+            DIE "$FUNCNAME: NvidiaIdsCommon failed."
+        fi
+    fi
     echo "$ids"
 }
 
