@@ -11,4 +11,4 @@ For up to date details regarding your NVIDIA GPU:
 
 ## Changelog
 2020-Mar-20, version 2.2-1:
-- using the latest NVIDIA driver database
+- updated to the latest NVIDIA driver database
