@@ -120,7 +120,9 @@ yad_calamares() {
 
     if [ ! -x $prog ] ; then
         eos_yad --text="$CAL_NOAVAIL $(basename $prog)" --title="$CAL_WARN" --height=100 --width=200 --button=yad-quit:1
-        return 1
+        if [ "${FUNCNAME[1]}" != "source" ] ; then     # don't stop while debugging
+            return 1
+        fi
     fi
 
     if [ "$mode" = "choose" ] ; then
@@ -129,19 +131,29 @@ yad_calamares() {
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
         local answer field
+        local impl=2
         local heightopt="--height=316"
 
-        if [ 0 -eq 1 ] ; then
-            answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
-                              --text="$t1$t2$t3$t4" \
-                              --field="$CAL_METHOD":CB 'Offline!Online' )
-            field=1
-        else
-            answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
-                              --text="$t1$t2$t3$t4" $heightopt \
-                              --column="Selected" --column="Method" true Offline false Online )
-            field=2
-        fi
+        case "$impl" in
+            0)
+                answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
+                                  --text="$t1$t2$t3$t4" \
+                                  --field="$CAL_METHOD":CB 'Offline!Online' )
+                field=1
+                ;;
+            1)
+                answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
+                                  --text="$t1$t2$t3$t4" $heightopt \
+                                  --column="Selected" --column="Method" true Offline false Online )
+                field=2
+                ;;
+            2)
+                heightopt="--height=321"
+                answer=$( eos_yad --list  --title="$CAL_CHOOSE" --image=dialog-question \
+                                  --text="$t1$t2$t3$t4" $heightopt --column="Method" Offline  Online )
+                field=1
+                ;;
+        esac
 
         test -n "$answer" || return 1
         mode=$(echo "$answer" | cut -d '|' -f $field | tr [:upper:] [:lower:])
