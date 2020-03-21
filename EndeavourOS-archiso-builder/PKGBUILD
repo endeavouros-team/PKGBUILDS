@@ -7,7 +7,8 @@ pkgver=0.7
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
-makedepends=(archiso arch-install-scripts git squashfs-tools)
+#makedepends=(archiso arch-install-scripts git squashfs-tools)
+makedepends=(arch-install-scripts git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
 sha512sums=(SKIP)
 
@@ -22,7 +23,7 @@ Error: repo [$reponame] is missing from file /etc/pacman.conf.
 Please add the following lines in the end of file /etc/pacman.conf:
 
    [$reponame]
-   Server = https://github.com/endeavouros-team/mirrors/releases/download/endeavouros_calamares
+   Server = https://github.com/endeavouros-team/mirrors/releases/download/$reponame
 
 Then run: 'sudo pacman -Syyu' before trying again.
 
@@ -46,7 +47,26 @@ EOF
     # build
     cd $basedir
 
+    while true ; do
+        read -p "Build with calamares 'test' or 'current'? [current] " >&2
+        case "$REPLY" in
+            "" | current)
+                sed -i packages.x86_64 \
+                    -e 's|^#[ ]*calamares_current[ ]*$|calamares_current|' \
+                    -e 's|^[ ]*calamares_test[ ]*$|#calamares_test|'
+                break
+                ;;
+            test)
+                sed -i packages.x86_64 \
+                    -e 's|^[ ]*calamares_current[ ]*$|#calamares_current|' \
+                    -e 's|^#[ ]*calamares_test[ ]*$|calamares_test|'
+                break
+                ;;
+        esac
+    done
+
     sudo pacman -Syyu
+    
     sudo ./fix_permissions.sh
     sudo ./build.sh -v
     cd ../..
