@@ -98,7 +98,7 @@ export SELECTED_LANGUAGE_WELCOME
 
 
 IsInstalling() {
-    test $show_installer -eq 1 && return 0
+    test "$show_installer" = "yes" && return 0
     test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "$EOS_LIVEUSER"
 }
 
@@ -120,7 +120,7 @@ yad_calamares() {
 
     if [ ! -x $prog ] ; then
         eos_yad --text="$CAL_NOAVAIL $(basename $prog)" --title="$CAL_WARN" --height=100 --width=200 --button=yad-quit:1
-        if [ "${FUNCNAME[1]}" != "source" ] ; then     # don't stop while debugging
+        if [ "$show_installer" != "yes" ] ; then
             return 1
         fi
     fi
@@ -148,7 +148,6 @@ yad_calamares() {
                 field=2
                 ;;
             2)
-                heightopt="--height=321"
                 answer=$( eos_yad --list  --title="$CAL_CHOOSE" --image=dialog-question \
                                   --text="$t1$t2$t3$t4" $heightopt --column="Method" Offline  Online )
                 field=1
@@ -164,15 +163,19 @@ yad_calamares() {
         online)
             eos_yad_check_internet_connection verbose || return 1
             ;;
-        *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode')"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
+        *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode'"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
             return 1
             ;;
     esac
 
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
-        eos_yad_WARN "$CAL_NOFILE '$file')"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
+        eos_yad_WARN "$CAL_NOFILE '$file'"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
         return 1
+    fi
+
+    if [ "$show_installer" = "yes" ] ; then
+        return
     fi
 
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
@@ -990,7 +993,7 @@ StartHere() {
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad > $yad_zombie_log
 
-    local show_installer=0    # explicitly show the installer, for testing only
+    local show_installer=yes    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
     #local netlog=0
@@ -1000,7 +1003,7 @@ StartHere() {
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
-            --installer) show_installer=1 ;;
+            --installer) show_installer=yes ;;
             --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
