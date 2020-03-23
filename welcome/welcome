@@ -993,7 +993,7 @@ StartHere() {
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad > $yad_zombie_log
 
-    local show_installer=yes    # explicitly show the installer, for testing only
+    local show_installer=no    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
     #local netlog=0
