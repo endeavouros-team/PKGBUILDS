@@ -3,28 +3,11 @@
 # TODO:
 #   - check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
 
-PROGNAME="$(basename "$0")"
-test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
+echoreturn() { echo "$@" ; }     # for "return" values!
 
-# pacman is changing default compression!
-_COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
-REPO_COMPRESSOR=xz
-
-echo2()   { echo   "$@" >&2 ; }
-printf2() { printf "$@" >&2 ; }
-
-read2()   {
-    # Always put the answer to REPLY !!
-    local ix="$1"
-    shift
-    if [ "$code_debug" = "yes" ] ; then
-        echo -n "==> $ix: read $*" >&2
-        REPLY="$(echo "${PREDEFINED_ANSWERS["$ix"]}")"
-        echo "$REPLY" >&2
-    else
-        read "$@" >&2
-    fi
-}
+echo2()   { echo   "$@" >&2 ; }    # output to stderr
+printf2() { printf "$@" >&2 ; }    # output to stderr
+read2()   { read   "$@" >&2 ; }    # output to stderr
 
 DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
 WARN()  { echo2 "Warning: $1." ; }
@@ -77,21 +60,21 @@ Build()
       Popd
     Popd
     rm -rf "$workdir"
-    echo "$pkg"
+    echoreturn "$pkg"
 }
 
 PkgBuildName()
 {
     local pkgdirname="$1"
     source "$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
-    echo "$pkgname"
+    echoreturn "$pkgname"
 }
 
 PkgBuildVersion()
 {
     local pkgdirname="$1"
     source "$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
-    echo "${pkgver}-$pkgrel"
+    echoreturn "${pkgver}-$pkgrel"
 }
 
 LocalVersion()
@@ -108,7 +91,7 @@ LocalVersion()
     done
 
     case "$(echo "$pkgs" | wc -l)" in
-        0) echo "0" ; return ;;
+        0) echoreturn "0" ; return ;;
         1) ;;
         *) WARN "$Pkgname: there is not only one version locally, using the latest."
            pkgs="$(echo "$pkgs" | tail -n 1)"
@@ -119,16 +102,16 @@ LocalVersion()
     local ver="$(echo "$tail" | cut -d '-' -f 1)"
     local rel="$(echo "$tail" | cut -d '-' -f 2)"
 
-    echo "${ver}-$rel"
+    echoreturn "${ver}-$rel"
 }
 
 JustPkgname()
 {
     local fakepath="$1"
     case "$fakepath" in
-        ./*)      echo "${fakepath:2}" ;;
-        aur/*)    echo "${fakepath:4}" ;;
-        *)        echo "${fakepath}"   ;;
+        ./*)      echoreturn "${fakepath:2}" ;;
+        aur/*)    echoreturn "${fakepath:4}" ;;
+        *)        echoreturn "${fakepath}"   ;;
     esac
 }
 
@@ -181,7 +164,7 @@ ListNameToPkgName()
         HookIndicator "$hook_no"
     fi
 
-    echo "$pkgname"
+    echoreturn "$pkgname"
 }
 
 Assets_clone()
@@ -200,7 +183,7 @@ Assets_clone()
     if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
 
         printf2 "\n%s " "Fetch assets from github (Y/n)?"
-        read2 ASSETS_FROM_GITHUB
+        read2
 
         case "$REPLY" in
             [yY]*|"") ;;
@@ -214,14 +197,14 @@ Assets_clone()
 
     Pushd "$ASSETSDIR"
 
-    echo "Deleting all local assets..."
+    echo2 "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
     rm -f *.{db,files,sig,old,xz,zst,txt}                                      # $_COMPRESSOR
     local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"    # $_COMPRESSOR
     test -z "$leftovers" || DIE "removing local assets failed!"
 
-    echo "Fetching all github assets..."
+    echo2 "Fetching all github assets..."
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
         hub release download $xx
@@ -301,7 +284,7 @@ ShowOldCompressedPackages() {
         pkg22="$(ls "$pkg2"-*.pkg.tar.xz 2>/dev/null)"
         if [ -n "$pkg22" ] ; then
             for pkg2 in $pkg22 ; do
-                printf "Remove old packages:\n    %s\n    %s\n" "$pkg2" "$pkg2.sig"
+                printf2 "Remove old packages:\n    %s\n    %s\n" "$pkg2" "$pkg2.sig"
                 rm -i "$pkg2" "$pkg2.sig"
             done
         fi
@@ -316,12 +299,12 @@ _pkgbuilds_eos_hook()
     local conf=assets.conf
 
     pushd "$dir_above_pkgbuilds" >/dev/null || {
-        echo "Error: $conf: cannot cd to '$dir_above_pkgbuilds'." >&2
+        echo2 "Error: $conf: cannot cd to '$dir_above_pkgbuilds'."
         exit 1
     }
     rm -rf "$PKGBUILD_ROOTDIR"
     git clone https://github.com/endeavouros-team/PKGBUILDS.git >& /dev/null || {
-        echo "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed." >&2
+        echo2 "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed."
         Popd
         exit 1
     }
@@ -383,13 +366,13 @@ WantAurDiffs() {
         aur/*)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
-                read2 WANT_AUR_DIFFS -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
+                read2 -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
                 if [ $? -eq 0 ] ; then
                     case "$REPLY" in
                         ""|[yY]*) aurdiff=1 ;;
                     esac
                 else
-                    echo no.
+                    echo2 no.   # no diffs if timeout
                 fi
             fi
             if [ "$aurdiff" = "1" ] ; then
@@ -416,10 +399,6 @@ Browser() {
     $browser "$@"
 }
 
-#### Global variables:
-
-ASSETS_CONF=./assets.conf
-
 Exit()
 {
     local code="$1"
@@ -431,10 +410,10 @@ _SleepSeconds() {
     local sec="$1"
     local xx
     for ((xx=sec; xx>0; xx--)) ; do
-        printf "\r%s   " "$xx"
+        printf2 "\r%s   " "$xx"
         sleep 1
     done
-    printf "\r%s\n" "$xx"
+    printf2 "\r%s\n" "$xx"
 }
 
 MirrorCheck() {
@@ -455,7 +434,7 @@ MirrorCheck() {
     fi
     if [ -x "$checker" ] ; then
         if [ $timeout -eq 180 ] ; then
-            read2 MIRROR_CHECK -p "Do $mirror_check (Y/n)?"
+            read2 -p "Do $mirror_check (Y/n)?"
         fi
         case "$REPLY" in
             ""|[yY]*)
@@ -505,7 +484,6 @@ Main2()
     local AUR_DIFFS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
-    local code_debug=no
 
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
@@ -525,9 +503,6 @@ Main2()
                     mirror_check_wait="${xx#*=}";;
                 --repoup)
                     repoup=1 ;;                  # sync repo even when no packages are built
-                --code)
-                    code_debug=yes
-                    source "$HOME"/.config/assets.make.conf ;;
                 --aurdiff)
                     aurdiff=1 ;;
                 --versuffix=*)
@@ -772,13 +747,13 @@ SettleDown() {
     for arg in "$@" ; do
         case "$arg" in
             --no-ask) ask=no ;;
-            -*) echo2 "Warning: $FUNCNAME: unsupported parameter '$arg'." ;;
+            -*) WARN "$FUNCNAME: unsupported parameter '$arg'." ;;
             *) msg="$arg" ;;
         esac
     done
     test -n "$msg" && echo2 "Info: $msg"
     if [ "$ask" = "yes" ] ; then
-        read2 SETTLE_DOWN -p "Wait, let things settle down, then press ENTER to continue: "
+        read2 -p "Wait, let things settle down, then press ENTER to continue: "
     fi
     echo2 ""
 }
@@ -823,12 +798,13 @@ AssetCmdLast() {
     AssetCmd $arg "$@"
 }
 
-ManuelCheckOfAssets() {
+ManualCheckOfAssets() {
+    local op="$1"
     sleep 1
     while true ; do
         hub release show -f %as%n $tag | sed 's|^.*/||' >&2
-        echo2 ""
-        read2 ASSET_LIST_OK -p "Remote asset list above is OK (y/n) "
+        printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
+        read2
         case "$REPLY" in
             [yY]*) break ;;
             *) ;;
@@ -839,7 +815,7 @@ ManuelCheckOfAssets() {
 
 ManageGithubReleaseAssets() {
     echo2 "Final stop before syncing with github!"
-    read2 BEFORE_SYNC -p "Continue (Y/n)? "
+    read2 -p "Continue (Y/n)? "
     case "$REPLY" in
         [yY]*|"") ;;
         *) Exit 0 ;;
@@ -877,7 +853,7 @@ ManageGithubReleaseAssets() {
             rm -f $filelist_txt
         fi
 
-        ManuelCheckOfAssets
+        ManualCheckOfAssets deletion
 
         # Now manage new assets.
 
@@ -917,7 +893,7 @@ ManageGithubReleaseAssets() {
 
         AssetCmdLast add-release-assets "$tag" "${assets[@]}"
 
-        ManuelCheckOfAssets
+        ManualCheckOfAssets addition
     done
 }
 
@@ -948,30 +924,40 @@ ManageGithubNormalFiles() {
 }
 
 Main() {
-    local conf=assets.conf   # This file must exist in the current folder when building packages.
-    test -r $conf || { echo "Error: file '$PWD/$conf' does not exist." >&2 ; return 1 ; }
-    local signer="$(  grep "^local SIGNER="   $conf | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
-    local reponame="$(grep "^local REPONAME=" $conf | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
+    local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
+    local PROGNAME="$(basename "$0")"
+
+    test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
+    test -n "$PROGNAME" || PROGNAME="assets.make"
+    test -r $ASSETS_CONF || DIE "Error: file '$PWD/$ASSETS_CONF' does not exist."
+
+    local signer="$(  grep "^local SIGNER="   $ASSETS_CONF | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
+    local reponame="$(grep "^local REPONAME=" $ASSETS_CONF | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
     local packager
     local fail=0
 
+    local _COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
+    local REPO_COMPRESSOR
+    local xx="$(ls -1 $reponame.db.tar.{xz,zst} 2>/dev/null)"
+
+    case "$xx" in
+        *.zst) REPO_COMPRESSOR=zst ;;
+        *.xz)  REPO_COMPRESSOR=xz ;;
+        *) DIE "no repo db file found for '$reponame' in '$PWD'!" ;;
+    esac
+
     if [ -z "$(grep ^PKGEXT /etc/makepkg.conf | grep zst)" ] ; then
-        echo "/etc/makepkg.conf: use zst in PKGEXT" >&2
+        echo2 "/etc/makepkg.conf: use zst in variable PKGEXT"
         fail=1
     fi
     if [ -z "$(grep ^COMPRESSZST /etc/makepkg.conf | grep T0)" ] ; then
-        echo "/etc/makepkg.conf: add -T0 -10 into COMPRESSZST" >&2
+        echo2 "/etc/makepkg.conf: add -T0 -19 into variable COMPRESSZST"
         fail=1
     fi
     test $fail -eq 1 && return
 
     local tmpdir=$(mktemp -d FOOBAR.XXXXX)
-    Pushd "$tmpdir" || { echo "Error: cannot create a temporary folder." ; return 1 ; }
-    local xx="$(ls -1 ../$reponame.db.tar.{xz,zst} 2>/dev/null)"
-    case "$xx" in
-        *.zst) REPO_COMPRESSOR=zst ;;
-        *.xz)  REPO_COMPRESSOR=xz ;;
-    esac
+    Pushd "$tmpdir" || DIE "Error: cannot create a temporary folder."
     tar xvf ../$reponame.db.tar.$REPO_COMPRESSOR > /dev/null
     case "$reponame" in
         endeavouros)
@@ -991,7 +977,7 @@ Main() {
     esac
     Popd
     rm -rf $tmpdir
-    echo "PACKAGER: $PACKAGER" >&2
+    echo2 "PACKAGER: $PACKAGER"
 
     Main2 "$@"
 }
