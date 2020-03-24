@@ -51,7 +51,7 @@ Main() {
     done
     test "$TAG" = "$xx" || DIE "TAG '$TAG' is not in existing tags [$existing_tags]"
 
-    if [ 0 -eq 1 ] ; then
+    if [ 1 -eq 1 ] ; then
         for asset in "$@" ; do
             test -r "$asset" || DIE "asset '$asset' does not exist."
             assets+=("-a" "$asset")

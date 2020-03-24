@@ -242,7 +242,7 @@ Main()  # parameters: [--quietly] TAG assetname...
     # Now delete given assets from github.
     for asset in "${matched_assets[@]}" ; do
         DeleteAsset "$asset_info_file" "$asset" "$quietly" || DIE "Failed to delete asset '$asset'." "$asset_info_file"
-        sleep 0.5
+        #sleep 0.5
     done
 
     rm -f "$asset_info_file"  # file no more needed
