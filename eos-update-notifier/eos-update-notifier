@@ -192,7 +192,7 @@ Update_common() {
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
                 eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus --window-icon=$EOS_WICON \
-                         --height=100 --width=300 --timeout=10 --timeout-indicator=left \
+                         --height=100 --width=350 --timeout=10 --timeout-indicator=left \
                          --theme="Classic" --tail --button=yad-quit:0
         fi
     fi
