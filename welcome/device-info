@@ -31,8 +31,14 @@ EOF
 }
 
 PCI_info() {
-    local search_string="$1"
-    lspci | grep "$search_string" | sed 's|^.*'"$search_string"'||'
+    # Many search strings may be given - show all results.
+    local result
+    for str in "$@" ; do
+        result="$(lspci | grep "$str" | sed 's|^.*'"$str"'||')"
+        if [ -n "$result" ] ; then
+            echo "$result"
+        fi
+    done
 }
 CPU_info() {
     # lscpu | grep "^Vendor ID:" | awk '{print $3}'
@@ -65,7 +71,8 @@ Main()
                 PCI_info " Display controller: "
                 ;;
             --vga)
-                PCI_info " VGA compatible controller: "
+                PCI_info " VGA compatible controller: " \
+                         " 3D controller: "
                 ;;
             *)
                 Usage "unsupported option '$arg'"
