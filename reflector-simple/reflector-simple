@@ -260,7 +260,7 @@ SaveMirrorlist() {
     AddCountryNamesToMirrors
 
     local opts=(--width=750 --height=450 --title="New $ml")
-    opts+=(--button=yad-quit:1 --button=" Save to $ml!gtk-save":0)
+    opts+=(--button=yad-quit:1 --button=" Save to $ml!document-save":0)
 
     cat $tmpfile | eos_yad --text-info "${opts[@]}" && {
         if [ 1 -eq 1 ] ; then
