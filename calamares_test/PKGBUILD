@@ -53,7 +53,7 @@ prepare() {
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
     #?? /usr/share/calamares/branding/endeavouros/img/restore.png
     # THIS ?
-    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images/restore.png
+    cp $_reponame/src/branding/endeavouros/restore.png  $_reponame/src/modules/keyboard/images/restore.png
     
     mkdir -p $_reponame/build/$pkgname
 
