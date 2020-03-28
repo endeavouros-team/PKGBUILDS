@@ -9,8 +9,8 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.20
-pkgrel=2
+pkgver=3.2.21
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -51,7 +51,10 @@ prepare() {
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
-
+    #?? /usr/share/calamares/branding/endeavouros/img/restore.png
+    # THIS ?
+    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images/restore.png
+    
     mkdir -p $_reponame/build/$pkgname
 
     # remove some calamares modules we don't need
