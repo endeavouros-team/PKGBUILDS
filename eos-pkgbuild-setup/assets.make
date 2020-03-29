@@ -180,20 +180,24 @@ Assets_clone()
     # echo2 "If so, you can delete your local assets and fetch assets from github now."
     # read -p "Delete local assets and fetch them from github now (y/N)? " xx >&2
 
-    if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
+    case "$REPONAME" in
+        endeavouros_calamares) ;;  # many maintainers, so make sure we have the same assets!
+        *)
+            if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
+                printf2 "\n%s " "Fetch assets from github (Y/n)?"
+                read2
 
-        printf2 "\n%s " "Fetch assets from github (Y/n)?"
-        read2
-
-        case "$REPLY" in
-            [yY]*|"") ;;
-            *)
-                echo2 "Using local assets."
-                echo2 ""
-                return
-                ;;
-        esac
-    fi
+                case "$REPLY" in
+                    [yY]*|"") ;;
+                    *)
+                        echo2 "Using local assets."
+                        echo2 ""
+                        return
+                        ;;
+                esac
+            fi
+            ;;
+    esac
 
     Pushd "$ASSETSDIR"
 
