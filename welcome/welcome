@@ -678,7 +678,6 @@ AfterInstall() {
           --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest' \
           --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager' \
           --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture' \
-          --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme' \
           --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay" \
           --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
@@ -686,6 +685,8 @@ AfterInstall() {
           --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
           --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
       &> /dev/null &
+
+#         --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme'
 }
 
 AddMoreApps() {
