@@ -599,6 +599,30 @@ yad_ChangeDisplayManager() {
 }
 export -f yad_ChangeDisplayManager
 
+yad_vanilla_xfce4_theme() {
+    local log="$HOME/.config/EOS-xfce-theme.log"
+    local DE="$(eos_yad_GetDesktopName)"
+    case "$DE" in
+        XFCE)
+            local conf="$HOME/.config/xfce4"
+            local datetime="$(date '+%Y%m%d-%H:%M:%S')"
+            local msg="If you agree to change Xfce theme to vanilla, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
+            msg+="To restore the previous theme:\n     - remove folder <b>$conf</b>\n     - rename <b>$conf.$datetime</b> into <b>$conf</b>\n\n"
+            msg+="(Note: this info is stored into file $log).\n\n"
+            msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
+            printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
+            eos_yad --form --title="Change Xfce theme to vanilla" --text="$msg" --image=preferences-desktop-theme \
+                    --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
+            case "$?" in
+                0) mv $conf $conf.$datetime ; reboot ;;
+            esac
+            ;;
+        *)  echo "Sorry $DE user, only Xfce is supported." > "$log"
+            ;;
+    esac
+}
+export -f yad_vanilla_xfce4_theme
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -654,6 +678,7 @@ AfterInstall() {
           --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest' \
           --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager' \
           --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture' \
+          --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme' \
           --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman" \
           --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay" \
           --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
