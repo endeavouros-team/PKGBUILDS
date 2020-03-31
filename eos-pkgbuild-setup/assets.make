@@ -348,7 +348,7 @@ RunPostHooks()
             ./GitUpdate
         fi
     fi
-    return
+#    return
     
     if [ -n "$ASSET_POST_HOOKS" ] ; then
         ShowPrompt "Running asset post hooks"
