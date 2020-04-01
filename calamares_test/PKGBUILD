@@ -10,7 +10,7 @@ pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.21
-pkgrel=2
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -28,11 +28,9 @@ source=(
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
-sha256sums=(
-'SKIP'
-'SKIP'
-'SKIP'
-)
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP')
 
 prepare() {
 
@@ -53,7 +51,7 @@ prepare() {
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
     #?? /usr/share/calamares/branding/endeavouros/img/restore.png
     # THIS ?
-    cp $_reponame/src/branding/endeavouros/restore.png  $_reponame/src/modules/keyboard/images/restore.png
+    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images/restore.png
     
     mkdir -p $_reponame/build/$pkgname
 
