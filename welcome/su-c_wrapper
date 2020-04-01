@@ -13,26 +13,6 @@ DIE() {
     exit 1
 }
 
-SigName() {
-    local nr="$1"
-    echo "$(grep -w "$nr" /usr/include/asm/signal.h | grep "^#define SIG" | awk '{print $2}') ($nr)"
-}
-
-RootCmd() {
-    local errlog=$(mktemp)
-    local retval=0
-
-    printf "Root "
-    LANG=C /usr/bin/su -c "$*" |& tee $errlog
-
-    case "$(tail -n 1 $errlog)" in
-        "error: target not found: "*) retval=250 ;;  # from pacman
-        "su: Authentication failure") retval=251 ;;  # from su
-    esac
-    rm -f $errlog
-    return $retval
-}
-
 Main() {
     local command=()
     local xx error
@@ -46,19 +26,14 @@ Main() {
 
     # run max 3 times
     for xx in {2..0} ; do
-        RootCmd ${command[*]}
+        printf "Root "
+        /usr/bin/su -c "${command[*]}"
         error=$?
-        # we get only error codes: 0, 250, 251
         case $error in
-            0)       break ;;       # OK
-            1) ;;                   # wrong password
-            126|127) break ;;       # command is erroneous or can't be executed
-            250)     break ;;       # target not found
-            251) ;;                 # wrong password
-            *)
-                echo "Killed by signal $(SigName $((error-128)))."
-                break
-                ;;
+            0) break ;;                # OK
+            127|126) break ;;          # command is erroneous or can't be executed
+            1) ;;                      # probably wrong password
+            *) ;;                      # signal killed command
         esac
         if [ $xx -ne 0 ] ; then
             echo "Sorry, try again ($xx)." >&2
