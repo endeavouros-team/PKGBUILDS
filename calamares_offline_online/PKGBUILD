@@ -48,6 +48,7 @@ prepare() {
     cp $_reponame/src/modules/packages/packages.conf_offline $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
+    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images/restore.png
 
     mkdir -p $_reponame/build/$pkgname
 
