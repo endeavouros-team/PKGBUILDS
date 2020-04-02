@@ -76,8 +76,8 @@ package() {
     # Build proccess can't understand our personal files, so we explicitly copy them here to be packed along calamares files
 
     cp -r $_reponame/src/branding                                    $_reponame/build/$pkgname/usr/share/calamares/
-    cp -r $_reponame/settings.conf_{on,off}line                      $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/settings.conf_{online,offline,vanilla}          $_reponame/build/$pkgname/usr/share/calamares/
+    cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line   $_reponame/build/$pkgname/usr/share/calamares/modules/
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line $_reponame/build/$pkgname/usr/share/calamares/modules/
 
     # Commom install -D doen't work
