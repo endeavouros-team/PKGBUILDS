@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.18
-pkgrel=2
+pkgver=3.2.20
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -80,7 +80,7 @@ package() {
 
     cp -r $_reponame/src/branding                                    $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/settings.conf_{on,off}line                      $_reponame/build/$pkgname/usr/share/calamares/
-    cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line   $_reponame/build/$pkgname/usr/share/calamares/modules/
+    cp -r $_reponame/settings.conf_{online,offline,vanilla}          $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line $_reponame/build/$pkgname/usr/share/calamares/modules/
 
     # Commom install -D doen't work
