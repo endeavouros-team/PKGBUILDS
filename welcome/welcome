@@ -1107,8 +1107,8 @@ StartHere() {
 
     case "$(eos_yad_GetDesktopName)" in
         KDE | GNOME | GNOME3 | *)
-            notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
             notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+            notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
             "${notebook[@]}"
             local result=$?
             case "$result" in
