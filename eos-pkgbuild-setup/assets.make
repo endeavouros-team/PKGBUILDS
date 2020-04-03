@@ -169,7 +169,7 @@ ListNameToPkgName()
 
 Assets_clone()
 {
-    if [ $use_local_assets -eq 1 ] ; then
+    if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
         return
     fi
 
