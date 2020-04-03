@@ -178,6 +178,13 @@ yad_calamares() {
         return
     fi
 
+    # allow nvidia install
+    if [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
+        sudo sed \
+             -i /usr/share/calamares/modules/netinstall.conf \
+             -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+    fi
+
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
     sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
