@@ -193,7 +193,7 @@ yad_calamares() {
                  -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
         fi
     elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
-        if [ -n "$(lspci -vnn | grep -A11 -P 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
+        if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
             # allow nvidia install
             if [ -r $file ] ; then
                 sudo sed \
@@ -657,20 +657,20 @@ INSTALL() {
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local image=gtk-save
-
-  eos_yad --plug="$handle" --tabnum="$tabnum" \
-          --form \
-          --columns=2 \
-          --image=$image \
-          --text="<b>$(ltr ins_text)</b>" --text-align=left \
-          --field="<b>$(ltr ins_start)</b>!!$(ltr ins_starttip)":fbtn            'bash -c "yad_calamares_debug choose"' \
-          --field="$(ltr ins_up)!!$(ltr ins_uptip)":fbtn                         'bash -c yad_UpdateMe' \
-          --field="$(ltr ins_keys)!!$(ltr ins_keystip)":fbtn                     'bash -c yad_InitializePacmanMirroring' \
-          --field="$(ltr ins_pm)!!$(ltr ins_pmtip)":fbtn                         'gparted' \
-          --field="$(ltr ins_rel)!!$(ltr ins_reltip)":fbtn                       "$_BROWSER https://endeavouros.com/latest-release" \
-          --field="$(ltr ins_tips)!!$(ltr ins_tipstip)":fbtn                     "$_BROWSER https://endeavouros.com/docs/installation" \
-          --field="$(ltr ins_trouble)!!$(ltr ins_troubletip)":fbtn               "$_BROWSER https://endeavouros.com/docs/system-rescue" \
-      &> /dev/null &
+  local tabcontents=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form  --columns=2
+      --image=$image
+      --text="<b>$(ltr ins_text)</b>" --text-align=left
+      --field="<b>$(ltr ins_start)</b>!!$(ltr ins_starttip)":fbtn            'bash -c "yad_calamares_debug choose"'
+      --field="$(ltr ins_up)!!$(ltr ins_uptip)":fbtn                         'bash -c yad_UpdateMe'
+      --field="$(ltr ins_keys)!!$(ltr ins_keystip)":fbtn                     'bash -c yad_InitializePacmanMirroring'
+      --field="$(ltr ins_pm)!!$(ltr ins_pmtip)":fbtn                         'gparted'
+      --field="$(ltr ins_rel)!!$(ltr ins_reltip)":fbtn                       "$_BROWSER https://endeavouros.com/latest-release"
+      --field="$(ltr ins_tips)!!$(ltr ins_tipstip)":fbtn                     "$_BROWSER https://endeavouros.com/docs/installation"
+      --field="$(ltr ins_trouble)!!$(ltr ins_troubletip)":fbtn               "$_BROWSER https://endeavouros.com/docs/system-rescue"
+  )
+  "${tabcontents[@]}" >& /dev/null &
 
   # could use 'gparted' as the icon for gparted...
 }
@@ -678,44 +678,44 @@ INSTALL() {
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
-  eos_yad --plug="$handle" --tabnum="$tabnum" \
-          --form \
-          --columns=3 \
-          --image=dialog-question \
-          --text="<b>$(ltr general_info_text)</b>" --text-align=left \
-          --field="$(ltr general_info_ws)!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com" \
-          --field="$(ltr general_info_wi)!!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki" \
-          --field="$(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news" \
-          --field="$(ltr general_info_fo)!!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com" \
-          --field="$(ltr general_info_do)!!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate" \
-          --field="$(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome" \
-      &> /dev/null &
+  local tabcontents=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form --columns=3
+      --image=dialog-question
+      --text="<b>$(ltr general_info_text)</b>" --text-align=left
+      --field="$(ltr general_info_ws)!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
+      --field="$(ltr general_info_wi)!!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki"
+      --field="$(ltr general_info_ne)!!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news"
+      --field="$(ltr general_info_fo)!!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com"
+      --field="$(ltr general_info_do)!!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate"
+      --field="$(ltr general_info_ab)!!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
+  )
+  "${tabcontents[@]}" >& /dev/null &
 }
 
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
-
-  eos_yad --plug="$handle" --tabnum="$tabnum" \
-          --form \
-          --columns=2 \
-          --image=dialog-information \
-          --text="<b>$(ltr after_install_text)</b>" --text-align=left \
-          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn          'reflector-simple' \
-          --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn         'bash -c yad_SystemUpdate' \
-          --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues' \
-          --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest' \
-          --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager' \
-          --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture' \
-          --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman" \
-          --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay" \
-          --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network" \
-          --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth" \
-          --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer" \
-          --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post" \
-      &> /dev/null &
-
-#         --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme'
+  local tabcontents=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --image=dialog-information
+      --text="<b>$(ltr after_install_text)</b>"
+      --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn          'reflector-simple'
+      --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn         'bash -c yad_SystemUpdate'
+      --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues'
+      --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest'
+      --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager'
+      --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
+#     --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme'
+      --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
+      --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay"
+      --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
+      --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer"
+      --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+  )
+  "${tabcontents[@]}" >& /dev/null &
 }
 
 AddMoreApps() {
@@ -727,17 +727,18 @@ AddMoreApps() {
   local chromium=""        #=chromium-browser
   local bluetooth=""       #=bluetooth
 
-  eos_yad --plug="$handle" --tabnum="$tabnum" \
-          --form \
-          --columns=2 \
-          --image=system-software-install \
-          --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left \
-          --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"' \
-          --field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"' \
-          --field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"' \
-          --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"' \
-          --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"' \
-      &> /dev/null &
+  local tabcontents=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --image=system-software-install
+      --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left
+      --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
+      --field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
+      --field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
+      --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
+      --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
+  )
+  "${tabcontents[@]}" >& /dev/null &
 }
 
 About() {
@@ -1134,23 +1135,15 @@ StartHere() {
 
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
 
-    case "$(eos_yad_GetDesktopName)" in
-        KDE | GNOME | GNOME3 | *)
-            if [ $is_installing -ne 0 ] ; then
-                notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
-            fi
-            notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
-            "${notebook[@]}"
-            local result=$?
-            case "$result" in
-                5) WelcomeSettings disable ;;
-                0|252) WelcomeSettings enable ;;
-            esac
-            ;;
-#        *)
-#            notebook+=(--button=" $(ltr butt_later)!face-cool!":0)
-#            "${notebook[@]}"
-#            ;;
+    if [ $is_installing -ne 0 ] ; then
+        notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+    fi
+    notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
+    "${notebook[@]}"
+    local result=$?
+    case "$result" in
+        5) WelcomeSettings disable ;;
+        0|252) WelcomeSettings enable ;;
     esac
 }
 
