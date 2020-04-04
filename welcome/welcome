@@ -118,6 +118,10 @@ yad_calamares() {
     local debug="$2"
     local prog=$INSTALLER_PROGRAM
 
+    if [ "$debug" = "stop" ] ; then
+        local show_installer=yes
+    fi
+
     if [ ! -x $prog ] ; then
         eos_yad --text="$CAL_NOAVAIL $(basename $prog)" --title="$CAL_WARN" --height=100 --width=200 --button=yad-quit:1
         if [ "$show_installer" != "yes" ] ; then
@@ -171,26 +175,37 @@ yad_calamares() {
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
         eos_yad_WARN "$CAL_NOFILE '$file'"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
-        return 1
+        if [ "$show_installer" != "yes" ] ; then
+            return 1
+        fi
     fi
 
-    if [ "$show_installer" = "yes" ] ; then
-        return
+    file=/usr/share/calamares/modules/netinstall.conf
+    if [ ! -r $file ] ; then
+        echo "Warning: $file not found!" >&2
     fi
-
     if [ -r "/home/$EOS_LIVEUSER/netinstall-yaml.url" ] ; then
         # allow an own netinstall.yaml from a URL config file!
         local netinstall_url=$(cat "/home/$EOS_LIVEUSER/netinstall-yaml.url")
-        sudo sed \
-             -i /usr/share/calamares/modules/netinstall.conf \
-             -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
+        if [ -r $file ] ; then
+            sudo sed \
+                 -i $file \
+                 -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
+        fi
     elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
-        # allow nvidia install
-        sudo sed \
-             -i /usr/share/calamares/modules/netinstall.conf \
-             -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+        if [ -n "$(lspci -vnn | grep -A11 -P 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
+            # allow nvidia install
+            if [ -r $file ] ; then
+                sudo sed \
+                     -i $file \
+                     -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+            fi
+        fi
     fi
 
+    if [ "$show_installer" = "yes" ] || [ "$debug" = "stop" ] ; then
+        return
+    fi
 
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
@@ -1140,5 +1155,6 @@ StartHere() {
 }
 
 StartHere "$@"
+# yad_calamares choose stop   # for debugging only
 
 exit 0
