@@ -180,28 +180,32 @@ yad_calamares() {
         fi
     fi
 
-    file=/usr/share/calamares/modules/netinstall.conf
-    if [ ! -r $file ] ; then
-        echo "Warning: $file not found!" >&2
-    fi
-    if [ -r "/home/$EOS_LIVEUSER/netinstall-yaml.url" ] ; then
-        # allow an own netinstall.yaml from a URL config file!
-        local netinstall_url=$(cat "/home/$EOS_LIVEUSER/netinstall-yaml.url")
-        if [ -r $file ] ; then
-            sudo sed \
-                 -i $file \
-                 -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
-        fi
-    elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
-        if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
-            # allow nvidia install
-            if [ -r $file ] ; then
-                sudo sed \
-                     -i $file \
-                     -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+    case "$mode" in
+        online)
+            file=/usr/share/calamares/modules/netinstall.conf
+            if [ ! -r $file ] ; then
+                echo "Warning: $file not found!" >&2
             fi
-        fi
-    fi
+            if [ -r "/home/$EOS_LIVEUSER/netinstall-yaml.url" ] ; then
+                # allow an own netinstall.yaml from a URL config file!
+                local netinstall_url=$(cat "/home/$EOS_LIVEUSER/netinstall-yaml.url")
+                if [ -r $file ] ; then
+                    sudo sed \
+                         -i $file \
+                         -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
+                fi
+            elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
+                if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
+                    # allow nvidia install
+                    if [ -r $file ] ; then
+                        sudo sed \
+                             -i $file \
+                             -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+                    fi
+                fi
+            fi
+            ;;
+    esac
 
     if [ "$show_installer" = "yes" ] || [ "$debug" = "stop" ] ; then
         return
