@@ -204,8 +204,11 @@ Assets_clone()
     echo2 "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    rm -f *.{db,files,sig,old,xz,zst,txt}                                      # $_COMPRESSOR
-    local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"    # $_COMPRESSOR
+    local savedir="$PWD/SAVED"
+    mkdir -p "$savedir"
+    cp -u $REPONAME.db.tar.{xz,zst} "$savedir" 2>/dev/null
+    rm -f *.{db,files,sig,old,xz,zst,txt}
+    local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"
     test -z "$leftovers" || DIE "removing local assets failed!"
 
     echo2 "Fetching all github assets..."
@@ -947,7 +950,17 @@ Main() {
     case "$xx" in
         *.zst) REPO_COMPRESSOR=zst ;;
         *.xz)  REPO_COMPRESSOR=xz ;;
-        *) DIE "no repo db file found for '$reponame' in '$PWD'!" ;;
+        *)
+            if [ -r   SAVED/$reponame.db.tar.zst ] ; then
+                cp -a SAVED/$reponame.db.tar.zst .
+                REPO_COMPRESSOR=zst
+            elif [ -r SAVED/$reponame.db.tar.xz ] ; then
+                cp -a SAVED/$reponame.db.tar.xz .
+                REPO_COMPRESSOR=xz
+            else
+                DIE "no repo db file found for '$reponame' in '$PWD'!"
+            fi
+            ;;
     esac
 
     if [ -z "$(grep ^PKGEXT /etc/makepkg.conf | grep zst)" ] ; then
