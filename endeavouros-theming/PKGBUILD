@@ -22,9 +22,9 @@ package() {
 	install -m644 endeavouros.svg "${pkgdir}/usr/share/pixmaps/endeavouros.svg"
 	install endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
 	install -m644 endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
+	install -Dm 644 endeavouros.theme \
+        "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
         cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
 	install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds"
-        install -Dm 644 endeavouros.theme \
-        "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
 }
