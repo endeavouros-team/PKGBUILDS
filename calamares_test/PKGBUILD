@@ -20,7 +20,7 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
-  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=testing_04_07_2020"
+  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=('SKIP'
@@ -34,9 +34,7 @@ prepare() {
     rm -rf $_eos_changes
 
     # New branding stuff from @FLVAL
-    # testing_04_07_2020
-    rsync -va calamares_branding/*   $_reponame
-    # rsync -va calamares_branding/*   $_reponame/src
+    rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
     
     # For testing EFI stuff 
@@ -47,11 +45,10 @@ prepare() {
     cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
     # branding files
-    # testing_04_07_2020
-    # cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
-    # cp $_reponame/src/branding/endeavouros/img/geoip/{bg,pin}.png $_reponame/src/modules/locale/images
-    # cp $_reponame/src/branding/endeavouros/img/{state-error.svg,state-warning.svg} $_reponame/data/images
-    # cp $_reponame/src/branding/endeavouros/img/yes.png $_reponame/data/images/yes.svgz
+    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
+    cp $_reponame/src/branding/endeavouros/img/{state-error.svg,state-warning.svg} $_reponame/data/images
+    cp $_reponame/src/branding/endeavouros/img/yes.png $_reponame/data/images/yes.svgz
+    cp $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
     
     mkdir -p $_reponame/build/$pkgname
 
