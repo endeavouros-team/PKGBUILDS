@@ -204,9 +204,6 @@ Assets_clone()
     echo2 "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    local savedir="$PWD/SAVED"
-    mkdir -p "$savedir"
-    cp -u $REPONAME.db.tar.{xz,zst} "$savedir" 2>/dev/null
     rm -f *.{db,files,sig,old,xz,zst,txt}
     local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"
     test -z "$leftovers" || DIE "removing local assets failed!"
@@ -258,6 +255,10 @@ RationalityTests()
     DirExists ASSETSDIR
     DirExists PKGBUILD_ROOTDIR yes  # silently create the dir
     DirExists GITDIR
+
+    if [ -z "$REPO_COMPRESSOR" ] ; then
+        REPO_COMPRESSOR=xz
+    fi
 
     echo2 "done."
 }
@@ -930,6 +931,14 @@ ManageGithubNormalFiles() {
     fi
 }
 
+AssetsConfLocalVal() {
+    # Search file assets.conf for values like:
+    #     local REPONAME="repo-name"
+
+    local searchval="$1"
+    grep "^local ${searchval}=" $ASSETS_CONF | cut -d '=' -f 2 | tr -d '"' | tr -d "'"
+}
+
 Main() {
     local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
     local PROGNAME="$(basename "$0")"
@@ -938,30 +947,14 @@ Main() {
     test -n "$PROGNAME" || PROGNAME="assets.make"
     test -r $ASSETS_CONF || DIE "Error: file '$PWD/$ASSETS_CONF' does not exist."
 
-    local signer="$(  grep "^local SIGNER="   $ASSETS_CONF | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
-    local reponame="$(grep "^local REPONAME=" $ASSETS_CONF | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
-    local packager
+    local reponame="$(AssetsConfLocalVal REPONAME)"
+    local signer="$(  AssetsConfLocalVal SIGNER)"
     local fail=0
 
     local _COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
-    local REPO_COMPRESSOR
-    local xx="$(ls -1 $reponame.db.tar.{xz,zst} 2>/dev/null)"
+    local REPO_COMPRESSOR="$(AssetsConfLocalVal REPO_COMPRESSOR)"
 
-    case "$xx" in
-        *.zst) REPO_COMPRESSOR=zst ;;
-        *.xz)  REPO_COMPRESSOR=xz ;;
-        *)
-            if [ -r   SAVED/$reponame.db.tar.zst ] ; then
-                cp -a SAVED/$reponame.db.tar.zst .
-                REPO_COMPRESSOR=zst
-            elif [ -r SAVED/$reponame.db.tar.xz ] ; then
-                cp -a SAVED/$reponame.db.tar.xz .
-                REPO_COMPRESSOR=xz
-            else
-                DIE "no repo db file found for '$reponame' in '$PWD'!"
-            fi
-            ;;
-    esac
+    test -n "$REPO_COMPRESSOR" || REPO_COMPRESSOR=xz
 
     if [ -z "$(grep ^PKGEXT /etc/makepkg.conf | grep zst)" ] ; then
         echo2 "/etc/makepkg.conf: use zst in variable PKGEXT"
@@ -971,29 +964,17 @@ Main() {
         echo2 "/etc/makepkg.conf: add -T0 -19 into variable COMPRESSZST"
         fail=1
     fi
+
     test $fail -eq 1 && return
 
-    local tmpdir=$(mktemp -d FOOBAR.XXXXX)
-    Pushd "$tmpdir" || DIE "Error: cannot create a temporary folder."
-    tar xvf ../$reponame.db.tar.$REPO_COMPRESSOR > /dev/null
-    case "$reponame" in
-        endeavouros)
-            export PACKAGER="$(grep -A1 PACKAGER $(ls endeavouros-mirrorlist-*/desc) | tail -n 1)"
-            ;;
-        endeavouros-testing-dev)
-            export PACKAGER="$(grep -A1 PACKAGER $(ls eos-pkgbuild-setup-*/desc) | tail -n 1)"
-            ;;
-        *)
-            cd "$(ls -1d * | head -n 1)"
-            export PACKAGER="$(grep -A1 PACKAGER desc | tail -n 1)"
-            cd ..
-            ;;
-    esac
-    case "$PACKAGER" in
-        "Unknown Packager") export PACKAGER="EndeavourOS <info@endeavouros.com>" ;;
-    esac
-    Popd
-    rm -rf $tmpdir
+    local _packager="$(AssetsConfLocalVal _PACKAGER)"
+    if [ -n "$_packager" ] ; then
+        export PACKAGER="$_packager"
+    else
+        export PACKAGER="EndeavourOS <info@endeavouros.com>"
+    fi
+    _packager=""
+
     echo2 "PACKAGER: $PACKAGER"
 
     Main2 "$@"

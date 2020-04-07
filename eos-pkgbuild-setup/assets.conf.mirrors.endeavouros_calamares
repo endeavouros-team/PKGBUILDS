@@ -13,6 +13,7 @@ local SIGNER="EndeavourOS"
 
 # general options
 local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
+local REPO_COMPRESSOR=zst                           # xz (=default) or zst
 
 # local folders
 local ASSETSDIR="$PWD"
