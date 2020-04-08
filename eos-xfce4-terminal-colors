@@ -1,0 +1,17 @@
+
+pkgname=eos-xfce4-terminal-colors
+pkgver=1
+pkgrel=1
+pkgdesc="EndeavourOS colorscheme for xfce4-terminal"
+arch=('any')
+depends=('xfce4-terminal')
+url="https://endeavouros.com/"
+license=('GPL3')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
+md5sums=('')
+
+package() {
+  cd "$srcdir/"
+  install -Dm 644 endeavouros.theme \
+    "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
+}
