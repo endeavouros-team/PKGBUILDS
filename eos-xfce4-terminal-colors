@@ -12,7 +12,7 @@ source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgn
 md5sums=('c816812c60b090ce4d33f1db2f0897b3')
 
 package() {
-  cd "$srcdir/"
+  cd "$srcdir/eos-xfce4-terminal-colors-${pkgver}"
   install -Dm 644 endeavouros.theme \
     "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
 }
