@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com> 
 
 pkgname=endeavouros-xfce4-terminal-colors
-pkgver=2
+pkgver=1
 pkgrel=1
 pkgdesc="EndeavourOS colorscheme for xfce4-terminal"
 arch=('any')
@@ -9,7 +9,7 @@ depends=('xfce4-terminal')
 url="https://endeavouros.com/"
 license=('GPL3')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('c816812c60b090ce4d33f1db2f0897b3')
+md5sums=('8d792c53e3757221422d6e6ebef34076')
 
 package() {
   cd "$srcdir/endeavouros-xfce4-terminal-colors-${pkgver}"
