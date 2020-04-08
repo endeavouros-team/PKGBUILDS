@@ -9,7 +9,7 @@ depends=('xfce4-terminal')
 url="https://endeavouros.com/"
 license=('GPL3')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('')
+md5sums=('c816812c60b090ce4d33f1db2f0897b3')
 
 package() {
   cd "$srcdir/"
