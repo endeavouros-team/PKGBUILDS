@@ -47,6 +47,7 @@ prepare() {
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
     cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning,yes}.svg $_reponame/data/images
+    rm -rf $_reponame/data/images/yes.svg
     cp $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
     
     mkdir -p $_reponame/build/$pkgname
