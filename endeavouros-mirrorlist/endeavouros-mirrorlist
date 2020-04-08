@@ -9,12 +9,12 @@
 ###     Include = /etc/pacman.d/endeavouros-mirrorlist
 ######################################################
 
+## Germany
+Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
+
 ## Github
 Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/
 Server = https://raw.githubusercontent.com/endeavouros-team/repo/master/$repo/$arch
-
-## Germany
-Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
 
 ## Sweden
 Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch

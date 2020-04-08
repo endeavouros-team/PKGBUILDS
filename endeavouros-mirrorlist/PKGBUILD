@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=1.6.1
+pkgver=1.6.2
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -13,7 +13,7 @@ options=(!strip !emptydirs)
 
 # https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
 source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
-sha512sums=('8bee4794a27b4ddeb46536842c3d9e3784b26cc53186263c9d435c55719ebb4b5fc1ff5e89ae584a72af857d47c6e0f007e506161a661e3889895350d98844db')
+sha512sums=('65d009c0fef3c992dabebc26f2f23f5abdf84f009dfd9cf3251a803eb6e36b464c7593e7dda0fc21cbe7da61013e1cdbebd581dabbefcec9b4f4184d651e6669')
 
 package() {
  mkdir -p "$pkgdir/etc/pacman.d"
