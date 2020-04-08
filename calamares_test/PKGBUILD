@@ -48,7 +48,8 @@ prepare() {
     cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
     cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning}.svg $_reponame/data/images
     cp $_reponame/src/branding/endeavouros/img/yes.svgz $_reponame/data/images
-    cp -f $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
+    cp $_reponame/src/branding/endeavouros/img/geoip/{bg,pin}.png $_reponame/src/modules/locale/images
+    #cp -f $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
     
     mkdir -p $_reponame/build/$pkgname
 
