@@ -46,8 +46,7 @@ prepare() {
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
-    cp $_reponame/src/branding/endeavouros/img/{state-error.svg,state-warning.svg} $_reponame/data/images
-    cp $_reponame/src/branding/endeavouros/img/yes.svg $_reponame/data/images
+    cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning,yes}.svg $_reponame/data/images
     cp $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
     
     mkdir -p $_reponame/build/$pkgname
