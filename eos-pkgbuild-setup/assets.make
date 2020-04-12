@@ -201,6 +201,28 @@ Assets_clone()
 
     Pushd "$ASSETSDIR"
 
+    if [ 1 -eq 1 ] ; then
+        local tag
+        local remotes remote
+        local waittime=30
+        for tag in "${RELEASE_TAGS[@]}" ; do
+            remotes="$(hub release show -f %as%n $tag | sed 's|^.*/||')"
+            for remote in $remotes ; do
+                if [ ! -r $remote ] ; then
+                    break
+                fi
+            done
+            break
+        done
+        if [ -r $remote ] ; then
+            read2 -p "[$waittime sec] Asset names at github are the same as here, fetch anyway (y/N)? " -t $waittime
+            case "$REPLY" in
+                [yY]*) ;;
+                *) Popd ; return ;;
+            esac
+        fi
+    fi
+
     echo2 "Deleting all local assets..."
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
