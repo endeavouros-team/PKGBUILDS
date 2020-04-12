@@ -7,10 +7,67 @@ echoreturn() { echo "$@" ; }     # for "return" values!
 
 echo2()   { echo   "$@" >&2 ; }    # output to stderr
 printf2() { printf "$@" >&2 ; }    # output to stderr
-read2()   { read   "$@" >&2 ; }    # output to stderr
+#read2()   { read   "$@" >&2 ; }    # output to stderr
+read2() {
+    # special handling for option -t (and -p)
+    local name=""
+    local prompt=""
+    local count=0
+    local cr=$'\r'
+    local args=()
+    local arg
+    local has_t_opt="no"
+    local prev=""
+    local retval=0
+
+    # get the prompt and timeout (=count) values, if they exist
+    while getopts ersa:d:i:n:N:p:t:u: name ; do
+        case $name in
+            t) count="$OPTARG" ; has_t_opt="yes" ;;
+            p) prompt="$OPTARG" ;;
+        esac
+    done
+
+    # add parameters from "$@" to the "args" array, except -t and -p and their values 
+    for arg in "$@" ; do
+        case "$arg" in
+            -t)  prev=t ;;
+            -t*) ;;
+            -p)  prev=p ;;
+            -p*) ;;
+            *)
+                case "$prev" in
+                    t|p) prev="" ;;
+                    *)   args+=("$arg") ;;
+                esac
+                ;;
+        esac
+    done
+
+    # read value
+    if [ "$has_t_opt" = "yes" ] ; then
+        # while reading, show a seconds counter
+        while [ $count -gt 0 ] ; do
+            printf "%s[%s] " "$cr" "$count" >&2
+            read -t 1 -p "$prompt" "${args[@]}" >&2
+            retval=$?
+            test $retval -eq 0 && break
+            test -n "$REPLY" && break
+            ((count--))
+        done
+    else
+        # just read the value, no special handling
+        read -p "$prompt" "${args[@]}" >&2
+        retval=$?
+    fi
+    test -z "$REPLY" && echo "" >&2
+    return $retval
+}
 
 DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
 WARN()  { echo2 "Warning: $1." ; }
+
+
 
 Pushd() { pushd "$@" >/dev/null || DIE "${FUNCNAME[1]}: pushd $* failed" ; }
 
@@ -215,7 +272,7 @@ Assets_clone()
             break
         done
         if [ -r $remote ] ; then
-            read2 -p "[$waittime sec] Asset names at github are the same as here, fetch anyway (y/N)? " -t $waittime
+            read2 -p "Asset names at github are the same as here, fetch anyway (y/N)? " -t $waittime
             case "$REPLY" in
                 [yY]*) ;;
                 *) Popd ; return ;;
@@ -396,7 +453,7 @@ WantAurDiffs() {
         aur/*)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
-                read2 -p "[${ask_timeout}s] AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
+                read2 -p "AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
                 if [ $? -eq 0 ] ; then
                     case "$REPLY" in
                         ""|[yY]*) aurdiff=1 ;;
@@ -783,7 +840,7 @@ SettleDown() {
     done
     test -n "$msg" && echo2 "Info: $msg"
     if [ "$ask" = "yes" ] ; then
-        read2 -p "Wait, let things settle down, then press ENTER to continue: "
+        read2 -p "Wait, let things settle down, then press ENTER to continue: " -t 10
     fi
     echo2 ""
 }
