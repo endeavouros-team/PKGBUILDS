@@ -482,6 +482,10 @@ Main()
                 systemctl --user status eos-update-notifier.timer | cat -
                 return
                 ;;
+            --changelog)
+                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.txt
+                return
+                ;;
             -iw=*)
                 initial_waittime="$(eos_yad_GetArgVal "$arg")"
                 ;;
