@@ -992,6 +992,7 @@ Options:
 --disable         Disable this $PRETTY_PROGNAME app.
 --version         Show the version of this app.
 --lang=X          Use language X on the user interface.
+--changelog       Show the changelog of this package.
 
 Experimental options:
 --genlang=X       Generate language X support for the user interface of the Welcome app.
@@ -1035,6 +1036,10 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --changelog)
+                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/welcome/changelog.txt
+                return
+                ;;
             --lang=*) lang="${arg#*=}" ;;
             --tr-engine=*) tr_engine="${arg#*=}" ;;
             --tr-prefer=*) tr_prefer="${arg#*=}" ;;
