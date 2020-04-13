@@ -159,6 +159,12 @@ RemovePersonalData() {
 
 Main()
 {
+    case "$1" in
+        --changelog)
+            wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-log-tool/changelog.txt
+            return
+            ;;
+    esac
     local FILE_OF_LOGS=$HOME/eos-log-tool.logs
     local DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
     local SUDO_CMDS=":"
