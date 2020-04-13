@@ -47,6 +47,13 @@ Footer() { printf "\n\n" ; }
 
 Cmd() {
     local cmd="$1"
+
+    if [ "$cmd" = "cat" ] ; then
+        if [ "${2::1}" = "." ] ; then
+            cd                  # $HOME stuff: go to $HOME to hide unnecessary info
+        fi
+    fi
+
     case "$cmd" in
         pkexec)
             shift
@@ -171,9 +178,10 @@ Main()
     local lightdm="lightdm.log"
     local lightdm2="x-0.log"
     local install="EndeavourOS install log"
-    local lspci="lspci"
+    local lspci="lspci -vnn"
     local lsusb="lsusb"
-    local inxi="inxi -Fxxc0"
+    #local inxi="inxi -Fxxc0"                         # 'inxi' does not work here !!!
+    local hwinfo="hwinfo --short"
     local rdbut="<i>Remove personal data from logs</i>"
     local slbut="<i>Send logs to internet</i>"
     local save="Save this log"
@@ -208,15 +216,10 @@ Main()
                 false "$install"  "$save" \
                 false "$lspci"    "$save" \
                 false "$lsusb"    "$save" \
-                false "$inxi"     "$save" \
+                false "$hwinfo"   "$save" \
                 false "$rdbut"    "$rdtip" \
                 false "$slbut"    "$sltip"
           )
-
-    ##################################################################
-    # 'inxi' does not work properly when eos-log-tool is started as
-    # ./eos-log-tool and /usr/bin/eos-log-tool exists !!!
-    ##################################################################
 
     if [ -z "$result" ] ; then
         return
@@ -229,14 +232,14 @@ Main()
             "$journal0") Cmd pkexec $xx ;;
             "$journal1") Cmd pkexec $xx ;;
             "$journal2") Cmd pkexec $xx ;;
-            "$xsession") cd $HOME ; Cmd cat .xsession-errors ;;
-            "$Xorg")     Cmd cat /var/log/$xx ;;
+            "$xsession") Cmd cat ~/.xsession-errors ;;
+            "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
             "$install")  Cmd cat /var/log/Calamares.log ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
-            "$inxi")     Cmd $xx ;;
+            "$hwinfo")   Cmd $xx ;;
         esac
     done
     if [ "$SUDO_CMDS" != ":" ] ; then
