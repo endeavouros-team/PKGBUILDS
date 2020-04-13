@@ -48,7 +48,7 @@ read2() {
     if [ "$has_t_opt" = "yes" ] ; then
         # while reading, show a seconds counter
         while [ $count -gt 0 ] ; do
-            printf "%s[%s] " "$cr" "$count" >&2
+            printf2 "%s[%s] " "$cr" "$count"
             read -t 1 -p "$prompt" "${args[@]}" >&2
             retval=$?
             test $retval -eq 0 && break
@@ -60,7 +60,7 @@ read2() {
         read -p "$prompt" "${args[@]}" >&2
         retval=$?
     fi
-    test -z "$REPLY" && echo "" >&2
+    test -z "$REPLY" && echo2 ""
     return $retval
 }
 
@@ -316,13 +316,28 @@ DirExists() {
     esac
 }
 
-ShowPrompt() {
-    printf2 "%-35s : " "$1"
+ShowIndented() {
+    # shows the "head" of a listed value, possibly indented
+
+    local txt="$1"
+    local indent_level="$2"    # optional number >= 0
+    local xx
+    local ind=""
+
+    case "$indent_level" in
+        "") ;;
+        *)
+            for ((xx=0; xx < indent_level; xx++)) ; do
+                ind+="    "
+            done
+            ;;
+    esac
+    printf2 "%s%-35s : " "$ind" "$1"
 }
 
 RationalityTests()
 {
-    ShowPrompt "Checking values in $ASSETS_CONF"
+    ShowIndented "Checking values in $ASSETS_CONF"
 
     IsEmptyString ASSETSDIR
     IsEmptyString PKGBUILD_ROOTDIR
@@ -409,7 +424,7 @@ RunPreHooks()
 {
     RunPreHooksEOS
     if [ -n "$ASSET_HOOKS" ] ; then
-        ShowPrompt "Running asset hooks"
+        ShowIndented "Running asset hooks"
         local xx
         for xx in "${ASSET_HOOKS[@]}" ; do
             $xx
@@ -434,7 +449,7 @@ RunPostHooks()
 #    return
     
     if [ -n "$ASSET_POST_HOOKS" ] ; then
-        ShowPrompt "Running asset post hooks"
+        ShowIndented "Running asset post hooks"
         local xx
         for xx in "${ASSET_POST_HOOKS[@]}" ; do
             $xx
@@ -638,7 +653,7 @@ Main2()
 
     Pushd "$PKGBUILD_ROOTDIR"
     for xx in "${PKGNAMES[@]}" ; do
-        printf2 "    %-25s : " "$(JustPkgname "$xx")"
+        ShowIndented "$(JustPkgname "$xx")" 1
         pkgdirname="$(ListNameToPkgName "$xx" yes)"
         test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
 
