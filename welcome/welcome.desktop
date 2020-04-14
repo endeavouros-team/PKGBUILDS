@@ -2,7 +2,6 @@
 Type=Application
 Encoding=UTF-8
 Name=Welcome
-Name[sk]=Privítanie
 Comment=EndeavourOS Welcome launcher
 Comment[sk]=Spúšťač privítania v systéme EndeavourOS
 Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3
