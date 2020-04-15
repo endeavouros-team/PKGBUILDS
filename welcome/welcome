@@ -113,18 +113,25 @@ yad_tailer() {
 }
 export -f yad_tailer
 
+eos_yad_WARN_debug() {
+    test "$debugging" = "yes" && eos_yad_WARN "$1"
+}
+export -f eos_yad_WARN_debug
+
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
     local debug="$2"
     local prog=$INSTALLER_PROGRAM
+    local debugging=no
 
-    if [ "$debug" = "stop" ] ; then
-        local show_installer=yes
+    if [ "$debug" = "stop" ] || [ "$show_installer" != "no" ] ; then
+        debugging=yes
     fi
 
     if [ ! -x $prog ] ; then
         eos_yad --text="$CAL_NOAVAIL $(basename $prog)" --title="$CAL_WARN" --height=100 --width=200 --button=yad-quit:1
-        if [ "$show_installer" != "yes" ] ; then
+        if [ "$show_installer" = "no" ] ; then
+            eos_yad_WARN_debug "Stopping $FUNCNAME (1)."
             return 1
         fi
     fi
@@ -134,8 +141,8 @@ yad_calamares() {
         local t2="$CAL_INFO2"
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
-        local answer field
-        local impl=2
+        local answer field=1
+        local impl=3   # was 2
         local heightopt="--height=316"
 
         case "$impl" in
@@ -143,7 +150,6 @@ yad_calamares() {
                 answer=$( eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
                                   --text="$t1$t2$t3$t4" \
                                   --field="$CAL_METHOD":CB 'Offline!Online' )
-                field=1
                 ;;
             1)
                 answer=$( eos_yad --list --radiolist --title="$CAL_CHOOSE" --image=dialog-question \
@@ -154,7 +160,17 @@ yad_calamares() {
             2)
                 answer=$( eos_yad --list  --title="$CAL_CHOOSE" --image=dialog-question \
                                   --text="$t1$t2$t3$t4" $heightopt --column="Method" Offline  Online )
-                field=1
+                ;;
+            3)
+                eos_yad --form --title="$CAL_CHOOSE" --image=dialog-question \
+                        --text="$t1$t2$t3$t4" --buttons-layout=spread \
+                        --button='Offline!!EOS Xfce theming, internet not required':1 \
+                        --button='Online!!Vanilla DE theming, internet required':0
+                case "$?" in
+                    1) answer="offline" ;;
+                    0) answer="online" ;;
+                    *) eos_yad_WARN_debug "Stopping $FUNCNAME (2)." ; return 1 ;;
+                esac
                 ;;
         esac
 
@@ -175,9 +191,21 @@ yad_calamares() {
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
         eos_yad_WARN "$CAL_NOFILE '$file'"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
-        if [ "$show_installer" != "yes" ] ; then
+        if [ "$show_installer" = "no" ] ; then
+            eos_yad_WARN_debug "Stopping $FUNCNAME (3)."
             return 1
         fi
+    fi
+
+    # Stop here if only debugging.
+    if [ "$debugging" = "yes" ] ; then
+        eos_yad_WARN_debug "Stopping $FUNCNAME (4)."
+        return
+    fi
+    if [ "$show_installer" != "no" ] ; then
+        # this 'if' could be removed
+        eos_yad_WARN_debug "Stopping $FUNCNAME (5)."
+        return
     fi
 
     case "$mode" in
@@ -206,10 +234,6 @@ yad_calamares() {
             fi
             ;;
     esac
-
-    if [ "$show_installer" = "yes" ] || [ "$debug" = "stop" ] ; then
-        return
-    fi
 
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
@@ -635,16 +659,17 @@ export -f yad_ChangeDisplayManager
 yad_vanilla_xfce4_theme() {
     local log="$HOME/.config/EOS-xfce-theme.log"
     local DE="$(eos_yad_GetDesktopName)"
+    local new_theme_name="vanilla"
     case "$DE" in
         XFCE)
             local conf="$HOME/.config/xfce4"
             local datetime="$(date '+%Y%m%d-%H:%M:%S')"
-            local msg="If you agree to change Xfce theme to vanilla, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
+            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
             msg+="To restore the previous theme:\n     - remove folder <b>$conf</b>\n     - rename <b>$conf.$datetime</b> into <b>$conf</b>\n\n"
             msg+="(Note: this info is stored into file $log).\n\n"
             msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
             printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
-            eos_yad --form --title="Change Xfce theme to vanilla" --text="$msg" --image=preferences-desktop-theme \
+            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=preferences-desktop-theme \
                     --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
             case "$?" in
                 0) mv $conf $conf.$datetime ; reboot ;;
@@ -655,6 +680,41 @@ yad_vanilla_xfce4_theme() {
     esac
 }
 export -f yad_vanilla_xfce4_theme
+
+yad_endeavouros_xfce4_theme() {
+    local log="$HOME/.config/EOS-xfce-theme.log"
+    local DE="$(eos_yad_GetDesktopName)"
+    local new_theme_name="EndeavourOS default"
+    case "$DE" in
+        XFCE)
+            local conf="$HOME/.config/xfce4"
+            local datetime="$(date '+%Y%m%d-%H:%M:%S')"
+            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
+            msg+="To restore the previous theme:\n     - remove folder <b>$conf</b>\n     - rename <b>$conf.$datetime</b> into <b>$conf</b>\n\n"
+            msg+="(Note: this info is stored into file $log).\n\n"
+            msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
+            printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
+            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=preferences-desktop-theme \
+                    --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
+            case "$?" in
+                0)
+                    mv $conf $conf.$datetime
+                    # Fetch the EndeavourOS default Xfce theme from github.
+                    local tmpdir=$(mktemp -d)
+                    pushd $tmpdir >/dev/null
+                    git clone https://github.com/endeavouros-team/EndeavourOS-archiso.git 2>/dev/null
+                    mv EndeavourOS-archiso/airootfs/etc/skel/.config/xfce4 "$(dirname "$conf")"
+                    popd >/dev/null
+                    rm -rf $tmpdir
+                    reboot
+                    ;;
+            esac
+            ;;
+        *)  echo "Sorry $DE user, only Xfce is supported." > "$log"
+            ;;
+    esac
+}
+export -f yad_endeavouros_xfce4_theme
 
 INSTALL() {
   local handle="$1"
@@ -712,6 +772,7 @@ AfterInstall() {
       --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager'
       --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
       --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme'
+      --field=" Xfce EndeavourOS default theme!preferences-desktop-theme!Use EndeavourOS default Xfce theme":fbtn               'bash -c yad_endeavouros_xfce4_theme'
       --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
       --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay"
       --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
