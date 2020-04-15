@@ -20,6 +20,8 @@ read2() {
     local prev=""
     local retval=0
 
+    OPTIND=1   # for some reason this is required!
+
     # get the prompt and timeout (=count) values, if they exist
     while getopts ersa:d:i:n:N:p:t:u: name ; do
         case $name in
