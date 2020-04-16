@@ -2,7 +2,7 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.3.2
+pkgver=1.3.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -15,7 +15,7 @@ url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 source=(
   $url/$pkgname
 )
-sha512sums=('f738d585eaed1fa3408e67b3ea9b9acb92640c81f45b9a8f8c58fbfb8cfc185c9e405da0042044f7484d48f45dfad79f362cc621c6fdac74ab38e67cbcfde6b5')
+sha512sums=('b598cb8184847c6fc905c85e9b910f3b3b0d2715505810709e01f60f5138fa321b0087b14f229c572888e46895e3b9492f1c3dcda44abc6e50c7fbf401e72642')
 
 package() {
   cd $srcdir

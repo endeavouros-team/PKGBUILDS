@@ -114,7 +114,7 @@ OptTypeNeeded() {
 AskCountriesAndOptions() {
     local tips=(
         "Select countries to include in mirror ranking"
-        "  - select one on more countries"
+        "  - select one or more countries"
         "  - closest locations are usually the fastest"
         "  - https is the preferred protocol"
     )
