@@ -6,6 +6,7 @@ Changelog for welcome
 - new translation: Portuguese
 - updated Slovakian translation
 - added button "Welcome's changelog"
+- show Xfce related buttons only when using Xfce
 
 2020-Apr-13:
 - added option --changelog
