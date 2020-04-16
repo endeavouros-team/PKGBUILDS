@@ -1128,7 +1128,7 @@ StartHere() {
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad > $yad_zombie_log
 
-    local show_installer=no    # explicitly show the installer, for testing only
+    export show_installer=no    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
     #local netlog=0
@@ -1138,7 +1138,7 @@ StartHere() {
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
-            --installer) show_installer=yes ;;
+            --installer) export show_installer=yes ;;
             --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
