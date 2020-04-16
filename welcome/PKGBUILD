@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.4.38
+pkgver=2.4.39
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -38,13 +38,14 @@ source=(
   $url/translations-${pkgname}-fr.bash
   $url/translations-${pkgname}-it.bash
   $url/translations-${pkgname}-pl.bash
+  $url/translations-${pkgname}-pt.bash
   $url/translations-${pkgname}-ro.bash
   $url/translations-${pkgname}-ru.bash
   $url/translations-${pkgname}-sk.bash
 )
-sha512sums=('a9c64964df37de03e42f39bf4f9d497acc0c757a95b15edc65c761351078f1b6f015cbc0252a4294cb3fedca71b65a0b56397225d29ad99a658dd56f4efa2186'
-            '3d18bef69d66ee595ad02827ac8cfdc4747a405bed28352434e50868c5b5c762eb6ae5ca55fb79b2e49e52a8c9d8eee8a0fa1f3a3aeda281bc25c69440ad4541'
-            'f16ab139f4199f0900cc6a5341bf036fb47b28f035d6c09276c49567bb44f561945aef4c0cc18867d94a07c06ae6b2c7d99567c6c36253f404737ea31a5e4e33'
+sha512sums=('4f01c450f5aae4d06980d4f558906ee2cd9382f114f14ae33573b476ba302609475d5264b4bae18f675a29622fd24fe55e87ce9f4185938bbc8e12f2f9878e36'
+            'b93dd88bbdfcf4badb1a3d5ce9235c4804f8008e3a8213d7b85f6d3ab7d5150aa1aebe1b3cc4d34edbea3545448d3b765e9824d796301f23052f714ef118316b'
+            'e13e8aae07f652d2df70a7150d5ece036e82412c10ac49de1e87d5631479c71325fa2640d05402c2dd712493b18b168a285297d4409aad6592c01b7dfef2065e'
             '789d9b534cc9e121d550ab68c2c7a8f56674c25bacb3dbeaafa2d9064d7b24a6e1b5a78aa9f99ade6a299e7c7b08679f7c6fc09e89dec2d6798159d86989fe8c'
             '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
             '9cc88b541318aa2b3e9a85ddf68cc1a7b4cff3a0e98b9e15b2760a2bda8d0831cf99ce61f6745dea8b284104bdea34bdadff4b266fd130910625395c0bda35a0'
@@ -63,12 +64,13 @@ sha512sums=('a9c64964df37de03e42f39bf4f9d497acc0c757a95b15edc65c761351078f1b6f01
             '4cfcee03e0efa1c2e000e27986bbe8256d00da2dd2bdfb9bbb8dcdfd6e67901e17c73110b957db13ac8ff01df982e95d70eb815e9ee9b5afbab6c0aa60da9525'
             '4d2397871c628bab0bdb2352c50d71a6f6e943d5e52292cbca0b84d41801b879b8bd70a0f22e002dbb64e27e3604d2f317e42dff04eff993938e75d1807d4779'
             '059470680fa82160c54d652e892454d442d7fb29ac0e07251e1ebc22cd5c51c7f09788d52eb8ef721f25305741a264dbc14664d61d16046148e279455d708bde'
+            '8c7a83e2814f2f42e430d8196434982d889d88dbb451c836b46f32fbc4f8d214c9ed8d9f95c689202593f1f9017046524502cf395cd5b271147850874e0f638b'
             'f847db78936307b8eaffa8466d11d49a70311ebe3a33c777473a0575b9746aa57ccfacce12c584ebbb6c15c8803070c06643890090c1af0c7c97c8465b40325a'
             'af6ad0b8b24b537079e2f7f040c6acbf6a24871f751ffced747e7e7c3aa9d7986926f77f95ef454e4c21d9a71cd176bb9014ad5b2740047a6c7fd085b3506275'
             '9193776e275ed2ec51a827f9e93a5ab84241d625e6feb791c6a94fcdf45f6d3821cfab5bb42c8830ad48cdee18a9663229469efbebdec63384a51a18a52743af')
 
 package() {
-  local languages="reference de en es fi fr it pl ro ru sk"   # Update this list when new languages are added.
+  local languages="reference de en es fi fr it pl pt ro ru sk"   # Update this list when new languages are added.
   local xx
 
   cd $srcdir
