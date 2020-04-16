@@ -4,6 +4,7 @@ Changelog for welcome
 - added button to install the EndeavourOS Xfce theming (experimental!)
 - welcome launcher icon starts welcome even it was disabled (and re-enables it)
 - new translation: Portuguese
+- new translation: Swedish
 - updated Slovakian translation
 - added button "Welcome's changelog"
 - show Xfce related buttons only when using Xfce
