@@ -4,7 +4,8 @@ Encoding=UTF-8
 Name=Welcome
 Comment=EndeavourOS Welcome launcher
 Comment[sk]=Spúšťač privítania v systéme EndeavourOS
-Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3 --enable
+Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3      # for autostart
+#Exec=sh /usr/share/endeavouros/scripts/welcome --enable           # for desktop launcher
 Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 # StartupNotify=false
 # Terminal=False

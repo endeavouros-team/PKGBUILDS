@@ -1239,6 +1239,7 @@ StartHere() {
     case "$result" in
         5) WelcomeSettings disable ;;
         0|252) WelcomeSettings enable ;;
+        *) echo "welcome exit code was: $result" >&2 ;;
     esac
 }
 

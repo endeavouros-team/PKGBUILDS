@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.4.42
+pkgver=2.4.43
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -45,8 +45,8 @@ source=(
   $url/translations-${pkgname}-sk.bash
 )
 sha512sums=('a664e26d0aee8326760221e09fe7df3d2dc273c985d3079b31195dc6394cebf4666308a40d41e034b505005619445cf5ac29891759cab3aa4255877c1583419a'
-            '2ad1a1106aac534001ee73e234f3cca30f973e313c4f70c9b670ac1baf76b912a053851757b512156ab48d8d0b9eca055f3171f6215a0ba443288e0dc98197f3'
-            'e13e8aae07f652d2df70a7150d5ece036e82412c10ac49de1e87d5631479c71325fa2640d05402c2dd712493b18b168a285297d4409aad6592c01b7dfef2065e'
+            '997cc3e1cc1ee73c2b1442797a13073187e6ad38aa7ab50b645d098b2960e276ab9df5d12f7ee4fe19e1e3f6be036cb7cc11d75eaca63ca79a0c2a0879f1e526'
+            '7de552c93610795caad3bec2e357d2c3126f6c8121ab8e4cb78ff4fba6e632e2370879becfba6352e169ca2603cd318f37ce87f6c1533efaa223387d486aba62'
             '789d9b534cc9e121d550ab68c2c7a8f56674c25bacb3dbeaafa2d9064d7b24a6e1b5a78aa9f99ade6a299e7c7b08679f7c6fc09e89dec2d6798159d86989fe8c'
             '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
             '9cc88b541318aa2b3e9a85ddf68cc1a7b4cff3a0e98b9e15b2760a2bda8d0831cf99ce61f6745dea8b284104bdea34bdadff4b266fd130910625395c0bda35a0'
@@ -96,10 +96,14 @@ package() {
   install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
 
   install -d $pkgdir/etc/xdg/autostart
-  install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop
   install -Dm644 eos-script-lib-yad.conf  $pkgdir/etc/eos-script-lib-yad.conf
+  install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop      # no --enable
 
   install -d $pkgdir/usr/share/applications
-  install -Dm644 $pkgname.desktop         $pkgdir/usr/share/applications/$pkgname.desktop
+  cp -a $pkgname.desktop $pkgname.desktop-enable
+  sed -i $pkgname.desktop-enable \
+      -e 's|^\(Exec=.* --startdelay.*\)$|#\1|' \
+      -e 's|^#\(Exec=.* --enable.*\)$|\1|'
+  install -Dm644 $pkgname.desktop-enable         $pkgdir/usr/share/applications/$pkgname.desktop      # has --enable
 }
