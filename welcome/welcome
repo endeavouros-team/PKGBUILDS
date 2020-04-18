@@ -880,7 +880,7 @@ export -f WelcomeHelp
 
 WelcomeChangelog() {
     SetBrowser
-    $_BROWSER https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/welcome/changelog.txt
+    $_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/changelog.md
 }
 export -f WelcomeChangelog
 
@@ -1121,7 +1121,7 @@ StartHere() {
     for arg in "$@" ; do
         case "$arg" in
             --changelog)
-                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/welcome/changelog.txt
+                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/welcome/changelog.md
                 return
                 ;;
             --lang=*) lang="${arg#*=}" ;;

@@ -1,7 +1,11 @@
 
 ## Changelog for welcome
 
-[Commit details](https://github.com/endeavouros-team/PKGBUILDS/commits/master/welcome)
+[Welcome commit details](https://github.com/endeavouros-team/PKGBUILDS/commits/master/welcome)
+
+2020-Apr-18:
+- added a link to Welcome's detailed git commits (click **Welcome commit details** above)
+- changelog.txt moved to changelog.md
 
 2020-Apr-16:
 - added button to install the EndeavourOS Xfce theming (experimental!)
