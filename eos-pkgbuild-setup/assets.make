@@ -5,11 +5,16 @@
 
 echoreturn() { echo "$@" ; }     # for "return" values!
 
-echo2()   { echo   "$@" >&2 ; }    # output to stderr
-printf2() { printf "$@" >&2 ; }    # output to stderr
-#read2()   { read   "$@" >&2 ; }    # output to stderr
+echo2()      { echo   "$@" >&2 ; }    # output to stderr
+printf2()    { printf "$@" >&2 ; }    # output to stderr
+
+DIE()        { echo2 -n "Error: "   ; echo2 "$@" ; Destructor ; exit 1 ; }
+WARN()       { echo2 -n "Warning: " ; echo2 "$@" ; }
+
 read2() {
-    # special handling for option -t (and -p)
+    # Special handling for option -t (and -p).
+    # The read value goes to the REPLY variable only.
+
     local name=""
     local prompt=""
     local count=0
@@ -65,11 +70,6 @@ read2() {
     test -z "$REPLY" && echo2 ""
     return $retval
 }
-
-DIE()   { echo2 "Error: $1." ; Destructor ; exit 1 ; }
-WARN()  { echo2 "Warning: $1." ; }
-
-
 
 Pushd() { pushd "$@" >/dev/null || DIE "${FUNCNAME[1]}: pushd $* failed" ; }
 
@@ -152,7 +152,7 @@ LocalVersion()
     case "$(echo "$pkgs" | wc -l)" in
         0) echoreturn "0" ; return ;;
         1) ;;
-        *) WARN "$Pkgname: there is not only one version locally, using the latest."
+        *) WARN -n "$Pkgname: many local versions, using the latest. "
            pkgs="$(echo "$pkgs" | tail -n 1)"
            ;;
     esac
