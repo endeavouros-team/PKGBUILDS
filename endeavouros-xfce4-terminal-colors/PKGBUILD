@@ -9,7 +9,7 @@ depends=('xfce4-terminal')
 url="https://endeavouros.com/"
 license=('GPL3')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('')
+md5sums=('9e93438893efb4493dfc3944f446aaee')
 
 package() {
   cd "$srcdir/endeavouros-xfce4-terminal-colors-${pkgver}"
