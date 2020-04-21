@@ -152,7 +152,8 @@ LocalVersion()
     case "$(echo "$pkgs" | wc -l)" in
         0) echoreturn "0" ; return ;;
         1) ;;
-        *) WARN -n "$Pkgname: many local versions, using the latest. "
+        *) echo2 -n "$hook_multiversion "
+           # WARN -n "$Pkgname: many local versions, using the latest. "
            pkgs="$(echo "$pkgs" | tail -n 1)"
            ;;
     esac
@@ -182,7 +183,11 @@ HookIndicator() {
 }
 
 ExplainHookMarks() {
-    printf2 "\nNote: mark %s above means a package hook from file %s was executed.\n\n" "$hook_yes" "$ASSETS_CONF"
+    printf2 "\nPossible markings above mean indications from %s:\n" "$ASSETS_CONF"
+    printf2 "    %s = a package hook was executed.\n" "$hook_yes"
+    printf2 "    %s = a package hook changed pkgver in PKGBUILD.\n" "$hook_pkgver"
+    printf2 "    %s = a package hook found many local versions, used latest.\n" "$hook_multiversion"
+    printf2 "\n"
 }
 
 ListNameToPkgName()
@@ -589,6 +594,8 @@ Main2()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
 
+    local hook_pkgver="#"
+    local hook_multiversion="+"
     local hook_yes="*"
     local hook_no=""                 # will contain strlen(hook_yes) spaces
     for xx in $(seq 1 ${#hook_yes}) ; do
