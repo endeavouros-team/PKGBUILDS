@@ -87,10 +87,13 @@ Main()
         local MIRROR_NAME=Github
         local MIRROR_URL=""
         local findpart=""
+        if [ -z "$REPO_COMPRESSOR" ] ; then
+            local REPO_COMPRESSOR=xz
+        fi
         case "$SIGNER" in
             EndeavourOS)
                 case "$REPONAME" in
-                    endeavouros)
+                    endeavouros | endeavouros_calamares)
                         MIRROR_URL=https://github.com/endeavouros-team/mirrors/releases/tag/"${RELEASE_TAGS[0]}"
                         findpart=/endeavouros-team/mirrors/releases/download/"${RELEASE_TAGS[0]}"/
                         ;;
@@ -159,8 +162,8 @@ Main()
 
     local SigLevel="$(grep -A3 "^\[$REPONAME\]$" /etc/pacman.conf | grep "^SigLevel = " | awk '{print $3}')"
     case "$SigLevel" in
-        Required) repofiles="$(echo $REPONAME.{db,files}{,.tar.xz}{,.sig})" ;;
-        *)        repofiles="$(echo $REPONAME.{db,files}{,.tar.xz})" ;;
+        Required) repofiles="$(echo $REPONAME.{db,files}{,.tar.$REPO_COMPRESSOR}{,.sig})" ;;
+        *)        repofiles="$(echo $REPONAME.{db,files}{,.tar.$REPO_COMPRESSOR})" ;;
     esac
 
     # Check files. 'NameCheck' is very fast but unreliable. 'ContentsCheck' is quite slow but reliable.
