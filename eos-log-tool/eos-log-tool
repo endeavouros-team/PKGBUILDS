@@ -132,6 +132,7 @@ RemovePersonalData() {
             -e 's| '$user')| _user_)|g' \
             -e 's| '$user'(| _user_(|g' \
             -e "s|‘$user:|‘_user_:|g" \
+            -e "s|\[$user\]|[_user_]|g" \
             -e 's|'$user'"|_user_"|g'
     done
 
