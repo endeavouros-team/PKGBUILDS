@@ -184,6 +184,7 @@ Main()
     local lightdm="lightdm.log"
     local lightdm2="x-0.log"
     local install="EndeavourOS install log"
+    local blame="systemd-analyze blame"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
     #local inxi="inxi -Fxxc0"                         # 'inxi' does not work here !!!
@@ -220,6 +221,7 @@ Main()
                 false "$lightdm"  "$save" \
                 false "$lightdm2" "$save" \
                 false "$install"  "$save" \
+                false "$blame"    "$save" \
                 false "$lspci"    "$save" \
                 false "$lsusb"    "$save" \
                 false "$hwinfo"   "$save" \
@@ -243,6 +245,7 @@ Main()
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
             "$install")  Cmd cat /var/log/Calamares.log ;;
+            "$blame")    Cmd systemd-analyze blame ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
             "$hwinfo")   Cmd $xx ;;
