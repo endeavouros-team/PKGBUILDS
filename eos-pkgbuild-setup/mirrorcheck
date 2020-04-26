@@ -20,7 +20,10 @@ NameCheck() {
             echo2 "file $xx missing from $reponame !"
             problemfiles+="$xx "
         else
-            echo2 "    OK: $xx"
+            case "$mode" in
+                fastall) ;;
+                *) echo2 "    OK: $xx" ;;
+            esac
         fi
     done
 }
@@ -43,58 +46,12 @@ ContentsCheck() {
     done
 }
 
-Usage() {
-    local progname="$(basename $0)"
-    cat <<EOF >&2
-$progname: Check the validity of EndeavourOS packages in the $reponame mirror.
-
-Usage: $progname [parameters]
-parameters:
-    --slow        Check contents of each file.
-    --fast        Check just the name of all package files.
-    --optimized   Check contents of some files, and names of other files.
-    --reponame=X  Use given name as the mirror name.
-    --no-filelist Don't generate list of latest files into the repo.
-    folder-name   Name of the local folder that contains package files.
-                  If not given, current folder is used.
-EOF
-}
-
-Main()
-{
-    # use assets.conf
-    local assets_conf=./assets.conf
-    test -r $assets_conf || DIE "cannot find local file $assets_conf."
-    local mode=fast   # show, optimized, fast
-    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
-
-    local conf=/etc/eos-mirrorcheck.conf
-    test -r $conf || DIE "configuration file $conf is required but not found."
-    local repo=endeavouros
-    local arch=x86_64
-    source $conf
-
-    local folder=""
+OneMirror() {
     local remotefilelist
     local packages repofiles
     local problemfiles=""
-    local reponame="${MIRROR_NAMES[0]}"
     local mirror_url
-    local arg
 
-    for arg in "$@" ; do
-        case "$arg" in
-            --reponame=*) reponame="${arg#*=}" ;;
-            --slow) mode=slow ;;
-            --fast) mode=fast ;;
-            --optimized) mode=optimized ;;
-            --no-filelist) has_filelist=no ;;   # no repofiles.txt
-            -*) Usage ; return ;;
-            *) folder="$arg" ;;
-        esac
-    done
-
-    test -n "$reponame" || DIE "MIRROR_NAMES[0] is empty! Check file $conf."
     mirror_url="${MIRROR_URLS[$reponame]}"
     test -n "$mirror_url" || DIE "MIRROR_URLS[$reponame] is empty! Check file $conf."
 
@@ -122,7 +79,7 @@ Main()
     fi
 
     case "$mode" in
-        fast)
+        fast | fastall)
             NameCheck $packages
             ;;
         slow)
@@ -150,6 +107,67 @@ Main()
         echo $problemfiles
     fi
     popd >/dev/null
+}
+
+Usage() {
+    local progname="$(basename $0)"
+    cat <<EOF >&2
+$progname: Check the validity of EndeavourOS packages in mirrors.
+
+Usage: $progname [parameters]
+parameters:
+    --slow        Check contents of each file.
+    --fast        Check just the name of all package files (default).
+    --optimized   Check contents of some files, and names of other files.
+    --reponame=X  Use given name as the mirror name (default: all known mirrors).
+    --no-filelist Don't generate list of latest files into the repo.
+    folder-name   Name of the local folder that contains package files.
+                  If not given, current folder is used.
+
+EOF
+}
+
+Main()
+{
+    # use assets.conf
+    local assets_conf=./assets.conf
+
+    test -r $assets_conf || DIE "cannot find local file $assets_conf."
+
+    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
+    local mode=fast   # show, optimized, fast
+    local repo=endeavouros
+    local arch=x86_64
+    local folder=""
+    local reponame
+    local arg
+    local conf=/etc/eos-mirrorcheck.conf
+    test -r $conf || DIE "configuration file $conf is required but not found."
+
+    source $conf
+
+    test -n "${MIRROR_NAMES[0]}" || DIE "MIRROR_NAMES[0] is empty! Check file $conf."
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --reponame=*) reponame="${arg#*=}" ;;
+            --slow) mode=slow ;;
+            --fast) mode=fast ;;
+            --optimized) mode=optimized ;;
+            --no-filelist) has_filelist=no ;;   # no repofiles.txt
+            -*) Usage ; return ;;
+            *) folder="$arg" ;;
+        esac
+    done
+
+    if [ -n "$reponame" ] ; then
+        OneMirror
+    else
+        mode=fastall
+        for reponame in "${MIRROR_NAMES[@]}" ; do
+            OneMirror
+        done
+    fi
 }
 
 Main "$@"
