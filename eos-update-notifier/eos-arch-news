@@ -37,7 +37,8 @@ ShowIfNotSeen() {
             echo "Later it is!" >&2
         }
     else
-        msg="$(printf "You've seen the latest Arch news at %s.\n" "$latest_seen")"
+        #msg="$(printf "You've seen the latest Arch news at %s.\n" "$latest_seen")"
+        msg="$(printf "Latest Arch news date: %s (already visited).\n" "$latest_seen")"
         echo "$msg" >&2
     fi
 }
@@ -56,14 +57,17 @@ Main() {
     local latestfile="$HOME/.config/EOS-arch-news.conf"
     local url=https://www.archlinux.org/news
     local arg stop=no
-    local dates data="$(wget -q -O- $url)"
+    local dates
+    local data="$(curl -s $url/)"
+    #local data="$(wget -q -O- $url)"
 
     if [ -z "$data" ] ; then
         echo "Sorry, cannot fetch Arch news. Please try again later." >&2
         return 1
     fi
 
-    readarray -t dates <<<  $(echo "$data" | grep '<td>20[0-9-]*</td>' | sed -e 's|^.*<td>||' -e 's|</td>$||')
+    readarray -t dates <<< $(echo "$data" | grep '^[ \t]*<td>[0-9-]*</td>$' | sed 's|^[ \t]*<td>\([0-9-]*\)</td>$|\1|')
+   #readarray -t dates <<< $(echo "$data" | grep '<td>20[0-9-]*</td>' | sed -e 's|^.*<td>||' -e 's|</td>$||')
 
     for arg in "$@" ; do
         case "$arg" in

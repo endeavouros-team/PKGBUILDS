@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=EndeavourOS Update Notifier
+Comment=Update Notifier and Updater for EndeavourOS
+Exec=eos-update-notifier -init
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
+# StartupNotify=false
+# Terminal=False
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel

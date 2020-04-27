@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=1.0.7
+pkgver=1.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -19,7 +19,7 @@ source=(
   $url/eos-arch-news
   $url/eos-reboot-required
   $url/eos-reboot-required.hook
-#  $url/$pkgname.desktop
+  $url/$pkgname.desktop
   $url/$pkgname.timer
   $url/$pkgname.service
 )
@@ -28,9 +28,10 @@ sha512sums=('959e7023d2c57cc1a6492e11bd638f12e833cb4c522522f08bdf8d7a8737c974b51
             '037e42e8c8e69484dcb14edfd98d5d1dae0ab1b8b7903812a9f43961f3e38c14bda19146ab1f1c5f1075f61cb02feb67500ddfa451e567ae12b54573094d6237'
             'd489cf73b0267cf9edf88a3d5a914f614ce0dfd694a1c40b329f56efa2e73d0497d2e3af35a99f04dde2a32d153177d04f16ed7751a457f9640397b45074e6d3'
             '97eed94588efa2fb0a824a92c2efaa484612033717795d1c0c7e72a7fe1352cc7b44c14c0f82748e1bbd00983d3ae5bc0ab8ca523db75b46c2a5002e5645fb2e'
-            'f30acaa30c556aeae5ddf96638d75afbf337ce37637d93abf568f83ceb454137d0b10b74f63d749f1c9c76f341a3f4a16f96ac1c1e56d14ed65afaecfa389375'
+            '00eabe6b04893f73a34eb35ef2eefaae408b85df37f0fe09b17c84a2bcf07be5421512cb34f505725571ded85d2a46400c6e11492b5a6e29e43414ec2994ac2f'
             'b6aad64f265cb6c203928df31bcd6a4b252532a6264e8702f5bac13bfeacfef323aa48ef0f0f550f45ade66c08de449279f7f2572b0b67121e01341759a3659e'
             'b922a7eda369a505c242f876da1676d26bb413819626eedaa57cca63f1e9c1008dae0609bf4d648f184297ca745ca79082da2c148ada9933635736466dbaa028'
+            '7425747b30ab36aefd15169f497fe2efb80297b9f2100c524d059f19a11c839e0435da217d4bccdc68ab932d508cb3d3fca758243c8fed9c0c3b98a93076540b'
             'fc306c2ada55c78afe7a3c5ee14155db7cdce393940873bf99ae2fbd7f9eb404a1288bfc74ba17fb39002e70706f62bba8ba1597f1c13491f3f72c42cff0d89c'
             '0bdcd09c69e1fb9d7e28a9155e90c6c632c506d619685b8a8a417dd737d240a96cce77b3231a4644e9f79de9e7b3a0048d299476ad0c78076528c5389641af31')
 
@@ -39,7 +40,7 @@ package() {
 
   install -Dm755 $pkgname                  $pkgdir/usr/bin/$pkgname
   install -Dm644 $pkgname.conf             $pkgdir/etc/$pkgname.conf
-#  install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop    # not needed because of systemd service
+  install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop    # not needed because of systemd service
   install -Dm755 arch-news-for-you         $pkgdir/usr/bin/arch-news-for-you
   install -Dm755 eos-arch-news             $pkgdir/usr/bin/eos-arch-news
 
