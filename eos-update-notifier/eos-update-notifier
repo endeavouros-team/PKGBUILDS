@@ -73,7 +73,7 @@ ShowTray() {
 }
 ShowNotify() {
     local ms=15000
-    /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
+    /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms --app-name='Update Notifier' \
                          "Updates available at $date" \
                          "$count $source updates are available"
 }
