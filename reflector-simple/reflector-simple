@@ -52,7 +52,7 @@ GetYourCountryCode() {
         echo "$code" ; return
     }
 
-    code="$(curl ipinfo.io 2>/dev/null | grep '"country":' | sed 's|^.*: "\([A-Z][A-Z]\)",$|\1|')"
+    code="$(curl -s https://ipinfo.io/country)"
     CCCheck "$code" && {
         echo "$code" ; return
     }
