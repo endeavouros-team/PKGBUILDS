@@ -74,6 +74,7 @@ ShowTray() {
 ShowNotify() {
     local ms=15000
     /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
+                         --app-name="EndeavourOS Update Notifier" \
                          "Updates available at $date" \
                          "$count $source updates are available"
 }
@@ -427,6 +428,7 @@ Options:
                 Note: this has effect only if configuration ArchNewsProg is
                 'arch-news-for-you'.
    -q           Be quieter with dialogs.
+   --changelog  Show the changelog of this package.
 EOF
 }
 
@@ -483,7 +485,7 @@ Main()
                 return
                 ;;
             --changelog)
-                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.txt
+                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.md
                 return
                 ;;
             -iw=*)
