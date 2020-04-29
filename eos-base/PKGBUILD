@@ -2,8 +2,8 @@
 
 pkgname=eos-base
 pkgdesc="Required packages in EndeavourOS."
-pkgver=1.0
-pkgrel=5
+pkgver=1.1
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -11,7 +11,7 @@ depends=(
   #base-devel
   #cryptsetup
   #device-mapper
-  dhcpcd
+  #dhcpcd
   diffutils
   e2fsprogs
   inetutils
