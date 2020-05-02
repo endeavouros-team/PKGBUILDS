@@ -787,11 +787,10 @@ Main2()
 
                 if [ -n "$removable" ] ; then
                     # rm -f  "${removable[@]}"
-                    mkdir -p "$pkg_archive"
-                    chmod +w "$pkg_archive"/*  2>/dev/null
-                    mv -f "${removable[@]}" "$pkg_archive" || \
-                        WARN "problem moving old packages to $pkg_archive"
-                    chmod -w "$pkg_archive"/*               # do not (accidentally) delete archived packages...
+                    test -e "$pkg_archive" || mkdir -p "$pkg_archive"
+                    chmod -R u+w "$pkg_archive"
+                    mv -f "${removable[@]}" "$pkg_archive" || WARN "problem moving old packages to $pkg_archive"
+                    chmod -R -w "$pkg_archive"               # do not (accidentally) delete archived packages...
                 fi
                 
                 if [ -n "$repo_removes" ] ; then
