@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Reflector Simple
+Comment=A simple GUI for 'reflector'
+Exec=/usr/bin/reflector-simple
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
+# StartupNotify=false
+# Terminal=False
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=System
