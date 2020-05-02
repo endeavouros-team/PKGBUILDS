@@ -10,3 +10,4 @@ Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 Hidden=false
 X-GNOME-Autostart-enabled=true
 X-KDE-autostart-after=panel
+Categories=System
