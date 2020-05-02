@@ -485,7 +485,8 @@ Main()
                 return
                 ;;
             --changelog)
-                wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.md
+                xdg-open https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname
+                #wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.md
                 return
                 ;;
             -iw=*)
