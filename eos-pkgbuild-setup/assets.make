@@ -448,9 +448,13 @@ RunPostHooks()
             endeavouros) newrepodir="$ASSETSDIR/../../repo" ;;
             *)           newrepodir="$GITDIR" ;;
         esac
-        if [ -r "$newrepodir/GitUpdate" ] ; then
-            cd "$newrepodir"
-            ./GitUpdate
+        if [ -e "$newrepodir/.GitUpdate" ] ; then
+            if [ -x /usr/bin/GitUpdate ] ; then
+                cd "$newrepodir"
+                /usr/bin/GitUpdate
+            else
+                WARN "$FUNCNAME: no GitUpdate app found."
+            fi
         fi
     fi
 #    return
