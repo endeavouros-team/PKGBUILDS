@@ -35,7 +35,8 @@ Main() {
     sleep 1s    # workaround for a silly (but not crucial) issue about overlapping windows
 
     case "$1" in
-        -r) rm -f "$conf" ;;     # -r allows for re-installing the default wallpaper
+        -r) rm -f "$conf" ;;             # -r allows for re-installing the default wallpaper
+        -rr) rm -f "$conf" ; return ;;   # the same, but don't reinstall
     esac
 
     if [ ! -r "$conf" ] ; then
