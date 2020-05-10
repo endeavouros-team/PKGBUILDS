@@ -1,5 +1,0 @@
-Changelog for eos-update-notifier
-
-2020-Apr-13:
-- added option --changelog
-
