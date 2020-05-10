@@ -706,7 +706,7 @@ yad_endeavouros_xfce4_theme() {
                     mv EndeavourOS-archiso/airootfs/etc/skel/.config/xfce4 "$(dirname "$conf")"
                     popd >/dev/null
                     rm -rf $tmpdir
-                    wallpaper-once -rr   # allows default wallpaper question after reboot
+                    /usr/share/endeavouros/scrips/wallpaper-once -rr   # allows default wallpaper question after reboot
                     reboot
                     ;;
             esac
