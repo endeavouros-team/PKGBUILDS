@@ -39,7 +39,7 @@ NameCheck() {
             test "$xx" = "$yy" && break
         done
         if [ "$xx" != "$yy" ] ; then
-            echo2 "file $xx missing from $reponame !"
+            echo2i "FAIL: $xx is missing from $reponame !"
             problemfiles+="$xx "
         else
             case "$mode" in
@@ -54,12 +54,12 @@ ContentsCheck() {
     local xx
     for xx in "$@" ; do
         wget -q --timeout=10 -O $tmpdir/$xx $mirror_url/$xx || {
-            echo2 "Error: fetching $xx failed."
+            echo2i "FAIL: $xx fetching failed."
             problemfiles+="$xx "
             continue
         }
         cmp $xx $tmpdir/$xx >/dev/null || {
-            echo2 "file $xx is different !"
+            echo2i "FAIL: $xx is different !"
             problemfiles+="$xx "
             continue
         }
@@ -125,10 +125,11 @@ OneMirror() {
     if [ -z "$problemfiles" ] ; then
         echo2i "==> No issues."
     else
-        echo2i "==> Problematic files: "
-        for arg in $problemfiles ; do
-            echoi -l3 "$arg"
-        done
+        :
+        #echo2i "==> Problematic files: "
+        #for arg in $problemfiles ; do
+        #    echoi -l3 "$arg"
+        #done
     fi
     popd >/dev/null
 }
@@ -187,7 +188,7 @@ Main()
     if [ -n "$reponame" ] ; then
         OneMirror
     else
-        mode=fastall
+        #mode=fastall
         for reponame in "${MIRROR_NAMES[@]}" ; do
             OneMirror
         done
