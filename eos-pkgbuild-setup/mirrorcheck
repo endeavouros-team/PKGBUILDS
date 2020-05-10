@@ -3,7 +3,29 @@
 # Check that a mirror repo has the same package and db files as the given local folder.
 #
 
-echo2() { echo "$@" >&2 ; }
+echo2()   { echo  "$@" >&2 ; }
+echo2i()  { echoi "$@" >&2 ; }
+echoi() {
+    local level=""
+    local xx
+    local optcount=0
+    for xx in "$@" ; do
+        case "$xx" in
+            -l=*) level=${xx:3} ; ((optcount++)) ;;
+            -l*)  level=${xx:2} ; ((optcount++)) ;;
+            -*) DIE "unsupported option $xx" ;;        # non-options cannot start with '-'
+            *) break ;;                                # all options must be before other params
+        esac
+    done
+    if [ -n "$level" ] ; then
+        shift $optcount
+    else
+        level=1
+    fi
+    
+    printf "%*s" $((level*4)) ""
+    echo2 "$@"
+}
 
 DIE() {
     echo2 "Error: $1"
@@ -62,7 +84,7 @@ OneMirror() {
         return
     }
 
-    echo2 "Fetching $reponame package info..."
+    echo2 "$reponame:"
     remotefilelist="$(curl -s "$mirror_url" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
     test -n "$remotefilelist" || DIE "cannot fetch package info from $mirror_url."
 
@@ -101,10 +123,12 @@ OneMirror() {
     rm -rf $tmpdir
 
     if [ -z "$problemfiles" ] ; then
-        echo2 "No issues."
+        echo2i "==> No issues."
     else
-        echo2 -n "Problematic files: "
-        echo $problemfiles
+        echo2i "==> Problematic files: "
+        for arg in $problemfiles ; do
+            echoi -l3 "$arg"
+        done
     fi
     popd >/dev/null
 }
