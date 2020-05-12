@@ -512,6 +512,18 @@ Browser() {
     $browser "$@"
 }
 
+ShowAurDiffs() {
+    if [ -d "$ASSETSDIR/AUR/$pkgdirname/.git" ] ; then
+        # If we have git source code available, then check diffs from that!
+        Pushd "$ASSETSDIR/AUR/$pkgdirname"
+        git pull >& /dev/null
+        gitk
+        Popd
+    else
+        Browser "${AUR_DIFFS[@]}" >& /dev/null   # xdg-open does not stop here...
+    fi
+}
+
 Exit()
 {
     local code="$1"
@@ -689,7 +701,7 @@ Main2()
         fi
     done
     if [ -n "$AUR_DIFFS" ] ; then
-        Browser "${AUR_DIFFS[@]}" >& /dev/null   # xdg-open does not stop here...
+        ShowAurDiffs
     fi
     Popd
 
