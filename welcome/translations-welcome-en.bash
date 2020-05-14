@@ -195,3 +195,8 @@ _tr_add2 after_install_us_from    "Updates from"                            # AU
 _tr_add2 after_install_us_el      "Elevated privileges required."
 _tr_add2 after_install_us_done    "update done."
 _tr_add2 after_install_us_fail    "update failed!"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Tips"
+_tr_add2 useful_tips_text      "Useful tips"

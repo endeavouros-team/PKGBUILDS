@@ -195,3 +195,8 @@ _tr_add2 after_install_us_from    "Päivityslähde:"                            
 _tr_add2 after_install_us_el      "Lisäoikeuksia tarvitaan."
 _tr_add2 after_install_us_done    "päivitys valmis."
 _tr_add2 after_install_us_fail    "päivitys epäonnistui!"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips    "Vinkkejä"
+_tr_add2 useful_tips_text     "Hyödyllisiä linkkejä ${_and} vinkkejä"

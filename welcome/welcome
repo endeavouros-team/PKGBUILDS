@@ -387,6 +387,9 @@ yad_PkgIssues() {
     local xx pkg pkgs
     local amd_ucode=0
     local intel_ucode=0
+    local ok_checks=()
+    local graphics_issues=0
+    local broadcom_wireless_issues=0
 
     ## Check some "conflicting" packages.
 
@@ -412,6 +415,8 @@ yad_PkgIssues() {
                 fi
                 ;;
         esac
+    else
+        ok_checks+=("Microcode package conflicts: no issue")
     fi
 
     # Detecting unnecessary video drivers.
@@ -434,20 +439,32 @@ yad_PkgIssues() {
     if [ $intel -eq 0 ] ; then
         pkgs="$(yad_PkgsToLetGo xf86-video-intel)"
         for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && removes+=($xx)
+            pacman -Q $xx >& /dev/null && {
+                removes+=($xx)
+                ((graphics_issues++))
+            }
         done
     fi
     if [ $nvidia -eq 0 ] ; then
         pkgs="$(yad_PkgsToLetGo xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings)"
         for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && removes+=($xx)
+            pacman -Q $xx >& /dev/null && {
+                removes+=($xx)
+                ((graphics_issues++))
+            }
         done
     fi
     if [ $amd -eq 0 ] ; then
         pkgs="$(yad_PkgsToLetGo xf86-video-amdgpu xf86-video-ati)"
         for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && removes+=($xx)
+            pacman -Q $xx >& /dev/null && {
+                removes+=($xx)
+                ((graphics_issues++))
+            }
         done
+    fi
+    if [ $graphics_issues -eq 0 ] ; then
+        ok_checks+=("Graphics package issues: no issue")
     fi
 
     # Remove Broadcom wifi driver if using another wifi card.
@@ -470,10 +487,16 @@ yad_PkgIssues() {
                     break
                 fi
                 pkg="$(yad_PkgsToLetGo $xx)"
-                test -n "$pkg" && removes+=($xx)
+                test -n "$pkg" && {
+                    removes+=($xx)
+                    ((broadcom_wireless_issues++))
+                }
             }
             break
         done
+    fi
+    if [ $broadcom_wireless_issues -eq 0 ] ; then
+        ok_checks+=("Broadcom wireless driver: no issue")
     fi
 
     # Make package removals as a sequence of commands.
@@ -505,6 +528,10 @@ yad_PkgIssues() {
         eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n%s\n' '$cmds_as_list' 'Elevated privileges required.' ; $EOS_ROOTER '$commands'"
     else
         local t="$ISSUES_NO"
+        t+="\n"
+        for xx in "${ok_checks[@]}" ; do
+            t+="\n$xx"
+        done
         eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
     fi
 }
@@ -745,7 +772,7 @@ GeneralInfo() {
   local tabnum="$2"
   local tabcontents=(
       eos_yad
-      --plug="$handle" --tabnum="$tabnum" --form --columns=3
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-question
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
       --field="$(ltr general_info_ws)!!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
@@ -770,8 +797,8 @@ AfterInstall() {
       --text="<b>$(ltr after_install_text)</b>"
       --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn          'reflector-simple'
       --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn         'bash -c yad_SystemUpdate'
-      --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues'
-      --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest'
+#      --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues'
+#      --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest'
       --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager'
       --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
   )
@@ -783,7 +810,18 @@ AfterInstall() {
         )
         ;;
   esac
+  "${tabcontents[@]}" >& /dev/null &
+}
+
+UsefulTips() {
+  local handle="$1"
+  local tabnum="$2"
+
   tabcontents+=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --image=help-contents
+      --text="<b>$(ltr useful_tips_text)</b>"
       --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
       --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay"
       --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
@@ -853,6 +891,7 @@ CreateNotebookCommands() {
         _NOTEBOOK_TABS=(                             # names of functions above
             GeneralInfo
             AfterInstall
+            UsefulTips
             AddMoreApps
             #About
         )
@@ -1176,6 +1215,10 @@ StartHere() {
     IsInstalling
     is_installing=$?
 
+    if [ "$start_delay" != "0" ] ; then
+        sleep "$start_delay"
+    fi
+
     if [ $is_installing -eq 0 ] ; then
         :
         #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
@@ -1201,10 +1244,6 @@ StartHere() {
     fi
 
     # UpdateInstallScripts
-
-    if [ "$start_delay" != "0" ] ; then
-        sleep "$start_delay"
-    fi
 
     SetBrowser
 
