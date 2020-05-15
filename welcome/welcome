@@ -920,7 +920,7 @@ export -f WelcomeHelp
 
 WelcomeChangelog() {
     SetBrowser
-    $_BROWSER https://github.com/endeavouros-team/PKGBUILDS/commits/master/welcome
+    $_BROWSER https://github.com/endeavouros-team/PKGBUILDS/commits/master/welcome 2> /dev/null
 }
 export -f WelcomeChangelog
 
