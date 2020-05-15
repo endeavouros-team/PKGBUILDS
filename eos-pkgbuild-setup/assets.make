@@ -806,6 +806,27 @@ Main2()
                     test -e "$pkg_archive" || mkdir -p "$pkg_archive"
                     chmod -R u+w "$pkg_archive"
                     mv -f "${removable[@]}" "$pkg_archive" || WARN "problem moving old packages to $pkg_archive"
+
+                    case "REPONAME" in
+                        endeavouros)
+                            Pushd "$pkg_archive"
+                            if [ ! -d .git ] ; then
+                                if [ -d ../../../archive/.git ] ; then
+                                    ln -s ../../../archive/.git
+                                fi
+                            fi
+                            if [ -d .git ] ; then
+                                for xx in "${removable[@]}" ; do
+                                    add-release-assets packages "$(basename "$xx")"
+                                    sleep 1
+                                done
+                            else
+                                WARN "pkg archive .git folder not found"
+                            fi
+                            Popd
+                            ;;
+                    esac
+
                     chmod -R -w "$pkg_archive"               # do not (accidentally) delete archived packages...
                 fi
                 
