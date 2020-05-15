@@ -1231,7 +1231,7 @@ StartHere() {
         else
             verbosity=none
         fi
-        eos_yad_check_internet_connection $verbosity 10 "" "Welcome" || return 1
+        eos_yad_check_internet_connection $verbosity 20 "3s" "Welcome" || return 1
 
         if [ -n "$TERMINAL_AT_START" ] ; then
             arg="$(echo "$TERMINAL_AT_START" | awk '{print $1}')"

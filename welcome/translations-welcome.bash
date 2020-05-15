@@ -133,6 +133,7 @@ _init_translations() {
     local tr_engine=""
     local tr_prefer=manual    # or generated
     local trlist trfile
+    local errlog=$(mktemp -u /tmp/translations-welcome-XXXXX.errlog)
 
     for arg in "$@" ; do
         case "$arg" in
@@ -241,10 +242,13 @@ _init_translations() {
             xx="${tr_strings["Lang_${lang}__$ix"]}"
             if [ -z "$xx" ] ; then
                 if [ "$silent_lang_warnings" = "no" ] ; then
-                    echo "Warning: $pname: translation for language '$lang' placeholder '$ix' is not found, fallback 'en' used." >&2
+                    echo "Warning: $pname: language '$lang' placeholder '$ix': translation not found, 'en' used as fallback." >> $errlog
                 fi
                 tr_strings["Lang_${lang}__$ix"]="${tr_strings[Lang_en__$ix]}"
             fi
         done
+    fi
+    if [ -r $errlog ] ; then
+        echo "Info: translation issues detected, see file '$errlog'."
     fi
 }
