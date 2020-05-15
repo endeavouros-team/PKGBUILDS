@@ -196,3 +196,7 @@ _tr_add2 after_install_us_el       "Требуется повышение при
 _tr_add2 after_install_us_done     "обновление выполнено."
 _tr_add2 after_install_us_fail     "ошибка обновления$_exclamation"
  
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Советы"
+_tr_add2 useful_tips_text      "Полезные советы"
