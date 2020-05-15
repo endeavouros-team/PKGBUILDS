@@ -195,3 +195,8 @@ _tr_add2 after_install_us_from   "Mises à jour de"	# AUR ou en amont
 _tr_add2 after_install_us_el     "Privilèges élevés requis."
 _tr_add2 after_install_us_done   "Mise à jour effectuée."
 _tr_add2 after_install_us_fail   "La mise à jour a échoué $_exclamation"
+
+# 14-mai-2020 :
+
+_tr_add2 nb_tab_UsefulTips     "Trucs"
+_tr_add2 useful_tips_text      "Trucs utiles"
