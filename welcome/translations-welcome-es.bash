@@ -198,3 +198,19 @@ _tr_add2 after_install_us_from    "Actualizar desde"                            
 _tr_add2 after_install_us_el      "Se requieren privilegios elevados."
 _tr_add2 after_install_us_done    "Actualización finalizada."
 _tr_add2 after_install_us_fail    "${_exclamation_down}La actualización falló$_exclamation"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Consejos"
+_tr_add2 useful_tips_text      "Consejos útiles"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Registro de cambios"
+_tr_add2 butt_changelogtip     "Mostrar el registro de cambios de Welcome"
+
+_tr_add2 after_install_themevan      "Tema sin personalización Xfce"
+_tr_add2 after_install_themevantip   "Usar tema sin personalización Xfce"
+
+_tr_add2 after_install_themedef     "Tema por defecto Xfce de EndeavourOS"
+_tr_add2 after_install_themedeftip  "Usar tema por defecto Xfce de EndeavourOS"
