@@ -124,3 +124,92 @@ _tr_add2 add_more_apps_fwtip   "Gufw Firewall"
 _tr_add2 add_more_apps_bt      "Bluetooth (blueberry) für Xfce"
 _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce"
 
+####################### NEW STUFF AFTER THIS LINE:
+
+_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME wieder verfügbar zu machen führe diesen Befehl in einem Terminal aus: $PROGNAME --enable"
+_tr_add2 settings_dis_text       "Wiederaktivierung $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder Aktivieren?"
+_tr_add2 settings_dis_butt       "Ich werde mir das merken!"
+_tr_add2 settings_dis_buttip     "versprochen"
+
+_tr_add2 help_butt_title         "$PRETTY_PROGNAME Hilfe"
+_tr_add2 help_butt_text          "Mehr Informationen über das $PRETTY_PROGNAME Programm"
+
+_tr_add2 dm_title                "Wähle einen anderen Anmelde Manager"
+_tr_add2 dm_col_name1            "Ausgewählt"
+_tr_add2 dm_col_name2            "DM Name"
+
+_tr_add2 dm_reboot_required      "Neustart ist erforderlich um die Änderungen anzuwenden."
+_tr_add2 dm_changed              "Neuer DM: "
+_tr_add2 dm_failed               "Änderung des DM fehlgeschlagen."
+_tr_add2 dm_warning_title        "Warnung"
+
+_tr_add2 install_installer       "Installateur"
+_tr_add2 install_already         "bereits installiert"
+_tr_add2 install_ing             "installiere"
+_tr_add2 install_done            "Abgeschlossen."
+
+_tr_add2 sysup_no                "Keine Updates verfügbar."
+_tr_add2 sysup_check             "Überprüfe auf neue Updates..."
+
+_tr_add2 issues_title            "Überprüfe auf Paketprobleme"
+_tr_add2 issues_grub             "WICHTIG: Eine manuelle Neuerstellung des Bootmenüs ist erforderlich."
+_tr_add2 issues_run              "Führe Befehle aus:"
+_tr_add2 issues_no               "Es wurden keine wichtigen Systemprobleme festgestellt."
+
+_tr_add2 cal_noavail            "Nicht verfügbar: "        # installer program
+_tr_add2 cal_warn               "Warnung"
+_tr_add2 cal_info1              "Dies ist eine Community-Entwicklungsversion.\n\n"                                   # specials needed!
+_tr_add2 cal_info2              "<b>Offline</b>Mit dieser Methode erhältst du einen Xfce4-Desktop mit EndeavourOS-Theme.\nKeine Internetverbindung erforderlich.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> Mit dieser Methode kannst du eine der Desktop-Umgebungen ohne verändertes Thema auswählen.\nEs wird eine Internetverbindung benötigt.\n\n"
+_tr_add2 cal_info4              "Bitte beachten Sie: Diese Version ist in Entwicklung. Bitte hilf uns, sie besser zu machen, indem du Fehler meldest.\n"
+_tr_add2 cal_choose             "Wähle die Installationsmethode"
+_tr_add2 cal_method             "Methode"
+_tr_add2 cal_nosupport          "$PROGNAME: Methode nicht unterstützt: "
+_tr_add2 cal_nofile             "$PROGNAME: benötigte Datei nicht verfügbar: "
+_tr_add2 cal_istarted           "Beginne mit der Installation"
+_tr_add2 cal_istopped           "Installation Beendet"
+
+_tr_add2 tail_butt              "Close this window"
+_tr_add2 tail_buttip            "Close only this window"
+
+
+_tr_add2 ins_text              "Installing EndeavourOS to disk"
+_tr_add2 ins_start             "Start the Installer"
+_tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
+_tr_add2 ins_up                "Update this app$_exclamation"
+_tr_add2 ins_uptip             "Updates this app and restarts it"
+_tr_add2 ins_keys              "Initialize pacman keys"
+_tr_add2 ins_keystip           "Initialize pacman keys"
+_tr_add2 ins_pm                "Partition manager"
+_tr_add2 ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
+_tr_add2 ins_rel               "Latest release info"
+_tr_add2 ins_reltip            "More info about the latest release"
+_tr_add2 ins_tips              "Installation tips"
+_tr_add2 ins_tipstip           "Installation tips"
+_tr_add2 ins_trouble           "Troubleshoot"
+_tr_add2 ins_troubletip        "System Rescue"
+
+_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Elevated privileges required."
+_tr_add2 after_install_us_done    "update done."
+_tr_add2 after_install_us_fail    "update failed!"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Tips"
+_tr_add2 useful_tips_text      "Useful tips"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Changelog"
+_tr_add2 butt_changelogtip     "Show the changelog of Welcome"
+
+_tr_add2 after_install_themevan      "Xfce vanilla theme"
+_tr_add2 after_install_themevantip   "Use vanilla Xfce theme"
+
+_tr_add2 after_install_themedef     "Xfce EndeavourOS default theme"
+_tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"
+
+
+
