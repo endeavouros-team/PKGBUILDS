@@ -200,3 +200,14 @@ _tr_add2 after_install_us_fail     "ошибка обновления$_exclamati
 
 _tr_add2 nb_tab_UsefulTips     "Советы"
 _tr_add2 useful_tips_text      "Полезные советы"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Изменения Welcome"
+_tr_add2 butt_changelogtip     "История изменений Welcome"
+
+_tr_add2 after_install_themevan      "Xfce оригинальная тема"
+_tr_add2 after_install_themevantip   "Использовать тему Xfce"
+
+_tr_add2 after_install_themedef     "Xfce тема в стиле EndeavourOS"
+_tr_add2 after_install_themedeftip  "использовать стиль EndeavourOS в теме Xfce"
