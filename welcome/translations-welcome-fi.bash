@@ -200,3 +200,14 @@ _tr_add2 after_install_us_fail    "päivitys epäonnistui!"
 
 _tr_add2 nb_tab_UsefulTips    "Vinkkejä"
 _tr_add2 useful_tips_text     "Hyödyllisiä linkkejä ${_and} vinkkejä"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Muutosloki"
+_tr_add2 butt_changelogtip     "Näytä Welcome:n muutosloki"
+
+_tr_add2 after_install_themevan      "Xfce: perusteema"
+_tr_add2 after_install_themevantip   "Ota Xfce:n perusteema käyttöön"
+
+_tr_add2 after_install_themedef     "Xfce: EndeavourOS:n oletusteema"
+_tr_add2 after_install_themedeftip  "Ota Xfce:n EndeavourOS-oletusteema käyttöön"

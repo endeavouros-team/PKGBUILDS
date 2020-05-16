@@ -200,3 +200,14 @@ _tr_add2 after_install_us_fail    "update failed!"
 
 _tr_add2 nb_tab_UsefulTips     "Tips"
 _tr_add2 useful_tips_text      "Useful tips"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Changelog"
+_tr_add2 butt_changelogtip     "Show the changelog of Welcome"
+
+_tr_add2 after_install_themevan      "Xfce vanilla theme"
+_tr_add2 after_install_themevantip   "Use vanilla Xfce theme"
+
+_tr_add2 after_install_themedef     "Xfce EndeavourOS default theme"
+_tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"

@@ -805,8 +805,8 @@ AfterInstall() {
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
-            --field=" Xfce vanilla theme!preferences-desktop-theme!Use vanilla Xfce theme":fbtn               'bash -c yad_vanilla_xfce4_theme'
-            --field=" Xfce EndeavourOS default theme (experimental$_exclamation)!preferences-desktop-theme!Use EndeavourOS default Xfce theme":fbtn  'bash -c yad_endeavouros_xfce4_theme'
+            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'bash -c yad_vanilla_xfce4_theme'
+            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'bash -c yad_endeavouros_xfce4_theme'
         )
         ;;
   esac
@@ -1266,7 +1266,7 @@ StartHere() {
 
     IsInstalling || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" Welcome's changelog!meld!Show the changelog of Welcome":"bash -c WelcomeChangelog")
+    notebook+=(--button=" $(ltr butt_changelog)!meld!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
     if [ $is_installing -ne 0 ] ; then
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
