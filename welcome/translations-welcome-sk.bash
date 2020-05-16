@@ -195,3 +195,19 @@ _tr_add2 after_install_us_from    "Aktualizácie z repozitára"                 
 _tr_add2 after_install_us_el      "Vyžadujú sa vyvýšené práva."
 _tr_add2 after_install_us_done    "aktualizácia dokončená."
 _tr_add2 after_install_us_fail    "aktualizácia zlyhala!"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Rady"
+_tr_add2 useful_tips_text      "Užitočné rady"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Zoznam zmien"
+_tr_add2 butt_changelogtip     "Ukázať zoznam zmien v uvítacej aplikácii"
+
+_tr_add2 after_install_themevan      "Čistý Xfce vzhľad"
+_tr_add2 after_install_themevantip   "Použiť čistý vzhľad Xfce"
+
+_tr_add2 after_install_themedef     "Endeavour OS vzhľad pre Xfce"
+_tr_add2 after_install_themedeftip  "Použiť EndeavourOS vzhľad pre Xfce"
