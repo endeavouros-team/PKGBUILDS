@@ -111,7 +111,7 @@ _tr_add2 general_info_ab       "Über $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip    "Wichtige Informationen über diese App"
 
 
-_tr_add2 add_more_apps_text    "Installiere einige nützliche Programme"
+_tr_add2 add_more_apps_text    "Installiere zusätzliche Programme"
 
 _tr_add2 add_more_apps_lotip   "Office Anwendung (libreoffice-fresh)"
 
@@ -121,8 +121,8 @@ _tr_add2 add_more_apps_chtip   "Web Browser"
 _tr_add2 add_more_apps_fw      "Firewall"
 _tr_add2 add_more_apps_fwtip   "Gufw Firewall"
 
-_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) für Xfce"
-_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce"
+_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) für Xfce4"
+_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce4"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
@@ -170,46 +170,43 @@ _tr_add2 cal_nofile             "$PROGNAME: benötigte Datei nicht verfügbar: "
 _tr_add2 cal_istarted           "Beginne mit der Installation"
 _tr_add2 cal_istopped           "Installation Beendet"
 
-_tr_add2 tail_butt              "Close this window"
-_tr_add2 tail_buttip            "Close only this window"
+_tr_add2 tail_butt              "Schließe diese Fenster"
+_tr_add2 tail_buttip            "Schließe nur dieses Fenster"
 
 
-_tr_add2 ins_text              "Installing EndeavourOS to disk"
-_tr_add2 ins_start             "Start the Installer"
-_tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
-_tr_add2 ins_up                "Update this app$_exclamation"
-_tr_add2 ins_uptip             "Updates this app and restarts it"
-_tr_add2 ins_keys              "Initialize pacman keys"
-_tr_add2 ins_keystip           "Initialize pacman keys"
-_tr_add2 ins_pm                "Partition manager"
-_tr_add2 ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
-_tr_add2 ins_rel               "Latest release info"
-_tr_add2 ins_reltip            "More info about the latest release"
-_tr_add2 ins_tips              "Installation tips"
-_tr_add2 ins_tipstip           "Installation tips"
-_tr_add2 ins_trouble           "Troubleshoot"
-_tr_add2 ins_troubletip        "System Rescue"
+_tr_add2 ins_text              "Installiere EndeavourOS aud deiner Festplatte"
+_tr_add2 ins_start             "Starte den Installer"
+_tr_add2 ins_starttip          "Starte den EndeavourOS Installer zusammen mit der Terminal Ausgabe"
+_tr_add2 ins_up                "Update dieses Programm$_exclamation"
+_tr_add2 ins_uptip             "Update dieses Programm und starte es neu"
+_tr_add2 ins_keys              "Initialisiere Pacman Schlüssel"
+_tr_add2 ins_keystip           "Initialisiere die von Pacman benötigten Schlüssel Dateien"
+_tr_add2 ins_pm                "Partition Manager"
+_tr_add2 ins_pmtip             "Gparted: ermöglicht das Untersuchen und Verwalten von Festplattenpartitionen und -Strukturen"
+_tr_add2 ins_rel               "Informationen zur neusten Veröffentlichung"
+_tr_add2 ins_reltip            "MehrInformationen zur neusten Veröffentlichung"
+_tr_add2 ins_tips              "Installations Tipps"
+_tr_add2 ins_tipstip           "Installations Tipps"
+_tr_add2 ins_trouble           "Fehlerbehebung"
+_tr_add2 ins_troubletip        "System Rettung"
 
-_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
-_tr_add2 after_install_us_el      "Elevated privileges required."
-_tr_add2 after_install_us_done    "update done."
-_tr_add2 after_install_us_fail    "update failed!"
+_tr_add2 after_install_us_from    "Updates von"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Erweiterte Rechte werden benötigt."
+_tr_add2 after_install_us_done    "Update erledigt."
+_tr_add2 after_install_us_fail    "Update fehlgeschlagen!"
 
 # 2020-May-14:
 
-_tr_add2 nb_tab_UsefulTips     "Tips"
-_tr_add2 useful_tips_text      "Useful tips"
+_tr_add2 nb_tab_UsefulTips     "Tipps"
+_tr_add2 useful_tips_text      "Hilfreiche Tipps"
 
 # 2020-May-16:
 
-_tr_add2 butt_changelog        "Changelog"
-_tr_add2 butt_changelogtip     "Show the changelog of Welcome"
+_tr_add2 butt_changelog        "Änderungsprotokoll"
+_tr_add2 butt_changelogtip     "Zeige Änderungsprotokoll von Welcome"
 
-_tr_add2 after_install_themevan      "Xfce vanilla theme"
-_tr_add2 after_install_themevantip   "Use vanilla Xfce theme"
+_tr_add2 after_install_themevan      "Xfce unverändertes Thema"
+_tr_add2 after_install_themevantip   "Benutze das unveränderte Xfce Thema"
 
-_tr_add2 after_install_themedef     "Xfce EndeavourOS default theme"
-_tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"
-
-
-
+_tr_add2 after_install_themedef     "Xfce EndeavourOS Thema"
+_tr_add2 after_install_themedeftip  "Benutze das EndeavourOS Xfce Thema"
