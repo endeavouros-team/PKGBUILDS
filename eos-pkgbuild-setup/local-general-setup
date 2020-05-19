@@ -40,6 +40,7 @@ Settings_json() {
        // gnome-terminal, xterm, uxterm, konsole work; terminator, xfce4-terminal, qterminal fail.
 }
 EOF
+    echo "Updating $file"
 }
 
 Launch_json() {
@@ -77,6 +78,7 @@ Launch_json() {
     ]
 }
 EOF
+    echo "Updating $file"
 }
 
 Main()
@@ -92,13 +94,15 @@ Main()
 
     file="$workdir/../.gitignore"
     if [ -z "$(grep '\.pkg\.tar\.' "$file")" ] ; then
-        xx="$(grep '^PKGEXT=' /etc/makepkg.conf | cut -d '=' -f2 | tr -d "'")"
+        xx="$(grep '^PKGEXT=' /etc/makepkg.conf 2>/dev/null | cut -d '=' -f2 | tr -d "'")"
         echo "*$xx" >> "$file"
+        echo "Updating $file"
     fi
 
     file="$HOME/.config/git/ignore"
     if [ -z "$(grep '^\.gitignore$' "$file")" ] ; then
         echo ".gitignore" >> "$file"
+        echo "Updating $file"
     fi
 
     if [ -n "$(pacman -Q code 2>/dev/null)" ] || [ -n "$(pacman -Q visual-studio-code-insiders 2>/dev/null)" ]
