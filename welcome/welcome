@@ -44,8 +44,10 @@ export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
 
+export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon='$EOS_WICON'"
+
 eos_yad() {
-    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
+    GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@"
 }
 export -f eos_yad
 
@@ -332,14 +334,15 @@ yad_UpdateMe() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
-pkexec pacman -Sy $PROG_PACKAGENAME --needed --noconfirm >& /dev/null
-pkill -f "eos-welcome"
-pkill -f "yad --plug"
-pkill -f "yad --notebook"
-eos-welcome &
-rm -f $tmpfile
+pkexec pacman -Sy $PROG_PACKAGENAME --needed --noconfirm >& /dev/null && {
+  pkill -f "$PROGNAME"
+  pkill -f "$EOS_YAD_STARTER_CMD"
+  $PROGNAME &
+}
 EOF
     bash $tmpfile
+    sleep 2
+    rm -f $tmpfile
 }
 export -f yad_UpdateMe
 
