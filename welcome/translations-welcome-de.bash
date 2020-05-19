@@ -88,7 +88,7 @@ _tr_add2 after_install_nv      "NVIDIA Nutzer$_exclamation"
 _tr_add2 after_install_nvtip   "Wie funktioniert der Nvidia-Installer"
 
 _tr_add2 after_install_ft      "Forum Tipps"
-_tr_add2 after_install_fttip   "Hilf uns dir zu helfen!"
+_tr_add2 after_install_fttip   "Hilf uns dir zu helfen$_exclamation"
 
 
 _tr_add2 general_info_text     "Finde dich auf der EndeavourOS Webseite zurecht$_exclamation"
@@ -124,12 +124,13 @@ _tr_add2 add_more_apps_fwtip   "Gufw Firewall"
 _tr_add2 add_more_apps_bt      "Bluetooth (blueberry) für Xfce4"
 _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce4"
 
+
 ####################### NEW STUFF AFTER THIS LINE:
 
 _tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME wieder verfügbar zu machen führe diesen Befehl in einem Terminal aus: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Wiederaktivierung $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder Aktivieren?"
-_tr_add2 settings_dis_butt       "Ich werde mir das merken!"
+_tr_add2 settings_dis_butt       "Ich werde mir das merken$_exclamation"
 _tr_add2 settings_dis_buttip     "versprochen"
 
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Hilfe"
@@ -174,26 +175,26 @@ _tr_add2 tail_butt              "Schließe diese Fenster"
 _tr_add2 tail_buttip            "Schließe nur dieses Fenster"
 
 
-_tr_add2 ins_text              "Installiere EndeavourOS aud deiner Festplatte"
+_tr_add2 ins_text              "EndeavourOS auf deine Festplatte installieren$_exclamation"
 _tr_add2 ins_start             "Starte den Installer"
-_tr_add2 ins_starttip          "Starte den EndeavourOS Installer zusammen mit der Terminal Ausgabe"
+_tr_add2 ins_starttip          "Starte den EndeavourOS Installer zusammen mit der Terminalausgabe"
 _tr_add2 ins_up                "Update dieses Programm$_exclamation"
 _tr_add2 ins_uptip             "Update dieses Programm und starte es neu"
-_tr_add2 ins_keys              "Initialisiere Pacman Schlüssel"
-_tr_add2 ins_keystip           "Initialisiere die von Pacman benötigten Schlüssel Dateien"
-_tr_add2 ins_pm                "Partition Manager"
+_tr_add2 ins_keys              "Initialisiere Pacman-Schlüssel"
+_tr_add2 ins_keystip           "Initialisiere die von Pacman benötigten Schlüsseldateien"
+_tr_add2 ins_pm                "Partition manager"
 _tr_add2 ins_pmtip             "Gparted: ermöglicht das Untersuchen und Verwalten von Festplattenpartitionen und -Strukturen"
 _tr_add2 ins_rel               "Informationen zur neusten Veröffentlichung"
-_tr_add2 ins_reltip            "MehrInformationen zur neusten Veröffentlichung"
-_tr_add2 ins_tips              "Installations Tipps"
-_tr_add2 ins_tipstip           "Installations Tipps"
+_tr_add2 ins_reltip            "Mehr Informationen zur neusten Veröffentlichung"
+_tr_add2 ins_tips              "Installationstipps"
+_tr_add2 ins_tipstip           "Installationstipps"
 _tr_add2 ins_trouble           "Fehlerbehebung"
-_tr_add2 ins_troubletip        "System Rettung"
+_tr_add2 ins_troubletip        "Systemrettung"
 
 _tr_add2 after_install_us_from    "Updates von"                            # AUR or upstream
 _tr_add2 after_install_us_el      "Erweiterte Rechte werden benötigt."
 _tr_add2 after_install_us_done    "Update erledigt."
-_tr_add2 after_install_us_fail    "Update fehlgeschlagen!"
+_tr_add2 after_install_us_fail    "Update fehlgeschlagen$_exclamation"
 
 # 2020-May-14:
 

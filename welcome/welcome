@@ -49,6 +49,15 @@ eos_yad() {
 }
 export -f eos_yad
 
+eos_GetArch() {
+    local arch="$(/usr/bin/uname -m)"
+    case "$arch" in
+        armv7*) arch=armv7h ;;
+    esac
+    printf "%s" "$arch"
+}
+export -f eos_GetArch
+
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
     # yad running in other processes...
