@@ -765,6 +765,7 @@ INSTALL() {
       --text="<b>$(ltr ins_text)</b>" --text-align=left
       --field="<b>$(ltr ins_start)</b>!!$(ltr ins_starttip)":fbtn            'bash -c "yad_calamares_debug choose"'
       --field="$(ltr ins_up)!!$(ltr ins_uptip)":fbtn                         'bash -c yad_UpdateMe'
+      --field=" $(ltr after_install_um)!!$(ltr after_install_umtip)":fbtn    'reflector-simple'
       --field="$(ltr ins_keys)!!$(ltr ins_keystip)":fbtn                     'bash -c yad_InitializePacmanMirroring'
       --field="$(ltr ins_pm)!!$(ltr ins_pmtip)":fbtn                         'gparted'
       --field="$(ltr ins_rel)!!$(ltr ins_reltip)":fbtn                       "$_BROWSER https://endeavouros.com/latest-release"
