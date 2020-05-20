@@ -138,8 +138,13 @@ Update_common() {
     local source=""
     local cmd=""
     local updates=""
-    local previous_check_time=$(/usr/bin/date +%s)
+    local extra_check=no
+    local previous_check_time
     local secs=10
+
+    if [ "extra_check" = "yes" ] ; then
+        previous_check_time=$(/usr/bin/date +%s)
+    fi
 
     SystemLockActive || return
     echo2 "Checking for updates ..."
@@ -149,10 +154,12 @@ Update_common() {
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
             SystemLockActive || return
-            if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
-                # Re-check for updates if more than $secs seconds elapsed from the first check.
-                echo2 "Re-checking for updates ..."
-                updates="$(/usr/bin/checkupdates)"
+            if [ "extra_check" = "yes" ] ; then
+                if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
+                    # Re-check for updates if more than $secs seconds elapsed from the first check.
+                    echo2 "Re-checking for updates ..."
+                    updates="$(/usr/bin/checkupdates)"
+                fi
             fi
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
