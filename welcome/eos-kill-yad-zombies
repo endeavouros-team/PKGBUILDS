@@ -6,7 +6,7 @@ Main()
 {
     sleep 0.1
 
-    local bad="$(pgrep -u "$LOGNAME" -a yad | grep -P "^[0-9]* /usr/bin/yad[ ]*$|^[0-9]* yad[ ]*$")"
+    local bad="$(/usr/bin/pgrep -u "$LOGNAME" -a yad | /usr/bin/grep -P "^[0-9]* /usr/bin/yad[ ]*$|^[0-9]* yad[ ]*$")"
     if [ -n "$bad" ] ; then
         printf "Killing yad zombies:\n%s\n" "$bad"
         kill $(echo "$bad" | awk '{print $1}')
