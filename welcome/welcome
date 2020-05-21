@@ -808,11 +808,15 @@ AfterInstall() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-information
       --text="<b>$(ltr after_install_text)</b>"
-      --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn          'reflector-simple'
-      --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn         'bash -c yad_SystemUpdate'
-#      --field=" $(ltr after_install_dsi)!face-glasses!$(ltr after_install_dsitip)":fbtn                 'bash -c yad_PkgIssues'
-#      --field=" $(ltr after_install_etl)!system-software-install!$(ltr after_install_etltip)":fbtn      'bash -c yad_UpdateEOStoLatest'
-      --field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn  'bash -c yad_ChangeDisplayManager'
+  )
+  test "$(eos_GetArch)" != "armv7h" && \
+      tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn 'reflector-simple')
+  tabcontents+=(
+      --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
+  )
+  test "$(eos_GetArch)" != "armv7h" && \
+      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
+  tabcontents+=(
       --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
   )
   case "$(eos_yad_GetDesktopName)" in
@@ -839,7 +843,10 @@ UsefulTips() {
       --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay"
       --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
       --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
-      --field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer"
+  )
+  test "$(eos_GetArch)" != "armv7h" && \
+      tabcontents+=(--field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
+  tabcontents+=(
       --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
   )
   "${tabcontents[@]}" >& /dev/null &
