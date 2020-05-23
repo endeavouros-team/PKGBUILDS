@@ -273,6 +273,8 @@ FetchAndCheck() {
     local sha512sums xx
     local ixt ixs
 
+    test -x /usr/bin/wget || eos_yad_DIE "$FUNCNAME: sorry, package 'wget' is required but not installed."
+
     pushd "$configdir" >/dev/null
 
     wget -q --timeout=10 -O $progname.service.pacnew $url/$progname.service || eos_yad_DIE "$FUNCNAME: wget 'service' failed."
