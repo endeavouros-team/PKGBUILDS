@@ -24,11 +24,21 @@ ShowAll() {
 
 ShowIfNotSeen() {
     local latest="${dates[0]}"
-    local latest_seen="$(test -r "$latestfile" && cat "$latestfile" || echo "0")"
+
+    if [ ! -r "$latestfile" ] ; then
+        if [ -z "$(checkupdates)" ] ; then
+            # No need to show Arch news right after install or reset (?)
+            echo "$latest" > "$latestfile"
+            echo "Saving the latest Arch news date $latest." >&2
+            return
+        fi
+        echo "0" > "$latestfile"
+    fi
+    local latest_seen="$(cat "$latestfile")"
     local msg
 
     if [[ "$latest" > "$latest_seen" ]] ; then
-        msg="Important Arch news are available! Want to see them now?"
+        msg="Important Arch news are available! Want to see the news list now?"
         eos_yad --form --text="$msg" --title="$progname" --image=info --no-focus --geometry=+60+30 \
                 --window-icon=/usr/share/endeavouros/EndeavourOS-icon.png \
                 --button=" Later!calendar!Show it later, please.":1 --button=yad-yes:0 && {
@@ -37,7 +47,6 @@ ShowIfNotSeen() {
             echo "Later it is!" >&2
         }
     else
-        #msg="$(printf "You've seen the latest Arch news at %s.\n" "$latest_seen")"
         msg="$(printf "Latest Arch news date: %s (already visited).\n" "$latest_seen")"
         echo "$msg" >&2
     fi
