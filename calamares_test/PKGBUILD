@@ -85,8 +85,8 @@ package() {
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line  $_reponame/build/$pkgname/usr/share/calamares/modules/
 
     # pacstrap as bash script implementation 
-    chmod +x $_reponame/src/modules/pacstrap/base_install.sh
-    cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/base_install.sh
+    # chmod +x $_reponame/src/modules/pacstrap/base_install.sh
+    # cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/base_install.sh
     
     # Commom install -D doen't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
