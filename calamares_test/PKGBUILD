@@ -19,7 +19,7 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager'
 provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=may_2020"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=may_2020_fix_grub"
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
