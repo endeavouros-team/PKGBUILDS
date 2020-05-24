@@ -27,6 +27,14 @@ export -f eos_yad_GetDesktopName
 
 eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
+eos_GetArch() {
+    local arch="$(/usr/bin/uname -m)"
+    case "$arch" in
+        armv7*) arch=armv7h ;;
+    esac
+    printf "%s" "$arch"
+}
+
 eos_yad_infomsg() {
     local msg="$1"
     echo "$msg" >&2
@@ -45,7 +53,11 @@ DIE() {
 XfceSetWallpaper() {
     # Set all "last-image" values in file $conf to picture $pic
 
-    local impl=2  # 2 = best
+    local impl=2                # 2 = best for x86_64 (?)
+
+    case "$(eos_GetArch)" in
+        armv7h) impl=1 ;;
+    esac
 
     case "$impl" in
         0)
@@ -59,7 +71,7 @@ XfceSetWallpaper() {
             for prop in $(xfconf-query --channel xfce4-desktop --list | grep /last-image$) ; do
                 xfconf-query --channel xfce4-desktop --property $prop --set "$pic"
             done
-            eos_yad_infomsg "Reboot is required for the changes to take effect."
+            #eos_yad_infomsg "Reboot is required for the changes to take effect."
             ;;
         2)
             local monitors=($(xrandr | grep -w connected | awk '{print $1}'))
