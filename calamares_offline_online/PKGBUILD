@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.20
-pkgrel=6
+pkgver=3.2.24
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -46,11 +46,10 @@ prepare() {
     cp $_reponame/settings.conf_offline                      $_reponame/settings.conf
     cp $_reponame/src/modules/welcome/welcome.conf_offline   $_reponame/src/modules/welcome/welcome.conf 
     # branding files
-    cp $_reponame/src/branding/endeavouros/img/restore.png  $_reponame/src/modules/keyboard/images
-    cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning}.svg $_reponame/data/images
-    cp $_reponame/src/branding/endeavouros/img/yes.svgz $_reponame/data/images
-    cp $_reponame/src/branding/endeavouros/img/geoip/{bg,pin}.png $_reponame/src/modules/locale/images
-    #cp -f $_reponame/src/branding/endeavouros/img/geoip/* $_reponame/src/modules/locale/images  # bg.png pin.png and timzones
+    cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
+    cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning}.svg  $_reponame/data/images
+    cp $_reponame/src/branding/endeavouros/img/{yes,no}.svgz                    $_reponame/data/images
+    cp $_reponame/src/branding/endeavouros/img/geoip/*                          $_reponame/src/modules/locale/images
 
     mkdir -p $_reponame/build/$pkgname
 
@@ -84,6 +83,9 @@ package() {
     cp -r $_reponame/settings.conf_{online,offline,vanilla}          $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line   $_reponame/build/$pkgname/usr/share/calamares/modules/
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line $_reponame/build/$pkgname/usr/share/calamares/modules/
+    # pacstrap as bash script implementation 
+    # chmod +x $_reponame/src/modules/pacstrap/base_install.sh
+    # cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/base_install.sh
 
     # Commom install -D doen't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
