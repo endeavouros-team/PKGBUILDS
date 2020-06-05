@@ -1122,6 +1122,11 @@ Main() {
 
     echo2 "PACKAGER: $PACKAGER"
 
+    local verfile=/usr/share/endeavouros/scripts/eos-pkgbuild-setup.version
+    if [ -r $verfile ] ; then
+        echo2 "VERSION: $(grep ^VERSION= $verfile | cut -d '=' -f 2)"
+    fi
+
     Main2 "$@"
 }
 
