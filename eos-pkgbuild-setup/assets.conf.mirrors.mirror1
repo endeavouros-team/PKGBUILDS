@@ -92,6 +92,7 @@ _inxi_hook_check_latest() {
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
     local dev_version
+    local prefer_dev_version=no
 
     wget -q --timeout=10 -O $tmpfile $url || {
         echo "cannot fetch info about $tool" >&2
@@ -100,7 +101,12 @@ _inxi_hook_check_latest() {
     }
     dev_version="$(grep /smxi/inxi/releases/tag/ $tmpfile | head -n 1 | sed 's|^.*/tag/\([0-9\.]*\)-.*$|\1|')"
 
-    _common_show_version
+    if [ "$prefer_dev_version" = "yes" ] ; then
+        sed -i $Pkgbuild -e 's|^pkgver='"$localversion"'$|pkgver='"$dev_version"'|'
+        echo -n "#" >&2
+    else
+        _common_show_version
+    fi
     rm -f $tmpfile
 }
 
