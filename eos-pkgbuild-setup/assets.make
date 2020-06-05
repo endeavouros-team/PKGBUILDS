@@ -223,7 +223,7 @@ ListNameToPkgName()
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
     if [ -n "$hook" ] ; then
         HookIndicator "$hook_yes"
-        $hook
+        test "$fetch" = "yes" && $hook
     else
         HookIndicator "$hook_no"
     fi
