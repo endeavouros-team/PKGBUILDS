@@ -813,6 +813,7 @@ AfterInstall() {
       tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn 'reflector-simple')
   tabcontents+=(
       --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
+      --field=" Package cleanup configuration!disk-utility!Configure package cache cleanup service":fbtn 'paccache-service-manager'
   )
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')

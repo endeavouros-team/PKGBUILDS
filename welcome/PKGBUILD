@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=2.7.2
+pkgver=2.8
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -20,6 +20,7 @@ source=(
   $url/changelog.md
   $url/$pkgname
   $url/$pkgname.desktop
+  paccache-service-manager
   $url/eos-script-lib-yad
   $url/eos-script-lib-yad.conf
   $url/device-info
@@ -91,6 +92,7 @@ package() {
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
   install device-info                           $pkgdir/usr/bin/device-info
   install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
+  install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
   install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
 
