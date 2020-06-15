@@ -63,6 +63,13 @@ _common_show_version() {
     fi
 }
 
+_Updpkgsums() {
+    local Pkgbuild="$1"
+    pushd "$(dirname "$Pkgbuild")" >/dev/null
+    updpkgsums 2>/dev/null
+    popd >/dev/null
+}
+
 _yay_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of yay from the developer
     local tool=yay
@@ -92,7 +99,7 @@ _inxi_hook_check_latest() {
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
     local dev_version
-    local prefer_dev_version=no
+    local prefer_dev_version=yes
 
     wget -q --timeout=10 -O $tmpfile $url || {
         echo "cannot fetch info about $tool" >&2
@@ -104,6 +111,7 @@ _inxi_hook_check_latest() {
     if [ "$prefer_dev_version" = "yes" ] ; then
         sed -i $Pkgbuild -e 's|^pkgver='"$localversion"'$|pkgver='"$dev_version"'|'
         echo -n "#" >&2
+        _Updpkgsums "$Pkgbuild"
     else
         _common_show_version
     fi
@@ -177,9 +185,7 @@ _welcome_hook_check_ksetwallpaper_py() {
             "" | [yY]*)
                 rm -f $current
                 mv $new $current
-                pushd "$(dirname "$current")" >/dev/null
-                updpkgsums 2>/dev/null
-                popd >/dev/null
+                _Updpkgsums "$current"
                 ;;
         esac
     fi
