@@ -211,3 +211,8 @@ _tr_add2 after_install_themevantip   "Ota Xfce:n perusteema käyttöön"
 
 _tr_add2 after_install_themedef     "Xfce: EndeavourOS:n oletusteema"
 _tr_add2 after_install_themedeftip  "Ota Xfce:n EndeavourOS-oletusteema käyttöön"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Pakettien tallennustilan konfigurointi"
+_tr_add2 after_install_pcleantip    "Muokkaa vanhojen pakettien hallinnointipalvelua"
+

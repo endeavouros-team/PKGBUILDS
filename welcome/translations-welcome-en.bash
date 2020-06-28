@@ -211,3 +211,8 @@ _tr_add2 after_install_themevantip   "Use vanilla Xfce theme"
 
 _tr_add2 after_install_themedef     "Xfce EndeavourOS default theme"
 _tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Package cleanup configuration"
+_tr_add2 after_install_pcleantip    "Configure package cache cleanup service"
+
