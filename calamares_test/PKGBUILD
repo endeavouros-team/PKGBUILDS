@@ -4,8 +4,8 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.24
-pkgrel=6
+pkgver=3.2.26
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -86,8 +86,8 @@ package() {
 
     # pacstrap as bash script implementation 
     # maybe download base_install.sh everytime from calamares module so it can be updated on the go...
-    chmod +x $_reponame/src/modules/pacstrap/base_install.sh
     cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
+    chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     
     # Commom install -D doen't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
