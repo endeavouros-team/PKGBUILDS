@@ -146,14 +146,14 @@ Update_common() {
         previous_check_time=$(/usr/bin/date +%s)
     fi
 
-    SystemLockActive || return
+    SystemLockActive a || return
     echo2 "Checking for updates ..."
     updates="$(/usr/bin/checkupdates)"
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
-            SystemLockActive || return
+            SystemLockActive b || return
             if [ "extra_check" = "yes" ] ; then
                 if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                     # Re-check for updates if more than $secs seconds elapsed from the first check.
@@ -174,7 +174,7 @@ Update_common() {
     # Check AUR updates.
 
     if [ "$CheckAurUpdates" = "yes" ] ; then
-        SystemLockActive || return
+        SystemLockActive c || return
         updates="$(/usr/bin/yay -Qua)"
     else
         updates=""
@@ -182,7 +182,7 @@ Update_common() {
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused AUR || return 1
-            SystemLockActive || return
+            SystemLockActive d || return
             updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
@@ -243,6 +243,7 @@ CheckArchNews() {
 SystemLockActive() {
     if [ -e $system_lockfile ] ; then
         debug "Sorry, another program is currently using pacman databases."
+        echo "Debug: ${FUNCNAME[1]} $@ stopped because of lock file." >> /tmp/.$progname.log
         return 1
     else
         return 0   # OK
@@ -261,7 +262,7 @@ Main2() {
     fi
 
     # check package manager lock
-    SystemLockActive || return
+    SystemLockActive a || return
 
     Update_common
 }
@@ -309,8 +310,9 @@ CheckInternetConnection() {
     local wait_rounds="$1"
     local one_wait="$2"
 
-    test -z "$wait_rounds" && wait_rounds=8
-    test -z "$one_wait"    && one_wait=5s
+    # default is max two minutes wait
+    test -z "$wait_rounds" && wait_rounds=30
+    test -z "$one_wait"    && one_wait=4s
 
     # Wait for internet connection max "$wait_rounds * $one_wait" seconds.
 
