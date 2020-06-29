@@ -211,3 +211,8 @@ _tr_add2 after_install_themevantip   "Использовать тему Xfce"
 
 _tr_add2 after_install_themedef     "Xfce тема в стиле EndeavourOS"
 _tr_add2 after_install_themedeftip  "использовать стиль EndeavourOS в теме Xfce"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Настройка очистки пакетов"
+_tr_add2 after_install_pcleantip    "Настройка очистки кэша пакетов Pacman"
+
