@@ -40,7 +40,7 @@ eos_yad2() { # TODO: VEKS
 }
 
 eos_un_log() {
-    local date="$(/usr/bin/date '+%x %X%p')"
+    local date="$(/usr/bin/date '+%x %X')"
     echo ""       >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$date"  >> $EOS_UPDATE_NOTIFIER_LOG
     echo "$@"     >> $EOS_UPDATE_NOTIFIER_LOG
@@ -80,7 +80,7 @@ ShowNotify() {
 }
 
 ShowNonFocused() {
-    local date="$(/usr/bin/date '+%x %X%p')"
+    local date="$(/usr/bin/date '+%x %X')"
     local source="$1"
     local count="$(echo "$updates" | wc -l)"
 
@@ -199,7 +199,7 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             echo "$msg" | \
-                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus --window-icon=$EOS_WICON \
+                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
                          --height=100 --width=350 --timeout=10 --timeout-indicator=left \
                          --theme="Classic" --tail --button=yad-quit:0
         fi
