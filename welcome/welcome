@@ -813,7 +813,7 @@ AfterInstall() {
       tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn 'reflector-simple')
   tabcontents+=(
       --field=" $(ltr after_install_us)!system-software-update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
-      --field=" $(ltr after_install_pclean)!disk-utility!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
@@ -1287,7 +1287,7 @@ StartHere() {
 
     IsInstalling || notebook+=(--active-tab=2)
 
-    notebook+=(--button=" $(ltr butt_changelog)!meld!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
+    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
     if [ $is_installing -ne 0 ] ; then
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
