@@ -37,7 +37,7 @@ import logging
 import subprocess
 import sys
 
-VERSION = "2.1"
+VERSION = "2.1"  # will be overwritten by PKGBUILD
 TEST = True
 
 LOG_FILE = "/tmp/nvidia-installer.log"
@@ -51,8 +51,7 @@ ENDC = '\033[0m'
 BOLD = '\033[1m'
 
 DEVICES = {
-    "nvidia" : [],
-    "nvidia-390xx" : []
+    "nvidia-dkms" : []
 }
 
 CLASS_ID = "0x03"
@@ -60,46 +59,30 @@ VENDOR_ID = "0x10de"
 
 PACKAGES = {
     "nouveau": ["xf86-video-nouveau", "mesa"],
-    "nvidia": ["nvidia-dkms", "libvdpau", "nvidia-settings"],
-    "nvidia-390xx": ["nvidia-390xx-dkms", "libvdpau", "nvidia-390xx-settings"],
+    "nvidia-dkms": ["nvidia-dkms", "libvdpau", "nvidia-settings"],
     "bumblebee": ["bumblebee", "mesa", "xf86-video-intel",
                   "nvidia-dkms", "virtualgl", "nvidia-settings", "bbswitch-dkms"]}
 
 PACKAGES_LTS = {
     "nouveau": [],
-    "nvidia": [],
-    "nvidia-390xx": [],
+    "nvidia-dkms": [],
     "bumblebee": []}
 
 PACKAGES_X86_64 = {
     "nouveau": ["lib32-mesa"],
-    "nvidia": ["lib32-nvidia-utils", "lib32-libvdpau"],
-    "nvidia-390xx": ["lib32-nvidia-390xx-utils", "lib32-libvdpau"],
+    "nvidia-dkms": ["lib32-nvidia-utils", "lib32-libvdpau"],
     "bumblebee": ["lib32-nvidia-utils", "lib32-virtualgl", "lib32-mesa"]}
 
 CONFLICTS = {
     "nouveau": ["nvidia-dkms", "nvidia", "nvidia-lts" "nvidia-utils", "nvidia-libgl",
-                "nvidia-390xx", "nvidia-390xx-lts", "nvidia-390xx-utils", "nvidia-390xx-dkms",
-                "nvidia-340xx", "nvidia-340xx-lts", "nvidia-340xx-utils",
-                "nvidia-304xx", "nvidia-304xx-lts", "nvidia-304xx-utils",
                 "bumblebee", "virtualgl", "nvidia-settings", "bbswitch", "bbswitch-lts", "bbswitch-dkms"],
-    "nvidia": ["xf86-video-nouveau", "nvidia-lts", "nvidia"],
-    "nvidia-390xx": ["xf86-video-nouveau", "nvidia-390xx-lts", "nvidia-390xx"],
-    "nvidia-340xx": ["xf86-video-nouveau"],
-    "bumblebee": ["xf86-video-nouveau", "nvidia-libgl",
-                  "nvidia-390xx-utils", "nvidia-340xx-utils", "nvidia-304xx-utils"]}
+    "nvidia-dkms": ["xf86-video-nouveau", "nvidia-lts", "nvidia"],
+    "bumblebee": ["xf86-video-nouveau", "nvidia-libgl"]}
 
 CONFLICTS_X86_64 = {
-    "nouveau": ["lib32-nvidia-libgl", "lib32-nvidia-340xx-utils",
-                "lib32-nvidia-304xx-utils", "lib32-nvidia-utils", "lib32-virtualgl"],
-    "nvidia": ["lib32-nvidia-libgl", "lib32-nvidia-340xx-utils",
-               "lib32-nvidia-304xx-utils"],
-    "nvidia-390xx": ["lib32-nvidia-libgl", "lib32-nvidia-utils",
-                     "lib32-nvidia-390xx-utils"],
-    "nvidia-340xx": ["lib32-nvidia-libgl", "lib32-nvidia-utils",
-                     "lib32-nvidia-340xx-utils"],
-    "bumblebee": ["lib32-nvidia-libgl", "lib32-nvidia-390xx-utils",
-                  "lib32-nvidia-340xx-utils", "lib32-nvidia-304xx-utils"]}
+    "nouveau": ["lib32-nvidia-libgl", "lib32-nvidia-utils", "lib32-virtualgl"],
+    "nvidia-dkms": ["lib32-nvidia-libgl"],
+    "bumblebee": ["lib32-nvidia-libgl"]}
 
 
 def get_class_vendor_product(line):
