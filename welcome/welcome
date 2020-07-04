@@ -828,9 +828,6 @@ AfterInstall() {
         )
         ;;
   esac
-  if [ -r    "$HOME/.config/.welcome-test-ai.conf" ] ; then
-      source "$HOME/.config/.welcome-test-ai.conf"
-  fi
   "${tabcontents[@]}" >& /dev/null &
 }
 
@@ -838,7 +835,7 @@ UsefulTips() {
   local handle="$1"
   local tabnum="$2"
 
-  tabcontents+=(
+  local tabcontents+=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=user-info
@@ -885,6 +882,20 @@ AddMoreApps() {
   "${tabcontents[@]}" >& /dev/null &
 }
 
+OwnCommands() {
+  local handle="$1"
+  local tabnum="$2"
+
+  local tabcontents=(
+      eos_yad
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --image=applications-other
+      --text="<b>$(ltr nb_tab_owncmds_text)</b>"
+  )
+  tabcontents+=("${welcome_own_commands[@]}")
+  "${tabcontents[@]}" >& /dev/null &
+}
+
 About() {
   local handle="$1"
   local tabnum="$2"
@@ -919,6 +930,9 @@ CreateNotebookCommands() {
             AddMoreApps
             #About
         )
+        if [ -n "$welcome_own_commands" ] ; then
+            _NOTEBOOK_TABS+=(OwnCommands)
+        fi
     }
 }
 
@@ -1229,6 +1243,10 @@ StartHere() {
         return
     fi
 
+    if [ -r    "$HOME/.config/.welcome-test-ai.conf" ] ; then
+        source "$HOME/.config/.welcome-test-ai.conf"
+    fi
+
     CreateNotebookCommands
 
     if [ "$(WelcomeSettings check)" != "enable" ] ; then
@@ -1283,7 +1301,11 @@ StartHere() {
     notebook+=(--window-icon=$EOS_WICON)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
-        tabname="$(ltr nb_tab_$tab)"
+#        if [ "$tab" = "OwnCommands" ] ; then
+#            tabname="Own Commands"             # TODO: make this via translation support!
+#        else
+            tabname="$(ltr nb_tab_$tab)"
+#        fi
         #tabname="$(SeparateWordsWithSpaces "$tabname")"
         notebook+=(--tab="$tabname")
     done

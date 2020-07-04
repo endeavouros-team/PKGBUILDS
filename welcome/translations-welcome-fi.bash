@@ -216,3 +216,6 @@ _tr_add2 after_install_themedeftip  "Ota Xfce:n EndeavourOS-oletusteema käyttö
 _tr_add2 after_install_pclean       "Pakettien tallennustilan konfigurointi"
 _tr_add2 after_install_pcleantip    "Muokkaa vanhojen pakettien hallinnointipalvelua"
 
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Omat komennot"
+_tr_add2 nb_tab_owncmds_text        "Lisätyt omat komennot"

@@ -216,3 +216,6 @@ _tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"
 _tr_add2 after_install_pclean       "Package cleanup configuration"
 _tr_add2 after_install_pcleantip    "Configure package cache cleanup service"
 
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Own Commands"
+_tr_add2 nb_tab_owncmds_text        "Own commands added"
