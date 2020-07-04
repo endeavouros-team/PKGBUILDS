@@ -1243,8 +1243,10 @@ StartHere() {
         return
     fi
 
-    if [ -r    "$HOME/.config/.welcome-test-ai.conf" ] ; then
-        source "$HOME/.config/.welcome-test-ai.conf"
+    local own_commands_conf="$HOME/.config/welcome-own-cmds.conf"
+
+    if [ -r    "$own_commands_conf" ] ; then
+        source "$own_commands_conf"
     fi
 
     CreateNotebookCommands
