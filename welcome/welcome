@@ -828,6 +828,9 @@ AfterInstall() {
         )
         ;;
   esac
+  if [ -r    "$HOME/.config/.welcome-test-ai.conf" ] ; then
+      source "$HOME/.config/.welcome-test-ai.conf"
+  fi
   "${tabcontents[@]}" >& /dev/null &
 }
 
