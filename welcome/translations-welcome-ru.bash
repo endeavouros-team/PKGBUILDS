@@ -216,3 +216,6 @@ _tr_add2 after_install_themedeftip  "использовать стиль Endeavo
 _tr_add2 after_install_pclean       "Настройка очистки пакетов"
 _tr_add2 after_install_pcleantip    "Настройка очистки кэша пакетов Pacman"
 
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Пользовательские команды"
+_tr_add2 nb_tab_owncmds_text        "Добавление пользовательских команд"
