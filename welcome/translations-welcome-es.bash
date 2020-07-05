@@ -214,3 +214,11 @@ _tr_add2 after_install_themevantip   "Usar tema sin personalización Xfce"
 
 _tr_add2 after_install_themedef     "Tema por defecto Xfce de EndeavourOS"
 _tr_add2 after_install_themedeftip  "Usar tema por defecto Xfce de EndeavourOS"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Configuración de limpieza de los paquetes"
+_tr_add2 after_install_pcleantip    "Configurar el servicio de limpieza de la caché de paquetes"
+
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Comandos propios"
+_tr_add2 nb_tab_owncmds_text        "Comandos propios agregados"
