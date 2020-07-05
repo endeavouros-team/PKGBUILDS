@@ -32,12 +32,12 @@ icon | system-software-install
 description | GUI package manager
 command string | pamac-manager
 
-Note that yad (together with bash) wants the field to be in specific format. You'll add the parts withing quotes. Between the --field= and :fbtn you'll write most of the information for the command. The name, icon, and description are separated with an exclamation (!) mark.
+Note that yad (together with bash) wants the field to be in a specific format. You'll add the parts within quotes. Between the `--field=` and `:fbtn` you'll write most of the command information. The name, icon, and description are separated with exclamation (!) marks.
 And because your added strings may contain spaces, it is good to always use quotes around the strings.
 
 Note also that to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.
 
-Here is an example file containing your own commands:
+Here is an example file containing commands:
 <pre>
 # Contents of file $HOME/.config/welcome-own-cmds.conf:
 
