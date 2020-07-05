@@ -202,7 +202,6 @@ _tr_add2 nb_tab_UsefulTips     "Rady"
 _tr_add2 useful_tips_text      "Užitočné rady"
 
 # 2020-May-16:
-
 _tr_add2 butt_changelog        "Zoznam zmien"
 _tr_add2 butt_changelogtip     "Ukázať zoznam zmien v uvítacej aplikácii"
 
@@ -211,3 +210,11 @@ _tr_add2 after_install_themevantip   "Použiť čistý vzhľad Xfce"
 
 _tr_add2 after_install_themedef     "Endeavour OS vzhľad pre Xfce"
 _tr_add2 after_install_themedeftip  "Použiť EndeavourOS vzhľad pre Xfce"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Nastavenie prečisťovania balíčkov"
+_tr_add2 after_install_pcleantip    "Nastavte službu prečisťovania vyrovnávacej pamäte balíčkov"
+
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Vlastné príkazy"
+_tr_add2 nb_tab_owncmds_text        "Vlastné pridané príkazy"
