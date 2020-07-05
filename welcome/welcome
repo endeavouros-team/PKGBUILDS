@@ -891,6 +891,8 @@ OwnCommands() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
+      --field=" $(ltr butt_help)!!Help on adding own commands":fbtn
+          "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
   )
   tabcontents+=("${welcome_own_commands[@]}")
   "${tabcontents[@]}" >& /dev/null &
