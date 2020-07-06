@@ -212,6 +212,11 @@ _tr_add2 after_install_themevantip   "Utiliser le thème original de Xfce"
 _tr_add2 after_install_themedef     "Thème d'EndeavourOS pour Xfce"
 _tr_add2 after_install_themedeftip  "Utiliser le thème d'EndeavourOS pour Xfce"
 
-# 28-Juin-2020:
-_tr_add2 after_install_pclean       "Configuration du nettoyage de paquets"
+# 28-juin-2020:
+_tr_add2 after_install_pclean       "Configuration nettoyage paquets"
 _tr_add2 after_install_pcleantip    "Configure le service de nettoyage du cache des paquets"
+
+# 04-juillet-2020:
+_tr_add2 nb_tab_OwnCommands         "Commandes personnelles"
+_tr_add2 nb_tab_owncmds_text        "Commandes personnelles ajoutées"
+
