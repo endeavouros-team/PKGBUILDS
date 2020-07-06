@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=akm
+Comment=Manages Kernels in Antergos/Arch
+Exec=akm
+Icon=system-software-install
+Path=
+Terminal=false
+StartupNotify=false

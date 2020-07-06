@@ -1,0 +1,247 @@
+#!/bin/bash
+
+# use monospace (non-proportional) fonts!
+FormatNameVersion() { printf "%-12s %s" "$1" "$2" ; }
+FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
+FormatName()        { FormatVersion "$@" ; }
+
+RepoType() {
+    test -z "$(grep "^\[testing\]$" /etc/pacman.conf)" && echo "Stable" || echo "Testing"
+}
+
+Header() {
+    local fname="${FUNCNAME[1]}"
+    case "$fname" in
+        KernelOrg) fname="$KOName" ;;
+        KOVersion) fname="$KOVersionName" ;;
+    esac
+    local hdr="<b>$fname</b>"
+
+    if [ "$fname" = "$(RepoType)" ] ; then
+        hdr+=" (current)"
+    fi
+    FormatVersion "$hdr"
+}
+
+LocalVersion() { /usr/bin/pacman -Q "$1" 2>/dev/null | /usr/bin/awk '{print $2}' ; }
+Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
+
+Choose() {
+    local version exist
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${kernels[@]}" ; do
+        version="$(LocalVersion "$xx")"
+        exist="$(Exist)"
+        cmd+=(--field="":CHK $exist)
+    done
+}
+
+PkgName() {
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${kernels[@]}" ; do
+        cmd+=(--field="$(FormatName "$xx")":LBL "")
+    done
+}
+
+Installed() {
+    local version
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${kernels[@]}" ; do
+        version="$(LocalVersion "$xx")"
+        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+    done
+}
+
+StableVersion() {
+    local pkg="$1"
+    local repo
+
+    case "$pkg" in
+        linux | linux-headers | linux-lts*) repo=core ;;
+        linux-zen* | linux-hardened*)       repo=extra ;;
+    esac
+    LANG=C pacman -Si $repo/"$pkg" | grep ^Version | awk '{print $3}'
+}
+
+Stable() {
+    local version
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${kernels[@]}" ; do
+        version="$(StableVersion "$xx")"
+        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+    done
+}
+
+TestingVersion() {
+    local pkg="$1"
+    echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^[ ]*<td>\([0-9a-z\.\-]*\)<.*$|\1|'
+}
+
+Testing() {
+    local testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing")"
+    local version
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${kernels[@]}" ; do
+        version="$(TestingVersion "$xx")"
+        test -n "$version" || version="$na"
+        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+    done
+}
+
+KernelOrgVersion() {
+    local type="$1"
+    local result="$(echo "$kernelorg" | grep -A2 $type: | head -n 2 | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
+    case "$type" in
+        mainline) ;;
+        *) result="$(echo "$result" | grep -v "[0-9][0-9\.]*-rc")" ;;
+    esac
+    echo "$result"
+}
+
+KernelOrg() {
+    local version
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${org_kernels[@]}" ; do
+        version="$(KernelOrgVersion "$xx")"
+        cmd+=(--field="$(FormatName "$xx")":LBL "")
+    done
+    for xx in $na $na $na $na ; do
+        cmd+=(--field="$(FormatName "")":LBL "")
+    done
+}
+
+KOVersion() {
+    local version
+    local stableversion="$(KernelOrgVersion stable)"
+    cmd+=(--field="$(Header)":LBL "")
+    for xx in "${org_kernels[@]}" ; do
+        version="$(KernelOrgVersion "$xx")"
+        case "$xx" in
+            stable|longterm)
+                cmd+=(--field="$(FormatVersion "<b>$version</b>")":LBL "") ;;
+            *)
+                cmd+=(--field="$(FormatVersion "$version")":LBL "") ;;
+        esac
+    done
+    for xx in $na $na $na $na ; do
+        cmd+=(--field="$(FormatVersion "")":LBL "")
+    done
+}
+
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+
+ShowFunctionLine() {
+    printf2 "%sGathering information: %3.f%%" $'\r' "$((100*SERVICES_DONE/SERVICES))"
+}
+ShowFunctionStart() {
+    SERVICES=${#functions[@]}
+    SERVICES_DONE=0
+    ShowFunctionLine
+}
+ShowFunction()      { ((SERVICES_DONE++)) ; ShowFunctionLine ; }
+ShowFunctionEnd()   { printf2 "\n" ; }
+
+CommonStuff() {
+    local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    if [ ! -f $EOS_SCRIPTS_YAD ] ; then
+        echo2 "Sorry, package 'welcome' is not installed."
+        exit 1
+    fi
+    source $EOS_SCRIPTS_YAD
+    export -f eos_yad_RunCmdTermBash
+    export -f eos_yad_terminal
+}
+eos_yad() {
+    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
+}
+
+Main()
+{
+    local na="(-)"
+    local kernels=(
+        linux             linux-headers
+        linux-lts         linux-lts-headers
+        linux-zen         linux-zen-headers
+        linux-hardened    linux-hardened-headers
+    )
+    local functions=(  # order is important!
+        Choose
+        PkgName
+        Installed
+        Stable
+        Testing
+        KernelOrg
+        KOVersion
+    )
+
+    CommonStuff
+
+    ShowFunctionStart
+
+    local kernelorg="$(curl -s https://www.kernel.org)"
+    local org_kernels=(mainline stable longterm linux-next)
+    local KOName="K.o.category"
+    local KOVersionName="K.o.version"
+    local xx
+    local t1=""
+
+    t1+="Here you'll see information about currently installed and available Linux kernels.\n"
+    t1+="You can install and/or uninstall kernel packages using the checkboxes on the left column.\n"
+    t1+="\n"
+    t1+="Column headers:\n"
+    t1+="        Choose = checkboxes for installing/uninstalling kernel packages.\n"
+    t1+="        PkgName = kernel package name.\n"
+    t1+="        Installed = currently installed kernel package versions.\n"
+    t1+="        Stable = versions available from the stable repos.\n"
+    t1+="        Testing = versions available from the testing repos.\n"
+    t1+="        $KOName = kernel category at kernel.org.\n"
+    t1+="        $KOVersionName = latest version announced at kernel.org.\n"
+    t1+="Your current repos are either Stable or Testing (see /etc/pacman.conf).\n"
+    t1+="Marking <b>$na</b> means: info not available.\n"
+
+    local cmd=(
+        /usr/bin/yad
+        --form --title="Simple kernel manager" --columns=${#functions[@]}
+        --text="$t1"
+        --image=system-software-update
+        --window-icon=applications-system
+    )
+
+    for xx in "${functions[@]}" ; do
+        ShowFunction
+        $xx
+    done
+    ShowFunctionEnd
+
+    local ix installed install=() uninstall=() pkg
+    local result="$("${cmd[@]}")"
+    test -z "$result" && return
+
+    result="${result:1}"                               # skip first LBL field !!
+
+    for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
+        pkg="${kernels[$ix]}"
+        installed="$(LocalVersion "$pkg")"
+        case "$(echo "$result" | cut -d '|' -f $((ix+1)))" in
+            TRUE)   test -z "$installed" && install+=("$pkg") ;;
+            FALSE)  test -n "$installed" && uninstall+=("$pkg") ;;
+        esac
+    done
+
+    cmd=()
+    test -n "$uninstall" && cmd+=(pacman -Rsn ${uninstall[*]} ";")
+    test -n "$install"   && cmd+=(pacman -S ${install[*]} ";")
+
+    if [ 0 -eq 1 ] ; then
+        echo "uninstall = ${uninstall[*]}"
+        echo "install   = ${install[*]}"
+        return
+    fi
+
+    if [ -n "$cmd" ] ; then
+        eos_yad_RunCmdTermBash "echo '${cmd[*]}' ; sudo bash -c '${cmd[*]}'"
+    fi
+}
+
+Main "$@"

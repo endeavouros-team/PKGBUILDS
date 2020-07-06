@@ -1,0 +1,24 @@
+#!/bin/bash
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=akm
+pkgdesc="Arch kernel manager."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=2
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(bash yad)
+
+source=(
+    "$url/$pkgname"
+    "$url/$pkgname.desktop"
+)
+sha512sums=('162466cd5fd89de9ff256fa7c9865fa242fec1a4e8d7eadb2cfda174aa7a9e735135f9050d99cd5a124ade18e83dbae9f35909817d89d81da54c2c65a077cb70'
+            '1eb13fe6e3edefbd1022d108832a2b295f8939d684abdba674a45453c5fbb8752a5a82743009144f7136a1f5b3cdc788c195cf56c02a8e6b59d437cef4b6fb82')
+
+package() {
+  cd $srcdir
+  install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
+}
