@@ -46,9 +46,10 @@ Here is an *example* file containing three commands/buttons:
 # Contents of file $HOME/.config/welcome-own-cmds.conf:
 
 local welcome_own_commands=(
-    --field=" Pamac!system-software-install!GUI package manager":fbtn      "pamac-manager"
-    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn  "mousepad"
-    --field=" Firefox!firefox!Firefox web browser":fbtn                    "firefox"
+    --field=" Simple Kernel Manager!system-software-install!Simple kernel manager":fbtn  "akm"
+    --field=" Pamac!system-software-install!GUI package manager":fbtn                    "pamac-manager"
+    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                "mousepad"
+    --field=" Firefox!firefox!Firefox web browser":fbtn                                  "firefox"
 )
 </pre>
 Feel free to copy this example and modify it to match your needs.<br>
