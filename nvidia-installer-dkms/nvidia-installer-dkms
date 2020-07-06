@@ -114,12 +114,17 @@ def check_device():
                 for driver in DEVICES:
                     if product_id in DEVICES[driver]:
                         drivers.append(driver)
-                        return drivers
+                        #return drivers
     return drivers
 
 
 def choose_driver(drivers):
     """ There is more than one suitable driver. Let user choose """
+
+    """ No, always choose nvidia-dkms if it is compatible """
+    if drivers[0] == "nvidia-dkms" or drivers[1] == "nvidia-dkms":
+        log_info("Chose nvidia-dkms out of possible {0} and {1}.".format(drivers[0], drivers[1]))
+        return "nvidia-dkms"
 
     print("There is more than one suitable driver. Please choose:")
     index = 0
@@ -168,7 +173,7 @@ def install(driver):
                     return False
 
     log_info("Downloading and installing driver packages, please wait as this may take a few minutes...")
-    cmd = ["pacman", "-Sqy", "--noconfirm", "--noprogressbar"]
+    cmd = ["yay", "-Sqy", "--noconfirm", "--noprogressbar"]
     cmd.extend(packages)
     if TEST:
         log_info(" ".join(cmd))
@@ -435,6 +440,10 @@ def setup_logging(cmd_line):
         fmt="%(asctime)s [%(levelname)s]: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S")
 
+    # remove any old log file
+    if not cmd_line.test and os.getuid() == 0:
+        remove_file(LOG_FILE)
+
     # File logger
     try:
         file_handler = logging.FileHandler(LOG_FILE, mode='w')
@@ -495,7 +504,7 @@ def load_ids():
     """ Load all nvidia devices pci ids """
     for item in os.listdir(IDS_PATH):
         if item.endswith('.ids') and "nvidia" in item:
-            key = item[:-4]
+            key = item[:-4] + "-dkms"
             path = os.path.join(IDS_PATH, item)
             DEVICES[key] = load_ids_file(path)
 
@@ -548,9 +557,9 @@ def main():
     if not driver and cmd_line.force:
         msg = (
             "Your graphics card is not in our database. "
-            "Forcing nvidia driver installation anyways...")
+            "Forcing nvidia-dkms driver installation anyways...")
         log_warning(msg)
-        driver = "nvidia"
+        driver = "nvidia-dkms"
 
     if driver:
         log_info("Installing {} driver...".format(driver))
