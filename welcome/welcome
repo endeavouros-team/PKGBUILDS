@@ -1259,18 +1259,13 @@ StartHere() {
     fi
 
     IsInstalling
-    is_installing=$?
+    test $? -eq 0 && is_installing=yes || is_installing=no
 
     if [ "$start_delay" != "0" ] ; then
         sleep "$start_delay"
     fi
 
-    if [ $is_installing -eq 0 ] ; then
-        :
-        #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
-        #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
-        #fi
-    else
+    if [ "$is_installing" = "no" ] ; then
         local verbosity
         if [ "$EOS_WELCOME_CONNECTION_WARNING" = "yes" ] ; then
             verbosity=verbose
@@ -1287,6 +1282,11 @@ StartHere() {
                 echo "Warning: terminal '$arg' (setting TERMINAL_AT_START) in file /etc/eos-script-lib-yad.conf is not supported." >&2
             }
         fi
+    else
+        :
+        #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
+        #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
+        #fi
     fi
 
     # UpdateInstallScripts
@@ -1305,20 +1305,29 @@ StartHere() {
     notebook+=(--window-icon=$EOS_WICON)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
-#        if [ "$tab" = "OwnCommands" ] ; then
-#            tabname="Own Commands"             # TODO: make this via translation support!
-#        else
-            tabname="$(ltr nb_tab_$tab)"
-#        fi
+        tabname="$(ltr nb_tab_$tab)"
         #tabname="$(SeparateWordsWithSpaces "$tabname")"
         notebook+=(--tab="$tabname")
     done
 
-    IsInstalling || notebook+=(--active-tab=2)
+    if [ "$is_installing" = "no" ] ; then
+        # Set the active tab number.
+
+        local active_tab_nr=2                              # 2 = the After Install tab
+
+        if [ -n "$welcome_own_commands" ] ; then
+            # 'activate_own_commands_tab' may have been set
+            # in the "$own_commands_conf" file
+            case "$activate_own_commands_tab" in
+                [Yy][Ee][Ss]) active_tab_nr=5 ;;            # 5 = the Own Commands tab
+            esac
+        fi
+        notebook+=(--active-tab=$active_tab_nr)
+    fi
 
     notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
-    if [ $is_installing -ne 0 ] ; then
+    if [ "$is_installing" = "no" ] ; then
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
     fi
     notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
@@ -1334,6 +1343,5 @@ StartHere() {
 }
 
 StartHere "$@"
-# yad_calamares choose stop   # for debugging only
 
 exit 0

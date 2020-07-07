@@ -43,7 +43,15 @@ Note also that to find useful icon names you can use e.g. command **yad-icon-bro
 
 Here is an *example* file containing three commands/buttons:
 <pre>
+#!/bin/bash
+
 # Contents of file $HOME/.config/welcome-own-cmds.conf:
+
+# Own commands:
+# - Create a local array variable 'welcome_own_commands'.
+# - Add yad form fields as in the example below.
+# - To have own commands activated initially, set local variable 'activate_own_commands_tab' to "yes";
+#   otherwise the default tab is initially active.
 
 local welcome_own_commands=(
     --field=" Simple Kernel Manager!system-software-install!Simple kernel manager":fbtn  "akm"
@@ -51,6 +59,11 @@ local welcome_own_commands=(
     --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                "mousepad"
     --field=" Firefox!firefox!Firefox web browser":fbtn                                  "firefox"
 )
+
+# If you want to have your own commands tab initially activated instead of the default tab,
+# set variable 'activate_own_commands_tab' to 'yes':
+
+local activate_own_commands_tab=yes    # "yes" or "no"
 </pre>
 Feel free to copy this example and modify it to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
