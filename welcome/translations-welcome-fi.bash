@@ -222,3 +222,6 @@ _tr_add2 nb_tab_owncmds_text        "Lisätyt omat komennot"
 
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Ohjeita omien komentojen tekemiseen"
+
+_tr_add2 add_more_apps_akm          "Linux-ytimien manageri"
+_tr_add2 add_more_apps_akmtip       "Helppo linux-ytimien asentaja ja tietolähde"

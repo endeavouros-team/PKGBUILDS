@@ -867,15 +867,16 @@ AddMoreApps() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=system-software-install
       --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left
-      --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
-      --field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
-      --field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
+      --field=" LibreOffice!libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
+      --field=" $(ltr add_more_apps_ch)!chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
+      --field=" $(ltr add_more_apps_fw)!gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
+      --field=" $(ltr add_more_apps_akm)!system-software-install!$(ltr add_more_apps_akmtip)":fbtn     'bash -c "yad_Install akm"'
   )
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
-            --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-            --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
+            --field=" $(ltr add_more_apps_bt)!bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
+            --field=" $(ltr add_more_apps_bt_bm)!bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
         )
         ;;
   esac

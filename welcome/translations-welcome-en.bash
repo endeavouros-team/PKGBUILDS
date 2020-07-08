@@ -222,3 +222,6 @@ _tr_add2 nb_tab_owncmds_text        "Personalized commands"               # modi
 
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Help on adding personal commands"
+
+_tr_add2 add_more_apps_akm          "A Kernel Manager"
+_tr_add2 add_more_apps_akmtip       "A small linux kernel manager and info source"
