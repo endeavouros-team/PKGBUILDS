@@ -56,10 +56,9 @@ local welcome_own_commands=(
     # Legend:
     # --field=" name!icon!description":fbtn "command"
 
-    --field=" Simple Kernel Manager!system-software-install!Simple kernel manager":fbtn  "akm"
-    --field=" Pamac!system-software-install!GUI package manager":fbtn                    "pamac-manager"
-    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                "mousepad"
-    --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn      "firefox"
+    --field=" A Kernel Manager!system-software-install!Simple kernel manager and info source":fbtn  "akm"
+    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
+    --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
 )
 
 # If you want to have your own commands tab initially activated instead of the default tab,
