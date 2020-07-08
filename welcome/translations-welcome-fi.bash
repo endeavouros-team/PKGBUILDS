@@ -219,3 +219,6 @@ _tr_add2 after_install_pcleantip    "Muokkaa vanhojen pakettien hallinnointipalv
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "Omat komennot"
 _tr_add2 nb_tab_owncmds_text        "Lisätyt omat komennot"
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Ohjeita omien komentojen tekemiseen"

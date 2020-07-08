@@ -891,7 +891,7 @@ OwnCommands() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
-      --field=" $(ltr butt_help)!!Help on adding own commands":fbtn
+      --field=" $(ltr butt_help)!!$(ltr nb_tab_owncmdstip)":fbtn
           "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
   )
   tabcontents+=("${welcome_own_commands[@]}")
@@ -1319,7 +1319,7 @@ StartHere() {
             # 'activate_own_commands_tab' may have been set
             # in the "$own_commands_conf" file
             case "$activate_own_commands_tab" in
-                [Yy][Ee][Ss]) active_tab_nr=5 ;;            # 5 = the Own Commands tab
+                [Yy][Ee][Ss]) active_tab_nr=5 ;;            # 5 = the Personal Commands tab
             esac
         fi
         notebook+=(--active-tab=$active_tab_nr)

@@ -217,5 +217,8 @@ _tr_add2 after_install_pclean       "Package cleanup configuration"
 _tr_add2 after_install_pcleantip    "Configure package cache cleanup service"
 
 # 2020-Jul-04:
-_tr_add2 nb_tab_OwnCommands         "Own Commands"
-_tr_add2 nb_tab_owncmds_text        "Own commands added"
+_tr_add2 nb_tab_OwnCommands         "Personal Commands"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Personalized commands"               # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Help on adding personal commands"
