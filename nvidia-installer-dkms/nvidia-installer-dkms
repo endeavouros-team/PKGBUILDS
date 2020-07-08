@@ -40,7 +40,11 @@ import sys
 VERSION = "2.1"  # will be overwritten by PKGBUILD
 TEST = True
 
-LOG_FILE = "/tmp/nvidia-installer.log"
+# Separate logs for root and others
+if os.getuid() == 0:
+    LOG_FILE = "/tmp/nvidia-installer_r.log"
+else:
+    LOG_FILE = "/tmp/nvidia-installer.log"
 
 IDS_PATH = "/var/lib/pci"
 
@@ -292,8 +296,7 @@ def remove_file(path):
     """ Removes file if exists """
     if os.path.exists(path):
         log_info("Removing {} file...".format(path))
-        if not TEST:
-            os.remove(path)
+        os.remove(path)
     else:
         log_info("{} not found. That's ok.".format(path))
 
@@ -440,8 +443,8 @@ def setup_logging(cmd_line):
         fmt="%(asctime)s [%(levelname)s]: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S")
 
-    # remove any old log file
-    if not cmd_line.test and os.getuid() == 0:
+    # remove old log file if one exists
+    if not cmd_line.test:
         remove_file(LOG_FILE)
 
     # File logger
@@ -529,6 +532,8 @@ def main():
 
     if TEST:
         log_info("Running the installer in testing mode...")
+
+    sys.exit(0)
 
     if update_nvidia_cards_database() != True:
         log_warning("Cannot update Nvidia cards database in /var/lib/pci")
