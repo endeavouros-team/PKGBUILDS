@@ -76,11 +76,13 @@ _os_prober_mod() {
 }
 
 Main() {
-    local lock=/var/log/grub-fix-initrd-generation.lck
-    local log=/var/log/grub-fix-initrd-generation.log
+    local in_pkg=grub-tools
+    local progname=grub-fix-initrd-generation
+    local lock=/var/log/$progname.lck
+    local log=/var/log/$progname.log
 
     if [ -r $lock ] ; then
-        _log2 "$0 is already running!"
+        _log2 "$progname is already running!"
         return
     fi
     if [ $EUID -ne 0 ] ; then
@@ -91,6 +93,7 @@ Main() {
 
     rm -f $log
 
+    _log2 "$in_pkg / $progname:"
     _grub_mod
     _os_prober_mod
 
