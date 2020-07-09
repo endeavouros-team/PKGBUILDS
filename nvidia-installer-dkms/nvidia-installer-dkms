@@ -533,8 +533,6 @@ def main():
     if TEST:
         log_info("Running the installer in testing mode...")
 
-    sys.exit(0)
-
     if update_nvidia_cards_database() != True:
         log_warning("Cannot update Nvidia cards database in /var/lib/pci")
 
