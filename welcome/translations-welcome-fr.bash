@@ -223,5 +223,5 @@ _tr_add2 nb_tab_owncmds_text        "Commandes personnelles ajoutées"
 # 08-juillet-2020:
 _tr_add2 nb_tab_owncmdstip          "Aide pour l'ajout de commandes personnelles"
 
-_tr_add2 add_more_apps_akm          "Un gestionnaire de noyaux"
+_tr_add2 add_more_apps_akm          "Gestionnaire de noyaux"
 _tr_add2 add_more_apps_akmtip       "Un petit gestionnaire de noyaux linux et une source d'informations"
