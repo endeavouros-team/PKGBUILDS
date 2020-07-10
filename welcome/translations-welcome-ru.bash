@@ -219,3 +219,9 @@ _tr_add2 after_install_pcleantip    "Настройка очистки кэша 
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "Пользовательские команды"
 _tr_add2 nb_tab_owncmds_text        "Добавление пользовательских команд"
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Справка по добавлению пользовательских команд"
+
+_tr_add2 add_more_apps_akm          "Выбор ядра Linux"
+_tr_add2 add_more_apps_akmtip       "Установка простого менеджера ядер Linux"
