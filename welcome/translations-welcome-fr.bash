@@ -220,3 +220,8 @@ _tr_add2 after_install_pcleantip    "Configure le service de nettoyage du cache 
 _tr_add2 nb_tab_OwnCommands         "Commandes personnelles"
 _tr_add2 nb_tab_owncmds_text        "Commandes personnelles ajoutées"
 
+# 08-juillet-2020:
+_tr_add2 nb_tab_owncmdstip          "Aide pour l'ajout de commandes personnelles"
+
+_tr_add2 add_more_apps_akm          "Un gestionnaire de noyaux"
+_tr_add2 add_more_apps_akmtip       "Un petit gestionnaire de noyaux linux et une source d'informations"
