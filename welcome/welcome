@@ -54,7 +54,7 @@ export -f eos_yad
 eos_GetArch() {
     local arch="$(/usr/bin/uname -m)"
     case "$arch" in
-        armv7*) arch=armv7h ;;
+        armv7* | aarch64) arch=armv7h ;;
     esac
     printf "%s" "$arch"
 }
