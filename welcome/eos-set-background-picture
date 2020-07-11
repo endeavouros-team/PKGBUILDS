@@ -56,7 +56,7 @@ XfceSetWallpaper() {
     local impl=2                # 2 = best for x86_64 (?)
 
     case "$(eos_GetArch)" in
-        armv7h) impl=1 ;;
+        armv7h | aarch64) impl=1 ;;
     esac
 
     case "$impl" in

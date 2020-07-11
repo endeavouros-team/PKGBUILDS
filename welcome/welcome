@@ -870,8 +870,12 @@ AddMoreApps() {
       --field=" LibreOffice!libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
       --field=" $(ltr add_more_apps_ch)!chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
       --field=" $(ltr add_more_apps_fw)!gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
-      --field=" $(ltr add_more_apps_akm)!system-software-install!$(ltr add_more_apps_akmtip)":fbtn     'bash -c "yad_Install akm"'
   )
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
+      tabcontents+=(
+          --field=" $(ltr add_more_apps_akm)!system-software-install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"'
+      )
+  fi
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
