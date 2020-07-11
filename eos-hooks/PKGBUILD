@@ -1,0 +1,22 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-hooks
+pkgver=1
+pkgrel=1
+pkgdesc='EndeavourOS pacman hooks'
+arch=('any')
+license=('GPL3')
+#url='https://www.endeavouros.com'
+url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
+
+source=(
+  $url/os-release.hook
+  $url/lsb-release.hook
+)
+sha512sums=('04d159d271eb190b1217952c1853bd0fbd454fdd8afd4f863e3748993670fe1820ae5fdb58da379ee5def40ef4e26ec0abf80b7688c4b36dd301c347859fa469'
+            '42016ad2537c70ddf39c7fef3ec54e0a39657d1b0dbcb9a6dca141a1bab079976c82e3ea811d741a1d60b473c0372f751760d369f4c1c5e48a37dff8b84f52bb')
+
+package() {
+  install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
+  install -Dm644 os-release.hook  $pkgdir/etc/pacman.d/hooks/os-release.hook
+}

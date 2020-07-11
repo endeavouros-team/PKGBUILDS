@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = filesystem
+
+[Action]
+Description = Add EndeavourOS specifc config.
+When = PostTransaction
+Exec = /bin/sh -c "sed -i -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' -e s'|^LOGO=.*$|LOGO=endeavouros|' /usr/lib/os-release"

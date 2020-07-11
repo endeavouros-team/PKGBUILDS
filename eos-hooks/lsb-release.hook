@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = lsb-release
+
+[Action]
+Description = Add EndeavourOS specifc config.
+When = PostTransaction
+Exec = /bin/sh -c "sed -i -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|' /etc/lsb-release"
