@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=endeavouros-theming
 pkgver=5
-pkgrel=2.1
+pkgrel=2.2
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
@@ -34,6 +34,7 @@ package() {
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds"
 
         cd $srcdir
+
         install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
         install -Dm644 os-release.hook  $pkgdir/etc/pacman.d/hooks/os-release.hook
 }

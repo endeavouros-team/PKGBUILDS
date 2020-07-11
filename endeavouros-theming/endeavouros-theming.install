@@ -12,6 +12,9 @@ pre_upgrade() {
        /usr/share/endeavouros/EndeavourOS-icon-E.png
        /usr/share/endeavouros/endeavouros-wallpaper.png
        /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
+
+       /etc/pacman.d/hooks/os-release.hook
+       /etc/pacman.d/hooks/lsb-release.hook
     )
     local xx removed=()
 
