@@ -1,14 +1,22 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=endeavouros-theming
 pkgver=5
-pkgrel=2
+pkgrel=2.1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('4369737559753b9980c17ad6b05cb39f')
+_hooks_url=https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-archiso/master/airootfs/etc/pacman.d/hooks
+
+source=(
+  "${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz"
+  $_hooks_url/os-release.hook
+  $_hooks_url/lsb-release.hook
+)
+md5sums=('4369737559753b9980c17ad6b05cb39f'
+         '89ae3dff8ce4a6a84b442604d4720b47'
+         '23a25075d615bd9d7101e046f157e6b8')
 install=$pkgname.install
 
 package() {
@@ -25,17 +33,7 @@ package() {
 	install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
 	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds"
 
-        local hook
-        local folder=etc/pacman.d/hooks
-        local source=https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-archiso/master/airootfs/$folder
-        install -d $pkgdir/$folder
-        for hook in os-release.hook lsb-release.hook ; do
-            if [ ! -r /$folder/$hook ] ; then
-               wget -q --timeout=20 $source/$hook || {
-                    echo "Failed to fetch hook '$hook'."
-                    return 1
-               }
-               install -m644 $hook $pkgdir/$folder/$hook
-            fi
-        done
+        cd $srcdir
+        install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
+        install -Dm644 os-release.hook  $pkgdir/etc/pacman.d/hooks/os-release.hook
 }
