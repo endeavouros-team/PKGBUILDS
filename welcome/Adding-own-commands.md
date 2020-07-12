@@ -9,9 +9,11 @@ $HOME/.config/welcome-own-cmds.conf
 
 ## Command syntax
 The Welcome app uses **yad forms** and bash language to create a simple GUI.
-<br><small>Note that you don't need to be familiar with yad nor bash (but it may help!) to add your own commands.
+<br>
+<sub>Note that you don't need to be familiar with yad nor bash (but it may help!) to add your own commands.
 Simply follow this short tutorial.<br>
-(More info with terminal commands: `man yad`, `man bash`).</small>
+(More info with terminal commands: `man yad`, `man bash`).
+</sub>
 
 Let's start with a simple Firefox example (this already works for Welcome!):
 <pre>
@@ -44,8 +46,11 @@ Between `--field=` and `:fbtn` you'll write most of the button information.
 The name, icon, and description are separated with exclamation (!) marks.<br>
 And because the added strings may contain space characters, always use quotes ("a string") around the strings.
 
-<small>*Tip*: to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.</small><br>
-<small>*Tip (advanced)*: the command string can be e.g. a bash function (that is exported by `export -f`).</small>
+<sub>*Tip*: to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.</sub><br>
+<sub>*Tip (advanced)*: the command string can be e.g. a bash function (that is exported by `export -f`).
+</sub><br>
+<sub>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
+</sub>
 
 An example field about the parameters on the command string:
 <pre>
