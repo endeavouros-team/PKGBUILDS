@@ -220,5 +220,11 @@ _tr_add2 after_install_pclean       "Configuración de limpieza de los paquetes"
 _tr_add2 after_install_pcleantip    "Configurar el servicio de limpieza de la caché de paquetes"
 
 # 2020-Jul-04:
-_tr_add2 nb_tab_OwnCommands         "Comandos propios"
-_tr_add2 nb_tab_owncmds_text        "Comandos propios agregados"
+_tr_add2 nb_tab_OwnCommands         "Comandos personales"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Comandos personalizados"               # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Ayuda para agregar comandos personales"
+
+_tr_add2 add_more_apps_akm          "Gestor del kernel"
+_tr_add2 add_more_apps_akmtip       "Un pequeño gestor del kernel de linux y una fuente de información"
