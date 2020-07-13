@@ -8,7 +8,7 @@ pkgrel=1
 
 arch=('any')
 license=('GPL')
-depends=(bash)
+depends=(bash yad)
 
 optdepends=(
     'xclip: for automatic copying the returned URL to clipboard'

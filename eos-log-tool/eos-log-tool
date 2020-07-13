@@ -77,7 +77,7 @@ Cmd() {
 SendToInternet() {
     RemovePersonalData  # always before sending logs to the internet
 
-    local url="$(cat "$FILE_OF_LOGS" | curl -F 'f:1=<-' ix.io)"
+    local url="$(cat "$FILE_OF_LOGS" | curl -F 'f:1=<-' ix.io 2>/dev/null)"
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
     if [[ -x /usr/bin/xclip ]]; then
         eos_yad --text="$url" --button="cancel":1 --button="copy":0 --title="Result URL" --width=300
@@ -174,9 +174,6 @@ Main()
 
     rm -f "$FILE_OF_LOGS"
 
-    local rdtip="Rename personal names to generic names"
-    local sltip="Send gathered logs to the internet (personal info always removed)"
-
     local journal0="journalctl -b -0"
     local journal1="journalctl -b -1"
     local journal2="journalctl -b -2"
@@ -190,27 +187,25 @@ Main()
     local lsusb="lsusb"
     #local inxi="inxi -Fxxc0"                         # 'inxi' does not work here !!!
     local hwinfo="hwinfo --short"
-    local rdbut="<i>Remove personal data from logs</i>"
-    local slbut="<i>Send logs to internet</i>"
-    local save="Save this log"
 
     local cmds
     local sendToInternet=no
     local removePersonalInfo=no
     local xx
     local helptext=""
+    local action
+    local msg="Log file $FILE_OF_LOGS created. "
+    local REMOVE
 
     helptext+="Selecting any of the boxes below (except the last two)\n"
     helptext+="will add that particular log to a common log file (<b>$FILE_OF_LOGS</b>).\n"
-    helptext+="Once you have selected the desired boxes, including '$slbut',\n"
-    helptext+="click the OK button and you will receive a URL\n"
-    helptext+="that tells the internet address of the logs.\n\n"
-    helptext+="Note1: personal data is automatically removed from logs before sending to internet.\n"
-    helptext+="Note2: remove personal data can be removed from the log file by selecting '$rdbut'.\n"
-    helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
+    helptext+="Once you have selected the desired boxes\n"
+    helptext+="click the OK button and you will see another window asking\n"
+    helptext+="how you'd wanna share the log from there.\n\n"
+    helptext+="Note: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
 
     local result=$(
-        eos_yad --list --checklist --width=750 --height=655 --text="$helptext" \
+        eos_yad --list --checklist --width=750 --height=600 --text="$helptext" \
                 --image=dialog-question --title="EndeavourOS log tools" \
                 --no-click --multiple \
                 --column=Select --column="Log" --column="Description" \
@@ -225,15 +220,25 @@ Main()
                 false "$blame"    "$save" \
                 false "$lspci"    "$save" \
                 false "$lsusb"    "$save" \
-                false "$hwinfo"   "$save" \
-                false "$rdbut"    "$rdtip" \
-                false "$slbut"    "$sltip"
+                false "$hwinfo"   "$save"
           )
 
     if [ -z "$result" ] ; then
         return
     fi
-    
+
+    REMOVE=$(
+        eos_yad --title "EndeavousOS log tools" --text-align="center" \
+            --text "\nWhich one would you like to choose?\n(Personal data is always removed if youchoose to generate a link)\n" \
+            --button="Generate a link":0 \
+            --button="Save log locally":1 \
+            --list --checklist --column=Select --column="Do you want to?" \
+            true "Remove personal data"
+    )
+
+    action=$?
+    (( $action == 252 )) && exit 1
+
     readarray -t cmds <<< "$(echo "$result" | cut -d '|' -f 2)"
 
     for xx in "${cmds[@]}" ; do
@@ -256,19 +261,17 @@ Main()
         pkexec bash -c "$SUDO_CMDS"
     fi
 
-    for xx in "${cmds[@]}" ; do
-        case "$xx" in
-            "$rdbut") RemovePersonalData ;;
-            "$slbut") SendToInternet ; break ;;
-        esac
-    done
+    if [ "$REMOVE" ]; then
+        RemovePersonalData
+        msg+="Personal data removed"
+    else
+        msg+="Personal data wasn't removed"
+    fi
 
-    if [ "$sendToInternet" = "no" ] ; then
-        if [ "$removePersonalInfo" = "yes" ] ; then
-            Msg "Log file $FILE_OF_LOGS created. Personal data was removed." "Info"
-        else
-            Msg "Log file $FILE_OF_LOGS created. Personal data was <b>not</b> removed." "Info"
-        fi
+    if (( $action )); then
+        Msg "$msg" "Info"
+    else
+        SendToInternet
     fi
 }
 
