@@ -22,20 +22,37 @@ DIE() {
     exit 1
 }
 
+GetCurrentValues() {
+    if [ ! -r $service ] ; then
+        # service is only under /usr/lib/... so get current values from there
+        local why="Is pacman-contrib installed?"
+        test -r $dir2/$pt || DIE "sorry, $dir2/$pt does not exist. $why"
+        test -r $dir2/paccache.service || DIE "sorry, $dir2/paccache.service does not exist. $why"
+        current_period="$(grep "^OnCalendar=" $dir2/paccache.timer | cut -d '=' -f 2)"
+        current_keepcount="$(grep "^ExecStart=" $dir2/paccache.service | awk '{print $NF}')"
+    else
+        current_period="$(grep "^OnCalendar=" $timer | cut -d '=' -f 2)"
+        current_keepcount="$(grep "^ExecStart=" $service | awk '{print $NF}')"
+    fi
+}
+
 _paccache_cleaner_manager()
 {
     local progname=paccache-service-manager
-    local dir=/usr/lib/systemd/system
+    local dir=/etc/systemd/system
+    local dir2=/usr/lib/systemd/system         # current values may be only here...
     local service=$dir/paccache.service
     local timer=$dir/paccache.timer
-    local current_period="$(grep "^OnCalendar=" $timer | cut -d '=' -f 2)"        # current value
-    local current_keepcount="$(grep "^ExecStart=" $service | awk '{print $NF}')"  # current value
+    local current_period
+    local current_keepcount
     local period keepcount
     local pt="paccache.timer"
-    local cmds xx
+    local cmds=":" xx
     local period_vals
     local txt
     local image=disk-utility
+
+    GetCurrentValues
 
     # possible period values, and set the default
     for xx in daily weekly monthly ; do
@@ -72,7 +89,10 @@ _paccache_cleaner_manager()
         keepcount="$(echo "$result" | cut -d '|' -f 3)"
 
         if [ "$keepcount" != "$current_keepcount" ] || [ "$period" != "$current_period" ] ; then
-           cmds="systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
+           if [ ! -r $service ] ; then
+                cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
+           fi
+           cmds+=" ; systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
            cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=/usr/bin/paccache -rk$keepcount|'"
            cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
            cmds+=" ; systemctl enable $pt"
