@@ -195,3 +195,33 @@ _tr_add2 after_install_us_from    "Actualizar a partir de"                      
 _tr_add2 after_install_us_el      "São necessário privilégios elevados."
 _tr_add2 after_install_us_done    "Actualização concluída."
 _tr_add2 after_install_us_fail    "A actualização falhou!"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Dicas"
+_tr_add2 useful_tips_text      "Dicas úteis"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Registo de alterações"
+_tr_add2 butt_changelogtip     "Mostrar o registo de alterações de Welcome"
+
+_tr_add2 after_install_themevan      "Tema original Xfce"
+_tr_add2 after_install_themevantip   "Usar o tema original Xfce"
+
+_tr_add2 after_install_themedef     "Tema do EndeavourOS para o Xfce"
+_tr_add2 after_install_themedeftip  "Usar o tema do EndeavourOS para o Xfce"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Configuração de limpeza de pacotes"
+_tr_add2 after_install_pcleantip    "Configurar o serviço de limpeza da cache de pacotes"
+
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Comandos Pessoais"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Comandos personalizados"             # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Ajuda para adicionar comandos pessoais"
+
+_tr_add2 add_more_apps_akm          "Um Gestor de Kernel"
+_tr_add2 add_more_apps_akmtip       "Um gestor leve de linux kernel e fonte de informação"
