@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1
+pkgver=1.1
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
@@ -12,11 +12,18 @@ url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 source=(
   $url/os-release.hook
   $url/lsb-release.hook
+  $url/${pkgname}.hook
+  $url/${pkgname}-runner
 )
-sha512sums=('04d159d271eb190b1217952c1853bd0fbd454fdd8afd4f863e3748993670fe1820ae5fdb58da379ee5def40ef4e26ec0abf80b7688c4b36dd301c347859fa469'
-            '42016ad2537c70ddf39c7fef3ec54e0a39657d1b0dbcb9a6dca141a1bab079976c82e3ea811d741a1d60b473c0372f751760d369f4c1c5e48a37dff8b84f52bb')
+sha512sums=('246233b11606ea7bbc491cb95ed24d0dcdb01eca20a1be51b1c3179eaa09551bcac46ddb1da1720ad37066877db9cecb035762ce368746e7b700ab623513609c'
+            'cd26ce37a41c5b13c19822074a1dfca28b90ec5d9ed8070feaad17ba33bc31cffdc08189542a8839e2f2a79c87b729d5b2980882bf860661e6c135c6cc42dd09'
+            '29661752370cfb7940a453d2fc479bd1a407338ea6d1edaaee54baaa2baec00fc9c5b880379555d42274ee5e1468e0b9f4195b7c1fe2f6b20c0e1e9cacb58c1e'
+            'e6456e46b9550c3c8aae9772ca62d5e608f27559c681f1286b3ceea63e8863f8c0598d7e6a9a1518ca9c1e740cef23788cac5a8ba1f0178ea2d362f56cf01ca9')
 
 package() {
   install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
   install -Dm644 os-release.hook  $pkgdir/etc/pacman.d/hooks/os-release.hook
+  install -Dm644 ${pkgname}.hook  $pkgdir/etc/pacman.d/hooks/${pkgname}.hook
+
+  install -Dm755 ${pkgname}-runner $pkgdir/usr/bin/${pkgname}-runner
 }

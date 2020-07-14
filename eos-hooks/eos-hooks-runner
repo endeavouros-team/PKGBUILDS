@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Run eos hooks related commands.
+
+Lsb_release() {
+    sed -i /etc/lsb-release \
+        -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
+        -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
+}
+
+Os_release() {
+    sed -i /usr/lib/os-release \
+        -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' \
+        -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' \
+        -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' \
+        -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' \
+        -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' \
+        -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' \
+        -e s'|^LOGO=.*$|LOGO=endeavouros|' 
+}
+
+Main()
+{
+    local hookname="$1"
+
+    case "$hookname" in
+        os-release)  Os_release ;;
+        lsb-release) Lsb_release ;;
+        "")          Os_release
+                     Lsb_release ;;
+    esac
+}
+
+Main "$@"
