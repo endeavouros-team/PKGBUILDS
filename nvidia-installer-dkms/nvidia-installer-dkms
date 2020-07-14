@@ -177,7 +177,7 @@ def install(driver):
                     return False
 
     log_info("Downloading and installing driver packages, please wait as this may take a few minutes...")
-    cmd = ["yay", "-Sqy", "--noconfirm", "--noprogressbar"]
+    cmd = ["pacman", "-Sqy", "--noconfirm", "--noprogressbar"]
     cmd.extend(packages)
     if TEST:
         log_info(" ".join(cmd))
