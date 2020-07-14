@@ -35,6 +35,7 @@ NvidiaIdsCommon() {
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
+    Info "$string: $branch"
     echo "$ids"
 }
 
@@ -58,10 +59,36 @@ NvidiaIdsLegacy() {
 
 echo2()   { echo "$@" >&2 ; }
 DIE()     { echo2 "Error: $1" ; exit 1 ; }
+Info()    { test "$show_additional_info" = "yes" && echo2 "Info: $@" ; }
+
+Options() {
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            -v | --verbose) show_additional_info=yes ;;
+            -*) DIE "unsupported option '$arg'" ;;
+            *) DIE "unsupported parameter '$arg'" ;;
+        esac
+    done
+}
+
+ExeEnv() {
+    case "$(echo "${BASH_SOURCE[@]}")" in
+        *rogalmic.bash-debug*)  exe_env=vscode ;;
+        */usr/bin/bashdb*)      exe_env=bashdb ;;
+        *)                      exe_env=run ;;
+    esac
+}
 
 CreateNvidiaDb()
 {
     local PROGNAME=nvidia-installer-update-db
+    local exe_env=""
+    #ExeEnv
+
+    local show_additional_info=no    # TESTING! no is the default
+
+    Options "$@"
 
     local targetdir=/var/lib/pci                        # db directory
     local target_latest=$targetdir/nvidia.ids           # db (list of ids) for driver type 'nvidia'
