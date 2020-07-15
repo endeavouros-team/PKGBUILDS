@@ -21,7 +21,7 @@ optdepends=(
 source=(
   $url/$pkgname
 )
-sha256sums=('ee1bcda968ccb807dfcecd3741004c13f15f61185f5109e434e3a03590a58041')
+sha256sums=('c2f6da8cf29cb7933a1efe4a162c28adb1ebe15be33fede414dbbc82705ecdc4')
 
 package() {
   sed -i $pkgname \
