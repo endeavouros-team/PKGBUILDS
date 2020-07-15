@@ -218,3 +218,6 @@ _tr_add2 after_install_pcleantip    "Nastavte službu prečisťovania vyrovnáva
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "Vlastné príkazy"
 _tr_add2 nb_tab_owncmds_text        "Vlastné pridané príkazy"
+
+_tr_add2 add_more_apps_akm          "Správca jadra"
+_tr_add2 add_more_apps_akmtip       "Malý zdroj informácií o, a správca linuxového jadra"
