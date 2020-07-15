@@ -225,3 +225,6 @@ _tr_add2 nb_tab_owncmdstip          "Ohjeita omien komentojen tekemiseen"
 
 _tr_add2 add_more_apps_akm          "Linux-ytimien manageri"
 _tr_add2 add_more_apps_akmtip       "Helppo linux-ytimien asentaja ja tietolähde"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Tutoriaali: Omat komennot"

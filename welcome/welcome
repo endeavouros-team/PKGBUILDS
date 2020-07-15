@@ -840,15 +840,16 @@ UsefulTips() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=user-info
       --text="<b>$(ltr useful_tips_text)</b>"
-      --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn           "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
-      --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn           "$_BROWSER https://endeavouros.com/docs/aur/yay"
-      --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
-      --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field="$(ltr after_install_pm)!!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
+      --field="$(ltr after_install_ay)!!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
+      --field="$(ltr after_install_hn)!!$(ltr after_install_hntip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
+      --field="$(ltr after_install_bt)!!$(ltr after_install_bttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
   )
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field="$(ltr after_install_nv)!!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
   tabcontents+=(
-      --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn           "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+      --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
   )
   "${tabcontents[@]}" >& /dev/null &
 }
@@ -896,7 +897,7 @@ OwnCommands() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
-      --field=" $(ltr butt_help)!!$(ltr nb_tab_owncmdstip)":fbtn
+      --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn
           "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
   )
   tabcontents+=("${welcome_own_commands[@]}")
