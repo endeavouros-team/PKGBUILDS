@@ -216,8 +216,14 @@ _tr_add2 after_install_pclean       "Nastavenie prečisťovania balíčkov"
 _tr_add2 after_install_pcleantip    "Nastavte službu prečisťovania vyrovnávacej pamäte balíčkov"
 
 # 2020-Jul-04:
-_tr_add2 nb_tab_OwnCommands         "Vlastné príkazy"
-_tr_add2 nb_tab_owncmds_text        "Vlastné pridané príkazy"
+_tr_add2 nb_tab_OwnCommands         "Vlastné príkazy"                       # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Sebe uspôsobené príkazy"               # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Pomoc s pridávaním vlastných príkazov"
 
 _tr_add2 add_more_apps_akm          "Správca jadra"
 _tr_add2 add_more_apps_akmtip       "Malý zdroj informácií o, a správca linuxového jadra"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help          "Návod: Vlastné príkazy"
