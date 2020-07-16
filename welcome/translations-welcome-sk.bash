@@ -202,6 +202,7 @@ _tr_add2 nb_tab_UsefulTips     "Rady"
 _tr_add2 useful_tips_text      "Užitočné rady"
 
 # 2020-May-16:
+
 _tr_add2 butt_changelog        "Zoznam zmien"
 _tr_add2 butt_changelogtip     "Ukázať zoznam zmien v uvítacej aplikácii"
 
