@@ -92,11 +92,12 @@ _paccache_cleaner_manager()
            if [ ! -r $service ] ; then
                 cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
            fi
-           cmds+=" ; systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
+           # cmds+=" ; systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
            cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=/usr/bin/paccache -rk$keepcount|'"
            cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
-           cmds+=" ; systemctl enable $pt"
-           cmds+=" ; systemctl start $pt"
+           # cmds+=" ; systemctl enable $pt"
+           # cmds+=" ; systemctl start $pt"
+           cmds+=" ; systemctl daemon-reload"
            pkexec bash -c "$cmds"
         else
             echo "Nothing changed." >&2               
