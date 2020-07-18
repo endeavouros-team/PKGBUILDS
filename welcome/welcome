@@ -623,11 +623,11 @@ export -f yad_InitializePacmanMirroring
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="eos_yad --text-info --title=INSTALL_INSTALLER --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd="eos_yad --text-info --title="$INSTALL_INSTALLER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
 
     local pkg pkgs=()
     for pkg in "$@" ; do
-        pacman -Q "$1" >& /dev/null || pkgs+=("$pkg")
+        pacman -Q "$pkg" >& /dev/null || pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
         echo "$*: $INSTALL_ALREADY" | $yadcmd

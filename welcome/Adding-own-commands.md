@@ -93,7 +93,40 @@ local welcome_own_commands=(
 
 local activate_own_commands_tab=yes
 local columns_for_own_commands=3
+</pre>
+## Example (advanced, assumes knowledge about bash language)
+This example shows how to use bash functions in the command string.
+<pre>
+Install_with_pacman() {
+    # Install one or more given packages. Does not reinstall any packages.
+
+    local yadcmd="eos_yad --text-info --title="Installer" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local pkg pkgs=()
+
+    # Check if given package(s) are already installed:
+    for pkg in "$@" ; do
+        pacman -Q "$pkg" >& /dev/null || pkgs+=("$pkg")
+    done
+    test -z "$pkgs" && {
+        echo "$*: already installed" | $yadcmd
+        return
+    }
+
+    # Install packages:
+    while true ; do
+        echo "Installing ${pkgs[*]} ..."
+        pkexec pacman -S --noconfirm "${pkgs[@]}"
+        echo "Finished."
+        break
+    done |& $yadcmd
+}
+
+export -f Install_with_pacman         # Mandatory to export the function!
+
+local welcome_own_commands=(
+    --field=" Install example!system-software-install!Install some packages":fbtn          "bash -c 'Install_with_pacman code vlc'"
+)
 
 </pre>
-Feel free to copy this example and modify it to match your needs.<br>
+Feel free to copy these examples and modify them to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
