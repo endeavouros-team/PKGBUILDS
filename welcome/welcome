@@ -892,9 +892,24 @@ OwnCommands() {
   local handle="$1"
   local tabnum="$2"
 
+  local cols="$columns_for_own_commands"
+
+  while true ; do
+      if [ -z "$cols" ] ; then
+          cols=2
+      elif [ -n "$(echo "$cols" | tr -d '0-9')" ] ; then
+          cols=2
+          echo "Warning: value '$columns_for_own_commands' for variable 'columns_for_own_commands' is unsupported, using $cols." >&2
+      elif [ $cols -lt 1 ] || [ $cols -gt 20 ] ; then
+          cols=2
+          echo "Warning: value '$columns_for_own_commands' for variable 'columns_for_own_commands' is unsupported, using $cols." >&2
+      fi
+      break
+  done
+
   local tabcontents=(
       eos_yad
-      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
       --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn

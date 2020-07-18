@@ -52,16 +52,20 @@ And because the added strings may contain space characters, always use quotes ("
 <sub>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
 </sub>
 
-An example field about the parameters on the command string:
+An example field about the parameters in the command string:
 <pre>
     --field=" EndeavourOS forum!web-browser!Discussions at the EndeavourOS forum":fbtn
             "xdg-open https://forum.endeavouros.com"
 </pre>
 
-Another supported (but optional) variable is `activate_own_commands_tab`. It specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.<br>
+Other supported (but optional) variables are
+- `activate_own_commands_tab`: specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.
+- `columns_for_own_commands`: specifies the layout (specifically: number of columns) of the buttons under the Personal Commands tab.
+
 For example:
 <pre>
-local activate_own_commands_tab=yes    # "yes" or "no"
+local activate_own_commands_tab=yes    # "yes" or "no" (default: no)
+local columns_for_own_commands=3       # a small positive number (default: 2)
 </pre>
 
 
@@ -77,6 +81,7 @@ Here is a full *example* file containing three commands/buttons, and activating 
 # - Add yad form fields as in the example below.
 # - To have own commands activated initially, set local variable 'activate_own_commands_tab' to "yes";
 #   otherwise the default tab is initially active.
+# - Layout: specify the number of columns for the buttons on the Personal Commands tab.
 
 local welcome_own_commands=(
     # Legend: --field=" name!icon!description":fbtn "command"
@@ -87,6 +92,8 @@ local welcome_own_commands=(
 )
 
 local activate_own_commands_tab=yes
+local columns_for_own_commands=3
+
 </pre>
 Feel free to copy this example and modify it to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
