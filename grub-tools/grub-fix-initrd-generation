@@ -9,9 +9,13 @@ _log2() {
     echo "$@" >&2
 }
 
+_logfile() {
+    echo "$@" >> $log
+}
+
 _log() {
     _log2 "$@"
-    echo "$@" >> $log
+    _logfile "$@"
 }
 
 _die() {
@@ -50,11 +54,13 @@ _show_result() {
     local diffs="$(diff $file $file.bak)"
 
     if [ "$diffs" != "" ] ; then
-        _log "Changes for $file:"
-        _log "$diffs"
-        _log "Backup to $file.bak."
+        changed=yes
+        _logfile "$prompt: Changes for $file:"
+        _logfile "$diffs"
+        _logfile "$prompt: Backup to $file.bak."
+        _log2 "$prompt: $file changed. See file $log."
     else
-        _log "$file not changed."
+        _logfile "$prompt: $file not changed."
     fi
 }
 
@@ -93,6 +99,8 @@ Main() {
     local progname=grub-fix-initrd-generation
     local lock=/var/log/$progname.lck
     local log=/var/log/$progname.log
+    local prompt="===> INFO"
+    local changed=no
 
     if [ -r $lock ] ; then
         _log2 "$progname is already running!"
@@ -106,11 +114,15 @@ Main() {
 
     rm -f $log
 
-    _log2 "$in_pkg / $progname:"
+    _log2 "$prompt: $in_pkg / $progname:"
     _grub_mods
     _os_prober_mod
 
     rm -f $lock
+
+    if [ "$changed" = "yes" ] ; then
+        _log "$prompt: Changes will take effect after running command: grub-mkconfig -o /boot/grub/grub.cfg"
+    fi
 }
 
 Main "$@"
