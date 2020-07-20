@@ -955,11 +955,15 @@ ManualCheckOfAssets() {
     local op="$1"
     sleep 1
     while true ; do
-        hub release show -f %as%n $tag | sed 's|^.*/||' >&2
-        printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
-        read2
+        if [ 0 -eq 1 ] ; then
+            hub release show -f %as%n $tag | sed 's|^.*/||' >&2
+            printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
+        else
+            : #printf2 "\n%s "  "Is $op OK (y/n)?"
+        fi
+        read2 -t 30 -p "Is $op OK (Y/n)? "
         case "$REPLY" in
-            [yY]*) break ;;
+            [yY]* | "") break ;;
             *) ;;
         esac
     done
