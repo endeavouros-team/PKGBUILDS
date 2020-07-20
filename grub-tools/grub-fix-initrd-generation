@@ -58,12 +58,25 @@ _show_result() {
     fi
 }
 
-_grub_mod() {
+_grub_mod1() {
     local file=/etc/grub.d/30_os-prober  # from package 'grub'
     _backup $file grub
     sed -i $file \
         -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|"
     _show_result $file
+}
+
+_grub_mod2() {
+    local file=/etc/grub.d/10_linux  # from package 'grub'
+    _backup $file grub
+    sed -i $file \
+        -e "s|s, with Linux |s, with kernel |"
+    _show_result $file
+}
+
+_grub_mods() {
+    _grub_mod1  # this is related to _os_prober_mod !
+    _grub_mod2
 }
 
 _os_prober_mod() {
@@ -94,7 +107,7 @@ Main() {
     rm -f $log
 
     _log2 "$in_pkg / $progname:"
-    _grub_mod
+    _grub_mods
     _os_prober_mod
 
     rm -f $lock
