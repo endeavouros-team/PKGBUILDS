@@ -76,7 +76,8 @@ _grub_mod2() {
     local file=/etc/grub.d/10_linux  # from package 'grub'
     _backup $file grub
     sed -i $file \
-        -e "s|s, with Linux |s, with kernel |"
+        -e "s|s, with Linux |s, with kernel |" \
+        -e 's|"Loading Linux |"Loading kernel |'
     _show_result $file
 }
 
@@ -121,7 +122,7 @@ Main() {
     rm -f $lock
 
     if [ "$changed" = "yes" ] ; then
-        _log "$prompt: Changes will take effect after running command: grub-mkconfig -o /boot/grub/grub.cfg"
+        _log "$prompt: Changes will take effect after running command: sudo grub-mkconfig -o /boot/grub/grub.cfg"
     fi
 }
 
