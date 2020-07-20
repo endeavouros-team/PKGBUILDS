@@ -935,7 +935,7 @@ AssetCmd() {
         --no-ask) arg="$1" ; shift ;;
     esac
 
-    AssetCmdShow "$@"
+    # AssetCmdShow "$@"
     "$@"
     if [ $? -ne 0 ] ; then
         DIE "command '$*' failed!"
@@ -961,7 +961,7 @@ ManualCheckOfAssets() {
         else
             : #printf2 "\n%s "  "Is $op OK (y/n)?"
         fi
-        read2 -t 30 -p "Is $op OK (Y/n)? "
+        read2 -t 10 -p "Is $op OK (Y/n)? "
         case "$REPLY" in
             [yY]* | "") break ;;
             *) ;;
