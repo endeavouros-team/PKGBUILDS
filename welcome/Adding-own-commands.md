@@ -124,7 +124,7 @@ Install_with_pacman() {
 export -f Install_with_pacman         # Mandatory to export the function!
 
 local welcome_own_commands=(
-    --field=" Install example!system-software-install!Install some packages":fbtn          "bash -c 'Install_with_pacman code vlc'"
+    --field=" Install example!system-software-install!Install some packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
 
 </pre>
