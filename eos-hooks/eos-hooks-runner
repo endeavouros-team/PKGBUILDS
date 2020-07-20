@@ -19,6 +19,10 @@ Os_release() {
         -e s'|^LOGO=.*$|LOGO=endeavouros|' 
 }
 
+Issues() {
+    sed -i 's|Arch|EndeavourOS|g' /etc/issue /usr/share/factory/etc/issue
+}
+
 Main()
 {
     local hookname="$1"
@@ -27,7 +31,9 @@ Main()
         os-release)  Os_release ;;
         lsb-release) Lsb_release ;;
         "")          Os_release
-                     Lsb_release ;;
+                     Lsb_release
+                     Issues
+                     ;;
     esac
 }
 
