@@ -128,5 +128,8 @@ local welcome_own_commands=(
 )
 
 </pre>
+
+*Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.
+
 Feel free to copy these examples and modify them to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
