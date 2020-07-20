@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.0.8
+pkgver=3.0.9
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -31,6 +31,7 @@ source=(
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
   $url/Adding-own-commands.md
+  $url/calamares-update
   $url/translations-${pkgname}.bash
   $url/translations-${pkgname}-reference.bash
   $url/translations-${pkgname}-de.bash
@@ -60,6 +61,7 @@ sha512sums=('c94468243f112c667a59733813888750437f5194920077ab5b824b58ebc977d4c10
             'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad'
             '47382fe6431ae179f991980b2bf2f4d4ad56bfba70873659c3a7720de2fca90a60fa6033fb4cfe313e87d771312c0c80feb1617a64885362763f4b66e62543b8'
             'ce1957a5235ce271c6c0d1462937e934e8e165a5a236366c94b96b612c3ded3cfc8cded9b33ebdf703cb32c83347c3387eb3d68d66b703513807c2c06ac6a64d'
+            '3a12d28cffe4a537929b65aa5ad31f3f08e1e37e38a481943a26c72cf8fd1e9fd117ca8d52043d06568587ac8cc365242f043efa326dff83485c8b757d2fb51b'
             'b2d36263d25c4f76da1c85658b6964eaf1183b23db3fbcadbc8ce8a8acda82fdc681f3514c0305efcfdb5e65c87d1b8a3e6cc35bb2625eb624f568eee34c6249'
             '394ac7527470178e33c655e6804c62389140bacd3dee0b8846d46c4fd6e70401e92a16182e981ef1ff7085df4d9e3d04483c7a974a435c76ff07f4134965bed7'
             '515b546d418fe58bb48c0fe6d162b6a327053c7af839f027bf28953ace8f17bd876392de14c07e2cd6e5dbc670713f3ac6e89b99da39ad896eddf0a188e556a0'
@@ -98,6 +100,7 @@ package() {
   install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
   install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
+  install -Dm755 calamares-update               $pkgdir/usr/bin/calamares-update
 
   install -d $pkgdir/etc/xdg/autostart
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop

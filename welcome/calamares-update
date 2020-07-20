@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# Update (=install latest) calamares, either current or test.
+#
+# Make sure /etc/pacman.conf contains proper repo definition,
+# and the databases are updated.
+#
+
+MakeSureRepoIsOk() {
+    local file=/etc/pacman.conf
+    local repo=endeavouros_calamares
+    local linerepo="[$repo]"
+    local lineserver='Server = https://github.com/endeavouros-team/mirrors/releases/download/$repo'
+
+    if [ -z "$(grep "^\[$repo\]$" $file)" ] ; then
+        cmds+=" ; printf '\n%s\n%s\n' '$linerepo' '$lineserver' >> $file"
+    fi
+}
+
+Main()
+{
+    local type="$1"
+    local cmds=":"
+
+    case "$type" in
+        test) ;;
+        current) ;;
+        *) type=current ;;
+    esac
+
+    MakeSureRepoIsOk
+
+    cmds+=" ; pacman -Syy calamares_$type"
+
+    echo "Executing commands: $cmds" >&2
+    echo "Elevated privileges required."
+    pkexec bash -c "$cmds"
+}
+
+Main "$@"
