@@ -17,6 +17,31 @@ MakeSureRepoIsOk() {
     fi
 }
 
+AskType() {
+    while true ; do
+        read -p "Give type of calamares (current, test): " >&2
+        case "$REPLY" in
+            test|current) type="$REPLY" ; break ;;
+            [qQ]*) exit 0 ;;
+        esac
+        echo "'$REPLY' is not supported." >&2
+    done
+}
+
+Usage() {
+    cat <<EOF >&2
+Usage: $0 [options] [type]
+
+options:
+    -h | --help          This help.
+
+type:
+    current       Use the 'current' version of calamares. (default)
+    test          Use the 'test' version of calamares.
+    ask           Ask user about the version of calamares [current,test].
+EOF
+}
+
 Main()
 {
     local type="$1"
@@ -25,6 +50,8 @@ Main()
     case "$type" in
         test) ;;
         current) ;;
+        ask) AskType ;;
+        -h | --help) Usage ; return ;;
         *) type=current ;;
     esac
 
