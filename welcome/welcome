@@ -953,10 +953,10 @@ CreateNotebookCommands() {
             AddMoreApps
             #About
         )
-        if [ -n "$welcome_own_commands" ] ; then
-            _NOTEBOOK_TABS+=(OwnCommands)
-        fi
     }
+    if [ -n "$welcome_own_commands" ] ; then
+        _NOTEBOOK_TABS+=(OwnCommands)
+    fi
 }
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -1331,20 +1331,20 @@ StartHere() {
         notebook+=(--tab="$tabname")
     done
 
-    if [ "$is_installing" = "no" ] ; then
-        # Set the active tab number.
-
-        local active_tab_nr=2                              # 2 = the After Install tab
-
-        if [ -n "$welcome_own_commands" ] ; then
-            # 'activate_own_commands_tab' may have been set
-            # in the "$own_commands_conf" file
-            case "$activate_own_commands_tab" in
-                [Yy][Ee][Ss]) active_tab_nr=5 ;;            # 5 = the Personal Commands tab
-            esac
-        fi
-        notebook+=(--active-tab=$active_tab_nr)
+    # Set the active tab number.
+    local active_tab_nr=2                             # 2 = the After Install tab
+    test "$is_installing" = "yes" && active_tab_nr=1
+    if [ -n "$welcome_own_commands" ] ; then
+        # 'activate_own_commands_tab' may have been set
+        # in the "$own_commands_conf" file
+        case "$activate_own_commands_tab" in
+            [Yy][Ee][Ss])
+                active_tab_nr=5                       # 5 = the Personal Commands tab
+                test "$is_installing" = "yes" && active_tab_nr=3
+                ;;
+        esac
     fi
+    notebook+=(--active-tab=$active_tab_nr)
 
     notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
