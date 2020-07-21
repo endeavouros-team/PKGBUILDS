@@ -104,7 +104,7 @@ After writing your bash function, there are two "additional" things to remember:
 Install_with_pacman() {
     # This bash function installs one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="eos_yad --text-info --title="Installer" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd="eos_yad --text-info --title=Installer --wrap --tail --width=600 --height=500 --button=yad-quit:0"
     local pkg pkgs=()
 
     # Check if given package(s) are already installed:
