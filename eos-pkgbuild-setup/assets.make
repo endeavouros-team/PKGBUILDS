@@ -947,6 +947,8 @@ AssetCmdLast() {
     local arg=""
     if [ "$tag" = "${RELEASE_TAGS[$last_tag]}" ] ; then
         arg="--no-ask"
+    else
+        arg="--no-ask"   # arg=""
     fi
     AssetCmd $arg "$@"
 }
