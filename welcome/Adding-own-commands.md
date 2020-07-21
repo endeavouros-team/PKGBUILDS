@@ -47,7 +47,7 @@ The name, icon, and description are separated with exclamation (!) marks.<br>
 And because the added strings may contain space characters, always use quotes ("a string") around the strings.
 
 <sub>*Tip*: to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.</sub><br>
-<sub>*Tip (advanced)*: the command string can be e.g. a bash function (that is exported by `export -f`).
+<sub>*Tip (advanced)*: the command string can be e.g. a bash function with parameters (see the examples below).
 </sub><br>
 <sub>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
 </sub>
@@ -60,12 +60,12 @@ An example field about the parameters in the command string:
 
 Other supported (but optional) variables are
 - `activate_own_commands_tab`: specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.
-- `columns_for_own_commands`: specifies the layout (specifically: number of columns) of the buttons under the Personal Commands tab.
+- `columns_for_own_commands`: specifies the layout (specifically: number of columns) of the buttons under the Personal Commands tab. Note: the layout is managed by **yad** and may *not* contain exactly the specified number of columns!
 
 For example:
 <pre>
 local activate_own_commands_tab=yes    # "yes" or "no" (default: no)
-local columns_for_own_commands=3       # a small positive number (default: 2)
+local columns_for_own_commands=4       # a small positive number (default: 2)
 </pre>
 
 
@@ -92,13 +92,17 @@ local welcome_own_commands=(
 )
 
 local activate_own_commands_tab=yes
-local columns_for_own_commands=3
+local columns_for_own_commands=2
 </pre>
 ## Example (advanced, assumes knowledge about bash language)
-This example shows how to use bash functions in the command string.
+This example shows how to use bash functions in the command string.<br>
+After writing your bash function, there are two "additional" things to remember:
+- export your bash function with: `export -f`
+- command string structure changes to: `"bash -c 'MyBashFunction parameters'"`
 <pre>
+
 Install_with_pacman() {
-    # Install one or more given packages. Does not reinstall any packages.
+    # This bash function installs one or more given packages. Does not reinstall any packages.
 
     local yadcmd="eos_yad --text-info --title="Installer" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
     local pkg pkgs=()
@@ -124,7 +128,10 @@ Install_with_pacman() {
 export -f Install_with_pacman         # Mandatory to export the function!
 
 local welcome_own_commands=(
-    --field=" Install example!system-software-install!Install some packages":fbtn "bash -c 'Install_with_pacman code vlc'"
+    # When using a bash function, the command string must be changed like this:
+    #    "bash -c 'MyBashFunction parameters'"
+
+    --field=" Install example!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
 
 </pre>
