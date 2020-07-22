@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# A config file helper for Welcome's Personal Commands.
+# User can drag&drop e.g. .desktop or document files onto this window.
+#
+# Assumes config file's welcome_own_commands variable has
+# the ending parenthesis ')' as the FIRST and ONLY character on a line.
+
+DndDIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || DndDIE "source failed."
+
+export -f eos_yad
+
+DndCreateConfigFile() {
+    if [ ! -r "$configfile" ] ; then
+        cat <<EOF > $configfile
+#!/bin/bash
+
+local welcome_own_commands=(
+    # --field=" Pamac!system-software-install!GUI package manager":fbtn  'pamac-manager'
+)
+# Note: leave the ')' character above as the first and only character on that line!
+EOF
+    fi
+}
+
+DndAddField() {
+    local configfile="$HOME/.config/welcome-own-cmds.conf"
+    local field="  --field=' $name!$icon!$description':fbtn '$command'"
+
+    # make sure the config file exists in a proper format
+    DndCreateConfigFile
+
+    # add a field line in the end of variable welcome_own_commands
+    sed -i "$configfile" -e "/^)$/i\  $field"
+}
+
+DndDesktopFile() {
+    local file="${arg#file://}"
+    local icon="$(grep "^Icon=" $file | head -n 1 | cut -d '=' -f 2)"
+    local name="$(grep "^Name=" $file | head -n 1 | cut -d '=' -f 2)"
+    local generic_name="$(grep "^GenericName=" $file | head -n 1 | cut -d '=' -f 2)"
+    local comment="$(grep "^Comment=" $file | head -n 1 | cut -d '=' -f 2)"
+    local description="Description not available."
+    local command="xdg-open $file"
+
+    if [ -n "$generic_name" ] ; then
+        description="$generic_name"
+    elif [ -n "$comment" ] ; then
+        description="$comment"
+    fi
+
+    DndAddField
+}
+
+DndDocumentFile() {
+    local file="${arg#file://}"
+    local desktopfile="$(xdg-mime query default $(xdg-mime query filetype $file))"
+    local dt2="$(find /usr/share/applications -name "$desktopfile")"
+    test -n "$dt2" || dt2="$(find "$HOME/.local/share/applications" -name "$desktopfile")"
+    case "$file" in
+        /*) ;;
+        *) file="$PWD/$file" ;;
+    esac
+    local ending="${file##*.}"
+    local name="$(basename "$file")"
+    local description="A $ending file"
+    local command="xdg-open $file"
+    local icon="$(grep "^Icon=" "$dt2" | head -n 1 | cut -d '=' -f 2)"
+
+    DndAddField
+}
+
+DndUrl() {
+    local file="${arg}"
+    local name="$file"
+    local description="A URL"
+    local command="xdg-open $file"
+    local icon="web-browser"
+    #local desktopfile="$(xdg-mime query default $(xdg-mime query filetype $file))"
+
+    DndAddField
+}
+
+DndServerStart() {
+    local cmd="/usr/bin/$progname"
+    local search="command=$cmd"
+
+    if [ -n "$(ps -ef | grep "$search" | grep -v "grep $search")" ] ; then
+        echo "$progname server is already running!" >&2
+        return
+    fi
+
+    local text="Drop item(s) into this window:\n"
+    text+="-  URLs\n"
+    text+="-  documents and files\n"
+    text+="-  .desktop files (=launchers)"
+
+    eos_yad --title="Welcome: Personal Commands drag & drop support" \
+            --text="$text" \
+            --width=500 --height=200 --posx=-20 --posy=-20 \
+            --text-align=left \
+            --dnd --$search &
+}
+
+DndMain()
+{
+    local progname=welcome-dnd
+
+    if [ "$1" = "" ] ; then
+        DndServerStart
+        return
+    fi
+
+    local arg
+
+    for arg in "$@" ; do
+        echo "Dropping '$arg'." >&2
+        case "$arg" in
+            https://* | http://*)  DndUrl ;;
+            *.desktop)             DndDesktopFile ;;
+            /* | file://*)         DndDocumentFile ;;
+            *)                     DndDIE "'$arg' not supported." ;;
+        esac
+        sleep 2
+    done
+}
+
+DndMain "$@"

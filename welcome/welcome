@@ -44,7 +44,7 @@ export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
 
-export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon='$EOS_WICON'"
+export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 
 eos_yad() {
     GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@"
@@ -834,6 +834,7 @@ AfterInstall() {
 UsefulTips() {
   local handle="$1"
   local tabnum="$2"
+  local _and='&#38;'           # '&'
 
   local tabcontents+=(
       eos_yad
@@ -850,6 +851,7 @@ UsefulTips() {
   tabcontents+=(
       --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
       --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field=" Personal Commands drag${_and}drop!$EOS_WICON!Show a window where to drag field items":fbtn  "welcome-dnd"
   )
   "${tabcontents[@]}" >& /dev/null &
 }
@@ -891,7 +893,7 @@ AddMoreApps() {
 OwnCommands() {
   local handle="$1"
   local tabnum="$2"
-
+  local _and='&#38;'           # '&'
   local cols="$columns_for_own_commands"
 
   while true ; do
@@ -914,6 +916,7 @@ OwnCommands() {
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
       --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn
           "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field=" Personal Commands drag${_and}drop!$EOS_WICON!Show a window where to drag field items":fbtn  "welcome-dnd"
   )
   tabcontents+=("${welcome_own_commands[@]}")
   "${tabcontents[@]}" >& /dev/null &
