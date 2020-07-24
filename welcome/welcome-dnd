@@ -95,9 +95,9 @@ DndServerStart() {
     fi
 
     local text="Drop item(s) into this window:\n"
-    text+="-  URLs\n"
-    text+="-  documents and files\n"
-    text+="-  .desktop files (=launchers)"
+    text+="-  URL shortcut from the address line of a web browser\n"
+    text+="-  document and file shortcuts from a file manager\n"
+    text+="-  .desktop file (=launcher) shortcut from the start menu"
 
     local yadcmd=(eos_yad --dnd
                   --$handler

@@ -149,10 +149,10 @@ Click that button, and it shows a new drag & drop window:
 
 ![](welcome-dnd-window.png)
 
-Now you can drop items onto that window, and they will appear as new fields in your Personal Commands configuration file.<br>
-And if you do not have a configuration file yet, it will be automatically created when dropping an item onto this window!
+Now you can drop items onto that window, and they will find their place as fields in your Personal Commands configuration file.<br>
+And if you didn't have a configuration file, it will be automatically created when dropping an item onto this window!
 
-After adding items, be sure to restart the Welcome app!
+The new command will also appear on the Welcome app shortly (this feature was added to Welcome version 3.2.6-1)!
 
 Feel free to copy these examples and modify them to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
