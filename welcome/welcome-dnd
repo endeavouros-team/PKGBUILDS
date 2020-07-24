@@ -87,10 +87,9 @@ DndUrl() {
 }
 
 DndServerStart() {
-    local cmd="/usr/bin/$progname"
-    local search="command=$cmd"
+    local handler="command=/usr/bin/$progname"
 
-    if [ -n "$(ps -ef | grep "$search" | grep -v "grep $search")" ] ; then
+    if [ -n "$(ps -ef | grep "$handler" | grep -v "grep $handler")" ] ; then
         echo "$progname server is already running!" >&2
         return
     fi
@@ -100,11 +99,26 @@ DndServerStart() {
     text+="-  documents and files\n"
     text+="-  .desktop files (=launchers)"
 
-    eos_yad --title="Welcome: Personal Commands drag & drop support" \
-            --text="$text" \
-            --width=500 --height=200 --posx=5 --posy=5 \
-            --text-align=left \
-            --dnd --$search &
+    local yadcmd=(eos_yad --dnd
+                  --$handler
+                  --title="Welcome: Personal Commands drag & drop support"
+                  --text="$text"
+                  --width=500 --height=200
+                  # --posx=5 --posy=5
+                 )
+
+    "${yadcmd[@]}" &
+}
+
+RestartWelcomeAndDndServer() {
+    local progname=eos-welcome
+
+    pkill -f "$progname"
+    pkill -f "/usr/bin/yad --window-icon=$EOS_WICON"
+    sleep 0.5
+    $progname &
+    sleep 1
+    DndServerStart
 }
 
 DndMain()
@@ -126,8 +140,10 @@ DndMain()
             /* | file://*)         DndDocumentFile ;;
             *)                     DndDIE "'$arg' not supported." ;;
         esac
-        sleep 2
+        sleep 0.5
     done
+
+    RestartWelcomeAndDndServer
 }
 
 DndMain "$@"
