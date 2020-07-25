@@ -579,6 +579,7 @@ def main():
                 log_info("Installation finished. You need to reboot now!")
     else:
         log_error("Couldn't find a driver suitable for your graphics card.")
+        log_error("If you have an older nvidia card, you may use the --force option to install nvidia-dkms and follow further instructions.")
 
 
 if __name__ == "__main__":
