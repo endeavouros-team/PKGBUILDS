@@ -562,6 +562,8 @@ def main():
             "Your graphics card is not in our database. "
             "Forcing nvidia-dkms driver installation anyways...")
         log_warning(msg)
+        msg = ("For an older card this command may be needed before reboot: yay -S nvidia-390xx-dkms")
+        log_warning(msg)
         driver = "nvidia-dkms"
 
     if driver:
