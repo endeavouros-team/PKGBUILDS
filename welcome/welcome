@@ -761,7 +761,7 @@ INSTALL() {
   local handle="$1"
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
-  local image=gtk-save
+  local image=system-softwwre-install  # gtk-save
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
