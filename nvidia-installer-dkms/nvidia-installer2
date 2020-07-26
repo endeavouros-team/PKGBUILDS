@@ -35,7 +35,7 @@ GetGpuIds() {
 
 Main()
 {
-    local TESTING=yes           # set to "no" on release !!!
+    local TESTING=no           # set to "no" on release !!!
 
     local vendorinfo=""             # e.g. nvidia:1234:2345|intel:4321:5432|amd:9876:6789
     local nvidia_id_file=/var/lib/pci/nvidia.ids
@@ -49,25 +49,26 @@ Main()
 
     GetGpuIds
 
-    nvidia-installer-update-db
-
     nvidia_info=$(echo "$vendorinfo" | cut -d '|' -f 1)
     if [ -n "$nvidia_info" ] ; then
+
+        nvidia-installer-update-db
+
         ix=2
         for id in $(echo "$nvidia_info" | cut -d ':' -f $ix) ; do
             if [ -n "$(grep -w "$id" $nvidia_id_file)" ] ; then
-                echo2 "Your graphics card is supported by the nvidia-dkms driver."
+                echo2 "Your graphics card (id $id) is supported by the nvidia-dkms driver."
                 echo2 "Use nvidia-installer-dkms to install the driver(s) you want."
                 break
             elif [ -n "$(grep -w "$id" $nvidia_id_file_390)" ] ; then
-                echo2 "Your graphics card is supported by the nvidia-390xx-dkms driver."
-                echo2 "You can use nvidia-installer-dkms to install nvidia-dkms using the --force option."
+                echo2 "Your graphics card (id $id) is supported by the nvidia-390xx-dkms driver."
+                echo2 "You can use nvidia-installer-dkms to install nvidia-dkms by adding the --force option."
                 echo2 "Then, BEFORE rebooting, install nvidia-390xx-dkms from the AUR, for example:"
                 echo2 "  yay -S nvidia-390xx-dkms"
                 break
             fi
+            ((ix++))
         done
-        ((ix++))
     else
         echo2 "Nvidia card not found."
     fi
