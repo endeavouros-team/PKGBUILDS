@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=1.7.2
+pkgver=1.7.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,17 +21,19 @@ source=(
   $url/$pkgname.desktop
   $url/$pkgname.timer
   $url/$pkgname.service
+  $url/checkupdatesext
 )
-sha512sums=('7bdc212595598a8d67d94338a1bd0551d749a00efc084d0fadca1b743e063ae797678aa85f761e0d2bfb33d3f9cc1c02bb6fa9ec7499135bbfc7c0c4f36a4ca9'
+sha512sums=('ec45b3e9cc939242afe5c9d91bf16da05de9d78e5e2722f250fe22b5fe72b43f18f86cdb13207931ec5d7224e4c67f8601781642ee404eca6cda58528d107344'
             'd5d4d92a9fd0d7a4425bb7000d208d717846ff30c2c31abac94c88840d3e8edc4862a6aacbb576330ff9d7644e63cf90e509caad629d9ed516f378e62b26e168'
             'd489cf73b0267cf9edf88a3d5a914f614ce0dfd694a1c40b329f56efa2e73d0497d2e3af35a99f04dde2a32d153177d04f16ed7751a457f9640397b45074e6d3'
             '97eed94588efa2fb0a824a92c2efaa484612033717795d1c0c7e72a7fe1352cc7b44c14c0f82748e1bbd00983d3ae5bc0ab8ca523db75b46c2a5002e5645fb2e'
-            'a999c463ac17c45a3d27b88e9f137de228c8d705c517f953e538d314bb9e9be9e04c453b129c478128e62037aa513869c38d6d0d8446cbdbf2c4b54a75c42ad1'
+            '08377927e0584c9e3f98d813069b771ee58d1396613ed4df760bc5c980be3812ac9120a806bbb1ad2df708f94a4d23b908f92ed8abf10eee23e633c6bc462cd5'
             'b6aad64f265cb6c203928df31bcd6a4b252532a6264e8702f5bac13bfeacfef323aa48ef0f0f550f45ade66c08de449279f7f2572b0b67121e01341759a3659e'
             'a40a03b5e2c8f4a3fd4d1dffccec6d6a622b54bea2ffead85f3892b2a0ceef6d8bc04dd0aee1b46989126245c47e7aedb630ac8ae1bbd3b64ca84a49eda5ccd2'
             'd0a67db74a020f94f72cca002b7b37c11d4dbe5a703c2259f804a53d00a361b94120c7bcc77d2532dd19ba40c5c89aacb489f05ec2734b570ad5c0c2988a3cba'
             'fc306c2ada55c78afe7a3c5ee14155db7cdce393940873bf99ae2fbd7f9eb404a1288bfc74ba17fb39002e70706f62bba8ba1597f1c13491f3f72c42cff0d89c'
-            '0bdcd09c69e1fb9d7e28a9155e90c6c632c506d619685b8a8a417dd737d240a96cce77b3231a4644e9f79de9e7b3a0048d299476ad0c78076528c5389641af31')
+            '0bdcd09c69e1fb9d7e28a9155e90c6c632c506d619685b8a8a417dd737d240a96cce77b3231a4644e9f79de9e7b3a0048d299476ad0c78076528c5389641af31'
+            '3523fb35f7a6174522eadf929e3d342c558309f3bbe6ab692f9ed9b1b69e35d5e7a2f69038d6d2e4ffcf4f0af356c66ea8849b253a6d432253fb661021584cda')
 
 package() {
   cd $srcdir
@@ -41,6 +43,7 @@ package() {
   install -Dm644 $pkgname.desktop          $pkgdir/etc/xdg/autostart/$pkgname.desktop    # not needed because of systemd service
   install -Dm755 arch-news-for-you         $pkgdir/usr/bin/arch-news-for-you
   install -Dm755 eos-arch-news             $pkgdir/usr/bin/eos-arch-news
+  install -Dm755 checkupdatesext           $pkgdir/usr/bin/checkupdatesext
 
   install -d $pkgdir/etc/pacman.d/hooks
   install -Dm644 eos-reboot-required.hook  $pkgdir/etc/pacman.d/hooks/eos-reboot-required.hook

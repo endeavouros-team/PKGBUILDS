@@ -108,7 +108,7 @@ ShowNonFocused() {
             case "$ShowWhatAboutUpdates" in
                 packages)
                     tmp="$(echo "$updates" | sed 's|^|    |')"
-                    height=$((10 * count + 120))
+                    height=$((10 * count + 120 + 20))
                     test $height -gt $limit && height=$limit
                     msg="$(printf "$count $source updates available at $date:\n$tmp\n")"
                     YadNonFocused
@@ -131,6 +131,10 @@ ShowNonFocused() {
     esac
 }
 
+Checkupdates() {
+    /usr/bin/checkupdatesext
+}
+
 Update_common() {
     # Check upstream updates first.
 
@@ -148,7 +152,7 @@ Update_common() {
 
     SystemLockActive a || return
     echo2 "Checking for updates ..."
-    updates="$(/usr/bin/checkupdates)"
+    updates="$(Checkupdates)"
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
@@ -158,7 +162,7 @@ Update_common() {
                 if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                     # Re-check for updates if more than $secs seconds elapsed from the first check.
                     echo2 "Re-checking for updates ..."
-                    updates="$(/usr/bin/checkupdates)"
+                    updates="$(Checkupdates)"
                 fi
             fi
         fi

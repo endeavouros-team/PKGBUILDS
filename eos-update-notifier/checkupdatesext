@@ -1,0 +1,40 @@
+#!/bin/bash
+
+CheckUpdates() {
+    readarray -t ups <<< $(/usr/bin/checkupdates)
+}
+
+ShowUpdates() {
+    local ix pkgname pkginfo dlsize
+
+    for ((ix=0; ix < ${#ups[@]}; ix++)) ; do
+        pkgname="$(echo "${ups[$ix]}" | awk '{print $1}')"
+        pkginfo="$(LANG=C /usr/bin/pacman -Si $pkgname)"
+        dlsize="$(echo "$pkginfo" | grep "Download Size" | awk '{print $4$5}')"
+        echo "${ups[$ix]} $dlsize"
+    done
+}
+
+ShowUpdatesHeader() {
+    echo "Name Current -> New DownloadSize"
+    echo "---- ------- -- --- ------------"
+}
+
+Main()
+{
+    local show_header=yes
+    local ups
+
+    test "$1" = "--nh" && show_header=no
+
+    CheckUpdates
+    while true ; do
+        if [ -n "$ups" ] ; then
+            test "$show_header" = "yes" && ShowUpdatesHeader | tr ' ' '|'
+            ShowUpdates | tr ' ' '|'
+        fi
+        break
+    done | column -t -s "|" | sed 's|\([0-9][0-9.,]*\)\([a-zA-Z][a-zA-Z]*\)$|\1 \2|'
+}
+
+Main "$@"

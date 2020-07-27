@@ -35,6 +35,13 @@ ShowIfNotSeen() {
         echo "0" > "$latestfile"
     fi
     local latest_seen="$(cat "$latestfile")"
+    if [ -n "$(echo "$latest_seen" | tr -d '0-9-')" ] ; then
+        mv "$latestfile" "$latestfile.bak.$(date "+%Y%m%d-%H:%M:%S")"
+        echo "0" > "$latestfile"
+        latest_seen="0"   # also: "$(cat "$latestfile")"
+        echo "Fixed a corrupt file: $latestfile (backup created)." >&2
+        echo "Re-checking Arch news." >&2
+    fi
     local msg
 
     if [[ "$latest" > "$latest_seen" ]] ; then
