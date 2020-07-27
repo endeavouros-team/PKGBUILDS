@@ -60,7 +60,7 @@ log2() {
 }
 
 YadNonFocused() {
-    local opts=(--no-focus --geometry=500x${height}+20+20 --title="Updates available!")
+    local opts=(--no-focus --geometry=650x${height}+20+20 --title="Updates available!")
     opts+=(--button="Dismiss!!Don't update, just close this window":1 --button="Update!!Close this window and update":0)
 
     echo "$msg" | eos_yad2 --text-info "${opts[@]}" "$@"
