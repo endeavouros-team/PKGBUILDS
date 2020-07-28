@@ -506,7 +506,7 @@ def load_ids_file(path):
 def load_ids():
     """ Load all nvidia devices pci ids """
     for item in os.listdir(IDS_PATH):
-        if item.endswith('.ids') and "nvidia" in item:
+        if item.endswith('nvidia.ids') and "nvidia" in item:
             key = item[:-4] + "-dkms"
             path = os.path.join(IDS_PATH, item)
             DEVICES[key] = load_ids_file(path)
