@@ -2,7 +2,7 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-dkms
-pkgver=3.3.5
+pkgver=3.3.6
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
@@ -20,11 +20,15 @@ optdepends=(
 
 source=(
   $url/$pkgname
+  $url/nvidia-installer-check
 )
-sha256sums=('980e4cd6fb31407df431891878b87caa21e59166bdd04fef16fe2a63e49314c6')
+sha512sums=('07e812872f524535845d5ff38edaeb5bbd44be43f2ada20d9b68888f39c57561eb6105626e88a8741824ceb97cf74e6160174bddb91b2ce6456667c95d041923'
+            '478005921455a2c6d6aed97ab4cc7dccb9393c92d25bc85665b5e293be51b186f2bd3d8c783d39a5b6675d7dfe3ac66ac872f24e8d7badc9eebb00f24547018b')
 
 package() {
   sed -i $pkgname \
       -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
-  install -Dm755 $pkgname $pkgdir/usr/bin/$pkgname
+
+  install -Dm755 $pkgname               $pkgdir/usr/bin/$pkgname
+  install -Dm755 nvidia-installer-check $pkgdir/usr/bin/nvidia-installer-check
 }
