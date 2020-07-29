@@ -12,7 +12,7 @@ ShowAll() {
     local latest="${dates[0]}"
     local browser
 
-    for browser in firefox chromium ; do
+    for browser in firefox chromium xdg-open exo-open ; do
         if [ -x /usr/bin/$browser ] ; then
             /usr/bin/$browser "$url" >& /dev/null
             echo "$latest" > "$latestfile"
@@ -22,16 +22,34 @@ ShowAll() {
     echo "Error: no browser found." >&2
 }
 
+IsTooEarlyToShowArchNews() {
+    local log=/var/log/Calamares.log
+    local yes=0
+    local no=1
+    local timediff ftime now max=$((3600*1))   # don't show Arch news right after install (?)
+
+    test -r "$log" || return $no  # log not found, probably removed
+    now=$(date +%s)
+    ftime=$(stat -c %Y $log)
+    timediff=$((now - ftime))
+    if [ $timediff -lt $max ] ; then
+        return $yes
+    else
+        return $no
+    fi
+}
+
 ShowIfNotSeen() {
     local latest="${dates[0]}"
 
     if [ ! -r "$latestfile" ] ; then
-        if [ -z "$(checkupdates)" ] ; then
-            # No need to show Arch news right after install or reset (?)
-            echo "$latest" > "$latestfile"
-            echo "Saving the latest Arch news date $latest." >&2
-            return
-        fi
+        IsTooEarlyToShowArchNews && return
+        #if [ -z "$(checkupdates)" ] ; then
+        #    # No need to show Arch news right after install or reset (?)
+        #    echo "$latest" > "$latestfile"
+        #    echo "Saving the latest Arch news date $latest." >&2
+        #    return
+        #fi
         echo "0" > "$latestfile"
     fi
     local latest_seen="$(cat "$latestfile")"
