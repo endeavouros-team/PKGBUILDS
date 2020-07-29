@@ -59,11 +59,11 @@ Main()
         ret_ids="$(echo "$nvidia_info" | sed -e 's|^nvidia:||' -e 's|:| |')"
         for id in $ret_ids ; do
             if [ -n "$(grep -w "$id" $nvidia_id_file)" ] ; then
-                echo2 "Your graphics card (id $id) is supported by the nvidia-dkms driver."
+                echo2 "Your graphics card (id: $id) is supported by the nvidia-dkms driver."
                 #echo2 "Use nvidia-installer-dkms to install the driver(s) you want."
                 driver_found="nvidia-dkms"
             elif [ -n "$(grep -w "$id" $nvidia_id_file_390)" ] ; then
-                echo2 "Your graphics card (id $id) is supported by the nvidia-390xx-dkms driver."
+                echo2 "Your graphics card (id: $id) is supported by the nvidia-390xx-dkms driver."
                 echo2 "Use the --force option with nvidia-installer-dkms."
                 echo2 "Then, BEFORE rebooting, install nvidia-390xx-dkms from the AUR, for example:"
                 echo2 "  yay -S nvidia-390xx-dkms"
