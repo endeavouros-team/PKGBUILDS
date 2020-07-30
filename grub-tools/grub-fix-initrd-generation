@@ -122,7 +122,7 @@ Main() {
     rm -f $lock
 
     if [ "$changed" = "yes" ] ; then
-        _log "$prompt: Changes will take effect after running command: sudo grub-mkconfig -o /boot/grub/grub.cfg"
+        /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
     fi
 }
 
