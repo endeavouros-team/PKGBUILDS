@@ -81,9 +81,34 @@ _grub_mod2() {
     _show_result $file
 }
 
+_grub_mod3() {
+    # Make sure GRUB_DISTRIBUTOR is taken from /etc/lsb-release:DISTRIB_ID.
+
+    local lsb=/etc/lsb-release
+    test -r $lsb || {
+        _log "$warning: package lsb-release is not installed."
+        return
+    }
+    local name="$(grep "^DISTRIB_ID=" $lsb | cut -d '=' -f 2 | tr -d '"' | tr -d "'")"
+    test -n "$name" || {
+        _log "$warning: $lsb does not contain a value for DISTRIB_ID."
+        return
+    }
+    local file=/etc/default/grub  # from package 'grub'
+
+    _backup $file grub
+    if [ -n "$(grep "^GRUB_DISTRIBUTOR=" $file)" ] ; then
+        sed -i $file -e "s|^GRUB_DISTRIBUTOR=.*|GRUB_DISTRIBUTOR=\"$name\"|"
+    else
+        echo "GRUB_DISTRIBUTOR=\"$name\"" >> $file
+    fi
+    _show_result $file
+}
+
 _grub_mods() {
     _grub_mod1  # this is related to _os_prober_mod !
     _grub_mod2
+    _grub_mod3
 }
 
 _os_prober_mod() {
@@ -101,6 +126,7 @@ Main() {
     local lock=/var/log/$progname.lck
     local log=/var/log/$progname.log
     local prompt="===> INFO"
+    local warning="===> WARNING"
     local changed=no
 
     if [ -r $lock ] ; then
