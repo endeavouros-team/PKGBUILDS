@@ -642,6 +642,33 @@ yad_Install() {
 }
 export -f yad_Install
 
+yad_Remove() {
+    # Remove one or more given packages.
+
+    # TODO: translate these!
+    local REMOVER="Remover"
+    local REMOVING="Removing"
+    local NOT_INSTALLED="not installed"
+
+    local yadcmd="eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+
+    local pkg pkgs=()
+    for pkg in "$@" ; do
+        pacman -Q "$pkg" >& /dev/null && pkgs+=("$pkg")
+    done
+    test -z "$pkgs" && {
+        echo "$*: $NOT_INSTALLED" | $yadcmd
+        return
+    }
+    while true ; do
+        echo "$REMOVING ${pkgs[*]} ..."
+        pkexec pacman -Rdd --noconfirm "${pkgs[@]}"
+        echo "$INSTALL_DONE"
+        break
+    done |& $yadcmd
+}
+export -f yad_Remove
+
 yad_GetCurrentDM() {
     local current=$(ls -l /etc/systemd/system/display-manager.service | awk '{print $NF}')
     current="$(basename $current .service)"
@@ -821,6 +848,9 @@ AfterInstall() {
   tabcontents+=(
       --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
   )
+
+  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!system-software-update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
+
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
@@ -1140,6 +1170,14 @@ EOF
             ;;
     esac
 }
+
+Check_r8168() {
+    # return 0 if r8168 is installed and no internet connection
+    pacman -Q r8168 >& /dev/null || return 1
+    eos_yad_check_internet_connection none 0 "0s" && return 1
+    return 0
+}
+export -f Check_r8168
 
 UpdateInstallScripts() {
     # IsInstalling || return
