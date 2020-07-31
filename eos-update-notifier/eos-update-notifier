@@ -69,20 +69,19 @@ YadNonFocused() {
 ShowTray() {
     # Tray notification may have issues on EOS...
     eos_yad2 --notification --image="system-software-update" \
-             --text="$count $source updates are available at $date"
+             --text="$update_count $source updates are available at $date"
 }
 ShowNotify() {
     local ms=15000
     /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
                          --app-name="EndeavourOS Update Notifier" \
                          "Updates available at $date" \
-                         "$count $source updates are available"
+                         "$update_count $source updates are available"
 }
 
 ShowNonFocused() {
     local date="$(/usr/bin/date '+%x %X')"
     local source="$1"
-    local count="$(echo "$updates" | wc -l)"
 
     if [ "$pkgsonly" = "yes" ] ; then       # cmd line options override config file options
         ShowHowAboutUpdates=window
@@ -108,14 +107,14 @@ ShowNonFocused() {
             case "$ShowWhatAboutUpdates" in
                 packages)
                     tmp="$(echo "$updates" | sed 's|^|    |')"
-                    height=$((10 * count + 120 + 20))
+                    height=$((10 * update_count + 120 + 20))
                     test $height -gt $limit && height=$limit
-                    msg="$(printf "$count $source updates available at $date:\n$tmp\n")"
+                    msg="$(printf "$update_count $source updates available at $date:\n$tmp\n")"
                     YadNonFocused
                     ;;
                 number | *)
                     height=100
-                    msg="$(printf "$count $source updates available at $date.\n")"
+                    msg="$(printf "$update_count $source updates available at $date.\n")"
                     YadNonFocused
                     ;;
             esac
@@ -131,8 +130,10 @@ ShowNonFocused() {
     esac
 }
 
-Checkupdates() {
-    /usr/bin/checkupdatesext
+GetUpdateCount() {
+    updates="$(/usr/bin/checkupdatesext)"
+    update_count="$(echo "$updates" | wc -l)"
+    update_count=$((update_count - 2))          # remove two lines of headers from checkupdatesext
 }
 
 Update_common() {
@@ -142,6 +143,7 @@ Update_common() {
     local source=""
     local cmd=""
     local updates=""
+    local update_count=0
     local extra_check=no
     local previous_check_time
     local secs=10
@@ -152,7 +154,7 @@ Update_common() {
 
     SystemLockActive a || return
     echo2 "Checking for updates ..."
-    updates="$(Checkupdates)"
+    GetUpdateCount
 
     if [ -n "$updates" ] ; then
         if [ $update_focused -eq 0 ] ; then
@@ -162,7 +164,7 @@ Update_common() {
                 if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                     # Re-check for updates if more than $secs seconds elapsed from the first check.
                     echo2 "Re-checking for updates ..."
-                    updates="$(Checkupdates)"
+                    GetUpdateCount
                 fi
             fi
         fi
