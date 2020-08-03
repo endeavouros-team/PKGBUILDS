@@ -74,11 +74,12 @@ Stable() {
 
 TestingVersion() {
     local pkg="$1"
-    echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^[ ]*<td>\([0-9a-z\.\-]*\)<.*$|\1|'
+    echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^.*>\([0-9][0-9a-z\.\-]*\)<.*$|\1|'
 }
 
 Testing() {
-    local testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing")"
+    local testinginfo
+    testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules")"
     local version
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
