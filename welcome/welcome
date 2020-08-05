@@ -882,7 +882,7 @@ UsefulTips() {
   tabcontents+=(
       --field="$(ltr after_install_ft)!!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
       --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
-      --field=" Personal Commands drag${_and}drop!$EOS_WICON!Show a window where to drag field items":fbtn  "welcome-dnd"
+      --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
   "${tabcontents[@]}" >& /dev/null &
 }
@@ -947,7 +947,7 @@ OwnCommands() {
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
       --field=" $(ltr butt_owncmds_help)!!$(ltr nb_tab_owncmdstip)":fbtn
           "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
-      --field=" Personal Commands drag${_and}drop!$EOS_WICON!Show a window where to drag field items":fbtn  "welcome-dnd"
+      --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
   tabcontents+=("${welcome_own_commands[@]}")
   "${tabcontents[@]}" >& /dev/null &

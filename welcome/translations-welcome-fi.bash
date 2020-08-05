@@ -228,3 +228,7 @@ _tr_add2 add_more_apps_akmtip       "Helppo linux-ytimien asentaja ja tietolähd
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help        "Tutoriaali: Omat komennot"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Omat komennot - raahaa${_and}pudota"
+_tr_add2 butt_owncmds_dnd_help    "Näytä ikkuna johon voi raahata elementtejä uusille painikkeille"

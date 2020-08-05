@@ -228,3 +228,7 @@ _tr_add2 add_more_apps_akmtip       "A small linux kernel manager and info sourc
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help        "Tutorial: Personal Commands"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Personal Commands drag${_and}drop"
+_tr_add2 butt_owncmds_dnd_help    "Show a window where to drag field items for new buttons"
