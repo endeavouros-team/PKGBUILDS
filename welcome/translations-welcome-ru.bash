@@ -225,3 +225,10 @@ _tr_add2 nb_tab_owncmdstip          "Справка по добавлению п
 
 _tr_add2 add_more_apps_akm          "Выбор ядра Linux"
 _tr_add2 add_more_apps_akmtip       "Установка простого менеджера ядер Linux"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Справка: пользовательские команды"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Создание пользовательских кнопок"
+_tr_add2 butt_owncmds_dnd_help    "Отображение окна для создания новых кнопок"
