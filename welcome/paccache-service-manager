@@ -47,7 +47,8 @@ _paccache_cleaner_manager()
     local current_keepcount
     local period keepcount
     local pt="paccache.timer"
-    local cmds=":" xx
+    local cmds=":" cmd=""
+    local xx
     local period_vals
     local txt
     local image=disk-utility
@@ -87,21 +88,21 @@ _paccache_cleaner_manager()
     if [ -n "$result" ] ; then
         period="$(   echo "$result" | cut -d '|' -f 2)"
         keepcount="$(echo "$result" | cut -d '|' -f 3)"
+        cmd="/usr/bin/paccache -rk$keepcount"
 
         if [ "$keepcount" != "$current_keepcount" ] || [ "$period" != "$current_period" ] ; then
            if [ ! -r $service ] ; then
                 cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
            fi
            # cmds+=" ; systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
-           cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=/usr/bin/paccache -rk$keepcount|'"
+           cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=$cmd|'"
            cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
            cmds+=" ; systemctl enable $pt"
            cmds+=" ; systemctl start $pt"
            cmds+=" ; systemctl daemon-reload"
-           pkexec bash -c "$cmds"
-        else
-            echo "Nothing changed." >&2               
         fi
+        cmds+=" ; $cmd"                         # clean up cache now!
+        pkexec bash -c "$cmds"
     fi
 }
 
