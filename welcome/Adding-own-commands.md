@@ -94,7 +94,9 @@ local welcome_own_commands=(
 local activate_own_commands_tab=yes
 local columns_for_own_commands=2
 </pre>
+
 ## Example (advanced, assumes knowledge about bash language)
+
 This example shows how to use bash functions in the command string.<br>
 After writing your bash function, there are two "additional" things to remember:
 - export your bash function with: `export -f`
@@ -136,6 +138,20 @@ local welcome_own_commands=(
 
 </pre>
 
+## Example (another advanced example, showing how to align texts on the new buttons)
+
+Welcome's version 3.2.14 added support to automatically align the texts on the buttons under a tab.<br>
+To align texts on the buttons, *mark* the **name** element with `_align(name)`.<br>
+The following code shows it:
+
+<pre>
+local welcome_own_commands=(
+    --field="_align(A Kernel Manager)!system-software-install!Simple kernel manager and info source":fbtn  "akm"
+    --field="_align(Mousepad)!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
+    --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
+)
+</pre>
+<br>
 *Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.
 
 ## Drag & drop items into the configuration file!

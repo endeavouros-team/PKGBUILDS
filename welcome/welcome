@@ -130,7 +130,6 @@ eos_yad_WARN_debug() {
 export -f eos_yad_WARN_debug
 
 
-
 _align_buttons_on_tab() {
     local -n arr="$1"
     local ix count="${#arr[@]}" xx name newname len=0 le pad tmpname
@@ -139,10 +138,11 @@ _align_buttons_on_tab() {
         case "$xx" in
             --field=*)
                 name="${xx/*_align(/}"                # remove from left of name
-                test "$name" = "$xx" && continue
-                name="${name/)!*/}"                   # remove from right of name
-                le=${#name}
-                test $le -gt $len && len=$le
+                if [ "$name" != "$xx" ] ; then
+                    name="${name/)!*/}"               # remove from right of name
+                    le=${#name}
+                    test $le -gt $len && len=$le
+                fi
                 ;;
         esac
     done
@@ -154,41 +154,31 @@ _align_buttons_on_tab() {
         case "$xx" in
             --field=*)
                 name="${xx/*_align(/}"                # remove from left of name
-                test "$name" = "$xx" && {
-                    ((ix++))
-                    continue
-                }
-                name="${name/)!*/}"                   # remove from right of name
+                if [ "$name" != "$xx" ] ; then
+                    name="${name/)!*/}"               # remove from right of name
+                    pad=$((len - ${#name}))
 
-                pad=$((len - ${#name}))
+                    # The $pad must be bigger if special chars (like "&#33;" = "!") are present!
+                    # Some translations use special characters.
+                    tmpname="$name"
+                    while [ "${tmpname/&#??;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
+                        ((pad+=4))                                         # each "&#??;" turns to one char!
+                        tmpname="${tmpname/&#??;/}"
+                    done
+                    while [ "${tmpname/&#???;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
+                        ((pad+=5))                                         # each "&#???;" turns to one char!
+                        tmpname="${tmpname/&#???;/}"
+                    done
 
-                # pad must be longer if special chars (like "&#33;" = "!") are present!
-                tmpname="$name"
-                while [ "${tmpname/&#??;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
-                    ((pad+=4))                                         # each "&#??;" turns to one char!
-                    tmpname=${tmpname/&#??;/}
-                done
-                while [ "${tmpname/&#???;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
-                    ((pad+=5))                                         # each "&#???;" turns to one char!
-                    tmpname=${tmpname/&#???;/}
-                done
-
-                newname="<tt> $name$(printf '%*s' $pad)</tt>"
-
-                xx="${xx/_align($name)!/$newname!}"
-                arr[$ix]="$xx"
+                    newname="<tt> $name$(printf '%*s' $pad)</tt>"
+                    xx="${xx/_align($name)!/$newname!}"
+                    arr[$ix]="$xx"
+                fi
                 ;;
         esac
         ((ix++))
     done
 }
-
-
-
-
-
-
-
 
 
 yad_calamares() {
