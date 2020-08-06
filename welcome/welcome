@@ -168,6 +168,10 @@ _align_buttons_on_tab() {
                     ((pad+=4))                                         # each "&#??;" turns to one char!
                     tmpname=${tmpname/&#??;/}
                 done
+                while [ "${tmpname/&#???;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
+                    ((pad+=5))                                         # each "&#???;" turns to one char!
+                    tmpname=${tmpname/&#???;/}
+                done
 
                 newname="<tt> $name$(printf '%*s' $pad)</tt>"
 
