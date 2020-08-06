@@ -230,5 +230,5 @@ _tr_add2 add_more_apps_akmtip       "Un petit gestionnaire de noyaux linux et un
 _tr_add2 butt_owncmds_help        "Tutoriel : Commandes personnelles"
 
 # 05-août-2020:
-_tr_add2 butt_owncmds_dnd         "Commandes personnelles tirer${_et}glisser"
+_tr_add2 butt_owncmds_dnd         "Commandes personnelles tirer${_and}glisser"
 _tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer les items pour les nouveaux boutons"
