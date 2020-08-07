@@ -228,3 +228,7 @@ _tr_add2 add_more_apps_akmtip       "Malý zdroj informácií o, a správca linu
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help          "Návod: Vlastné príkazy"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Chyťte ${_and} pretiahnite vlastné príkazy"
+_tr_add2 butt_owncmds_dnd_help    "Zobraziť okno, do ktorého sa dajú pretiahnúť položky na nové tlačítka"
