@@ -969,13 +969,44 @@ FindAppIcon() {
     echo ""
 }
 
+FindAppIconKDE() {
+    local app="$1"
+    local sz=32
+    local path
+
+    for sz in 48 ; do
+        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
+        test -n "$path" && {
+            echo "$path"
+            return
+        }
+    done
+    echo "Sorry, icon path not found for app '$app'." >&2
+    echo ""
+}
+
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
 
-  local gufw="$(FindAppIcon gufw)"
-  local libreoffice="$(FindAppIcon libreoffice)"
-  local chromium="$(FindAppIcon chromium)"
+  local DE="$(eos_yad_GetDesktopName)"
+
+  local gufw
+  local libreoffice
+  local chromium
+
+  case "$DE" in
+      KDE)
+          gufw="$(FindAppIconKDE firewall-config)"
+          libreoffice="$(FindAppIconKDE libreoffice-writer)"
+          chromium="$(FindAppIconKDE web-browser)"
+          ;;
+      *)
+          gufw="$(FindAppIcon gufw)"
+          libreoffice="$(FindAppIcon libreoffice)"
+          chromium="$(FindAppIcon chromium)"
+          ;;
+  esac
 
   local tabcontents=(
       eos_yad
