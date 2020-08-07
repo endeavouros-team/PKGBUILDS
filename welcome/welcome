@@ -112,6 +112,7 @@ IsInstalling() {
     test "$show_installer" = "yes" && return 0
     test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "$EOS_LIVEUSER"
 }
+export -f IsInstalling
 
 yad_tailer() {
     local file="$1"
@@ -843,6 +844,7 @@ INSTALL() {
   local image=$system_software_install
   local gparted="$(FindAppIcon gparted)"
   local reflector_simple="$(FindAppIcon software-update-available)"
+  local user_info=info
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
@@ -868,6 +870,9 @@ INSTALL() {
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
+  IsInstalling && {
+      local user_info=info
+  }
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
