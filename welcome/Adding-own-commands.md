@@ -36,7 +36,7 @@ A field definition consists of the following *elements*:
 
 Element | Purpose | Value in the example above
 :--- | :--- | :---
-name | button name | Firefox web browser
+name | button name (may add special _align(name) marking, see below) | Firefox web browser
 icon | name of an icon on the button (optional) | firefox-default
 description | useful info for the user (optional) | Browse the web with Firefox
 command string | actual command the button executes (can have parameters) | firefox
@@ -52,9 +52,16 @@ And because the added strings may contain space characters, always use quotes ("
 <sub>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
 </sub>
 
+### The **name** element and aligning
+
+If you want to left-align the texts on all buttons on your Personal Commands tab, you should use the `_align(name)` marking on each field.
+Otherwise texts will be centered. Marking simply makes button's **name** part to be processed by Welcome for left-alignment.<br>
+Left-aligning is useful especially if you have icons on the buttons.
+<br><sub>*Tip*: use `_align()` on *all* fields to make all left aligned. Mixing left-aligned and centered names may make button layout unappealing.</sub><br>
+
 An example field about the parameters in the command string:
 <pre>
-    --field=" EndeavourOS forum!web-browser!Discussions at the EndeavourOS forum":fbtn
+    --field="_align(EndeavourOS forum)!web-browser!Discussions at the EndeavourOS forum":fbtn
             "xdg-open https://forum.endeavouros.com"
 </pre>
 
@@ -138,7 +145,7 @@ local welcome_own_commands=(
 
 </pre>
 
-## Example (another advanced example, showing how to align texts on the new buttons)
+## Example showing how to align texts on the buttons of your Personal Commands tab
 
 Welcome's version 3.2.14 added support to automatically align the texts on the buttons under a tab.<br>
 To align texts on the buttons, *mark* the **name** element with `_align(name)`.<br>
