@@ -840,20 +840,22 @@ INSTALL() {
   local handle="$1"
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
-  local image=system-softwwre-install  # gtk-save
+  local image=$system_software_install
+  local gparted="$(FindAppIcon gparted)"
+  local reflector_simple="$(FindAppIcon software-update-available)"
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
-      --field="_align($(ltr ins_start))!system-software-install!$(ltr ins_starttip)":fbtn                  'bash -c "yad_calamares_debug choose"'
-      --field="_align($(ltr ins_up))!system-software-update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
-      --field="_align($(ltr after_install_um))!software-update-available!$(ltr after_install_umtip)":fbtn    'reflector-simple'
-      --field="_align($(ltr ins_keys))!system-software-update!$(ltr ins_keystip)":fbtn                    'bash -c yad_InitializePacmanMirroring'
-      --field="_align($(ltr ins_pm))!gparted!$(ltr ins_pmtip)":fbtn                        'gparted'
-      --field="_align($(ltr ins_rel))!info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
-      --field="_align($(ltr ins_tips))!info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
-      --field="_align($(ltr ins_trouble))!info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
+      --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                  'bash -c "yad_calamares_debug choose"'
+      --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
+      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn    'reflector-simple'
+      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                    'bash -c yad_InitializePacmanMirroring'
+      --field="_align($(ltr ins_pm))!$gparted!$(ltr ins_pmtip)":fbtn                        'gparted'
+      --field="_align($(ltr ins_rel))!$user_info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
+      --field="_align($(ltr ins_tips))!$user_info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
+      --field="_align($(ltr ins_trouble))!$user_info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
   )
 
   _align_buttons_on_tab tabcontents
@@ -871,12 +873,12 @@ GeneralInfo() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-question
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
-      --field="_align($(ltr general_info_ws))!info!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
-      --field="_align($(ltr general_info_wi))!info!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki"
-      --field="_align($(ltr general_info_ne))!info!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news"
-      --field="_align($(ltr general_info_fo))!info!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com"
-      --field="_align($(ltr general_info_do))!info!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate"
-      --field="_align($(ltr general_info_ab))!info!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
+      --field="_align($(ltr general_info_ws))!$user_info!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
+      --field="_align($(ltr general_info_wi))!$user_info!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki"
+      --field="_align($(ltr general_info_ne))!$user_info!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news"
+      --field="_align($(ltr general_info_fo))!$user_info!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com"
+      --field="_align($(ltr general_info_do))!$user_info!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate"
+      --field="_align($(ltr general_info_ab))!$user_info!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
   )
 
   _align_buttons_on_tab tabcontents
@@ -898,7 +900,7 @@ AfterInstall() {
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field="_align($(ltr after_install_um))!applications-internet!$(ltr after_install_umtip)":fbtn 'reflector-simple')
   tabcontents+=(
-      --field="_align($(ltr after_install_us))!system-software-update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
+      --field="_align($(ltr after_install_us))!$system_software_update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
       --field="_align($(ltr after_install_pclean))!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
   test "$(eos_GetArch)" != "armv7h" && \
@@ -907,7 +909,7 @@ AfterInstall() {
       --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
   )
 
-  Check_r8168 && tabcontents+=(--field="_align(Ethernet issue? Remove r8168)!system-software-update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
+  Check_r8168 && tabcontents+=(--field="_align(Ethernet issue? Remove r8168)!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
 
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
@@ -933,16 +935,16 @@ UsefulTips() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=user-info
       --text="<b>$(ltr useful_tips_text)</b>"
-      --field="_align($(ltr after_install_pm))!info!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
-      --field="_align($(ltr after_install_ay))!info!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
-      --field="_align($(ltr after_install_hn))!info!$(ltr after_install_hntip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
-      --field="_align($(ltr after_install_bt))!info!$(ltr after_install_bttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field="_align($(ltr after_install_pm))!$user_info!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
+      --field="_align($(ltr after_install_ay))!$user_info!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
+      --field="_align($(ltr after_install_hn))!$user_info!$(ltr after_install_hntip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
+      --field="_align($(ltr after_install_bt))!$user_info!$(ltr after_install_bttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
   )
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field="_align($(ltr after_install_nv))!info!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
+      tabcontents+=(--field="_align($(ltr after_install_nv))!$user_info!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
   tabcontents+=(
-      --field="_align($(ltr after_install_ft))!info!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
-      --field="_align($(ltr butt_owncmds_help))!info!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field="_align($(ltr after_install_ft))!$user_info!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+      --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
       --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
 
@@ -951,34 +953,50 @@ UsefulTips() {
   "${tabcontents[@]}" >& /dev/null &
 }
 
+FindAppIcon() {
+    local app="$1"
+    local sz=32
+    local path
+
+    for sz in 32 48 64 24 ; do
+        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}x${sz}/ | /usr/bin/head -n 1)"
+        test -n "$path" && {
+            echo "$path"
+            return
+        }
+    done
+    echo "Sorry, icon path not found for app '$app'." >&2
+    echo ""
+}
+
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
 
-  local gufw=""            #=gufw
-  local libreoffice=""     #=libreoffice
-  local chromium=""        #=chromium-browser
-  local bluetooth=""       #=bluetooth
+  local gufw="$(FindAppIcon gufw)"
+  local libreoffice="$(FindAppIcon libreoffice)"
+  local chromium="$(FindAppIcon chromium)"
 
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=system-software-install
+      --image=$system_software_install
       --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left
-      --field="_align(LibreOffice)!libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
-      --field="_align($(ltr add_more_apps_ch))!chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
-      --field="_align($(ltr add_more_apps_fw))!gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
+      --field="_align(LibreOffice)!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
+      --field="_align($(ltr add_more_apps_ch))!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
+      --field="_align($(ltr add_more_apps_fw))!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
   )
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       tabcontents+=(
-          --field="_align($(ltr add_more_apps_akm))!system-software-install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"'
+          --field="_align($(ltr add_more_apps_akm))!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"'
       )
   fi
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
+        local bluetooth="$(FindAppIcon bluetooth)"
         tabcontents+=(
-            --field="_align($(ltr add_more_apps_bt))!bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-            --field="_align($(ltr add_more_apps_bt_bm))!bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
+            --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
+            --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
         )
         ;;
   esac
@@ -1012,7 +1030,7 @@ OwnCommands() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
-      --field="_align($(ltr butt_owncmds_help))!info!$(ltr nb_tab_owncmdstip)":fbtn
+      --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
           "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
       --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
@@ -1330,6 +1348,11 @@ StartHere() {
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
+
+    # common button icons
+    local user_info="$(FindAppIcon user-info)"
+    local system_software_update="$(FindAppIcon system-software-update)"
+    local system_software_install="$(FindAppIcon system-software-install)"
 
     for arg in "$@" ; do
         case "$arg" in
