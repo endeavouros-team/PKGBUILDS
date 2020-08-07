@@ -933,7 +933,7 @@ UsefulTips() {
   local tabcontents+=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=user-info
+      --image=$user_info
       --text="<b>$(ltr useful_tips_text)</b>"
       --field="_align($(ltr after_install_pm))!$user_info!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
       --field="_align($(ltr after_install_ay))!$user_info!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
