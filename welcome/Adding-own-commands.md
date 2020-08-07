@@ -93,9 +93,9 @@ Here is a full *example* file containing three commands/buttons, and activating 
 local welcome_own_commands=(
     # Legend: --field=" name!icon!description":fbtn "command"
 
-    --field=" A Kernel Manager!system-software-install!Simple kernel manager and info source":fbtn  "akm"
-    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
-    --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
+    --field="_align(A Kernel Manager)!system-software-install!Simple kernel manager and info source":fbtn  "akm"
+    --field="_align(Mousepad)!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
+    --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
 )
 
 local activate_own_commands_tab=yes
@@ -140,7 +140,7 @@ local welcome_own_commands=(
     # When using a bash function, the command string must be changed like this:
     #    "bash -c 'MyBashFunction parameters'"
 
-    --field=" Install example!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
+    --field="_align(Install example)!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
 
 </pre>
