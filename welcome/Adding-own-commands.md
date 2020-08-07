@@ -68,11 +68,14 @@ An example field about the parameters in the command string:
 Other supported (but optional) variables are
 - `activate_own_commands_tab`: specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.
 - `columns_for_own_commands`: specifies the layout (specifically: number of columns) of the buttons under the Personal Commands tab. Note: the layout is managed by **yad** and may *not* contain exactly the specified number of columns!
+- `show_predefined_buttons_at_own_commands`: specifies whether to show (yes) or not (no) the two predefined buttons as the first buttons of the Personal Commands tab.
+Note that the same two buttons exist on the **Tips** tab.
 
 For example:
 <pre>
-local activate_own_commands_tab=yes    # "yes" or "no" (default: no)
-local columns_for_own_commands=4       # a small positive number (default: 2)
+local activate_own_commands_tab=yes               # "yes" or "no" (default: no)
+local columns_for_own_commands=4                  # a small positive number (default: 2)
+local show_predefined_buttons_at_own_commands=no  # "yes" or "no" (default:yes)
 </pre>
 
 
@@ -100,6 +103,7 @@ local welcome_own_commands=(
 
 local activate_own_commands_tab=yes
 local columns_for_own_commands=2
+local show_predefined_buttons_at_own_commands=no
 </pre>
 
 ## Example (advanced, assumes knowledge about bash language)

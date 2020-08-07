@@ -1047,6 +1047,12 @@ OwnCommands() {
   local tabnum="$2"
   local _and='&#38;'           # '&'
   local cols="$columns_for_own_commands"
+  local show_buttons="$show_predefined_buttons_at_own_commands"
+
+  case "$show_buttons" in
+      no) ;;
+      *) show_buttons=yes ;;
+  esac
 
   while true ; do
       if [ -z "$cols" ] ; then
@@ -1066,10 +1072,14 @@ OwnCommands() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
-      --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
-          "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
-      --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
+  if [ "$show_buttons" = "yes" ] ; then
+      tabcontents+=(
+          --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
+                  "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+          --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
+      )
+  fi
   tabcontents+=("${welcome_own_commands[@]}")
 
   _align_buttons_on_tab tabcontents
