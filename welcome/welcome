@@ -955,7 +955,7 @@ UsefulTips() {
 
 FindAppIcon() {
     local app="$1"
-    local sz=32
+    local sz
     local path
 
     for sz in 32 48 64 24 ; do
@@ -971,10 +971,10 @@ FindAppIcon() {
 
 FindAppIconKDE() {
     local app="$1"
-    local sz=32
+    local sz
     local path
 
-    for sz in 48 ; do
+    for sz in "48" "48x48"  ; do
         path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
         test -n "$path" && {
             echo "$path"
