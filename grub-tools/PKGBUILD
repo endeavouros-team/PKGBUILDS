@@ -2,7 +2,7 @@
 
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
-pkgver=1.4.3
+pkgver=1.4.4
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,7 +17,7 @@ source=(
   $url/grub-fix-initrd-generation.hook  # Calls the fixer after grub or os-prober upgrades.
 )
 sha512sums=('2062e58ae2c903187d98c05df6986d2a1a400fa9c35ffc5f91e31d3da0e779edf0b3ba21404769295dc34138ca9f6d94f12830ab3e203a4386571b05d346b4b6'
-            '08c9568719e7e387c01daf9a468342d42fdc5519fb24cacc8bacdb3e8fac97f82ceaf9f4e0157485b55eeac62831fcaeb31a5d484521e85f83d38e53b009a4c6'
+            '884153e4fbc2a2fd98bddb5547c1eec7ef7ff2009500da51dd55b8103f17a1ff781bf9e05df3f59d82ec208cd400e6b198483ba611ee608fe184f94ee2432c0f'
             '2007eed2651c348fb0c769add72a66b01e898d9a9d066a962005ddd868078164ba65fa46b180fba6ec8e2b6f6a54b89b02d79647484576c698978c57216d1d8f')
 
 package() {

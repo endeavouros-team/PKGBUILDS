@@ -76,7 +76,7 @@ _grub_mod2() {
     local file=/etc/grub.d/10_linux  # from package 'grub'
     _backup $file grub
     sed -i $file \
-        -e "s|s, with Linux |s, with kernel |" \
+        -e "s|s, with Linux |s on |" \
         -e 's|"Loading Linux |"Loading kernel |'
     _show_result $file
 }
