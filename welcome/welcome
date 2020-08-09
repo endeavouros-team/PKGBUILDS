@@ -973,18 +973,33 @@ UsefulTips() {
 #    #echo "Sorry, icon path not found for app '$app'." >&2
 #}
 
+FindDesktopIcon() {
+    local dir=/usr/share/applications
+
+    if [ -r $dir/"$app".desktop ] ; then
+        path="$(/usr/bin/grep "^Icon=" $dir/"$app".desktop | /usr/bin/head -n 1 | /usr/bin/cut -d '=' -f 2)"
+        if [ -n "$path" ] ; then
+            echo "$path"
+            return 0
+        fi
+    fi
+    return 1
+}
+
 FindAppIcon() {
     local app="$1"
     local sz
     local path
 
+    FindDesktopIcon && return
+
     for sz in 48 32 # 64 24
     do
         path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep -P "/$sz/|/${sz}x${sz}/" | /usr/bin/head -n 1)"
-        test -n "$path" && {
+        if [ -n "$path" ] ; then
             echo "$path"
             return
-        }
+        fi
     done
     echo "Sorry, icon path not found for app '$app'." >> $button_icons_log
 }
