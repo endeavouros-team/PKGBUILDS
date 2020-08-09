@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.3
+pkgver=3.4
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -23,6 +23,7 @@ source=(
   $url/paccache-service-manager
   $url/eos-script-lib-yad
   $url/eos-script-lib-yad.conf
+  $url/eos-connection-checker
   $url/device-info
   $url/su-c_wrapper
   $url/eos-set-background-picture
@@ -52,11 +53,12 @@ source=(
   $url/translations-${pkgname}-sk.bash
 )
 sha512sums=('c94468243f112c667a59733813888750437f5194920077ab5b824b58ebc977d4c101c836e891e1d5f2a06e57aaa67a4be8d341c98e6c741f9222f38f9d512f1d'
-            '5299080fbf004845c6d33f02021e44fdfeb5ae592d2fcfba8c79fa26ff9022d202a6a97bc85588b778ca919d39b533c5b09b41702dba35adfac47741269ee951'
+            'aed4d47da7e9cc053b70ea1a9625ab3b5e6bb90de8a5478bdde90f52a3ea4035952d7f4cbaefb0decfc3bb4e21b45f82d3fa4dbf74e3998423346cccb6b57885'
             '22ac459f10ab773ff96fed866ee4b29038452172f59bc61ce3b0b640ab9d1cb3c9b170fd1bc3838d459e11015b4f995d2ed4b695cf497eb1ddf8daa41801f267'
             'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
-            '789d9b534cc9e121d550ab68c2c7a8f56674c25bacb3dbeaafa2d9064d7b24a6e1b5a78aa9f99ade6a299e7c7b08679f7c6fc09e89dec2d6798159d86989fe8c'
+            '9c012e6ab74d5fdfa6e5520aa6623a9bff06e01948eaa869077f1e9e2eef964f676c52499ff0f62e2f069f7a652a7ebc0c7893a365ea33d5026f42f9e956215f'
             '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
+            '3422186535809728ee20da4418143d6933e853bef2300a7c031d4c038864e2dc108955eea6a7f11d9acc430702fb3f68675d37ee6a695e6062fbd28bd2b1bd81'
             '9cc88b541318aa2b3e9a85ddf68cc1a7b4cff3a0e98b9e15b2760a2bda8d0831cf99ce61f6745dea8b284104bdea34bdadff4b266fd130910625395c0bda35a0'
             'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa'
             'fd704d1f9f16b793f353ee24e4e65ea0edc358e165f2c26628b079cf83bea64bf7b7e15c44a8ef2040794407483943f554bc25f516d430480eecce974c516584'
@@ -100,7 +102,9 @@ package() {
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
-  install device-info                           $pkgdir/usr/bin/device-info
+
+  install -Dm755 device-info                    $pkgdir/usr/bin/device-info
+  install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
   install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
   install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies

@@ -958,36 +958,35 @@ UsefulTips() {
   "${tabcontents[@]}" >& /dev/null &
 }
 
+#FindAppIconKDE() {
+#    local app="$1"
+#    local sz
+#    local path
+#
+#    for sz in "48" "48x48"  ; do
+#        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
+#        test -n "$path" && {
+#            echo "$path"
+#            return
+#        }
+#    done
+#    #echo "Sorry, icon path not found for app '$app'." >&2
+#}
+
 FindAppIcon() {
     local app="$1"
     local sz
     local path
 
-    for sz in 32 48 64 24 ; do
-        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}x${sz}/ | /usr/bin/head -n 1)"
+    for sz in 48 32 # 64 24
+    do
+        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep -P "/$sz/|/${sz}x${sz}/" | /usr/bin/head -n 1)"
         test -n "$path" && {
             echo "$path"
             return
         }
     done
-    echo "Sorry, icon path not found for app '$app'." >&2
-    echo ""
-}
-
-FindAppIconKDE() {
-    local app="$1"
-    local sz
-    local path
-
-    for sz in "48" "48x48"  ; do
-        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
-        test -n "$path" && {
-            echo "$path"
-            return
-        }
-    done
-    echo "Sorry, icon path not found for app '$app'." >&2
-    echo ""
+    echo "Sorry, icon path not found for app '$app'." >> $button_icons_log
 }
 
 AddMoreApps() {
@@ -1001,15 +1000,21 @@ AddMoreApps() {
   local chromium
 
   case "$DE" in
-      KDE)
-          gufw="$(FindAppIconKDE firewall-config)"
-          libreoffice="$(FindAppIconKDE libreoffice-writer)"
-          chromium="$(FindAppIconKDE web-browser)"
-          ;;
+#      KDE)
+#          gufw="$(FindAppIconKDE firewall-config)"
+#          libreoffice="$(FindAppIconKDE libreoffice-writer)"
+#          chromium="$(FindAppIconKDE web-browser)"
+#          ;;
       *)
           gufw="$(FindAppIcon gufw)"
-          libreoffice="$(FindAppIcon libreoffice)"
+          test -n "$gufw" || gufw="$(FindAppIcon network-firewall)"
+          test -n "$gufw" || gufw="$(FindAppIcon firewall-config)"
+
+          libreoffice="$(FindAppIcon libreoffice-writer)"
+          test -n "$libreoffice" || libreoffice="$(FindAppIcon libreoffice)"
+
           chromium="$(FindAppIcon chromium)"
+          test -n "$chromium" || chromium="$(FindAppIcon web-browser)"
           ;;
   esac
 
@@ -1394,6 +1399,7 @@ StartHere() {
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
+    local button_icons_log=/tmp/welcome-icons.log
 
     # common button icons
     local user_info="$(FindAppIcon user-info)"

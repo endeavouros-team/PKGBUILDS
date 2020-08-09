@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Checks that an internet connection exists.
+# Return value is 0 on success, or another number on failure.
+#
+# Example usage:
+#    eos-connection-checker && echo connection is ON
+#    eos-connection-checker || echo connection is OFF
+
+/usr/bin/curl --silent --connect-timeout 8 https://mirror.alpix.eu/endeavouros >/dev/null
