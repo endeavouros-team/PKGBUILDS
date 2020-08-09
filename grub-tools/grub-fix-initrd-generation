@@ -77,7 +77,8 @@ _grub_mod2() {
     _backup $file grub
     sed -i $file \
         -e "s|s, with Linux |s on |" \
-        -e 's|"Loading Linux |"Loading kernel |'
+        -e 's|"Loading Linux |"Loading kernel |' \
+        -e 's|^  OS="${GRUB_DISTRIBUTOR} Linux"$|  OS="${GRUB_DISTRIBUTOR}"|'
     _show_result $file
 }
 
