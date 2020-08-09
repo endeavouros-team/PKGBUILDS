@@ -1,0 +1,93 @@
+#!/bin/bash
+
+echo2() { echo "$@" >&2 ; }
+
+GetGpuIds() {
+    declare -A vcodes
+    vcodes[nvidia]=10de
+    vcodes[intel]=8086
+    vcodes[amd]=1002
+
+    local infobase="$(lspci -vnn | grep -P 'VGA|Display')"
+    local info
+    local vcode
+    local v id
+    local result=""
+
+    for v in nvidia intel amd ; do
+        vcode="${vcodes[$v]}"
+        info="$(echo "$infobase" | grep "\[$vcode:[0-9a-f][0-9a-f]*\]")"
+        test -n "$info" || continue
+        card_id="$(echo "$info" | sed -e "s|^.*\[$vcode:||" -e "s|\].*$||")"
+        test -n "$result" && result+="|"
+        result+="$v"
+        for id in $card_id ; do
+            result+=":$id"
+        done
+    done
+    vendorinfo="$result"
+
+    if [ $TESTING = yes ] ; then
+        vendorinfo="nvidia:1dba|$result"
+        vendorinfo="nvidia:06c4|$result"
+        #vendorinfo="nvidia:aaaa|$result"
+        #vendorinfo="nvidia:aaaa:bbbb|$result"
+        #vendorinfo="nvidia:06c4:1dba|$result"
+    fi
+}
+
+Main()
+{
+    local TESTING=no           # set to "no" on release !!!
+
+    local vendorinfo=""        # e.g. nvidia:1234:2345|intel:4321:5432|amd:9876:6789
+    local db_dir=/tmp          # /var/lib/pci
+    local nvidia_id_file=$db_dir/nvidia.ids
+    local nvidia_id_file_390=$db_dir/nvidia-390xx.ids
+    local nvidia_info
+    local id ids=""
+    local ret_ids
+    local driver_found=""
+
+    nvidia_info=$(echo "$vendorinfo" | cut -d '|' -f 1 | grep nvidia)
+
+    if [ -n "$nvidia_info" ] ; then
+        GetGpuIds
+        nvidia-installer-update-db --tmpdb  >& /dev/null      # --tmpdb: files go to /tmp
+        ret_ids="$(echo "$nvidia_info" | sed -e 's|^nvidia:||' -e 's|:| |')"
+        for id in $ret_ids ; do
+            if [ -n "$(grep -w "$id" $nvidia_id_file)" ] ; then
+                echo2 "Your graphics card (id: $id) is supported by the nvidia-dkms driver."
+                #echo2 "Use nvidia-installer-dkms to install the driver(s) you want."
+                driver_found="nvidia-dkms"
+            elif [ -n "$(grep -w "$id" $nvidia_id_file_390)" ] ; then
+                echo2 "Your graphics card (id: $id) is supported by the nvidia-390xx-dkms driver."
+                echo2 "Use the --force option with nvidia-installer-dkms."
+                echo2 "Then, BEFORE rebooting, install nvidia-390xx-dkms from the AUR, for example:"
+                echo2 "  yay -S nvidia-390xx-dkms"
+                driver_found="nvidia-390xx-dkms"
+            else
+                if [ -z "$ids" ] ; then
+                    ids=($id)
+                else
+                    ids+=($id)
+                fi
+            fi
+        done
+        case "$driver_found" in
+            nvidia-dkms)                ;;
+            nvidia-390xx-dkms)          ;;
+            *)
+                if [ ${#ids[@]} -eq 1 ] ; then
+                    echo2 "Sorry, your Nvidia card (id: ${ids[*]}) is not supported by nvidia-dkms nor nvidia-390xx-dkms."
+                else
+                    echo2 "Sorry, your Nvidia cards (ids: ${ids[*]}) are not supported by nvidia-dkms nor nvidia-390xx-dkms."
+                fi
+                ;;
+        esac
+    else
+        echo2 "Nvidia card not found."
+    fi
+}
+
+Main "$@"

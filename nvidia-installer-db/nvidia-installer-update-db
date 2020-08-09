@@ -150,12 +150,15 @@ CreateNvidiaDb()
         echo "$nvidia_ids_legacy" | awk '{print $1}' | sort | uniq > $tmpfile2
         Logging "$tmpfile2" "$target_legacy" "Legacy"
     fi
+
     if [ "$has_logs" = "no" ] ; then
         rm -f $log
         echo "Database is already up-to-date." >&2
-        test -r $tmpfile1 && rm -f $tmpfile1
-        test -r $tmpfile2 && rm -f $tmpfile2
-        return
+        if [ "$targetdir" != "/tmp" ] ; then
+            test -r $tmpfile1 && rm -f $tmpfile1
+            test -r $tmpfile2 && rm -f $tmpfile2
+            return
+        fi
     fi
 
     # Now save the data into the local database.
