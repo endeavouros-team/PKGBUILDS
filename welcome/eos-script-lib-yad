@@ -248,6 +248,9 @@ eos_yad__detectDE()
          X-Generic)
            DE=generic
            ;;
+         i3)
+           DE=i3
+           ;;
       esac
     fi
 

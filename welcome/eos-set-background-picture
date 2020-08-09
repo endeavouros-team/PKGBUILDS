@@ -193,6 +193,10 @@ Main()
             AssertPicture ${picprefix}xfce4.png no && \
                 XfceSetWallpaper
             ;;
+        I3)
+            AssertPicture ${picprefix}i3.png no && \
+                feh --bg-scale "$pic"
+            ;;
         *)
             DIE "Sorry, desktop '$DE' is not supported."
             ;;
