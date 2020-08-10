@@ -7,12 +7,27 @@ CheckUpdates() {
 }
 
 ShowUpdates() {
-    local ix pkgname pkginfo dlsize
+    local ix pkgname pkginfo dlsize prog
 
     for ((ix=0; ix < ${#ups[@]}; ix++)) ; do
         pkgname="$(echo "${ups[$ix]}" | awk '{print $1}')"
         pkginfo="$(LANG=C /usr/bin/pacman -Si $pkgname)"
-        dlsize="$(echo "$pkginfo" | grep "Download Size" | awk '{print $4$5}')"
+        # repo can be testing or stable, find out which one to use:
+        if [ 1 -eq 1 ] ; then
+                test $repo_type -eq 0 && prog=/usr/bin/head || prog=/usr/bin/tail
+                dlsize="$(echo "$pkginfo" | grep "Download Size" | $prog -n 1 | awk '{print $4$5}')"
+        else
+            case "$(echo "$pkginfo" | /usr/bin/grep "Download Size" | /usr/bin/wc -l)" in
+                1) # stable:
+                   dlsize="$(echo "$pkginfo" | grep "Download Size" | awk '{print $4$5}')"
+                   ;;
+                2) # testing:
+                   FindRepoType && prog=head || prog=tail
+                   dlsize="$(echo "$pkginfo" | grep "Download Size" | $prog -n 1 | awk '{print $4$5}')"
+                   ;;
+                *) dlsize="N/A" ;;
+            esac
+        fi
         echo "${ups[$ix]} $dlsize"
     done
 }
@@ -22,15 +37,22 @@ ShowUpdatesHeader() {
     echo "---- ------- -- --- ------------"
 }
 
+FindRepoType() {
+    /usr/bin/grep "^\[testing\]" /etc/pacman.conf >/dev/null
+    repo_type=$?
+}
+
 Main()
 {
     local show_header=yes
     local ups
     local retcode=1
+    local repo_type
 
     test "$1" = "--nh" && show_header=no
 
     CheckUpdates
+    FindRepoType
 
     case "$retcode" in
         0)
