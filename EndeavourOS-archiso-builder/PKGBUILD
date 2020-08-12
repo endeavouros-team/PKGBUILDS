@@ -4,49 +4,52 @@
 
 pkgname=EndeavourOS-archiso
 pkgver=0.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
-#makedepends=(archiso arch-install-scripts git squashfs-tools)
-makedepends=(arch-install-scripts git squashfs-tools)
+makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
 sha512sums=(SKIP)
 
-build() {
-    # check we have calamares repo properly set up
+
+_check_repo_in_pacman_conf() {
     local reponame="endeavouros_calamares"
-    if [ -z "$(grep "^\[$reponame\]$" /etc/pacman.conf)" ] ; then
-        cat <<EOF >&2
+    local conf=/etc/pacman.conf
 
-Error: repo [$reponame] is missing from file /etc/pacman.conf.
+    if [ -z "$(grep "^\[$reponame\]$" $conf)" ] ; then
+        echo "Sorry, repo [$reponame] is not found in $conf." >&2
+        read -p "Add it now and update system (Y/n)? " >&2
+        case "$REPLY" in
+            [yY]* | "")
+                local conftmp="$(mktemp -u "$HOME"/pacman.conf.tmp.XXXX)"
+                cp $conf $conftmp
+                cat <<EOF >> $conftmp
 
-Please add the following lines in the end of file /etc/pacman.conf:
-
-   [$reponame]
-   Server = https://github.com/endeavouros-team/mirrors/releases/download/$reponame
-
-Then run: 'sudo pacman -Syyu' before trying again.
-
+[$reponame]
+Server = https://github.com/endeavouros-team/mirrors/releases/download/\$repo
 EOF
-        return 1
+                sudo cp $conftmp $conf || { rm -f $conftmp ; return 1 ; }
+                rm -f $conftmp
+                ;;
+            *)
+                return 1
+                ;;
+        esac
     fi
+}
 
-    local build_rootdir="$srcdir/.."
-    local cleanup="$build_rootdir/cleanup.bash"
-    local basedir=$srcdir/$pkgname
-
-    # create a cleanup script
+_create_cleanup_script() {
     cat <<EOF > "$cleanup"
 #!/bin/bash
 sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
 sudo rm -rf $build_rootdir/${pkgname}
 sudo rm -rf $build_rootdir/pkg
 sudo rm -rf $build_rootdir/src
+rm -f $cleanup
 EOF
+}
 
-    # build
-    cd $basedir
-
+_select_calamares_type() {
     while true ; do
         read -p "Build with calamares 'test' or 'current'? [current] " >&2
         case "$REPLY" in
@@ -64,20 +67,45 @@ EOF
                 ;;
         esac
     done
+}
 
-    sudo pacman -Syyu
+build() {
+    ###################################################
+    # Check that we have calamares repo properly set up.
+    ###################################################
+
+    _check_repo_in_pacman_conf
+
+    ###################################################
+    # Create a cleanup script.
+    ###################################################
+
+    local build_rootdir="$srcdir/.."
+    local cleanup="$build_rootdir/cleanup.bash"
+    local basedir=$srcdir/$pkgname
+
+    _create_cleanup_script
+
+    ###################################################
+    # Build.
+    ###################################################
+
+    cd $basedir
+    _select_calamares_type   # current or test
+
+    sudo pacman -Syyu || return 1
     
     sudo ./fix_permissions.sh
     sudo ./build.sh -v
     cd ../..
     sudo mv $srcdir/$pkgname/out/*.iso .
-    #sudo cd "$build_rootdir"
-    #sudo mv "$basedir"/out/*.iso .
     sudo chown $LOGNAME *.iso
 
     sync
 
-    # show the result
+    ###################################################
+    # Show the result.
+    ###################################################
 
     cd "$build_rootdir"
 
