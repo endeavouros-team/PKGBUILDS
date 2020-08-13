@@ -1,0 +1,26 @@
+#!/bin/bash
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=keyserver-rank
+pkgdesc="Ranks some keyservers."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=1
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(
+    bash
+    time    # for timing commands
+)
+
+source=(
+    "$url/$pkgname"
+    "$url/$pkgname"-helper
+)
+sha512sums=('fdfa9d5eb268bb22f1f7d04e3a734e921c00b68434fe140d280658150fb0560b7e6231101dfa12be70153313d36f22c98a1d056fcf57a217713708e4426297a6'
+            '9943d580d16517bb14b743c99cb06dde80025abec286210245b0c7303a7261460e6cee7f702903812cb66563b96b312d2e0643efc7871401430ce37163e0776c')
+
+package() {
+  install -Dm755 ${pkgname}           $pkgdir/usr/bin/${pkgname}
+  install -Dm755 ${pkgname}-helper    $pkgdir/usr/bin/${pkgname}-helper
+}

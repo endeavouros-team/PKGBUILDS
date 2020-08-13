@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Made by @fernandomaroto.
+# Modified by @manuel.
+
+_run() {
+    local yesno="$1"
+
+    local servers_array=(    # Feel free to suggest mirrors to be added or removed bellow
+
+        ############ These don't seem to work:
+        #  "keys.openpgp.org"
+        ## "pgp.mit.edu"
+        #  "keyring.debian.org"
+        ## "subset.pool.sks-keyservers.net"
+        #  "ipv6.pool.sks-keyservers.net"
+
+        ############ These do seem to work:
+        "ipv4.pool.sks-keyservers.net"
+        "keyserver.ubuntu.com"
+        "zimmermann.mayfirst.org"
+        "pool.sks-keyservers.net"
+        "na.pool.sks-keyservers.net"
+        "eu.pool.sks-keyservers.net"
+        "oc.pool.sks-keyservers.net"
+        "p80.pool.sks-keyservers.net"
+    )
+    local helper=/usr/bin/keyserver-rank-helper
+    local server
+    local cmdresult
+    local timeresult
+    local fastest
+    local log=$(mktemp)
+    
+    for server in "${servers_array[@]}"
+    do
+        echo "Ranking $server ..." >&2
+        timeresult="$(/usr/bin/time -f %e $helper $server $log 2>&1 | tail -n 1)"
+        echo "$timeresult" >> $log
+    done
+    printf "\nResults:\n\n" >&2
+    cat $log | sort -k 3 | column -t
+    fastest="$(cat $log | grep -v -w FAIL | sort -k 3 | head -n 1 | awk '{print $1}')"
+    rm -f $log
+    printf "\nFastest keyserver is: $fastest\n\n" >&2
+
+    case "$yesno" in
+        [yY]* | -[yY]* | --[yY]*) ;;
+        *)
+            read -p "Refresh pacman keys using the fastest keyserver (y/N)? " >&2
+            case "$REPLY" in
+                "" | [nN]*) return ;;
+            esac
+            ;;
+    esac
+    sudo pacman-key --refresh-keys --keyserver "$fastest"
+}
+
+_run "$@"
