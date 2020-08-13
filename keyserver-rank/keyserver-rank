@@ -4,9 +4,13 @@
 # Modified by @manuel.
 
 _run() {
-    local yesno="$1"
+    local yesno="$1"    # --yes = refresh pacman keys, --no = don't refresh pacman keys, "" = ask
 
     local servers_array=(    # Feel free to suggest mirrors to be added or removed bellow
+
+        # We want to use keyservers only with secured (hkps or https) connections!
+
+        # Status at 2020-Aug-13:
 
         ############ These don't seem to work:
         #  "keys.openpgp.org"
@@ -14,16 +18,25 @@ _run() {
         #  "keyring.debian.org"
         ## "subset.pool.sks-keyservers.net"
         #  "ipv6.pool.sks-keyservers.net"
+        # hkps://keys.mailvelope.com
+        ## hkps://hkps.pool.sks-keyservers.net
+        # hkps://attester.flowcrypt.com
 
         ############ These do seem to work:
-        "ipv4.pool.sks-keyservers.net"
-        "keyserver.ubuntu.com"
-        "zimmermann.mayfirst.org"
-        "pool.sks-keyservers.net"
-        "na.pool.sks-keyservers.net"
-        "eu.pool.sks-keyservers.net"
-        "oc.pool.sks-keyservers.net"
-        "p80.pool.sks-keyservers.net"
+        hkps://keyserver.ubuntu.com
+        hkps://zimmermann.mayfirst.org
+        hkps://hkps.pool.sks-keyservers.net        # doesn't work currently; keeping this here anyway
+        # https://keyserver.ubuntu.com
+        # https://zimmermann.mayfirst.org
+
+        ############ These seem to work but only with hkp:
+        # "hkp://ipv4.pool.sks-keyservers.net"
+        # "hkp://pool.sks-keyservers.net"
+        # "hkp://na.pool.sks-keyservers.net"
+        # "hkp://eu.pool.sks-keyservers.net"
+        # "hkp://oc.pool.sks-keyservers.net"
+        # "hkp://p80.pool.sks-keyservers.net"
+        # hkp://hkps.pool.sks-keyservers.net
     )
     local helper=/usr/bin/keyserver-rank-helper
     local server
@@ -46,6 +59,7 @@ _run() {
 
     case "$yesno" in
         [yY]* | -[yY]* | --[yY]*) ;;
+        [nN]* | -[nN]* | --[nN]*) return ;;
         *)
             read -p "Refresh pacman keys using the fastest keyserver (y/N)? " >&2
             case "$REPLY" in
