@@ -40,6 +40,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-update-notifier
     grub-theme-endeavouros
     grub-tools
+    keyserver-rank
     nvidia-installer-db
     nvidia-installer
     nvidia-installer-dkms

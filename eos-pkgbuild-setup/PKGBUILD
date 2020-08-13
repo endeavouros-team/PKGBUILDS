@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=3.3.7
+pkgver=3.3.8
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -25,9 +25,10 @@ source=(
     mirrorcheck
     githubcheck
     eos-mirrorcheck.conf
-    assets.conf.mirrors.mirror1
-    assets.conf.mirrors.endeavouros_calamares
-    assets.conf.repo-testing.x86_64
+
+    # assets.conf.mirrors.mirror1
+    # assets.conf.mirrors.endeavouros_calamares
+    # assets.conf.repo-testing.x86_64
 )
 sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23e2025a82a1fdcf29887d9ac6c57cb23bb3473e217e2daf61a000c4e5c54a8'
             '8bc92e1d4e060da115d25b22569b91fc9ffb47a741d4a6acb31a7796b06deb662b4b3cb28c622d0ef4764d8f2aeead2e7d6b70c711a0a7f8d155acf1662fd9a6'
@@ -40,10 +41,7 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '72eaac6c410bdbc9c9fa82c3e1d595b2fedad39bee532e1ff39e64e8c7c32c8905061f531e4e7f28cd0df6789336706ec324b928df9a70bfe3bd2168e984d82d'
             '1a8ac7caa7b3afe1c7272b6d68379415e8e6183178bd06d4f1d181a6d16177ff4d283c6639b9dc7f01bfdb3f0d8ee2628ee2b088f4fadf68f06b474ef1691d86'
             'e666f229c342ac91fcf7e4c235fd99e013e55277886e3db1fc336d99432f6f570c8a599565df5afbe6276a528b34eab57fd01d5531fb340e8f798f406c8365f1'
-            '06a562c11f1087e2f824ff493cedee4230b9c7d26cfb40c32da2df1da20e43a91718261f30877f3388db05ab64c86d1ce86ebaf4f83ae828a4ba54e33b2a505a'
-            '03fb89176fb1375840795a48d451bb33b0e0cc5d95ed766f893d8552d35cf2f5daa6f7903c235296a9628f2c2680856ec4a333f777a9a264c09e5adb90ab84d0'
-            'bb4a60b0d297317fd8888ecfeb976f47fdd316699d3fc51f30c4a8183f26b1d71bd7cf1781bd7cc0c183d812c9018e49db1ce5af0290489b710e06afe8c0a25e'
-            'f89f9ea29e3c47fe7d53de7410cb677a00fe1f51436000383740ce107b5c265f1ded4fa4b9e253e3669b6be53c2b4233f4859992319a4b489c91480a2c6da9cd')
+            '06a562c11f1087e2f824ff493cedee4230b9c7d26cfb40c32da2df1da20e43a91718261f30877f3388db05ab64c86d1ce86ebaf4f83ae828a4ba54e33b2a505a')
 
 package() {
     local scripts=usr/share/endeavouros/scripts
@@ -63,9 +61,9 @@ package() {
     install -Dm755 mirrorcheck                               $pkgdir/$scripts/mirrorcheck
     install -Dm755 githubcheck                               $pkgdir/$scripts/githubcheck
     install -Dm755 local-general-setup                       $pkgdir/$scripts/local-general-setup
-    install -Dm644 assets.conf.mirrors.mirror1               $pkgdir/$scripts/assets.conf.mirrors.mirror1
-    install -Dm644 assets.conf.mirrors.endeavouros_calamares $pkgdir/$scripts/assets.conf.mirrors.endeavouros_calamares
-    install -Dm644 assets.conf.repo-testing.x86_64           $pkgdir/$scripts/assets.conf.repo-testing.x86_64
+#    install -Dm644 assets.conf.mirrors.mirror1               $pkgdir/$scripts/assets.conf.mirrors.mirror1
+#    install -Dm644 assets.conf.mirrors.endeavouros_calamares $pkgdir/$scripts/assets.conf.mirrors.endeavouros_calamares
+#    install -Dm644 assets.conf.repo-testing.x86_64           $pkgdir/$scripts/assets.conf.repo-testing.x86_64
     install -Dm644 $pkgname.version                          $pkgdir/$scripts/$pkgname.version
 
     install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
