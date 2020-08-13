@@ -4,7 +4,7 @@
 pkgname=keyserver-rank
 pkgdesc="Ranks some keyservers."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,7 +17,7 @@ source=(
     "$url/$pkgname"
     "$url/$pkgname"-helper
 )
-sha512sums=('ed5f04d4205291a1beb06312c3f67f9f12d73da5f1830116e70f8dd415e63c86f54d59f597b05492d5f8696cafe6da92246e82642117400cdaaa002ae6f3febe'
+sha512sums=('e64f8e7f917d75ae2d2a05db80275c2bba77d1ae5f8ebe74c1deb7640c372495b457b7abe762aa3bdfc4af08ee431cb4ec512a972d898041663c586df2e107c6'
             '9943d580d16517bb14b743c99cb06dde80025abec286210245b0c7303a7261460e6cee7f702903812cb66563b96b312d2e0643efc7871401430ce37163e0776c')
 
 package() {

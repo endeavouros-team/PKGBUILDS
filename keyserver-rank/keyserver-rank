@@ -3,9 +3,53 @@
 # Made by @fernandomaroto.
 # Modified by @manuel.
 
-_run() {
-    local yesno="$1"    # --yes = refresh pacman keys, --no = don't refresh pacman keys, "" = ask
+_die() {
+    echo "Error: $1" >&2
+    _usage
+    exit 1
+}
 
+_options() {
+    local arg
+    local tmp
+    local serverlistfile
+
+    for arg in "$@" ; do
+        case "$arg" in
+            [yY]* | -[yY]* | --[yY]*) yesno="yes" ;;
+            [nN]* | -[nN]* | --[nN]*) yesno="no" ;;
+            --servers=*)
+                serverlistfile="${arg#*=}"
+                readarray -t tmp <<< $(cat "$serverlistfile")
+                servers_array+=("${tmp[@]}")
+                ;;
+            -h | --help)
+                _usage
+                exit 0
+                ;;
+            *)
+                _die "unsupported parameter '$arg'."
+                ;;
+        esac
+    done
+}
+
+_usage() {
+    cat <<EOF >&2
+Usage: $0 [options]
+Options:
+    --servers=FILE   FILE includes a list of (additional) keyservers, one for each line.
+                     Note: empty lines or comments are not allowed.
+    --yes            Allow refreshing pacman keys using the fastest keyserver.
+    --no             Do not refresh pacman keys.
+
+Without any options, a list of predefined keyservers are ranked, and permission is asked for
+refreshing pacman keys using the fastest keyserver.
+EOF
+}
+
+_run() {
+    local yesno="ask"        # --yes = refresh pacman keys, --no = don't refresh pacman keys, "ask" = ask what to do
     local servers_array=(    # Feel free to suggest mirrors to be added or removed bellow
 
         # We want to use keyservers only with secured (hkps or https) connections!
@@ -25,7 +69,6 @@ _run() {
         ############ These do seem to work:
         hkps://keyserver.ubuntu.com
         hkps://zimmermann.mayfirst.org
-        hkps://hkps.pool.sks-keyservers.net        # doesn't work currently; keeping this here anyway
         # https://keyserver.ubuntu.com
         # https://zimmermann.mayfirst.org
 
@@ -44,6 +87,8 @@ _run() {
     local timeresult
     local fastest
     local log=$(mktemp)
+
+    _options "$@"
     
     for server in "${servers_array[@]}"
     do
@@ -58,9 +103,9 @@ _run() {
     printf "\nFastest keyserver is: $fastest\n\n" >&2
 
     case "$yesno" in
-        [yY]* | -[yY]* | --[yY]*) ;;
-        [nN]* | -[nN]* | --[nN]*) return ;;
-        *)
+        yes) ;;
+        no)  return ;;
+        ask)
             read -p "Refresh pacman keys using the fastest keyserver (y/N)? " >&2
             case "$REPLY" in
                 "" | [nN]*) return ;;
