@@ -54,10 +54,9 @@ _run() {
 
         # We want to use keyservers only with secured (hkps or https) connections!
 
-        # Status at 2020-Aug-13:
+        # Status at 2020-Aug-14:
 
         ############ These don't seem to work:
-        #  "keys.openpgp.org"
         ## "pgp.mit.edu"
         #  "keyring.debian.org"
         ## "subset.pool.sks-keyservers.net"
@@ -67,6 +66,7 @@ _run() {
         # hkps://attester.flowcrypt.com
 
         ############ These do seem to work:
+        hkps://keys.openpgp.org
         hkps://keyserver.ubuntu.com
         hkps://zimmermann.mayfirst.org
         # https://keyserver.ubuntu.com
