@@ -32,6 +32,10 @@ _options() {
                 yesno=no
                 show_fastest=yes
                 ;;
+            --list-servers)
+                yesno=no
+                list_servers=yes
+                ;;
             -h | --help)
                 _usage
                 exit 0
@@ -49,7 +53,8 @@ Usage: $0 [options]
 Options:
     --servers=FILE   FILE includes a list of (additional) keyservers, one for each line.
                      Note: empty lines or comments are not allowed.
-    --show-fastest   Only show the fastest keyserver. Implies --no. Useful for scripts.
+    --show-fastest   Only show (to /dev/stdout) the fastest keyserver. Implies --no. Useful for scripts.
+    --list-servers   Only list servers (to /dev/stdout) that would be used for ranking. Implies --no.
     --yes            Allow refreshing pacman keys using the fastest keyserver.
     --no             Do not refresh pacman keys.
 
@@ -61,6 +66,7 @@ EOF
 _run() {
     local yesno="ask"        # --yes = refresh pacman keys, --no = don't refresh pacman keys, "ask" = ask what to do
     local show_fastest=no
+    local list_servers=no
     local servers_array=(    # Feel free to suggest mirrors to be added or removed bellow
 
         # We want to use keyservers only with secured (hkps or https) connections!
@@ -100,6 +106,13 @@ _run() {
     local log=$(mktemp)
 
     _options "$@"
+
+    if [ "$list_servers" = "yes" ] ; then
+        for server in "${servers_array[@]}" ; do
+            echo "$server"
+        done
+        return
+    fi
     
     for server in "${servers_array[@]}"
     do
