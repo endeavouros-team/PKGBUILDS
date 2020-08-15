@@ -3,8 +3,13 @@
 # Made by @fernandomaroto.
 # Modified by @manuel.
 
+_echo2()    { echo "$@" >&2 ; }
+_printf2()  { printf "$@" >&2 ; }
+_echo2c()   { test "$show_fastest" = "yes" || _echo2 "$@" ; }
+_printf2c() { test "$show_fastest" = "yes" || _printf2 "$@" ; }
+
 _die() {
-    echo "Error: $1" >&2
+    _echo2 "Error: $1"
     _usage
     exit 1
 }
@@ -23,6 +28,10 @@ _options() {
                 readarray -t tmp <<< $(cat "$serverlistfile")
                 servers_array+=("${tmp[@]}")
                 ;;
+            --show-fastest)
+                yesno=no
+                show_fastest=yes
+                ;;
             -h | --help)
                 _usage
                 exit 0
@@ -40,6 +49,7 @@ Usage: $0 [options]
 Options:
     --servers=FILE   FILE includes a list of (additional) keyservers, one for each line.
                      Note: empty lines or comments are not allowed.
+    --show-fastest   Only show the fastest keyserver. Implies --no. Useful for scripts.
     --yes            Allow refreshing pacman keys using the fastest keyserver.
     --no             Do not refresh pacman keys.
 
@@ -50,6 +60,7 @@ EOF
 
 _run() {
     local yesno="ask"        # --yes = refresh pacman keys, --no = don't refresh pacman keys, "ask" = ask what to do
+    local show_fastest=no
     local servers_array=(    # Feel free to suggest mirrors to be added or removed bellow
 
         # We want to use keyservers only with secured (hkps or https) connections!
@@ -92,15 +103,20 @@ _run() {
     
     for server in "${servers_array[@]}"
     do
-        echo "Ranking $server ..." >&2
+        _echo2c "Ranking $server ..."
         timeresult="$(/usr/bin/time -f %e $helper $server $log 2>&1 | tail -n 1)"
         echo "$timeresult" >> $log
     done
-    printf "\nResults:\n\n" >&2
-    cat $log | sort -k 3 | column -t
+    _printf2c "\nResults:\n\n"
+    test "$show_fastest" = "yes" || cat $log | sort -k 3 | column -t >&2
     fastest="$(cat $log | grep -v -w FAIL | sort -k 3 | head -n 1 | awk '{print $1}')"
     rm -f $log
-    printf "\nFastest keyserver is: $fastest\n\n" >&2
+    _printf2c "\nFastest keyserver is: $fastest\n\n"
+
+    if [ "$show_fastest" = "yes" ] ; then
+        echo "$fastest"
+        return
+    fi
 
     case "$yesno" in
         yes) ;;
