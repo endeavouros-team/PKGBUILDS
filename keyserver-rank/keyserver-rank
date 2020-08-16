@@ -28,6 +28,11 @@ _options() {
                 readarray -t tmp <<< $(cat "$serverlistfile")
                 servers_array+=("${tmp[@]}")
                 ;;
+            --servers-replace=*)
+                serverlistfile="${arg#*=}"
+                readarray -t tmp <<< $(cat "$serverlistfile")
+                servers_array=("${tmp[@]}")
+                ;;
             --show-fastest)
                 yesno=no
                 show_fastest=yes
@@ -51,12 +56,13 @@ _usage() {
     cat <<EOF >&2
 Usage: $0 [options]
 Options:
-    --servers=FILE   FILE includes a list of (additional) keyservers, one for each line.
-                     Note: empty lines or comments are not allowed.
-    --show-fastest   Only show (to /dev/stdout) the fastest keyserver. Implies --no. Useful for scripts.
-    --list-servers   Only list servers (to /dev/stdout) that would be used for ranking. Implies --no.
-    --yes            Allow refreshing pacman keys using the fastest keyserver.
-    --no             Do not refresh pacman keys.
+    --servers=FILE          FILE includes a list of (additional) keyservers, one for each line.
+                            Note: empty lines or comments are not allowed.
+    --servers-replace=FILE  Like above, but use only keyservers listed in FILE, and not the predefined ones.
+    --show-fastest          Only show (to /dev/stdout) the fastest keyserver. Implies --no. Useful for scripts.
+    --list-servers          Only list servers (to /dev/stdout) that would be used for ranking. Implies --no.
+    --yes                   Allow refreshing pacman keys using the fastest keyserver.
+    --no                    Do not refresh pacman keys.
 
 Without any options, a list of predefined keyservers are ranked, and permission is asked for
 refreshing pacman keys using the fastest keyserver.
