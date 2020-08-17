@@ -27,7 +27,7 @@ LocalVersion() { /usr/bin/pacman -Q "$1" 2>/dev/null | /usr/bin/awk '{print $2}'
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
 Choose() {
-    local version exist
+    local version exist xx
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
@@ -37,6 +37,7 @@ Choose() {
 }
 
 PkgName() {
+    local xx
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         cmd+=(--field="$(FormatName "$xx")":LBL "")
@@ -44,7 +45,7 @@ PkgName() {
 }
 
 Installed() {
-    local version
+    local version xx
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
@@ -64,7 +65,7 @@ StableVersion() {
 }
 
 Stable() {
-    local version
+    local version xx
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(StableVersion "$xx")"
@@ -78,9 +79,8 @@ TestingVersion() {
 }
 
 Testing() {
-    local testinginfo
-    testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules")"
-    local version
+    local testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules")"
+    local version xx
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
@@ -91,40 +91,54 @@ Testing() {
 
 KernelOrgVersion() {
     local type="$1"
-    local result="$(echo "$kernelorg" | grep -A2 $type: | head -n 2 | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
+    local result="$(echo "$kernelorg" | grep -A2 $type: | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
     case "$type" in
         mainline) ;;
+        longterm) result="$(echo "$result" | head -n 1)" ;;
         *) result="$(echo "$result" | grep -v "[0-9][0-9\.]*-rc")" ;;
     esac
     echo "$result"
 }
 
 KernelOrg() {
-    local version
+    local version versions xx count=${#kernels[@]}
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${org_kernels[@]}" ; do
-        version="$(KernelOrgVersion "$xx")"
-        cmd+=(--field="$(FormatName "$xx")":LBL "")
+        readarray -t versions <<< "$(KernelOrgVersion "$xx")"
+        for version in "${versions[@]}" ; do
+            cmd+=(--field="$(FormatName "$xx")":LBL "")
+            ((count--))
+        done
     done
-    for xx in $na $na $na $na ; do
-        cmd+=(--field="$(FormatName "")":LBL "")
-    done
+    PaddingLines
 }
 
 KOVersion() {
-    local version
+    local version versions xx count=${#kernels[@]}
     local stableversion="$(KernelOrgVersion stable)"
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${org_kernels[@]}" ; do
-        version="$(KernelOrgVersion "$xx")"
+        readarray -t versions <<< "$(KernelOrgVersion "$xx")"
         case "$xx" in
             stable|longterm)
-                cmd+=(--field="$(FormatVersion "<b>$version</b>")":LBL "") ;;
+                for version in "${versions[@]}" ; do
+                    cmd+=(--field="$(FormatVersion "<b>$version</b>")":LBL "")
+                    ((count--))
+                done
+                ;;
             *)
-                cmd+=(--field="$(FormatVersion "$version")":LBL "") ;;
+                for version in "${versions[@]}" ; do
+                    cmd+=(--field="$(FormatVersion "$version")":LBL "")
+                    ((count--))
+                done
+                ;;
         esac
     done
-    for xx in $na $na $na $na ; do
+    PaddingLines
+}
+
+PaddingLines() {
+    for ((xx=0; xx<count; xx++)) ; do
         cmd+=(--field="$(FormatVersion "")":LBL "")
     done
 }
