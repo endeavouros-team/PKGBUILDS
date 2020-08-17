@@ -648,9 +648,10 @@ yad_SystemUpdate() {
         fi
     done
     if [ $hasupdates -eq 0 ] ; then
+        echo "foobar $system_software_update" > /home/edi/EOS/PKGBUILDS/welcome/zzz.log
         eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                --button=yad-quit:0 --image=info
+                --button=yad-quit:0 --image="$(FindAppIcon system-software-update)"
     fi
 }
 yad_SystemUpdate_fails() {
@@ -985,6 +986,7 @@ FindDesktopIcon() {
     fi
     return 1
 }
+export -f FindDesktopIcon
 
 FindAppIcon() {
     local app="$1"
@@ -1003,6 +1005,7 @@ FindAppIcon() {
     done
     echo "Sorry, icon path not found for app '$app'." >> $button_icons_log
 }
+export -f FindAppIcon
 
 AddMoreApps() {
   local handle="$1"
