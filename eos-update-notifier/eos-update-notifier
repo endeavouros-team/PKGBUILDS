@@ -213,6 +213,9 @@ Update_common() {
 }
 
 CheckArchNews() {
+    if [ "$AllowNewsCheckWhileUpdating" = "no" ] ; then
+        test -e $system_lockfile && return
+    fi
     local CheckArchNewsForYou
     local ArchNewsProg
 
