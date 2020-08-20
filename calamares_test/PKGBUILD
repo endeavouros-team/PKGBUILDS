@@ -61,14 +61,13 @@ prepare() {
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'         $_reponame/src/modules/initcpio/InitcpioJob.cpp
     
-    # August 20th 2020 - Removing as much as source files possible
-    
-    _user_groups=(adm power sys floppy log rfkill optical scanner)
-    for user_groups in "${_user_groups[@]}"
-    do
+    # August 20th 2020 - Removing as much as source files possible - Remove users.conf first
+    #_user_groups=(adm power sys floppy log rfkill optical scanner)
+    #for user_groups in "${_user_groups[@]}"
+    #do
     # will add one by one using -i
-    sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
-    done
+    #sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
+    #done
 
 }
 
