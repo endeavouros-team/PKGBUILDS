@@ -2,11 +2,11 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=1.7.11
+pkgver=1.7.12
 pkgrel=1
 arch=('any')
 license=('GPL')
-depends=(bash yad welcome xdg-utils wget pacman-contrib yay)
+depends=(bash yad eos-bash-shared xdg-utils wget pacman-contrib yay)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 backup=(etc/$pkgname.conf)
 
