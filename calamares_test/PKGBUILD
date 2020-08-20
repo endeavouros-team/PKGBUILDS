@@ -70,7 +70,8 @@ prepare() {
     #done
     
     #echo "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
-
+    
+    # recheck if InitcpioJob.cpp is still needed
 }
 
 build() {
