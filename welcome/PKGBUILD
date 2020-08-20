@@ -2,37 +2,41 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.4.4
+pkgver=3.4.5
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
-  bash yad reflector-simple systemd
+  bash yad systemd eos-bash-shared
   python-dbus           # for ksetwallpaper.py
   xorg-xrandr           # for eos-set-background-picture
   endeavouros-theming   # for eos-set-background-picture
 )
-optdepends=('translate-shell: for generating a language translation for the User Interface')
-backup=(etc/eos-script-lib-yad.conf)
+optdepends=(
+  'translate-shell: for generating a language translation for the User Interface'
+  'reflector-simple: for the Update Mirrors button'
+)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+# backup=(etc/eos-script-lib-yad.conf)
 
 source=(
   $url/changelog.md
   $url/$pkgname
   $url/$pkgname.desktop
-  $url/paccache-service-manager
-  $url/eos-script-lib-yad
-  $url/eos-script-lib-yad.conf
-  $url/eos-connection-checker
-  $url/device-info
-  $url/su-c_wrapper
+#  $url/paccache-service-manager
+#  $url/eos-script-lib-yad
+#  $url/eos-script-lib-yad.conf
+#  $url/eos-connection-checker
+#  $url/device-info
+#  $url/su-c_wrapper
   $url/eos-set-background-picture
   $url/ksetwallpaper.py
   $url/wallpaper-once
   $url/wallpaper-once.desktop
   $url/eos-kill-yad-zombies
 #  $url/Adding-own-commands.md
-  $url/RunInTerminal
+#  $url/RunInTerminal
   $url/welcome-dnd
 #  $url/welcome-dnd-tips.png
 #  $url/welcome-dnd-window.png
@@ -55,18 +59,11 @@ source=(
 sha512sums=('c94468243f112c667a59733813888750437f5194920077ab5b824b58ebc977d4c101c836e891e1d5f2a06e57aaa67a4be8d341c98e6c741f9222f38f9d512f1d'
             'b24c697de4f8096f2542d93abf2534b97fd1fb029ae1197a667c70d217fe4f3f27d2e0d33e97e8ced4f5569134b58e7c7451fcda93ebe247ca5d31b5ed45f7c5'
             '22ac459f10ab773ff96fed866ee4b29038452172f59bc61ce3b0b640ab9d1cb3c9b170fd1bc3838d459e11015b4f995d2ed4b695cf497eb1ddf8daa41801f267'
-            'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
-            '519534264198a4fd32a3456c9bc9a1c441399e7181811e8d5dfeb7ba496c5cf56ae7ab54c247f313438262692350b2b577637e9f3b08d1cd4b76a4a7b4263bd7'
-            '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
-            '3422186535809728ee20da4418143d6933e853bef2300a7c031d4c038864e2dc108955eea6a7f11d9acc430702fb3f68675d37ee6a695e6062fbd28bd2b1bd81'
-            '9cc88b541318aa2b3e9a85ddf68cc1a7b4cff3a0e98b9e15b2760a2bda8d0831cf99ce61f6745dea8b284104bdea34bdadff4b266fd130910625395c0bda35a0'
-            'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa'
             'f2db14f4cfdeb60cf13e4896e685e8b401f4082d0ad683675e2c95e2774f63c9ac1165cbcf79042f15aebf4a28f6e0e75a044932f4d130a8e95a97c1d08b1f4f'
             'a3488dab4b65f215ee1513c5ff4c81b1d9e43346abb3a1e9571271c8e60e13184bd826a6206938c14c004fa5adb4f629ea832a535a51972657adb2de5bc30634'
             '64875e8743b8c58a38efbd9c84549bb020231c110bcf6577e8e50f0981fcc520c2f54bf59e23120e137ce139caeac604bfa8a2959e655d26407b58930b7eee32'
             'a5d8391ea7de40847a05a7f301871d615dbb40a6638dbb7375911ef5921cfb986298a251c251eba25ca0448dec980f05692bacab94310dd7253cf400227c80ad'
             '47382fe6431ae179f991980b2bf2f4d4ad56bfba70873659c3a7720de2fca90a60fa6033fb4cfe313e87d771312c0c80feb1617a64885362763f4b66e62543b8'
-            'b097c58d4e954ab86a07d685977b698645b1e2b49131ad76015e65b98e599c3b57728f4b2cfcf3a10527de23d7ba069ea4cf0dfddb8ee4587fc9815f4885dec7'
             '7449221c2aa0033d04b4d14453c3963cbac86b7820868372f7b4e11f6ba80a069f7db91ea2f8a356b0e7c1ff4c71bba406f852e37036d9349811ef52068153d7'
             '0191d609f0444ce7e120effedf890579455b8094f987f0a47bcecc0581caa7c7030799f600d9f7b705d857b7990c7eb2bba64705b1277538db9206a50bcc97c2'
             'b2d36263d25c4f76da1c85658b6964eaf1183b23db3fbcadbc8ce8a8acda82fdc681f3514c0305efcfdb5e65c87d1b8a3e6cc35bb2625eb624f568eee34c6249'
@@ -92,7 +89,6 @@ package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
   install -Dm755 ksetwallpaper.py         $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
-  install -Dm644 eos-script-lib-yad       $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
 
   install -Dm644 translations-${pkgname}.bash        $pkgdir/usr/share/endeavouros/scripts/translations-${pkgname}.bash
@@ -103,20 +99,13 @@ package() {
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
 
-  install -Dm755 device-info                    $pkgdir/usr/bin/device-info
-  install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
   install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
-  install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
-  install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
   install -Dm755 calamares-update               $pkgdir/usr/bin/calamares-update
   install -Dm755 welcome-dnd                    $pkgdir/usr/bin/welcome-dnd
-  install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
-  
 
   install -d $pkgdir/etc/xdg/autostart
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop
-  install -Dm644 eos-script-lib-yad.conf  $pkgdir/etc/eos-script-lib-yad.conf
   install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop      # no --enable
 
   install -d $pkgdir/usr/share/applications
