@@ -160,7 +160,7 @@ ShowFunctionEnd()   { printf2 "\n" ; }
 CommonStuff() {
     local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
     if [ ! -f $EOS_SCRIPTS_YAD ] ; then
-        echo2 "Sorry, package 'welcome' is not installed."
+        echo2 "Sorry, package 'eos-bash-shared' is not installed."
         exit 1
     fi
     source $EOS_SCRIPTS_YAD

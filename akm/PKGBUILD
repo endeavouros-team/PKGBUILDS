@@ -4,17 +4,17 @@
 pkgname=akm
 pkgdesc="Arch kernel manager."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=2.2
-pkgrel=2
+pkgver=2.3
+pkgrel=1
 arch=('any')
 license=('GPL')
-depends=(bash yad)
+depends=(bash yad eos-bash-shared)
 
 source=(
     "$url/$pkgname"
     "$url/$pkgname.desktop"
 )
-sha512sums=('1bd7c250fc5a7f437e1cb5cc731cce8f53705d3a475121b287ad2208bcb406a5e34099a4fd429a05b16bdb22da0a72e6afa7ec815df3de9e1decd0b618daf1e9'
+sha512sums=('1c416040a177abed805e6483f8944e4eee1350fa0ec495b24be8c674720041a5f82c93b60b3316e38bea00f105b9479e2855372ded96f63cafbd2e47bbf90feb'
             '2454e61d3f0752d7bd741e3699a5a54023b7ab2f1d04c514fb8af9dad1657413248253f3f453733210923e4af1bf39ba23f28ad8c6825fe0fba9be31ec5326ae')
 
 package() {
