@@ -1,12 +1,13 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-rankmirrors
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=(GPL3)
+depends=(eos-bash-shared)
 options=(!strip !emptydirs)
 
 source=("$url/PKGBUILDS/raw/master/$pkgname/$pkgname")
