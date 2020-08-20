@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
+    echo "Error: cannot source eos-script-lib-yad" >&2
+    exit 1
+}
+
+export -f eos_yad_terminal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad
+
+Main()
+{
+    eos_yad_RunCmdTermBash "$*"
+}
+
+Main "$@"

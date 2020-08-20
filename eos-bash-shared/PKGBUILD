@@ -1,0 +1,43 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-bash-shared
+pkgdesc="Bash code shared by certain EndeavourOS apps."
+pkgver=1
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(
+  bash yad
+)
+backup=(etc/eos-script-lib-yad.conf)
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+
+source=(
+  $url/eos-script-lib-yad
+  $url/eos-script-lib-yad.conf
+
+  $url/RunInTerminal
+  $url/device-info
+  $url/eos-connection-checker
+  $url/paccache-service-manager
+  $url/su-c_wrapper
+)
+
+sha512sums=('519534264198a4fd32a3456c9bc9a1c441399e7181811e8d5dfeb7ba496c5cf56ae7ab54c247f313438262692350b2b577637e9f3b08d1cd4b76a4a7b4263bd7'
+            '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
+            'b097c58d4e954ab86a07d685977b698645b1e2b49131ad76015e65b98e599c3b57728f4b2cfcf3a10527de23d7ba069ea4cf0dfddb8ee4587fc9815f4885dec7'
+            '9cc88b541318aa2b3e9a85ddf68cc1a7b4cff3a0e98b9e15b2760a2bda8d0831cf99ce61f6745dea8b284104bdea34bdadff4b266fd130910625395c0bda35a0'
+            '3422186535809728ee20da4418143d6933e853bef2300a7c031d4c038864e2dc108955eea6a7f11d9acc430702fb3f68675d37ee6a695e6062fbd28bd2b1bd81'
+            'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
+            'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa')
+
+package() {
+  install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
+  install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
+
+  install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
+  install -Dm755 device-info                    $pkgdir/usr/bin/device-info
+  install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
+  install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
+  install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
+}
