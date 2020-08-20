@@ -1,7 +1,7 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
 
-pkgname=calamares_test
+pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.28.2
@@ -37,14 +37,28 @@ prepare() {
     # New branding stuff from @FLVAL
     rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
-    
-    # For testing EFI stuff 
-    # mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
-    
+       
     # Build proccess can't understand our personal files, so we adjust here
+
+    #Create settings.conf here
+
+# branding:
+
+    # shellprocess - simply replace it by scripts at settings.conf is easier right before umount module
+    # used for both offline and online
+
+    sed -i "s?- umount?- $scripts\n- umount?" $_reponame/{settings.conf,settings.conf_online,settings.conf_offline}
+
+    echo "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" >$_reponame/src/modules/packages/packages.conf_online 
+    echo "---\nbackend: pacman\nskip_if_no_internet: true\nupdate_db: false\nupdate_system: false\nupdate_system: false" >$_reponame/src/modules/packages/packages.conf_offline
+
+    # default
     cp $_reponame/src/modules/packages/packages.conf_offline                    $_reponame/src/modules/packages/packages.conf
-    cp $_reponame/settings.conf_offline                                         $_reponame/settings.conf
+    cp $_reponame/settings.conf_offline  $_reponame/settings.conf
+
     cp $_reponame/src/modules/welcome/welcome.conf_offline                      $_reponame/src/modules/welcome/welcome.conf 
+
+
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
     cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning}.svg  $_reponame/data/images
@@ -71,8 +85,15 @@ prepare() {
     
     echo "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     
-    # recheck if InitcpioJob.cpp is still needed
+    # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
+
+    sed -i 's?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?' $_reponame/src/modules/packages/main.py
+    sed -i 's?pacman_flags,?pacman_flags, "--needed",?' $_reponame/src/modules/packages/main.py
+
+
 }
+
+
 
 build() {
 
