@@ -53,7 +53,7 @@ sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
 sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
 # create settings for offline and online
-cp settings.conf settings.conf{_online,_offline}
+cp $_reponame/settings.conf $_reponame/settings.conf{_online,_offline}
 
 # offline
 sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
