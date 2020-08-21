@@ -74,11 +74,19 @@ sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings
     cp $_reponame/src/modules/packages/packages.conf_offline                    $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline  $_reponame/settings.conf
 
-# welcome
+# welcome module
 
 sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
 cp $_reponame/src/modules/welcome.conf $_reponame/src/modules/welcome/welcome.conf_{online,offline}
 sed -i "s?# - root?# - root\n        - internet\?" $_reponame/src/modules/welcome/welcome.conf_online
+
+# netinstall moduule
+cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+
+# Escape /? \
+sed -i "s?groupsUrl: local?groupsUrl: https://github.com/endeavouros-team/install-scripts/raw/master/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
+
+sed -i "s?groupsUrl: local?groupsUrl: https://github.com/endeavouros-team/install-scripts/raw/master/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
     # branding files
