@@ -53,7 +53,8 @@ sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
 sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
 # create settings for offline and online
-cp $_reponame/settings.conf $_reponame/settings.conf{_online,_offline}
+cp $_reponame/settings.conf $_reponame/settings.conf_online
+cp $_reponame/settings.conf $_reponame/settings.conf_offline
 
 # offline
 sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
@@ -77,7 +78,8 @@ sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings
 # welcome module
 
 sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
-cp $_reponame/src/modules/welcome.conf $_reponame/src/modules/welcome/welcome.conf_{online,offline}
+cp $_reponame/src/modules/welcome.conf $_reponame/src/modules/welcome/welcome.conf_online
+cp $_reponame/src/modules/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
 sed -i "s?# - root?# - root\n        - internet\?" $_reponame/src/modules/welcome/welcome.conf_online
 
 # netinstall moduule
