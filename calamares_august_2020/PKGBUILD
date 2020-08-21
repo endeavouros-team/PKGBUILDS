@@ -40,22 +40,41 @@ prepare() {
        
     # Build proccess can't understand our personal files, so we adjust here
 
-    #Create settings.conf here
+    # Create settings.conf here
 
-# branding:
+sed -i 's?branding:.*?branding: endeavouros?' $_reponame/settings.conf
+sed -i 's?#  - luksbootkeyfile?  - luksbootkeyfile?' $_reponame/settings.conf
+sed -i 's?#  - luksopenswaphookcfg?  - luksopenswaphookcfg?' $_reponame/settings.conf
+sed -i 's?#  - grubcfg?  - grubcfg?' $_reponame/settings.conf
 
-    # shellprocess - simply replace it by scripts at settings.conf is easier right before umount module
-    # used for both offline and online
+sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
 
-    sed -i "s?- umount?- $scripts\n- umount?" $_reponame/{settings.conf,settings.conf_online,settings.conf_offline}
+# scripts instead of shellprocess
+sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
+# create settings for offline and online
+cp settings.conf settings.conf{_online,_offline}
+
+# offline
+sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
+
+sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
+
+# online
+sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
+
+
+
+
+# Create packages.conf
     echo "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" >$_reponame/src/modules/packages/packages.conf_online 
     echo "---\nbackend: pacman\nskip_if_no_internet: true\nupdate_db: false\nupdate_system: false\nupdate_system: false" >$_reponame/src/modules/packages/packages.conf_offline
 
-    # default
+    # offline is default
     cp $_reponame/src/modules/packages/packages.conf_offline                    $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline  $_reponame/settings.conf
 
+    # TODO
     cp $_reponame/src/modules/welcome/welcome.conf_offline                      $_reponame/src/modules/welcome/welcome.conf 
 
 
@@ -75,7 +94,7 @@ prepare() {
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'         $_reponame/src/modules/initcpio/InitcpioJob.cpp
     
-    # August 20th 2020 - Removing as much as source files possible - Remove users.conf grubcfg.conf
+    # August 20th 2020
     _user_groups=(adm power sys floppy log rfkill optical scanner)
     for user_groups in "${_user_groups[@]}"
     do
@@ -111,7 +130,7 @@ package() {
     # Build proccess can't understand our personal files, so we explicitly copy them here to be packed along calamares files
 
     cp -r $_reponame/src/branding                                     $_reponame/build/$pkgname/usr/share/calamares/
-    cp -r $_reponame/settings.conf_{online,offline,vanilla}           $_reponame/build/$pkgname/usr/share/calamares/
+    cp -r $_reponame/settings.conf_{online,offline}           $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line    $_reponame/build/$pkgname/usr/share/calamares/modules/
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line  $_reponame/build/$pkgname/usr/share/calamares/modules/
 
