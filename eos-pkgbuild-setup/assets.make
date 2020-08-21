@@ -8,7 +8,14 @@ echoreturn() { echo "$@" ; }     # for "return" values!
 echo2()      { echo   "$@" >&2 ; }    # output to stderr
 printf2()    { printf "$@" >&2 ; }    # output to stderr
 
-DIE()        { echo2 -n "Error: "   ; echo2 "$@" ; Destructor ; exit 1 ; }
+DIE() {
+    echo2 "Error: $@"
+    if [ "${FUNCNAME[1]}" = "Main" ] ; then
+        Usage
+    fi
+    Destructor
+    exit 1
+}
 WARN()       { echo2 -n "Warning: " ; echo2 "$@" ; }
 
 read2() {
@@ -1096,7 +1103,7 @@ Main() {
 
     test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
     test -n "$PROGNAME" || PROGNAME="assets.make"
-    test -r $ASSETS_CONF || DIE "Error: file '$PWD/$ASSETS_CONF' does not exist."
+    test -r $ASSETS_CONF || DIE "file './$ASSETS_CONF' does not exist."
 
     local reponame="$(AssetsConfLocalVal REPONAME)"
     local signer="$(  AssetsConfLocalVal SIGNER)"
