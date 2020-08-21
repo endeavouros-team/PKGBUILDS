@@ -74,8 +74,11 @@ sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings
     cp $_reponame/src/modules/packages/packages.conf_offline                    $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline  $_reponame/settings.conf
 
-    # TODO
-    cp $_reponame/src/modules/welcome/welcome.conf_offline                      $_reponame/src/modules/welcome/welcome.conf 
+# welcome
+
+sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
+cp $_reponame/src/modules/welcome.conf $_reponame/src/modules/welcome/welcome.conf_{online,offline}
+sed -i "s?# - root?# - root\n        - internet\?" $_reponame/src/modules/welcome/welcome.conf_online
 
 
     # branding files
