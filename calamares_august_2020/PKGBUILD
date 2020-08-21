@@ -42,33 +42,29 @@ prepare() {
 
     # Create settings.conf here
 
-sed -i 's?branding:.*?branding: endeavouros?' $_reponame/settings.conf
-sed -i 's?#  - luksbootkeyfile?  - luksbootkeyfile?' $_reponame/settings.conf
-sed -i 's?#  - luksopenswaphookcfg?  - luksopenswaphookcfg?' $_reponame/settings.conf
-sed -i 's?#  - grubcfg?  - grubcfg?' $_reponame/settings.conf
+    sed -i 's?branding:.*?branding: endeavouros?' $_reponame/settings.conf
+    sed -i 's?#  - luksbootkeyfile?  - luksbootkeyfile?' $_reponame/settings.conf
+    sed -i 's?#  - luksopenswaphookcfg?  - luksopenswaphookcfg?' $_reponame/settings.conf
+    sed -i 's?#  - grubcfg?  - grubcfg?' $_reponame/settings.conf
 
-sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
+    sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
 
-# scripts instead of shellprocess
-sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
+    # scripts instead of shellprocess
+    sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
-# create settings for offline and online
-cp $_reponame/settings.conf $_reponame/settings.conf_online
-cp $_reponame/settings.conf $_reponame/settings.conf_offline
+    # create settings for offline and online
+    cp $_reponame/settings.conf $_reponame/settings.conf_online
+    cp $_reponame/settings.conf $_reponame/settings.conf_offline
 
-# offline
-sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
+    # offline
+    sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
 
-sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
+    sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
 
-# online
-sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
+    # online
+    sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
 
-
-
-
-# Create packages.conf
-# failed
+    # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
     echo -e "---\nbackend: pacman\nskip_if_no_internet: true\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_offline
 
@@ -76,21 +72,21 @@ sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings
     cp $_reponame/src/modules/packages/packages.conf_offline                    $_reponame/src/modules/packages/packages.conf
     cp $_reponame/settings.conf_offline  $_reponame/settings.conf
 
-# welcome module
+    # welcome module
 
-sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
-cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_online
-cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
+    sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
+    cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_online
+    cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
 
-sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
+    sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
 
-# netinstall moduule
-cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    # netinstall moduule
+    cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
-# Escape /? \
-sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
+    # Escape /? \
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
 
-sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
     # branding files
@@ -110,23 +106,19 @@ sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/in
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'         $_reponame/src/modules/initcpio/InitcpioJob.cpp
     
     # August 20th 2020
-# failed
     _user_groups=(adm power sys floppy log rfkill optical scanner)
     for user_groups in "${_user_groups[@]}"
     do
     # will add one by one using -i
     sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
     done
-    echo "useers"
     
     echo -e "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     
     # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
 
     sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
-    echo "pacman1"
     sed -i "s?pacman_flags,?pacman_flags, "--needed",?" $_reponame/src/modules/packages/main.py
-    echo "pacman2"
 
 
 }
