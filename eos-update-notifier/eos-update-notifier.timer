@@ -1,9 +1,9 @@
 [Unit]
-Description=Run EOS update notifier a few times a day
+Description=Run EOS update notifier on a schedule
 
 [Timer]
 OnStartupSec=30sec
-OnCalendar=0/2:25:00
+OnCalendar=daily
  
 [Install]
 WantedBy=timers.target

@@ -371,52 +371,90 @@ Initialize() {    # initialize service and timer for the current user
 
 Configure() {
     local current_value=$(grep "^OnCalendar=" $configdir/$progname.timer | cut -d '=' -f 2)
-
-    local current_interval=$(echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 2)
-    local current_initial=$( echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 1)
-    local current_minute=$(  echo $current_value | cut -d ':' -f 2)
-
-    local result retval
-    local tips="Tips:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n"
-    tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
-
-    result=$(
-        eos_yad2 --form --title="Configure update check schedule" --width=400 \
-                 --text="$tips" --window-icon=$EOS_WICON \
-                 --field="Interval in hours":num           $current_interval \
-                 --field="Initial hour":num                $current_initial \
-                 --field="Minute offset":ro                $current_minute \
-                 --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
-          )
-    retval=$?
-    test $retval -eq 1 && return 1
-
-    local new_interval=$(echo "$result" | cut -d '|' -f 1)
-    local new_initial=$( echo "$result" | cut -d '|' -f 2)
-    local new_minute=$(shuf -i0-59 -n1)                      # try make users start at different times...
-
     local oncalendar
+    local result retval
 
-    case $retval in
-        10)
-            local default_interval=2
-            local default_initial=0
-            local default_minute=$(shuf -i0-59 -n1)          # try make users start at different times...
+    if [ 1 -eq 1 ] ; then
+        local xx
+        local periods=(
+            hourly daily weekly monthly
+            # quarterly semiannually yearly   # not sensible values!?
+        )
+        local defaultperiod=daily
+        local cmd=(
+            eos_yad2 --list --radiolist --column=Select --column=Period --width=400 --height=250
+            --image=preferences-system
+            --title="Configure update check schedule"
+            --text="Select the period for system updates"
+            --button="Set to default":10 --button=yad-cancel:1 --button=yad-ok:0
+        )
+        # Convert from the old settings:
+        case "$current_value" in
+            hourly | daily | weekly | monthly) ;;
+            *) current_value=$defaultperiod ;;
+        esac
+        # build selections:
+        for xx in "${periods[@]}" ; do
+            case "$xx" in
+                $current_value) cmd+=(true  "$xx") ;;
+                *)              cmd+=(false "$xx") ;;
+            esac
+        done
 
-            if [ $new_interval -eq $default_interval ] && [ $new_initial -eq $default_initial ] && [ $new_minute -eq $default_minute ]
-            then
-                return  # nothing to do
-            fi
-            oncalendar="$default_initial/$default_interval:$default_minute:00"
-            ;;
-        0)  
-            if [ $new_interval -eq $current_interval ] && [ $new_initial -eq $current_initial ] && [ $new_minute -eq $current_minute ]
-            then
-                return  # nothing to do
-            fi
-            oncalendar="$new_initial/$new_interval:$new_minute:00"
-            ;;
-    esac
+        # ask user
+        result=$("${cmd[@]}")
+        retval=$?
+
+        case "$retval" in
+            0)  oncalendar=$(echo "$result" | cut -d '|' -f 2) ;;
+            10) oncalendar=$defaultperiod ;;
+            1) return 1 ;;
+        esac
+    else
+        local current_interval=$(echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 2)
+        local current_initial=$( echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 1)
+        local current_minute=$(  echo $current_value | cut -d ':' -f 2)
+
+        local tips="Tips:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n"
+        tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
+
+        result=$(
+            eos_yad2 --form --title="Configure update check schedule" --width=400 \
+                     --text="$tips" --window-icon=$EOS_WICON \
+                     --field="Interval in hours":num           $current_interval \
+                     --field="Initial hour":num                $current_initial \
+                     --field="Minute offset":ro                $current_minute \
+                     --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
+              )
+        retval=$?
+        test $retval -eq 1 && return 1
+
+        local new_interval=$(echo "$result" | cut -d '|' -f 1)
+        local new_initial=$( echo "$result" | cut -d '|' -f 2)
+        local new_minute=$(shuf -i0-59 -n1)                      # try make users start at different times...
+
+        case $retval in
+            10)
+                local default_interval=2
+                local default_initial=0
+                local default_minute=$(shuf -i0-59 -n1)          # try make users start at different times...
+                
+                if [ $new_interval -eq $default_interval ] && [ $new_initial -eq $default_initial ] && [ $new_minute -eq $default_minute ]
+                then
+                    return  # nothing to do
+                fi
+                oncalendar="$default_initial/$default_interval:$default_minute:00"
+                ;;
+            0)  
+                if [ $new_interval -eq $current_interval ] && [ $new_initial -eq $current_initial ] && [ $new_minute -eq $current_minute ]
+                then
+                    return  # nothing to do
+                fi
+                oncalendar="$new_initial/$new_interval:$new_minute:00"
+                ;;
+        esac
+    fi
+
     echo2 "New OnCalendar value: $oncalendar"
     Initialize
 }
