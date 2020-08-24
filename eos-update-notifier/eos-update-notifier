@@ -375,6 +375,9 @@ Configure() {
     local result retval
 
     if [ 1 -eq 1 ] ; then
+        # backup old timer file:
+        cp $configdir/$progname.timer $configdir/$progname.timer.bak."$(date +%x-%X)"
+
         local xx
         local periods=(
             hourly daily weekly monthly
