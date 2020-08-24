@@ -1,10 +1,14 @@
 [Desktop Entry]
-Version=1.0
 Type=Application
+Encoding=UTF-8
 Name=akm
-Comment=Manages Kernels in Antergos/Arch
+Comment=Manages official kernels in EndeavourOS
+Comment[fi]=Asentaa/poistaa linux-ytimiä ja näyttää ytimien tietoja
 Exec=akm
-Icon=system-software-install
-Path=
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
+Hidden=false
 Terminal=false
 StartupNotify=true
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=System
