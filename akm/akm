@@ -79,8 +79,11 @@ TestingVersion() {
 }
 
 Testing() {
-    local testinginfo="$(curl -s "https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules")"
+    local URL="https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules"
+    local testinginfo="$(/usr/bin/curl -s $URL_timeout $URL)"
     local version xx
+
+    test -n "$testinginfo" || return 1
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
@@ -171,6 +174,11 @@ eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
 }
 
+DIE() {
+    eos_yad --form --title="AKM failure" --image=error --text="$1" --button=yad-quit
+    exit 1
+}
+
 Main()
 {
     local na="(-)"
@@ -194,12 +202,17 @@ Main()
 
     ShowFunctionStart
 
-    local kernelorg="$(curl -s https://www.kernel.org)"
+    local URL_timeout="--max-time 30"                      # used for all curl calls here
+
+    local URL="https://www.kernel.org"
+    local kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
     local org_kernels=(mainline stable longterm linux-next)
     local KOName="K.o.category"
     local KOVersionName="K.o.version"
     local xx
     local t1=""
+
+    test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
 
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
     t1+="You can install and/or uninstall kernel packages using the checkboxes on the left column.\n"
@@ -216,16 +229,15 @@ Main()
     t1+="Marking <b>$na</b> means: info not available.\n"
 
     local cmd=(
-        /usr/bin/yad
+        eos_yad
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
-        --window-icon=applications-system
     )
 
     for xx in "${functions[@]}" ; do
         ShowFunction
-        $xx
+        $xx || DIE "Function '$xx' failed.\n"
     done
     ShowFunctionEnd
 
