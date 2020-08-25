@@ -51,7 +51,6 @@ prepare() {
     # disable
     sed -i "s?- initramfs?#- initramfs?" $_reponame/settings.conf
 
-initramfs
     # scripts instead of shellprocess
     sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
