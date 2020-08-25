@@ -4,8 +4,8 @@
 pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.28
-pkgrel=1
+pkgver=3.2.29
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -48,7 +48,10 @@ prepare() {
     sed -i 's?#  - grubcfg?  - grubcfg?' $_reponame/settings.conf
 
     sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
+    # disable
+    sed -i "s?- initramfs?#- initramfs?" $_reponame/settings.conf
 
+initramfs
     # scripts instead of shellprocess
     sed -i "s?  - umount?  - scripts\n  - umount?" $_reponame/settings.conf
 
@@ -59,7 +62,9 @@ prepare() {
     # offline
     sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
 
-    sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
+    #sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
+    # 2 user instances at settings.conf, bypass the wrong one
+    sed -i "N;s?  - users\n  - displaymanager?  - removeuser\n  - users\n  - displaymanager?" $_reponame/settings.conf_offline
 
     # online
     sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
