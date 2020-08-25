@@ -72,8 +72,10 @@ ShowIfNotSeen() {
             echo "Later it is!" >&2
         }
     else
-        msg="$(printf "Latest Arch news date: %s (already visited).\n" "$latest_seen")"
-        echo "$msg" >&2
+        if [ "$keep_quiet" = "no" ] ; then
+            msg="$(printf "Latest Arch news date: %s (already visited).\n" "$latest_seen")"
+            echo "$msg" >&2
+        fi
     fi
 }
 
@@ -91,6 +93,7 @@ Main() {
     local latestfile="$HOME/.config/EOS-arch-news.conf"
     local url=https://www.archlinux.org/news
     local arg stop=no
+    local keep_quiet=no
     local dates
     local data="$(curl -s $url/)"
     #local data="$(wget -q -O- $url)"
@@ -105,6 +108,9 @@ Main() {
 
     for arg in "$@" ; do
         case "$arg" in
+            -q | --quiet)
+                keep_quiet=yes
+                ;;
             -f | --force)
                 ShowAll
                 stop=yes
