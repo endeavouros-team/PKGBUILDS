@@ -5,7 +5,7 @@ pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.29
-pkgrel=2
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -63,7 +63,7 @@ prepare() {
 
     #sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
     # 2 user instances at settings.conf, bypass the wrong one
-    sed -i "N;s?  - users\n  - displaymanager?  - removeuser\n  - users\n  - displaymanager?" $_reponame/settings.conf_offline
+    sed -i "N;N;s?  - users\n  - displaymanager?  - removeuser\n  - users\n  - displaymanager?" $_reponame/settings.conf_offline
 
     # online
     sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
@@ -77,8 +77,18 @@ prepare() {
     cp $_reponame/settings.conf_offline  $_reponame/settings.conf
 
     # welcome module
+    # Observation: timezone urls fail sometimes
+    # https://geoip.kde.org/v1/ubiquity # xml
+    # https://geoip.kde.org/v1/calamares # locale.conf
+    # https://ipapi.co/json # json
+    # https://freegeoip.app/xml/ # xml, slow
+    # welcome.conf # country / countrycode
+    # locale.conf # TimeZone
 
     sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
+    # "none" causes calamares to hang forever at "checking modules requirements"
+    sed -i "s?style:    "none"?style:    "xml"?" $_reponame/src/modules/welcome/welcome.conf
+
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_online
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
 
