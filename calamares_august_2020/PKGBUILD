@@ -87,7 +87,7 @@ prepare() {
 
     sed -i "s?showDonateUrl:.*??" $_reponame/src/modules/welcome/welcome.conf
     # "none" causes calamares to hang forever at "checking modules requirements"
-    sed -i "s?style:    "none"?style:    "xml"?" $_reponame/src/modules/welcome/welcome.conf
+    sed -i "s?style:    \"none\"?style:    \"xml\"?" $_reponame/src/modules/welcome/welcome.conf
 
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_online
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
