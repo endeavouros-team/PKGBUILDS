@@ -3,8 +3,8 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.7
-pkgrel=3
+pkgver=0.8
+pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
@@ -50,8 +50,9 @@ EOF
 }
 
 _select_calamares_type() {
+    local timeout=60
     while true ; do
-        read -p "Build with calamares 'test' or 'current'? [current] " >&2
+        read -t $timeout -p "[${timeout}sec] Build with calamares 'test' or 'current'? [current] " >&2
         case "$REPLY" in
             "" | current)
                 sed -i packages.x86_64 \
@@ -67,6 +68,72 @@ _select_calamares_type() {
                 ;;
         esac
     done
+}
+
+_inject_at_pkgbuild() {
+
+    # The $conf file (see below) may contain local bash arrays named CHANGE, INSERT and END.
+    # It also contains the file name variable FILE that defines where all changes take place.
+    #
+    # CHANGE array specifies which packages will be changed to another.
+    # INSERT array specifies the place before new packages are added.
+    # END array specifies the packages added to the end of the FILE.
+    #
+    # Example:
+    #
+    # local CHANGE=("vi|emacs" "less|most")                                      # change vi --> emacs, less --> most
+    # local INSERT=("#virtualbox.packages|#for virt-viewer\nspice-vdagent\n")    # add spice-vdagent just before line "#virtualbox packages"
+    # local END=(vlc simple-scan)                                                # add some packages to the end of the $FILE
+    # local FILE=packages.x86_64
+
+    local conf="$HOME/.pkgbuild-inject.conf"
+
+    if [ ! -r "$conf" ] ; then
+        echo "Info: $FUNCNAME: no inject configuration file '$conf'"
+        return
+    fi
+
+    source "$conf"
+
+    if [ -z "$FILE" ] ; then
+        echo "Error: $FUNCNAME: conf file $conf must set variable: FILE"
+        return 1
+    fi
+    if [ ! -r "$FILE" ] ; then
+        echo "Error: $FUNCNAME: conf file $conf refers to a non-existent file in assignment: FILE='$FILE'"
+        return 1
+    fi
+
+    local xx
+    local old new
+    local justbefore
+
+    if [ -n "$CHANGE" ] ; then
+        for xx in "${CHANGE[@]}" ; do
+            echo "Changing: '$xx'" >&2
+            old="$(echo "$xx" | cut -d '|' -f 1)"
+            new="$(echo "$xx" | cut -d '|' -f 2)"
+            sed -i "$FILE" -e "s|^$old$|$new|"
+        done
+    fi
+
+    if [ -n "$INSERT" ] ; then
+        for xx in "${INSERT[@]}" ; do
+            echo "Inserting: '$xx'" >&2
+            justbefore="$(echo "$xx" | cut -d '|' -f 1)"
+            new="$(       echo "$xx" | cut -d '|' -f 2)"
+            sed -i $FILE -e "/^$justbefore/i$new"
+        done
+    fi
+
+    if [ -n "$END" ] ; then
+        echo "" >> $FILE
+        echo "# Personal packages:" >> $FILE
+        for xx in "${END[@]}" ; do
+            echo "Appending: '$xx'" >&2
+            echo "$xx" >> $FILE
+        done
+    fi
 }
 
 build() {
@@ -91,6 +158,9 @@ build() {
     ###################################################
 
     cd $basedir
+
+    _inject_at_pkgbuild || return 1
+    
     _select_calamares_type   # current or test
 
     sudo pacman -Syyu || return 1
