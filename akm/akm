@@ -94,7 +94,7 @@ Testing() {
 
 KernelOrgVersion() {
     local type="$1"
-    local result="$(echo "$kernelorg" | grep -A2 $type: | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
+    local result="$(echo "$kernelorg" | grep -A2 $type: | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
     case "$type" in
         mainline) ;;
         longterm) result="$(echo "$result" | head -n 1)" ;;
