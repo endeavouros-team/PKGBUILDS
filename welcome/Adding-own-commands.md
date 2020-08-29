@@ -149,7 +149,7 @@ local welcome_own_commands=(
 
 </pre>
 
-## Example showing how to align texts on the buttons of your Personal Commands tab
+## Example: how to align texts on the buttons on the Personal Commands tab
 
 Welcome's version 3.2.14 added support to automatically align the texts on the buttons under a tab.<br>
 To align texts on the buttons, *mark* the **name** element with `_align(name)`.<br>
@@ -162,8 +162,15 @@ local welcome_own_commands=(
     --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
 )
 </pre>
-<br>
 *Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.
+<br>
+
+## Example: run commands in terminal with `RunInTerminal`
+
+<pre>
+    --field="_align(Update system)!system-software-install!":fbtn \
+            "RunInTerminal 'checkupdates && sudo pacman -Syu || echo No updates.'"
+</pre>
 
 ## Drag & drop items into the configuration file!
 
