@@ -363,6 +363,7 @@ Initialize() {    # initialize service and timer for the current user
         esac
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
+        systemctl --user daemon-reload
         debug "New '$configdir/$progname.service' successfully set up."
         debug "New '$configdir/$progname.timer' successfully set up."
         debug "$progname service initialized for user '$(basename "$HOME")'."
