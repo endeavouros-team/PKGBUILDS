@@ -10,10 +10,10 @@ $HOME/.config/welcome-own-cmds.conf
 ## Command syntax
 The Welcome app uses **yad forms** and bash language to create a simple GUI.
 <br>
-<sub>Note that you don't need to be familiar with yad nor bash (but it may help!) to add your own commands.
+<sup>Note that you don't need to be familiar with yad nor bash (but it may help!) to add your own commands.
 Simply follow this short tutorial.<br>
 (More info with terminal commands: `man yad`, `man bash`).
-</sub>
+</sup>
 
 Let's start with a simple Firefox example (this already works for Welcome!):
 <pre>
@@ -46,18 +46,18 @@ Between `--field=` and `:fbtn` you'll write most of the button information.
 The name, icon, and description are separated with exclamation (!) marks.<br>
 And because the added strings may contain space characters, always use quotes ("a string") around the strings.
 
-<sub>*Tip*: to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.</sub><br>
-<sub>*Tip (advanced)*: the command string can be e.g. a bash function with parameters (see the examples below).
-</sub><br>
-<sub>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
-</sub>
+<sup>*Tip*: to find useful icon names you can use e.g. command **yad-icon-browser**. It is included in the yad package.</sup><br>
+<sup>*Tip (advanced)*: the command string can be e.g. a bash function with parameters (see the examples below).
+</sup><br>
+<sup>*Tip (more advanced)*: take a look at file /usr/bin/eos-welcome about using bash functions in the command strings.
+</sup>
 
 ### The **name** element and aligning
 
 If you want to left-align the texts on all buttons on your Personal Commands tab, you should use the `_align(name)` marking on each field.
 Otherwise texts will be centered. Marking simply makes button's **name** part to be processed by Welcome for left-alignment.<br>
 Left-aligning is useful especially if you have icons on the buttons.
-<br><sub>*Tip*: use `_align()` on *all* fields to make all left aligned. Mixing left-aligned and centered names may make button layout unappealing.</sub><br>
+<br><sup>*Tip*: use `_align()` on *all* fields to make all left aligned. Mixing left-aligned and centered names may make button layout unappealing.</sup><br>
 
 An example field about the parameters in the command string:
 <pre>
@@ -162,7 +162,7 @@ local welcome_own_commands=(
     --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
 )
 </pre>
-*Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.
+<sup>*Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.</sup>
 <br>
 
 ## Example: run commands in terminal with `RunInTerminal`
