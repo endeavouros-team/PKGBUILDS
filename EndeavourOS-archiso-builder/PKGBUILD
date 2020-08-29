@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-archiso
 pkgver=0.8
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
@@ -47,6 +47,7 @@ sudo rm -rf $build_rootdir/pkg
 sudo rm -rf $build_rootdir/src
 rm -f \$(basename $cleanup)         # underlying folder no more exists...
 EOF
+    chmod +x "$cleanup"
 }
 
 _select_calamares_type() {
