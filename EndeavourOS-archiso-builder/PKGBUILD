@@ -86,10 +86,17 @@ _inject_at_pkgbuild() {
     # local END=(vlc simple-scan)                                                # add some packages to the end of the $FILE
     # local FILE=packages.x86_64
 
-    local conf="$HOME/.pkgbuild-inject.conf"
+    local conf_places=(
+        "$HOME/.config/pkgbuild-inject.conf"
+        "$HOME/.pkgbuild-inject.conf"
+    )
+    local conf
 
+    for conf in "${conf_places[@]}" ; do
+        test -r "$conf" && break
+    done
     if [ ! -r "$conf" ] ; then
-        echo "Info: $FUNCNAME: no inject configuration file '$conf'"
+        echo "Info: $FUNCNAME: no inject configuration file at ${conf_places[*]}"
         return
     fi
 
