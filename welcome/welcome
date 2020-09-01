@@ -892,6 +892,32 @@ GeneralInfo() {
   "${tabcontents[@]}" >& /dev/null &
 }
 
+RunIfInstalled() {
+    local app pkg
+    local opt
+
+    while [ -n "$1" ] ; do
+        opt="$1"
+        case "$opt" in
+            -a=*) app="${opt#*=}" ; shift ;;
+            -p=*) pkg="${opt#*=}" ; shift ;;
+            -*) eos_yad_WARN "$FUNCNAME: unsupported option '$opt'" ; return ;;
+            *) break ;;
+        esac
+    done
+
+    app="/usr/bin/$app"
+    if [ -x "$app" ] ; then
+        "$app" "$@"
+    else
+        test -n "$pkg" || pkg="$(basename $app)"
+        eos_yad_WARN "Sorry, application '$app' from package '$pkg' is needed." \
+                     --text="Application not installed" \
+                     --width=800 --height=200
+    fi
+}
+export -f RunIfInstalled
+
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
@@ -903,8 +929,9 @@ AfterInstall() {
       --image=dialog-information
       --text="<b>$(ltr after_install_text)</b>"
   )
-  test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field="_align($(ltr after_install_um))!applications-internet!$(ltr after_install_umtip)":fbtn 'reflector-simple')
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
+     tabcontents+=(--field="_align($(ltr after_install_um))!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
+  fi
   tabcontents+=(
       --field="_align($(ltr after_install_us))!$system_software_update!$(ltr after_install_ustip)":fbtn 'bash -c yad_SystemUpdate'
       --field="_align($(ltr after_install_pclean))!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
