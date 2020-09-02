@@ -181,6 +181,26 @@ _align_buttons_on_tab() {
     done
 }
 
+ChangeResoInVirtualMachine() {
+    local query="$(xrandr --query)"
+    local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
+    local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
+    local xrandr="xrandr --output $output --mode"
+    local reso
+    local cmd=(
+        eos_yad
+        --form --width=400 --columns=2 --image=display
+        --title="Change display resolution"
+        --text="Select display resolution to be used at install time"
+        --button=yad-ok
+    )
+    readarray -t resos <<< $(echo "$resos")
+    for reso in "${resos[@]}" ; do
+        cmd+=(--field="$reso":fbtn "$xrandr $reso")
+    done
+    "${cmd[@]}" >/dev/null
+}
+export -f ChangeResoInVirtualMachine
 
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
@@ -648,7 +668,6 @@ yad_SystemUpdate() {
         fi
     done
     if [ $hasupdates -eq 0 ] ; then
-        echo "foobar $system_software_update" > /home/edi/EOS/PKGBUILDS/welcome/zzz.log
         eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
                 --button=yad-quit:0 --image="$(FindAppIcon system-software-update)"
@@ -851,10 +870,18 @@ INSTALL() {
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
-      --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                  'bash -c "yad_calamares_debug choose"'
+      --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
-      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn    'reflector-simple'
-#      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                    'bash -c yad_InitializePacmanMirroring'
+      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          'reflector-simple'
+  )
+  # If installing into a virtual machine, allow changing the display resolution now
+  case "$(lspci -vnn)" in
+      *" QEMU "* | *VMware* | *VirtualBox*)
+          tabcontents+=(--field="_align(Change display resolution)!display!Change display resolution at install time":fbtn  'bash -c ChangeResoInVirtualMachine')
+          ;;
+  esac
+  tabcontents+=(
+#      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
       --field="_align($(ltr ins_pm))!$gparted!$(ltr ins_pmtip)":fbtn                        'gparted'
       --field="_align($(ltr ins_rel))!$user_info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
       --field="_align($(ltr ins_tips))!$user_info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
