@@ -3,13 +3,13 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.8
-pkgrel=2
+pkgver=0.8.1
+pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
-sha512sums=(SKIP)
+sha512sums=('SKIP')
 
 
 _check_repo_in_pacman_conf() {
@@ -39,12 +39,29 @@ EOF
 }
 
 _create_cleanup_script() {
+    # There may be lots of files to delete:
+    local installer_files=(
+        cleaner_script.sh chrooted_cleaner_script.sh calamares_switcher update-mirrorlist
+        pacstrap_calamares calamares_for_testers rank_pacman_key.sh
+    )
+    local file=run_before_squashfs.sh
+    if [ -r $file ] ; then
+        installer_files=($(grep "^mv " $file | grep "/usr/bin/$" | sed -e 's|^mv ||' -e 's| /usr/bin/$||'))
+    fi
+    installer_files+=(update-mirrorlist)
+
     cat <<EOF > "$cleanup"
 #!/bin/bash
 sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
 sudo rm -rf $build_rootdir/${pkgname}
 sudo rm -rf $build_rootdir/pkg
 sudo rm -rf $build_rootdir/src
+
+# pushd /usr/bin
+# sudo rm -fv "${installer_files[@]}"
+# popd
+           
+sync
 rm -f \$(basename $cleanup)         # underlying folder no more exists...
 EOF
     chmod +x "$cleanup"
@@ -144,6 +161,22 @@ _inject_at_pkgbuild() {
     fi
 }
 
+_inject_to__run_before_squashfs_sh() {
+    local file=run_before_squashfs.sh
+    local keyserver=hkps://keyserver.ubuntu.com
+
+    sed -i $file \
+        -e "s|^pacman-key --refresh-keys$|pacman-key --refresh-keys --keyserver $keyserver|"
+
+    return  # TODO !
+
+    if [ 0 -eq 1 ] ; then
+        local justbefore="$(grep -P "^mv .* /usr/bin/$" $file)"
+        local new=""                                                 # modify chrooted_cleaner_script.sh ??
+        sed -i $file -e "/^$justbefore/i$new"
+    fi
+}
+
 build() {
     ###################################################
     # Check that we have calamares repo properly set up.
@@ -168,6 +201,7 @@ build() {
     cd $basedir
 
     _inject_at_pkgbuild || return 1
+    _inject_to__run_before_squashfs_sh || return 1
     
     _select_calamares_type   # current or test
 
