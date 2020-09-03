@@ -856,7 +856,7 @@ INSTALL() {
   # If installing into a virtual machine, allow changing the display resolution now
   case "$(lspci -vnn)" in
       *" QEMU "* | *VMware* | *VirtualBox*)
-          tabcontents+=(--field="_align(Change display resolution)!display!Change display resolution at install time":fbtn  ChangeDisplayResolution)
+          tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn                  ChangeDisplayResolution)
           ;;
   esac
   tabcontents+=(

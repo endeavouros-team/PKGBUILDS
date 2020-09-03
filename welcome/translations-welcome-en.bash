@@ -232,3 +232,7 @@ _tr_add2 butt_owncmds_help        "Tutorial: Personal Commands"
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Personal Commands drag${_and}drop"
 _tr_add2 butt_owncmds_dnd_help    "Show a window where to drag field items for new buttons"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Change display resolution"
+_tr_add2 ins_resotip              "Change display resolution now"

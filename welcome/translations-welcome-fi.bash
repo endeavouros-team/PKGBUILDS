@@ -232,3 +232,7 @@ _tr_add2 butt_owncmds_help        "Tutoriaali: Omat komennot"
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Omat komennot - raahaa${_and}pudota"
 _tr_add2 butt_owncmds_dnd_help    "Näytä ikkuna johon voi raahata elementtejä uusille painikkeille"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Vaihda näytön tarkkuus"
+_tr_add2 ins_resotip              "Vaihda näytön tarkkuus nyt"
