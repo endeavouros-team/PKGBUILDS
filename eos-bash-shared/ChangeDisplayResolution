@@ -15,9 +15,10 @@ yad_ChangeDisplayResolution() {
     local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
     local xrandr="xrandr --output $output --mode"
     local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
+    local resosarr
     local current_reso="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | grep "*" | awk '{print $1}')"
 
-    readarray -t resos <<< $(echo "$resos")
+    readarray -t resosarr <<< $(echo "$resos")
 
     if [ -n "$reso" ] ; then
         if [ -n "$(echo "$resos" | grep "$reso")" ] ; then
@@ -25,7 +26,7 @@ yad_ChangeDisplayResolution() {
         else
             echo "Error: $progname: given resolution '$reso' is not supported." >&2
             echo "Supported values:" >&2
-            for reso in "${resos[@]}" ; do
+            for reso in "${resosarr[@]}" ; do
                 if [ "$reso" = "$current_reso" ] ; then
                     echo "  * $reso"
                 else
@@ -41,7 +42,7 @@ yad_ChangeDisplayResolution() {
             --text="Select display resolution to be used now"
             --button=yad-ok
         )
-        for reso in "${resos[@]}" ; do
+        for reso in "${resosarr[@]}" ; do
             if [ "$reso" = "$current_reso" ] ; then
                 cmd+=(--field="* $reso":fbtn "$xrandr $reso")
             else
