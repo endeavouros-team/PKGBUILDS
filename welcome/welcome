@@ -649,7 +649,7 @@ yad_SystemUpdate() {
     if [ $hasupdates -eq 0 ] ; then
         eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                --button=yad-quit:0 --image="$(FindAppIcon system-software-update)"
+                --button=yad-quit:0 --image="$(eos-FindAppIcon system-software-update)"
     fi
 }
 yad_SystemUpdate_fails() {
@@ -841,8 +841,8 @@ INSTALL() {
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local image=$system_software_install
-  local gparted="$(FindAppIcon gparted)"
-  local reflector_simple="$(FindAppIcon software-update-available)"
+  local gparted="$(eos-FindAppIcon gparted)"
+  local reflector_simple="$(eos-FindAppIcon software-update-available)"
   local user_info=info
   local tabcontents=(
       eos_yad
@@ -992,82 +992,21 @@ UsefulTips() {
   "${tabcontents[@]}" >& /dev/null &
 }
 
-#FindAppIconKDE() {
-#    local app="$1"
-#    local sz
-#    local path
-#
-#    for sz in "48" "48x48"  ; do
-#        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
-#        test -n "$path" && {
-#            echo "$path"
-#            return
-#        }
-#    done
-#    #echo "Sorry, icon path not found for app '$app'." >&2
-#}
-
-FindDesktopIcon() {
-    local dir=/usr/share/applications
-
-    if [ -r $dir/"$app".desktop ] ; then
-        path="$(/usr/bin/grep "^Icon=" $dir/"$app".desktop | /usr/bin/head -n 1 | /usr/bin/cut -d '=' -f 2)"
-        if [ -n "$path" ] ; then
-            echo "$path"
-            return 0
-        fi
-    fi
-    return 1
-}
-export -f FindDesktopIcon
-
-FindAppIcon() {
-    local app="$1"
-    local sz
-    local path
-
-    FindDesktopIcon && return
-
-    for sz in 48 32 # 64 24
-    do
-        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep -P "/$sz/|/${sz}x${sz}/" | /usr/bin/head -n 1)"
-        if [ -n "$path" ] ; then
-            echo "$path"
-            return
-        fi
-    done
-    echo "Sorry, icon path not found for app '$app'." >> $button_icons_log
-}
-export -f FindAppIcon
-
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
 
   local DE="$(eos_yad_GetDesktopName)"
 
-  local gufw
-  local libreoffice
-  local chromium
+  local gufw="$(eos-FindAppIcon gufw)"
+  test -n "$gufw" || gufw="$(eos-FindAppIcon network-firewall)"
+  test -n "$gufw" || gufw="$(eos-FindAppIcon firewall-config)"
 
-  case "$DE" in
-#      KDE)
-#          gufw="$(FindAppIconKDE firewall-config)"
-#          libreoffice="$(FindAppIconKDE libreoffice-writer)"
-#          chromium="$(FindAppIconKDE web-browser)"
-#          ;;
-      *)
-          gufw="$(FindAppIcon gufw)"
-          test -n "$gufw" || gufw="$(FindAppIcon network-firewall)"
-          test -n "$gufw" || gufw="$(FindAppIcon firewall-config)"
+  local libreoffice="$(eos-FindAppIcon libreoffice-writer)"
+  test -n "$libreoffice" || libreoffice="$(eos-FindAppIcon libreoffice)"
 
-          libreoffice="$(FindAppIcon libreoffice-writer)"
-          test -n "$libreoffice" || libreoffice="$(FindAppIcon libreoffice)"
-
-          chromium="$(FindAppIcon chromium)"
-          test -n "$chromium" || chromium="$(FindAppIcon web-browser)"
-          ;;
-  esac
+  local chromium="$(eos-FindAppIcon chromium)"
+  test -n "$chromium" || chromium="$(eos-FindAppIcon web-browser)"
 
   local tabcontents=(
       eos_yad
@@ -1083,9 +1022,9 @@ AddMoreApps() {
           --field="_align($(ltr add_more_apps_akm))!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"'
       )
   fi
-  case "$(eos_yad_GetDesktopName)" in
+  case "$DE" in
     XFCE)
-        local bluetooth="$(FindAppIcon bluetooth)"
+        local bluetooth="$(eos-FindAppIcon bluetooth)"
         tabcontents+=(
             --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
             --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
@@ -1450,12 +1389,11 @@ StartHere() {
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
-    local button_icons_log=/tmp/welcome-icons.log
 
     # common button icons
-    local user_info="$(FindAppIcon user-info)"
-    local system_software_update="$(FindAppIcon system-software-update)"
-    local system_software_install="$(FindAppIcon system-software-install)"
+    local user_info="$(eos-FindAppIcon user-info)"
+    local system_software_update="$(eos-FindAppIcon system-software-update)"
+    local system_software_install="$(eos-FindAppIcon system-software-install)"
 
     for arg in "$@" ; do
         case "$arg" in
