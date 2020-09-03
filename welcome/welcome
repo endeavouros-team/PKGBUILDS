@@ -836,6 +836,30 @@ yad_endeavouros_xfce4_theme() {
 }
 export -f yad_endeavouros_xfce4_theme
 
+WelcomeDevelConf() {
+    local varname="$1"
+    local fallback="$2"
+
+    test -n "$fallback" || {
+        echo "Error: ${FUNCNAME[1]} calling ${FUNCNAME[0]}: must give two parameters!" >&2
+        return 1
+    }
+
+    # echo "$fallback" ; return
+
+    local devconf="$HOME/.config/welcome-devel.conf"
+    local answer="$fallback"
+
+    if [ -r "$devconf" ] ; then
+        source "$devconf"
+        answer="${!varname}"
+        test -n "$answer" || answer="$fallback"
+    fi
+    echo "$answer"
+
+}
+export -f WelcomeDevelConf
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -844,6 +868,7 @@ INSTALL() {
   local gparted="$(eos-FindAppIcon gparted)"
   local reflector_simple="$(eos-FindAppIcon software-update-available)"
   local user_info=info
+  local tmp
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
@@ -853,15 +878,17 @@ INSTALL() {
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
+
   # If installing into a virtual machine, allow changing the display resolution now
+  tmp="$(WelcomeDevelConf _show_change_reso no)"
   case "$(lspci -vnn)" in
-      *" QEMU "* | *VMware* | *VirtualBox*)
-          tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn                  ChangeDisplayResolution)
-          ;;
+      *" QEMU "* | *VMware* | *VirtualBox*) tmp=yes ;;
   esac
+  test "$tmp" = "yes" && tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+
   tabcontents+=(
 #      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
-      --field="_align($(ltr ins_pm))!$gparted!$(ltr ins_pmtip)":fbtn                        'gparted'
+      --field="_align($(ltr ins_pm))!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
       --field="_align($(ltr ins_rel))!$user_info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
       --field="_align($(ltr ins_tips))!$user_info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
       --field="_align($(ltr ins_trouble))!$user_info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
