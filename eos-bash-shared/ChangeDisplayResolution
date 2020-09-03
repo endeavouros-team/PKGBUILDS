@@ -38,7 +38,7 @@ yad_ChangeDisplayResolution() {
             eos_yad
             --form --width=400 --columns=2 --image=display
             --title="Change display resolution"
-            --text="Select display resolution to be used at install time"
+            --text="Select display resolution to be used now"
             --button=yad-ok
         )
         for reso in "${resos[@]}" ; do
