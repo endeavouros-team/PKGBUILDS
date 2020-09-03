@@ -181,27 +181,6 @@ _align_buttons_on_tab() {
     done
 }
 
-ChangeResoInVirtualMachine() {
-    local query="$(xrandr --query)"
-    local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
-    local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
-    local xrandr="xrandr --output $output --mode"
-    local reso
-    local cmd=(
-        eos_yad
-        --form --width=400 --columns=2 --image=display
-        --title="Change display resolution"
-        --text="Select display resolution to be used at install time"
-        --button=yad-ok
-    )
-    readarray -t resos <<< $(echo "$resos")
-    for reso in "${resos[@]}" ; do
-        cmd+=(--field="$reso":fbtn "$xrandr $reso")
-    done
-    "${cmd[@]}" >/dev/null
-}
-export -f ChangeResoInVirtualMachine
-
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
     local debug="$2"
@@ -872,12 +851,12 @@ INSTALL() {
       --text="<b>$(ltr ins_text)</b>" --text-align=left
       --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
-      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          'reflector-simple'
+      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
   # If installing into a virtual machine, allow changing the display resolution now
   case "$(lspci -vnn)" in
       *" QEMU "* | *VMware* | *VirtualBox*)
-          tabcontents+=(--field="_align(Change display resolution)!display!Change display resolution at install time":fbtn  'bash -c ChangeResoInVirtualMachine')
+          tabcontents+=(--field="_align(Change display resolution)!display!Change display resolution at install time":fbtn  ChangeDisplayResolution)
           ;;
   esac
   tabcontents+=(
