@@ -1,0 +1,29 @@
+#!/bin/bash
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
+    echo "Error: ChangeDisplayResolution: cannot find /usr/share/endeavouros/scripts/eos-script-lib-yad" >&2
+    exit 1
+}
+export -f eos_yad
+
+yad_ChangeDisplayResolution() {
+    local query="$(xrandr --query)"
+    local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
+    local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
+    local xrandr="xrandr --output $output --mode"
+    local reso
+    local cmd=(
+        eos_yad
+        --form --width=400 --columns=2 --image=display
+        --title="Change display resolution"
+        --text="Select display resolution to be used at install time"
+        --button=yad-ok
+    )
+    readarray -t resos <<< $(echo "$resos")
+    for reso in "${resos[@]}" ; do
+        cmd+=(--field="$reso":fbtn "$xrandr $reso")
+    done
+    "${cmd[@]}" >/dev/null
+}
+
+yad_ChangeDisplayResolution "$@"
