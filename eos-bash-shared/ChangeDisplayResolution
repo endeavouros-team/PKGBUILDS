@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Usage: ChangeDisplayResolution [resolution]
+
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
     echo "Error: ChangeDisplayResolution: cannot find /usr/share/endeavouros/scripts/eos-script-lib-yad" >&2
     exit 1
@@ -7,23 +9,47 @@ source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
 export -f eos_yad
 
 yad_ChangeDisplayResolution() {
+    local reso="$1"
+    local progname="$(basename $0)"
     local query="$(xrandr --query)"
     local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
-    local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
     local xrandr="xrandr --output $output --mode"
-    local reso
-    local cmd=(
-        eos_yad
-        --form --width=400 --columns=2 --image=display
-        --title="Change display resolution"
-        --text="Select display resolution to be used at install time"
-        --button=yad-ok
-    )
+    local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
+    local current_reso="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | grep "*" | awk '{print $1}')"
+
     readarray -t resos <<< $(echo "$resos")
-    for reso in "${resos[@]}" ; do
-        cmd+=(--field="$reso":fbtn "$xrandr $reso")
-    done
-    "${cmd[@]}" >/dev/null
+
+    if [ -n "$reso" ] ; then
+        if [ -n "$(echo "$resos" | grep "$reso")" ] ; then
+            $xrandr "$reso"
+        else
+            echo "Error: $progname: given resolution '$reso' is not supported." >&2
+            echo "Supported values:" >&2
+            for reso in "${resos[@]}" ; do
+                if [ "$reso" = "$current_reso" ] ; then
+                    echo "  * $reso"
+                else
+                    echo "    $reso"
+                fi
+            done
+        fi
+    else
+        local cmd=(
+            eos_yad
+            --form --width=400 --columns=2 --image=display
+            --title="Change display resolution"
+            --text="Select display resolution to be used at install time"
+            --button=yad-ok
+        )
+        for reso in "${resos[@]}" ; do
+            if [ "$reso" = "$current_reso" ] ; then
+                cmd+=(--field="* $reso":fbtn "$xrandr $reso")
+            else
+                cmd+=(--field="  $reso":fbtn "$xrandr $reso")
+            fi
+        done
+        "${cmd[@]}" >/dev/null
+    fi
 }
 
 yad_ChangeDisplayResolution "$@"
