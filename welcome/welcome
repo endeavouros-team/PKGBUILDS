@@ -837,6 +837,9 @@ yad_endeavouros_xfce4_theme() {
 export -f yad_endeavouros_xfce4_theme
 
 WelcomeDevelConf() {
+    # Supported config file variables, defaults, and supported values:
+    #    local _show_change_reso=no      # yes or no
+    #
     local varname="$1"
     local fallback="$2"
 
@@ -868,7 +871,6 @@ INSTALL() {
   local gparted="$(eos-FindAppIcon gparted)"
   local reflector_simple="$(eos-FindAppIcon software-update-available)"
   local user_info=info
-  local tmp
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
@@ -880,7 +882,7 @@ INSTALL() {
   )
 
   # If installing into a virtual machine, allow changing the display resolution now
-  tmp="$(WelcomeDevelConf _show_change_reso no)"
+  local tmp="$(WelcomeDevelConf _show_change_reso no)"
   case "$(lspci -vnn)" in
       *" QEMU "* | *VMware* | *VirtualBox*) tmp=yes ;;
   esac
@@ -974,6 +976,15 @@ AfterInstall() {
   tabcontents+=(
       --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
   )
+  
+  # If in a VM *and* configured, show a button for changing the display resolution
+  local tmp=no
+  case "$(lspci -vnn)" in
+      *" QEMU "* | *VMware* | *VirtualBox*)
+          tmp="$(WelcomeDevelConf _show_change_reso no)"
+          ;;
+  esac
+  test "$tmp" = "yes" && tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
 
   Check_r8168 && tabcontents+=(--field="_align(Ethernet issue? Remove r8168)!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
 
