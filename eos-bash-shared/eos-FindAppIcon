@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#FindAppIconKDE() {
+#    local app="$1"
+#    local sz
+#    local path
+#
+#    for sz in "48" "48x48"  ; do
+#        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep /${sz}/ | /usr/bin/head -n 1)"
+#        test -n "$path" && {
+#            echo "$path"
+#            return
+#        }
+#    done
+#    #echo "Sorry, icon path not found for app '$app'." >&2
+#}
+
+
+FindDesktopIcon() {
+    local app="$1"
+    local path
+    local dir=/usr/share/applications
+
+    if [ -r $dir/"$app".desktop ] ; then
+        path="$(/usr/bin/grep "^Icon=" $dir/"$app".desktop | /usr/bin/head -n 1 | /usr/bin/cut -d '=' -f 2)"
+        if [ -n "$path" ] ; then
+            echo "$path"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+FindAppIcon() {
+    local progname="$(/usr/bin/basename "$0")"
+    local app="$1"
+    local sz
+    local path
+
+    FindDesktopIcon "$app" && return
+
+    for sz in 48 32 24 64
+    do
+        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep -P "/$sz/|/${sz}x${sz}/" | /usr/bin/head -n 1)"
+        if [ -n "$path" ] ; then
+            echo "$path"
+            return
+        fi
+    done
+    echo "$progname: sorry, icon path not found for app '$app'." >> /tmp/${progname}-issues.log
+}
+
+FindAppIcon "$@"
