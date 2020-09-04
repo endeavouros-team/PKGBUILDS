@@ -232,3 +232,7 @@ _tr_add2 butt_owncmds_help        "Tutoriel : Commandes personnelles"
 # 05-août-2020:
 _tr_add2 butt_owncmds_dnd         "Commandes personnelles tirer${_and}glisser"
 _tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer les items pour les nouveaux boutons"
+
+# 03-septembre-2020:
+_tr_add2 ins_reso                 "Changer la résolution d'affichage"
+_tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant"
