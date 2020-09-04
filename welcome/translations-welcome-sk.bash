@@ -232,3 +232,7 @@ _tr_add2 butt_owncmds_help          "Návod: Vlastné príkazy"
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Chyťte ${_and} pretiahnite vlastné príkazy"
 _tr_add2 butt_owncmds_dnd_help    "Zobraziť okno, do ktorého sa dajú pretiahnúť položky na nové tlačítka"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Zmeniť rozlíšenie displeja"
+_tr_add2 ins_resotip              "Teraz zmeniť rozlíšenie displeja"
