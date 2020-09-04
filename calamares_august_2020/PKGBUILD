@@ -128,6 +128,11 @@ prepare() {
     # will add one by one using -i
     sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
     done
+
+    sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
+
+    sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
+
     sed -i "s?libpwquality:?#libpwquality:?" $_reponame/src/modules/users/users.conf
     sed -i "s?- minlen=0?#- minlen=0?" $_reponame/src/modules/users/users.conf   
     sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf    
