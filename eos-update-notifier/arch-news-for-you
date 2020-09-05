@@ -179,7 +179,7 @@ Parameters:
    <days>     Show only news that are newer than <days> days.
    -f         Show the news even though have seen them before.
 
-Without any paramaters, show the latest news headline,
+Without any parameters, show the latest news headline,
 even if it doesn't affect this machine.
 EOF
 }
