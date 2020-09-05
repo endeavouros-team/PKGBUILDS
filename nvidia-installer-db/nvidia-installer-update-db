@@ -9,12 +9,15 @@
 GetNvidiaBranch() {
     local string="$1"
     local series="$2"
+    local processor="Linux x86_64/AMD64/EM64T"
     local data="$(wget -q --timeout=10 -O- https://www.nvidia.com/en-us/drivers/unix)"
     test -n "$data" || DIE "$FUNCNAME: fetching branch '$string' failed."
     if [ -n "$series" ] ; then
-        echo "$data" | grep "$string" | grep "$series" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
+        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|^.*$string ($series)||" -e 's|</a>.*||' -e 's|.*">||'
+        # echo "$data" | grep "$string" | grep "$series" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
     else
-        echo "$data" | grep "$string" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
+        echo "$data" | grep "$string" | grep "$processor" | sed -e 's|</a>.*$||' -e 's|^.*">||'
+        # echo "$data" | grep "$string" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
     fi
 }
 
@@ -22,7 +25,9 @@ GetNvidiaIds() {
     local branch="$1"
     local ids="$(wget -q --timeout=10 -O- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     test -n "$ids" || DIE "$FUNCNAME: fetching ids from branch '$branch' failed."
-    ids="$(echo "$ids" | sed -n '1,/.*NVIDIA Tesla GPUs.*/p' | grep "</td>" | grep "<td>")"
+    
+    # ids="$(echo "$ids" | sed -n '1,/.*NVIDIA Tesla GPUs.*/p' | grep "</td>" | grep "<td>")"
+    ids="$(echo "$ids" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | grep "</td>" | grep "<td>")"
     ids="$(echo "$ids" | grep -P "<td>[0-9A-F][0-9A-F][0-9A-F ]*</td>" | sed -e 's|<td>||' -e 's|</td>||')"
     ids="$(echo "$ids" | tr '[:upper:]' '[:lower:]')"
     echo "$ids"

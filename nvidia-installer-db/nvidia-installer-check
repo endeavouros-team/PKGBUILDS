@@ -36,7 +36,7 @@ GetGpuIds() {
             vendorinfo="nvidia:06c4:1dba|$result"
             ;;
         nvidia:*)
-            vendorinfo="$1|$result"
+            vendorinfo="$1"
             ;;
     esac
 }
