@@ -1103,7 +1103,7 @@ Main() {
 
     test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
     test -n "$PROGNAME" || PROGNAME="assets.make"
-    test -r $ASSETS_CONF || DIE "file './$ASSETS_CONF' does not exist."
+    test -r $ASSETS_CONF || DIE "file './$ASSETS_CONF' does not exist in $PWD."
 
     local reponame="$(AssetsConfLocalVal REPONAME)"
     local signer="$(  AssetsConfLocalVal SIGNER)"
