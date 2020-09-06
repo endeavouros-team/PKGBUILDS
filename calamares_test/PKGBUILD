@@ -4,7 +4,7 @@
 pkgname=calamares_test
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.28.2
+pkgver=3.2.26
 pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -37,6 +37,12 @@ prepare() {
     # New branding stuff from @FLVAL
     rsync -va calamares_branding/*   $_reponame/src
     rm -rf calamares_branding
+    
+    wget https://github.com/calamares/calamares/raw/calamares/src/modules/users/Config.cpp
+    wget https://github.com/calamares/calamares/raw/calamares/src/modules/users/UsersPage.cpp
+    wget https://github.com/calamares/calamares/raw/calamares/src/modules/users/page_usersetup.ui
+    chmod +x page_usersetup.ui UsersPage.cpp Config.cpp
+    mv -f page_usersetup.ui UsersPage.cpp Config.cpp $_reponame/src/modules/users
     
     # For testing EFI stuff 
     # mv -f $_reponame/src/modules/bootloader/main.py_test $_reponame/src/modules/bootloader/main.py
