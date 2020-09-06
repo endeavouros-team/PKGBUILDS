@@ -131,9 +131,15 @@ ShowNonFocused() {
 }
 
 GetUpdateCount() {
+    local retcode
     updates="$(/usr/bin/checkupdatesext)"
-    update_count="$(echo "$updates" | wc -l)"
-    update_count=$((update_count - 2))          # remove two lines of headers from checkupdatesext
+    retcode=$?
+    if [ $retcode -eq 0 ] ; then
+        update_count="$(echo "$updates" | wc -l)"
+        update_count=$((update_count - 2))          # remove two lines of headers from checkupdatesext
+    else
+        update_count=0
+    fi
 }
 
 Update_common() {
