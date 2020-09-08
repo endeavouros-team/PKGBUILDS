@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # use monospace (non-proportional) fonts!
-FormatNameVersion() { printf "%-12s %s" "$1" "$2" ; }
 FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
-FormatName()        { FormatVersion "$@" ; }
+FormatName()        { FormatVersion "$1" ; }
 
 RepoType() {
     test -z "$(grep "^\[testing\]$" /etc/pacman.conf)" && echo "Stable" || echo "Testing"
