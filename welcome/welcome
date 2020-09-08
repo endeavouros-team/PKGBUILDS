@@ -1168,8 +1168,6 @@ About() {
 
 ### These variables are required:
 
-_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(IsInstalled $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
-
 CreateNotebookCommands() {
     IsInstalling && {
         _NOTEBOOK_TABS=(                             # names of functions above
@@ -1490,6 +1488,8 @@ StartHere() {
     export show_installer=no    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
+    local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
+
     #local netlog=0
 
     for arg in "$@" ; do
