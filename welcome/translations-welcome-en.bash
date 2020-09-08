@@ -236,3 +236,11 @@ _tr_add2 butt_owncmds_dnd_help    "Show a window where to drag field items for n
 # 2020-Sep-03:
 _tr_add2 ins_reso                 "Change display resolution"
 _tr_add2 ins_resotip              "Change display resolution now"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Browse all Arch packages"
+_tr_add2 add_more_apps_aur           "Browse all AUR packages"
+_tr_add2 add_more_apps_done1_text    "Suggested apps already installed$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nYou may also Browse all Arch and AUR packages (and install them using terminal).\n"
+_tr_add2 add_more_apps_done2_tip1    "To install, use 'pacman' or 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "To install, use 'yay'"

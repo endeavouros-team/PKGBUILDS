@@ -107,6 +107,8 @@ export -f ltr
 export tr_strings
 export SELECTED_LANGUAGE_WELCOME
 
+IsInstalled() { pacman -Q "$1" >& /dev/null ; }
+export -f IsInstalled
 
 IsInstalling() {
     test "$show_installer" = "yes" && return 0
@@ -679,7 +681,7 @@ yad_Install() {
 
     local pkg pkgs=()
     for pkg in "$@" ; do
-        pacman -Q "$pkg" >& /dev/null || pkgs+=("$pkg")
+        IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
         echo "$*: $INSTALL_ALREADY" | $yadcmd
@@ -706,7 +708,7 @@ yad_Remove() {
 
     local pkg pkgs=()
     for pkg in "$@" ; do
-        pacman -Q "$pkg" >& /dev/null && pkgs+=("$pkg")
+        IsInstalled "$pkg" >& /dev/null && pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
         echo "$*: $NOT_INSTALLED" | $yadcmd
@@ -755,7 +757,7 @@ yad_ChangeDisplayManager() {
     esac
 
     cmd=""
-    pacman -Q "$dm" >& /dev/null || {
+    IsInstalled "$dm" >& /dev/null || {
         case "$dm" in
             lightdm) cmd+="pacman -S ${dm}{,-gtk-greeter{,-settings}} --noconfirm >& /dev/null && ";;
             *)       cmd+="pacman -S $dm --noconfirm >& /dev/null && " ;;
@@ -1034,6 +1036,7 @@ AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
 
+  local shown_app_buttons=0
   local DE="$(eos_yad_GetDesktopName)"
 
   local gufw="$(eos-FindAppIcon gufw)"
@@ -1048,27 +1051,54 @@ AddMoreApps() {
 
   local tabcontents=(
       eos_yad
-      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
-      --text="<b>$(ltr add_more_apps_text)</b>" --text-align=left
-      --field="_align(LibreOffice)!$libreoffice!$(ltr add_more_apps_lotip)":fbtn            'bash -c "yad_Install libreoffice-fresh"'
-      --field="_align($(ltr add_more_apps_ch))!$chromium!$(ltr add_more_apps_chtip)":fbtn   'bash -c "yad_Install chromium"'
-      --field="_align($(ltr add_more_apps_fw))!$gufw!$(ltr add_more_apps_fwtip)":fbtn       'bash -c "yad_Install gufw"'
   )
+  IsInstalled libreoffice-fresh || {
+      ((shown_app_buttons++))
+      tabcontents+=( --field="_align(LibreOffice)!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'bash -c "yad_Install libreoffice-fresh"')
+  }
+  IsInstalled chromium || {
+      ((shown_app_buttons++))
+      tabcontents+=(--field="_align($(ltr add_more_apps_ch))!$chromium!$(ltr add_more_apps_chtip)":fbtn 'bash -c "yad_Install chromium"')
+  }
+  IsInstalled gufw || {
+      ((shown_app_buttons++))
+      tabcontents+=(--field="_align($(ltr add_more_apps_fw))!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'bash -c "yad_Install gufw"')
+  }
+
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      tabcontents+=(
-          --field="_align($(ltr add_more_apps_akm))!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"'
-      )
+      IsInstalled akm || {
+          ((shown_app_buttons++))
+          tabcontents+=(--field="_align($(ltr add_more_apps_akm))!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"')
+      }
   fi
   case "$DE" in
     XFCE)
-        local bluetooth="$(eos-FindAppIcon bluetooth)"
-        tabcontents+=(
-            --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-            --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
-        )
+        while true ; do                       # Show buttons only if none of them are installed.
+            IsInstalled blueberry && break
+            IsInstalled blueman && break
+            ((shown_app_buttons+=2))
+            local bluetooth="$(eos-FindAppIcon bluetooth)"
+            tabcontents+=(
+                --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
+                --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
+            )
+            break
+        done
         ;;
   esac
+  # General app browsing buttons:
+  tabcontents+=(
+      --field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages"
+      --field="$(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages"
+  )
+
+  if [ $shown_app_buttons -eq 0 ] ; then
+      tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
+  else
+      tabcontents+=(--text="<b>$(ltr add_more_apps_text).$(ltr add_more_apps_done2_text)</b>")
+  fi
 
   _align_buttons_on_tab tabcontents
 
@@ -1138,7 +1168,7 @@ About() {
 
 ### These variables are required:
 
-_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
+_NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(IsInstalled $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
 
 CreateNotebookCommands() {
     IsInstalling && {
@@ -1340,7 +1370,7 @@ EOF
 
 Check_r8168() {
     # return 0 if r8168 is installed and no internet connection
-    pacman -Q r8168 >& /dev/null || return 1
+    IsInstalled r8168 >& /dev/null || return 1
     eos_yad_check_internet_connection none 0 "0s" && return 1
     return 0
 }
@@ -1468,7 +1498,7 @@ StartHere() {
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
-            --version) pacman -Q $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
+            --version) IsInstalled $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
