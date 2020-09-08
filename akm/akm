@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # use monospace (non-proportional) fonts!
-FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
+#FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
+FormatVersion()     { printf "%s  " "$1" ; }
 FormatName()        { FormatVersion "$1" ; }
 
 RepoType() {
@@ -31,7 +32,7 @@ Choose() {
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
         exist="$(Exist)"
-        cmd+=(--field="":CHK $exist)
+        cmd+=(--field=" ":CHK "$exist")   # field has one space, workaround for a yad bug ??
     done
 }
 
