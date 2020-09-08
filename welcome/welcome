@@ -1089,10 +1089,12 @@ AddMoreApps() {
         ;;
   esac
   # General app browsing buttons:
-  tabcontents+=(
-      --field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages"
-      --field="$(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages"
-  )
+  if [ "$(eos_GetArch)" = "armv7h" ] ; then
+      tabcontents+=(--field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinuxarm.org/packages")
+  else
+      tabcontents+=(--field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages")
+  fi
+  tabcontents+=(--field="$(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages")
 
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
