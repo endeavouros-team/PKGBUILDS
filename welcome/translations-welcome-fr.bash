@@ -236,3 +236,11 @@ _tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer les items po
 # 03-septembre-2020:
 _tr_add2 ins_reso                 "Changer la résolution d'affichage"
 _tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant"
+
+# 08-septembre-2020:
+_tr_add2 add_more_apps_arch          "Parcourir tous les paquets Arch"
+_tr_add2 add_more_apps_aur           "parcourir tous les paquets AUR"
+_tr_add2 add_more_apps_done1_text    "Suggestions d'applications déjà installées$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nVouos pouvez aussi parcourir tous les paquets d'Arch et d'AUR packages (et les installer dans un terminal).\n"
+_tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
