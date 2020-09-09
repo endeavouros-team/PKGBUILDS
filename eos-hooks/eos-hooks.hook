@@ -5,6 +5,6 @@ Type = Package
 Target = eos-hooks
 
 [Action]
-Description = Update EndeavourOS specifc hooks.
+Description = Update EndeavourOS specific hooks.
 When = PostTransaction
 Exec = /usr/bin/eos-hooks-runner
