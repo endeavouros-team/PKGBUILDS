@@ -5,6 +5,6 @@ Type = Package
 Target = filesystem
 
 [Action]
-Description = Add EndeavourOS specifc config.
+Description = Add EndeavourOS specific config.
 When = PostTransaction
 Exec = /usr/bin/eos-hooks-runner os-release
