@@ -195,7 +195,9 @@ Update_common() {
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused AUR || return 1
             SystemLockActive d || return
-            updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
+            if [ "extra_check" = "yes" ] ; then
+                updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
+            fi
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
             ((hasupdates++))
