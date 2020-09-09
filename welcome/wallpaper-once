@@ -40,7 +40,7 @@ Main() {
     esac
 
     if [ ! -r "$conf" ] ; then
-        eos-set-background-picture
+        eos-set-background-picture --force
         touch "$conf"
     fi
 }
