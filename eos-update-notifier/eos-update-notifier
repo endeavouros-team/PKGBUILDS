@@ -212,10 +212,18 @@ Update_common() {
         local msg="No updates available."
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
-            echo "$msg" | \
-                eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
-                         --height=100 --width=350 --timeout=10 --timeout-indicator=left \
-                         --theme="Classic" --tail --button=yad-quit:0
+            if [ 1 -eq 1 ] ; then
+                eos_yad2 --form \
+                         --title="EndeavourOS update notifier" --text="$msg" \
+                         --timeout=10 --timeout-indicator=left \
+                         --image=info --width=350 --no-focus \
+                         --button=yad-quit:0
+            else
+                echo "$msg" | \
+                    eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
+                             --height=100 --width=350 --timeout=10 --timeout-indicator=left \
+                             --theme="Classic" --tail --button=yad-quit:0 --image=info
+            fi
         fi
     fi
 }
