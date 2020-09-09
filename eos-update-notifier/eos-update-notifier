@@ -192,6 +192,7 @@ Update_common() {
         updates=""
     fi
     if [ -n "$updates" ] ; then
+        update_count="$(echo "$updates" | wc -l)"
         if [ $update_focused -eq 0 ] ; then
             ShowNonFocused AUR || return 1
             SystemLockActive d || return
