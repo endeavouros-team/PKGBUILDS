@@ -2,7 +2,7 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-dkms
-pkgver=3.3.7
+pkgver=3.3.8
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
@@ -21,7 +21,7 @@ optdepends=(
 source=(
   $url/$pkgname
 )
-sha512sums=('07e812872f524535845d5ff38edaeb5bbd44be43f2ada20d9b68888f39c57561eb6105626e88a8741824ceb97cf74e6160174bddb91b2ce6456667c95d041923')
+sha512sums=('eb97de9318306b6b9e627a4d72773039deb66f8d2224d6cce2bc1a67d79af950a9254acf70af7f024cf3ae1367a5b984d2c9e6496724a7cec2e7bd789441dcfe')
 
 package() {
   sed -i $pkgname \

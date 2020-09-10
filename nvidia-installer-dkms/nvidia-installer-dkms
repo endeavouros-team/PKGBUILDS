@@ -226,14 +226,18 @@ def add_user_to_group(user, group):
 def update_nvidia_cards_database():
     """ Update Nvidia cards database """
     log_info("Updating Nvidia graphics cards database...")
-    cmd = ["nvidia-installer-update-db"]
     if TEST:
+        IDS_PATH = "/tmp"
+        cmd = ["nvidia-installer-update-db", "--tmpdb"]
         log_info(" ".join(cmd))
     else:
-        try:
-            subprocess.check_output(cmd)
-        except subprocess.CalledProcessError as err:
-            return False
+        cmd = ["nvidia-installer-update-db"]
+
+    try:
+        subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as err:
+        return False
+
     return True
 
 def get_user():
@@ -534,7 +538,10 @@ def main():
         log_info("Running the installer in testing mode...")
 
     if update_nvidia_cards_database() != True:
-        log_warning("Cannot update Nvidia cards database in /var/lib/pci")
+        if TEST:
+            log_warning("Cannot create Nvidia cards database in /tmp")
+        else:
+            log_warning("Cannot update Nvidia cards database in /var/lib/pci")
 
     try:
         load_ids()
