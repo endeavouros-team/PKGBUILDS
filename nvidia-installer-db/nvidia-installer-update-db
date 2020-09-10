@@ -94,12 +94,18 @@ Logging() {
     local newfile="$1"
     local currfile="$2"
     local branch="$3"
-    local xx="$(diff $newfile $currfile)"
+    local xx
 
-    if [ -n "$xx" ] ; then
-        printf "\nDiffs for the $branch branch:\n" >> $log
-        echo "$xx" >> $log
+    if [ ! -r "$currfile" ] ; then
+        printf "\nBranch $branch: new db created!\n" >> $log
         has_logs=yes
+    else
+        xx="$(diff $newfile $currfile)"
+        if [ -n "$xx" ] ; then
+            printf "\nDiffs for the $branch branch:\n" >> $log
+            echo "$xx" >> $log
+            has_logs=yes
+        fi
     fi
 }
 
@@ -127,6 +133,10 @@ CreateNvidiaDb()
     local xx
     local log=$(mktemp /tmp/$PROGNAME.log.XXXXX)
     local has_logs=no
+
+    if [ "$targetdir" = "/tmp" ] ; then
+        rm -f $target_latest $target_legacy  # option --tmpdb: always create new db into /tmp
+    fi
 
     # check that legacy driver is available either in the repos or AUR
     if [ -z "$(yay -S -s nvidia -s dkms -s "$legacy_series"xx -q)" ] ; then
@@ -186,13 +196,13 @@ CreateNvidiaDb()
     fi
     sudo_commands+=" ; echo $readme > $targetdir/README.txt"
 
-    echo2 "Adding NVIDIA graphics card ids to the local database."
-
     if [ "$targetdir" = "/tmp" ] ; then
         # temporary files used, no sudo needed
+        echo2 "Adding NVIDIA graphics card ids to a temporary local database."
         bash -c "$sudo_commands"
     else
         # Now we need elevated privileges.
+        echo2 "Adding NVIDIA graphics card ids to the local database."
         sudo bash -c "$sudo_commands"
     fi
 }
