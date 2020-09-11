@@ -60,7 +60,7 @@ WallpaperSelect() {
         height=$hmin
     fi
 
-    pic="$(eos_yad --file --filename="$picfolder" --width=700 --height=$height)"
+    pic="$(eos_yad --file --filename="$picfolder" --width=700 --height=$height --title="Choose wallpaper file")"
     test $? -eq 0 || exit 1
 }
 
