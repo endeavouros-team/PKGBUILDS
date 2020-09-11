@@ -18,6 +18,7 @@
 #
 # export -f eos_yad__detectDE
 # export -f eos_yad_GetDesktopName
+# export -f eos_GetArch
 #
 # The two last functions above do not use yad.
 
@@ -29,6 +30,16 @@ eos_yad() {
     GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
 }
 #export -f eos_yad
+
+
+eos_GetArch() {
+    local arch="$(/usr/bin/uname -m)"
+    case "$arch" in
+        armv7* | aarch64) arch=armv7h ;;
+    esac
+    printf "%s" "$arch"
+}
+
 
 eos_yad_terminal() {
     local conf=/etc/eos-script-lib-yad.conf

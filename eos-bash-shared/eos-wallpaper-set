@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# Usage: eos-wallpaper-set [filename]
+# where
+#    filename      Picture file name (optional).
+#
+# Without filename, assumes all wallpapers are at /usr/share/endeavouros/backgrounds.
+
+#################################################################################
+EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
+test -r  $EOS_SCRIPTS_YAD || {
+    echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
+    exit 1
+}
+source $EOS_SCRIPTS_YAD
+unset EOS_SCRIPTS_YAD
+
+#export -f eos_yad
+export -f eos_yad_terminal
+export -f eos_yad_check_internet_connection
+export -f eos_yad_GetArgVal
+export -f eos_yad_RunCmdTermBash
+export -f eos_yad_problem
+export -f eos_yad_DIE
+export -f eos_yad_WARN
+export -f eos_yad__detectDE
+export -f eos_yad_GetDesktopName
+export -f eos_GetArch
+#################################################################################
+
+eos_yad() { GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@" ; }
+
+eos_yad_infomsg() {
+    local msg="$1"
+    echo "$msg" >&2
+    eos_yad --form --text="$msg" --title="Message" --tail --wrap --image=info \
+            --button=yad-quit:0 "$@"
+}
+
+DIE() {
+    echo "$1" >&2
+    if [ 0 -eq 1 ] ; then
+        echo "$1" | \
+            eos_yad --text-info --title="Error" --image=error --button=yad-ok:0 \
+                    --width=500 --height=300
+    else
+        eos_yad --form --text="$1\n" --title="Error" --image=error --button=yad-ok:0
+    fi
+    exit 1
+}
+
+WallpaperSelect() {
+    local pic_count=$(/usr/bin/ls -l "$picfolder" | /usr/bin/wc -l)
+    local height=$((pic_count * 36))
+    local hmax=600 hmin=300
+
+    if [ $height -gt $hmax ] ; then
+        height=$hmax
+    elif [ $height -lt $hmin ] ; then
+        height=$hmin
+    fi
+
+    pic="$(eos_yad --file --filename="$picfolder" --width=700 --height=$height)"
+    test $? -eq 0 || exit 1
+}
+
+XfceSetWallpaper() {
+    # Set all "last-image" values in file $conf to picture $pic
+
+    local impl
+
+    case "$(eos_GetArch)" in
+        armv7h) impl=1 ;;
+        *)      impl=2 ;;       # 2 = best for x86_64 (?)
+    esac
+
+    case "$impl" in
+        0)
+            local conf="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+            test -r "$conf" || DIE "Config file '$conf' does not exist."
+            sed -i "$conf" -e 's|name="last-image".*$|name="last-image" type="string" value="'"$pic"'"/>|'
+            eos_yad_infomsg "Reboot is required for the changes to take effect."
+            ;;
+        1)
+            local prop
+            for prop in $(xfconf-query --channel xfce4-desktop --list | grep /last-image$) ; do
+                xfconf-query --channel xfce4-desktop --property $prop --set "$pic"
+            done
+            #eos_yad_infomsg "Reboot is required for the changes to take effect."
+            ;;
+        2)
+            local monitors=($(xrandr | grep -w connected | awk '{print $1}'))
+            local monitor mon prop
+
+            for monitor in "${monitors[@]}" ; do
+                mon=monitor${monitor}
+                prop=$(xfconf-query --channel xfce4-desktop --list | grep  /last-image$  | grep $mon)
+                xfconf-query --channel xfce4-desktop --property $prop --set "$pic"
+            done
+            ;;
+    esac
+}
+
+WallpaperSetCommon() {
+    # Assume:
+    #    - $pic is the picture file name
+    #    - $DE is the desktop environment
+
+    test -n "$pic" || DIE "no picture!"
+    test -n "$DE"  || DIE "no DE!"
+
+    echo "Setting desktop wallpaper for '$DE' ..." >&2
+
+    case "$DE" in
+        BUDGIE)
+            AssertPicture
+            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            ;;
+        CINNAMON)
+            AssertPicture
+            gsettings set org.cinnamon.desktop.background picture-uri "$pic"
+            ;;
+        DEEPIN)
+            AssertPicture
+            dconf write /com/deepin/wrap/gnome/desktop/background/picture-uri "'$pic'"  # Note: extra quotes required!
+            ;;
+        GNOME | GNOME3)
+            AssertPicture
+            gsettings set org.gnome.desktop.background picture-uri "$pic"
+            ;;
+        I3)
+            AssertPicture no
+            feh --bg-scale "$pic"
+            ;;
+        KDE)
+            AssertPicture no
+            python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
+            # see also:
+            # https://www.kubuntuforums.net/showthread.php/66762-Right-click-wallpaper-changer?p=387392&viewfull=1#post387392
+            ;;
+        LXQT)
+            AssertPicture no
+            pcmanfm-qt --set-wallpaper="$pic"
+            ;;
+        MATE)
+            AssertPicture no
+            gsettings set org.mate.background picture-filename "$pic"
+            ;;
+        XFCE)
+            AssertPicture no
+            XfceSetWallpaper
+            ;;
+        *)
+            DIE "Sorry, desktop '$DE' is not supported."
+            ;;
+    esac
+}
+
+AssertPicture() {
+    local use_file_prefix="$1"
+
+    test -n "$pic" || DIE "no picture file given!"
+
+    case "$pic" in
+        file://*) pic="${pic:7}" ;;
+        /*)       ;;
+        *)        test -r "$pic" && pic="$PWD/$pic" ;;
+    esac
+
+    # Now we have a full path.
+    test -r "$pic" || DIE "Picture file '$pic' does not exist."
+
+    # Some DE's prefer file:// prefix.
+    if [ "$use_file_prefix" = "no" ] ; then
+        case "$pic" in
+            file://*) pic="${pic:7}" ;;
+        esac
+    else
+        case "$pic" in
+            file://*) ;;
+            *) pic="file://$pic" ;;
+        esac
+    fi
+}
+
+Usage() {
+    cat <<EOF
+Usage: <b>$progname</b> [wallpaper-file]
+where
+       wallpaper-file     Wallpaper file name.
+
+If wallpaper-file is not given, user can select a wallpaper from EndeavourOS default wallpapers.
+
+EOF
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local DE="$(eos_yad_GetDesktopName)"
+    local picfolder=/usr/share/endeavouros/backgrounds
+    local arg
+    local pic=""
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -*)
+                local msg="$(printf "\n%s\n\n" "Unsupported option '$arg'." ; Usage)"
+                DIE "$msg"
+                ;;
+            *)
+                pic="$arg"    # filename with absolute or relative path, and with or without leading "file://"
+                ;;
+        esac
+    done
+
+    if [ -z "$pic" ] ; then
+        WallpaperSelect
+    fi
+    WallpaperSetCommon
+}
+
+Main "$@"
