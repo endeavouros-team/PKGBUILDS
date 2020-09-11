@@ -238,12 +238,13 @@ _tr_add2 ins_reso                 "Vaihda näytön tarkkuus"
 _tr_add2 ins_resotip              "Vaihda näytön tarkkuus nyt"
 
 # 2020-Sep-08:
-#_tr_add2 add_more_apps_done_text    "Ehdotetut sovellukset on jo asennettu$_exclamation\n\n
-#Selaile kaikkia Arch- ja AUR-sovelluksia alla olevien linkkien avulla.\nVoit asentaa niitä ohjelmien 'pacman' tai 'yay' avulla."
-
 _tr_add2 add_more_apps_arch          "Selaa kaikkia Arch-sovelluksia"
 _tr_add2 add_more_apps_aur           "Selaa kaikkia AUR-sovelluksia"
 _tr_add2 add_more_apps_done1_text    "Ehdotetut sovellukset on jo asennettu$_exclamation"
 _tr_add2 add_more_apps_done2_text    "\n\nVoit myös selata kaikkia Arch- ja AUR-sovelluksia (ja asentaa erikseen päätteessä).\n"
 _tr_add2 add_more_apps_done2_tip1    "Käytä asentamiseen ohjelmaa 'pacman' tai 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "Käytä asentamiseen ohjelmaa 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2      "EndeavourOS:n taustakuva (valitse)"
+_tr_add2 after_install_ewtip2   "Valitse taustakuva EndeavourOS:n kuvien joukosta"

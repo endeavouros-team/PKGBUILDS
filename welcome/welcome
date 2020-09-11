@@ -976,7 +976,8 @@ AfterInstall() {
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field="_align($(ltr after_install_cdm))!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
   tabcontents+=(
-      --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn  'eos-set-background-picture'
+      --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-set-background-picture'
+      --field="_align($(ltr after_install_ew2))!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
   )
   
   # If in a VM *and* configured, show a button for changing the display resolution

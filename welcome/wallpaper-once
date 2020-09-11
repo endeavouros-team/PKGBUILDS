@@ -30,19 +30,24 @@ Main() {
     test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
 
     local DE="$(eos_yad_GetDesktopName)"
-    local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
-
-    sleep 1s    # workaround for a silly (but not crucial) issue about overlapping windows
+    local confs=(
+        "$HOME/.config/EOS-initial-wallpaper.general"
+        "$HOME/.config/EOS-initial-wallpaper.$DE"
+    )
+    local conf
 
     case "$1" in
-        -r) rm -f "$conf" ;;             # -r allows for re-installing the default wallpaper
-        -rr) rm -f "$conf" ; return ;;   # the same, but don't reinstall
+        -r)  rm -f "${confs[@]}" ;;            # -r re-installs the default wallpaper now
+        -rr) rm -f "${confs[@]}" ; return ;;   # same as -r, but not now
     esac
 
-    if [ ! -r "$conf" ] ; then
-        eos-set-background-picture --force
-        touch "$conf"
-    fi
+    # Set default wallpaper only if no DE specific or general config file is found.
+    for conf in "${confs[@]}" ; do
+        [ -r "$conf" ] && return
+    done
+
+    eos-wallpaper-set /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
+    touch "${confs[0]}"  # general wallpaper!
 }
 
 Main "$@"

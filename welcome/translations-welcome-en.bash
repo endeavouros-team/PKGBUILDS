@@ -244,3 +244,7 @@ _tr_add2 add_more_apps_done1_text    "Suggested apps already installed$_exclamat
 _tr_add2 add_more_apps_done2_text    "\n\nYou may also Browse all Arch and AUR packages (and install them using terminal).\n"
 _tr_add2 add_more_apps_done2_tip1    "To install, use 'pacman' or 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "To install, use 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2      "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2   "Choose from EndeavourOS default wallpapers"
