@@ -4,19 +4,27 @@
 
 Lsb_release() {
     sed -i /etc/lsb-release \
-        -e s'|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
-        -e s'|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
+        -e 's|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
+        -e 's|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
 }
 
 Os_release() {
-    sed -i /usr/lib/os-release \
-        -e s'|^NAME=.*$|NAME=\"EndeavourOS\"|' \
-        -e s'|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' \
-        -e s'|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' \
-        -e s'|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' \
-        -e s'|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' \
-        -e s'|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' \
-        -e s'|^LOGO=.*$|LOGO=endeavouros|' 
+    local file=/usr/lib/os-release
+
+    sed -i $file \
+        -e 's|^NAME=.*$|NAME=\"EndeavourOS\"|' \
+        -e 's|^PRETTY_NAME=.*$|PRETTY_NAME=\"EndeavourOS\"|' \
+        -e 's|^HOME_URL=.*$|HOME_URL=\"https://endeavouros.com\"|' \
+        -e 's|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL=\"https://endeavouros.com/wiki/\"|' \
+        -e 's|^SUPPORT_URL=.*$|SUPPORT_URL=\"https://forum.endeavouros.com\"|' \
+        -e 's|^BUG_REPORT_URL=.*$|BUG_REPORT_URL=\"https://github.com/endeavouros-team\"|' \
+        -e 's|^LOGO=.*$|LOGO=endeavouros|' \
+        -e 's|^ID=.*$|ID=endeavouros|' \
+        -e 's|^ID_LIKE=.*$|ID_LIKE=arch|'
+
+    if [ -z "$(grep "^ID_LIKE=" $file)" ] && [ -n "$(grep "^ID=" $file)" ] ; then
+        sed -i $file -e '/^ID=/a \ID_LIKE=arch'
+    fi
 }
 
 Issues() {

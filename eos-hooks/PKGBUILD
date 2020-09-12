@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.2.1
+pkgver=1.2.2
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
@@ -18,7 +18,7 @@ source=(
 sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c494256e872cacd3c5ebe08d4f73bc96517c52d227808c5bcfbf89284094c72'
             '20568a779c4ec34e9a79559a125efb1a85aacde8474df4ab9c5f766b6eb7a6b5848c049387f78306ad844e7571cf8a22afc89e6aab18c47b5be419e3d0e4e2e7'
             '11940266adb37425e9b89b448a005a99dfc978ec0c91555cfa78f2e955a35bcd175374b775d7d31a395ce135587be106cbc8ad55eef1a9c933cea1806bf4dcfc'
-            'be0bd7d5f3c91c7ac13442a63a9b56ef4eade795cac63af7832ed15032b869dbd1165e355c374fca17a77623b5c1e7dcfc82d0d521ea458fe9eb309cc326a864')
+            '06dd1f2b8e7bdb26843722c4fa681a460e5923be1734a828219f8b1c6529fb0df178fe2b9f89776ff87430b84704d0c38e46bc322fcbe244cd1db1bbff14270d')
 
 package() {
   install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
