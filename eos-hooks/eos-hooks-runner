@@ -10,6 +10,7 @@ Lsb_release() {
 
 Os_release() {
     local file=/usr/lib/os-release
+    local eosfile=/usr/lib/endeavouros-release
 
     sed -i $file \
         -e 's|^NAME=.*$|NAME=\"EndeavourOS\"|' \
@@ -23,7 +24,13 @@ Os_release() {
         -e 's|^ID_LIKE=.*$|ID_LIKE=arch|'
 
     if [ -z "$(grep "^ID_LIKE=" $file)" ] && [ -n "$(grep "^ID=" $file)" ] ; then
+        # add missing ID_LIKE=
         sed -i $file -e '/^ID=/a \ID_LIKE=arch'
+    fi
+    if [ -r $eosfile ] ; then
+        # fix BUILD_ID for EndeavourOS
+        local buildid="$(grep "^VERSION=" $eosfile | awk '{print $1}' | cut -d '=' -f 2)"
+        sed -i $file -e "s|^BUILD_ID=.*$|BUILD_ID=$buildid|"
     fi
 }
 
