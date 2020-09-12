@@ -883,12 +883,15 @@ INSTALL() {
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
 
-  # If installing into a virtual machine, allow changing the display resolution now
-  local tmp="$(WelcomeDevelConf _show_change_reso no)"
-  case "$(lspci -vnn)" in
-      *" QEMU "* | *VMware* | *VirtualBox*) tmp=yes ;;
-  esac
-  test "$tmp" = "yes" && tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+#  # If installing into a virtual machine, allow changing the display resolution now
+#  local tmp="$(WelcomeDevelConf _show_change_reso no)"
+#  case "$(lspci -vnn)" in
+#      *" QEMU "* | *VMware* | *VirtualBox*) tmp=yes ;;
+#  esac
+#  test "$tmp" = "yes" &&
+  if [ -x /usr/bin/xrandr ] ; then
+      tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn              ChangeDisplayResolution)
+  fi
 
   tabcontents+=(
 #      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
@@ -1206,7 +1209,7 @@ DIE() {
 WelcomeHelp() {
     Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=600 --height=500 \
                     --text="<b>$WH_BUTT_TEXT</b>" \
-                    --text-align=left --window-icon=$EOS_WICON \
+                    --text-align=left \
                     --image=help-about --button=yad-ok:0
 }
 export -f WelcomeHelp
@@ -1570,7 +1573,6 @@ StartHere() {
     # Create the yad command gradually into an array 'notebook':
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
-    notebook+=(--window-icon=$EOS_WICON)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"
