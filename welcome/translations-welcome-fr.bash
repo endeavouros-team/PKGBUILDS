@@ -246,5 +246,5 @@ _tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 
 _tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
 
 # 11-septembre-2020:
-_tr_add2 after_install_ew2      "Fonds d'écran EndeavourOS wallpaper (choix)"
+_tr_add2 after_install_ew2      "Fonds d'écran EndeavourOS (choix)"
 _tr_add2 after_install_ewtip2   "Choisir parmi les fonds d'écran d'EndeavourOS"
