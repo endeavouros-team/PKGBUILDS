@@ -209,5 +209,42 @@ _tr_add2 butt_changelogtip     "Zeige Änderungsprotokoll von Welcome"
 _tr_add2 after_install_themevan      "Xfce unverändertes Thema"
 _tr_add2 after_install_themevantip   "Benutze das unveränderte Xfce Thema"
 
-_tr_add2 after_install_themedef     "Xfce EndeavourOS Thema"
-_tr_add2 after_install_themedeftip  "Benutze das EndeavourOS Xfce Thema"
+_tr_add2 after_install_themedef     "Xfce unverändertes Thema"
+_tr_add2 after_install_themedeftip  "Benutze das unveränderte Xfce Thema"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Paket Cache Bereinigung"
+_tr_add2 after_install_pcleantip    "Konfiguriere den Paket Cache Bereinigungsservice"
+
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Persönliche Befehle"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Personalisierte Befehle"               # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Hilfestellung für persönliche Befehle"
+
+_tr_add2 add_more_apps_akm          "Ein Kernel Manager
+_tr_add2 add_more_apps_akmtip       "Ein kleines Kernel Paket Manager und Info Tool"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Anleitung: Persönliche Befehle"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Persönliche Befehle drag${_and}drop"
+_tr_add2 butt_owncmds_dnd_help    "Zeige das Eingabe Fenster zum Einfügen der Befehle"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Ändere die Bildschirmauflösung"
+_tr_add2 ins_resotip              "Ändere jetzt die Bildschirmauflösung "
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Suche nach Archlinux Paketen"
+_tr_add2 add_more_apps_aur           "Suche nach AUR Paketen"
+_tr_add2 add_more_apps_done1_text    "Empfohlene Programme sind bereits installiert$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nDu kannst auch alle Archlinux und AUR Pakete durchsuchen  (und diese dann mit dem Terminal installieren).\n"
+_tr_add2 add_more_apps_done2_tip1    "Benutze 'pacman' oder 'yay' zum installieren"
+_tr_add2 add_more_apps_done2_tip2    "Benutze 'yay' zum installieren."
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2      "EndeavourOS Hintergrundbild (Auswahl)"
+_tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Hintergründen"
