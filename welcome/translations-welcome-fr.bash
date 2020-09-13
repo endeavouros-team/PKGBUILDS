@@ -241,6 +241,10 @@ _tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant
 _tr_add2 add_more_apps_arch          "Parcourir tous les paquets Arch"
 _tr_add2 add_more_apps_aur           "parcourir tous les paquets AUR"
 _tr_add2 add_more_apps_done1_text    "Suggestions d'applications déjà installées$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nVouos pouvez aussi parcourir tous les paquets d'Arch et d'AUR packages (et les installer dans un terminal).\n"
+_tr_add2 add_more_apps_done2_text    "\n\nVous pouvez aussi parcourir tous les paquets d'Arch et d'AUR packages (et les installer dans un terminal).\n"
 _tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
+
+# 11-septembre-2020:
+_tr_add2 after_install_ew2      "Fonds d'écran EndeavourOS wallpaper (choix)"
+_tr_add2 after_install_ewtip2   "Choisir parmi les fonds d'écran d'EndeavourOS"
