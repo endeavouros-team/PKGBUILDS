@@ -223,7 +223,7 @@ _tr_add2 nb_tab_owncmds_text        "Personalisierte Befehle"               # mo
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Hilfestellung für persönliche Befehle"
 
-_tr_add2 add_more_apps_akm          "Ein Kernel Manager
+_tr_add2 add_more_apps_akm          "Ein Kernel Manager"
 _tr_add2 add_more_apps_akmtip       "Ein kleines Kernel Paket Manager und Info Tool"
 
 # 2020-Jul-15:
