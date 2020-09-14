@@ -879,6 +879,9 @@ ShowChangeResoButton() {
                 ;;
         esac
     fi
+    if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] || [ "$show_installer" = "yes" ] ; then
+        show_reso_butt=yes                  # show the button if installing
+    fi
 
     if [ "$show_reso_butt" = "yes" ] ; then
         tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
