@@ -68,7 +68,7 @@ _tr_add2 after_install_etltip  "Zeigt an was zu tun ist um das System auf den ne
 _tr_add2 after_install_cdm     "Ändere den Login-Manager"
 _tr_add2 after_install_cdmtip  "benutze einen anderen Login-Manager"
 
-_tr_add2 after_install_ew      "EndeavourOS Hintergrund"
+_tr_add2 after_install_ew      "EndeavourOS Bildschirm-Hintergrund"
 _tr_add2 after_install_ewtip   "Benutze den EndeavourOS Bildschirm-Hintergrund"
 
 
@@ -246,5 +246,5 @@ _tr_add2 add_more_apps_done2_tip1    "Benutze 'pacman' oder 'yay' zum installier
 _tr_add2 add_more_apps_done2_tip2    "Benutze 'yay' zum installieren."
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2      "EndeavourOS Hintergrundbild (Auswahl)"
-_tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Hintergründen"
+_tr_add2 after_install_ew2      "EndeavourOS Bildschirm-Hintergrund (Auswahl)"
+_tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Bildschirm-Hintergründen"
