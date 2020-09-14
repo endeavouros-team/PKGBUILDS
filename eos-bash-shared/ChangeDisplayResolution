@@ -3,20 +3,38 @@
 # Usage: ChangeDisplayResolution [resolution]
 
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
-    echo "Error: ChangeDisplayResolution: cannot find /usr/share/endeavouros/scripts/eos-script-lib-yad" >&2
+    echo "Error: ${BASH_SOURCE[1]}, line $LINENO: cannot find /usr/share/endeavouros/scripts/eos-script-lib-yad" >&2
     exit 1
 }
 export -f eos_yad
 
+Restart_me() {
+    local tmpfile=$(mktemp)
+    cat <<EOF > $tmpfile
+#!/bin/bash
+pkill -f "$progname"
+sleep 0.1
+"$progname" &
+EOF
+    bash $tmpfile
+    sleep 2
+    rm -f $tmpfile
+}
+export -f Restart_me
+
 yad_ChangeDisplayResolution() {
     local reso="$1"
-    local progname="$(basename $0)"
+    local progname="${BASH_SOURCE[1]}"    #  "$(basename $0)"
     local query="$(xrandr --query)"
     local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
     local xrandr="xrandr --output $output --mode"
     local resos="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | awk '{print $1}')"
     local resosarr
     local current_reso="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | grep "*" | awk '{print $1}')"
+    local retval
+    local result
+    local refresh=10
+    local impl=list   # list or form
 
     readarray -t resosarr <<< $(echo "$resos")
 
@@ -37,19 +55,54 @@ yad_ChangeDisplayResolution() {
     else
         local cmd=(
             eos_yad
-            --form --width=400 --columns=2 --image=display
+            --image=display
             --title="Change display resolution"
-            --text="Select display resolution to be used now"
-            --button=yad-ok
+            --text="Select new display resolution from the list below"
         )
+
+        case "$impl" in
+            form) cmd+=(--form --width=400 --columns=2 --button=yad-quit:0) ;;
+            list) cmd+=(--list --radiolist --height=500 --no-click --grid-lines=both
+                        --column="Selected!Click to change selection":RD --column="Resolution!Selected resolution value" 
+                        --button="yad-quit!!Change nothing, just quit":1
+                        --button="Set and stay!view-refresh!Use selected resolution but don't quit":$refresh
+                        --button="Set and quit!gtk-ok!Use selected resolution and quit":0
+                       ) ;;
+        esac
         for reso in "${resosarr[@]}" ; do
             if [ "$reso" = "$current_reso" ] ; then
-                cmd+=(--field="* $reso":fbtn "$xrandr $reso")
+                case "$impl" in
+                    form) cmd+=(--field="* $reso":fbtn "$xrandr $reso") ;;
+                    list) cmd+=(true "$reso") ;;
+                esac
             else
-                cmd+=(--field="  $reso":fbtn "$xrandr $reso")
+                case "$impl" in
+                    form) cmd+=(--field="  $reso":fbtn "$xrandr $reso") ;;
+                    list) cmd+=(false "$reso") ;;
+                esac
             fi
         done
-        "${cmd[@]}" >/dev/null
+
+        result="$("${cmd[@]}")"
+        retval=$?
+        if [ -z "$result" ] ; then
+            return
+        fi
+
+        case "$impl" in
+            form) ;;  # does not support refresh...
+            list)
+                reso="$(echo "$result" | cut -d '|' -f 2)"
+                if [ -n "$(echo "$reso" | tr -d '0-9x')" ] ; then
+                    echo "Invalid resolution value '$reso'" >&2
+                    return 1
+                fi
+                $xrandr $reso
+                case "$retval" in
+                    $refresh) Restart_me ;;
+                esac
+                ;;
+        esac
     fi
 }
 
