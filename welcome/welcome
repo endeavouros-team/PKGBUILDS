@@ -865,6 +865,27 @@ WelcomeDevelConf() {
 }
 export -f WelcomeDevelConf
 
+ShowChangeResoButton() {
+    # Allow showing a button for changing the display resolution?
+
+    [ -x /usr/bin/xrandr ] || return
+
+    local show_reso_butt="$(WelcomeDevelConf _show_change_reso no)"
+
+    if [ "$show_reso_butt" = "no" ] ; then
+        case "$(lspci -vnn)" in
+            *" QEMU "* | *VMware* | *VirtualBox*)
+                show_reso_butt=yes                  # in a VM always show the button
+                ;;
+        esac
+    fi
+
+    if [ "$show_reso_butt" = "yes" ] ; then
+        tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+    fi
+}
+export -f ShowChangeResoButton
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -883,15 +904,7 @@ INSTALL() {
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
 
-#  # If installing into a virtual machine, allow changing the display resolution now
-#  local tmp="$(WelcomeDevelConf _show_change_reso no)"
-#  case "$(lspci -vnn)" in
-#      *" QEMU "* | *VMware* | *VirtualBox*) tmp=yes ;;
-#  esac
-#  test "$tmp" = "yes" &&
-  if [ -x /usr/bin/xrandr ] ; then
-      tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn              ChangeDisplayResolution)
-  fi
+  ShowChangeResoButton
 
   tabcontents+=(
 #      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
@@ -982,15 +995,8 @@ AfterInstall() {
       --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-set-background-picture'
       --field="_align($(ltr after_install_ew2))!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
   )
-  
-  # If in a VM *and* configured, show a button for changing the display resolution
-  local tmp=no
-  case "$(lspci -vnn)" in
-      *" QEMU "* | *VMware* | *VirtualBox*)
-          tmp="$(WelcomeDevelConf _show_change_reso no)"
-          ;;
-  esac
-  test "$tmp" = "yes" && tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+
+  ShowChangeResoButton
 
   Check_r8168 && tabcontents+=(--field="_align(Ethernet issue? Remove r8168)!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
 
