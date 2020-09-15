@@ -6,13 +6,13 @@
 
 #################################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
-test -r  $EOS_SCRIPTS_YAD || {
+source $EOS_SCRIPTS_YAD || {
     echo "ERROR: cannot find $EOS_SCRIPTS_YAD" >&2
     exit 1
 }
-source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
+export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_check_internet_connection
 export -f eos_yad_GetArgVal
@@ -24,7 +24,6 @@ export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 #################################################################################
 
-eos_yad() { GDK_BACKEND=x11 /usr/bin/yad "$@" ; }
 
 Main() {
     test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
@@ -46,7 +45,7 @@ Main() {
         [ -r "$conf" ] && return
     done
 
-    eos-wallpaper-set /usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png
+    eos-wallpaper-set endeavouros-wallpaper.png
     touch "${confs[0]}"  # general wallpaper!
 }
 

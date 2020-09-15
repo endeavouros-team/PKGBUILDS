@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Näytä mitä tehdä jos haluat järjestemĺmän
 _tr_add2 after_install_cdm     "Vaihda ikkunamanageri"
 _tr_add2 after_install_cdmtip  "Käytä toista ikkunamageria"
 
-_tr_add2 after_install_ew     "EndeavourOS:n lähtökohtainen taustakuva"           # oli: "EndeavourOS:n taustakuva"
-_tr_add2 after_install_ewtip  "Palauta EndeavourOS:n lähtökohtainen taustakuva"   # oli: "Vaihda taustakuva EndeavourOS:n oletuskuvaksi"
+_tr_add2 after_install_ew     "EndeavourOS:n taustakuva"
+_tr_add2 after_install_ewtip  "Palauta EndeavourOS:n taustakuva oletukseensa"   # oli: "Vaihda taustakuva EndeavourOS:n oletuskuvaksi"
 
 
 _tr_add2 after_install_pm     "Pakettien hallinta"
