@@ -45,7 +45,7 @@ Main() {
         [ -r "$conf" ] && return
     done
 
-    eos-wallpaper-set endeavouros-wallpaper.png
+    eos-wallpaper-set DEFAULT    # endeavouros-wallpaper.png
     touch "${confs[0]}"  # general wallpaper!
 }
 
