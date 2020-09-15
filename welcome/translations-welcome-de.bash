@@ -206,11 +206,11 @@ _tr_add2 useful_tips_text      "Hilfreiche Tipps"
 _tr_add2 butt_changelog        "Änderungsprotokoll"
 _tr_add2 butt_changelogtip     "Zeige Änderungsprotokoll von Welcome"
 
-_tr_add2 after_install_themevan      "Xfce unverändertes Thema"
-_tr_add2 after_install_themevantip   "Benutze das unveränderte Xfce Thema"
+_tr_add2 after_install_themevan      "Xfce vanilla Thema"
+_tr_add2 after_install_themevantip   "Benutze das unveränderte eingebaute Thema von Xfce"
 
-_tr_add2 after_install_themedef     "Xfce unverändertes Thema"
-_tr_add2 after_install_themedeftip  "Benutze das unveränderte Xfce Thema"
+_tr_add2 after_install_themedef     "Xfce EndeavourOS Thema"
+_tr_add2 after_install_themedeftip  "Benutze das EndeavourOS Xfce Thema"
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Paket Cache Bereinigung"
