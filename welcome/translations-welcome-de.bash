@@ -248,3 +248,10 @@ _tr_add2 add_more_apps_done2_tip2    "Benutze 'yay' zum installieren."
 # 2020-Sep-11:
 _tr_add2 after_install_ew2      "EndeavourOS Bildschirm-Hintergrund (Auswahl)"
 _tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Bildschirm-Hintergründen"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'

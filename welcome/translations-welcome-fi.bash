@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Näytä mitä tehdä jos haluat järjestemĺmän
 _tr_add2 after_install_cdm     "Vaihda ikkunamanageri"
 _tr_add2 after_install_cdmtip  "Käytä toista ikkunamageria"
 
-_tr_add2 after_install_ew     "EndeavourOS:n taustakuva"
-_tr_add2 after_install_ewtip  "Vaihda taustakuva EndeavourOS:n oletuskuvaksi"
+_tr_add2 after_install_ew     "EndeavourOS:n lähtökohtainen taustakuva"           # oli: "EndeavourOS:n taustakuva"
+_tr_add2 after_install_ewtip  "Palauta EndeavourOS:n lähtökohtainen taustakuva"   # oli: "Vaihda taustakuva EndeavourOS:n oletuskuvaksi"
 
 
 _tr_add2 after_install_pm     "Pakettien hallinta"
@@ -246,5 +246,12 @@ _tr_add2 add_more_apps_done2_tip1    "Käytä asentamiseen ohjelmaa 'pacman' tai
 _tr_add2 add_more_apps_done2_tip2    "Käytä asentamiseen ohjelmaa 'yay'"
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2      "EndeavourOS:n taustakuva (valitse)"
-_tr_add2 after_install_ewtip2   "Valitse taustakuva EndeavourOS:n kuvien joukosta"
+_tr_add2 after_install_ew2      "Valitse yksi EndeavourOS:n taustakuvista"  # oli: "EndeavourOS:n taustakuva (valitse)"
+_tr_add2 after_install_ewtip2   "Taustakuvien valitsin"                     # oli: "Valitse taustakuva EndeavourOS:n kuvien joukosta"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'

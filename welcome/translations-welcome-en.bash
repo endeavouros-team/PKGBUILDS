@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Show what to do to get your system to the latest
 _tr_add2 after_install_cdm     "Change Display Manager"
 _tr_add2 after_install_cdmtip  "Use a different display manager"
 
-_tr_add2 after_install_ew      "EndeavourOS wallpaper"
-_tr_add2 after_install_ewtip   "Change desktop wallpaper to EOS default"
+_tr_add2 after_install_ew      "EndeavourOS default wallpaper"      # was: "EndeavourOS wallpaper"
+_tr_add2 after_install_ewtip   "Reset to the default wallpaper"     # was: "Change desktop wallpaper to EOS default"
 
 
 _tr_add2 after_install_pm      "Package management"
@@ -246,5 +246,12 @@ _tr_add2 add_more_apps_done2_tip1    "To install, use 'pacman' or 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "To install, use 'yay'"
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2      "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2   "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ew2        "Choose one of the EndeavourOS wallpapers"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Wallpaper chooser"                          # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
