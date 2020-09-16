@@ -226,23 +226,23 @@ eos_yad__detectDE()
       case "${XDG_CURRENT_DESKTOP}" in
          # only recently added to menu-spec, pre-spec X- still in use
          Budgie*)
-           DE=BUDGIE
+           DE=budgie
            ;;
          Cinnamon|X-Cinnamon)
            DE=cinnamon;
            ;;
-         ENLIGHTENMENT)
+         DEEPIN|[Dd]eepin)
+           DE=deepin;
+           ;;
+         ENLIGHTENMENT|Enlightenment)
            DE=enlightenment;
            ;;
          # GNOME, GNOME-Classic:GNOME, or GNOME-Flashback:GNOME
-         GNOME*)
+         GNOME*|gnome)
            DE=gnome;
            ;;
          KDE)
            DE=kde;
-           ;;
-         DEEPIN|Deepin|deepin)
-           DE=deepin;
            ;;
          LXDE)
            DE=lxde;
@@ -293,6 +293,9 @@ eos_yad__detectDE()
          xfce|xfce4|'Xfce Session')
            DE=xfce;
            ;;
+         openbox)
+             DE=openbox
+             ;;
       esac
     fi
 
@@ -316,6 +319,12 @@ eos_yad__detectDE()
 
     if [ -f "$XDG_RUNTIME_DIR/flatpak-info" ]; then
       DE="flatpak"
+    fi
+
+    if [ -z "$DE" ] ; then
+        # neofetch fails: Enlightenment, openbox
+        # neofetch differs: KDE -> plasma (with DESKTOP_SESSION=openbox-kde and DESKTOP_SESSION=plasma)
+        [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr [:upper:] [:lower:])"
     fi
 }
 
