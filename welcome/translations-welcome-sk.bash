@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Zobrazí, ako dostať váš systém EndeavourOS 
 _tr_add2 after_install_cdm     "Zmeniť správcu zobrazenia"
 _tr_add2 after_install_cdmtip  "Použije iného správcu zobrazenia"
 
-_tr_add2 after_install_ew      "Pozadie systému EndeavourOS"
-_tr_add2 after_install_ewtip   "Zmení pozadie pracovnej plochy na predvolené systémom EOS"
+_tr_add2 after_install_ew      "Východzie pozadie systému EndeavourOS"
+_tr_add2 after_install_ewtip   "Navrátiť pozadie na východzie"
 
 
 _tr_add2 after_install_pm      "Správa balíkov"
@@ -236,3 +236,15 @@ _tr_add2 butt_owncmds_dnd_help    "Zobraziť okno, do ktorého sa dajú pretiahn
 # 2020-Sep-03:
 _tr_add2 ins_reso                 "Zmeniť rozlíšenie displeja"
 _tr_add2 ins_resotip              "Teraz zmeniť rozlíšenie displeja"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch       "Prehľadávať medzi všetkými Arch balíkmi"
+_tr_add2 add_more_apps_aur        "Prehľadávať medzi všetkými AUR balíkmi"
+_tr_add2 add_more_apps_done1_text "Navrhované balíky sú už nainštalované$_exclamation"
+_tr_add2 add_more_apps_done2_text "\n\nMôžete tiež prehliadať všetky Arch a AUR balíky (a inštalovať ich pomocou terminálu).\n"      
+_tr_add2 add_more_apps_done2_tip1    "Pre inštaláciu použite 'pacman', alebo 'yay'"     
+_tr_add2 add_more_apps_done2_tip2    "Pre inštaláciu použite 'yay'"
+
+# 2020-Sep-11:      
+_tr_add2 after_install_ew2        "Výber jedného z pozadí EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"   
+_tr_add2 after_install_ewtip2     "Výber pozadí"                         # was: "Choose from EndeavourOS default wallpapers"
