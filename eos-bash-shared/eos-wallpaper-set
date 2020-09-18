@@ -27,8 +27,6 @@ export -f eos_yad_GetDesktopName
 export -f eos_GetArch
 #################################################################################
 
-#eos_yad() { GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@" ; }
-
 eos_yad_infomsg() {
     local msg="$1"
     echo "$msg" >&2
@@ -153,29 +151,66 @@ WallpaperSetCommon() {
     esac
 }
 
+PictureNameVariations() {
+    # Allow very small naming choices in the default wallpapers,
+    # like '-' instead of '_' before the DE name.
+
+    [ -r "$pic" ] && return    # picture found, OK
+    
+    if [ "$(basename "$pic")" = "$fallback" ] ; then
+        local changed="$(echo "$pic" | sed 's|endeavouros_\([a-z][a-z]*[0-9]\.png\)$|endeavouros-\1|')"
+        if [ -r "$changed" ] ; then
+            echo "Info: wallpaper name changed from '$(basename "$pic")' to '$(basename "$changed")'" >&2
+            pic="$changed"
+            return 0
+        fi
+    fi
+    DIE "Picture file '$pic' does not exist."
+}
+
 AssertPicture() {
     local fallback="$1"
     local use_file_prefix="$2"
 
     case "$pic" in
-        DEFAULT | default) pic="$fallback" ;;
+        DEFAULT | default)
+            case "$(eos_GetArch)" in
+                armv7h)
+                    pic="$picfolder/arm-$fallback"
+                    [ -r "$pic" ] || pic="$picfolder/$fallback"          # ARM pictures missing
+                    ;;
+                *)
+                    pic="$picfolder/$fallback"
+                    ;;
+            esac
+            ;;
+        ISO | iso)
+            pic="$picfolder/endeavouros-default-background.png"          # new picture
+            [ -r "$pic" ] || pic="$picfolder/endeavouros-wallpaper.png"  # old picture
+            ;;
     esac
 
     # change $pic to full path format
     case "$pic" in
-        "")       DIE "no picture file given!" ;;
-        file://*) pic="${pic:7}" ;;                         # remove prefix
-        /*)       ;;                                        # OK, full path
-        *)        if [ -r "$pic" ] ; then
-                      pic="$PWD/$pic"                       # picture in current folder
-                  elif [ -r "$picfolder/$pic" ] ; then
-                      pic="$picfolder/$pic"                 # EOS picture without path given, add path
-                  fi
-                  ;;
+        "")
+            DIE "no picture file given!"
+            ;;
+        file://*)
+            pic="${pic:7}"
+            ;;
+        /*)
+            ;;                                        # OK, full path
+        *)
+            if [ -r "$picfolder/$pic" ] ; then
+                pic="$picfolder/$pic"                 # EOS picture without path given, add path
+            elif [ -r "$pic" ] ; then
+                pic="$PWD/$pic"                       # picture has relative path
+            fi
+            ;;
     esac
 
-    # Now we have a full path.
-    test -r "$pic" || DIE "Picture file '$pic' does not exist."
+    # Now we have a full path. Check that it exists or die.
+    PictureNameVariations
 
     # Some DE's prefer file:// prefix, some not.
     if [ "$use_file_prefix" = "no" ] ; then
@@ -216,6 +251,7 @@ where
 'wallpaper-file' value
     - can have absolute or relative path, with or without leading 'file://'.
     - 'DEFAULT' means the default Desktop specific wallpaper.
+    - 'ISO'     means the default wallpaper for the installer ISO
 If 'wallpaper-file' is not given, user can choose a wallpaper from EndeavourOS default wallpapers.
 
 EOF
