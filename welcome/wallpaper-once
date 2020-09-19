@@ -30,8 +30,8 @@ Main() {
 
     local DE="$(eos_yad_GetDesktopName)"
     local confs=(
-        "$HOME/.config/EOS-initial-wallpaper.general"
         "$HOME/.config/EOS-initial-wallpaper.$DE"
+#        "$HOME/.config/EOS-initial-wallpaper.general"
     )
     local conf
 
@@ -45,8 +45,9 @@ Main() {
         [ -r "$conf" ] && return
     done
 
-    eos-wallpaper-set DEFAULT    # endeavouros-wallpaper.png
-    touch "${confs[0]}"  # general wallpaper!
+    sleep 3
+    eos-wallpaper-set DEFAULT
+    touch "${confs[0]}"
 }
 
 Main "$@"
