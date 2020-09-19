@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
-pkgver=2
+pkgver=3
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -13,7 +13,7 @@ backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
 
 # https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
 source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
-sha512sums=('1bc5125ed3f25b15b6fa7b048ab92851502f4669be167e23c39c91842988a948d7704cffc84c4c143ce9d554523bb3d84a505ebcb623ac139fa7a204cde80ad1')
+sha512sums=('de5598c511551477f68c07ee85b1b3394a52d561a72cec76560628a56de93947f158b8abe1fe69c725518ddd70cb10c50179e5621eb1fd03b43d8d37a74046d3')
 
 package() {
  mkdir -p "$pkgdir/etc/pacman.d"
