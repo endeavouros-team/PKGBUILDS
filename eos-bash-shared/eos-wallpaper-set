@@ -27,22 +27,19 @@ export -f eos_yad_GetDesktopName
 export -f eos_GetArch
 #################################################################################
 
+Monospaced() { printf "<tt>%s</tt>" "$1" ; }
+Untagged()   { echo "$1" | sed -e 's|<[/]*[ib]>||g' ; }
+
 eos_yad_infomsg() {
     local msg="$1"
-    echo "$msg" >&2
-    eos_yad --form --text="$msg" --title="Message" --tail --wrap --image=info \
+    Untagged "$msg"  >&2
+    eos_yad --form --text="$(Monospaced "$msg")" --title="Message" --tail --wrap --image=info \
             --button=yad-quit:0 "$@"
 }
 
 DIE() {
-    echo "$1" >&2
-    if [ 0 -eq 1 ] ; then
-        echo "$1" | \
-            eos_yad --text-info --title="Error" --image=error --button=yad-ok:0 \
-                    --width=500 --height=300
-    else
-        eos_yad --form --text="$1\n" --title="Error" --image=error --button=yad-ok:0
-    fi
+    Untagged "$1" >&2
+    eos_yad --form --text="$(Monospaced "$1")\n" --title="Error" --image=error --button=yad-ok:0
     exit 1
 }
 
@@ -231,12 +228,20 @@ Parameters() {
 
     for arg in "$@" ; do
         case "$arg" in
+            -h | --help)
+                eos_yad_infomsg "$(Usage)"
+                exit 0
+                ;;
             -*)
                 msg="$(printf "\n%s\n\n" "Unsupported option '$arg'." ; Usage)"
                 DIE "$msg"
                 ;;
             *)
-                pic="$arg"
+                if [ -d "$arg" ] ; then
+                    picfolder="$arg"
+                else
+                    pic="$arg"
+                fi
                 ;;
         esac
     done
@@ -244,16 +249,24 @@ Parameters() {
 
 Usage() {
     cat <<EOF
-Usage: <b>$progname</b> [wallpaper-file]
+Usage: <b>$progname</b> [wallpaper-file | folder]
 where
-    wallpaper-file     Wallpaper file name, or DEFAULT
+    <i>wallpaper-file</i>
+        Wallpaper file name, 'DEFAULT', or 'ISO':
+        - absolute or relative path, with or without leading 'file://'.
+        - 'DEFAULT' means the default Desktop specific wallpaper.
+        - 'ISO'     means the default wallpaper for the installer ISO
+    <i>folder</i>
+        An existing folder path for wallpapers.
 
-'wallpaper-file' value
-    - can have absolute or relative path, with or without leading 'file://'.
-    - 'DEFAULT' means the default Desktop specific wallpaper.
-    - 'ISO'     means the default wallpaper for the installer ISO
-If 'wallpaper-file' is not given, user can choose a wallpaper from EndeavourOS default wallpapers.
+If <i>wallpaper-file</i> is not given, the <i>wallpaper chooser</i> is started.
 
+Examples:
+    $progname ~/Pictures/a_picture.jpg  # wallpaper file name
+    $progname ~/Pictures                # folder path for pictures
+    $progname DEFAULT                   # Desktop specific default wallpaper
+    $progname ISO                       # wallpaper used by the ISO
+    $progname                           # starts the wallpaper chooser
 EOF
 }
 

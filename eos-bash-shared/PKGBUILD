@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.2.9
+pkgver=1.2.10
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -38,7 +38,7 @@ sha512sums=('514822bf774d0fbfbc55f266940395d36cdfc0ede17964f590dc37c2837dbf1e5af
             '3422186535809728ee20da4418143d6933e853bef2300a7c031d4c038864e2dc108955eea6a7f11d9acc430702fb3f68675d37ee6a695e6062fbd28bd2b1bd81'
             'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
             'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa'
-            '557bb37533d54628a47f1e3bb7407f6debbda8c175215eb1f8cab9a21bf207367af1aaade5469149761d4d8ba5bcde9c057c711ae6ba876f5dfa37d67c1c429b')
+            '3fa37ec0cc5e8ee2f39023bcb79c0448ec26439fdb0ba7e75cae3b1a4f1f2b7a57c4ba55829b68e677353785a605f303d19ba5df44656f54c3789ab5b0d94600')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
