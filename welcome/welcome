@@ -1497,7 +1497,8 @@ StartHere() {
     export show_installer=no    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
-    local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"        # main window title
+    local prog_version="$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
+    local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$prog_version"        # main window title
 
     #local netlog=0
 
@@ -1507,7 +1508,7 @@ StartHere() {
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
-            --version) IsInstalled $PROG_PACKAGENAME | awk '{print $2}' ; return ;;
+            --version) echo "$prog_version" >&2 ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
