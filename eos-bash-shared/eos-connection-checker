@@ -7,4 +7,20 @@
 #    eos-connection-checker && echo connection is ON
 #    eos-connection-checker || echo connection is OFF
 
-/usr/bin/curl --silent --connect-timeout 8 https://mirror.alpix.eu/endeavouros >/dev/null
+Main() {
+    local eml=/etc/pacman.d/endeavouros-mirrorlist
+    local default=https://duckduckgo.com
+    local url="$default"
+
+    if [ -r "$eml" ] ; then
+        url="$(/usr/bin/grep "^Server = " "$eml" | /usr/bin/head -n 1 | /usr/bin/awk '{print $3}' | /usr/bin/sed 's|/$repo/$arch$||')"
+        case "$url" in
+            https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo) ;;
+            *) url=$default ;;
+        esac
+    fi
+
+    /usr/bin/curl --silent --connect-timeout 8 "$url" >/dev/null
+}
+
+Main "$@"
