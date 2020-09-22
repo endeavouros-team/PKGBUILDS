@@ -203,7 +203,7 @@ _tr_add2 useful_tips_text      "Полезные советы"
 
 # 2020-May-16:
 
-_tr_add2 butt_changelog        "Изменения Welcome"
+_tr_add2 butt_changelog        "Изменения в Welcome"
 _tr_add2 butt_changelogtip     "История изменений Welcome"
 
 _tr_add2 after_install_themevan      "Xfce оригинальная тема"
@@ -232,3 +232,26 @@ _tr_add2 butt_owncmds_help        "Справка: пользовательск�
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Создание пользовательских кнопок"
 _tr_add2 butt_owncmds_dnd_help    "Отображение окна для создания новых кнопок"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Разрешение дисплея"
+_tr_add2 ins_resotip              "Изменить разрешение дисплея"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Просмотр всех Arch пакетов"
+_tr_add2 add_more_apps_aur           "Просмотр всех AUR пакетов"
+_tr_add2 add_more_apps_done1_text    "Рекомендуемые приложения уже установлены$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nТакже можно просмотреть все пакеты Arch и AUR, и установить их используя терминал.\n"
+_tr_add2 add_more_apps_done2_tip1    "Для установки, используйте 'pacman' или 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Для установки, используйте 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2        "Выбор обоев"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Выбор обоев EndeavourOS"                          # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
