@@ -2,7 +2,7 @@
 # Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
-pkgver=2.4.8
+pkgver=2.4.9
 pkgrel=1
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
@@ -20,7 +20,7 @@ source=(
   $url/nvidia.ids
 )
 sha256sums=('e1a8353d74ecb9b03b9ae4f8cfd3a2eeb7cec0287d2f512587f9783011930a94'
-            'b1ceaebacd0465c97831fe6f870a7738cae935e8716125d226c4db6531bde123'
+            'ca6bf8c96073ff70f38eb1e70d2f640817e3e908eba02779034396886636960b'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
             'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'

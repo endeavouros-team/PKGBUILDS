@@ -8,7 +8,7 @@ GetGpuIds() {
     vcodes[intel]=8086
     vcodes[amd]=1002
 
-    local infobase="$(lspci -vnn | grep -P 'VGA|Display')"
+    local infobase="$(lspci -vnn | grep -P 'VGA|Display|3D')"
     local info
     local vcode
     local v id
