@@ -32,7 +32,8 @@ Choose() {
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
         exist="$(Exist)"
-        cmd+=(--field=" ":CHK "$exist")   # field has one space, workaround for a yad bug ??
+        cmd+=(--field="":CHK "$exist")   # Field has one space, workaround for a yad bug.
+                                         # Fixed in yad 7.2-1, removed workaround.
     done
 }
 
