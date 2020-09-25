@@ -50,8 +50,8 @@ InVirtualBox() {
 InVm() {
     case "$(lspci -vnn)" in
         *" QEMU "*)   echo qemu ;;
-        *VMware*)     echo vmware ;;
         *VirtualBox*) echo virtualbox ;;
+        *VMware*)     echo vmware ;;        # this should be the last here!
     esac
 }
 
