@@ -19,13 +19,11 @@ Usage: $0 option
 where
    --wireless
    --wifi         shows info about the wireless LAN device
-
    --display      shows info about the display controller
-
-   --vga          shows info about the VGA compatible controller
-
+   --vga          shows info about the VGA compatible controller and 3D controller
+   --graphics     same as both --vga and --display
    --cpu          shows the name of the CPU type
-
+   --vm           if running in VM, echoes the name of the VM (virtualbox, qemu, vmware)
    --virtualbox   echoes "yes" is running in VirtualBox VM, otherwise "no"
 EOF
 }
@@ -49,6 +47,14 @@ InVirtualBox() {
     test -n "$(lspci | grep "VirtualBox Graphics Adapter")" && echo yes || echo no
 }
 
+InVm() {
+    case "$(lspci -vnn)" in
+        *" QEMU "*)   echo qemu ;;
+        *VMware*)     echo vmware ;;
+        *VirtualBox*) echo virtualbox ;;
+    esac
+}
+
 Main()
 {
     test -n "$1" || { Usage "option missing" ; return 1 ; }
@@ -58,26 +64,20 @@ Main()
     for arg in "$@"
     do
         case "$arg" in
-            --cpu)
-                CPU_info
-                ;;
-            --virtualbox)
-                InVirtualBox
-                ;;
-            --wireless | --wifi)
-                PCI_info " Network controller: "
-                ;;
-            --display)
-                PCI_info " Display controller: "
-                ;;
-            --vga)
-                PCI_info " VGA compatible controller: " \
-                         " 3D controller: "
-                ;;
-            *)
-                Usage "unsupported option '$arg'"
-                return 1
-                ;;
+            --cpu)                 CPU_info ;;
+
+            --virtualbox)          InVirtualBox ;;
+            --vm)                  InVm ;;
+
+            --wireless | --wifi)   PCI_info " Network controller: " ;;
+
+            --display)             PCI_info " Display controller: " ;;
+            --vga)                 PCI_info " VGA compatible controller: " " 3D controller: " ;;
+            --graphics)            Main --vga ; Main --display ;;
+
+            *)                     Usage "unsupported option '$arg'"
+                                   return 1
+                                   ;;
         esac
     done
 }
