@@ -12,7 +12,7 @@ Restart_me() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
 #!/bin/bash
-pkill -f "$progname"
+pkill "$progname"
 sleep 0.1
 "$progname" &
 EOF
@@ -34,7 +34,10 @@ yad_ChangeDisplayResolution() {
     local retval
     local result
     local refresh=10
+    local txt mark="*"
     local impl=list   # list or form
+    local butt_set_quit="Set and quit"
+    local butt_set_stay="Set and stay"
 
     readarray -t resosarr <<< $(echo "$resos")
 
@@ -53,32 +56,36 @@ yad_ChangeDisplayResolution() {
             done
         fi
     else
+        txt="Select new display resolution from the list below.\n"
+        txt+="- Current value is marked with: <b>$mark</b>\n"
+        txt+="- Double clicking a value does <b>$butt_set_quit</b>\n"
+
         local cmd=(
             eos_yad
             --image=display
             --title="Change display resolution"
-            --text="Select new display resolution from the list below"
+            --text="$txt"
         )
 
         case "$impl" in
             form) cmd+=(--form --width=400 --columns=2 --button=yad-quit:0) ;;
-            list) cmd+=(--list --radiolist --height=500 --no-click --grid-lines=both
-                        --column="Selected!Click to change selection":RD --column="Resolution!Selected resolution value" 
+            list) cmd+=(--list --height=500 --no-click --grid-lines=both
+                        --column="Available resolution values:" 
                         --button="yad-quit!!Change nothing, just quit":1
-                        --button="Set and stay!view-refresh!Use selected resolution but don't quit":$refresh
-                        --button="Set and quit!gtk-ok!Use selected resolution and quit":0
+                        --button="$butt_set_stay!view-refresh!Use selected resolution but don't quit":$refresh
+                        --button="$butt_set_quit!gtk-ok!Use selected resolution and quit":0
                        ) ;;
         esac
         for reso in "${resosarr[@]}" ; do
             if [ "$reso" = "$current_reso" ] ; then
                 case "$impl" in
                     form) cmd+=(--field="* $reso":fbtn "$xrandr $reso") ;;
-                    list) cmd+=(true "$reso") ;;
+                    list) cmd+=("$reso $mark") ;;
                 esac
             else
                 case "$impl" in
                     form) cmd+=(--field="  $reso":fbtn "$xrandr $reso") ;;
-                    list) cmd+=(false "$reso") ;;
+                    list) cmd+=("$reso") ;;
                 esac
             fi
         done
@@ -92,7 +99,7 @@ yad_ChangeDisplayResolution() {
         case "$impl" in
             form) ;;  # does not support refresh...
             list)
-                reso="$(echo "$result" | cut -d '|' -f 2)"
+                reso="$(echo "$result" | cut -d '|' -f 1 | awk '{print $1}')"
                 if [ -n "$(echo "$reso" | tr -d '0-9x')" ] ; then
                     echo "Invalid resolution value '$reso'" >&2
                     return 1
