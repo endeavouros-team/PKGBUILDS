@@ -162,7 +162,7 @@ Main()
 {
     case "$1" in
         --changelog)
-            wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-log-tool/changelog.txt
+            xdg-open https://github.com/endeavouros-team/PKGBUILDS/commits/master/eos-log-tool 2> /dev/null
             return
             ;;
     esac
@@ -185,6 +185,8 @@ Main()
     local lightdm="lightdm.log"
     local lightdm2="x-0.log"
     local install="EndeavourOS install log"
+    local fstab="fstab"
+    local grub="grub.cfg"
     local blame="systemd-analyze blame"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
@@ -222,6 +224,8 @@ Main()
                 false "$lightdm"  "$save" \
                 false "$lightdm2" "$save" \
                 false "$install"  "$save" \
+                false "$fstab"    "$save" \
+                false "$grub"     "$save" \
                 false "$blame"    "$save" \
                 false "$lspci"    "$save" \
                 false "$lsusb"    "$save" \
@@ -246,6 +250,8 @@ Main()
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
             "$install")  Cmd cat /var/log/Calamares.log ;;
+            "$fstab")    Cmd cat /etc/fstab ;;
+            "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
             "$blame")    Cmd systemd-analyze blame ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
