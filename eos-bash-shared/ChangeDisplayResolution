@@ -33,11 +33,16 @@ yad_ChangeDisplayResolution() {
     local current_reso="$(echo "$query" | grep "^ [ ]*[0-9][0-9]*x[0-9][0-9]* " | grep "*" | awk '{print $1}')"
     local retval
     local result
-    local refresh=10
     local txt mark="*"
     local impl=list   # list or form
     local butt_set_quit="Set and quit"
     local butt_set_stay="Set and stay"
+
+    # yad window return values must be different:
+    local b_ok=0              # button "Set and quit" clicked
+    local b_quit=1            # button "Quit" clicked (button currently not visible!)
+    local b_refresh=10        # button "Set and stay" clicked
+    local b_exit=252          # (X) clicked in the upper right corner
 
     readarray -t resosarr <<< $(echo "$resos")
 
@@ -71,9 +76,9 @@ yad_ChangeDisplayResolution() {
             form) cmd+=(--form --width=400 --columns=2 --button=yad-quit:0) ;;
             list) cmd+=(--list --height=500 --no-click --grid-lines=both
                         --column="Available resolution values:" 
-                        --button="yad-quit!!Change nothing, just quit":1
-                        --button="$butt_set_stay!view-refresh!Use selected resolution but don't quit":$refresh
-                        --button="$butt_set_quit!gtk-ok!Use selected resolution and quit":0
+                        # --button="yad-quit!!Change nothing, just quit":$b_quit
+                        --button="$butt_set_stay!view-refresh!Use selected resolution but don't quit":$b_refresh
+                        --button="$butt_set_quit!gtk-ok!Use selected resolution and quit":$b_ok
                        ) ;;
         esac
         for reso in "${resosarr[@]}" ; do
@@ -95,6 +100,9 @@ yad_ChangeDisplayResolution() {
         if [ -z "$result" ] ; then
             return
         fi
+        case "$retval" in
+             $b_quit | $b_exit) return ;;
+        esac
 
         case "$impl" in
             form) ;;  # does not support refresh...
@@ -106,7 +114,7 @@ yad_ChangeDisplayResolution() {
                 fi
                 $xrandr $reso
                 case "$retval" in
-                    $refresh) Restart_me ;;
+                    $b_refresh) Restart_me ;;
                 esac
                 ;;
         esac
