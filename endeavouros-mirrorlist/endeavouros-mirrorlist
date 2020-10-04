@@ -20,5 +20,4 @@ Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch
 Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 
 ## Github
-Server = https://github.com/endeavouros-team/mirrors/releases/download/mirror1/
 Server = https://raw.githubusercontent.com/endeavouros-team/repo/master/$repo/$arch
