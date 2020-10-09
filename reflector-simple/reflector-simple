@@ -163,6 +163,7 @@ AskCountriesAndOptions() {
 
 BuildReflectorCommand() {
     local ix xx
+    local ix_ext=""
 
     reflector_cmd=(reflector)
 
@@ -185,16 +186,23 @@ BuildReflectorCommand() {
     test "$rsync_supported" = "yes" && {
         test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol rsync) ; rsync_selected=1 ; }
     }
+
     if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
-        local tmpconf=$(mktemp)
-        _get_reflector_auto_configs
-        test "${reflector_info[$((ix++))]}" = "TRUE" && reflector_cmd+=($(cat $tmpconf))
-        rm -f $tmpconf
+        ix_ext=$ix
+        ((ix++))
     fi
+
     reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
     reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
     ((ix++))
     reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+
+    if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
+        local tmpconf=$(mktemp)
+        _get_reflector_auto_configs
+        test "${reflector_info[$ix_ext]}" = "TRUE" && reflector_cmd+=($(cat $tmpconf))
+        rm -f $tmpconf
+    fi
 }
 
 ShowMirrorlistSaved() {
