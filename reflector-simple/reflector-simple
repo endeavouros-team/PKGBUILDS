@@ -71,6 +71,13 @@ ArgsYesNo() {
     echo "no"
 }
 
+_config_country() {
+    local xx="$1"
+    case "$xx" in
+        [A-Z][A-Z]) selected_countries+=("$(CodeToCountry "$xx")") ;;
+    esac
+}
+
 _get_reflector_auto_configs() {
     # Read reflector options from /etc/reflector-auto.conf,
     # convert country names to country codes, and put all options
@@ -90,11 +97,34 @@ _get_reflector_auto_configs() {
         #fi
     done
 
-    local xx
+    local xx list yy prev=""
     for xx in $(cat $tmpconf) ; do
+        # split possible -cGB,FR,DE into: "-c" "GB,FR,DE"
         case "$xx" in
-            [A-Z][A-Z]) selected_countries+=("$(CodeToCountry "$xx")") ;;
+            -c?*) prev="-c"
+                  xx="${xx:2}"
+                  ;;
         esac
+
+        # for a country spec, separate country names if $xx is a country list
+        case "$prev" in
+            -c | --country)
+                if [ "$(echo "$xx" | tr -d ',')" != "$xx" ] ; then   # is it a list?
+                    # yes, a list of countries
+                    list="$xx"
+                    while [ -n "$list" ] ; do
+                        yy="$(echo "$list" | cut -d ',' -f 1)"
+                        list="$(echo "$list" | sed 's|^[^,]*,||')"
+                        [ "$list" = "$yy" ] && list=""
+                        _config_country "$yy"
+                    done
+                else
+                    # no, only one country
+                    _config_country "$xx"
+                fi
+                ;;
+        esac
+        prev="$xx"
     done
 }
 
