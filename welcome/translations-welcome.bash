@@ -145,15 +145,25 @@ _init_translations() {
         esac
     done
 
-    if [ -z "$lang" ] ; then
-        lang="$(echo "$LANG" | cut -d '_' -f 1)"
-    fi
-    case "$lang" in
-        [a-z][a-z]) ;;
-        *) echo "Warning: $FUNCNAME: language '$lang' is not recognized, using en." >&2 ;;
-    esac
-
     local trdir="$translations_dir"   # from Welcome app
+    local f1 f2
+
+    # We may have $lang as 'pt' or 'pt_BR' or something else...
+
+    if [ -z "$lang" ] ; then
+        f1="$(echo "$LANG" | cut -d '_' -f 1)"
+        f2="$(echo "$LANG" | sed "s|^${f1}_\([A-Z@]*[a-z]*\).*$|\1|")"
+        if [ -r "$trdir/translations-welcome-$f1.bash" ] ; then
+            lang="$f1"
+        elif [ -r "$trdir/translations-welcome-${f1}_$f2.bash" ] ; then
+            lang="${f1}_$f2"
+        fi
+    fi
+
+    if [ ! -r "$trdir/translations-welcome-$lang.bash" ] ; then
+        echo "Warning: $FUNCNAME: language '$lang' is not recognized, using en." >&2
+    fi
+
     local trdir2="$HOME/.config/EOS-generated-translations"              # generated translations go here
     local target_gen="$trdir2/translations-welcome-${lang}-generated.bash"
 
