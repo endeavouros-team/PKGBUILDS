@@ -23,7 +23,7 @@
 
 ### First some useful definitions:
 
-_tr_lang=pt            # required helper variable for _tr_add2
+_tr_lang=pt_BR            # required helper variable for _tr_add2
 
 # Help with some special characters (HTML). Yad has problems without them:
 _exclamation='&#33;'   # '!'
@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Mostrar o que fazer para atualizar o seu sistema
 _tr_add2 after_install_cdm     "Mudar o gestor de visualização"
 _tr_add2 after_install_cdmtip  "Usar um gestor de visualização diferente"
 
-_tr_add2 after_install_ew      "Wallpaper EndeavourOS"
-_tr_add2 after_install_ewtip   "Mudar o wallpaper para o predefinido do EOS"
+_tr_add2 after_install_ew      "Papel de Parede EndeavourOS"
+_tr_add2 after_install_ewtip   "Mudar o Papel de Parede para o predefinido do EOS"
 
 
 _tr_add2 after_install_pm      "Gestão de pacotes"
@@ -225,3 +225,33 @@ _tr_add2 nb_tab_owncmdstip          "Ajuda para adicionar comandos pessoais"
 
 _tr_add2 add_more_apps_akm          "Gestor de Kernel"
 _tr_add2 add_more_apps_akmtip       "Gestor leve de linux kernel e fonte de informação"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Tutorial: Comandos Pessoais"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Comandos Pessoais drag${_and}drop"
+_tr_add2 butt_owncmds_dnd_help    "Mostrar uma Janela onde pode arrastar itens para novos botões"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Mudar a resolução da Tela"
+_tr_add2 ins_resotip              "Mudar a resolução da Tela Agora"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Navegue por todos os pacotes Arch"
+_tr_add2 add_more_apps_aur           "Navegue por todos os pacotes AUR"
+_tr_add2 add_more_apps_done1_text    "Aplicativos sugeridos já instalados$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nVocê também pode navegar por todos os pacotes Arch e AUR (e instalá-los usando o terminal).\n"
+_tr_add2 add_more_apps_done2_tip1    "Para Instalar, use 'pacman' ou 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Para Instalar, use 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2        "Escolher um papel de parede EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Escolher Papel de Parede"                          # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
