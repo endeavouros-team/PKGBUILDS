@@ -153,10 +153,10 @@ _init_translations() {
     if [ -z "$lang" ] ; then
         f1="$(echo "$LANG" | cut -d '_' -f 1)"
         f2="$(echo "$LANG" | sed "s|^${f1}_\([A-Z@]*[a-z]*\).*$|\1|")"
-        if [ -r "$trdir/translations-welcome-$f1.bash" ] ; then
-            lang="$f1"
-        elif [ -r "$trdir/translations-welcome-${f1}_$f2.bash" ] ; then
+        if [ -r "$trdir/translations-welcome-${f1}_$f2.bash" ] ; then
             lang="${f1}_$f2"
+        elif [ -r "$trdir/translations-welcome-$f1.bash" ] ; then
+            lang="$f1"
         fi
     fi
 
