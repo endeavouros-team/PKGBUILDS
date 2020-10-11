@@ -12,7 +12,7 @@ _mirrorcheck_mirrornames() {
 
 _mirrorcheck_() 
 {
-    local cur prev words cword split
+    local cur prev #words cword split
     _init_completion -s || return
 
     case "$prev" in
