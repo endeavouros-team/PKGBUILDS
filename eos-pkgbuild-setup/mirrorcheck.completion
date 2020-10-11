@@ -1,0 +1,34 @@
+# bash completion for mirrorcheck        -*- shell-script -*-
+
+_mirrorcheck_complete() {
+    COMPREPLY=( $(compgen -W "$1" -- "$cur") )
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+}
+
+_mirrorcheck_mirrornames() {
+    source /etc/eos-mirrorcheck.conf
+    echo "${MIRROR_NAMES[*]}"
+}
+
+_mirrorcheck_() 
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case "$prev" in
+        --reponame)
+            COMPREPLY=( $(compgen -W "$(_mirrorcheck_mirrornames)" -- "$cur") )
+            ;;
+        *)
+            case "$cur" in
+                -* | "")
+                    _mirrorcheck_complete "<folder> --slow --fast --optimized --no-filelist --reponame="
+                    ;;
+                *)
+                    _filedir -d
+                    ;;
+            esac
+            ;;
+    esac
+} &&
+complete -F _mirrorcheck_ mirrorcheck

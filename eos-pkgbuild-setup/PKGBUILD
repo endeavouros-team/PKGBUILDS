@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=3.3.10
+pkgver=3.3.11
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -23,6 +23,7 @@ source=(
     eos-assets-sign
     local-general-setup
     mirrorcheck
+    mirrorcheck.completion
     githubcheck
     eos-mirrorcheck.conf
 
@@ -40,6 +41,7 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '2f9b6bb737bf1dd1e39f63af8b8cefdeaa66aa6a01eae31136613e68ac8f6fb91035d67796d1c0b6e37a603c6a6529cd3931415ac1c805c8db8fb901b6baa3e9'
             '72eaac6c410bdbc9c9fa82c3e1d595b2fedad39bee532e1ff39e64e8c7c32c8905061f531e4e7f28cd0df6789336706ec324b928df9a70bfe3bd2168e984d82d'
             '1a8ac7caa7b3afe1c7272b6d68379415e8e6183178bd06d4f1d181a6d16177ff4d283c6639b9dc7f01bfdb3f0d8ee2628ee2b088f4fadf68f06b474ef1691d86'
+            '67fd45d4f00d131cb7fba480357f3712fe29b521d94d3311ac2a719148566ba84eb5665e0a44ab5d8b2d127f2e430937511e81d25e6d488ad01888d4e3be3294'
             'e666f229c342ac91fcf7e4c235fd99e013e55277886e3db1fc336d99432f6f570c8a599565df5afbe6276a528b34eab57fd01d5531fb340e8f798f406c8365f1'
             '06a562c11f1087e2f824ff493cedee4230b9c7d26cfb40c32da2df1da20e43a91718261f30877f3388db05ab64c86d1ce86ebaf4f83ae828a4ba54e33b2a505a')
 
@@ -67,4 +69,6 @@ package() {
     install -Dm644 $pkgname.version                          $pkgdir/$scripts/$pkgname.version
 
     install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
+
+    install -Dm644 mirrorcheck.completion $pkgdir/usr/share/bash-completion/completions/mirrorcheck
 }
