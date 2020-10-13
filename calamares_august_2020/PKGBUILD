@@ -5,7 +5,7 @@ pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.30
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -17,6 +17,7 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager'
 'boost' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'qt5ct' 'solid' 'qt5-tools')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
+# When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=updating_august_20_2020"
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
@@ -133,8 +134,11 @@ prepare() {
 
     sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
 
+    sed -i "s?nonempty:?#nonempty:?" $_reponame/src/modules/users/users.conf
+    sed -i "s?maxLength:?#maxLength:?" $_reponame/src/modules/users/users.conf
     sed -i "s?libpwquality:?#libpwquality:?" $_reponame/src/modules/users/users.conf
-    sed -i "s?- minlen=0?#- minlen=0?" $_reponame/src/modules/users/users.conf   
+
+    sed -i "s?minLength:.*?minLength: 1?"  $_reponame/src/modules/users/users.conf
     sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf    
     echo -e "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     
