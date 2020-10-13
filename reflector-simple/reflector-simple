@@ -186,8 +186,12 @@ AskCountriesAndOptions() {
         "  - select one or more countries"
         "  - closest locations are usually the fastest"
         "  - https is the preferred protocol"
-        "  - default settings can come from /etc/reflector-simple.conf"
     )
+    if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
+        tips+=("\nNote: configuration file <b>$REFLECTOR_AUTO_CONF</b> is in use.")
+    else
+        tips+=("\nNote: no configuration file in use.")
+    fi
     local ix included xx tip
     local command
     local columns=5
@@ -208,11 +212,11 @@ AskCountriesAndOptions() {
     
 
     command=(eos_yad --form --columns=$columns --title="Selecting Arch mirrors")
-    tip="" #"<b>"
+    tip=""
     for xx in "${tips[@]}" ; do
         tip+="${xx}\n"
     done
-    tip+="\n" #</b>"
+    tip+=""
     command+=(--text="$tip")
 
     for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
@@ -358,16 +362,6 @@ Main() {
 
     local REFLECTOR_AUTO_CONF=/etc/reflector-simple.conf
     [ -r "$REFLECTOR_AUTO_CONF" ] || REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
-
-    case "$REFLECTOR_AUTO_CONF" in
-        /etc/reflector-simple.conf | /etc/reflector-auto.conf)
-            if [ -r "$REFLECTOR_AUTO_CONF" ] ; then
-                echo "Configuration file $REFLECTOR_AUTO_CONF used." >&2
-            else
-                echo "No configuration file in use." >&2
-            fi
-            ;;
-    esac
 
     local rsync_supported=no   # yes or no
 
