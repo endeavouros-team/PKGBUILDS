@@ -2,7 +2,7 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.5.3
+pkgver=1.5.4
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -16,11 +16,13 @@ source=(
   $url/$pkgname
   $url/$pkgname.desktop
 )
-sha512sums=('5151c9123ea6c040cb0c3a8b87b638c8f04ba57ac8c5e10b007ec4d208fbbe360d5d1b65d4b5fcdb20bd5442ab4063de22d810878e90eccb6b6e1e5dc70455ee'
+sha512sums=('d53bcb5893a22995ff3b9afcb2a1318eb337ac728918ef4e122dd7b328488ac2b862490e6b6449966c7497c71f17543d27326a1a433a0326bcfa7b2e94f7b551'
             'd100ccacc5a352b6bdf8965d7bb23249ffb565c624e02800b8d7e722f70b782748fbbc24a476794b24dcc259090833d843dae12a360ada7f4775485795d57a54')
 
 package() {
   cd $srcdir
+
+  sed -i $pkgname -e "s|local VERSION_INFO=.*$|local VERSION_INFO=${pkgver}-$pkgrel|"
 
   install -d $pkgdir/usr/bin
   install -d $pkgdir/usr/share/applications

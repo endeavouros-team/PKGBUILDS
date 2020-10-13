@@ -211,7 +211,7 @@ AskCountriesAndOptions() {
     [ -n "$conf_sort" ]    && default_sort="$(echo "$default_sort" | sed -e 's|\^||' -e "s|$conf_sort|^$conf_sort|")"
     
 
-    command=(eos_yad --form --columns=$columns --title="Selecting Arch mirrors")
+    command=(eos_yad --form --columns=$columns --title="Select Arch mirrors with $progname v$VERSION_INFO")
     tip=""
     for xx in "${tips[@]}" ; do
         tip+="${xx}\n"
@@ -359,6 +359,7 @@ SaveMirrorlist() {
 
 Main() {
     local progname=reflector-simple
+    local VERSION_INFO="added by PKGBUILD"
 
     local REFLECTOR_SIMPLE_CONF=/etc/reflector-simple.conf
     local REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
