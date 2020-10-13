@@ -2,7 +2,7 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.5
+pkgver=1.5.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -16,7 +16,7 @@ source=(
   $url/$pkgname
   $url/$pkgname.desktop
 )
-sha512sums=('104f5e8e0517248ff8463b9f3d510e52dd3bdc91de4066e5c82471eb26475da7ae00e290f8b4402f3a2d8906f5653c2d44c6eee7b807852ddb627ba0ba5dca1f'
+sha512sums=('2630de4d5dc987444e22b4ed18a911fee5911c6bb434af70176c3379ba5f99236ed279e70217fafd2e6fec2266965c0125b11dc2199c3c3d6cabaa1bf10d10fe'
             '423d891fe803625813abd8104046388f0cec0558451b54e4367faa31e19d692b29fad08b24376ea135c257f4fdaee7486dd902b6a7029777acc37b7fa0393bb5')
 
 package() {
