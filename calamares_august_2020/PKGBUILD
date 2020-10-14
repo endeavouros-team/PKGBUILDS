@@ -70,7 +70,7 @@ prepare() {
 
     # online
     # 2 partition instances at settings.conf, bypass the wrong one
-    sed -i "N;N;s?  - keyboard\n  - partition?  - keyboard\n  - partition\n  - netinstall?" $_reponame/settings.conf_online
+    sed -i "N;N;s?  - partition\n  - users?  - partition\n  - netinstall\n  - users?" $_reponame/settings.conf_online
     sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
 
     # Create packages.conf
