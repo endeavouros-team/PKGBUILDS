@@ -5,7 +5,7 @@ pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.30
-pkgrel=2
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -139,7 +139,9 @@ prepare() {
     sed -i "s?libpwquality:?#libpwquality:?" $_reponame/src/modules/users/users.conf
 
     sed -i "s?minLength:.*?minLength: 1?"  $_reponame/src/modules/users/users.conf
-    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf    
+    sed -i "s?- minlen=0?#- minlen=0?" $_reponame/src/modules/users/users.conf 
+    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf   
+ 
     echo -e "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     
     # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
