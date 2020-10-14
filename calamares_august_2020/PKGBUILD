@@ -69,6 +69,8 @@ prepare() {
     sed -i "N;N;s?  - users\n  - displaymanager?  - removeuser\n  - users\n  - displaymanager?" $_reponame/settings.conf_offline
 
     # online
+    # 2 partition instances at settings.conf, bypass the wrong one
+    sed -i "N;N;s?  - keyboard\n  - partition?  - keyboard\n  - partition\n  - netinstall?" $_reponame/settings.conf_online
     sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
 
     # Create packages.conf
@@ -97,7 +99,7 @@ prepare() {
 
     sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
 
-    # netinstall moduule
+    # netinstall module
     cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
     # Escape /? \
@@ -179,7 +181,7 @@ package() {
     cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     
-    # Commom install -D doen't work
+    # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
 
 }
