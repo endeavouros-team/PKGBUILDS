@@ -73,6 +73,7 @@ OneMirror() {
     local packages repofiles
     local problemfiles=""
     local mirror_url
+    local repo=endeavouros
 
     mirror_url="${MIRROR_URLS[$reponame]}"
     test -n "$mirror_url" || DIE "MIRROR_URLS[$reponame] is empty! Check file $conf."
@@ -83,6 +84,9 @@ OneMirror() {
         echo2 "$(basename $0): nothing to see here."
         return
     }
+
+    mirror_url="$(echo "$mirror_url" | sed "s|\$arch|$arch|")"
+    mirror_url="$(echo "$mirror_url" | sed "s|\$repo|$repo|")"
 
     echo2 "$reponame:"
     remotefilelist="$(curl -s "$mirror_url" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
@@ -155,18 +159,26 @@ EOF
 Main()
 {
     # use assets.conf
-    local assets_conf=./assets.conf
+    # local assets_conf=./assets.conf
+    # test -r $assets_conf || DIE "cannot find local file $assets_conf."
 
-    test -r $assets_conf || DIE "cannot find local file $assets_conf."
-
-    local has_filelist="$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
+    local has_filelist=no # "$(grep "^local USE_GENERATED_FILELIST=" $assets_conf | sed 's|^.*="\([yesno]*\)".*$|\1|')"
     local mode=fast   # show, optimized, fast
-    local repo=endeavouros
-    local arch=x86_64
     local folder=""
     local reponame
     local arg
     local conf=/etc/eos-mirrorcheck.conf
+    local arch=$(basename "$PWD")   #x86_64
+
+    case "$arch" in
+        x86_64 | aarch64 | armv7h) ;;
+        *) DIE "must run this program at an architecture specific (e.g. repo/endeavouros/x86_64) folder!" ;;
+    esac
+    case "$(grep "/endeavouros-team/" ../../.git/config)" in
+        *https://github.com/endeavouros-team/repo) ;;
+        *) DIE "this folder is not in endeavouros-team repo" ;;
+    esac
+
     test -r $conf || DIE "configuration file $conf is required but not found."
 
     source $conf
