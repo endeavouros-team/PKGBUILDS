@@ -229,8 +229,10 @@ ListNameToPkgName()
     # A pkg may need some changes:
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
     if [ -n "$hook" ] ; then
-        test "$fetch" = "yes" && $hook
-        HookIndicator "$hook_yes"
+        if [ "$fetch" = "yes" ] ; then
+            HookIndicator "$hook_yes"
+            $hook
+        fi
     else
         HookIndicator "$hook_no"
     fi
