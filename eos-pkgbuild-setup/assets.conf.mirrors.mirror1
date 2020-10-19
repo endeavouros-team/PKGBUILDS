@@ -74,13 +74,19 @@ _Updpkgsums() {
     popd >/dev/null
 }
 
+_Get_pkgver() {
+    local Pkgbuild="$1"
+    grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2 | sed "s|^[\"']\(.*\)[\"']$|\1|"
+}
+
+
 _yay_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of yay from the developer
     local tool=yay
     local url=https://github.com/Jguer/$tool/releases
     local tmpdata
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
-    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
     tmpdata="$(wget -q --timeout=10 -O- $url)"
@@ -99,7 +105,7 @@ _yay_hook_check_latest_old() {
     local url=https://github.com/Jguer/$tool/releases
     local tmpfile=$(mktemp)
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
-    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
     wget -q --timeout=10 -O $tmpfile $url || {
@@ -120,7 +126,7 @@ _inxi_hook_check_latest() {
     local url=https://github.com/smxi/$tool/releases
     local tmpdata
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
-    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
     local prefer_dev_version=yes
 
@@ -146,7 +152,7 @@ _downgrade_hook_check_latest() {
     local url=https://github.com/pbrisbin/$tool/releases
     local tmpdata
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
-    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
     tmpdata="$(wget -q --timeout=10 -O- $url)"
