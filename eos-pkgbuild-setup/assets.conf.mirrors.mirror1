@@ -78,6 +78,25 @@ _yay_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of yay from the developer
     local tool=yay
     local url=https://github.com/Jguer/$tool/releases
+    local tmpdata
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
+    local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
+    local dev_version
+
+    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    if [ $? -ne 0 ] ; then
+        echo "cannot fetch info about $tool" >&2
+        return 1
+    fi
+    dev_version="$(echo "$tmpdata" | grep /Jguer/yay/tree/v | head -n 1 | sed 's|^.*/tree/v\([0-9\.]*\)" .*$|\1|')"
+
+    _common_show_version
+}
+
+_yay_hook_check_latest_old() {
+    # check if AUR PKGBUILD has the latest version of yay from the developer
+    local tool=yay
+    local url=https://github.com/Jguer/$tool/releases
     local tmpfile=$(mktemp)
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
@@ -99,18 +118,18 @@ _inxi_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of inxi from the developer
     local tool=inxi
     local url=https://github.com/smxi/$tool/releases
-    local tmpfile=$(mktemp)
+    local tmpdata
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
     local dev_version
     local prefer_dev_version=yes
 
-    wget -q --timeout=10 -O $tmpfile $url || {
+    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    if [ $? -ne 0 ] ; then
         echo "cannot fetch info about $tool" >&2
-        rm -f $tmpfile
         return 1
-    }
-    dev_version="$(grep /smxi/inxi/releases/tag/ $tmpfile | head -n 1 | sed 's|^.*/tag/\([0-9\.]*\)-.*$|\1|')"
+    fi
+    dev_version="$(echo "$tmpdata" | grep /smxi/inxi/releases/tag/ | head -n 1 | sed 's|^.*/tag/\([0-9\.]*\)-.*$|\1|')"
 
     if [ "$prefer_dev_version" = "yes" ] ; then
         sed -i $Pkgbuild -e 's|^pkgver='"$localversion"'$|pkgver='"$dev_version"'|'
@@ -119,27 +138,25 @@ _inxi_hook_check_latest() {
     else
         _common_show_version
     fi
-    rm -f $tmpfile
 }
 
 _downgrade_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of downgrade from the developer
     local tool=downgrade
     local url=https://github.com/pbrisbin/$tool/releases
-    local tmpfile=$(mktemp)
+    local tmpdata
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local localversion=$(grep ^pkgver= "$Pkgbuild" | cut -d '=' -f 2)
     local dev_version
 
-    wget -q --timeout=10 -O $tmpfile $url || {
+    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    if [ $? -ne 0 ] ; then
         echo "cannot fetch info about $tool" >&2
-        rm -f $tmpfile
         return 1
-    }
-    dev_version="$(grep /pbrisbin/downgrade/releases/tag/v $tmpfile | head -n 1 | sed 's|^.*/tag/v\([0-9\.]*\).*$|\1|')"
+    fi
+    dev_version="$(echo "$tmpdata" | grep /pbrisbin/downgrade/releases/tag/v | head -n 1 | sed 's|^.*/tag/v\([0-9\.]*\).*$|\1|')"
 
     _common_show_version
-    rm -f $tmpfile
 }
 
 _ckbcomp_hook_change_version() {
@@ -165,6 +182,16 @@ _yad_hook_add_gspell() {
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
 }
 
+_diff_file_and_data() {
+    local file="$1"
+    local data="$2"
+    local datafile="$3"
+    local retval
+
+    echo "$data" > $datafile
+    diff "$file" "$datafile"
+}
+
 _welcome_hook_check_ksetwallpaper_py() {
     # Check if we have the latest version of file ksetwallpaper.py.
     # See https://github.com/pashazz/ksetwallpaper/raw/master/ksetwallpaper.py
@@ -172,15 +199,17 @@ _welcome_hook_check_ksetwallpaper_py() {
     local file=ksetwallpaper.py
     local url="https://github.com/pashazz/ksetwallpaper/raw/master/$file"
     local current="$PKGBUILD_ROOTDIR"/welcome/$file
-    local new=$file.latest
+    local new
     local diffs answer
 
-    wget -q --timeout=10 -O $new "$url" || {
+    new="$(wget -q --timeout=10 -O- "$url")"
+    if [ $? -ne 0 ] ; then
         echo "Warning: cannot fetch '$url'." >&2
         return 1
-    }
-    diffs="$(diff "$current" "$new")"
-    if [ -n "$diffs" ] ; then
+    fi
+    if [ "$(cat "$current")" != "$new" ] ; then
+        local newfile=$(mktemp)
+        diffs="$(_diff_file_and_data "$current" "$new" "$newfile")"
         echo "" >&2
         echo "$diffs" >&2
         echo "" >&2
@@ -188,12 +217,12 @@ _welcome_hook_check_ksetwallpaper_py() {
         case "$answer" in
             "" | [yY]*)
                 rm -f $current
-                mv $new $current
+                mv $newfile $current
                 _Updpkgsums "$current"
                 ;;
         esac
+        rm -f "$newfile"
     fi
-    rm -f "$new"
 }
 
 declare -A ASSET_PACKAGE_HOOKS
