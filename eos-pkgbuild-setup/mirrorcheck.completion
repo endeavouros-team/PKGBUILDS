@@ -22,7 +22,7 @@ _mirrorcheck_()
         *)
             case "$cur" in
                 -* | "")
-                    _mirrorcheck_complete "<folder> --slow --fast --optimized --no-filelist --reponame="
+                    _mirrorcheck_complete "$(mirrorcheck --show-params)"
                     ;;
                 *)
                     _filedir -d

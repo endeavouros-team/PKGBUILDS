@@ -29,6 +29,7 @@ echoi() {
 
 DIE() {
     echo2 "Error: $1"
+    Usage
     exit 1
 }
 
@@ -141,17 +142,19 @@ OneMirror() {
 Usage() {
     local progname="$(basename $0)"
     cat <<EOF >&2
+
 $progname: Check the validity of EndeavourOS packages in mirrors.
 
 Usage: $progname [parameters]
 parameters:
-    --slow        Check contents of each file.
-    --fast        Check just the name of all package files (default).
-    --optimized   Check contents of some files, and names of other files.
-    --reponame=X  Use given name as the mirror name (default: all known mirrors).
-    --no-filelist Don't generate list of latest files into the repo.
-    folder-name   Name of the local folder that contains package files.
-                  If not given, current folder is used.
+    --slow          Check contents of each file.
+    --fast          Check just the name of all package files (default).
+    --optimized     Check contents of some files, and names of other files.
+    --reponame=X    Use given name as the mirror name (default: all known mirrors).
+    --no-filelist   Don't generate list of latest files into the repo.
+    --show-params   Show all available parameters as a list (for completion support).
+    <folder-name>   Name of the local folder that contains package files.
+                    If not given, current folder is used.
 
 EOF
 }
@@ -169,10 +172,32 @@ Main()
     local arg
     local conf=/etc/eos-mirrorcheck.conf
     local arch=$(basename "$PWD")   #x86_64
+    local supported_params=(
+        "<folder-name>"
+        --slow
+        --fast
+        --optimized
+        --reponame=
+        --no-filelist
+        --show-params
+    )
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --reponame=*) reponame="${arg#*=}" ;;
+            --slow) mode=slow ;;
+            --fast) mode=fast ;;
+            --optimized) mode=optimized ;;
+            --no-filelist) has_filelist=no ;;   # no repofiles.txt
+            --show-params) echo "${supported_params[*]}" ; return ;;
+            -*) DIE "unsupported parameter '$arg'" ;;
+            *) folder="$arg" ;;
+        esac
+    done
 
     case "$arch" in
         x86_64 | aarch64 | armv7h) ;;
-        *) DIE "must run this program at an architecture specific (e.g. repo/endeavouros/x86_64) folder!" ;;
+        *) DIE "must run this program at an architecture specific folder (e.g. repo/endeavouros/x86_64)." ;;
     esac
     case "$(grep "/endeavouros-team/" ../../.git/config)" in
         *https://github.com/endeavouros-team/repo) ;;
@@ -184,18 +209,6 @@ Main()
     source $conf
 
     test -n "${MIRROR_NAMES[0]}" || DIE "MIRROR_NAMES[0] is empty! Check file $conf."
-
-    for arg in "$@" ; do
-        case "$arg" in
-            --reponame=*) reponame="${arg#*=}" ;;
-            --slow) mode=slow ;;
-            --fast) mode=fast ;;
-            --optimized) mode=optimized ;;
-            --no-filelist) has_filelist=no ;;   # no repofiles.txt
-            -*) Usage ; return ;;
-            *) folder="$arg" ;;
-        esac
-    done
 
     if [ -n "$reponame" ] ; then
         OneMirror
