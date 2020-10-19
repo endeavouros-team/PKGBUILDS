@@ -1,6 +1,6 @@
 # bash completion for mirrorcheck        -*- shell-script -*-
 
-_mirrorcheck_complete() {
+_my_complete() {
     COMPREPLY=( $(compgen -W "$1" -- "$cur") )
     [[ $COMPREPLY == *= ]] && compopt -o nospace
 }
@@ -15,19 +15,28 @@ _mirrorcheck_()
     local cur prev #words cword split
     _init_completion -s || return
 
+    # Handle options that need sub-options.
+    # Each option "case" should return immediately.
+
     case "$prev" in
         --reponame)
-            COMPREPLY=( $(compgen -W "$(_mirrorcheck_mirrornames)" -- "$cur") )
+            _my_complete "$(_mirrorcheck_mirrornames)"
+            return
+            ;;
+    esac
+
+    # Handle top-level options.
+    # Command 'mirrorcheck --show-params' shows all available parameters.
+
+    case "$cur" in
+        -* | "")
+            # Any option or no parameters.
+            _my_complete "$(mirrorcheck --show-params)"
             ;;
         *)
-            case "$cur" in
-                -* | "")
-                    _mirrorcheck_complete "$(mirrorcheck --show-params)"
-                    ;;
-                *)
-                    _filedir -d
-                    ;;
-            esac
+            # A non-option parameter given.
+            # Folder required.
+            _filedir -d
             ;;
     esac
 } &&
