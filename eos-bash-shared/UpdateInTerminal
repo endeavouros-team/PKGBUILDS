@@ -1,0 +1,61 @@
+#!/bin/bash
+
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+DIE()     { echo2 "Error: $1" ; Usage ; exit 1 ; }
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
+    DIE "Error: /usr/share/endeavouros/scripts/eos-script-lib-yad not found!"
+}
+
+Options() {
+    local pp
+    for pp in "$@" ; do
+        case "$pp" in
+            --noup) checkArchEos=no ;;
+            --noaur) checkAur=no ;;
+            --help | -h) Usage ; return 1 ;;
+            -*) DIE "unsupported option '$pp'" ;;
+            *)  DIE "unsupported parameter '$pp'" ;;
+        esac
+    done
+}
+
+Usage() {
+    cat <<EOF
+Usage: $progname [options]
+Options:
+    --noup     Don't check $upname updates.
+    --noaur    Don't check AUR updates.
+EOF
+}
+
+Main() {
+    local checkArchEos=yes
+    local checkAur=yes
+
+    local progname="$(basename "$0")"
+    local upname="Arch & EndeavourOS"
+
+    Options "$@" || return
+
+    if [ "$checkArchEos" = "yes" ] ; then
+        echo2 "$upname update check:"
+        echo2 ":: Searching $upname for updates..."
+        checkupdates
+        case "$?" in
+            0) $EOS_ROOTER 'pacman -Syu' ;;
+            1) DIE "checkupdates: failure!" ;;
+            2) echo2 " there is nothing to do"
+               ;;
+        esac
+        [ "$checkAur" = "yes" ] && echo2 ""
+    fi
+
+    if [ "$checkAur" = "yes" ] ; then
+        echo2 "AUR update check:"
+        yay -Syua
+    fi
+}
+
+Main "$@"
