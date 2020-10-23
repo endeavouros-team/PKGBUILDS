@@ -249,6 +249,13 @@ _tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
 _tr_add2 after_install_ew2      "Choisir un des fonds d'écran EOS"
 _tr_add2 after_install_ewtip2   "Choisir parmi les fonds d'écran d'EndeavourOS"
 
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
+
 # 2020-Oct-23:
 _tr_add2 updt_update_check        "vérification de la mise à jour"
 _tr_add2 updt_searching           "En train de rechercher"
