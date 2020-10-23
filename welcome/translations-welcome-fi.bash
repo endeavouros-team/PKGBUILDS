@@ -255,3 +255,10 @@ _tr_add2 after_install_ewtip2   "Taustakuvien valitsin"                     # ol
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "päivitysten tarkistus"
+_tr_add2 updt_searching           "Etsitään"
+_tr_add2 updt_for_updates         "päivityksiä"
+_tr_add2 updt_failure             "virhe$_exclamation"
+_tr_add2 updt_nothing_todo        "ei mitään tehtävää"

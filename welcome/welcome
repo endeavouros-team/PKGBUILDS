@@ -982,7 +982,7 @@ AfterInstall() {
      tabcontents+=(--field="_align($(ltr after_install_um))!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
   fi
   tabcontents+=(
-      --field="_align($(ltr after_install_us))!$system_software_update!$(ltr after_install_ustip)":fbtn 'RunInTerminal UpdateInTerminal'
+      --field="_align($(ltr after_install_us))!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
       --field="_align($(ltr after_install_pclean))!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
   test "$(eos_GetArch)" != "armv7h" && \

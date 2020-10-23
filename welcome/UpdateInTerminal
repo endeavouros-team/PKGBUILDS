@@ -1,0 +1,69 @@
+#!/bin/bash
+
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+DIE()     { echo2 "Error: $1" ; Usage ; exit 1 ; }
+
+translations_dir=/usr/share/endeavouros/scripts  # needed in translations-welcome.bash
+
+source $translations_dir/eos-script-lib-yad || {
+    DIE "$translations_dir/eos-script-lib-yad not found!"
+}
+source $translations_dir/translations-welcome.bash || {
+    DIE "$translations_dir/translations-welcome.bash not found!"
+}
+
+Options() {
+    local pp
+    for pp in "$@" ; do
+        case "$pp" in
+            --noup) checkArchEos=no ;;
+            --noaur) checkAur=no ;;
+            --lang=*) lang="${pp#*=}" ;;
+            --help | -h) Usage ; return 1 ;;
+            -*) DIE "unsupported option '$pp'" ;;
+            *)  DIE "unsupported parameter '$pp'" ;;
+        esac
+    done
+}
+
+Usage() {
+    cat <<EOF
+Usage: $progname [options]
+Options:
+    --noup     Don't check $upname updates.
+    --noaur    Don't check AUR updates.
+EOF
+}
+
+Main() {
+    local checkArchEos=yes
+    local checkAur=yes
+    local lang=""
+
+    local progname="$(basename "$0")"
+    local upname="Arch & EndeavourOS"
+
+    Options "$@" || return
+
+    _init_translations "$lang"         # other parameters as defaults
+
+    if [ "$checkArchEos" = "yes" ] ; then
+        echo2 "$upname $(ltr updt_update_check):"
+        echo2 ":: $(ltr updt_searching) $upname $(ltr updt_for_updates)..."
+        checkupdates
+        case "$?" in
+            0) $EOS_ROOTER 'pacman -Syu' ;;
+            1) DIE "checkupdates: $(ltr updt_failure)" ;;
+            2) echo2 " $(ltr updt_nothing_todo)" ;;
+        esac
+        [ "$checkAur" = "yes" ] && echo2 ""
+    fi
+
+    if [ "$checkAur" = "yes" ] ; then
+        echo2 "AUR $(ltr updt_update_check):"
+        yay -Syua
+    fi
+}
+
+Main "$@"
