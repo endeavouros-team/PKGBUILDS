@@ -228,3 +228,41 @@ _tr_add2 nb_tab_owncmdstip          "Ayuda para agregar comandos personales"
 
 _tr_add2 add_more_apps_akm          "Gestor del kernel"
 _tr_add2 add_more_apps_akmtip       "Un pequeño gestor del kernel de linux y una fuente de información"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Tutorial: Comandos personales"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Comandos personales drag${_and}drop"
+_tr_add2 butt_owncmds_dnd_help    "Mostrar una ventana donde arrastrar los elementos del campo para los nuevos botones"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Cambiar la resolución de la pantalla"
+_tr_add2 ins_resotip              "Cambiar la resolución de la pantalla ahora"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Ver todos los paquetes de Arch"
+_tr_add2 add_more_apps_aur           "Ver todos los paquetes de AUR"
+_tr_add2 add_more_apps_done1_text    "${_exclamation_down}Aplicaciones sugeridas ya instaladas$_exclamation"
+_tr_add2 add_more_apps_done2_text    "\n\nTambién puedes ver todos los paquetes de Arch y AUR (e instalarlos usando la terminal).\n"
+_tr_add2 add_more_apps_done2_tip1    "Para instalar, usa 'pacman' o 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Para instalar, usa 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2        "Elija uno de los fondos de pantalla de EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Selector de fondos de pantalla"                          # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "Comprobar actualizaciones"
+_tr_add2 updt_searching           "buscando"
+_tr_add2 updt_for_updates         "actualizaciones"
+_tr_add2 updt_failure             "${_exclamation_down}falló$_exclamation"
+_tr_add2 updt_nothing_todo        "no hay nada que hacer"
+_tr_add2 updt_press_enter         "Pulse ENTER para cerrar esta ventana"
