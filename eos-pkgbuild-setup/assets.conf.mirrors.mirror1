@@ -38,6 +38,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-hooks
     eos-log-tool
     eos-rankmirrors
+    eos-translations
     eos-update-notifier
     grub-theme-endeavouros
     grub-tools
