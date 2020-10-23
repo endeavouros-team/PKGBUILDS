@@ -12,9 +12,9 @@ export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 
 EOS_SCRIPTS_DIR=/usr/share/endeavouros/scripts
-translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translations-welcome.bash !!
+translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translation.bash !!
 
-source $translations_dir/translations-welcome.bash
+source $translations_dir/translations.bash
 
 
 #################################################################################
@@ -98,7 +98,7 @@ AfterTranslations() {
 
 export -f ltr
 export tr_strings
-export SELECTED_LANGUAGE_WELCOME
+export SELECTED_EOS_WELCOME
 
 IsInstalled() { pacman -Q "$1" >& /dev/null ; }
 export -f IsInstalled

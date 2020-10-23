@@ -4,13 +4,13 @@ echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 DIE()     { echo2 "Error: $1" ; Usage ; exit 1 ; }
 
-translations_dir=/usr/share/endeavouros/scripts  # needed in translations-welcome.bash
+translations_dir=/usr/share/endeavouros/scripts  # needed in translations.bash
 
 source $translations_dir/eos-script-lib-yad || {
     DIE "$translations_dir/eos-script-lib-yad not found!"
 }
-source $translations_dir/translations-welcome.bash || {
-    DIE "$translations_dir/translations-welcome.bash not found!"
+source $translations_dir/translations.bash || {
+    DIE "$translations_dir/translations.bash not found!"
 }
 
 Options() {

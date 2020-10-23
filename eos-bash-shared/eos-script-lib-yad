@@ -31,6 +31,11 @@ eos_yad() {
 }
 #export -f eos_yad
 
+translations_dir=/usr/share/endeavouros/scripts  # needed in translations.bash
+source $translations_dir/translations.bash || {
+    echo "$translations_dir/translations.bash not found!" >&2
+    exit 1
+}
 
 eos_GetArch() {
     local arch="$(/usr/bin/uname -m)"
@@ -161,7 +166,12 @@ eos_yad_RunCmdTermBash() {
     case "$term" in
         */deepin-terminal) ;;
         *)
-            echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
+            if [ 0 -eq 1 ] ; then
+                echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
+            else
+                _init_translations
+                echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
+            fi
             ;;
     esac
     echo "rm -f $tmpfile"                                >> $tmpfile

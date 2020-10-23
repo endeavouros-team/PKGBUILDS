@@ -2,12 +2,12 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.2.16
+pkgver=1.3
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
-  bash yad xorg-xrandr
+  bash yad xorg-xrandr eos-translations
 )
 optdepends=(
   neofetch    # for additional DE detection
@@ -27,9 +27,10 @@ source=(
   $url/paccache-service-manager
   $url/su-c_wrapper
   $url/eos-wallpaper-set
+  $url/UpdateInTerminal
 )
 
-sha512sums=('514822bf774d0fbfbc55f266940395d36cdfc0ede17964f590dc37c2837dbf1e5af144a281925d21be701d3781ac41f638a37910ec596617bd98186c95eb4977'
+sha512sums=('86daaf9526715adc5f4c9c9e397a5c5673904797005fd288465694df47dce2b247d7c3eacc6f607ac772fa58f8465093b374905e7f84a8413f526e2f96c3d7cc'
             '37385554fee75e0bd052ebf0d5abfc3808a233a430f6fc227fa03ecbc34d32fc63af72e8a9e14de5f3b4b5c03b7fdb97db1a2e1f90d24dffc2f9cf937c96e422'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             'b097c58d4e954ab86a07d685977b698645b1e2b49131ad76015e65b98e599c3b57728f4b2cfcf3a10527de23d7ba069ea4cf0dfddb8ee4587fc9815f4885dec7'
@@ -38,7 +39,8 @@ sha512sums=('514822bf774d0fbfbc55f266940395d36cdfc0ede17964f590dc37c2837dbf1e5af
             'c2939fc7843b3c34bcc192b849eec962e682bfeb0df1d38b9a991cab03060f1847f32502552d9b17c8333ad698840f851d10cbd5012c1618f3e81f040162bb3d'
             'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
             'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa'
-            '3fa37ec0cc5e8ee2f39023bcb79c0448ec26439fdb0ba7e75cae3b1a4f1f2b7a57c4ba55829b68e677353785a605f303d19ba5df44656f54c3789ab5b0d94600')
+            '3fa37ec0cc5e8ee2f39023bcb79c0448ec26439fdb0ba7e75cae3b1a4f1f2b7a57c4ba55829b68e677353785a605f303d19ba5df44656f54c3789ab5b0d94600'
+            'c489ab580db11dd26df72031bddf0132004b8a52a10b75ecea68b4f1833a85e7b762e921a1b9461b40f242dbabc2db44b9cb05bb9883bb3e211b5ff459bcbed8')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -52,4 +54,5 @@ package() {
   install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
   install -Dm755 eos-wallpaper-set              $pkgdir/usr/bin/eos-wallpaper-set
+  install -Dm755 UpdateInTerminal               $pkgdir/usr/bin/UpdateInTerminal
 }

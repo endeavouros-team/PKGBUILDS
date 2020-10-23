@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Translations for the 'welcome' app.
+# Translations especially for the 'welcome' app.
 
 tr_indexes=()
 
@@ -22,7 +22,7 @@ _tr_add2() {
     local str="$2"
 
     # local lang="$_tr_lang"
-    # test -n "$lang" || lang="$SELECTED_LANGUAGE_WELCOME"
+    # test -n "$lang" || lang="$SELECTED_EOS_LANGUAGE"
 
     if [ -z "$_tr_lang" ] ; then
         echo "Warning: variable '_tr_lang' is not set in the translation file!" >&2
@@ -34,7 +34,7 @@ _tr_add2() {
 
 ltr() {                                              # puts string to stdout
     local ix="$1"
-    local str="${tr_strings["Lang_${SELECTED_LANGUAGE_WELCOME}__$ix"]}"
+    local str="${tr_strings["Lang_${SELECTED_EOS_LANGUAGE}__$ix"]}"
     test -n "$2" && str+="$2"                        # remove this line some day...
     echo "$str"
 }
@@ -62,7 +62,7 @@ _translate_with_fixes() {
 
     if [ -z "$to" ] ; then
         echo "$eng2"           # translation failed!
-        echo "Warning: translating ix '$ix' failed." > "$HOME/.welcome-translation-${lang}-issue.log"
+        echo "Warning: translating ix '$ix' failed." > "$HOME/.translation-${lang}-issue.log"
         return 1
     fi
 
@@ -93,7 +93,7 @@ _tr_generate() {
     mkdir -p "$trdir2"
 
     echo "Translating to $lang ..." >&2
-    export SELECTED_LANGUAGE_WELCOME="$lang"
+    export SELECTED_EOS_LANGUAGE="$lang"
     #silent_lang_warnings=yes   # give no more warnings about this language...
 
     cat <<EOF > $target_gen
@@ -133,7 +133,7 @@ _init_translations() {
     local tr_engine=""
     local tr_prefer=manual    # or generated
     local trlist trfile
-    local errlog=$(mktemp -u /tmp/translations-welcome-XXXXX.errlog)
+    local errlog=$(mktemp -u /tmp/translations-XXXXX.errlog)
 
     for arg in "$@" ; do
         case "$arg" in
@@ -145,33 +145,34 @@ _init_translations() {
         esac
     done
 
-    local trdir="$translations_dir"   # from Welcome app
+    local trdir="$translations_dir"   # from the using (e.g. welcome) app
     local f1 f2
 
     # We may have $lang as 'pt' or 'pt_BR' or something else...
 
     if [ -z "$lang" ] ; then
+        # See /usr/share/i18n/locales
         f1="$(echo "$LANG" | cut -d '_' -f 1)"
         f2="$(echo "$LANG" | sed "s|^${f1}_\([A-Z@]*[a-z]*\).*$|\1|")"
-        if [ -r "$trdir/translations-welcome-${f1}_$f2.bash" ] ; then
+        if [ -r "$trdir/translation-${f1}_$f2.bash" ] ; then
             lang="${f1}_$f2"
-        elif [ -r "$trdir/translations-welcome-$f1.bash" ] ; then
+        elif [ -r "$trdir/translation-$f1.bash" ] ; then
             lang="$f1"
         fi
     fi
 
-    if [ ! -r "$trdir/translations-welcome-$lang.bash" ] ; then
+    if [ ! -r "$trdir/translation-$lang.bash" ] ; then
         echo "Warning: $FUNCNAME: language '$lang' is not recognized, using en." >&2
     fi
 
     local trdir2="$HOME/.config/EOS-generated-translations"              # generated translations go here
-    local target_gen="$trdir2/translations-welcome-${lang}-generated.bash"
+    local target_gen="$trdir2/translation-${lang}-generated.bash"
 
     if [ "$generate" = "yes" ] ; then
         if [ -z "$tr_engine" ] ; then
             tr_engine=bing
         fi
-        source $trdir/translations-welcome-reference.bash
+        source $trdir/translation-reference.bash
         _tr_generate
         return
     fi
@@ -179,14 +180,14 @@ _init_translations() {
     case "$tr_prefer" in
         manual)
             trlist=(
-                "$trdir/translations-welcome-en.bash"
-                "$trdir2/translations-welcome-en-generated.bash"
+                "$trdir/translation-en.bash"
+                "$trdir2/translation-en-generated.bash"
             )
             ;;
         generated)
             trlist=(
-                "$trdir2/translations-welcome-en-generated.bash"
-                "$trdir/translations-welcome-en.bash"
+                "$trdir2/translation-en-generated.bash"
+                "$trdir/translation-en.bash"
             )
             ;;
         *)
@@ -208,19 +209,19 @@ _init_translations() {
     local pname="$PRETTY_PROGNAME"
     local selected=0
 
-    export SELECTED_LANGUAGE_WELCOME=en
+    export SELECTED_EOS_LANGUAGE=en
     if [ "$lang" != "en" ] ; then
         case "$tr_prefer" in
             manual)
                 trlist=(
-                    "$trdir/translations-welcome-"$lang".bash"
-                    "$trdir2/translations-welcome-"$lang"-generated.bash"
+                    "$trdir/translation-"$lang".bash"
+                    "$trdir2/translation-"$lang"-generated.bash"
                 )
                 ;;
             generated)
                 trlist=(
-                    "$trdir2/translations-welcome-"$lang"-generated.bash"
-                    "$trdir/translations-welcome-"$lang".bash"
+                    "$trdir2/translation-"$lang"-generated.bash"
+                    "$trdir/translation-"$lang".bash"
                 )
                 ;;
         esac
@@ -228,7 +229,7 @@ _init_translations() {
         for trfile in "${trlist[@]}" ; do
             if [ -r "$trfile" ] ; then
                 #echo "$trfile" >&2
-                export SELECTED_LANGUAGE_WELCOME="$lang"
+                export SELECTED_EOS_LANGUAGE="$lang"
                 source "$trfile"
                 selected=1
                 if [ "$tr_prefer" = "manual" ] ; then
@@ -241,12 +242,12 @@ _init_translations() {
         done
 
         if [ $selected -eq 0 ] ; then
-            echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_LANGUAGE_WELCOME'." >&2
+            echo "Warning: $pname: no translations file for language '$lang' - falling back to '$SELECTED_EOS_LANGUAGE'." >&2
             silent_lang_warnings=yes   # give no more warnings about this language...
         fi
     fi
 
-    if [ "$SELECTED_LANGUAGE_WELCOME" != "en" ] ; then
+    if [ "$SELECTED_EOS_LANGUAGE" != "en" ] ; then
         # Check we have all strings translated. Copy the missing strings from 'en'.
         for ix in "${tr_indexes[@]}" ; do
             xx="${tr_strings["Lang_${lang}__$ix"]}"
