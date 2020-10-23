@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip    "Montrez ce qu'il faut faire pour que votre sys
 _tr_add2 after_install_cdm       "Gestionnaire Sessions"
 _tr_add2 after_install_cdmtip    "Utiliser un gestionnaire de session graphique différent"
 
-_tr_add2 after_install_ew        "Fond d'écran EOS"
-_tr_add2 after_install_ewtip     "Remplacer le fond d'écran du bureau par celui d'EndeavourOS"
+_tr_add2 after_install_ew        "Fond d'écran EOS par défaut"
+_tr_add2 after_install_ewtip     "Remplacer le fond d'écran du bureau par celui d'EndeavourOS par défaut"
 
 
 _tr_add2 after_install_pm        "Gestion Paquets"
@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip     "Conseils pour le Bluetooth"
 _tr_add2 after_install_nv        "Utilisateurs NVIDIA $_exclamation"
 _tr_add2 after_install_nvtip     "Utiliser le gestionnaire d'installation NVIDIA"
 
-_tr_add2 after_install_ft        "Astuces Forum"
+_tr_add2 after_install_ft        "Forum"
 _tr_add2 after_install_fttip     "Aidez-nous à vous aider$_exclamation"
 
 
@@ -198,18 +198,18 @@ _tr_add2 after_install_us_fail   "La mise à jour a échoué $_exclamation"
 
 # 14-mai-2020 :
 
-_tr_add2 nb_tab_UsefulTips     "Trucs"
-_tr_add2 useful_tips_text      "Trucs utiles"
+_tr_add2 nb_tab_UsefulTips     "Astuces"
+_tr_add2 useful_tips_text      "Astuces utiles"
 
 # 16-mai-2020 :
 
 _tr_add2 butt_changelog        "Changements"
-_tr_add2 butt_changelogtip     "Affiche les changements de Welcome"
+_tr_add2 butt_changelogtip     "Affiche les changements de l'application Welcome"
 
-_tr_add2 after_install_themevan      "Thème original de Xfce"
+_tr_add2 after_install_themevan      "Thème original Xfce"
 _tr_add2 after_install_themevantip   "Utiliser le thème original de Xfce"
 
-_tr_add2 after_install_themedef     "Thème d'EndeavourOS pour Xfce"
+_tr_add2 after_install_themedef     "Thème EOS Xfce"
 _tr_add2 after_install_themedeftip  "Utiliser le thème d'EndeavourOS pour Xfce"
 
 # 28-juin-2020:
@@ -223,7 +223,7 @@ _tr_add2 nb_tab_owncmds_text        "Commandes personnelles ajoutées"
 # 08-juillet-2020:
 _tr_add2 nb_tab_owncmdstip          "Aide pour l'ajout de commandes personnelles"
 
-_tr_add2 add_more_apps_akm          "Gestionnaire de noyaux"
+_tr_add2 add_more_apps_akm          "Gestionnaire noyaux"
 _tr_add2 add_more_apps_akmtip       "Un petit gestionnaire de noyaux linux et une source d'informations"
 
 # 15-juillet-2020:
@@ -234,11 +234,11 @@ _tr_add2 butt_owncmds_dnd         "Commandes personnelles tirer${_and}glisser"
 _tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer les items pour les nouveaux boutons"
 
 # 03-septembre-2020:
-_tr_add2 ins_reso                 "Changer la résolution d'affichage"
+_tr_add2 ins_reso                 "Changer résolution affichage"
 _tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant"
 
 # 08-septembre-2020:
-_tr_add2 add_more_apps_arch          "Parcourir tous les paquets Arch"
+_tr_add2 add_more_apps_arch          "Parcourir paquets Arch"
 _tr_add2 add_more_apps_aur           "Parcourir tous les paquets AUR"
 _tr_add2 add_more_apps_done1_text    "Suggestions d'applications déjà installées$_exclamation"
 _tr_add2 add_more_apps_done2_text    "\n\nVous pouvez aussi parcourir tous les paquets d'Arch et d'AUR packages (et les installer dans un terminal).\n"
@@ -246,5 +246,13 @@ _tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 
 _tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
 
 # 11-septembre-2020:
-_tr_add2 after_install_ew2      "Fonds d'écran EndeavourOS (choix)"
+_tr_add2 after_install_ew2      "Choisir un des fonds d'écran EOS"
 _tr_add2 after_install_ewtip2   "Choisir parmi les fonds d'écran d'EndeavourOS"
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "vérification de la mise à jour"
+_tr_add2 updt_searching           "En train de rechercher"
+_tr_add2 updt_for_updates         "pour les mises à jour"
+_tr_add2 updt_failure             "échec$_exclamation"
+_tr_add2 updt_nothing_todo        "il n'y a rien à faire"
+_tr_add2 updt_press_enter         "Presser ENTRÉE pour fermer cette fenêtre"
