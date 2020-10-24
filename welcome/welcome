@@ -1115,7 +1115,7 @@ AddMoreApps() {
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
   else
-      tabcontents+=(--text="<b>$(ltr add_more_apps_text).$(ltr add_more_apps_done2_text)</b>")
+      tabcontents+=(--text="<b>$(ltr add_more_apps_text) $(ltr add_more_apps_done2_text)</b>")
   fi
 
   _align_buttons_on_tab tabcontents "$handle"
