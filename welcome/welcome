@@ -1244,14 +1244,28 @@ SetBrowser() {
 }
 export -f SetBrowser
 
+CalculateMaxButtonNameLength() {
+    local conf="$HOME/.config/welcome.conf"
+    local translation_version="$(pacman -Q eos-translations | awk '{print $2}')"
+    if [ -r "$conf" ] ; then
+        source $conf                           # has: ConfVersion, MaxButtonNameLength
+        if [ "$ConfVersion" = "$translation_version" ] ; then
+            max_button_name_length="$MaxButtonNameLength"
+            return
+        fi
+    fi
+    local ix=1 xx
+    for xx in "${_NOTEBOOK_TABS[@]}" ; do
+        $xx "calculate" "$((ix++))"
+    done
+    printf "local ConfVersion=$translation_version\nlocal MaxButtonNameLength=$max_button_name_length\n" > "$conf"
+}
+
 PrepareTabs() {
     local handle="$1"
     local xx ix
 
-    ix=1
-    for xx in "${_NOTEBOOK_TABS[@]}" ; do
-        $xx "calculate" "$((ix++))"
-    done
+    CalculateMaxButtonNameLength
 
     ix=1
     for xx in "${_NOTEBOOK_TABS[@]}" ; do
