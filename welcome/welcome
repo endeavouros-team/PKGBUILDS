@@ -128,22 +128,30 @@ export -f eos_yad_WARN_debug
 
 _align_buttons_on_tab() {
     local -n arr="$1"
-    local ix count="${#arr[@]}" xx name newname len=0 le pad tmpname
+    local handle="$2"
+    local ix xx name newname len=0 le pad tmpname
 
-    for xx in "${arr[@]}" ; do
-        case "$xx" in
-            --field=*)
-                name="${xx/*_align(/}"                # remove from left of name
-                if [ "$name" != "$xx" ] ; then
-                    name="${name/)!*/}"               # remove from right of name
-                    le=${#name}
-                    test $le -gt $len && len=$le
-                fi
-                ;;
-        esac
-    done
+    if [ "$handle" = "calculate" ] ; then
+        for xx in "${arr[@]}" ; do
+            case "$xx" in
+                --field=*)
+                    name="${xx/*_align(/}"                # remove from left of name
+                    if [ "$name" != "$xx" ] ; then
+                        name="${name/)!*/}"               # remove from right of name
+                        le=${#name}
+                        test $le -gt $len && len=$le
+                    fi
+                    ;;
+            esac
+        done
 
-    # now we know $len
+        # now we know $len
+
+        [ $max_button_name_length -lt $len ] && max_button_name_length=$len
+        return
+    fi
+
+    len=$max_button_name_length
 
     ix=0
     for xx in "${arr[@]}" ; do
@@ -166,7 +174,8 @@ _align_buttons_on_tab() {
                         tmpname="${tmpname/&#???;/}"
                     done
 
-                    newname="<tt> $name$(printf '%*s' $pad)</tt>"
+                    newname="$name$(printf '%*s' $pad)"
+                    newname="$(printf '<tt> %-s</tt>' "$newname")"
                     xx="${xx/_align($name)!/$newname!}"
                     arr[$ix]="$xx"
                 fi
@@ -910,9 +919,9 @@ INSTALL() {
       --field="_align($(ltr ins_trouble))!$user_info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
   )
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 
   # could use 'gparted' as the icon for gparted...
 }
@@ -936,9 +945,9 @@ GeneralInfo() {
       --field="_align($(ltr general_info_ab))!$user_info!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
   )
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 RunIfInstalled() {
@@ -1006,9 +1015,9 @@ AfterInstall() {
         ;;
   esac
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 UsefulTips() {
@@ -1034,9 +1043,9 @@ UsefulTips() {
       --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 AddMoreApps() {
@@ -1097,11 +1106,11 @@ AddMoreApps() {
   esac
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
-      tabcontents+=(--field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinuxarm.org/packages")
+      tabcontents+=(--field="_align($(ltr add_more_apps_arch))!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinuxarm.org/packages")
   else
-      tabcontents+=(--field="$(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages")
+      tabcontents+=(--field="_align($(ltr add_more_apps_arch))!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages")
   fi
-  tabcontents+=(--field="$(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages")
+  tabcontents+=(--field="_align($(ltr add_more_apps_aur))!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages")
 
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
@@ -1109,9 +1118,9 @@ AddMoreApps() {
       tabcontents+=(--text="<b>$(ltr add_more_apps_text).$(ltr add_more_apps_done2_text)</b>")
   fi
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 OwnCommands() {
@@ -1154,9 +1163,9 @@ OwnCommands() {
   fi
   tabcontents+=("${welcome_own_commands[@]}")
 
-  _align_buttons_on_tab tabcontents
+  _align_buttons_on_tab tabcontents "$handle"
 
-  "${tabcontents[@]}" >& /dev/null &
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 About() {
@@ -1238,6 +1247,12 @@ export -f SetBrowser
 PrepareTabs() {
     local handle="$1"
     local xx ix
+
+    ix=1
+    for xx in "${_NOTEBOOK_TABS[@]}" ; do
+        $xx "calculate" "$((ix++))"
+    done
+
     ix=1
     for xx in "${_NOTEBOOK_TABS[@]}" ; do
         $xx "$handle" "$((ix++))"
@@ -1464,6 +1479,7 @@ StartHere() {
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
+    local max_button_name_length=0
 
     # common button icons
     local user_info="$(eos-FindAppIcon user-info)"
