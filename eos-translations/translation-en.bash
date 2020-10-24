@@ -241,7 +241,7 @@ _tr_add2 ins_resotip              "Change display resolution now"
 _tr_add2 add_more_apps_arch          "Browse all Arch packages"
 _tr_add2 add_more_apps_aur           "Browse all AUR packages"
 _tr_add2 add_more_apps_done1_text    "Suggested apps already installed$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nYou may also Browse all Arch and AUR packages (and install them using terminal).\n"
+_tr_add2 add_more_apps_done2_text    "or browse all Arch and AUR packages"
 _tr_add2 add_more_apps_done2_tip1    "To install, use 'pacman' or 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "To install, use 'yay'"
 
@@ -263,3 +263,7 @@ _tr_add2 updt_for_updates         "for updates"
 _tr_add2 updt_failure             "failure$_exclamation"
 _tr_add2 updt_nothing_todo        "there is nothing to do"
 _tr_add2 updt_press_enter         "Press ENTER to close this window"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'

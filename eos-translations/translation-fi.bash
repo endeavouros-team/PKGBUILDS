@@ -241,7 +241,7 @@ _tr_add2 ins_resotip              "Vaihda näytön tarkkuus nyt"
 _tr_add2 add_more_apps_arch          "Selaa kaikkia Arch-sovelluksia"
 _tr_add2 add_more_apps_aur           "Selaa kaikkia AUR-sovelluksia"
 _tr_add2 add_more_apps_done1_text    "Ehdotetut sovellukset on jo asennettu$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nVoit myös selata kaikkia Arch- ja AUR-sovelluksia (ja asentaa erikseen päätteessä).\n"
+_tr_add2 add_more_apps_done2_text    "tai selaa kaikkia Arch- ja AUR-sovelluksia"
 _tr_add2 add_more_apps_done2_tip1    "Käytä asentamiseen ohjelmaa 'pacman' tai 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "Käytä asentamiseen ohjelmaa 'yay'"
 
@@ -263,3 +263,7 @@ _tr_add2 updt_for_updates         "päivityksiä"
 _tr_add2 updt_failure             "virhe$_exclamation"
 _tr_add2 updt_nothing_todo        "ei mitään tehtävää"
 _tr_add2 updt_press_enter         "Paina ENTER-näppäintä sulkeaksesi tämän ikkunan"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
