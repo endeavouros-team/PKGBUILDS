@@ -1419,7 +1419,7 @@ UpdateInstallScripts() {
         # the files below are needed only for installing
     fi
 
-    local URL=https://github.com/endeavouros-team/install-scripts/raw/master
+    local URL=https://raw.githubusercontent.com/endeavouros-team/install-scripts/master
     local scripts=(                        # may need to adjust files ...
         calamares_switcher
         chrooted_cleaner_script.sh
