@@ -255,3 +255,15 @@ _tr_add2 after_install_ewtip2     "Výber pozadí"                         # was
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "skontrolovať aktualizácie"
+_tr_add2 updt_searching           "Vyhľadávanie"
+_tr_add2 updt_for_updates         "za aktualizáciámi"
+_tr_add2 updt_failure             "zlyhanie$_exclamation"
+_tr_add2 updt_nothing_todo        "nieje potrebné vykonať nič"
+_tr_add2 updt_press_enter         "Toto okno zavriete klávesou ENTER"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
