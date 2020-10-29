@@ -3,14 +3,15 @@
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
 pkgver=1.5.4
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
   bash yad reflector whois geoip bind-tools
 )
 
-url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
   $url/$pkgname
