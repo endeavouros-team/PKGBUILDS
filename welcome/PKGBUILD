@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=3.7.3
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -16,7 +16,9 @@ optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
   'reflector-simple: for the Update Mirrors button'
 )
-url="https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname"
+
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 # backup=(etc/eos-script-lib-yad.conf)
 
