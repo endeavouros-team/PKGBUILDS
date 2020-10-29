@@ -21,7 +21,7 @@ Main()
     fi
     local new=$(mktemp)
     local cur_ml=$(mktemp)
-    local url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname/$pkgname"
+    local url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname"
 
     wget -q --timeout=5 -O $cur_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
     rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new
