@@ -3,10 +3,12 @@
 pkgname=endeavouros-mirrorlist
 _reponame=endeavouros-mirrorlist
 pkgver=3.2
-pkgrel=1
+pkgrel=2
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
-url="https://github.com/endeavouros-team"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+
 license=('GPL3')
 options=(!strip !emptydirs)
 backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
@@ -14,8 +16,7 @@ backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
 conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
-# https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-mirrorlist/endeavouros-mirrorlist
-source=("$url/PKGBUILDS/raw/master/$_reponame/$pkgname")
+source=($url/$pkgname)
 sha512sums=('4523daa4682dde2294ba829c0a362189d7b654b259242e887a371d6335170fc841a48196a8eb727442bf1933a330cea52d3336918b1b8a22cb460abb43951919')
 
 package() {
