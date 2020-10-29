@@ -217,7 +217,7 @@ Update_common() {
                 eos_yad2 --form \
                          --title="EndeavourOS update notifier" --text="$msg" \
                          --timeout=10 --timeout-indicator=left \
-                         --image=info --width=350 --no-focus \
+                         --image=dialog-information --width=350 --no-focus \
                          --button=yad-quit:0
             else
                 echo "$msg" | \
