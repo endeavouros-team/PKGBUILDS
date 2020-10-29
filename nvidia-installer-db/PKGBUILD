@@ -3,9 +3,10 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.4.9
-pkgrel=1
+pkgrel=2
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
-url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 arch=('any')
 license=('GPL2')
 
