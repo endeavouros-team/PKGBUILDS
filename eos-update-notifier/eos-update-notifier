@@ -354,7 +354,7 @@ CheckInternetConnection() {
 
 Initialize() {    # initialize service and timer for the current user
 
-    local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/$progname
+    local url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$progname
     local modify_service=0
     local fetch_files=0
 
@@ -565,7 +565,6 @@ Main()
                 ;;
             --changelog)
                 xdg-open https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname
-                #wget -q -O- https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-update-notifier/changelog.md
                 return
                 ;;
             -iw=*)
