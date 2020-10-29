@@ -3,14 +3,15 @@
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
 pkgver=1.1.1
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(bash)
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
 )
-url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
   $url/translations.bash
