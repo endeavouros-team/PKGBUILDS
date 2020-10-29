@@ -3,12 +3,13 @@
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
 pkgver=1.4.4
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(grub os-prober lsb-release)
 
-url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
   $url/grub-update-after-kernel.hook    # Automatically updates grub.cfg after a kernel is installed/uninstalled.
