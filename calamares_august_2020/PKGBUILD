@@ -5,7 +5,7 @@ pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.32.1
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -149,7 +149,7 @@ prepare() {
     # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
 
     sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
-    sed -i "s?pacman_flags,?pacman_flags, "--needed",?" $_reponame/src/modules/packages/main.py
+    sed -i "s?pacman_flags,?pacman_flags, \"--needed\",?" $_reponame/src/modules/packages/main.py
 
 
 }
