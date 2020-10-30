@@ -1,26 +1,28 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
 
-pkgbase=endeavouros-keyring
-pkgname=("$pkgbase")
-destdir=/usr/share/pacman/keyrings
+pkgname=endeavouros-keyring
 pkgver=1
-pkgrel=4
+pkgrel=5
 pkgdesc="EndeavourOS keyring"
 arch=('any')
-url="https://github.com/endeavouros-team"
+# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 license=('GPL3')
-source=("https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-keyring/endeavouros-keyring.install"
-        "https://github.com/endeavouros-team/PKGBUILDS/raw/master/endeavouros-keyring/endeavouros.gpg")
 
-sha256sums=('SKIP'
-            'SKIP')
+install=$pkgname.install
+[ -r $install ] || curl -o $install -s --max-time 30 $url/$install
 
-install=$pkgbase.install
+source=(
+  $url/endeavouros.gpg
+  $url/$install
+)
+
+sha512sums=('53a4fa6595d86df7ccf024df0a79c1969b47758c4170685935484f7594a61a100b7024b8ad8b118254cf71453c2e3097a7da2fde52095aa3759fec16eab9ae80'
+            'd0fcd2fdabd610c2c656ae71d61780a3d69ec0cb2f30952af7658d8a9a50fe366d15b1ccfcd2d74675dfbcade143f593b91437ed3a9071f9eb3d0b94eb61ac54')
 
 package() {
-    mkdir -p ${pkgdir}/$destdir
-    cd ..
-    mv endeavouros.gpg ${pkgdir}/$destdir
-    install -dm 755 "${pkgdir}/$destdir"
+    local destdir=usr/share/pacman/keyrings
 
+    install -d $pkgdir/$destdir
+    install -Dm644 endeavouros.gpg $pkgdir/$destdir/endeavouros.gpg
 }
