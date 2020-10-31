@@ -583,6 +583,10 @@ MirrorCheck() {
     fi
 }
 
+TimeStamp() {
+    date +%Y%m%d-%H:%M:%S
+}
+
 Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
@@ -730,7 +734,6 @@ Main2()
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
         if [ $(vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
-            echo2 "building '$pkgdirname' ..."
 
             # old pkg
             pkgname="$(PkgBuildName "$pkgdirname")"
@@ -746,8 +749,13 @@ Main2()
                 }
             done
 
+            echo2 "$(TimeStamp): building '$pkgdirname' ..."
+
             # new pkg
             pkg="$(Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname")"
+
+            echo2 "$(TimeStamp): '$pkgdirname' built."
+
             case "$pkg" in
                 "") DIE "$pkgdirname: build failed" ;;
                 *)  built+=("$pkg")               ;;
