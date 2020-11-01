@@ -2,8 +2,8 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=1.8.10
-pkgrel=3
+pkgver=1.8.11
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(bash eos-bash-shared pacman-contrib wget xdg-utils yad yay)
@@ -30,7 +30,7 @@ sha512sums=('4ac7ccdab78d1751b98e81fed18c4dc407fa9cf7becf8545060dddc1d7128cfc0fd
             'b1d371cf840e6e2c463be5ae7fbfc150c327cd067f82ca4ccdcbab8c8dc8f019ecc0ec001a805d78ba3bb55bb58854ff31ea76de54eea6cbb76111fba9d5a3ff'
             '46b8363fc32276fbba0fc98ec95076b6db190622e9feca281e4d05f85b2249a4653c1e7d6779a96bb242f2fa30016d61b8b5f76ac0beb032041ce39fe70f874f'
             'c7f0d38a1a67164bd14c76c672467c6fe962558f06c6e4f14763a39cbf5b975380d2a5fb0b44a4bfdbffb4a8c61d98f7c62b7a15c3539aa706e7b4c710db840b'
-            'b6aad64f265cb6c203928df31bcd6a4b252532a6264e8702f5bac13bfeacfef323aa48ef0f0f550f45ade66c08de449279f7f2572b0b67121e01341759a3659e'
+            '8c3a3305aa7d467ab10486c5ba8917a99f22b10918c704cb1e6abf8f504afb4a196bcfa51691a92dccc0ea3f85d7eb40eb9927e1836722b3b2dcad81dc183ce1'
             '14a8b30e15231456ec68d0f6ec42d1fffec3dddd20f7638ffbb8640b2d52424b7e234de7dfca4fca5948df4a233e6308d32670610ab19fc6064db0ab95ab3f84'
             'd0a67db74a020f94f72cca002b7b37c11d4dbe5a703c2259f804a53d00a361b94120c7bcc77d2532dd19ba40c5c89aacb489f05ec2734b570ad5c0c2988a3cba'
             '47dc0b096cebee56e056c6c6996268b5495b70e027922abfcf2b5d003d2988f2cc80a63c00fae893eb916cfe28623795bd2264ddd212b0faf576179ea9ab3a35'

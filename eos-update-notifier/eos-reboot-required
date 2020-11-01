@@ -7,7 +7,7 @@
 _other_reboot_required() {
     local xx
 
-    for xx in "$DISPLAY" "$DESKTOP_SESSION" "$XDG_CURRENT_DESKTOP" ; do
+    for xx in "$DESKTOP_SESSION" "$XDG_CURRENT_DESKTOP" ; do
         if [ -n "$xx" ] ; then
             break
         fi
