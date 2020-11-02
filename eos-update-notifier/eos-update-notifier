@@ -187,7 +187,8 @@ Update_common() {
 
     if [ "$CheckAurUpdates" = "yes" ] ; then
         SystemLockActive c || return
-        updates="$(/usr/bin/yay -Qua)"
+        echo2 "Checking AUR updates ..."
+        updates="$(/usr/bin/$AurUpdaterProg -Qua)"
     else
         updates=""
     fi
@@ -197,12 +198,12 @@ Update_common() {
             ShowNonFocused AUR || return 1
             SystemLockActive d || return
             if [ "extra_check" = "yes" ] ; then
-                updates="$(/usr/bin/yay -Qua)"    # may have been a long wait...
+                updates="$(/usr/bin/$AurUpdaterProg -Qua)"    # may have been a long wait...
             fi
         fi
         if [ -n "$updates" ] ; then              # some other process may have updated!
             ((hasupdates++))
-            cmd="/usr/bin/yay -Syua"                                        # potential problem for non-sudoers ...
+            cmd="/usr/bin/$AurUpdaterProg -Syua"                                        # potential problem for non-sudoers ...
             source=AUR
             eos_un_log "$source updates available: $updates"
             eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
@@ -280,6 +281,8 @@ Main2() {
     local CheckAurUpdates=yes
     local system_lockfile=/var/lib/pacman/db.lck
     local pids
+
+    local AurUpdaterProg=yay
 
     test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
 
