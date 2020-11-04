@@ -767,7 +767,7 @@ Main2()
             # new pkg
             pkg="$(Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname")"
 
-            echo2 "==> Build time: $(TimeStamp $buildStartTime)"
+            echo2 "==> $pkgname: build time: $(TimeStamp $buildStartTime)"
 
             case "$pkg" in
                 "") DIE "$pkgdirname: build failed" ;;
