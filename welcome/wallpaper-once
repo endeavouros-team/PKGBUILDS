@@ -3,7 +3,6 @@
 # EndeavourOS initial wallpaper installer for a user.
 #
 
-
 #################################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
 source $EOS_SCRIPTS_YAD || {
@@ -29,25 +28,19 @@ Main() {
     test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
 
     local DE="$(eos_yad_GetDesktopName)"
-    local confs=(
-        "$HOME/.config/EOS-initial-wallpaper.$DE"
-#        "$HOME/.config/EOS-initial-wallpaper.general"
-    )
-    local conf
+    local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
 
     case "$1" in
-        -r)  rm -f "${confs[@]}" ;;            # -r re-installs the default wallpaper now
-        -rr) rm -f "${confs[@]}" ; return ;;   # same as -r, but not now
+        -r)  /usr/bin/rm -f "$conf" ;;            # -r re-installs the default wallpaper now
+        -rr) /usr/bin/rm -f "$conf" ; return ;;   # same as -r, but not now
     esac
 
-    # Set default wallpaper only if no DE specific or general config file is found.
-    for conf in "${confs[@]}" ; do
-        [ -r "$conf" ] && return
-    done
+    # Set default wallpaper only if no DE specific config file is found.
+    [ -r "$conf" ] && return
 
     sleep 3
     eos-wallpaper-set DEFAULT
-    touch "${confs[0]}"
+    touch "$conf"
 }
 
 Main "$@"
