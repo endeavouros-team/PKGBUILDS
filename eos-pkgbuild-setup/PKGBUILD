@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=3.4.2
+pkgver=3.4.3
 pkgrel=1
 arch=(any)
 license=(GPL2)
