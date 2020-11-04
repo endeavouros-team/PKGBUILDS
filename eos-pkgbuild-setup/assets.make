@@ -584,7 +584,18 @@ MirrorCheck() {
 }
 
 TimeStamp() {
-    date +%Y%m%d-%H:%M:%S
+    local start_sec="$1"
+
+    case "$start_sec" in
+        "")
+            # return starting time
+            /usr/bin/date +%s
+            ;;
+        [0-9]*)
+            # return elapsed time
+            /usr/bin/date -u --date=@$start_sec '+%Hh %Mm %Ss'
+            ;;
+    esac
 }
 
 Usage() {
@@ -607,6 +618,8 @@ EOF
 Main2()
 {
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
+
+    local buildStartTime
 
     local cmd=""
     local xx yy zz
@@ -749,12 +762,12 @@ Main2()
                 }
             done
 
-            echo2 "$(TimeStamp): building '$pkgdirname' ..."
+            buildStartTime="$(TimeStamp)"
 
             # new pkg
             pkg="$(Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname")"
 
-            echo2 "$(TimeStamp): '$pkgdirname' built."
+            echo2 "==> Build time: $(TimeStamp $buildStartTime)"
 
             case "$pkg" in
                 "") DIE "$pkgdirname: build failed" ;;
