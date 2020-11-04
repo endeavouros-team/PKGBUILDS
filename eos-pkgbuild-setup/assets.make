@@ -593,7 +593,7 @@ TimeStamp() {
             ;;
         [0-9]*)
             # return elapsed time
-            /usr/bin/date -u --date=@$start_sec '+%Hh %Mm %Ss'
+            /usr/bin/date -u --date=@$(($(TimeStamp) - start_sec)) '+%Hh %Mm %Ss'
             ;;
     esac
 }
