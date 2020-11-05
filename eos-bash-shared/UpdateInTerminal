@@ -62,7 +62,7 @@ Main() {
 
     if [ "$checkAur" = "yes" ] ; then
         echo2 "AUR $(ltr updt_update_check):"
-        yay -Syua
+        $EOS_AUR_HELPER -Sua
     fi
 }
 
