@@ -282,7 +282,8 @@ Main2() {
     local system_lockfile=/var/lib/pacman/db.lck
     local pids
 
-    local AurUpdaterProg=yay
+    local AurUpdaterProg="$EOS_AUR_HELPER"
+    [ -n "$AurUpdaterProg" ] || AurUpdaterProg=yay
 
     test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
 
