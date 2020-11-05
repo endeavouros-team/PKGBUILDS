@@ -563,7 +563,7 @@ Main()
                 return
                 ;;
             -show-timer | --show-timer)
-                systemctl --user status eos-update-notifier.timer | cat -
+                RunInTerminal "systemctl --user status eos-update-notifier.timer | cat -"
                 return
                 ;;
             --changelog)
