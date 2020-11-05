@@ -613,7 +613,7 @@ _xx_main() {
   local updates="\$(checkupdates)"
   test -n "\$updates" && {
       echo "\$updates"
-      yay -Syu # --noconfirm
+      $EOS_AUR_HELPER -Syu # --noconfirm
   } || {
       echo "$SYSUP_NO"
   }
@@ -637,8 +637,8 @@ yad_SystemUpdate() {
                 action="$EOS_ROOTER 'pacman -Syu'"
                 ;;
             AUR)
-                updates="$(yay -Qua)"
-                action="yay -Syua"
+                updates="$($EOS_AUR_HELPER -Qua)"
+                action="$EOS_AUR_HELPER -Sua"
                 ;;
         esac
         if [ -n "$updates" ] ; then
