@@ -40,9 +40,11 @@ Main() {
     local checkArchEos=yes
     local checkAur=yes
     local lang=""
-
     local progname="$(basename "$0")"
     local upname="Arch & EndeavourOS"
+    local aur_helper="$EOS_AUR_HELPER"
+
+    [ -n "$aur_helper" ] || aur_helper=yay
 
     Options "$@" || return
 
@@ -62,7 +64,7 @@ Main() {
 
     if [ "$checkAur" = "yes" ] ; then
         echo2 "AUR $(ltr updt_update_check):"
-        $EOS_AUR_HELPER -Sua
+        $aur_helper -Sua
     fi
 }
 
