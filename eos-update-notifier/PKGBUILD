@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=1.9.2
+pkgver=1.9.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -19,8 +19,6 @@ source=(
   $url/$pkgname.conf
   $url/arch-news-for-you
   $url/eos-arch-news
-  $url/eos-reboot-required
-  $url/eos-reboot-required.hook
   $url/$pkgname.desktop
   $url/$pkgname.timer
   $url/$pkgname.service
@@ -31,8 +29,6 @@ sha512sums=('dfecd8d9680342e9a9dff242ce1d41127ad9a6bd4cda603eb1bf6200f2f8cff7d64
             '258cfb39c54ccb7fab98e56583e185b2d8c1cfb2ae43346bc0c99b86477ed831aae0b9ac21ef8c76cacd55e750fda120c560d36f263d3700c96ee3758933b608'
             '46b8363fc32276fbba0fc98ec95076b6db190622e9feca281e4d05f85b2249a4653c1e7d6779a96bb242f2fa30016d61b8b5f76ac0beb032041ce39fe70f874f'
             'c7f0d38a1a67164bd14c76c672467c6fe962558f06c6e4f14763a39cbf5b975380d2a5fb0b44a4bfdbffb4a8c61d98f7c62b7a15c3539aa706e7b4c710db840b'
-            '8c3a3305aa7d467ab10486c5ba8917a99f22b10918c704cb1e6abf8f504afb4a196bcfa51691a92dccc0ea3f85d7eb40eb9927e1836722b3b2dcad81dc183ce1'
-            '14a8b30e15231456ec68d0f6ec42d1fffec3dddd20f7638ffbb8640b2d52424b7e234de7dfca4fca5948df4a233e6308d32670610ab19fc6064db0ab95ab3f84'
             'd0a67db74a020f94f72cca002b7b37c11d4dbe5a703c2259f804a53d00a361b94120c7bcc77d2532dd19ba40c5c89aacb489f05ec2734b570ad5c0c2988a3cba'
             '47dc0b096cebee56e056c6c6996268b5495b70e027922abfcf2b5d003d2988f2cc80a63c00fae893eb916cfe28623795bd2264ddd212b0faf576179ea9ab3a35'
             '0bdcd09c69e1fb9d7e28a9155e90c6c632c506d619685b8a8a417dd737d240a96cce77b3231a4644e9f79de9e7b3a0048d299476ad0c78076528c5389641af31'
@@ -47,10 +43,6 @@ package() {
   install -Dm755 arch-news-for-you         $pkgdir/usr/bin/arch-news-for-you
   install -Dm755 eos-arch-news             $pkgdir/usr/bin/eos-arch-news
   install -Dm755 checkupdatesext           $pkgdir/usr/bin/checkupdatesext
-
-  install -d $pkgdir/etc/pacman.d/hooks
-  install -Dm644 eos-reboot-required.hook  $pkgdir/etc/pacman.d/hooks/eos-reboot-required.hook
-  install -Dm755 eos-reboot-required       $pkgdir/usr/bin/eos-reboot-required
 
   install -d $pkgdir/usr/share/bash-completion/completions
   install -Dm644 $pkgname.completion $pkgdir/usr/share/bash-completion/completions/$pkgname
