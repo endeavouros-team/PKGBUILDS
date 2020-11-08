@@ -241,7 +241,7 @@ _tr_add2 ins_resotip              "Teraz zmeniť rozlíšenie displeja"
 _tr_add2 add_more_apps_arch       "Prehľadávať medzi všetkými Arch balíkmi"
 _tr_add2 add_more_apps_aur        "Prehľadávať medzi všetkými AUR balíkmi"
 _tr_add2 add_more_apps_done1_text "Navrhované balíky sú už nainštalované$_exclamation"
-_tr_add2 add_more_apps_done2_text "\n\nMôžete tiež prehliadať všetky Arch a AUR balíky (a inštalovať ich pomocou terminálu).\n"      
+_tr_add2 add_more_apps_done2_text "\n\nAlebo prehľadávať všetky Arch a AUR balíčky\n"      
 _tr_add2 add_more_apps_done2_tip1    "Pre inštaláciu použite 'pacman', alebo 'yay'"     
 _tr_add2 add_more_apps_done2_tip2    "Pre inštaláciu použite 'yay'"
 
