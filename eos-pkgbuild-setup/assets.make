@@ -139,8 +139,17 @@ PkgBuildName()
 PkgBuildVersion()
 {
     local pkgdirname="$1"
-    source "$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
-    echoreturn "${pkgver}-$pkgrel"
+    local srcfile="$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
+
+    if [ ! -r "$srcfile" ] ; then
+        DIE "'$srcfile' does not exist."
+    fi
+    source "$srcfile"
+    if [ -n "$epoch" ] ; then
+        echoreturn "$epoch:${pkgver}-$pkgrel"
+    else
+        echoreturn "${pkgver}-$pkgrel"
+    fi
 }
 
 LocalVersion()
