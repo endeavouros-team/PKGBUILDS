@@ -239,6 +239,41 @@ yad_calamares() {
                     *) eos_yad_WARN_debug "Stopping $FUNCNAME (2)." ; return 1 ;;
                 esac
                 ;;
+            4)
+                # same as 3, but added support for enable/disable autolocation
+                local autolocation=""
+                local retval result choosecmd
+                choosecmd=(
+                    eos_yad
+                    --form --title="$CAL_CHOOSE" --image=dialog-question
+                    --text="$t1$t2$t3$t4" --buttons-layout=spread
+                    --button='Offline!!EOS Xfce theming, internet not required':20
+                    --button='Online!!Vanilla DE theming, internet required':10
+                )
+                choosecmd+=(
+                    # enable or disable usage of automatic location
+                    --field="Automatic location detection!!Used for ranking mirrors":CHK "FALSE"
+                )
+                result=$("${choosecmd[@]}")
+                retval=$?
+                case "$retval" in
+                    20) answer="offline" ;;
+                    10) answer="online" ;;
+                    *) eos_yad_WARN_debug "Stopping $FUNCNAME (2)." ; return 1 ;;
+                esac
+                autolocation=$(echo "$result" | cut -d '|' -f 1)
+
+                case "$autolocation" in
+                    TRUE|FALSE)
+                        local EOS_WELCOME2CALAMARES=/home/$EOS_LIVEUSER/.welcome2calamares.conf
+                        if [ -d /home/$EOS_LIVEUSER ] ; then
+                            echo "autolocation=$autolocation" > $EOS_WELCOME2CALAMARES
+                        else
+                            echo "autolocation=$autolocation" > $HOME/$(basename $EOS_WELCOME2CALAMARES)
+                        fi
+                        ;;
+                esac
+                ;;
         esac
 
         test -n "$answer" || return 1
@@ -273,6 +308,10 @@ yad_calamares() {
         # this 'if' could be removed
         eos_yad_WARN_debug "Stopping $FUNCNAME (5)."
         return
+    fi
+    if [ ! -x $prog ] ; then
+        eos_yad_WARN_debug "Stopping $FUNCNAME (6)."
+        return 1
     fi
 
     case "$mode" in
@@ -1635,6 +1674,12 @@ StartHere() {
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
     fi
     notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
+
+    if [ 0 -eq 1 ] ; then
+        # TESTING !!!
+        yad_calamares choose
+        return
+    fi
 
     "${notebook[@]}"
 
