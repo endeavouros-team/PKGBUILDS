@@ -23,6 +23,7 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
     aur/arc-x-icons-theme
+    aur/ckbcomp
     aur/downgrade
     aur/inxi
     aur/mkinitcpio-openswap
@@ -70,9 +71,7 @@ _common_show_version() {
 
 _Updpkgsums() {
     local Pkgbuild="$1"
-    pushd "$(dirname "$Pkgbuild")" >/dev/null
-    updpkgsums 2>/dev/null
-    popd >/dev/null
+    updpkgsums "$Pkgbuild" 2>/dev/null
 }
 
 _Get_pkgver() {
@@ -80,6 +79,51 @@ _Get_pkgver() {
     grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2 | sed "s|^[\"']\(.*\)[\"']$|\1|"
 }
 
+_GetSource0() {
+    local Pkgbuild="$1"
+    source "$Pkgbuild"
+    echo "${source[0]}"
+}
+
+_ckbcomp_hook() {
+    local tool=ckbcomp
+    local Dstdir="$PKGBUILD_ROOTDIR"/$tool
+    local Pkgbuild="$Dstdir"/PKGBUILD
+    local Url="$(_GetSource0 "$Pkgbuild")"
+    Url="$(dirname "$Url")"
+    local newinfo="$(wget -q -O- "$Url")"
+    local newbase=console-setup_
+    local newver="$(echo "$newinfo" | grep $newbase | grep "\.tar\.xz" | tail -n 1 | sed "s|^.*\"$newbase\([0-9\.]*\)\.tar.*$|\1|")"
+    local curver="$(_Get_pkgver "$Pkgbuild")"
+    local filebase=$newbase$newver
+
+    if [ "$newver" != "$curver" ] ; then
+        local ff
+        for ff in dsc tar.xz ; do
+            wget -q -O "$Dstdir/$filebase.$ff" "$Url"/$filebase.$ff || {
+                echo "Error: $tool: fetching $filebase.$ff failed." >&2
+                return 1
+            }
+        done
+        local sha256="$(cat "$Dstdir/$filebase.dsc" | grep -A1 ^Checksums-Sha256 | tail -n 1 | awk '{print $1}')"
+        echo "$sha256  $Dstdir/$filebase.tar.xz" | sha256sum -c >& /dev/null || {
+            echo "Error: $tool: sha256 for $filebase.tar.xz does not match!" >&2
+            return 1
+        }
+        rm -f "$Dstdir/$filebase.dsc"
+        sed -i "$Pkgbuild" \
+            -e "s|^pkgver=.*|pkgver=$newver|" \
+            -e 's| cd console-setup$| cd console-setup-$pkgver|'
+        updpkgsums "$Pkgbuild" 2>/dev/null
+        echo -n "#" >&2
+    fi
+}
+
+_ckbcomp_hook_change_version_old() {
+    # change "$url" http to https
+    sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
+        -e 's|^url="http:|url="https:|'
+}
 
 _yay_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of yay from the developer
@@ -166,12 +210,6 @@ _downgrade_hook_check_latest() {
     _common_show_version
 }
 
-_ckbcomp_hook_change_version() {
-    # change "$url" http to https
-    sed -i "$PKGBUILD_ROOTDIR"/ckbcomp/PKGBUILD \
-        -e 's|^url="http:|url="https:|'
-}
-
 _kalu_hook_fix_files() {
     # fix kalu.install
     sed -i "$PKGBUILD_ROOTDIR"/kalu/kalu.install \
@@ -234,6 +272,7 @@ _welcome_hook_check_ksetwallpaper_py() {
 
 declare -A ASSET_PACKAGE_HOOKS
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
+ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
