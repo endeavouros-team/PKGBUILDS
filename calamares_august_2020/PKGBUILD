@@ -4,7 +4,7 @@
 pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.32
+pkgver=3.2.32.1
 pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
