@@ -5,7 +5,7 @@ pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.33
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -48,7 +48,6 @@ prepare() {
     sed -i 's?#  - luksopenswaphookcfg?  - luksopenswaphookcfg?' $_reponame/settings.conf
     sed -i 's?#  - grubcfg?  - grubcfg?' $_reponame/settings.conf
 
-    sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf
     # disable
     sed -i "s?- initramfs?#- initramfs?" $_reponame/settings.conf
 
@@ -63,6 +62,7 @@ prepare() {
 
     # offline
     sed -i "s?  - unpackfs?  - unpackfs\n  - get_root_username\n  - copy_kernel?" $_reponame/settings.conf_offline
+    sed -i "s?  - networkcfg?  - networkcfg\n  - packages?" $_reponame/settings.conf_offline
 
     #sed -i "s?  - users?  - removeuser\n  - users?" $_reponame/settings.conf_offline
     # 2 user instances at settings.conf, bypass the wrong one
@@ -72,6 +72,9 @@ prepare() {
     # 2 partition instances at settings.conf, bypass the wrong one
     sed -i "N;N;s?  - partition\n  - users?  - partition\n  - netinstall\n  - users?" $_reponame/settings.conf_online
     sed -i "s?  - unpackfs?  - pacstrap\n  - get_root_username?" $_reponame/settings.conf_online
+
+    sed -i '/- networkcfg/d' $_reponame/settings.conf_online
+    sed -i "s?  - localecfg?  - localecfg\n  - networkcfg\n  - packages?" $_reponame/settings.conf_online
 
     # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
