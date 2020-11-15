@@ -340,6 +340,24 @@ AddCountryNamesToMirrors() {
     rm -f $full_list
 }
 
+FindAvailableFont() {
+    local size="$1"
+    local font="Mono"   # fallback
+
+    if [ -r /usr/share/fonts/liberation/LiberationMono-Regular.ttf ] ; then
+        font="Liberation Mono"
+    elif [ -r /usr/share/fonts/TTF/DejaVuSansMono.ttf ] ; then
+        font"DejaVu Sans Mono"
+    elif [ -r /usr/share/fonts/noto/NotoSansMono-Regular.ttf ] ; then
+        font="Noto Sans Mono"
+    elif [ -r /usr/share/fonts/gsfonts/NimbusMonoPS-Regular.otf ] ; then
+        font="Nimbus Mono"
+    elif [ -r /usr/share/fonts/adobe-source-code-pro/SourceCodePro-Regular.otf ] ; then
+        font="Source Code Pro"
+    fi
+    echo "$font $size"
+}
+
 SaveMirrorlist() {
     grep "^Server = [hr]" $tmpfile >/dev/null || {
         echo "$progname: no mirrors found!" | \
@@ -348,10 +366,18 @@ SaveMirrorlist() {
     }
     AddCountryNamesToMirrors
 
-    local opts=(--width=750 --height=550 --title="New $ml")
-    opts+=(--button=yad-quit:1 --button=" Save to $ml!document-save":0)
+    local font="$(FindAvailableFont 10)"
+    local opts=(--text-info
+                --height=500
+                --title="New Arch mirrorlist"
+                --button=yad-quit:1 --button=" Save to $ml!document-save":0
+                --filename=$tmpfile
+               )
+    if [ -n "$font" ] ; then
+        opts+=(--fontname="$font")
+    fi
+    eos_yad "${opts[@]}"
 
-    cat $tmpfile | eos_yad --text-info "${opts[@]}"
     case "$?" in
         0) pkexec bash -c "cp $ml $ml.bak && cp $tmpfile $ml" && ShowMirrorlistSaved ;;
     esac
