@@ -22,7 +22,7 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
-    aur/ckbcomp
+#    aur/ckbcomp
     aur/mkinitcpio-openswap                         # openswap: EOS has a minor change
 
     calamares_offline_online
