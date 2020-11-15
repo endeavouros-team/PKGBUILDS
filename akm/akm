@@ -234,6 +234,8 @@ Main()
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
+        --button="Cancel!gtk-cancel!Change nothing":1
+        --button="Execute!system-run!Make your changes":0
     )
 
     for xx in "${functions[@]}" ; do
