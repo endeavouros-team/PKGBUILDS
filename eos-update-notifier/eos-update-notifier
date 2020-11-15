@@ -59,9 +59,30 @@ log2() {
     eos_un_log "$@"
 }
 
+FindAvailableFont() {
+    local size="$1"
+    local font="Mono"   # fallback
+
+    [ -n "$size" ] || size=10
+
+    if [ -r /usr/share/fonts/liberation/LiberationMono-Regular.ttf ] ; then
+        font="Liberation Mono"
+    elif [ -r /usr/share/fonts/TTF/DejaVuSansMono.ttf ] ; then
+        font"DejaVu Sans Mono"
+    elif [ -r /usr/share/fonts/noto/NotoSansMono-Regular.ttf ] ; then
+        font="Noto Sans Mono"
+    elif [ -r /usr/share/fonts/gsfonts/NimbusMonoPS-Regular.otf ] ; then
+        font="Nimbus Mono"
+    elif [ -r /usr/share/fonts/adobe-source-code-pro/SourceCodePro-Regular.otf ] ; then
+        font="Source Code Pro"
+    fi
+    echo "$font $size"
+}
+
 YadNonFocused() {
     local opts=(--no-focus --geometry=650x${height}+20+20 --title="Updates available!")
     opts+=(--button="Dismiss!!Don't update, just close this window":1 --button="Update!!Close this window and update":0)
+    opts+=(--fontname="$(FindAvailableFont)")
 
     echo "$msg" | eos_yad2 --text-info "${opts[@]}" "$@"
 }
