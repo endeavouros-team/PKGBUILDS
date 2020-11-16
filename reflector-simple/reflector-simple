@@ -368,6 +368,7 @@ SaveMirrorlist() {
 
     local font="$(FindAvailableFont 10)"
     local opts=(--text-info
+                --width=750
                 --height=500
                 --title="New Arch mirrorlist"
                 --button=yad-quit:1 --button=" Save to $ml!document-save":0
