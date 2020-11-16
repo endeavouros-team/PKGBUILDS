@@ -233,6 +233,7 @@ Main()
 
     local cmd=(
         eos_yad
+        --width=700
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
