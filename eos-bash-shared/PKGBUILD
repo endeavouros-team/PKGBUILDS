@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.4.2
+pkgver=1.4.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -31,7 +31,7 @@ source=(
   $url/UpdateInTerminal
 )
 
-sha512sums=('86daaf9526715adc5f4c9c9e397a5c5673904797005fd288465694df47dce2b247d7c3eacc6f607ac772fa58f8465093b374905e7f84a8413f526e2f96c3d7cc'
+sha512sums=('27eeadf3ce1df1c420dab9eb24ee74703b13cc1aa15a614f8721d86d45d4e7b4cbe474e1a49f7568c9eab65e60eff3bb5ad35efc13c18a599bd50d83f5b051bf'
             '7dd9f8053d3663be077e1f7cf0b805484ac34f817304359093e9fcd950a831352a9f6fa0b9feb12bc2880ec32c5178024463b87830fa0bb472286fbc967989a4'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             'b097c58d4e954ab86a07d685977b698645b1e2b49131ad76015e65b98e599c3b57728f4b2cfcf3a10527de23d7ba069ea4cf0dfddb8ee4587fc9815f4885dec7'

@@ -358,6 +358,26 @@ eos_yad_GetDesktopName() {      # return DE name in uppercase letters
 #}
 
 
+FindAvailableMonoFont() {
+    local size="$1"
+    local font="Mono"   # fallback
+
+    [ -n "$size" ] || size=10
+
+    if [ -r /usr/share/fonts/liberation/LiberationMono-Regular.ttf ] ; then
+        font="Liberation Mono"
+    elif [ -r /usr/share/fonts/TTF/DejaVuSansMono.ttf ] ; then
+        font"DejaVu Sans Mono"
+    elif [ -r /usr/share/fonts/noto/NotoSansMono-Regular.ttf ] ; then
+        font="Noto Sans Mono"
+    elif [ -r /usr/share/fonts/gsfonts/NimbusMonoPS-Regular.otf ] ; then
+        font="Nimbus Mono"
+    elif [ -r /usr/share/fonts/adobe-source-code-pro/SourceCodePro-Regular.otf ] ; then
+        font="Source Code Pro"
+    fi
+    echo "$font $size"
+}
+
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
