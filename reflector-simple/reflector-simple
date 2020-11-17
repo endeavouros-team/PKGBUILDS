@@ -3,10 +3,12 @@
 # Select pacman mirrors with a simple GUI.
 #
 
-eos_yad() {
-    local icon=/usr/share/endeavouros/EndeavourOS-icon.png  # always use EndeavourOS icon
-    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$icon "$@"
-}
+#eos_yad() {
+#    local icon=/usr/share/endeavouros/EndeavourOS-icon.png  # always use EndeavourOS icon
+#    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$icon "$@"
+#}
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+export -f eos_yad
 
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
 
@@ -340,24 +342,6 @@ AddCountryNamesToMirrors() {
     rm -f $full_list
 }
 
-FindAvailableFont() {
-    local size="$1"
-    local font="Mono"   # fallback
-
-    if [ -r /usr/share/fonts/liberation/LiberationMono-Regular.ttf ] ; then
-        font="Liberation Mono"
-    elif [ -r /usr/share/fonts/TTF/DejaVuSansMono.ttf ] ; then
-        font"DejaVu Sans Mono"
-    elif [ -r /usr/share/fonts/noto/NotoSansMono-Regular.ttf ] ; then
-        font="Noto Sans Mono"
-    elif [ -r /usr/share/fonts/gsfonts/NimbusMonoPS-Regular.otf ] ; then
-        font="Nimbus Mono"
-    elif [ -r /usr/share/fonts/adobe-source-code-pro/SourceCodePro-Regular.otf ] ; then
-        font="Source Code Pro"
-    fi
-    echo "$font $size"
-}
-
 SaveMirrorlist() {
     grep "^Server = [hr]" $tmpfile >/dev/null || {
         echo "$progname: no mirrors found!" | \
@@ -366,7 +350,7 @@ SaveMirrorlist() {
     }
     AddCountryNamesToMirrors
 
-    local font="$(FindAvailableFont 10)"
+    local font="$(FindAvailableMonoFont)"
     local opts=(--text-info
                 --width=750
                 --height=500
