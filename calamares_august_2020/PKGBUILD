@@ -117,7 +117,7 @@ prepare() {
 
     # sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
 
-    sed -i "s?groupsUrl: local?groupsUrl: "https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
     #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
