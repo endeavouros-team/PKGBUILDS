@@ -4,8 +4,8 @@
 pkgname=calamares_fun
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.33
-pkgrel=3
+pkgver=3.2.34
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -77,7 +77,7 @@ prepare() {
     sed -i "s?  - localecfg?  - localecfg\n  - networkcfg\n  - packages?" $_reponame/settings.conf_online
 
     # Download .yaml from url to local
-    sed -i "N;N;s?  - partition\n  - netinstall?  - partition\n  - yaml_pkglist\n  - netinstall?" $_reponame/settings.conf_online
+    #sed -i "N;N;s?  - partition\n  - netinstall?  - partition\n  - yaml_pkglist\n  - netinstall?" $_reponame/settings.conf_online
 
     # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
@@ -110,10 +110,10 @@ prepare() {
 
     # Escape /? \
     # This is for using local .yaml file
-    sed -i "s?groupsUrl: local?groupsUrl: file:\/\/\/usr\/share\/calamares\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
+    #sed -i "s?groupsUrl: local?groupsUrl: file:\/\/\/usr\/share\/calamares\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
 
     # This is for using upstream file (github or server)
-    #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
 
     sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
