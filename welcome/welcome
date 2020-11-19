@@ -316,6 +316,10 @@ yad_calamares() {
 
     case "$mode" in
         online)
+            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
+                mv -f netinstall.yaml /usr/share/calamares/netinstall.yaml
+            }
+
             file=/usr/share/calamares/modules/netinstall.conf
             if [ ! -r $file ] ; then
                 echo "Warning: $file not found!" >&2
