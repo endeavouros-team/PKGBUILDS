@@ -17,7 +17,7 @@ For full details:
 
 On your system, find your NVIDIA card id with command:
 <pre>
-lspci -vnn | grep -P 'VGA|Display' | grep 10de | sed 's|.* \[10de:\([0-9a-f]*\)\] .*|\1|'
+lspci -vnn | grep -P 'VGA|Display|3D' | grep 10de | sed 's|.* \[10de:\([0-9a-f]*\)\] .*|\1|'
 </pre>
 
 ## Changelog
