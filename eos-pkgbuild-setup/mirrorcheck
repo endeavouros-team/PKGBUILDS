@@ -211,7 +211,14 @@ Main()
     test -n "${MIRROR_NAMES[0]}" || DIE "MIRROR_NAMES[0] is empty! Check file $conf."
 
     if [ -n "$reponame" ] ; then
-        OneMirror
+        local list=/etc/pacman.d/endeavouros-mirrorlist
+        if [ -n "$(grep "^Server = " $list | grep -iw "$reponame")" ] ; then
+            OneMirror
+        else
+            cat <<EOF
+Sorry, '$reponame' is unknown, or the URL is not active in file $list.
+EOF
+        fi
     else
         #mode=fastall
         for reponame in "${MIRROR_NAMES[@]}" ; do
