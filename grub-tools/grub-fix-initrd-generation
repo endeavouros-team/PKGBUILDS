@@ -113,12 +113,14 @@ _grub_mods() {
 }
 
 _os_prober_mod() {
-    local file=/usr/lib/linux-boot-probes/mounted/40grub2  # from package 'os-prober'
-    _backup $file os-prober
-    sed -i $file \
-        -e 's|initrd="\$(echo "\$2"|shift; initrd="\$(echo "\$\@"|' \
-        -e 's|initrd="/boot\$initrd"|initrd=($initrd); initrd=\${initrd[@]/#//boot}|'
-    _show_result $file
+    if [ -x /usr/bin/os-prober ] ; then
+        local file=/usr/lib/linux-boot-probes/mounted/40grub2  # from package 'os-prober'
+        _backup $file os-prober
+        sed -i $file \
+            -e 's|initrd="\$(echo "\$2"|shift; initrd="\$(echo "\$\@"|' \
+            -e 's|initrd="/boot\$initrd"|initrd=($initrd); initrd=\${initrd[@]/#//boot}|'
+        _show_result $file
+    fi
 }
 
 Main() {
@@ -150,6 +152,8 @@ Main() {
 
     if [ "$changed" = "yes" ] ; then
         /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
+    else
+        _log2 "No changes."
     fi
 }
 
