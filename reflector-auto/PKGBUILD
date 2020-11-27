@@ -4,10 +4,11 @@ pkgname=reflector-auto
 pkgdesc="Automates ranking of Arch mirrors with 'reflector'."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 pkgver=1.3
-pkgrel=1
+pkgrel=2
 arch=(any)
 license=(GPL)
 depends=(systemd reflector)
+install=$pkgname.install
 
 source=(
   "$url/$pkgname"

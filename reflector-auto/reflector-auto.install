@@ -1,0 +1,15 @@
+#!/bin/bash
+
+post_upgrade() {
+    cat <<EOF >&2
+
+==> Please note that reflector-auto is deprecated, and the package
+==> will be removed from the repository in the beginning of January 2021.
+==> Similar systemd features are available in package reflector.
+
+EOF
+}
+
+post_install() {
+    post_upgrade
+}
