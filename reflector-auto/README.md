@@ -1,4 +1,5 @@
-# reflector-auto (DEPRECATED! To be removed in the beginning of January 2021)
+# reflector-auto
+## DEPRECATED! To be removed in the beginning of January 2021.
 Automates ranking Arch mirrors, calls reflector periodically.<br>
 Currently set to launch once a week.
 ## Notes
