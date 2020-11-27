@@ -105,8 +105,8 @@ prepare() {
 
     sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
 
-    # netinstall module
-    #sed -i s"?sidebar:.*?sidebar: \"Choose Desktop\"?" $_reponame/src/modules/netinstall/netinstall.conf
+    # netinstall module To give another name for the left panel requires translating the title somewhere so it adjusts to each language the installer supports
+    #sed -i s"?sidebar:.*?sidebar: \"Choose Desktop\"?" $_reponame/src/modules/netinstall/netinstall.conf 
     cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
