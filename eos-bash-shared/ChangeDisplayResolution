@@ -67,13 +67,14 @@ yad_ChangeDisplayResolution() {
 
         local cmd=(
             eos_yad
-            --image=display
+            --image=preferences-desktop-display
+            --width=400
             --title="Change display resolution"
             --text="$txt"
         )
 
         case "$impl" in
-            form) cmd+=(--form --width=400 --columns=2 --button=yad-quit:0) ;;
+            form) cmd+=(--form --columns=2 --button=yad-quit:0) ;;
             list) cmd+=(--list --height=500 --no-click --grid-lines=both
                         --column="Available resolution values:" 
                         # --button="yad-quit!!Change nothing, just quit":$b_quit
