@@ -2,14 +2,15 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.6.2
-pkgrel=2
+pkgver=1.7
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
   bash yad reflector whois geoip bind-tools
   eos-bash-shared
 )
+backup=(etc/$pkgname.conf)
 
 # url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
@@ -17,9 +18,11 @@ url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgnam
 source=(
   $url/$pkgname
   $url/$pkgname.desktop
+  $url/$pkgname.conf
 )
 sha512sums=('c8ce78823281acde31375a685bcce49faecc4c281fa31fde68e621f8411ac3d4a1b2af430be5783e8fb17ebd99b0ef947206726691b5d252b78c703970d9c574'
-            'd100ccacc5a352b6bdf8965d7bb23249ffb565c624e02800b8d7e722f70b782748fbbc24a476794b24dcc259090833d843dae12a360ada7f4775485795d57a54')
+            'd100ccacc5a352b6bdf8965d7bb23249ffb565c624e02800b8d7e722f70b782748fbbc24a476794b24dcc259090833d843dae12a360ada7f4775485795d57a54'
+            '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d')
 
 package() {
   cd $srcdir
@@ -27,8 +30,10 @@ package() {
   sed -i $pkgname -e "s|local VERSION_INFO=.*$|local VERSION_INFO=${pkgver}-$pkgrel|"
 
   install -d $pkgdir/usr/bin
+  install -d $pkgdir/etc
   install -d $pkgdir/usr/share/applications
 
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
   install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
 }
