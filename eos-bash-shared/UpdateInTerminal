@@ -13,6 +13,9 @@ source $translations_dir/translations.bash || {
     DIE "$translations_dir/translations.bash not found!"
 }
 
+export -f eos_yad_terminal
+export -f eos_yad_RunCmdTermBash
+
 Options() {
     local pp
     for pp in "$@" ; do
@@ -20,6 +23,7 @@ Options() {
             --noup) checkArchEos=no ;;
             --noaur) checkAur=no ;;
             --lang=*) lang="${pp#*=}" ;;
+            --nt) new_terminal=yes ;;
             --help | -h) Usage ; return 1 ;;
             -*) DIE "unsupported option '$pp'" ;;
             *)  DIE "unsupported parameter '$pp'" ;;
@@ -33,6 +37,7 @@ Usage: $progname [options]
 Options:
     --noup     Don't check $upname updates.
     --noaur    Don't check AUR updates.
+    --nt       Check updates in a new terminal window.
 EOF
 }
 
@@ -43,10 +48,16 @@ Main() {
     local progname="$(basename "$0")"
     local upname="Arch & EndeavourOS"
     local aur_helper="$EOS_AUR_HELPER"
+    local new_terminal=no
 
     [ -n "$aur_helper" ] || aur_helper=yay
 
     Options "$@" || return
+
+    if [ "$new_terminal" = "yes" ] ; then
+        eos_yad_RunCmdTermBash "$progname"
+        return
+    fi
 
     _init_translations "$lang"         # other parameters as defaults
 
