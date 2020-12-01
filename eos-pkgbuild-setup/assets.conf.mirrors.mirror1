@@ -112,8 +112,15 @@ _ckbcomp_hook() {
         }
         rm -f "$Dstdir/$filebase.dsc"
         sed -i "$Pkgbuild" \
-            -e "s|^pkgver=.*|pkgver=$newver|" \
-            -e 's| cd console-setup$| cd console-setup-$pkgver|'
+            -e "s|^pkgver=.*|pkgver=$newver|"
+
+        if [ "$newver" = "1.198" ] ; then
+            sed -i "$Pkgbuild"  \
+                -e 's| cd console-setup$| cd console-setup-$pkgver|'
+        else
+            sed -i "$Pkgbuild"  \
+                -e 's| cd console-setup-${pkgver}$| cd console-setup|'
+        fi
         updpkgsums "$Pkgbuild" 2>/dev/null
         echo -n "#" >&2
     fi

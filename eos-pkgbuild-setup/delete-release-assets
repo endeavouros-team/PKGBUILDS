@@ -11,10 +11,11 @@ verbose() {
     esac
 }
 Usage() {
-    echo2 "Usage: $(basename "$0") TAG asset-names"
+    echo2 "Usage: $(basename "$0") [--quietly] TAG asset-names"
     echo2 "where"
     echo2 "   TAG            release tag"
     echo2 "   asset-names    one or more asset names (without path) separated by space"
+    echo2 "   --quietly      don't ask confirmation for deletions"
 }
 DIE() {
     local msg="$1"
