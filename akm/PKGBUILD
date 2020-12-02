@@ -6,10 +6,11 @@ pkgdesc="Arch kernel manager."
 # url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 pkgver=2.7
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(bash yad eos-bash-shared)
+backup=(etc/$pkgname.conf)
 
 source=(
     "$url/$pkgname"
