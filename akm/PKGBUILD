@@ -5,7 +5,7 @@ pkgname=akm
 pkgdesc="Arch kernel manager."
 # url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=2.6.2
+pkgver=2.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -13,13 +13,15 @@ depends=(bash yad eos-bash-shared)
 
 source=(
     "$url/$pkgname"
+    "$url/$pkgname.conf"
     "$url/$pkgname.desktop"
 )
-sha512sums=('e3890409136a45fe78f78f8e27d62cd3a0567ecd7d8952e8721692bc6a212884d70bcf912af530805b9657048cc0ed810b3b2e4976650a855fda0679861d4fbb'
+sha512sums=('b6a90650a50e91248b5a9f5acd2b3ac88247e2f2ddbb25bd7dfa22ec989a235caa342da3b2f61157218d058112df86ba012615734905cdf971f52b17167f0463'
+            '05f7b5beb7c77403035a3d6ccc4a37d51659e56cdfd9aa49b119338676a1280f67c885cc0bac375ae3dc32fa3fb1ba6c23d1180e899d8d7fda05b68e08c34175'
             '27ebbeb3f7965aa9fd1abc40b6ec2773375878464434721a2049ac6d1ad2852b948773a9b7a4be35e1eeaf76b67fb03bc1112432aaabe98ac3bbde85d8e47f96')
 
 package() {
-  cd $srcdir
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
   install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
+  install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
 }

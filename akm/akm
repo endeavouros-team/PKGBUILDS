@@ -168,16 +168,52 @@ CommonStuff() {
         exit 1
     fi
     source $EOS_SCRIPTS_YAD
+    export -f eos_yad
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
 }
-eos_yad() {
-    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
+
+AkmConfig() {
+    local conf=/etc/akm.conf
+    local xx
+    if [ -f $conf ] ; then
+        source $conf
+
+        xx="$KERNEL_HEADER_WITH_KERNEL"
+        [ -n "$xx" ] && connect_header_with_kernel="$xx"
+        echo "==> Config file $conf read." >&2
+    fi
 }
 
 DIE() {
-    eos_yad --form --title="AKM failure" --image=error --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="AKM failure" --image=error --text="$1" --button=yad-quit
     exit 1
+}
+
+UniqueArr() {
+    # remove duplicates from an array 'arr'
+    local -n arr=$1
+    local to=()
+    local xx yy
+
+    for xx in "${arr[@]}" ; do
+        for yy in "${to[@]}" ; do
+            [ "$xx" = "$yy" ] && break
+        done
+        [ "$xx" != "$yy" ] && to+=("$xx")
+    done
+    arr=("${to[@]}")
+}
+
+Options() {
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            --connect-header) connect_header_with_kernel=yes ;;
+            -*) DIE "unsupported option '$arg'" ;;
+            *) DIE "unsupported parameter '$arg'" ;;
+        esac
+    done
 }
 
 Main()
@@ -198,8 +234,13 @@ Main()
         KernelOrg
         KOVersion
     )
+    local connect_header_with_kernel=no    # default, change with option --connect-header
 
     CommonStuff
+    AkmConfig
+    Options "$@"
+
+    # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
     ShowFunctionStart
 
@@ -230,6 +271,11 @@ Main()
     t1+="</tt>"
     t1+="Your current repos are either Stable or Testing (see /etc/pacman.conf).\n"
     t1+="Marking <b>$na</b> means: info not available.\n"
+    if [ "$connect_header_with_kernel" = "yes" ] ; then
+        t1+="\n"
+        t1+="You have configured the header to <i>follow</i> the kernel.\n"
+        t1+="If a kernel setting chosen below contradicts its header setting, the kernel setting is used.\n"
+    fi
 
     local cmd=(
         eos_yad
@@ -247,20 +293,61 @@ Main()
     done
     ShowFunctionEnd
 
-    local ix installed install=() uninstall=() pkg
+    local ix installed install=() uninstall=() pkg partner
     local result="$("${cmd[@]}")"
+    declare -A pkgstatus
     test -z "$result" && return
 
     result="${result:1}"                               # skip first LBL field !!
 
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
         pkg="${kernels[$ix]}"
-        installed="$(LocalVersion "$pkg")"
-        case "$(echo "$result" | cut -d '|' -f $((ix+1)))" in
-            TRUE)   test -z "$installed" && install+=("$pkg") ;;
-            FALSE)  test -n "$installed" && uninstall+=("$pkg") ;;
+        pkgstatus[$pkg]="$(echo "$result" | cut -d '|' -f $((ix+1)))"   # TRUE or FALSE
+
+        if [ "$connect_header_with_kernel" = "yes" ] ; then
+
+            # Note: a kernel may have TRUE but header FALSE!
+            # When connecting header with kernel this may conflict.
+            # To solve this, assume kernel value is stronger.
+            # Remember that the kernel value exists because it is set
+            # before the header value in the local variable 'kernels' above.
+
+            case "$pkg" in
+                *-headers)
+                    partner="${pkg%-headers}"
+                    pkgstatus[$pkg]="${pkgstatus[$partner]}"  # kernel value overrides the header value!
+                    ;;
+            esac
+        fi
+    done
+
+    for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
+        pkg="${kernels[$ix]}"
+        if [ "$connect_header_with_kernel" = "yes" ] ; then
+            case "$pkg" in
+                *-headers) partner="${pkg%-headers}" ;;
+                *)         partner="$pkg"-headers    ;;
+            esac
+        fi
+
+        case "${pkgstatus[$pkg]}" in
+            TRUE)
+                [ -z "$(LocalVersion "$pkg")" ] && install+=("$pkg")
+                if [ "$connect_header_with_kernel" = "yes" ] ; then
+                    [ -z "$(LocalVersion "$partner")" ] && install+=("$partner")
+                fi
+                ;;
+            FALSE)
+                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=("$pkg")
+                if [ "$connect_header_with_kernel" = "yes" ] ; then
+                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=("$partner")
+                fi
+                ;;
         esac
     done
+
+    UniqueArr install
+    UniqueArr uninstall
 
     cmd=()
     test -n "$uninstall" && cmd+=(pacman -Rsn ${uninstall[*]} ";")
