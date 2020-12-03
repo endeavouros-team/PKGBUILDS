@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=3.8.3
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -17,32 +17,32 @@ optdepends=(
   'reflector-simple: for the Update Mirrors button'
 )
 
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 # backup=(etc/eos-script-lib-yad.conf)
 
 source=(
-  $url/changelog.md
-  $url/$pkgname
-  $url/$pkgname.desktop
-#  $url/paccache-service-manager
-#  $url/eos-script-lib-yad
-#  $url/eos-script-lib-yad.conf
-#  $url/eos-connection-checker
-#  $url/device-info
-#  $url/su-c_wrapper
-  $url/eos-set-background-picture
-  $url/ksetwallpaper.py
-  $url/wallpaper-once
-  $url/wallpaper-once.desktop
-  $url/eos-kill-yad-zombies
-#  $url/Adding-own-commands.md
-#  $url/RunInTerminal
-  $url/welcome-dnd
-#  $url/welcome-dnd-tips.png
-#  $url/welcome-dnd-window.png
-  $url/calamares-update
+  $_url/changelog.md
+  $_url/$pkgname
+  $_url/$pkgname.desktop
+#  $_url/paccache-service-manager
+#  $_url/eos-script-lib-yad
+#  $_url/eos-script-lib-yad.conf
+#  $_url/eos-connection-checker
+#  $_url/device-info
+#  $_url/su-c_wrapper
+  $_url/eos-set-background-picture
+  $_url/ksetwallpaper.py
+  $_url/wallpaper-once
+  $_url/wallpaper-once.desktop
+  $_url/eos-kill-yad-zombies
+#  $_url/Adding-own-commands.md
+#  $_url/RunInTerminal
+  $_url/welcome-dnd
+#  $_url/welcome-dnd-tips.png
+#  $_url/welcome-dnd-window.png
+  $_url/calamares-update
 )
 sha512sums=('c94468243f112c667a59733813888750437f5194920077ab5b824b58ebc977d4c101c836e891e1d5f2a06e57aaa67a4be8d341c98e6c741f9222f38f9d512f1d'
             'b51ffdaea20bb4dacbca66bdc37aebb9d589dd7aa76c31fa68d30959b0fe13bd9883dd995d47bb7ec6a324117e47c41405b045659aa10b8772d7e145616b1c54'
