@@ -2,20 +2,20 @@
 
 pkgname=eos-hooks
 pkgver=1.3
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
 license=('GPL3')
-#url='https://www.endeavouros.com'
-url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
+url=https://github.com/endeavouros-team/PKGBUILDS
+_url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 
 source=(
-  $url/os-release.hook
-  $url/lsb-release.hook
-  $url/${pkgname}.hook
-  $url/${pkgname}-runner
-  $url/eos-reboot-required
-  $url/eos-reboot-required.hook
+  $_url/os-release.hook
+  $_url/lsb-release.hook
+  $_url/${pkgname}.hook
+  $_url/${pkgname}-runner
+  $_url/eos-reboot-required
+  $_url/eos-reboot-required.hook
 )
 sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c494256e872cacd3c5ebe08d4f73bc96517c52d227808c5bcfbf89284094c72'
             '20568a779c4ec34e9a79559a125efb1a85aacde8474df4ab9c5f766b6eb7a6b5848c049387f78306ad844e7571cf8a22afc89e6aab18c47b5be419e3d0e4e2e7'
