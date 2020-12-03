@@ -3,20 +3,20 @@
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
 pkgver=1.5
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(grub lsb-release)
 optdepends=(os-prober)
 
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
-  $url/grub-update-after-kernel.hook    # Automatically updates grub.cfg after a kernel is installed/uninstalled.
-  $url/grub-fix-initrd-generation       # Command modifies os-prober and grub to fix 'initrd' line generation;
-                                        # re-run if grub or os-prober is updated (but not fixed upstream!).
-  $url/grub-fix-initrd-generation.hook  # Calls the fixer after grub or os-prober upgrades.
+  $_url/grub-update-after-kernel.hook    # Automatically updates grub.cfg after a kernel is installed/uninstalled.
+  $_url/grub-fix-initrd-generation       # Command modifies os-prober and grub to fix 'initrd' line generation;
+                                         # re-run if grub or os-prober is updated (but not fixed upstream!).
+  $_url/grub-fix-initrd-generation.hook  # Calls the fixer after grub or os-prober upgrades.
 )
 sha512sums=('2062e58ae2c903187d98c05df6986d2a1a400fa9c35ffc5f91e31d3da0e779edf0b3ba21404769295dc34138ca9f6d94f12830ab3e203a4386571b05d346b4b6'
             'a6aa60d4df9b1f75f41d7c37116a0d935709a0de86e9cf1e5acbf33b75f4f074dbbbe1e5617a20da4e0437bcad5fecbf0af3283be92fcd17f5431c3a1ae6b017'
