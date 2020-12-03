@@ -2,8 +2,8 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.4.6
-pkgrel=2
+pkgver=1.4.7
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -42,7 +42,7 @@ sha512sums=('27eeadf3ce1df1c420dab9eb24ee74703b13cc1aa15a614f8721d86d45d4e7b4cbe
             'f2de596e2476dbe2de008dd43984fddb9387014e5cdc71fff2f595b753dcbea9e5cbe0df0a777347f60d3b02031f7e5204333e784047b195d9e7b0df146748ed'
             'c1b65169422458a71c59cb1b98749674b885812d43d9d281eeaae5cd9c876c4fdd495ab00d49798af40d2b54edbbad52f23effd54b736b057aa6454a50e23aaa'
             '3fa37ec0cc5e8ee2f39023bcb79c0448ec26439fdb0ba7e75cae3b1a4f1f2b7a57c4ba55829b68e677353785a605f303d19ba5df44656f54c3789ab5b0d94600'
-            '7e7152c5123d1a6bb2184922fe94ee42b09843e8a696fc98afac6b317c3b4aaa44a39c43003cbd589208a73229fcda6d30a1d0623d9bc5bdb9902c2d4eb4afff'
+            'd399f6f4f7392783dbca6d2d5a7081b879ed1109d5bb652b6fe186acd3e92f0396d2f55e90cda14e481f7af35349d94a00f6cf8fb14142c3e431eb53a5cb0f57'
             'e522e1dcdc2c1c85d4d4e6002ff5feb2ff397bdbf9a5a54de4fc130b5c3daaf38bfb0af3cc022e5aefe82a0d9160108507bcbf398bb6a6145f294c3f38c8d61f')
 
 package() {

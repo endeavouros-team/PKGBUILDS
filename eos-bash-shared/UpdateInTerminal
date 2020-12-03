@@ -28,6 +28,9 @@ Options() {
             -*) DIE "unsupported option '$pp'" ;;
             *)  DIE "unsupported parameter '$pp'" ;;
         esac
+        if [ "$pp" != "--nt" ] ; then
+            new_terminal_options+=" $pp"
+        fi
     done
 }
 
@@ -49,13 +52,14 @@ Main() {
     local upname="Arch & EndeavourOS"
     local aur_helper="$EOS_AUR_HELPER"
     local new_terminal=no
+    local new_terminal_options=""  # skips only --nt
 
     [ -n "$aur_helper" ] || aur_helper=yay
 
     Options "$@" || return
 
     if [ "$new_terminal" = "yes" ] ; then
-        eos_yad_RunCmdTermBash "$progname"
+        eos_yad_RunCmdTermBash "$progname $new_terminal_options"
         return
     fi
 
