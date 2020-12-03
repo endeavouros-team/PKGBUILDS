@@ -3,7 +3,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.4.6
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -13,23 +13,23 @@ optdepends=(
   neofetch    # for additional DE detection
 )
 backup=(etc/eos-script-lib-yad.conf)
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
-  $url/eos-script-lib-yad
-  $url/eos-script-lib-yad.conf
+  $_url/eos-script-lib-yad
+  $_url/eos-script-lib-yad.conf
 
-  $url/eos-FindAppIcon
-  $url/RunInTerminal
-  $url/ChangeDisplayResolution
-  $url/device-info
-  $url/eos-connection-checker
-  $url/paccache-service-manager
-  $url/su-c_wrapper
-  $url/eos-wallpaper-set
-  $url/UpdateInTerminal
-  $url/UpdateInTerminal.desktop
+  $_url/eos-FindAppIcon
+  $_url/RunInTerminal
+  $_url/ChangeDisplayResolution
+  $_url/device-info
+  $_url/eos-connection-checker
+  $_url/paccache-service-manager
+  $_url/su-c_wrapper
+  $_url/eos-wallpaper-set
+  $_url/UpdateInTerminal
+  $_url/UpdateInTerminal.desktop
 )
 
 sha512sums=('27eeadf3ce1df1c420dab9eb24ee74703b13cc1aa15a614f8721d86d45d4e7b4cbe474e1a49f7568c9eab65e60eff3bb5ad35efc13c18a599bd50d83f5b051bf'
