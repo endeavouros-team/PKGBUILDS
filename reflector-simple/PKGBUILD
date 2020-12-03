@@ -3,7 +3,7 @@
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
 pkgver=1.7
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -12,13 +12,13 @@ depends=(
 )
 backup=(etc/$pkgname.conf)
 
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
-  $url/$pkgname
-  $url/$pkgname.desktop
-  $url/$pkgname.conf
+  $_url/$pkgname
+  $_url/$pkgname.desktop
+  $_url/$pkgname.conf
 )
 sha512sums=('c8ce78823281acde31375a685bcce49faecc4c281fa31fde68e621f8411ac3d4a1b2af430be5783e8fb17ebd99b0ef947206726691b5d252b78c703970d9c574'
             'd100ccacc5a352b6bdf8965d7bb23249ffb565c624e02800b8d7e722f70b782748fbbc24a476794b24dcc259090833d843dae12a360ada7f4775485795d57a54'
