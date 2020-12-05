@@ -15,7 +15,7 @@ where
 
 Without options, `akm` installs selected packages and uninstalls unselected packages.<br>
 <br>
-If option `--connect-header` is used, then `akm` ties kernel and header package into one atomic "unit" when installing or uninstalling.
+If option `--connect-header` is used, then `akm` ties kernel and header package into one atomic "unit" when installing or uninstalling.<br>
 If selections of a kernel and its header conflict, kernel selection is used for both packages.
 For example, if you only choose to install package `linux-zen` but not its header, option `--connect-header` would cause installing `linux-zen-headers` too.
 
