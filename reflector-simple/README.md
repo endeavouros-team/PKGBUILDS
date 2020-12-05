@@ -7,7 +7,10 @@ Screenshot:<br>
 
 ## Notes about configuration of reflector-simple
 
-- configuration files `/etc/reflector-simple.conf` and `/etc/reflector-auto.conf` are supported
+- configuration file `/etc/reflector-simple.conf` is supported
+- if `/etc/reflector-simple.conf` exists, the GUI uses it by default
+- configuration file can contain options supported by the `reflector` command. Use command `reflector -h` for more info
+
+### Additional old compatibility notes
+- for backwards compatibility, configuration file `/etc/reflector-auto.conf` is still supported, but will no more be supported after year 2020.
 - if file `/etc/reflector-simple.conf` exists, then `/etc/reflector-auto.conf` is not used
-- if `/etc/reflector-simple.conf` exists, the GUI selects it by default
-- configuration file can contain options supported by the `reflector` command, see `reflector -h` for more info
