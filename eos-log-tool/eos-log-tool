@@ -190,7 +190,7 @@ Main()
     local blame="systemd-analyze blame"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
-    #local inxi="inxi -Fxxc0"                         # 'inxi' does not work here !!!
+    #local inxi="inxi -Fzxxc0"                         # 'inxi' does not work here !!!
     local hwinfo="hwinfo --short"
     local rdbut="<i>Remove personal data from logs</i>"
     local slbut="<i>Send logs to internet</i>"
