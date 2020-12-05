@@ -10,3 +10,4 @@ wallpaper-once | Sets the initial EOS wallpaper
 wallpaper-once.desktop | A launcher for wallpaper-once
 welcome | The welcome greeter app for both install phase and on the installed system
 welcome.desktop | A launcher for Welcome
+welcome-dnd | Support drag&drop for the Personal Commands
