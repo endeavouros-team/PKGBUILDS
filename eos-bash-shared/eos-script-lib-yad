@@ -154,6 +154,7 @@ eos_yad_RunCmdTermBash() {
     local cmd="$1"
     local prompt="$2"
     local termopts="$3"
+    local waitopt="$4"
 
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
@@ -170,7 +171,9 @@ eos_yad_RunCmdTermBash() {
                 echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
             else
                 _init_translations
-                echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
+                if [ "$waitopt" != "--no-enter-wait" ] ; then
+                    echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
+                fi
             fi
             ;;
     esac

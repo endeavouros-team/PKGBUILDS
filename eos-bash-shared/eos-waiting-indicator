@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Show a waiting indicator on the terminal.
+# Usage: eos-waiting-indicator lock-file
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+ShowIndicator() {
+    local str items
+    # items=( "◡◡" "⊙⊙" "◠◠" )
+    # items=( "◴" "◷" "◶" "◵" )
+    # items=( "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█" "▇" "▆" "▅" "▄" "▃" "▁" )
+    items=( "◢" "◣" "◤" "◥" )
+
+    tput civis   # hide cursor
+    #printf "%s\n" "$prompt" >&2
+    case "$1" in
+        -nl) printf "\n" >&2 ;;
+    esac
+    while true ; do
+        for str in "${items[@]}" ; do
+            printf "\r%s %s" "$prompt" "$str" >&2
+            if [ ! -r "$lockfile" ] ; then
+                tput cnorm # unhide cursor
+                return
+            fi
+            sleep 0.25
+        done
+    done
+}
+
+Main()
+{
+    local lockfile="$1"
+    local prompt="$2"
+
+    [ -n "$lockfile" ] || DIE "lockfile argument missing"
+    [ -r "$lockfile" ] || DIE "lockfile does not exist"
+
+    ShowIndicator -nl
+}
+
+Main "$@"
