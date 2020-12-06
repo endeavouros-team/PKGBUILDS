@@ -9,6 +9,8 @@
 #}
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 export -f eos_yad
+export -f eos_yad_terminal
+export -f eos_yad_RunCmdTermBash
 
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
 
@@ -231,7 +233,7 @@ AskCountriesAndOptions() {
     command+=(--image="preferences-system")
 
     #command+=(--field=":LBL" "")
-    command+=(--field="<b><i>Feature selection\:</i></b>:LBL" "")
+    command+=(--field="<span font='italic 14'>Feature selection\:</span>:LBL" "")
     command+=(--field="Include https mirrors:chk" true)             # always suggest https
     included=false
     for xx in "${conf_protocol[@]}" ; do
@@ -361,6 +363,12 @@ SaveMirrorlist() {
     if [ -n "$font" ] ; then
         opts+=(--fontname="$font")
     fi
+
+    if [ ${#conf_selected_countries[@]} -gt 1 ] ; then
+        sleep 0.5
+        rm -f "$lockfile"
+    fi
+
     eos_yad "${opts[@]}"
 
     case "$?" in
@@ -427,6 +435,14 @@ Main() {
     local tmpfile=$(mktemp)
 
     # Now all is ready, so just run the command.
+
+    if [ ${#conf_selected_countries[@]} -gt 1 ] ; then
+        local lockfile="$(mktemp)"
+        eos_yad_RunCmdTermBash "eos-waiting-indicator $lockfile '$progname is working, please wait ...'" \
+                               "" \
+                               "" \
+                               "--no-enter-wait"
+    fi
 
     "${reflector_cmd[@]}" > $tmpfile
 
