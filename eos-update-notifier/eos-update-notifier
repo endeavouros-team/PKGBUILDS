@@ -23,7 +23,7 @@ source /etc/eos-script-lib-yad.conf  # for EOS_ROOTER
 source $EOS_SCRIPTS_YAD
 unset EOS_SCRIPTS_YAD
 
-#export -f eos_yad
+export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_check_internet_connection
 export -f eos_yad_GetArgVal
@@ -32,12 +32,6 @@ export -f eos_yad_problem
 export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
-
-export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
-
-eos_yad2() { # TODO: VEKS
-    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$EOS_WICON "$@"
-}
 
 eos_un_log() {
     local date="$(/usr/bin/date '+%x %X')"
@@ -64,13 +58,13 @@ YadNonFocused() {
     opts+=(--button="Dismiss!!Don't update, just close this window":1 --button="Update!!Close this window and update":0)
     opts+=(--fontname="$(FindAvailableMonoFont)")
 
-    echo "$msg" | eos_yad2 --text-info "${opts[@]}" "$@"
+    echo "$msg" | eos_yad --text-info "${opts[@]}" "$@"
 }
 
 ShowTray() {
     # Tray notification may have issues on EOS...
-    eos_yad2 --notification --image="system-software-update" \
-             --text="$update_count $source updates are available at $date"
+    eos_yad --notification --image="system-software-update" \
+            --text="$update_count $source updates are available at $date"
 }
 ShowNotify() {
     local ms=15000
@@ -216,16 +210,16 @@ Update_common() {
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
             if [ 1 -eq 1 ] ; then
-                eos_yad2 --form \
-                         --title="EndeavourOS update notifier" --text="$msg" \
-                         --timeout=10 --timeout-indicator=left \
-                         --image=dialog-information --width=350 --no-focus \
-                         --button=yad-quit:0
+                eos_yad --form \
+                        --title="EndeavourOS update notifier" --text="$msg" \
+                        --timeout=10 --timeout-indicator=left \
+                        --image=dialog-information --width=350 --no-focus \
+                        --button=yad-quit:0
             else
                 echo "$msg" | \
-                    eos_yad2 --text-info --title="EndeavourOS update notifier" --no-focus \
-                             --height=100 --width=350 --timeout=10 --timeout-indicator=left \
-                             --theme="Classic" --tail --button=yad-quit:0 --image=info
+                    eos_yad --text-info --title="EndeavourOS update notifier" --no-focus \
+                            --height=100 --width=350 --timeout=10 --timeout-indicator=left \
+                            --theme="Classic" --tail --button=yad-quit:0 --image=info
             fi
         fi
     fi
@@ -408,7 +402,7 @@ Configure() {
         )
         local defaultperiod=daily
         local cmd=(
-            eos_yad2 --list --radiolist --column=Select --column=Period --width=400 --height=250
+            eos_yad --list --radiolist --column=Select --column=Period --width=400 --height=250
             --image=preferences-system
             --title="Configure update check schedule"
             --text="Select the period for system updates"
@@ -445,12 +439,12 @@ Configure() {
         tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
 
         result=$(
-            eos_yad2 --form --title="Configure update check schedule" --width=400 \
-                     --text="$tips" --window-icon=$EOS_WICON \
-                     --field="Interval in hours":num           $current_interval \
-                     --field="Initial hour":num                $current_initial \
-                     --field="Minute offset":ro                $current_minute \
-                     --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
+            eos_yad --form --title="Configure update check schedule" --width=400 \
+                    --text="$tips" --window-icon=$EOS_WICON \
+                    --field="Interval in hours":num           $current_interval \
+                    --field="Initial hour":num                $current_initial \
+                    --field="Minute offset":ro                $current_minute \
+                    --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
               )
         retval=$?
         test $retval -eq 1 && return 1
@@ -528,7 +522,7 @@ yad_infomsg() {
     local title="$2"
     test -n "$title" || title="Info"
     echo2 "$title: $msg"
-    eos_yad2 --form --text="$msg" --title="$title" --button=yad-ok:0 --image=info
+    eos_yad --form --text="$msg" --title="$title" --button=yad-ok:0 --image=info
 }
 
 Main()

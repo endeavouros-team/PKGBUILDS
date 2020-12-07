@@ -3,9 +3,9 @@
 # Shows latest Arch news.
 # Keeps simple record of what you've already seen.
 
-eos_yad() {
-    GDK_BACKEND=x11 /usr/bin/yad "$@"
-}
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+
+export -f eos_yad
 
 ShowAll() {
     echo "Showing all Arch news..." >&2
@@ -65,7 +65,6 @@ ShowIfNotSeen() {
     if [[ "$latest" > "$latest_seen" ]] ; then
         msg="Important Arch news are available! Want to see the news list now?"
         eos_yad --form --text="$msg" --title="$progname" --image=info --no-focus --geometry=+60+30 \
-                --window-icon=/usr/share/endeavouros/EndeavourOS-icon.png \
                 --button=" Later!calendar!Show it later, please.":1 --button=yad-yes:0 && {
             ShowAll
         } || {
