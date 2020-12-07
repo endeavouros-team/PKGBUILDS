@@ -3,10 +3,6 @@
 # Select pacman mirrors with a simple GUI.
 #
 
-#eos_yad() {
-#    local icon=/usr/share/endeavouros/EndeavourOS-icon.png  # always use EndeavourOS icon
-#    GDK_BACKEND=x11 /usr/bin/yad --window-icon=$icon "$@"
-#}
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 export -f eos_yad
 export -f eos_yad_terminal
