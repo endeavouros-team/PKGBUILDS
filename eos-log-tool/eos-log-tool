@@ -10,14 +10,9 @@
 #       and file "$DIR_OF_CONFIG/eos-log-tool-filter.bash" below.
 #
 
-eos_yad() {
-    local icon=/usr/share/endeavouros/EndeavourOS-icon.png
-    if [ -r "$icon" ] ; then
-        GDK_BACKEND=x11 /usr/bin/yad --window-icon="$icon" "$@"
-    else
-        GDK_BACKEND=x11 /usr/bin/yad "$@"
-    fi
-}
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+
+export -f eos_yad
 
 Msg() {
     local msg="$1"
