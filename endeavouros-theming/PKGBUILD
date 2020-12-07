@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=endeavouros-theming
 pkgver=6.2
-pkgrel=1
+pkgrel=2
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
@@ -12,19 +12,27 @@ source=(
   "${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz"
 )
 md5sums=('598b4f0f035af10c1bbbc8c8d1ebdd93')
+sha512sums=('bf80652506cebd4bdaec30a1427299586d26eb2776ceb497b8e026f8b82a270afddd4a11fea9ad62c29f3b445380e1ec1fa712408401e322389f9e1968f3c314')
 install=$pkgname.install
 
 package() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
-        install -d "${pkgdir}/usr/share/endeavouros"
-	install -m644 *.png "${pkgdir}/usr/share/endeavouros"
-	install -m644 *.svg "${pkgdir}/usr/share/endeavouros"
-        install -d "${pkgdir}/usr/share/pixmaps"
-	install endeavouros.svg "${pkgdir}/usr/share/pixmaps/endeavouros.svg"
-	install -m644 endeavouros.svg "${pkgdir}/usr/share/pixmaps/endeavouros.svg"
-	install endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
-	install -m644 endeavouros.png "${pkgdir}/usr/share/pixmaps/endeavouros.png"
-        cd "${srcdir}/${pkgname}-${pkgver}/backgrounds"
-	install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
-	install -m644 *.png "${pkgdir}/usr/share/endeavouros/backgrounds"
+  cd "$srcdir/${pkgname}-$pkgver"
+  install -d "${pkgdir}/usr/share/endeavouros"
+  install -d "${pkgdir}/usr/share/pixmaps"
+  install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
+
+  install -Dm644 *.png *.svg           "${pkgdir}/usr/share/endeavouros"
+  install -Dm644 endeavouros.{svg,png} "${pkgdir}/usr/share/pixmaps"
+
+  cd backgrounds
+  install -Dm644 *.png                 "${pkgdir}/usr/share/endeavouros/backgrounds"
+
+  # make symlinks for KDE:
+  cd "${pkgdir}/usr/share/pixmaps"
+  ln -s endeavouros.png endeavouros-logo.png
+  ln -s endeavouros.svg endeavouros-logo.svg
+
+  # cleanup
+  cd $srcdir
+  rm -f ../${pkgname}-${pkgver}.tar.gz
 }
