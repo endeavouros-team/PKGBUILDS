@@ -6,7 +6,7 @@ pkgdesc="Arch kernel manager."
 url=https://github.com/endeavouros-team/PKGBUILDS
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 pkgver=2.7
-pkgrel=4
+pkgrel=5
 arch=('any')
 license=('GPL')
 depends=(bash yad eos-bash-shared)
@@ -19,7 +19,7 @@ source=(
 )
 sha512sums=('b6a90650a50e91248b5a9f5acd2b3ac88247e2f2ddbb25bd7dfa22ec989a235caa342da3b2f61157218d058112df86ba012615734905cdf971f52b17167f0463'
             '2c109c185647dbb21b1ee7afbe13818515af1ab19271ac744d7888711862962f82036837b03a1385e60c81d0e321e809c024e5e54e9a2f5204b2b35bf1ccee61'
-            '27ebbeb3f7965aa9fd1abc40b6ec2773375878464434721a2049ac6d1ad2852b948773a9b7a4be35e1eeaf76b67fb03bc1112432aaabe98ac3bbde85d8e47f96')
+            'a428c7deb368062e3a0de39d7b89e7c77fc9eacf01f1588b6c62d1d5397709cd5b47c521b531051eb36e721ae0592e7ee7c888e46bcf39397b6289a20100b8f7')
 
 package() {
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
