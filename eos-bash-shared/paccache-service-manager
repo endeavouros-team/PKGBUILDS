@@ -8,17 +8,15 @@
 #   polkit           (for pkexec)
 #
 
-Yad() {
-    local icon="/usr/share/endeavouros/EndeavourOS-icon.png"
-    test -r "$icon" || echo "$progname: warning: icon $icon not found." >&2
-    GDK_BACKEND=x11 /usr/bin/yad --window-icon="$icon" "$@"
-}
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+
+export -f eos_yad
 
 DIE() {
     local msg="$1"
     shift
-    echo "Error: $msg" | Yad --text-info --image=error --title="$progname error" \
-                             --wrap --width=500 --height=300 --button=yad-quit:1 "$@"
+    echo "Error: $msg" | eos_yad --text-info --image=error --title="$progname error" \
+                                 --wrap --width=500 --height=300 --button=yad-quit:1 "$@"
     exit 1
 }
 
@@ -51,7 +49,7 @@ _paccache_cleaner_manager()
     local xx
     local period_vals
     local txt
-    local image=disk-utility
+    local image=drive-harddisk # disk-utility
 
     GetCurrentValues
 
@@ -77,12 +75,12 @@ _paccache_cleaner_manager()
     txt+="Package cache usage: $du.\n"
     txt+="Free space on disk: $df.</b>\n" \
 
-    local result=$(Yad --form --width=500 --image=$image \
-                       --title='Pacman cache cleaner service manager' \
-                       --text="$txt" \
-                       --field="":LBL "" \
-                       --field='Cleaning period':CB "$period_vals" \
-                       --field='Number of package versions to keep':NUM  "$current_keepcount"
+    local result=$(eos_yad --form --width=500 --image=$image \
+                           --title='Pacman cache cleaner service manager' \
+                           --text="$txt" \
+                           --field="":LBL "" \
+                           --field='Cleaning period':CB "$period_vals" \
+                           --field='Number of package versions to keep':NUM  "$current_keepcount"
           )
 
     if [ -n "$result" ] ; then
