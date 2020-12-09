@@ -162,10 +162,19 @@ _get_reflector_x_configs() {
 
 IsInSelectedCountries() {
     local cname="$1"
-        local xx
-        for xx in "${conf_selected_countries[@]}" ; do
-            [ "$xx" = "$cname" ] && return 0
-        done
+    local xx
+    for xx in "${conf_selected_countries[@]}" ; do
+        [ "$xx" = "$cname" ] && return 0
+    done
+    return 1
+}
+
+IsInAddedCountries() {
+    local ccode="$1"
+    local xx
+    for xx in "${added_countries[@]}" ; do
+        [ "$xx" = "$ccode" ] && return 0
+    done
     return 1
 }
 
@@ -253,11 +262,16 @@ AskCountriesAndOptions() {
 BuildReflectorCommand() {
     local ix xx
     local ix_ext=""
+    local ac
 
     reflector_cmd=(reflector)
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         reflector_cmd+=($(cat $tmpconf | grep -v "^$country_exclude"))
+        # now we may have countries from config file
+        for ac in "${conf_selected_countries[@]}" ; do
+            added_countries+=("$(CountryToCode "$ac")")
+        done
     fi
 
     # then, add countries
@@ -266,7 +280,15 @@ BuildReflectorCommand() {
         test "$xx" = TRUE && {
             conf_selected_countries+=("${countrynames[$ix]}")
             if [ "${countrynames[$ix]}" != "Worldwide" ] ; then
-                reflector_cmd+=(-c "${countrycodes[$ix]}")
+                ac="${countrycodes[$ix]}"
+                if [ 1 -eq 1 ] ; then
+                    IsInAddedCountries "$ac" || {
+                        added_countries+=("$ac")
+                        reflector_cmd+=(-c "$ac")
+                    }
+                else
+                    reflector_cmd+=(-c "$ac")
+                fi
             else
                 worldwide_selected=1
             fi
@@ -360,7 +382,7 @@ SaveMirrorlist() {
         opts+=(--fontname="$font")
     fi
 
-    if [ ${#conf_selected_countries[@]} -gt 1 ] ; then
+    if [ -n "$lockfile" ] ; then
         sleep 0.5
         rm -f "$lockfile"
     fi
@@ -397,6 +419,7 @@ Main() {
     local ml=/etc/pacman.d/mirrorlist
     local conf_selected_countries=()
     local conf_dropped_countries=()
+    local added_countries=()           # used in removing duplicates in given countries!
     local conf_age=""
     local conf_sort=""
     local conf_number=""
@@ -432,8 +455,9 @@ Main() {
 
     # Now all is ready, so just run the command.
 
-    if [ ${#conf_selected_countries[@]} -gt 1 ] ; then
-        local lockfile="$(mktemp)"
+    local lockfile=""
+    if [ ${#added_countries[@]} -gt 1 ] ; then
+        lockfile="$(mktemp)"
         eos_yad_RunCmdTermBash "eos-waiting-indicator $lockfile '$progname is working, please wait ...'" \
                                "" \
                                "" \
