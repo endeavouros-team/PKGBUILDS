@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.8.4
+pkgver=3.8.5
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -20,7 +20,7 @@ optdepends=(
 url=https://github.com/endeavouros-team/PKGBUILDS
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
-# backup=(etc/eos-script-lib-yad.conf)
+install=$pkgname.install
 
 source=(
   $_url/$pkgname
@@ -32,6 +32,7 @@ source=(
   $_url/eos-kill-yad-zombies
   $_url/welcome-dnd
   $_url/calamares-update
+  $_url/$pkgname.install
 
 #  $_url/changelog.md
 #  $_url/paccache-service-manager
@@ -53,7 +54,8 @@ sha512sums=('51c0b6be352357d8bf73460a41d7ce7c20ad088a9725d26c6605d2c39b91c1454cf
             '3761a92815ae08990e43c9b7879850873089478f7f9013e2af070769a317d56230444856378ab4d36981e0816dcdb2c8d991b2fcd845819df31008bae51abadb'
             '47382fe6431ae179f991980b2bf2f4d4ad56bfba70873659c3a7720de2fca90a60fa6033fb4cfe313e87d771312c0c80feb1617a64885362763f4b66e62543b8'
             '7449221c2aa0033d04b4d14453c3963cbac86b7820868372f7b4e11f6ba80a069f7db91ea2f8a356b0e7c1ff4c71bba406f852e37036d9349811ef52068153d7'
-            '0191d609f0444ce7e120effedf890579455b8094f987f0a47bcecc0581caa7c7030799f600d9f7b705d857b7990c7eb2bba64705b1277538db9206a50bcc97c2')
+            '0191d609f0444ce7e120effedf890579455b8094f987f0a47bcecc0581caa7c7030799f600d9f7b705d857b7990c7eb2bba64705b1277538db9206a50bcc97c2'
+            'd85dac14b83ef92891250036a4b336a611a41cfb729ca0f6b52c0c8d8ba82d06bf1c96d2a8b9570843033c4a8f91927eec59ff345f7d041d55a01799cc67d030')
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
