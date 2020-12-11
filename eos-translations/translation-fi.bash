@@ -267,3 +267,6 @@ _tr_add2 updt_press_enter         "Paina ENTER-näppäintä sulkeaksesi tämän 
 # 2020-Oct-24:
 #    IMPORTANT NOTE:
 #       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Hallitse tiedostoja pacnew, pacorig $_and pacsave sovelluksilla pacdiff $_and"
