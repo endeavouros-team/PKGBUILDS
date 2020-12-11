@@ -1042,7 +1042,7 @@ AfterInstall() {
   )
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
-          tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn "RunInTerminal DIFFPROG=$differ sudo pacdiff")
+          tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn "RunInTerminal DIFFPROG=$differ su-c_wrapper pacdiff")
           break
       fi
   done
