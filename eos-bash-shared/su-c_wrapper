@@ -4,12 +4,16 @@
 # (understands spaces in command parameters).
 
 Usage() {
-    echo "Usage: $progname command-with-parameters" >&2
+    cat <<EOF
+Usage: $progname [-p] command-with-parameters
+-p    Meant to be used by the Welcome app only.
+EOF
+    #echo "Usage: $progname [-p] command-with-parameters" >&2
 }
 
 DIE() {
+    echo "$progname: Error: $1" >&2
     Usage
-    echo "Error: $1" >&2
     exit 1
 }
 
@@ -20,8 +24,17 @@ Main() {
     local subresultfile="$(mktemp -u $HOME/$progname.$(date +%s%N).XXXXX)"
     local owner="$LOGNAME:users"
     local subresult=0
+    local prompt="Root "
 
-    test -z "$1" && DIE "command missing"
+    while true ; do
+        case "$1" in
+            -p) prompt+="Password: " ; shift ;;
+            "") DIE "command missing" ;;
+            *) break ;;
+        esac
+    done
+
+    # test -z "$1" && DIE "command missing"
 
     # command and parameters containing spaces: surround each with single quotes
     for xx in "$@" ; do
@@ -30,7 +43,7 @@ Main() {
 
     # run max 3 times
     for xx in {2..0} ; do
-        printf "Root "
+        printf "$prompt"
         LANG=C /usr/bin/su -c "${command[*]} ; echo $? > '$subresultfile' ; chown $owner '$subresultfile'"
 
         result=$?
