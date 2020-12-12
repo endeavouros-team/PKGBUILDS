@@ -1042,15 +1042,16 @@ AfterInstall() {
   )
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
+          tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn)
           case "$differ" in
               meld)
-                  tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn "RunInTerminal DIFFPROG=\'dbus-launch $differ\' su-c_wrapper -p pacdiff 2>/dev/null")
+                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=\'dbus-launch $differ\' su-c_wrapper -p pacdiff 2>/dev/null")
                   ;;
               vim | code)
-                  tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn "RunInTerminal DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
+                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
                   ;;
               *)
-                  tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn "RunInTerminal DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
+                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
                   ;;
           esac
           break
