@@ -1025,7 +1025,7 @@ AfterInstall() {
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
   local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ
+  local differ pdtext
 
   local tabcontents=(
       eos_yad
@@ -1043,15 +1043,16 @@ AfterInstall() {
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
           tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn)
+          pdtext="Starting pacdiff as root ..."
           case "$differ" in
               meld)
-                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=\'dbus-launch $differ\' su-c_wrapper -p pacdiff 2>/dev/null")
+                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=\'dbus-launch $differ\' su-c_wrapper -p pacdiff 2>/dev/null")
                   ;;
               vim | code)
-                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
+                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
                   ;;
               *)
-                  tabcontents+=("RunInTerminal echo \'Starting pacdiff as root ...\' ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
+                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
                   ;;
           esac
           break
