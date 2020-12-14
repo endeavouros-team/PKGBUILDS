@@ -273,13 +273,17 @@ Main()
     t1+="Marking <b>$na</b> means: info not available.\n"
     if [ "$connect_header_with_kernel" = "yes" ] ; then
         t1+="\n"
-        t1+="You have configured the header to <i>follow</i> the kernel.\n"
-        t1+="If a kernel setting chosen below contradicts its header setting, the kernel setting is used.\n"
+        t1+="You have configured the header to install/uninstall along with the kernel.\n"
+        t1+="If a chosen kernel setting below contradicts its header setting, the kernel setting is used for header, too.\n"
+    else
+        t1+="\n"
+        t1+="You have configured the header and kernel to install/uninstall separately (default behavior).\n"
+        t1+="See file /etc/akm.conf for more info.\n"
     fi
 
     local cmd=(
         eos_yad
-        --width=700
+        --width=750
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
