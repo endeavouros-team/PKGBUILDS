@@ -14,10 +14,8 @@ GetNvidiaBranch() {
     test -n "$data" || DIE "$FUNCNAME: fetching branch '$string' failed."
     if [ -n "$series" ] ; then
         echo "$data" | grep "$string" | grep "$processor" | sed -e "s|^.*$string ($series)||" -e 's|</a>.*||' -e 's|.*">||'
-        # echo "$data" | grep "$string" | grep "$series" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
     else
-        echo "$data" | grep "$string" | grep "$processor" | sed -e 's|</a>.*$||' -e 's|^.*">||'
-        # echo "$data" | grep "$string" | head -n 1 | sed 's|^.*">\([0-9\.]*\)<.*$|\1|'
+        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|.*$string||" -e 's|</a>.*$||' -e 's|^.*">||'
     fi
 }
 
@@ -38,6 +36,9 @@ NvidiaIdsCommon() {
     local series="$2"
     local branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
+    if [ -z "$series" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
+        return   # not the latest branch pacman has currently
+    fi
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
     Info "$string: $branch"
@@ -133,6 +134,7 @@ CreateNvidiaDb()
     local xx
     local log=$(mktemp /tmp/$PROGNAME.log.XXXXX)
     local has_logs=no
+    local pacman_latest_branch=$(LANG=C pacman -Si nvidia-dkms | grep ^Version | awk '{print $NF}' | sed 's|-[0-9][0.9]*$||')
 
     if [ "$targetdir" = "/tmp" ] ; then
         rm -f $target_latest $target_legacy  # option --tmpdb: always create new db into /tmp
