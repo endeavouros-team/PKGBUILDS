@@ -256,10 +256,13 @@ _tr_add2 after_install_ewtip2   "Choisir parmi les fonds d'écran d'EndeavourOS"
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
 
-# 2020-Oct-23:
+# 23-octobre-2020:
 _tr_add2 updt_update_check        "vérification de la mise à jour"
 _tr_add2 updt_searching           "En train de rechercher"
 _tr_add2 updt_for_updates         "pour les mises à jour"
 _tr_add2 updt_failure             "échec$_exclamation"
 _tr_add2 updt_nothing_todo        "il n'y a rien à faire"
 _tr_add2 updt_press_enter         "Presser ENTRÉE pour fermer cette fenêtre"
+
+# 11-décembre-2020:
+_tr_add2 after_install_pacdiff_tip "Gère les fichier pacnew, pacorig $_and pacsave avec pacdiff $_and"
