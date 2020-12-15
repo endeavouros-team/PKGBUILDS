@@ -176,19 +176,19 @@ Main()
     local journal1="journalctl -b -1"
     local journal2="journalctl -b -2"
     local xsession="~/.xsession-errors"
-    local Xorg="Xorg.0.log"
-    local lightdm="lightdm.log"
-    local lightdm2="x-0.log"
+    local Xorg="/var/log/Xorg.0.log"
+    local lightdm="/var/log/lightdm/lightdm.log"
+    local lightdm2="/var/log/lightdm/x-0.log"
     local install="EndeavourOS install log"
-    local fstab="fstab"
-    local grub="grub.cfg"
+    local fstab="/etc/fstab"
+    local grub="/boot/grub/grub.cfg"
     local blame="systemd-analyze blame"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
     #local inxi="inxi -Fzxxc0"                         # 'inxi' does not work here !!!
     local hwinfo="hwinfo --short"
-    local rdbut="<i>Remove personal data from logs</i>"
-    local slbut="<i>Send logs to internet</i>"
+    local rdbut="<b>Remove personal data from logs</b>"
+    local slbut="<b>Send logs to internet</b>"
     local save="Save this log"
 
     local cmds
@@ -207,24 +207,24 @@ Main()
     helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
 
     local result=$(
-        eos_yad --list --checklist --width=750 --height=655 --text="$helptext" \
+        eos_yad --list --checklist --width=770 --height=600 --text="$helptext" \
                 --image=dialog-question --title="EndeavourOS log tools" \
                 --no-click --multiple \
-                --column=Select --column="Log" --column="Description" \
+                --column=Select --column="Log contents" --column="Description of action" \
                 false "$journal0" "$save" \
                 false "$journal1" "$save" \
                 false "$journal2" "$save" \
-                false "$xsession" "$save" \
-                false "$Xorg"     "$save" \
-                false "$lightdm"  "$save" \
-                false "$lightdm2" "$save" \
-                false "$install"  "$save" \
-                false "$fstab"    "$save" \
-                false "$grub"     "$save" \
                 false "$blame"    "$save" \
                 false "$lspci"    "$save" \
                 false "$lsusb"    "$save" \
                 false "$hwinfo"   "$save" \
+                false "$install"  "$save" \
+                false "$xsession" "$save" \
+                false "$Xorg"     "$save" \
+                false "$lightdm"  "$save" \
+                false "$lightdm2" "$save" \
+                false "$fstab"    "$save" \
+                false "$grub"     "$save" \
                 false "$rdbut"    "$rdtip" \
                 false "$slbut"    "$sltip"
           )
@@ -240,13 +240,13 @@ Main()
             "$journal0") Cmd pkexec $xx ;;
             "$journal1") Cmd pkexec $xx ;;
             "$journal2") Cmd pkexec $xx ;;
-            "$xsession") Cmd cat ~/.xsession-errors ;;
-            "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
+            "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
+            "$xsession") Cmd cat ~/.xsession-errors ;;
+            "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
             "$install")  Cmd cat /var/log/Calamares.log ;;
             "$fstab")    Cmd cat /etc/fstab ;;
-            "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
             "$blame")    Cmd systemd-analyze blame ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
