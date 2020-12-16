@@ -255,3 +255,18 @@ _tr_add2 after_install_ewtip2     "Выбор обоев EndeavourOS"           
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "update check"
+_tr_add2 updt_searching           "Searching"
+_tr_add2 updt_for_updates         "for updates"
+_tr_add2 updt_failure             "failure$_exclamation"
+_tr_add2 updt_nothing_todo        "there is nothing to do"
+_tr_add2 updt_press_enter         "Press ENTER to close this window"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Управление файлами pacnew, pacorig $_and pacsave (необходимы pacdiff или meld, например) с помощью pacdiff $_and"
