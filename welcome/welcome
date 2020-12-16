@@ -939,7 +939,7 @@ INSTALL() {
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local image=$system_software_install
-  local gparted="$(eos-FindAppIcon gparted)"
+  local gparted="$(IconGrasp gparted)"       # "$(eos-FindAppIcon gparted)"
   local reflector_simple="$(eos-FindAppIcon software-update-available)"
   local user_info=info
   local tabcontents=(
@@ -1019,13 +1019,20 @@ RunIfInstalled() {
 }
 export -f RunIfInstalled
 
+IconGrasp() {
+    local differ="$1"
+    local desktop=$(/usr/bin/find /usr/share/applications -name \*$differ\*\.desktop | /usr/bin/head -n1)
+    local icon=$(/usr/bin/grep ^Icon= "$desktop" | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
+    echo "$icon"
+}
+
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
   local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ pdtext
+  local differ pdtext Icon=preferences-system
 
   local tabcontents=(
       eos_yad
@@ -1042,7 +1049,11 @@ AfterInstall() {
   )
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
-          tabcontents+=(--field="_align(Pacdiff $_and $differ)!preferences-system!$(ltr after_install_pacdiff_tip) $differ":fbtn)
+          case "$differ" in
+              meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
+              kdiff3|kompare|diffuse) Icon=$differ ;;
+          esac
+          tabcontents+=(--field="_align(Pacdiff $_and $differ)!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
           pdtext="Starting pacdiff as root ..."
           case "$differ" in
               meld)
@@ -1120,14 +1131,14 @@ AddMoreApps() {
   local shown_app_buttons=0
   local DE="$(eos_yad_GetDesktopName)"
 
-  local gufw="$(eos-FindAppIcon gufw)"
+  local gufw="$(IconGrasp gufw)"   # "$(eos-FindAppIcon gufw)"
   test -n "$gufw" || gufw="$(eos-FindAppIcon network-firewall)"
   test -n "$gufw" || gufw="$(eos-FindAppIcon firewall-config)"
 
-  local libreoffice="$(eos-FindAppIcon libreoffice-writer)"
+  local libreoffice="$(IconGrasp libreoffice-writer)"   # "$(eos-FindAppIcon libreoffice-writer)"
   test -n "$libreoffice" || libreoffice="$(eos-FindAppIcon libreoffice)"
 
-  local chromium="$(eos-FindAppIcon chromium)"
+  local chromium="$(IconGrasp chromium)"   # "$(eos-FindAppIcon chromium)"
   test -n "$chromium" || chromium="$(eos-FindAppIcon web-browser)"
 
   local tabcontents=(
