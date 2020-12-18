@@ -10,7 +10,7 @@ export -f eos_yad_RunCmdTermBash
 
 
 DIE() {
-    eos_yad --form --width=400 --title="AKM failure" --image=error --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="reflector-simple problem" --image=error --text="$1" --button=yad-quit
     exit 1
 }
 
