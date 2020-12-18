@@ -8,7 +8,15 @@ export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
 
-REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; reflector --list-countries)"
+
+DIE() {
+    eos_yad --form --width=400 --title="AKM failure" --image=error --text="$1" --button=yad-quit
+    exit 1
+}
+
+REFLECTOR_LIST_COUNTRIES="$(reflector --list-countries 2>/dev/null)"
+REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
+
 
 CodeToCountry() {  # convert country code to country name
     local code="$1"
@@ -477,4 +485,8 @@ Main() {
     fi
 }
 
-Main "$@"
+if [ -n "$REFLECTOR_LIST_COUNTRIES" ] ; then
+    Main "$@"
+else
+    DIE "reflector: Fetching information from https://www.archlinux.org failed!"
+fi
