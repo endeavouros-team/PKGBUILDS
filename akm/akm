@@ -84,7 +84,8 @@ Testing() {
     local testinginfo="$(/usr/bin/curl -s $URL_timeout $URL)"
     local version xx
 
-    test -n "$testinginfo" || return 1
+    [ -n "$testinginfo" ] || DIE "Fetching info from https://www.archlinux.org failed!"
+
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
