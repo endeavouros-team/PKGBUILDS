@@ -173,7 +173,7 @@ CommonStuff() {
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
 
-    curl --silent --connect-timeout 8 https://www.archlinux.org || DIE "Sorry, archlinux site is unavailable!"
+    curl --silent --connect-timeout 8 https://www.archlinux.org >/dev/null || DIE "Sorry, archlinux site is unavailable!"
 }
 
 AkmConfig() {
