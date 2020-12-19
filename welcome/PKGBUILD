@@ -2,15 +2,12 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.8.11
+pkgver=3.8.12
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
   bash yad systemd eos-bash-shared eos-translations
-  python-dbus           # for ksetwallpaper.py
-  xorg-xrandr           # for eos-set-background-picture
-  endeavouros-theming   # for eos-set-background-picture
 )
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
@@ -25,8 +22,6 @@ install=$pkgname.install
 source=(
   $_url/$pkgname
   $_url/$pkgname.desktop
-  $_url/eos-set-background-picture
-  $_url/ksetwallpaper.py
   $_url/wallpaper-once
   $_url/wallpaper-once.desktop
   $_url/eos-kill-yad-zombies
@@ -34,6 +29,7 @@ source=(
   $_url/calamares-update
   $_url/$pkgname.install
 
+#  $_url/eos-set-background-picture
 #  $_url/changelog.md
 #  $_url/paccache-service-manager
 #  $_url/eos-script-lib-yad
@@ -46,10 +42,8 @@ source=(
 #  $_url/welcome-dnd-tips.png
 #  $_url/welcome-dnd-window.png
 )
-sha512sums=('f3b804ceaad0f358a57c9e8d636ff14d89a3808faf3739cdac290e606f6b37d4c7942b4717769fb8ae982115508ac19cead354cf3a881d0a99e8aa89fa893bfb'
+sha512sums=('adfb96c474b548ad90955dbc9577ab1d417aa90b7085aed1b634bf440f7cd467f88fbb7a9d56b4d7f52cd9b42412d52ead2104296f700f584f18b201dce1c070'
             '4bfb2211bea561bfb99f4f02e6d921ed3a2fb83cab5daa5400c979bef9440e277a61d041929081cd9550ccd488141726ca6a1b97f5d2eb9f6067a986914298db'
-            '2af25af3c83fd5cf90cd9bdc15884c38432c8513801321eed437fbd173ee54fbe860e73b9e8252cfb693efc42af9d62535cff09042afc5e6a332d3a6c18b435f'
-            'a3488dab4b65f215ee1513c5ff4c81b1d9e43346abb3a1e9571271c8e60e13184bd826a6206938c14c004fa5adb4f629ea832a535a51972657adb2de5bc30634'
             '562d9fbbccf211e6f61299713395af0240ed605acb6860e3d284102ca9eab48a7ef4087ecb8a8a7771bc4f2d217b7fa80770ac66581b8bda4dd01e030a6572f1'
             '3761a92815ae08990e43c9b7879850873089478f7f9013e2af070769a317d56230444856378ab4d36981e0816dcdb2c8d991b2fcd845819df31008bae51abadb'
             '47382fe6431ae179f991980b2bf2f4d4ad56bfba70873659c3a7720de2fca90a60fa6033fb4cfe313e87d771312c0c80feb1617a64885362763f4b66e62543b8'
@@ -59,13 +53,12 @@ sha512sums=('f3b804ceaad0f358a57c9e8d636ff14d89a3808faf3739cdac290e606f6b37d4c79
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
-  install -Dm755 ksetwallpaper.py         $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm755 wallpaper-once           $pkgdir/usr/share/endeavouros/scripts/wallpaper-once
 
   install -d $pkgdir/usr/bin
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
 
-  install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
+#  install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
   install -Dm755 calamares-update               $pkgdir/usr/bin/calamares-update
   install -Dm755 welcome-dnd                    $pkgdir/usr/bin/welcome-dnd

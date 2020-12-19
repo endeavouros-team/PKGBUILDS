@@ -1076,7 +1076,7 @@ AfterInstall() {
   ShowChangeResoButton
 
   tabcontents+=(
-      --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'    # 'eos-set-background-picture'
+      --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
       --field="_align($(ltr after_install_ew2))!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
   )
 
