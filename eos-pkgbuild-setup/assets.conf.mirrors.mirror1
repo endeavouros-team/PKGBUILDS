@@ -244,13 +244,13 @@ _diff_file_and_data() {
     diff "$file" "$datafile"
 }
 
-_welcome_hook_check_ksetwallpaper_py() {
+_eos-bash-shared_hook_check_ksetwallpaper_py() {
     # Check if we have the latest version of file ksetwallpaper.py.
     # See https://github.com/pashazz/ksetwallpaper/raw/master/ksetwallpaper.py
 
     local file=ksetwallpaper.py
     local url="https://github.com/pashazz/ksetwallpaper/raw/master/$file"
-    local current="$PKGBUILD_ROOTDIR"/welcome/$file
+    local current="$PKGBUILD_ROOTDIR"/eos-bash-shared/$file
     local new
     local diffs answer
 
@@ -265,7 +265,7 @@ _welcome_hook_check_ksetwallpaper_py() {
         echo "" >&2
         echo "$diffs" >&2
         echo "" >&2
-        read -p "welcome: file '$file' differs from current, update (Y/n)? " answer >&2
+        read -p "eos-bash-shared: file '$file' differs from current, update (Y/n)? " answer >&2
         case "$answer" in
             "" | [yY]*)
                 rm -f $current
@@ -283,7 +283,7 @@ ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
-ASSET_PACKAGE_HOOKS["welcome"]=_welcome_hook_check_ksetwallpaper_py
+ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
 ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 
