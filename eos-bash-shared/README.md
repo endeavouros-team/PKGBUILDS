@@ -11,6 +11,7 @@ eos-FindAppIcon | Find a suitable icon path for an app.
 eos-script-lib-yad | Common bash code for various EOS apps.
 eos-script-lib-yad.conf | Configuration file for eos-script-lib-yad.
 eos-wallpaper-set | Sets the wallpaper according to the current DE, given file, or from given folder.
+ksetwallpaper.py | KDE wallpaper installer, forked from https://github.com/pashazz/ksetwallpaper.
 paccache-service-manager | Tool to manage paccache service (prevents package cache size growing too much).
 RunInTerminal | Run one or many commands in a new terminal. Useful for Welcome and related apps.
 su-c_wrapper | A small utility to perform command "su -c". Useful e.g. for users without sudoers rights.
