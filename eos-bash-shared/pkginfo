@@ -1,0 +1,51 @@
+#!/bin/bash
+
+DIE() {
+    local PROGNAME="$(/usr/bin/basename "$0")"
+    echo "$PROGNAME: error: $1" >&2
+    exit 1
+}
+
+OpenUrl() {
+    local url="$(echo "$PKGINFO" | /usr/bin/grep ^URL | /usr/bin/head -n1 | /usr/bin/awk '{print $NF}')"
+    case "$url" in
+        http*)
+            echo "$url ..." >&2
+            case "$url" in
+                https://*) ;;
+                http://*)  read -p "Change http to https (Y/n)? " >&2
+                           case "$REPLY" in
+                               ""|[yY]*) url="${url/http:/https:}" ;;
+                           esac
+                           ;;
+            esac
+            ;;
+        "") DIE "URL for package '$pkgname' not found" ;;
+        *)  DIE "unsupported URL '$url'" ;;
+    esac
+    /usr/bin/xdg-open "$url" 2>/dev/null
+}
+
+Helper() {
+    local helper
+    for helper in paru yay ; do
+        if [ -x /usr/bin/$helper ] ; then
+            echo "$helper"
+            return
+        fi
+    done
+}
+
+Main()
+{
+    local pkgname="$1"
+    [ -n "$pkgname" ] || DIE "give package-name"
+    local helper=$(Helper)
+    [ -n "$helper" ] || DIE "AUR helper not found!"
+    local PKGINFO="$(LANG=C $helper -Si "$pkgname" 2>/dev/null)"
+    [ -n "$PKGINFO" ] || DIE "package '$pkgname' not found"
+
+    OpenUrl
+}
+
+Main "$@"
