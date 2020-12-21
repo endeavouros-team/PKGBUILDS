@@ -14,7 +14,7 @@ DIE() {
     exit 1
 }
 
-REFLECTOR_LIST_COUNTRIES="$(reflector --list-countries 2>/dev/null)"
+REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
 
 
