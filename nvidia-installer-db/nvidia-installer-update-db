@@ -6,6 +6,14 @@
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/supportedchips.html
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/index.html
 
+#LATEST_BRANCH1="Latest Long Lived Branch"
+#LATEST_BRANCH2="Latest Short Lived Branch"
+
+LATEST_BRANCH1="Latest Production Branch Version"
+LATEST_BRANCH2="Latest New Feature Branch Version"
+
+LATEST_LEGACY="Latest Legacy GPU version"
+
 GetNvidiaBranch() {
     local string="$1"
     local series="$2"
@@ -46,20 +54,23 @@ NvidiaIdsCommon() {
 }
 
 NvidiaIdsLatest() {
-    local ids="$(NvidiaIdsCommon "Latest Long Lived Branch")"
-    if [ -z "$ids" ] ; then
-        ids="$(NvidiaIdsCommon "Latest Short Lived Branch")"
-        if [ -z "$ids" ] ; then
-            DIE "$FUNCNAME: NvidiaIdsCommon failed."
+    local br ids
+    for br in "$LATEST_BRANCH1" "$LATEST_BRANCH2" ; do
+        ids="$(NvidiaIdsCommon "$br")"
+        if [ -n "$ids" ] ; then
+            echo "==> $br: found!" >&2
+            echo "$ids"
+            return 0
         fi
-    fi
-    echo "$ids"
+    done
+    DIE "$FUNCNAME: NvidiaIdsCommon failed."
 }
 
 NvidiaIdsLegacy() {
     local series="$legacy_series.xx series"
-    local ids="$(NvidiaIdsCommon "Latest Legacy GPU version" "$series")"
+    local ids="$(NvidiaIdsCommon "$LATEST_LEGACY" "$series")"
     test -n "$ids" || DIE "$FUNCNAME: NvidiaIdsCommon failed for Legacy $series."
+    echo "==> $LATEST_LEGACY: found!" >&2
     echo "$ids"
 }
 
