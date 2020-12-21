@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.5
+pkgver=1.5.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -13,12 +13,12 @@ depends=(
   python-dbus           # for ksetwallpaper.py
   xorg-xrandr           # for eos-wallpaper-set
   endeavouros-theming   # for eos-wallpaper-set
-  xdg-utils             # for pkginfo
+  xdg-utils             # for eos-pkginfo
 )
 optdepends=(
   "neofetch: for additional DE detection"
-  "yay:      an AUR helper supported by pkginfo"
-  "paru:     an AUR helper supported by pkginfo"
+  "yay:      an AUR helper supported by eos-pkginfo"
+  "paru:     an AUR helper supported by eos-pkginfo"
 )
 backup=(etc/eos-script-lib-yad.conf)
 #url=https://github.com/endeavouros-team/PKGBUILDS/$pkgname
@@ -41,8 +41,8 @@ source=(
   $_url/UpdateInTerminal
   $_url/UpdateInTerminal.desktop
   $_url/eos-waiting-indicator
-  $_url/pkginfo
-  $_url/pkginfo.completion
+  $_url/eos-pkginfo
+  $_url/eos-pkginfo.completion
 )
 
 sha512sums=('318c02304bf35e010a1c72c6fb89295dbaa309aa484c22948e4e93f2590c41dc4ed609d36171ca4c0c2317f1307ad7f3f401b3ea58c4499efff06a786964ba80'
@@ -80,6 +80,6 @@ package() {
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
-  install -Dm755 pkginfo                       $pkgdir/usr/bin/pkginfo
-  install -Dm644 pkginfo.completion            $pkgdir/usr/share/bash-completion/completions/pkginfo
+  install -Dm755 eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo
+  install -Dm644 eos-pkginfo.completion         $pkgdir/usr/share/bash-completion/completions/eos-pkginfo
 }
