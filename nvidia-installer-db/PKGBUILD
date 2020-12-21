@@ -1,5 +1,5 @@
 # Original Maintainer: Gustau Castells <karasu@antergos.com>
-# Maintainer: joekamprad <archlinux@kamprad.net>
+# Initial Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
 pkgver=2.4.10
