@@ -172,6 +172,26 @@ _yay_hook_check_latest_old() {
     rm -f $tmpfile
 }
 
+_nvidia-installer-db_hook() {
+    # check if Nvidia has changed its driver archive (db) site
+    local archive=https://www.nvidia.com/en-us/drivers/unix
+    local store="$HOME"/.nvidia-installer/archive.html
+    mkdir -p "$(dirname "$store")"
+    local tmpfile="$(mktemp "$store".XXXXX)"
+
+    wget -q -O "$tmpfile" $archive || {
+        rm -f "$tmpfile"
+        return 1
+    }
+    if (diff "$tmpfile" "$store" >& /dev/null) ; then
+        rm -f "$tmpfile"  # no diffs
+    else
+        rm -f "$store"
+        mv "$tmpfile" "$store"
+        printf "$archive changed! Check nvidia-installer-update-db." >&2
+    fi
+}
+
 _inxi_hook_check_latest() {
     # check if AUR PKGBUILD has the latest version of inxi from the developer
     local tool=inxi
@@ -281,9 +301,10 @@ declare -A ASSET_PACKAGE_HOOKS
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
+ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
-ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
+ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 
