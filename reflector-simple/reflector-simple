@@ -20,7 +20,7 @@ REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")
 
 CodeToCountry() {  # convert country code to country name
     local code="$1"
-    echo "$REFLECTOR_COUNTRIES" | grep -w "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
+    echo "$REFLECTOR_COUNTRIES" | grep -wi "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
 }
 CountryToCode() {  # convert country name to country code
     local country="$1"
@@ -90,7 +90,7 @@ IsDroppedCountry() {
 _config_country() {
     local xx="$1"
     case "$xx" in
-        [A-Z][A-Z]) conf_selected_countries+=("$(CodeToCountry "$xx")") ;;
+        [a-zA-Z][a-zA-Z]) conf_selected_countries+=("$(CodeToCountry "$xx")") ;;
     esac
 }
 
