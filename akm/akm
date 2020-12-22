@@ -80,11 +80,11 @@ TestingVersion() {
 }
 
 Testing() {
-    local URL="https://www.archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules"
+    local URL="https://archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules"
     local testinginfo="$(/usr/bin/curl -s $URL_timeout $URL)"
     local version xx
 
-    [ -n "$testinginfo" ] || DIE "Fetching info from https://www.archlinux.org failed!"
+    [ -n "$testinginfo" ] || DIE "Fetching info from https://archlinux.org failed!"
 
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
@@ -173,7 +173,7 @@ CommonStuff() {
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
 
-    curl --silent --connect-timeout 8 https://www.archlinux.org >/dev/null || DIE "Sorry, archlinux site is unavailable!"
+    curl --silent --connect-timeout 8 https://archlinux.org >/dev/null || DIE "Sorry, archlinux site is unavailable!"
 }
 
 AkmConfig() {
