@@ -1,0 +1,11 @@
+#!/bin/bash
+
+Main()
+{
+    local tool="$1"
+    local urlbase=https://github.com/endeavouros-team/PKGBUILDS/commits/master
+
+    /usr/bin/xdg-open "$urlbase/$tool" 2> /dev/null
+}
+
+Main "$@"
