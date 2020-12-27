@@ -94,9 +94,15 @@ _config_country() {
     esac
 }
 
+GetListToken() {
+    local -n __lista__=$1
+    local -n __token__=$2
+    __token__="$(echo "$__lista__" | cut -d ',' -f 1)"
+    __lista__="$(echo "$__lista__" | sed 's|^[^,]*[,]*||')"
+}
 
 # Conf limitations:
-# * protocols: comma separated list not supported
+# - nothing known!
 
 _get_reflector_x_configs() {
     # Read reflector options from $REFLECTOR_X_CONF,
@@ -135,27 +141,24 @@ _get_reflector_x_configs() {
             --sort)            conf_sort="$xx" ;;
             -a | --age)        conf_age="$xx" ;;
             -n | --number)     conf_number="$xx" ;;
-            -p | --protocol)   conf_protocol+=("$xx") ;;
+            -p | --protocol)
+                list="$xx"
+                while [ -n "$list" ] ; do
+                    GetListToken list yy
+                    conf_protocol+=("$yy")
+                done
+                ;;
             $country_exclude)                                  # extension
                 conf_dropped_countries+=("$xx")
                 conf_dropped_countries+=("$(CodeToCountry "$xx")")
                 ;;
             -c | --country)
                 # list or single value: "GB,FR,DE" or "GB"
-                # for a country spec, separate country names if $xx is a country list
-                if [ "$(echo "$xx" | tr -d ',')" != "$xx" ] ; then   # is it a list?
-                    # yes, a list of countries
-                    list="$xx"
-                    while [ -n "$list" ] ; do
-                        yy="$(echo "$list" | cut -d ',' -f 1)"
-                        list="$(echo "$list" | sed 's|^[^,]*,||')"
-                        [ "$list" = "$yy" ] && list=""
-                        _config_country "$yy"
-                    done
-                else
-                    # no, only one country
-                    _config_country "$xx"
-                fi
+                list="$xx"
+                while [ -n "$list" ] ; do
+                    GetListToken list yy
+                    _config_country "$yy"
+                done
                 ;;
         esac
         opt="$xx"
