@@ -265,7 +265,13 @@ AskCountriesAndOptions() {
     command+=(--field="Sort by":cb "$default_sort")                            # --sort
     command+=(--field="Max number of mirrors":num $default_number)             # --number
 
+    command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
+
     reflector_info="$("${command[@]}")"
+    case "$?" in
+        1) exit 1 ;;
+        2) eos-pkg-changelog $progname ; exit 0 ;;
+    esac
     test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
     reflector_info=($(echo $reflector_info))                       # make it an array
 }
