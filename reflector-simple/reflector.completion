@@ -22,12 +22,22 @@ _reflector_complete_countries() {
     fi
 
     local IFS=$'\n'
-    COMPREPLY=( $(compgen -S "'" -P "'" -W "$country_names" -- "$cur") )
+    COMPREPLY=( $(compgen -W "$country_names" -- "$cur") )
     compopt -o nosort
+    compopt -o filenames
 }
 
 _reflector_options() {
     local opts=(
+        -a
+        -c
+        -f
+        -h
+        -i
+        -l
+        -n
+        -p
+        -x
         --age #n         #-a= #n
         --cache-timeout #n
         --completion-percent #[0-100]
@@ -64,7 +74,7 @@ _reflector_()
     # Each option "case" should return immediately.
 
     case "$prev" in
-        --age | --cache-timeout | --connection-timeout | --download-timeout | --fastest | --latest | --score | --number)
+        --age | --cache-timeout | --connection-timeout | --download-timeout | --fastest | --latest | --score | --number | -a | -f | -l | -n)
             COMPREPLY=($(compgen -P "$cur" -W "{0..9}"))
             compopt -o nospace
             ;;
@@ -72,12 +82,12 @@ _reflector_()
             COMPREPLY=($(compgen -W "{0..100}" -- "$cur"))
             compopt -o nosort
             ;;
-        --country)   _reflector_complete_countries ;;
-        --protocol)  _reflector_complete "https http rsync" ;;
-        --sort)      _reflector_complete "age rate country score delay" ;;
-        --save)      _filedir ;;
+        --country | -c)  _reflector_complete_countries ;;
+        --protocol | -p) _reflector_complete "https http rsync" ;;
+        --sort)          _reflector_complete "age rate country score delay" ;;
+        --save)          _filedir ;;
         --url) ;;
-        --include | --exclude) ;;
+        --include | -i | --exclude | -x) ;;
 
         *)
             # Handle all top-level parameters.
