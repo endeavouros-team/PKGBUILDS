@@ -29,37 +29,29 @@ _reflector_complete_countries() {
 
 _reflector_options() {
     local opts=(
-        -a
-        -c
-        -f
-        -h
-        -i
-        -l
-        -n
-        -p
-        -x
-        --age #n         #-a= #n
-        --cache-timeout #n
-        --completion-percent #[0-100]
-        --connection-timeout #n
-        --country #<country name or code>[,<country name or code>,...]   #-c #<country name or code>[,<country name or code>,...]
-        --download-timeout #n
-        --exclude #<regex>        #-x #<regex>
-        --fastest #n        #-f= #n
-        --help #-h
-        --include #<regex>        #-i #<regex>
+        --help     -h
+        --age      -a
+        --country  -c
+        --exclude  -x
+        --fastest  -f
+        --include  -i
+        --latest   -l
+        --number   -n
+        --protocol -p
+
+        --cache-timeout
+        --completion-percent
+        --connection-timeout
+        --download-timeout
         --info
         --ipv4
         --ipv6
         --isos
-        --latest #n        #-l= #n
         --list-countries
-        --number #n        #-n= #n
-        --protocol #<protocol>[,<protocol>,...]        #-p #<protocol>[,<protocol>,...]
-        --save #<filepath>
-        --score #n
-        --sort #{age,rate,country,score,delay}
-        --url #URL
+        --save
+        --score
+        --sort
+        --url
         --verbose
     )
     echo "${opts[*]}"

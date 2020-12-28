@@ -3,7 +3,7 @@
 pkgname=reflector-bash-completion
 pkgdesc="Bash completion support for 'reflector'"
 pkgver=1
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(bash-completion
@@ -14,7 +14,7 @@ _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgna
 source=(
   $_url/$pkgname
 )
-sha512sums=('0dd24db7509a27df3c4ef5d761f3be1aa41a7232d2aaa0dbd86647d56586127a39c3b9a494a244a7187ce1796391069596dc44b4598df095f11715b85b159468')
+sha512sums=('e05d17f089f0bf5e3590642399985a63cc76c6b49a9a6547010922910c0f1b2f71769219b9e379bccda584ee01488dd9bc7693c374c8610bd6041a897a1e6b4a')
 
 package() {
   install -Dm644 $pkgname  $pkgdir/usr/share/bash-completion/completions/reflector
