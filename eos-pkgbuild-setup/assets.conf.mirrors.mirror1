@@ -49,6 +49,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer-dkms
     pahis
     reflector-auto
+    reflector-bash-completion
     reflector-simple
     welcome
 )
