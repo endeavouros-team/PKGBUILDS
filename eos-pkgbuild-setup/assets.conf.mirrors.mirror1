@@ -178,18 +178,19 @@ _nvidia-installer-db_hook() {
     local archive=https://www.nvidia.com/en-us/drivers/unix
     local store="$HOME"/.nvidia-installer/archive.html
     mkdir -p "$(dirname "$store")"
-    local tmpfile="$(mktemp "$store".XXXXX)"
+    local tmpfile="$(mktemp "$store".tmp.XXXXX)"
 
     wget -q -O "$tmpfile" $archive || {
         rm -f "$tmpfile"
         return 1
     }
     if (diff "$tmpfile" "$store" >& /dev/null) ; then
-        rm -f "$tmpfile"  # no diffs
+        rm -f "$store".tmp.*  # no diffs
     else
-        rm -f "$store"
+        mv "$store" "$store".tmp
         mv "$tmpfile" "$store"
-        printf "$archive changed! Check nvidia-installer-update-db." >&2
+        mv "$store".tmp "$tmpfile"
+        printf "$archive changed! Run nvidia-installer-check to see if there's a problem. " >&2
     fi
 }
 
