@@ -7,7 +7,20 @@ _reflector_complete() {
 }
 
 _reflector_complete_countries() {
-    local country_names="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed -e '1d' -e 's|^\([A-Z][a-zA-Z ]*[a-z]\).*$|\1|')"
+    local folder=$HOME/.config/reflector-complete
+    local countrylist=$folder/countrylist
+    local date=$(date +%Y%V)                # updates countrylist weekly
+    local country_names
+
+    mkdir -p $folder
+    if [ -r $countrylist.$date ] ; then
+        country_names="$(cat $countrylist.$date)"
+    else
+        rm -f $countrylist.*
+        country_names="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed -e '1d' -e 's|^\([A-Z][a-zA-Z ]*[a-z]\).*$|\1|')"
+        echo "$country_names" > $countrylist.$date
+    fi
+
     local IFS=$'\n'
     COMPREPLY=( $(compgen -S "'" -P "'" -W "$country_names" -- "$cur") )
     compopt -o nosort
