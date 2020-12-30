@@ -157,7 +157,7 @@ Main()
 {
     case "$1" in
         --changelog)
-            xdg-open https://github.com/endeavouros-team/PKGBUILDS/commits/master/eos-log-tool 2> /dev/null
+            /usr/bin/eos-pkg-changelog eos-log-tool
             return
             ;;
     esac
