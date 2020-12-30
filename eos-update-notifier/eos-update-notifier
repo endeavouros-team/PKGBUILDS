@@ -563,7 +563,7 @@ Main()
                 return
                 ;;
             --changelog)
-                xdg-open https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname
+                /usr/bin/eos-pkg-changelog $progname
                 return
                 ;;
             -iw=*)
