@@ -1,9 +1,23 @@
 #!/bin/bash
 
 DIE() {
-    local PROGNAME="$(/usr/bin/basename "$0")"
     echo "$PROGNAME: error: $1" >&2
+    Usage
     exit 1
+}
+
+Helper() {
+    for HELPER in paru yay ; do
+        if [ -x /usr/bin/$HELPER ] ; then
+            return
+        fi
+    done
+    DIE "AUR helper not found!"
+}
+
+FindUrl() {
+    PKGINFO="$(LANG=C $HELPER -Si "$PKGNAME" 2>/dev/null)"
+    [ -n "$PKGINFO" ] || DIE "package '$PKGNAME' not found"
 }
 
 OpenUrl() {
@@ -20,31 +34,45 @@ OpenUrl() {
                            ;;
             esac
             ;;
-        "") DIE "URL for package '$pkgname' not found" ;;
+        "") DIE "URL for package '$PKGNAME' not found" ;;
         *)  DIE "unsupported URL '$url'" ;;
     esac
     /usr/bin/xdg-open "$url" 2>/dev/null
 }
 
-Helper() {
-    local helper
-    for helper in paru yay ; do
-        if [ -x /usr/bin/$helper ] ; then
-            echo "$helper"
-            return
-        fi
+Options() {
+    PROGNAME="$(/usr/bin/basename "$0")"
+    PKGNAME=""
+
+    local arg
+
+    for arg in "$@" ; do
+        case "$arg" in
+            -*) DIE "option $arg is not supported." ;;
+            *)  PKGNAME="$arg" ;;
+        esac
     done
+
+    [ -n "$PKGNAME" ] || DIE "give package-name"
+}
+
+Usage() {
+    cat <<EOF
+Usage: $PROGNAME <package-name>
+  package-name     A package name from upstream or AUR.
+EOF
 }
 
 Main()
 {
-    local pkgname="$1"
-    [ -n "$pkgname" ] || DIE "give package-name"
-    local helper=$(Helper)
-    [ -n "$helper" ] || DIE "AUR helper not found!"
-    local PKGINFO="$(LANG=C $helper -Si "$pkgname" 2>/dev/null)"
-    [ -n "$PKGINFO" ] || DIE "package '$pkgname' not found"
+    local PKGNAME
+    local PROGNAME
+    local HELPER
+    local PKGINFO
 
+    Options "$@"
+    Helper
+    FindUrl
     OpenUrl
 }
 

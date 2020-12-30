@@ -1,17 +1,17 @@
-# bash completion for pkginfo        -*- shell-script -*-
+# bash completion for eos-pkginfo        -*- shell-script -*-
 
-_pkginfo_complete() {
+_eos-pkginfo_complete() {
     COMPREPLY=( $(compgen -W "$1" -- "$cur") )
     [[ $COMPREPLY == *= ]] && compopt -o nospace
 }
 
-_pkginfo_() 
+_eos-pkginfo_() 
 {
     local cur prev #words cword split
     _init_completion -s || return
 
     local helper=/usr/bin/pacman  # AUR helpers are too slow for this!
 
-    _pkginfo_complete "$($helper -Slq)"
+    _eos-pkginfo_complete "$($helper -Slq)"
 } &&
-complete -F _pkginfo_ pkginfo
+complete -F _eos-pkginfo_ eos-pkginfo
