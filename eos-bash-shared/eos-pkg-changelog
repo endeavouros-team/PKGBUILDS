@@ -16,6 +16,28 @@ SetBrowser() {
     DIE "$FUNCNAME: cannot find a web browser"
 }
 
+EosPackages() {
+    wget -q -O- https://github.com/endeavouros-team/PKGBUILDS | grep ' href="/endeavouros-team/PKGBUILDS/tree/master/' | sed 's|.*/tree/master/\([^"]*\).*|\1|' | \
+        grep -P -v 'z_archived|ckbcomp'
+}
+
+HasPkgbuild() {
+    local pkgs="$(EosPackages)"
+    local pkg
+    for pkg in $pkgs ; do
+        if [ "$pkgname" = "$pkg" ] ; then
+            return 0
+        fi
+    done
+    case "$pkgname" in
+        mkinitcpio-openswap)
+            pkgname=openswap ; return 0 ;;
+        grub-theme2-endeavouros)
+            pkgname=grub-theme-endeavouros ; return 0 ;;
+    esac
+    return 1
+}
+
 Main()
 {
     local pkgname="$1"
@@ -25,7 +47,11 @@ Main()
 
     SetBrowser
 
-    [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" 2> /dev/null
+    if (HasPkgbuild) ; then
+        [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" 2> /dev/null
+    else
+        eos-pkginfo "$pkgname"
+    fi
 }
 
 Main "$@"

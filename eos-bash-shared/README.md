@@ -8,13 +8,14 @@ ChangeDisplayResolution | Helps changing display resolution (with xrandr).
 device-info | A helper app for finding info about devices.
 eos-connection-checker | Checks that an internet connection is available.
 eos-FindAppIcon | Find a suitable icon path for an app.
+eos-pkg-changelog | Show the changelog of (most) EndeavourOS packages.<br>Usage: `eos-pkg-changelog <package-name>`
+eos-pkginfo | Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Usage: `eos-pkginfo <package-name>`
+eos-pkginfo.completion | Bash completion for pkginfo.<br>Note: does not support completion for AUR packages because of performance.
 eos-script-lib-yad | Common bash code for various EOS apps.
 eos-script-lib-yad.conf | Configuration file for eos-script-lib-yad.
 eos-wallpaper-set | Sets the wallpaper according to the current DE, given file, or from given folder.
 ksetwallpaper.py | KDE wallpaper installer, forked from https://github.com/pashazz/ksetwallpaper.
 paccache-service-manager | Tool to manage paccache service (prevents package cache size growing too much).
-eos-pkginfo | Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Usage: `eos-pkginfo <package-name>`
-eos-pkginfo.completion | Bash completion for pkginfo.<br>Note: does not support completion for AUR packages because of performance.
 RunInTerminal | Run one or many commands in a new terminal. Useful for Welcome and related apps.
 su-c_wrapper | A small utility to perform command "su -c". Useful e.g. for users without sudoers rights.
 UpdateInTerminal | Simple system updater using only terminal.
