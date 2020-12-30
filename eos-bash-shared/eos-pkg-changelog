@@ -1,11 +1,31 @@
 #!/bin/bash
 
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+SetBrowser() {
+    local browser
+    for browser in xdg-open exo-open firefox chromium vivaldi-stable opera ; do
+        if [ -x /usr/bin/$browser ] ; then
+            Browser=/usr/bin/$browser
+            return
+        fi
+    done
+    DIE "$FUNCNAME: cannot find a web browser"
+}
+
 Main()
 {
-    local tool="$1"
+    local pkgname="$1"
+    local progname="$(basename "$0")"
     local urlbase=https://github.com/endeavouros-team/PKGBUILDS/commits/master
+    local Browser=""
 
-    /usr/bin/xdg-open "$urlbase/$tool" 2> /dev/null
+    SetBrowser
+
+    [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" 2> /dev/null
 }
 
 Main "$@"
