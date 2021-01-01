@@ -115,13 +115,16 @@ _ckbcomp_hook() {
         sed -i "$Pkgbuild" \
             -e "s|^pkgver=.*|pkgver=$newver|"
 
-        if [ "$newver" = "1.198" ] ; then
-            sed -i "$Pkgbuild"  \
-                -e 's| cd console-setup$| cd console-setup-$pkgver|'
-        else
-            sed -i "$Pkgbuild"  \
-                -e 's| cd console-setup-${pkgver}$| cd console-setup|'
-        fi
+        case "$newver" in
+            "1.199")
+                sed -i "$Pkgbuild"  \
+                    -e 's| cd console-setup-${pkgver}$| cd console-setup|'
+                ;;
+            *)
+                sed -i "$Pkgbuild"  \
+                    -e 's| cd console-setup$| cd console-setup-$pkgver|'
+                ;;
+        esac
         updpkgsums "$Pkgbuild" 2>/dev/null
         echo -n "#" >&2
     fi
