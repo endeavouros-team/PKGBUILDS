@@ -319,6 +319,9 @@ yad_calamares() {
             wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
                 mv -f netinstall.yaml /usr/share/calamares/netinstall.yaml
             }
+            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist && {
+                mv -f update-mirrorlist /usr/bin/
+            }
 
             file=/usr/share/calamares/modules/netinstall.conf
             if [ ! -r $file ] ; then
