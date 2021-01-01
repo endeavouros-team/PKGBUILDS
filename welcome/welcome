@@ -317,10 +317,10 @@ yad_calamares() {
     case "$mode" in
         online)
             wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
-                mv -f netinstall.yaml /usr/share/calamares/netinstall.yaml
+                sudo bash -c "cp -f netinstall.yaml /usr/share/calamares/ ; chown root:root /usr/share/calamares/netinstall.yaml"
             }
             wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist && {
-                mv -f update-mirrorlist /usr/bin/
+                sudo bash -c "cp -f update-mirrorlist /usr/bin/ ; chown root:root /usr/bin/update-mirrorlist ; chmod 0755 /usr/bin/update-mirrorlist"
             }
 
             file=/usr/share/calamares/modules/netinstall.conf
@@ -414,14 +414,15 @@ EOF
         yad_tailer $PACMAN_LOG
     fi
 
-    if [ 0 -eq 1 ] ; then
+    if [ 1 -eq 1 ] ; then
         # Copy install log to /var/log of the installed system.
         # Note: if $only_one_output_window != yes, this fails.
 
         local varlog="$(/usr/bin/ls -d /tmp/calamares-root-*/var/log)"
         if [ -d "$varlog" ] ; then
-            echo "Copying install log to /var/log/$(/usr/bin/basename $INSTALL_LOG_FILE) of the new install." >&2
-            cp $INSTALL_LOG_FILE $varlog
+            local varlogfile=$varlog/$(/usr/bin/basename $INSTALL_LOG_FILE)
+            echo "Copying install log to $varlogfile of the new install." >&2
+            sudo bash -c "cp $INSTALL_LOG_FILE $varlog ; chown root:root $varlogfile"
         fi
 
         # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
