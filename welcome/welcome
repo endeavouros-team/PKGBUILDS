@@ -359,6 +359,13 @@ yad_calamares() {
 ############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
 EOF
+    case "$mode" in
+        online)
+            echo "Updating mirrorlist, please wait ..." >> $INSTALL_LOG_FILE
+            /usr/bin/update-mirrorlist
+            ;;
+    esac
+
     local only_one_output_window=yes   # yes=one, no=more than one
 
     if [ "$debug" = "yes" ] ; then
