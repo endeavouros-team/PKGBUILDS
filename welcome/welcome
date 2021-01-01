@@ -414,7 +414,7 @@ EOF
         yad_tailer $PACMAN_LOG
     fi
 
-    if [ 1 -eq 1 ] ; then
+    if [ 0 -eq 1 ] ; then
         # Copy install log to /var/log of the installed system.
         # Note: if $only_one_output_window != yes, this fails.
 
