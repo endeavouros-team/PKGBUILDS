@@ -1187,7 +1187,7 @@ AddMoreApps() {
             local bluetooth="$(eos-FindAppIcon bluetooth)"
             tabcontents+=(
                 --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-                --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils"'
+                --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
             )
             break
         done
