@@ -5,13 +5,44 @@ _eos-pkginfo_complete() {
     [[ $COMPREPLY == *= ]] && compopt -o nospace
 }
 
+_eos-pkginfo_aur() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    local weekofyear=$(/usr/bin/date +%V)
+    local datafilebase="$HOME/.config/eos-pkginfo-aur.txt"
+    local datafile="$datafilebase.$weekofyear"
+
+    if [ ! -r "$datafile" ] ; then
+        # Update database file.
+        # Note that a systemd service (--user) can update too.
+
+        # AUR helpers are very slow for this!
+        local helper=/usr/bin/paru
+        [ -x $helper ] || helper=/usr/bin/yay
+
+        rm -f "$datafilebase".*
+        $helper -Slq > "$datafile"
+    fi
+    _eos-pkginfo_complete "$(cat "$datafile")"
+}
+
 _eos-pkginfo_() 
 {
     local cur prev #words cword split
     _init_completion -s || return
 
-    local helper=/usr/bin/pacman  # AUR helpers are too slow for this!
+    local weekofyear=$(/usr/bin/date +%V)
+    local datafilebase="$HOME/.config/eos-pkginfo.txt"
+    local datafile="$datafilebase.$weekofyear"
 
-    _eos-pkginfo_complete "$($helper -Slq)"
-} &&
-complete -F _eos-pkginfo_ eos-pkginfo
+    if [ ! -r "$datafile" ] ; then
+        # Update database file.
+        rm -f "$datafilebase".*
+        /usr/bin/pacman -Slq > "$datafile"
+    fi
+    _eos-pkginfo_complete "$(cat "$datafile")"
+}
+complete -F _eos-pkginfo_    eos-pkginfo
+complete -F _eos-pkginfo_aur eos-pkginfo-aur
