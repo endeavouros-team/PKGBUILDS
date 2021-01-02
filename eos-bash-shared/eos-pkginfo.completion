@@ -23,7 +23,7 @@ _eos-pkginfo_aur()
         [ -x $helper ] || helper=/usr/bin/yay
 
         rm -f "$datafilebase".*
-        $helper -Slq > "$datafile"
+        $helper -Slq aur > "$datafile"
     fi
     _eos-pkginfo_complete "$(cat "$datafile")"
 }
