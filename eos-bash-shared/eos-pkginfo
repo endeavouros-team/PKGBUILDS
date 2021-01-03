@@ -16,7 +16,10 @@ Helper() {
 }
 
 FindUrl() {
-    PKGINFO="$(LANG=C $HELPER -Si "$PKGNAME" 2>/dev/null)"
+    PKGINFO="$(LANG=C $HELPER -Qi "$PKGNAME" 2>/dev/null)"
+    if [ -z "$PKGINFO" ] ; then
+        PKGINFO="$(LANG=C $HELPER -Si "$PKGNAME" 2>/dev/null)"
+    fi
     [ -n "$PKGINFO" ] || DIE "package '$PKGNAME' not found"
 }
 
