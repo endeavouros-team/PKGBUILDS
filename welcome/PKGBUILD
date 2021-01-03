@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=3.8.17
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -14,7 +14,7 @@ optdepends=(
   'reflector-simple: for the Update Mirrors button'
 )
 
-url=https://github.com/endeavouros-team/PKGBUILDS
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 install=$pkgname.install
