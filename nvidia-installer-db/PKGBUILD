@@ -3,22 +3,22 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.4.11
-pkgrel=1
+pkgrel=2
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 arch=('any')
 license=('GPL2')
 
 source=(
-  $url/nvidia-installer-update-db
-  $url/nvidia-installer-check
-  $url/amdgpu_exp.ids
-  $url/amdgpu.ids
-  $url/ati.ids
-  $url/catalyst.ids
-#  $url/nvidia-390xx.ids
-  $url/nvidia.ids
+  $_url/nvidia-installer-update-db
+  $_url/nvidia-installer-check
+  $_url/amdgpu_exp.ids
+  $_url/amdgpu.ids
+  $_url/ati.ids
+  $_url/catalyst.ids
+#  $_url/nvidia-390xx.ids
+  $_url/nvidia.ids
 )
 sha256sums=('6b774c7725e798911dacc8150d9716eb5336c34d27ad10a774789630ea6df3be'
             'ca6bf8c96073ff70f38eb1e70d2f640817e3e908eba02779034396886636960b'
