@@ -2,10 +2,10 @@
 
 pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 pkgver=0.2.3
-pkgrel=2
+pkgrel=3
 
 arch=('any')
 license=('GPL')
@@ -15,9 +15,9 @@ install=pahis.install
 [ -r $install ] || curl -o $install -s --max-time 30 $url/$install
 
 source=(
-    "$url/$pkgname"
-    "$url/$pkgname.completion"
-    "$url/$pkgname.install"
+    "$_url/$pkgname"
+    "$_url/$pkgname.completion"
+    "$_url/$pkgname.install"
 )
 sha512sums=('dae3f6b64ae8fd5d21bde2a60fc916ab44b30afe09f894b5150c05ccfc0ec4ed3c346b470699d1191c5347e890ba82f963193452243ad29e74b117a9627ea8d8'
             '8d6121338334798879bee60862c1faf9ecce16a83c59de0d7bb2d9c55c72e76c5b8fb046e2f5de3a339812807daa68d6f48f3624d5fddf73e4ef9bf6496f423c'
