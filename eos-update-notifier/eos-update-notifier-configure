@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# This program manages and configures eos-update-notifier with a small GUI.
+
+ERROR() { echo "$progname: error: $1" >&2 ; }
+DIE()   { ERROR "$1" ; exit 1 ; }
+
+GetLibCode() {
+    local libcode=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    source $libcode || {
+        ERROR "loading $libcode failed."
+        return 1
+    }
+    export -f eos_yad
+}
+
+Main()
+{
+    local targetprog=eos-update-notifier
+    local progname=${targetprog}-configure
+
+    GetLibCode || return 1
+
+    local cmd=(
+        eos_yad
+        --form --title="Configure $targetprog"
+        --image=system-settings
+        --text="Configure and manage features of $targetprog"
+        --width=420
+        --columns=2
+
+        --field="Edit config!!<tt>View and modify configuration file /etc/$targetprog.conf with nano</tt>":fbtn \
+               "/usr/bin/RunInTerminal /usr/bin/pkexec /usr/bin/nano /etc/eos-update-notifier.conf"
+        --field="Schedule!!<tt>View and modify the schedule of update checks</tt>":fbtn \
+               "/usr/bin/eos-update-notifier --conf"
+        --field="Reset!!<tt>Reset eos-update-notifier's systemd service files to defaults</tt>":fbtn \
+               "/usr/bin/RunInTerminal /usr/bin/eos-update-notifier --init-force"
+        --field="Timer status!!<tt>Show status of systemd timer</tt>":fbtn \
+               "/usr/bin/eos-update-notifier --show-timer"
+        --field="Operation test!!<tt>Run $targetprog now</tt>":fbtn 
+               "/usr/bin/RunInTerminal /usr/bin/eos-update-notifier --systemd -iw=0s"
+
+        --button="Changelog!help-about!<tt>Show changelog of $targetprog</tt>":"/usr/bin/eos-update-notifier --changelog"
+        --button="yad-quit!!<tt>Quit now</tt>"
+    )
+    "${cmd[@]}" #> /dev/null
+}
+
+Main "$@"
