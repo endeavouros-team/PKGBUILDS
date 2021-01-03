@@ -2,11 +2,11 @@
 
 pkgname=eos-hooks
 pkgver=1.3
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
 license=('GPL3')
-url=https://github.com/endeavouros-team/PKGBUILDS
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 
 source=(
