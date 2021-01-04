@@ -15,13 +15,14 @@ GetSudoEditor() {
     local editor
 
     for editor in ${EOS_SUDO_EDITORS[*]} "$SUDO_EDITOR" "$VISUAL" "$EDITOR" nano ; do
-        if (/usr/bin/which "$editor" 2>/dev/null) ; then
+        if (/usr/bin/which "$editor" >& /dev/null) ; then
             case "$editor" in
                 mousepad* | /usr/bin/mousepad*)
                     Editor="dbus-launch $editor" ;;
                 *)
                     Editor="$editor" ;;
             esac
+            # echo "==> info: sudo-editor: $Editor" >&2
             return
         fi
     done
@@ -45,7 +46,7 @@ Main()
         --width=420
         --columns=2
 
-        --field="Edit config!!<tt>View and modify configuration file /etc/$targetprog.conf with nano</tt>":fbtn \
+        --field="Edit config!!<tt>View and modify configuration file /etc/$targetprog.conf with '$Editor'</tt>":fbtn \
                "/usr/bin/RunInTerminal /usr/bin/su-c_wrapper -p $Editor /etc/$targetprog.conf 2>/dev/null"
         --field="Schedule!!<tt>View and modify the schedule of update checks</tt>":fbtn \
                "/usr/bin/$targetprog --conf"
