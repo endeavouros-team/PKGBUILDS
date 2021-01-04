@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Configure EOS Update Notifier
+Comment=Configures the Update Notifier and Updater for EndeavourOS
+Exec=eos-update-notifier-configure
+Icon=/usr/share/endeavouros/endeavouros.png
+# StartupNotify=false
+# Terminal=False
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=System
