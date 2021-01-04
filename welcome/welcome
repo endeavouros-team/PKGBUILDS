@@ -1082,6 +1082,9 @@ AfterInstall() {
           break
       fi
   done
+  if [ -x /usr/bin/eos-update-notifier-configure ] ; then
+      tabcontents+=(--field="_align(Configure eos-update-notifier)!preferences-system!Configure eos-update-notifier":fbtn "eos-update-notifier-configure")
+  fi
 
   test "$(eos_GetArch)" != "armv7h" && \
       tabcontents+=(--field="_align($(ltr after_install_cdm))!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
