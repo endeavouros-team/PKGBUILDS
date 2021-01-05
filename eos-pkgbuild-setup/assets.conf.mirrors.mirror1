@@ -177,6 +177,9 @@ _yay_hook_check_latest_old() {
 }
 
 _nvidia-installer-db_hook() {
+    nvidia-site-checks-and-update
+    return
+
     # check if Nvidia has changed its driver archive (db) site
     local archive=https://www.nvidia.com/en-us/drivers/unix
     local store="$HOME"/.nvidia-installer/archive.html

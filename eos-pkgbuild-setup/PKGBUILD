@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=3.4.7
+pkgver=3.4.8
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -26,6 +26,7 @@ source=(
     mirrorcheck.completion
     githubcheck
     eos-mirrorcheck.conf
+    nvidia-site-check-and-update-db
 
     # assets.conf.mirrors.mirror1
     # assets.conf.mirrors.endeavouros_calamares
@@ -43,7 +44,8 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '24bd091b63c2a9978f7c4668f7a8fa411a12a2abd31b2f37870bb52747b2889bc7c93d3da50e7c91e8b4b1f783c30b3bb592509dd23410ede1a171555ddc02db'
             '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
             'e666f229c342ac91fcf7e4c235fd99e013e55277886e3db1fc336d99432f6f570c8a599565df5afbe6276a528b34eab57fd01d5531fb340e8f798f406c8365f1'
-            '852ac62f9568ded8030c4e7c886bc298e9a203d8e958cc4ad65bbd98defbaed2d00fb0865767fa850fbb6f86c0b76edff5fff4d0b336a9effcbc1848cd9120d7')
+            '852ac62f9568ded8030c4e7c886bc298e9a203d8e958cc4ad65bbd98defbaed2d00fb0865767fa850fbb6f86c0b76edff5fff4d0b336a9effcbc1848cd9120d7'
+            '9de1bf6c5d858ce0cbdc62eb4e3440f844a6cecc7f06a61796aa1cca9afa3b0b40a8ffa4cbcfbfbe7e9af421c1c7f2eef0c8cad8e47992dddfaf5e5058dcdf42')
 
 package() {
     local scripts=usr/share/endeavouros/scripts
@@ -57,6 +59,8 @@ package() {
     install -Dm755 add-release-assets     $pkgdir/usr/bin/add-release-assets
     install -Dm755 delete-release-assets  $pkgdir/usr/bin/delete-release-assets
     install -Dm755 release-asset-names    $pkgdir/usr/bin/release-asset-names
+
+    install -Dm755 nvidia-site-check-and-update-db  $pkgdir/usr/bin/nvidia-site-check-and-update-db
 
     install -Dm755 mirrorcheck            $pkgdir/usr/local/bin/mirrorcheck
     install -Dm755 githubcheck            $pkgdir/usr/local/bin/githubcheck
