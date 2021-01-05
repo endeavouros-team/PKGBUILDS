@@ -1035,7 +1035,7 @@ export -f RunIfInstalled
 IconGrasp() {
     local differ="$1"
     local desktop=$(/usr/bin/find /usr/share/applications -name \*$differ\*\.desktop | /usr/bin/head -n1)
-    local icon=$(/usr/bin/grep ^Icon= "$desktop" | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
+    local icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
     echo "$icon"
 }
 
