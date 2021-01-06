@@ -273,6 +273,9 @@ AskCountriesAndOptions() {
         2) eos-pkg-changelog $progname ; exit 0 ;;
     esac
     test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
+    if [ "$(echo "$reflector_info" | wc -l)" != "1" ] ; then
+        DIE "yad output is garbage!"
+    fi
     reflector_info=($(echo $reflector_info))                       # make it an array
 }
 
