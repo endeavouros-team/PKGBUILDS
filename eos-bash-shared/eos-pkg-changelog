@@ -48,7 +48,7 @@ Main()
     SetBrowser
 
     if (HasPkgbuild) ; then
-        [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" 2> /dev/null
+        [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" >& /dev/null
     else
         eos-pkginfo "$pkgname"
     fi

@@ -40,7 +40,7 @@ OpenUrl() {
         "") DIE "URL for package '$PKGNAME' not found" ;;
         *)  DIE "unsupported URL '$url'" ;;
     esac
-    /usr/bin/xdg-open "$url" 2>/dev/null
+    /usr/bin/xdg-open "$url" >& /dev/null
 }
 
 Options() {
