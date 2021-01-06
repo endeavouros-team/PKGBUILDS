@@ -305,6 +305,10 @@ Main()
     declare -A pkgstatus
     test -z "$result" && return
 
+    if [ "$(echo "$result" | wc -l)" != "1" ] ; then
+        DIE "yad output is garbage!"
+    fi
+
     result="${result:1}"                               # skip first LBL field !!
 
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
