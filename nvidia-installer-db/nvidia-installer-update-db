@@ -30,6 +30,7 @@ GetNvidiaBranch() {
 GetNvidiaIds() {
     local branch="$1"
     local ids="$(wget -q --timeout=10 -O- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
+    [ -n "$ids" ] || ids="$(wget -q --timeout=10 -O- https://us.download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     test -n "$ids" || DIE "$FUNCNAME: fetching ids from branch '$branch' failed."
     
     # ids="$(echo "$ids" | sed -n '1,/.*NVIDIA Tesla GPUs.*/p' | grep "</td>" | grep "<td>")"
