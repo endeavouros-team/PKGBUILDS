@@ -33,10 +33,8 @@ GetNvidiaIds() {
     [ -n "$ids" ] || ids="$(wget -q --timeout=10 -O- https://us.download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     test -n "$ids" || DIE "$FUNCNAME: fetching ids from branch '$branch' failed."
     
-    # ids="$(echo "$ids" | sed -n '1,/.*NVIDIA Tesla GPUs.*/p' | grep "</td>" | grep "<td>")"
     ids="$(echo "$ids" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | grep "</td>" | grep "<td>")"
-    ids="$(echo "$ids" | grep -P "<td>[0-9A-F][0-9A-F][0-9A-F ]*</td>" | sed -e 's|<td>||' -e 's|</td>||')"
-    ids="$(echo "$ids" | tr '[:upper:]' '[:lower:]')"
+    ids="$(echo "$ids" | grep "<td>[0-9A-F][0-9A-F][0-9>-F][0-9A-F][ <]" | sed 's|<td>\(....\).*|\1|' | sort | uniq | tr '[:upper:]' '[:lower:]')"
     echo "$ids"
 }
 
@@ -171,12 +169,12 @@ CreateNvidiaDb()
     # Check if anything has changed.
 
     tmpfile1=$(mktemp)
-    echo "$nvidia_ids_latest" | awk '{print $1}' | sort | uniq > $tmpfile1
+    echo "$nvidia_ids_latest" > $tmpfile1
     Logging "$tmpfile1" "$target_latest" "Latest"
     
     if [ "$legacy_available" = "yes" ] ; then
         tmpfile2=$(mktemp)
-        echo "$nvidia_ids_legacy" | awk '{print $1}' | sort | uniq > $tmpfile2
+        echo "$nvidia_ids_legacy" > $tmpfile2
         Logging "$tmpfile2" "$target_legacy" "Legacy"
     fi
 
