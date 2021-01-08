@@ -44,6 +44,7 @@ export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
+export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
 
 #export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 #eos_yad() {
@@ -1310,7 +1311,8 @@ DIE() {
 }
 
 WelcomeHelp() {
-    Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=600 --height=500 \
+    Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=700 --height=500 \
+                    --fontname="Mono 10" \
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
                     --image=help-about --button=yad-ok:0
@@ -1533,6 +1535,8 @@ UpdateInstallScripts() {
 
 Usage() {
     cat <<EOF
+===== $PROG_PACKAGENAME $PROG_VERSION =====
+
 Usage: $PROGNAME [options]
 
 Options:
@@ -1617,8 +1621,7 @@ StartHere() {
     export show_installer=no    # explicitly show the installer, for testing only
     local start_delay=0
     local is_installing
-    local prog_version="$(pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
-    local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$prog_version"        # main window title
+    local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
 
     #local netlog=0
 
@@ -1628,7 +1631,7 @@ StartHere() {
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
-            --version) echo "$prog_version" >&2 ; return ;;
+            --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
