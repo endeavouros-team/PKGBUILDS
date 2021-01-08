@@ -29,6 +29,7 @@ export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 
 eos_yad() {
     GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@" | grep -v "^WINDOW DECORATIONS RELOADED$"
+    return ${PIPESTATUS[0]}
 }
 #export -f eos_yad
 
