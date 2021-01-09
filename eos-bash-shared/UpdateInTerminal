@@ -79,7 +79,11 @@ Main() {
 
     if [ "$checkAur" = "yes" ] ; then
         echo2 "AUR $(ltr updt_update_check):"
-        $aur_helper -Sua
+        which $aur_helper >& /dev/null && {
+            $aur_helper -Sua
+        } || {
+            echo2 ":: Warning: no AUR helper found."
+        }
     fi
 }
 
