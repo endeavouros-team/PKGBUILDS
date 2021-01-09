@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo2() { echo "$@" >&2 ; }
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
 
 GetGpuIds() {
     declare -A vcodes
@@ -28,21 +29,45 @@ GetGpuIds() {
     vendorinfo="$result"
 
     case "$1" in
-        yes)
+        "")
+            ;;
+        internal-test)
             vendorinfo="nvidia:1dba|$result"
             vendorinfo="nvidia:06c4|$result"
             #vendorinfo="nvidia:aaaa|$result"
             #vendorinfo="nvidia:aaaa:bbbb|$result"
             vendorinfo="nvidia:06c4:1dba|$result"
             ;;
-        nvidia:*)
-            vendorinfo="$1"
+        [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])            # id = 4 hex numbers
+            id="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+            vendorinfo="nvidia:$id"
+            ;;
+        *:[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])          # id = 4 hex numbers
+            id="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+            vendorinfo="$id"
+            ;;
+        *)
+            printf2 "Warning: unsupported parameter '$1' is ignored.\n\n"
+            Usage2
+            exit 1
             ;;
     esac
 }
 
+Usage2() {
+    cat <<EOF >&2
+Usage: $progname [<id> | internal-test]
+where
+    <id>            Check if an Nvidia card with given id (4 hex numbers) is supported.
+    internal-test   Internal ad hoc test (useful for devs only).
+
+If no parameter is given, check if the currently installed Nvidia card is supported.
+EOF
+}
+
 Main()
 {
+    local progname=nvidia-installer-check
     local vendorinfo=""        # e.g. nvidia:1234:2345|intel:4321:5432|amd:9876:6789
     local db_dir=/tmp          # /var/lib/pci
     local nvidia_id_file=$db_dir/nvidia.ids
@@ -98,7 +123,10 @@ EOF
         esac
         rm -f $nvidia_id_file $nvidia_id_file_390
     else
-        echo2 "Nvidia card not found."
+        case "$vendorinfo" in
+            nvidia:*) echo2 "Card '$vendorinfo' not found." ;;
+            *)        echo2 "Sorry, card '$vendorinfo' not checked by this program." ;;
+        esac
     fi
 }
 
