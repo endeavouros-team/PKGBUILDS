@@ -3,7 +3,7 @@
 
 pkgname=nvidia-installer-db
 pkgver=2.4.14
-pkgrel=1
+pkgrel=2
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
@@ -26,7 +26,7 @@ sha256sums=('c6238673534d8260c95044c5b4dfa21fc24aad656fbc25a5f528a49222b73f60'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
             'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'
             '246d9273fed6d232125476afc1a06dfceba4028fa3a6d6fd2c4c460187d3ee2f'
-            '28db61a59b2b1f1beb469eadabab7180af5654383142341eac56700d431e9c22')
+            'be5d87a2b40f0965e0a30956d8b38e5f3a326956fa766bc63712191186ad6bd4')
 
 package() {
   install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
