@@ -59,8 +59,8 @@ _tr_add2 after_install_umtip   "Ažuriraj spisak mirror-a, prije ažuriranja sis
 _tr_add2 after_install_us      "Ažuriraj Sistem"
 _tr_add2 after_install_ustip   "Ažuriraj sistemski software"
 
-_tr_add2 after_install_dsi     "Pronadji probleme sa sistemom"
-_tr_add2 after_install_dsitip  "Pronadji sve potencijalne probleme sa sistemskim paketima ili drugdje"
+_tr_add2 after_install_dsi     "Pronađi probleme sa sistemom"
+_tr_add2 after_install_dsitip  "Pronđji sve potencijalne probleme sa sistemskim paketima ili drugdje"
 
 _tr_add2 after_install_etl     "EndeavourOS na najnoviju verziju$_question"
 _tr_add2 after_install_etltip  "Pokaži šta uraditi da bi se sistem doveo na najnoviji EndeavourOS nivo"
@@ -73,7 +73,7 @@ _tr_add2 after_install_ewtip   "Vrati na uobičajeni wallpaper"     # was: "Chan
 
 
 _tr_add2 after_install_pm      "Upravljanje paketima"
-_tr_add2 after_install_pmtip   "Kako upravljati sa paketima pomoću pacman-a"
+_tr_add2 after_install_pmtip   "Kako upravljati paketima pomoću pacman-a"
 
 _tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip   "Arch User Repository i yay informacije"
@@ -127,7 +127,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) za Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Da bi $PRETTY_PROGNAME pokrneuli opet, otvorite terminal i ukucajte: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Da bi $PRETTY_PROGNAME pokrenuli opet, otvorite terminal i ukucajte: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Ponovno omogućavanje $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Kako ponovo omogućiti $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Pamtim"
@@ -210,11 +210,11 @@ _tr_add2 after_install_themevan      "Xfce vanilla tema"
 _tr_add2 after_install_themevantip   "Koristi vanilla Xfce temu"
 
 _tr_add2 after_install_themedef     "Xfce EndeavourOS uobičajena tema"
-_tr_add2 after_install_themedeftip  "Koristi EndeavourOS uobičajena Xfce temu"
+_tr_add2 after_install_themedeftip  "Koristi EndeavourOS uobičajenu Xfce temu"
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Konfiguracija čišćenja paketa"
-_tr_add2 after_install_pcleantip    "Konfigurisi servis za čišćenje kesa paketa"
+_tr_add2 after_install_pcleantip    "Konfiguriši servis za čišćenje kesa paketa"
 
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "Lične komande"                   # modified 2020-Jul-08
