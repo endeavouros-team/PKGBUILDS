@@ -2,7 +2,7 @@
 
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
-pkgver=1.1.5
+pkgver=1.1.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -26,6 +26,7 @@ source=(
   $url/translation-pt.bash
   $url/translation-pt_BR.bash
   $url/translation-ro.bash
+  $url/translation-rs.bash
   $url/translation-ru.bash
   $url/translation-se.bash
   $url/translation-sk.bash
@@ -43,13 +44,16 @@ sha512sums=('dacbbddc30d6c055c8bd530f8e0051cca917a26f0c8c35f08f00e2b241ebe6acbd7
             '3b69e123cb7d303711c01e5ed643b531fa0f7aaebf88280b8c7150e8b2c58c8ae8f8d20a2d3216a51a714cf12ab564c47e64f089abecbe876fb4007ffc189a9c'
             '26f45704e1ce86484d70794f62233c464a36a97ff3f1cd36ce829f1e49e3fd0d976d4346550c2b90e168528705426515c46496e68a78fe82d71c5844867bc3c4'
             'f847db78936307b8eaffa8466d11d49a70311ebe3a33c777473a0575b9746aa57ccfacce12c584ebbb6c15c8803070c06643890090c1af0c7c97c8465b40325a'
+            '634d7e2f4200f621eb654d4b222435a1572fb2c52786de1bbaa5af3946558c68c1d1ce131840356eaa9a64e6446dd64985aca984e8ed530c50403add359c58ee'
             '94e463665c1a78600efe0361a3fa9c1df962a68e523fe57006423e0dfc1ff4159e4bca4a3b384895887211561b96255830216051a28329b47df70af5c1a6ce73'
             '61aa14ddf7d6ed2eee8b16d3521a702ea8f93fbfd599727f6b7eadb2f42a367a6c96072fa300bc239a367579123c8954ab614993beb6fe1599ae73b799f6e14a'
             '844bf1e44ab79ec635de94cc6ee9759b1ec618db3a3a5a960635acde5e42ad14d87cf6407b86c784af26cb4437a85966c59d5b3c5387d7dd4e27d3694d3345b0'
             '5685cadbc9dc44c54d1b16204f55470a934881b4ceb02b9f4419d3ea557c39705bb311e43bbb0901e04438ac60683c1b2f84d32d6c63ba5f269e96cb4a3e64d4')
 package() {
-  # Update variable 'languages' when new languages are added:
-  local languages="de en es fi fr it pl pt pt_BR ro ru se sk zh"
+
+  ### Update variable 'languages' when new languages are added:
+  local languages="de en es fi fr it pl pt pt_BR ro rs ru se sk zh"
+
   local folderspec=/usr/share/endeavouros/scripts
   local xx
 
