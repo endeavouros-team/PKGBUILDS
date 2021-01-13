@@ -247,7 +247,7 @@ _tr_add2 add_more_apps_done2_tip2    "Da bi instalirali, koristite 'yay'"
 
 # 2020-Sep-11:
 _tr_add2 after_install_ew2        "Odaberi jedan od EndeavourOS wallpaper-a"   # was: "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2     "Birač wallpaper-a                          # was: "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ewtip2     "Birač wallpaper-a"                          # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
