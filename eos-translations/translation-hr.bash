@@ -23,7 +23,7 @@
 
 ### First some useful definitions:
 
-_tr_lang=rs            # required helper variable for _tr_add2
+_tr_lang=sr            # required helper variable for _tr_add2
 
 # Help with some special characters (HTML). Yad has problems without them:
 _exclamation='&#33;'   # '!'
@@ -46,7 +46,7 @@ _tr_add2 butt_help             "Pomoć"
 
 
 _tr_add2 nb_tab_INSTALL        "INSTALL"
-_tr_add2 nb_tab_GeneralInfo    "Opšte informacije"
+_tr_add2 nb_tab_GeneralInfo    "Opće informacije"
 _tr_add2 nb_tab_AfterInstall   "Poslije instalacije"
 _tr_add2 nb_tab_AddMoreApps    "Dodaj još aplikacija"
 
@@ -54,22 +54,22 @@ _tr_add2 nb_tab_AddMoreApps    "Dodaj još aplikacija"
 _tr_add2 after_install_text    "Zadaci nakon instalacije"
 
 _tr_add2 after_install_um      "Ažuriraj Mirror-e"
-_tr_add2 after_install_umtip   "Ažuriraj spisak mirror-a, prije ažuriranja sistema"
+_tr_add2 after_install_umtip   "Ažuriraj spisak mirror-a, prije ažuriranja sustav"
 
-_tr_add2 after_install_us      "Ažuriraj Sistem"
-_tr_add2 after_install_ustip   "Ažuriraj sistemski software"
+_tr_add2 after_install_us      "Ažuriraj Sustava"
+_tr_add2 after_install_ustip   "Ažuriraj softare sustava"
 
-_tr_add2 after_install_dsi     "Pronađi probleme sa sistemom"
-_tr_add2 after_install_dsitip  "Pronđji sve potencijalne probleme sa sistemskim paketima ili drugdje"
+_tr_add2 after_install_dsi     "Pronađi probleme sa sustavaom"
+_tr_add2 after_install_dsitip  "Pronđji sve potencijalne probleme sa paketima sustava ili drugdje"
 
 _tr_add2 after_install_etl     "EndeavourOS na najnoviju verziju$_question"
-_tr_add2 after_install_etltip  "Pokaži šta uraditi da bi se sistem doveo na najnoviji EndeavourOS nivo"
+_tr_add2 after_install_etltip  "Pokaži šta uraditi da bi se sustav doveo na najnoviji EndeavourOS nivo"
 
 _tr_add2 after_install_cdm     "Promjeni Display Manager-a"
 _tr_add2 after_install_cdmtip  "Koristi drugi display manager"
 
-_tr_add2 after_install_ew      "EndeavourOS uobičajeni wallpaper"      # was: "EndeavourOS wallpaper"
-_tr_add2 after_install_ewtip   "Vrati na uobičajeni wallpaper"     # was: "Change desktop wallpaper to EOS default"
+_tr_add2 after_install_ew      "EndeavourOS zadani wallpaper"      # was: "EndeavourOS wallpaper"
+_tr_add2 after_install_ewtip   "Vrati na zadani wallpaper"     # was: "Change desktop wallpaper to EOS default"
 
 
 _tr_add2 after_install_pm      "Upravljanje paketima"
@@ -154,9 +154,9 @@ _tr_add2 sysup_no                "Nema ažuriranja."
 _tr_add2 sysup_check             "Provjeravanje software-skog ažuriranja"
 
 _tr_add2 issues_title            "Otkrivanje problema sa paketima"
-_tr_add2 issues_grub             "Bitno: ručno rekreiranje boot menija je potrebno."
+_tr_add2 issues_grub             "Bitno: ručno rekreiranje boot izbornika je potrebno."
 _tr_add2 issues_run              "Running commands:"
-_tr_add2 issues_no               "Nisu otkriveni značajni sistemski problemi."
+_tr_add2 issues_no               "Nisu otkriveni značajni problemi sa sustavom."
 
 _tr_add2 cal_noavail            "Nije dostupno: "        # installer program
 _tr_add2 cal_warn               "Upozorenje"
@@ -189,7 +189,7 @@ _tr_add2 ins_reltip            "Vise informacija o poslednjem izdanju"
 _tr_add2 ins_tips              "Savjeti za instalaciju"
 _tr_add2 ins_tipstip           "Savjeti za instalaciju"
 _tr_add2 ins_trouble           "Rješavanje problema"
-_tr_add2 ins_troubletip        "Spašavanje sistema"
+_tr_add2 ins_troubletip        "Spašavanje sustava"
 
 _tr_add2 after_install_us_from    "Ažuriranje od"                            # AUR or upstream
 _tr_add2 after_install_us_el      "Povišene privilegije su potrebne."
@@ -209,8 +209,8 @@ _tr_add2 butt_changelogtip     "Pokaži listu promjena za Welcome aplikaciju"
 _tr_add2 after_install_themevan      "Xfce vanilla tema"
 _tr_add2 after_install_themevantip   "Koristi vanilla Xfce temu"
 
-_tr_add2 after_install_themedef     "Xfce EndeavourOS uobičajena tema"
-_tr_add2 after_install_themedeftip  "Koristi EndeavourOS uobičajenu Xfce temu"
+_tr_add2 after_install_themedef     "Xfce EndeavourOS zadana tema"
+_tr_add2 after_install_themedeftip  "Koristi EndeavourOS zadanu Xfce temu"
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Konfiguracija čišćenja paketa"
