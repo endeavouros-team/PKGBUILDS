@@ -3,6 +3,7 @@ Type=Application
 Encoding=UTF-8
 Name=Configure EOS Update Notifier
 Comment=Configures the Update Notifier and Updater for EndeavourOS
+Comment[fi]=Konfiguroi päivitysten näyttäjä
 Exec=eos-update-notifier-configure
 Icon=/usr/share/endeavouros/endeavouros.png
 # StartupNotify=false

@@ -3,6 +3,7 @@ Type=Application
 Encoding=UTF-8
 Name=EndeavourOS Update Notifier
 Comment=Update Notifier and Updater for EndeavourOS
+Comment[fi]=Päivitysten näyttäjä
 Exec=eos-update-notifier -init
 Icon=/usr/share/endeavouros/endeavouros.png
 # StartupNotify=false
