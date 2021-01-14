@@ -3,7 +3,7 @@
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
 pkgver=1.12.4
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -26,7 +26,7 @@ source=(
 #  $_url/reflector.completion
 )
 sha512sums=('1688056057f6473285940f356ffb2a01f2293709371a90212b3cbc95d59d65e47a0aa1fe885992ad1c00acd1b806927a0139950f72e296f5955d8efed02bbb16'
-            '4895c5e215fb041bb5ea799ae7aff338fb9c326f37952a2d7e48a0087c2e7e2dd9562845418b30a56c34c2a3098719f92061d4dec081014ee827602b4d43337b'
+            '0ba1c92709dfb60394ac1c33daffb1b52bb3cf7ea8105235d46dbfb5abe1e42467a69d1586d8755d35b195b9639cae13c00828ba42b652fd0e3cfcb37bc27817'
             '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d')
 
 package() {

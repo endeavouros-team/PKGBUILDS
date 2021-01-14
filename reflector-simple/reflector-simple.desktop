@@ -3,6 +3,7 @@ Type=Application
 Encoding=UTF-8
 Name=Reflector Simple
 Comment=A simple GUI for 'reflector'
+Comment[fi]=Helppo graafinen käyttöliittymä ohjelmalle 'reflector'
 Exec=/usr/bin/reflector-simple
 Icon=/usr/share/endeavouros/endeavouros.png
 StartupNotify=true
