@@ -3,6 +3,7 @@ Type=Application
 Encoding=UTF-8
 Name=EndeavourOS log tool
 Comment=Log tool to send selected system logs to the internet
+Comment[fi]=Jaa valitsemasi järjestelmälokit internetiin muiden nähtäväksi
 Exec=/usr/bin/eos-log-tool
 Icon=/usr/share/endeavouros/endeavouros.png
 # StartupNotify=false
