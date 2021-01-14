@@ -3,6 +3,7 @@ Type=Application
 Encoding=UTF-8
 Name=UpdateInTerminal
 Comment=Update system in terminal
+Comment[fi]=Päivitä järjestelmä uudessa pääteikkunassa
 Exec=UpdateInTerminal --nt
 Icon=/usr/share/endeavouros/endeavouros.png
 Hidden=false
