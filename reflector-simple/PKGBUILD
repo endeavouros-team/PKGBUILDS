@@ -2,8 +2,8 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.12.4
-pkgrel=2
+pkgver=1.13
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -23,11 +23,12 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.desktop
   $_url/$pkgname.conf
-#  $_url/reflector.completion
+  $_url/mirrorlist-rank-info
 )
 sha512sums=('1688056057f6473285940f356ffb2a01f2293709371a90212b3cbc95d59d65e47a0aa1fe885992ad1c00acd1b806927a0139950f72e296f5955d8efed02bbb16'
             '0ba1c92709dfb60394ac1c33daffb1b52bb3cf7ea8105235d46dbfb5abe1e42467a69d1586d8755d35b195b9639cae13c00828ba42b652fd0e3cfcb37bc27817'
-            '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d')
+            '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d'
+            'a32dbd88f336e07852e494efa47d2488c4f505f00e4ccfb8a298cf30b20cdf104af8da98e611dcce42b26886989d80ec87c71317a65c53501ac369525bdd69a8')
 
 package() {
   cd $srcdir
@@ -38,9 +39,9 @@ package() {
   install -d $pkgdir/etc
   install -d $pkgdir/usr/share/applications
 
-  install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
+  install -Dm755 $pkgname              $pkgdir/usr/bin/$pkgname
+  install -Dm755 mirrorlist-rank-info  $pkgdir/usr/bin/mirrorlist-rank-info
+  
   install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
   install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
-
-#  install -Dm644 reflector.completion   $pkgdir/usr/share/bash-completion/completions/reflector
 }
