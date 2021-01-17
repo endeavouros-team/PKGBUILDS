@@ -205,7 +205,18 @@ Update_common() {
         fi
     fi
 
-    if [ $hasupdates -eq 0 ] ; then
+    # Optionally, call additional (possibly user specified) updaters (e.g. a script to get flatpak updates)
+
+    local external_updater_code=2             # Additional updater must return exit code like in 'checkupdates' (0=has updates, 1=failure, or 2=no updates)
+    if [ -n "$AdditionalEosUpdater" ] ; then
+        # Additional updater assumptions:
+        #   - input:  the log file name (if needed, see also function eos_un_log() above)
+        #   - output: exit code like in 'checkupdates' (see: man checkupdates)
+        $AdditionalEosUpdater "$EOS_UPDATE_NOTIFIER_LOG"
+        external_updater_code=$?
+    fi
+
+    if [ $hasupdates -eq 0 ] && [ $external_updater_code -ne 0 ] ; then
         local msg="No updates available."
         debug "$msg"
         if [ "$verbosity" = "high" ] ; then
