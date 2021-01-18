@@ -20,7 +20,7 @@ options=(!strip !emptydirs)
 # When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=next_01_2021"
-  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=3_2_32_1-nov_20_ISO"
+  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=(
@@ -80,7 +80,7 @@ prepare() {
     #sed -i "N;N;s?  - partition\n  - netinstall?  - partition\n  - yaml_pkglist\n  - netinstall?" $_reponame/settings.conf_online
 
     # user_pkglist module
-    sed -i "?  - packages?  - packages\n  - user_pkglist?" $_reponame/settings.conf_online
+    sed -i "s?  - packages?  - packages\n  - user_pkglist?" $_reponame/settings.conf_online
 
     # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
