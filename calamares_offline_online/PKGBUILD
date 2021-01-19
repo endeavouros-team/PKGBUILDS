@@ -195,6 +195,8 @@ package() {
     # maybe download base_install.sh everytime from calamares module so it can be updated on the go...
     cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
+    cp -r $_reponame/src/modules/user_pkglist/pkglist_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
+    chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
     
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
