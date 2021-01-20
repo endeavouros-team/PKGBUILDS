@@ -2,8 +2,8 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.5.13
-pkgrel=2
+pkgver=1.5.14
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -44,6 +44,7 @@ source=(
   $_url/eos-pkginfo
   $_url/eos-pkginfo.completion
   $_url/eos-pkg-changelog
+  $_url/eos-sendlog
 )
 
 sha512sums=('aa083661627753b5e27636d4d1cf048b02f9b94e1be2465a0ddce3976b082923d87e19fa529113a0fecbbc60872604104df7325f289f6eface71af97f3cbd13c'
@@ -62,7 +63,8 @@ sha512sums=('aa083661627753b5e27636d4d1cf048b02f9b94e1be2465a0ddce3976b082923d87
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '98671b1d249b4bcca6c5857108459b67ac60f22e8b8aac41a04f3bef3f5e787acd1dfcfea46db5bc71c2bd9ba5ed57911f6cc910c4ae32ff3bb099c9a8af3c42'
             'd4a3786d5a6f0defcbaa463ab1cfb7f96faaad1040ab0ff6929b95a0193f4f2a62de5d70f35470bc66e04a994d094340dfb1ffe7502dda90a11c8a9703302261'
-            '17c52a50e70bf925ccc985dcfb6be54d13c9caf159208e834d82f64203f2614861d627958aae22a3472da1c2f0d1dc3777f92d350226ef8dbe4809ffe7f298e6')
+            '17c52a50e70bf925ccc985dcfb6be54d13c9caf159208e834d82f64203f2614861d627958aae22a3472da1c2f0d1dc3777f92d350226ef8dbe4809ffe7f298e6'
+            '208a4eaa41e634c75e9c9d6f439c873cfd70a1d1fdb11c00993abd898c33000d29e1d41d050d39cc66f1b634089c0d7204cbde9334771e2a5b79e7877a9675c8')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -70,6 +72,7 @@ package() {
   install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
 
   install -Dm755 eos-FindAppIcon                $pkgdir/usr/bin/eos-FindAppIcon
+  install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog
   install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
   install -Dm755 ChangeDisplayResolution        $pkgdir/usr/bin/ChangeDisplayResolution
   install -Dm755 device-info                    $pkgdir/usr/bin/device-info
