@@ -361,8 +361,10 @@ yad_calamares() {
 EOF
     case "$mode" in
         online)
-            echo "Updating mirrorlist, please wait ..." >> $INSTALL_LOG_FILE
-            /usr/bin/update-mirrorlist
+            if [ -z "$(/usr/bin/grep "^update-mirrorlist$" /usr/bin/pacstrap_calamares)" ] ; then
+                echo "Updating mirrorlist, please wait ..." >> $INSTALL_LOG_FILE
+                /usr/bin/update-mirrorlist
+            fi
             ;;
     esac
 
