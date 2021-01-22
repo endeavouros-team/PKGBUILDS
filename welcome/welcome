@@ -1683,6 +1683,7 @@ StartHere() {
             }
         fi
     else
+        eos-connection-checker && setxkbmap $(curl -s https://ipinfo.io/country | tr '[:upper:]' '[:lower:]')
         :
         #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
