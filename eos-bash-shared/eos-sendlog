@@ -1,3 +1,63 @@
 #!/bin/bash
 
-curl -F 'f:1=<-' ix.io
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+Options() {
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            -h | --help)
+                cat <<EOF
+Directs standard input into $serviceuri, and saves returned URLs
+into file $db.
+
+Usage: $progname [options]
+options:
+    -n | --nosave   Don't save returned URL.
+    -h | --help     This help.
+    --man           Show manual at $serviceuri.
+EOF
+                exit 0
+                ;;
+            --man)
+                xdg-open $serviceuri
+                exit 0
+                ;;
+            -n | --nosave)
+                save=no
+                ;;
+            -*) DIE "unsupported option '$arg'" ;;
+            *) DIE "unsupported parameter '$arg'" ;;
+        esac
+    done
+}
+
+SendToNet() {
+    url=$(curl -F 'f:1=<-' $serviceuri)
+}
+
+Main() {
+    local progname="$(basename "$0")"
+    local save=yes
+    local db=$HOME/.config/$progname.txt
+    local serviceuri=http://ix.io
+    local url
+
+    Options "$@"
+
+    SendToNet
+
+    if [ "$save" = "yes" ] ; then
+        local tmpfile=$(mktemp $HOME/.config/eos-sendlog.XXXXX)
+        mv $db $tmpfile
+        printf "%s: %s\n" "$(date +%Y%m%d-%H%M)" "$url" > $db
+        cat $tmpfile >> $db
+        rm -f $tmpfile
+    fi
+    echo "$url"
+}
+
+Main "$@"
