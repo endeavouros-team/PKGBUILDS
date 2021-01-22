@@ -9,7 +9,8 @@ Comment[sk]=Spúšťač privítania v systéme EndeavourOS
 Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3
 # for desktop launcher:
 #Exec=sh /usr/share/endeavouros/scripts/welcome --enable
-Icon=/usr/share/endeavouros/endeavouros.png
+#Icon=/usr/share/endeavouros/endeavouros.png
+Icon=/usr/share/endeavouros/EndeavourOS-icon.png
 # StartupNotify=false
 # Terminal=False
 Hidden=false
