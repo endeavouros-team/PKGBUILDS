@@ -3,7 +3,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.5.15
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
