@@ -1,0 +1,3 @@
+#!/bin/bash
+
+eos-connection-checker && setxkbmap $(curl -s https://ipinfo.io/country | tr '[:upper:]' '[:lower:]')
