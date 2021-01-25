@@ -215,7 +215,8 @@ _inxi_hook_check_latest() {
         echo "cannot fetch info about $tool" >&2
         return 1
     fi
-    dev_version="$(echo "$tmpdata" | grep /smxi/inxi/releases/tag/ | head -n 1 | sed 's|^.*/tag/\([0-9\.]*\)-.*$|\1|')"
+    # Inxi has a version number "conflicting" with Arch versioning. Have to change inxi's '-' to '.'.
+    dev_version="$(echo "$tmpdata" | grep /smxi/inxi/releases/tag/ | head -n 1 | sed -e 's|^.*/tag/||' -e 's|".*$||' | tr '-' '.')"
 
     if [ "$prefer_dev_version" = "yes" ] ; then
         sed -i $Pkgbuild -e 's|^pkgver='"$localversion"'$|pkgver='"$dev_version"'|'
@@ -313,7 +314,7 @@ ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
-ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
+#ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 
 # Special hooks. Implemented via package hooks.
