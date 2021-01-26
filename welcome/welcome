@@ -185,6 +185,11 @@ _align_buttons_on_tab() {
     done
 }
 
+Welog() {
+    echo "$progname: " "$@" >> $INSTALL_LOG_FILE
+}
+export -f Welog
+
 yad_calamares() {
     local mode="$1"                             # offline, online, choose
     local debug="$2"
@@ -290,6 +295,8 @@ yad_calamares() {
             ;;
     esac
 
+    echo "$mode" > /tmp/install_mode.txt
+
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
         eos_yad_WARN "$CAL_NOFILE '$file'"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
@@ -314,21 +321,44 @@ yad_calamares() {
         return 1
     fi
 
+    local INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
+    local progname="$PRETTY_PROGNAME"
+    [ -n "$progname" ] || progname="Welcome"
+
+    cat <<EOF > $INSTALL_LOG_FILE
+############## $INSTALL_LOG_FILE by $progname
+############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
+
+Install mode: $mode
+
+EOF
+
     case "$mode" in
         online)
             wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
+                Welog "fetching netinstall.yaml."
                 sudo bash -c "cp -f netinstall.yaml /usr/share/calamares/ ; chown root:root /usr/share/calamares/netinstall.yaml"
             }
             wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist && {
+                Welog "fetching update-mirrorlist."
                 sudo bash -c "cp -f update-mirrorlist /usr/bin/ ; chown root:root /usr/bin/update-mirrorlist ; chmod 0755 /usr/bin/update-mirrorlist"
             }
+            if [ -n "$user_pkglist_url" ] ; then
+                Welog "fetching $user_pkglist_url."
+                if [ -d /home/$EOS_LIVEUSER ] ; then
+                    wget -q --timeout=10 -O "/home/$EOS_LIVEUSER/user_pkglist.txt" "$user_pkglist_url"
+                else
+                    wget -q --timeout=10 -O "$HOME/user_pkglist.txt" "$user_pkglist_url"
+                fi
+            fi
 
             file=/usr/share/calamares/modules/netinstall.conf
             if [ ! -r $file ] ; then
-                echo "Warning: $file not found!" >&2
+                Welog "warning: $file not found!"
             fi
             if [ -r "/home/$EOS_LIVEUSER/netinstall-yaml.url" ] ; then
                 # allow an own netinstall.yaml from a URL config file!
+                Welog "fetching using netinstall-yaml.url"
                 local netinstall_url=$(cat "/home/$EOS_LIVEUSER/netinstall-yaml.url")
                 if [ -r $file ] ; then
                     sudo sed \
@@ -348,21 +378,15 @@ yad_calamares() {
             ;;
     esac
 
+    Welog "copying settings.conf files."
     sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
     sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
     sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
 
-    local INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
-
-    cat <<EOF > $INSTALL_LOG_FILE
-############## $INSTALL_LOG_FILE
-############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
-
-EOF
     case "$mode" in
         online)
             if [ -z "$(/usr/bin/grep "^update-mirrorlist$" /usr/bin/pacstrap_calamares)" ] ; then
-                echo "Updating mirrorlist, please wait ..." >> $INSTALL_LOG_FILE
+                Welog "updating mirrorlist, please wait ..."
                 /usr/bin/update-mirrorlist
             fi
             ;;
@@ -430,7 +454,7 @@ EOF
         local varlog="$(/usr/bin/ls -d /tmp/calamares-root-*/var/log)"
         if [ -d "$varlog" ] ; then
             local varlogfile=$varlog/$(/usr/bin/basename $INSTALL_LOG_FILE)
-            echo "Copying install log to $varlogfile of the new install." >&2
+            Welog "Copying install log to $varlogfile of the new install."
             sudo bash -c "cp $INSTALL_LOG_FILE $varlog ; chown root:root $varlogfile"
         fi
 
@@ -1621,6 +1645,7 @@ StartHere() {
     KillExtraYad > $yad_zombie_log
 
     export show_installer=no    # explicitly show the installer, for testing only
+    export user_pkglist_url=""
     local start_delay=0
     local is_installing
     local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
@@ -1633,6 +1658,7 @@ StartHere() {
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
+            --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=*) ;; # already handled!
             #--netlog) netlog=1 ;;
