@@ -146,6 +146,14 @@ prepare() {
     # will add one by one using -i
     sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
     done
+    
+    # remove unused groups
+    sed -i $_reponame/src/modules/users/users.conf \
+    -e '/^    - lp/d' \
+    -e '/^    - video/d' \
+    -e '/^    - network/d' \
+    -e '/^    - storage/d' \
+    -e '/^    - audio/d' \
 
     sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
 
