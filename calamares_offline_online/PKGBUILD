@@ -154,6 +154,12 @@ prepare() {
     -e '/^    - network/d' \
     -e '/^    - storage/d' \
     -e '/^    - audio/d' \
+    
+    # set date for calamares_branding
+    _date=$(date +%Y.%m.%d)
+    sed -i $_reponame/src/branding/endeavouros/branding.desc \
+    -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
+    -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
     sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
 
