@@ -1710,6 +1710,11 @@ StartHere() {
         fi
     else
         eos-kbd-set
+        if [ -r /etc/pacman.d/mirrorlist ] && [ ! -r /tmp/mirrorlist.bu ] ; then
+            cp /etc/pacman.d/mirrorlist /tmp/mirrorlist.bu  # to be checked by update-mirrorlist
+        else
+            Welog "Warning: cannot make a backup of mirrorlist!"
+        fi
         #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
         #fi
