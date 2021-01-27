@@ -45,6 +45,7 @@ export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
 export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
+export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
 #export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 #eos_yad() {
@@ -186,7 +187,7 @@ _align_buttons_on_tab() {
 }
 
 Welog() {
-    echo "$progname: " "$@" >> $INSTALL_LOG_FILE
+    [ -d /home/$EOS_LIVEUSER ] && echo "$progname: " "$@" >> $INSTALL_LOG_FILE
 }
 export -f Welog
 
@@ -321,7 +322,6 @@ yad_calamares() {
         return 1
     fi
 
-    local INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
     local progname="$PRETTY_PROGNAME"
     [ -n "$progname" ] || progname="Welcome"
 
