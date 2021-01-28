@@ -968,7 +968,8 @@ ShowChangeResoButton() {
     fi
 
     if [ "$show_reso_butt" = "yes" ] ; then
-        tabcontents+=(--field="_align($(ltr ins_reso))!display!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+        local icon=preferences-desktop-display
+        tabcontents+=(--field="_align($(ltr ins_reso))!$icon!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
     fi
 }
 export -f ShowChangeResoButton
