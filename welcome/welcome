@@ -1531,6 +1531,41 @@ Check_r8168() {
 }
 export -f Check_r8168
 
+MagicId() {
+    if (! IsInstalling) ; then
+        echo "Sorry, option --id is only an install feature." >&2
+        return 1
+    fi
+    local id="$1"
+    if [ -z "$id" ] ; then
+        echo "Id value missing." >&2
+        return 1
+    fi
+    local target=$HOME/user_pkglist.txt
+    local time
+    local data="$(curl -s https://raw.githubusercontent.com/endeavouros-team/sandbox/master/pkg/list)"
+    if [ -z "$data" ] ; then
+        echo "Error: list not found." >&2
+        return 1
+    fi
+    local url="$(echo "$data" | grep "^$id=" | sed "s|^$id=||")"
+    if [ -z "$url" ] ; then
+        echo "Id '$id' not found." >&2
+        return 1
+    fi
+    if [ -r $target ] ; then
+        time=$(date +%Y%m%d-%H%M-%S)
+        echo "Moving existing $target to $target.$time" >&2
+        mv $target $target.$time
+    fi
+    wget -q -O $target "$url" || {
+        echo "Sorry, URL '$url' not found. " >&2
+        [ -r $target.$time ] && mv $target.$time $target
+        return 1
+    }
+    echo "$target: OK" >&2
+}
+
 UpdateInstallScripts() {
     # IsInstalling || return
     if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] ; then
@@ -1630,6 +1665,7 @@ StartHere() {
             --lang=*) lang="${arg#*=}" ;;
             --tr-engine=*) tr_engine="${arg#*=}" ;;
             --tr-prefer=*) tr_prefer="${arg#*=}" ;;
+            --id=*) MagicId "${arg#*=}" || return 0 ;;
             --genlang=*)
                 lang="${arg#*=}"
                 _init_translations --tr-engine="$tr_engine" --generate "$lang"
@@ -1661,7 +1697,7 @@ StartHere() {
             --installer) export show_installer=yes ;;
             --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=*) ;; # already handled!
+            --lang=* | --tr-prefer=* | --tr-engine=* | --id=*) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
