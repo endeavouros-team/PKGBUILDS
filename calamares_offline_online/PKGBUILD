@@ -19,7 +19,7 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 # When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=next_01_2021"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
