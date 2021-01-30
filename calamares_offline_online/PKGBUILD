@@ -5,7 +5,7 @@ pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.34
-pkgrel=1
+pkgrel=9
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -19,8 +19,8 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 # When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
-  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=3_2_32_1-nov_20_ISO"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=next_01_2021"
+  "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=(
@@ -79,6 +79,9 @@ prepare() {
     # Download .yaml from url to local
     #sed -i "N;N;s?  - partition\n  - netinstall?  - partition\n  - yaml_pkglist\n  - netinstall?" $_reponame/settings.conf_online
 
+    # user_pkglist module
+    sed -i "s?  - packages?  - packages\n  - user_pkglist?" $_reponame/settings.conf_online
+
     # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
     echo -e "---\nbackend: pacman\nskip_if_no_internet: true\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_offline
@@ -135,14 +138,29 @@ prepare() {
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"             $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'         $_reponame/src/modules/initcpio/InitcpioJob.cpp
+    sed -i 's|^kernel: linux312$|kernel: linux|'                                $_reponame/src/modules/initcpio/initcpio.conf
     
     # August 20th 2020
-    _user_groups=(adm power sys floppy log rfkill optical scanner)
+    _user_groups=(sys rfkill wheel)
     for user_groups in "${_user_groups[@]}"
     do
     # will add one by one using -i
     sed -i "s?defaultGroups:?defaultGroups:\n    - $user_groups?" $_reponame/src/modules/users/users.conf
     done
+    
+    # remove unused groups
+    sed -i $_reponame/src/modules/users/users.conf \
+    -e '/^    - lp/d' \
+    -e '/^    - video/d' \
+    -e '/^    - network/d' \
+    -e '/^    - storage/d' \
+    -e '/^    - audio/d' \
+    
+    # set date for calamares_branding
+    _date=$(date +%Y.%m.%d)
+    sed -i $_reponame/src/branding/endeavouros/branding.desc \
+    -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
+    -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
     sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
 
@@ -192,6 +210,8 @@ package() {
     # maybe download base_install.sh everytime from calamares module so it can be updated on the go...
     cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
+    cp -r $_reponame/src/modules/user_pkglist/pkglist_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
+    chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
     
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
