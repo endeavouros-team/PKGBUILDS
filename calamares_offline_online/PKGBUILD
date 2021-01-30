@@ -138,6 +138,7 @@ prepare() {
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"             $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/'         $_reponame/src/modules/initcpio/InitcpioJob.cpp
+    sed -i 's|^kernel: linux312$|kernel: linux|'                                $_reponame/src/modules/initcpio/initcpio.conf
     
     # August 20th 2020
     _user_groups=(sys rfkill wheel)
