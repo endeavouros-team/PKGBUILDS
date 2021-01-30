@@ -1610,6 +1610,11 @@ Options:
 --lang=X          Use language X on the user interface.
 --changelog       Show the changelog of this package.
 
+Install time options:
+--pkglist=URL     User can give an URL to a file that contains a list of additional packages
+                  to install. Package names are listed as one package name per line.
+                  Empty lines and comments (lines starting with character #) are allowed.
+
 Experimental options:
 --genlang=X       Generate language X support for the user interface of the Welcome app.
                   X is a shorthand of two lowercase letters, like de, en, or fr.
