@@ -181,6 +181,9 @@ AssertPicture() {
                     ;;
             esac
             ;;
+        DEFAULT-2021 | default-2021)
+            pic="$picfolder/endeavouros-wallpaper.png"
+            ;;
         ISO | iso)
             pic="$picfolder/endeavouros-default-background.png"          # new picture
             [ -r "$pic" ] || pic="$picfolder/endeavouros-wallpaper.png"  # old picture
