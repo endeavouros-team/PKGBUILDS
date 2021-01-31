@@ -11,8 +11,8 @@ license=('GPL3')
 source=(
   "${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz"
 )
-md5sums=('598b4f0f035af10c1bbbc8c8d1ebdd93')
-sha512sums=('bf80652506cebd4bdaec30a1427299586d26eb2776ceb497b8e026f8b82a270afddd4a11fea9ad62c29f3b445380e1ec1fa712408401e322389f9e1968f3c314')
+md5sums=('80e4a0afb1e99d6e2f69a7ff44fb0220')
+sha512sums=('fe722603b136039ccbb9198d5bee5e7e6b88e793b691b309fe998219a1887399bd9290d73f8653b66b9b822a8a92e45b60a1e9b0db39e15c26ed237a73b57240')
 install=$pkgname.install
 
 package() {
