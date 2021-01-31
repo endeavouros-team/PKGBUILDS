@@ -39,7 +39,7 @@ Main() {
     [ -r "$conf" ] && return
 
     sleep 3
-    eos-wallpaper-set DEFAULT
+    eos-wallpaper-set DEFAULT-2021
     touch "$conf"
 }
 
