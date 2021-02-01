@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.9
+pkgver=0.9.1
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
@@ -143,5 +143,37 @@ build() {
 }
 
 package() {
+
+    cd $srcdir/..
+
+    local isofile=$(ls -1 endeavouros-*-x86_64.iso | grep -v devel | tail -n1)   # $isofile = endeavouros-<date>-x86_64.iso
+    local isobase=$(basename $isofile .iso)                                      # $isobase = endeavouros-<date>-x86_64
+    local date=$(echo $isofile | sed 's|endeavouros-\([0-9][0-9.]*\)-.*|\1|')    # date from the ISO file name
+
+    echo "Create the sha512sum file:"
+    sha512sum $isofile > $isofile.sha512sum
+
+    echo "Create the signature file:"
+    gpg --default-key info@endeavouros.com \
+        --detach-sign \
+        --output $isofile.sig \
+        $isofile
+
+    if [ "$HOME" = "/home/joekamprad" ] ; then
+
+        echo "Create the torrent file:"
+        mktorrent -p -v \
+                  --announce=udp://tracker.openbittorrent.com:80 \
+                  -a udp://tracker.torrent.eu.org:451/announce \
+                  -a udp://thetracker.org:80/announce \
+                  -a udp://tracker.dutchtracking.com:6969/announce \
+                  -a udp://tracker.opentrackr.org:1337/announce \
+                  -c $isobase.tar \
+                  -n $isobase.tar \
+                  -o $isobase.tar.torrent \
+                  -w https://mirror.alpix.eu/endeavouros/iso/$isofile \
+                  $HOME/Documents/$isobase.tar
+    fi
+
     echo Done.
 }
