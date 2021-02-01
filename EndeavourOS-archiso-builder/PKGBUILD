@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.8.2
+pkgver=0.9
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
@@ -116,7 +116,7 @@ build() {
     sudo pacman -Syyu || return 1
     
     sudo ./fix_permissions.sh
-    sudo ./build.sh -v | tee $HOME/build.log
+    sudo ./build.sh -v |& tee $HOME/iso-build-log.txt
     cd ../..
     sudo mv $srcdir/$pkgname/out/*.iso .
     sudo chown $LOGNAME *.iso
