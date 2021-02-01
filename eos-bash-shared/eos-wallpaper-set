@@ -170,7 +170,7 @@ AssertPicture() {
     local use_file_prefix="$2"
 
     case "$pic" in
-        DEFAULT | default)
+        DEFAULT-2020 | default-2020)
             case "$(eos_GetArch)" in
                 armv7h)
                     pic="$picfolder/arm-$fallback"
@@ -181,7 +181,7 @@ AssertPicture() {
                     ;;
             esac
             ;;
-        DEFAULT-2021 | default-2021)
+        DEFAULT | default | DEFAULT-2021 | default-2021)
             pic="$picfolder/endeavouros-wallpaper.png"
             ;;
         ISO | iso)
