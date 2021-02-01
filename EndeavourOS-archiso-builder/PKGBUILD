@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=EndeavourOS-archiso
-pkgver=0.8.1
+pkgver=0.8.2
 pkgrel=1
 pkgdesc="Build EndeavourOS-archiso"
 arch=(any)
@@ -88,95 +88,6 @@ _select_calamares_type() {
     done
 }
 
-_inject_at_pkgbuild() {
-
-    # The $conf file (see below) may contain local bash arrays named CHANGE, INSERT and END.
-    # It also contains the file name variable FILE that defines where all changes take place.
-    #
-    # CHANGE array specifies which packages will be changed to another.
-    # INSERT array specifies the place before new packages are added.
-    # END array specifies the packages added to the end of the FILE.
-    #
-    # Example:
-    #
-    # local CHANGE=("vi|emacs" "less|most")                                      # change vi --> emacs, less --> most
-    # local INSERT=("#virtualbox.packages|#for virt-viewer\nspice-vdagent\n")    # add spice-vdagent just before line "#virtualbox packages"
-    # local END=(vlc simple-scan)                                                # add some packages to the end of the $FILE
-    # local FILE=packages.x86_64
-
-    local conf_places=(
-        "$HOME/.config/pkgbuild-inject.conf"
-        "$HOME/.pkgbuild-inject.conf"
-    )
-    local conf
-
-    for conf in "${conf_places[@]}" ; do
-        test -r "$conf" && break
-    done
-    if [ ! -r "$conf" ] ; then
-        echo "Info: $FUNCNAME: no inject configuration file at ${conf_places[*]}"
-        return
-    fi
-
-    source "$conf"
-
-    if [ -z "$FILE" ] ; then
-        echo "Error: $FUNCNAME: conf file $conf must set variable: FILE"
-        return 1
-    fi
-    if [ ! -r "$FILE" ] ; then
-        echo "Error: $FUNCNAME: conf file $conf refers to a non-existent file in assignment: FILE='$FILE'"
-        return 1
-    fi
-
-    local xx
-    local old new
-    local justbefore
-
-    if [ -n "$CHANGE" ] ; then
-        for xx in "${CHANGE[@]}" ; do
-            echo "Changing: '$xx'" >&2
-            old="$(echo "$xx" | cut -d '|' -f 1)"
-            new="$(echo "$xx" | cut -d '|' -f 2)"
-            sed -i "$FILE" -e "s|^$old$|$new|"
-        done
-    fi
-
-    if [ -n "$INSERT" ] ; then
-        for xx in "${INSERT[@]}" ; do
-            echo "Inserting: '$xx'" >&2
-            justbefore="$(echo "$xx" | cut -d '|' -f 1)"
-            new="$(       echo "$xx" | cut -d '|' -f 2)"
-            sed -i $FILE -e "/^$justbefore/i$new"
-        done
-    fi
-
-    if [ -n "$END" ] ; then
-        echo "" >> $FILE
-        echo "# Personal packages:" >> $FILE
-        for xx in "${END[@]}" ; do
-            echo "Appending: '$xx'" >&2
-            echo "$xx" >> $FILE
-        done
-    fi
-}
-
-_inject_to__run_before_squashfs_sh() {
-    local file=run_before_squashfs.sh
-    local keyserver=hkps://keyserver.ubuntu.com
-
-    sed -i $file \
-        -e "s|^pacman-key --refresh-keys$|pacman-key --refresh-keys --keyserver $keyserver|"
-
-    return  # TODO !
-
-    if [ 0 -eq 1 ] ; then
-        local justbefore="$(grep -P "^mv .* /usr/bin/$" $file)"
-        local new=""                                                 # modify chrooted_cleaner_script.sh ??
-        sed -i $file -e "/^$justbefore/i$new"
-    fi
-}
-
 build() {
     ###################################################
     # Check that we have calamares repo properly set up.
@@ -200,15 +111,12 @@ build() {
 
     cd $basedir
 
-    _inject_at_pkgbuild || return 1
-    _inject_to__run_before_squashfs_sh || return 1
-    
     _select_calamares_type   # current or test
 
     sudo pacman -Syyu || return 1
     
     sudo ./fix_permissions.sh
-    sudo ./build.sh -v
+    sudo ./build.sh -v | tee $HOME/build.log
     cd ../..
     sudo mv $srcdir/$pkgname/out/*.iso .
     sudo chown $LOGNAME *.iso
