@@ -66,7 +66,7 @@ eos_yad_terminal() {
     # Requires: yad
     #
     # These terminal programs are known not to work with this program:
-    #     -
+    #     - putty
     # The following terminals are known to work:
     local suitable_terminals=(
         xfce4-terminal
@@ -82,6 +82,8 @@ eos_yad_terminal() {
         termite
         xterm
         kitty
+        terminology
+        sakura
     )
     local eos_terminal_prog=""
     local xx
