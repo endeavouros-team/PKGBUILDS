@@ -151,6 +151,7 @@ WallpaperSetCommon() {
         *)
             # may be DM instead of DE
             if (IsSway) ; then
+                AssertPicture endeavouros-wallpaper.png no
                 swaybg -i "$pic"
             else
                 DIE "Sorry, desktop '$DE' is not supported."
