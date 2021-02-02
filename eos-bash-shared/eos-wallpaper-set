@@ -95,13 +95,19 @@ XfceSetWallpaper() {
     esac
 }
 
+IsSway() { test -x /usr/bin/swaybg ; }
+
 WallpaperSetCommon() {
     # Assume:
     #    - $pic is the picture file name
     #    - $DE is the desktop environment
 
     test -n "$pic" || DIE "no picture!"
-    test -n "$DE"  || DIE "no DE!"
+    if [ -z "$DE" ] ; then
+        if (! IsSway) ; then
+            DIE "no DE!"
+        fi
+    fi
 
     case "$DE" in
         BUDGIE)
@@ -143,7 +149,12 @@ WallpaperSetCommon() {
             XfceSetWallpaper
             ;;
         *)
-            DIE "Sorry, desktop '$DE' is not supported."
+            # may be DM instead of DE
+            if (IsSway) ; then
+                swaybg -i "$pic"
+            else
+                DIE "Sorry, desktop '$DE' is not supported."
+            fi
             ;;
     esac
 }
@@ -223,7 +234,7 @@ AssertPicture() {
             *) pic="file://$pic" ;;
         esac
     fi
-    echo "Setting desktop wallpaper $(basename "$pic") for '$DE' ..." >&2
+    echo "Setting desktop wallpaper $pic for '$DE' ..." >&2
 }
 
 Parameters() {
