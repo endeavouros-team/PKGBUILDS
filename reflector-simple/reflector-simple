@@ -476,12 +476,14 @@ Main() {
     # Now all is ready, so just run the command.
 
     local lockfile=""
-    if [ ${#added_countries[@]} -gt 1 ] ; then
-        lockfile="$(mktemp)"
-        eos_yad_RunCmdTermBash "eos-waiting-indicator $lockfile '$progname is working, please wait ...'" \
-                               "" \
-                               "" \
-                               "--no-enter-wait"
+    if [ 0 -eq 1 ] ; then                            # lockfile feature no more working?
+        if [ ${#added_countries[@]} -gt 1 ] ; then
+            lockfile="$(mktemp)"
+            eos_yad_RunCmdTermBash "eos-waiting-indicator $lockfile '$progname is working, please wait ...'" \
+                                   "" \
+                                   "" \
+                                   "--no-enter-wait"
+        fi
     fi
 
     "${reflector_cmd[@]}" > $tmpfile
