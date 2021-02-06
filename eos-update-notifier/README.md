@@ -1,10 +1,10 @@
 # eos-update-notitier
 <style>
   table th:first {
-    width: 30%:
+    width: 40%:
   }
   table th:second {
-    width: 70%;
+    width: 60%;
   }
 </style>
 
