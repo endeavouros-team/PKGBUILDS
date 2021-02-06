@@ -3,7 +3,7 @@
 <head>
 <style>
 table {
-    table-layout: fixed;
+    table-layout: auto;
     width: 100%;
 }
 </style>
