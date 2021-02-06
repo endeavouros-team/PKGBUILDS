@@ -1,6 +1,6 @@
 # eos-update-notitier
 
-| <div style="width:500px">File name</div> | Description |
+| File name | Description |
 :--- | :---
 arch-news-for-you | Alternative Arch news checker (deprecated).
 eos-arch-news | Alternative Arch news checker.
