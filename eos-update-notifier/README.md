@@ -1,5 +1,12 @@
 # eos-update-notitier
 
+<style>
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+</style>
+
 File name | Description
 :--- | :---
 arch-news-for-you | Alternative Arch news checker (deprecated).
