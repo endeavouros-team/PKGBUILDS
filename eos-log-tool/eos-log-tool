@@ -162,7 +162,9 @@ Main()
             ;;
     esac
     local FILE_OF_LOGS=$HOME/eos-log-tool.logs
+    local FILE_OF_LOGS2='$HOME/eos-log-tool.logs'
     local DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
+    local DIR_OF_CONFIG2='$HOME/.config/eos-log-tool'
     local SUDO_CMDS=":"
 
     mkdir -p "$DIR_OF_CONFIG"
@@ -198,13 +200,13 @@ Main()
     local helptext=""
 
     helptext+="Selecting any of the boxes below (except the last two)\n"
-    helptext+="will add that particular log to a common log file (<b>$FILE_OF_LOGS</b>).\n"
+    helptext+="will add that particular log to a common log file (<b>$FILE_OF_LOGS2</b>).\n"
     helptext+="Once you have selected the desired boxes, including '$slbut',\n"
     helptext+="click the OK button and you will receive a URL\n"
     helptext+="that tells the internet address of the logs.\n\n"
     helptext+="Note1: personal data is automatically removed from logs before sending to internet.\n"
     helptext+="Note2: remove personal data can be removed from the log file by selecting '$rdbut'.\n"
-    helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG</b>.\n"
+    helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
 
     local result=$(
         eos_yad --list --checklist --width=770 --height=600 --text="$helptext" \
