@@ -4,7 +4,7 @@
 <head>
 <style>
 table {
-    table-layout: auto;
+    table-layout: fixed;
     width: 100%;
 }
 </style>
