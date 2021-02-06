@@ -1,12 +1,4 @@
 # eos-update-notitier
-<style>
-  table th:first {
-    width: 40%:
-  }
-  table th:second {
-    width: 60%;
-  }
-</style>
 
 File name | Description
 :--- | :---
