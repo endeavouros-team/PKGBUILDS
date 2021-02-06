@@ -1,5 +1,6 @@
 # eos-update-notitier
 
+<html>
 <head>
 <style>
 table {
@@ -8,6 +9,7 @@ table {
 }
 </style>
 </head>
+</html>
 
 File name | Description
 :--- | :---
