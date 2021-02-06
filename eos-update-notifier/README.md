@@ -1,8 +1,8 @@
 # eos-update-notitier
 
 | File name | Description |
-:--- | :---
-arch-news-for-you | Alternative Arch news checker (deprecated).
+| :--- | :--- |
+| arch-news-for-you | Alternative Arch news checker (deprecated). |
 eos-arch-news | Alternative Arch news checker.
 checkupdatesext | Like `checkupdates`, shows the updates with columnized layout.
 eos-update-notifier | Checks the availability of package updates, and offers to perform the actual update. Can be configured, see `eos-update-notifier.conf`.
