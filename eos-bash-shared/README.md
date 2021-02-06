@@ -10,7 +10,7 @@ eos-connection-checker | Checks that an internet connection is available.
 eos-FindAppIcon | Find a suitable icon path for an app.
 eos-pkg-changelog | Show the changelog of (most) EndeavourOS packages.<br>Usage: `eos-pkg-changelog <package-name>`
 eos-pkginfo | Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.<br>Usage: `eos-pkginfo {<package-name> \| <program-name> \| <file path>`}
-eos-pkginfo.completion | Bash completion for pkginfo.<br>Note: does not support completion for AUR packages because of performance.
+eos-pkginfo.completion | Bash completion for eos-pkginfo.<br>Note: does not support completion for AUR packages because of performance.
 eos-script-lib-yad | Common bash code for various EOS apps.
 eos-script-lib-yad.conf | Configuration file for eos-script-lib-yad.
 eos-sendlog | Send a text file to pastebin, and save the returned URL to ~/.config/eos-sendlog.txt.<br>Example: `cat log.txt \| eos-sendlog`
