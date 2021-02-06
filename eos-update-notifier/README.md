@@ -1,11 +1,13 @@
 # eos-update-notitier
 
+<head>
 <style>
 table {
     table-layout: fixed;
     width: 100%;
 }
 </style>
+</head>
 
 File name | Description
 :--- | :---
