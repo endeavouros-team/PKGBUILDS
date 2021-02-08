@@ -56,12 +56,17 @@ GetGpuIds() {
 
 Usage2() {
     cat <<EOF >&2
-Usage: $progname [<id> | internal-test]
+Usage: $progname [<nvidia-id> | internal-test]
 where
-    <id>            Check if an Nvidia card with given id (4 hex numbers) is supported.
+    <nvidia-id>     Check if an Nvidia card with given id (4 hex numbers) is supported.
     internal-test   Internal ad hoc test (useful for devs only).
 
 If no parameter is given, check if the currently installed Nvidia card is supported.
+
+Program return codes:
+    0 = nvidia-dkms is supported
+    2 = only nvidia-390x-dkms is supported (obsolete)
+    1 = no Nvidia card detected or not supported
 EOF
 }
 
@@ -76,6 +81,7 @@ Main()
     local id ids=""
     local ret_ids
     local driver_found=""
+    local resultcode=1
     local TESTING=no           # set to "no" on release !!!
 
     GetGpuIds "$@"
@@ -112,7 +118,8 @@ EOF
             fi
         done
         case "$driver_found" in
-            *nvidia-dkms* | *nvidia-390xx-dkms*) ;;
+            *nvidia-dkms*)        resultcode=0 ;;
+            " nvidia-390xx-dkms") resultcode=2 ;;
             *)
                 if [ ${#ids[@]} -eq 1 ] ; then
                     echo2 "Sorry, your Nvidia card (id: ${ids[*]}) is not supported by nvidia-dkms nor nvidia-390xx-dkms."
@@ -128,6 +135,8 @@ EOF
             *)        echo2 "Sorry, card '$vendorinfo' not checked by this program." ;;
         esac
     fi
+
+    return $resultcode         # 0=OK, 1=FAIL, 2=OK (but only 390xx)
 }
 
 Main "$@"
