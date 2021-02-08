@@ -3,6 +3,7 @@ Operation = Upgrade
 Type = Package
 Target = amd-ucode
 Target = intel-ucode
+Target = btrfs-progs
 Target = cryptsetup
 Target = linux
 Target = linux-hardened
