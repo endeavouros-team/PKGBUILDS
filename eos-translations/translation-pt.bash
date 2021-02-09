@@ -34,33 +34,33 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME A aplicação está desactivada. Para, ainda assim, a iniciar, use a opção --enable."
+_tr_add2 welcome_disabled      "$PRETTY_PROGNAME A aplicação está desativada. Para, ainda assim, a iniciar, use a opção --enable."
 
 _tr_add2 butt_later            "Até breve"
-_tr_add2 butt_latertip         "Manter $PRETTY_PROGNAME activo"
+_tr_add2 butt_latertip         "Manter $PRETTY_PROGNAME ativo"
 
-_tr_add2 butt_noshow           "Não me mostrar"
-_tr_add2 butt_noshowtip        "Desactivar $PRETTY_PROGNAME"
+_tr_add2 butt_noshow           "Não me mostre mais"
+_tr_add2 butt_noshowtip        "Desativar $PRETTY_PROGNAME"
 
 _tr_add2 butt_help             "Ajuda"
 
 
 _tr_add2 nb_tab_INSTALL        "INSTALAR"
 _tr_add2 nb_tab_GeneralInfo    "Informação Geral"
-_tr_add2 nb_tab_AfterInstall   "Depois da Instalação"
-_tr_add2 nb_tab_AddMoreApps    "Obter Mais Aplicações"
+_tr_add2 nb_tab_AfterInstall   "Após a Instalação"
+_tr_add2 nb_tab_AddMoreApps    "Obter mais Aplicações"
 
 
 _tr_add2 after_install_text    "Tarefas depois da instalação"
 
-_tr_add2 after_install_um      "Actualizar Servidores"
-_tr_add2 after_install_umtip   "Actualizar a lista de servidores antes da actualização do sistema"
+_tr_add2 after_install_um      "Atualizar Servidores"
+_tr_add2 after_install_umtip   "Atualizar a lista de servidores antes da atualização do sistema"
 
-_tr_add2 after_install_us      "Actualizar Sistema"
-_tr_add2 after_install_ustip   "Actualizar o Software do Sistema"
+_tr_add2 after_install_us      "Atualizar Sistema"
+_tr_add2 after_install_ustip   "Atualizar o Software do Sistema"
 
-_tr_add2 after_install_dsi     "Detectar problemas no sistema"
-_tr_add2 after_install_dsitip  "Detectar potenciais problemas nos pacotes do sistema ou noutro local"
+_tr_add2 after_install_dsi     "Detetar problemas no sistema"
+_tr_add2 after_install_dsitip  "Detetar potenciais problemas nos pacotes do sistema ou noutro local"
 
 _tr_add2 after_install_etl     "EndeavourOS mais recente$_question"
 _tr_add2 after_install_etltip  "Mostrar o que fazer para atualizar o seu sistema EndeavourOS para o nível mais recente"
@@ -84,7 +84,7 @@ _tr_add2 after_install_hntip   "Ponha o seu hardware a funcionar"
 _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Recomendações sobre Bluetooth"
 
-_tr_add2 after_install_nv      "NVIDIA users$_exclamation"
+_tr_add2 after_install_nv      "Utilizadores NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip   "Use o instalador de NVIDIA"
 
 _tr_add2 after_install_ft      "Dicas do fórum"
@@ -128,8 +128,8 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) para Xfce"
 ####################### NEW STUFF AFTER THIS LINE:
 
 _tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME outra vez, abra um terminal e execute: $PROGNAME --enable"
-_tr_add2 settings_dis_text       "Reactivar o $PRETTY_PROGNAME:"
-_tr_add2 settings_dis_title      "Como voltar a activar o $PRETTY_PROGNAME"
+_tr_add2 settings_dis_text       "Reativar o $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_title      "Como voltar a ativar o $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Lembro-me"
 _tr_add2 settings_dis_buttip     "Prometo"
 
@@ -150,8 +150,8 @@ _tr_add2 install_already         "Já instalado"
 _tr_add2 install_ing             "A instalar"
 _tr_add2 install_done            "Terminado."
 
-_tr_add2 sysup_no                "Não há actualizações."
-_tr_add2 sysup_check             "A procurar actualizações de software..."
+_tr_add2 sysup_no                "Não existem atualizações."
+_tr_add2 sysup_check             "A procurar atualizações de software..."
 
 _tr_add2 issues_title            "Detectado problema de pacote"
 _tr_add2 issues_grub             "IMPORTANTE: é necessário voltar a criar manualmente o menú de arranque."
@@ -161,7 +161,7 @@ _tr_add2 issues_no               "Não foram detectados problemas de sistema imp
 _tr_add2 cal_noavail            "Não disponível: "        # programa de instalação
 _tr_add2 cal_warn               "Alerta"
 _tr_add2 cal_info1              "Esta é uma versão desenvolvida pela comunidade.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> Este método dá-lhe um ambiente Xfce com tema do EndeavourOS.\nNão é necessária ligação à Internet.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> Este método dá-lhe um ambiente gráfico Xfce com tema do EndeavourOS.\nNão é necessária ligação à Internet.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> Este método permite-lhe escolher o seu ambiente de trabalho, com temas padrão.\nÉ necessária ligação à Internet.\n\n"
 _tr_add2 cal_info4              "Atenção: Esta versão está em aperfeiçoamento, ajude-nos a torná-la mais estável, reportando falhas.\n"
 _tr_add2 cal_choose             "Escolha o método de instalação"
@@ -178,8 +178,8 @@ _tr_add2 tail_buttip            "Feche apenas esta janela"
 _tr_add2 ins_text              "A instalar o EndeavourOS no disco"
 _tr_add2 ins_start             "A iniciar o Instalador"
 _tr_add2 ins_starttip          "Inicie o instalador do EndeavourOS em simultâneo com um terminal de depuração"
-_tr_add2 ins_up                "Actualize esta aplicação$_exclamation"
-_tr_add2 ins_uptip             "Actualiza esta aplicação e reinicia-a"
+_tr_add2 ins_up                "Atualize esta aplicação$_exclamation"
+_tr_add2 ins_uptip             "Atualiza esta aplicação e reinicia-a"
 _tr_add2 ins_keys              "Iniciar as chaves pacman"
 _tr_add2 ins_keystip           "Iniciar as chaves pacman"
 _tr_add2 ins_pm                "Gestor de partições"
@@ -191,10 +191,10 @@ _tr_add2 ins_tipstip           "Dicas de instalação"
 _tr_add2 ins_trouble           "Resolução de problemas"
 _tr_add2 ins_troubletip        "Recuperação de Sistema"
 
-_tr_add2 after_install_us_from    "Actualizar a partir de"                            # AUR or upstream
+_tr_add2 after_install_us_from    "Atualizar a partir de"                            # AUR or upstream
 _tr_add2 after_install_us_el      "São necessário privilégios elevados."
-_tr_add2 after_install_us_done    "Actualização concluída."
-_tr_add2 after_install_us_fail    "A actualização falhou!"
+_tr_add2 after_install_us_done    "Atualização concluída."
+_tr_add2 after_install_us_fail    "A atualização falhou!"
 
 # 2020-May-14:
 
@@ -204,7 +204,7 @@ _tr_add2 useful_tips_text      "Dicas úteis"
 # 2020-May-16:
 
 _tr_add2 butt_changelog        "Registo de alterações"
-_tr_add2 butt_changelogtip     "Mostrar o registo de alterações de Welcome"
+_tr_add2 butt_changelogtip     "Mostrar o registo de alterações do Welcome"
 
 _tr_add2 after_install_themevan      "Tema original Xfce"
 _tr_add2 after_install_themevantip   "Usar o tema original Xfce"
@@ -225,3 +225,48 @@ _tr_add2 nb_tab_owncmdstip          "Ajuda para adicionar comandos pessoais"
 
 _tr_add2 add_more_apps_akm          "Um Gestor de Kernel"
 _tr_add2 add_more_apps_akmtip       "Um gestor leve de linux kernel e fonte de informação"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Tutorial: Comandos pessoais"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Comandos pessoais arrastar${_and}largar"
+_tr_add2 butt_owncmds_dnd_help    "Mostra uma janela onde pode arrastar itens de área para novos botões"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Alterar a resolução do ecrã"
+_tr_add2 ins_resotip              "Altere agora a resolução do ecrã"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Navegar por todos os pacotes Arch"
+_tr_add2 add_more_apps_aur           "Navegar por todos os pacotes AUR"
+_tr_add2 add_more_apps_done1_text    "Aplicações sugeridas já instaladas$_exclamation"
+_tr_add2 add_more_apps_done2_text    "ou navegue por todos os pacotes Arch e AUR"
+_tr_add2 add_more_apps_done2_tip1    "Para instalar, use o 'pacman' ou o 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Para instalar, use o 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2        "Escolha um dos papéis de parede do EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Selecionador de papel de parede"                  # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "verificação de atualização"
+_tr_add2 updt_searching           "A procurar"
+_tr_add2 updt_for_updates         "por atualizações"
+_tr_add2 updt_failure             "falha$_exclamation"
+_tr_add2 updt_nothing_todo        "não há nada para fazer"
+_tr_add2 updt_press_enter         "Pressione ENTER para fechar esta janela"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Gerir ficheiros pacnew, pacorig $_and pacsave com pacdiff $_and"
