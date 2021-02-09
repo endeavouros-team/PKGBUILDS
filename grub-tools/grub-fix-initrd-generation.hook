@@ -1,7 +1,8 @@
 [Trigger]
 Operation = Upgrade
-Type = Package
+Type = PackageT
 Target = grub
+Target = grub-silent
 Target = os-prober
 
 [Action]
