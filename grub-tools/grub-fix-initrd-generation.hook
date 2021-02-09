@@ -2,6 +2,7 @@
 Operation = Upgrade
 Type = Package
 Target = grub
+Target = grub-silent
 Target = os-prober
 
 [Action]
