@@ -5,6 +5,7 @@
 Lsb_release() {
     sed -i /etc/lsb-release \
         -e 's|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
+        -e 's|^DISTRIB_CODENAME=.*$|DISTRIB_CODENAME=rolling|' \
         -e 's|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
 }
 
