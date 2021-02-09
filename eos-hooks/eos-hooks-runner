@@ -3,7 +3,13 @@
 # Run eos hooks related commands.
 
 Lsb_release() {
-    sed -i /etc/lsb-release \
+    local file=/etc/lsb-release
+
+    if [ -z "$(grep "^DISTRIB_CODENAME=" $file)" ] ; then
+        # add missing DISTRIB_CODENAME=
+        echo "DISTRIB_CODENAME=rolling" >> $file
+    fi
+    sed -i $file \
         -e 's|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
         -e 's|^DISTRIB_CODENAME=.*$|DISTRIB_CODENAME=rolling|' \
         -e 's|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
