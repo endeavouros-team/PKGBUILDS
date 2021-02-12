@@ -267,3 +267,6 @@ _tr_add2 updt_press_enter         "Toto okno zavriete klávesou ENTER"
 # 2020-Oct-24:
 #    IMPORTANT NOTE:
 #       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Spravovať pacnew, pacorig $_and pacsave súbory s pacdiff $_and"
