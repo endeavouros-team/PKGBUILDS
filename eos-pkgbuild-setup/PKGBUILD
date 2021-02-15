@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=3.4.11
+pkgver=3.4.12
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -45,7 +45,7 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
             'e666f229c342ac91fcf7e4c235fd99e013e55277886e3db1fc336d99432f6f570c8a599565df5afbe6276a528b34eab57fd01d5531fb340e8f798f406c8365f1'
             '852ac62f9568ded8030c4e7c886bc298e9a203d8e958cc4ad65bbd98defbaed2d00fb0865767fa850fbb6f86c0b76edff5fff4d0b336a9effcbc1848cd9120d7'
-            'd8e060bcabfae68c3fb7a59fed4f83c74d24e5706389d27622b2c35444404b985c40ea09f8db23f81296b0c8419ef4a633e8c450a5d60754edeadfd80d656b97')
+            '3017131dcef926d174eb4319bf130a13f81a2a1b8859937af89dc600620fdc1c0c1d919f53366731e53239838f7d6aed92500008d3571435f0f6f1ab708be335')
 
 package() {
     local scripts=usr/share/endeavouros/scripts

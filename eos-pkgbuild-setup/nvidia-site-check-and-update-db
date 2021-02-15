@@ -8,10 +8,19 @@ DIE() {
     exit 11
 }
 
+STOP() {
+    echo "Info: $1" >&2
+    exit 3
+}
+
 nvidia-site-checks() {
     local ids=/var/lib/pci/nvidia.ids
     local newids=/tmp/nvidia.ids
     local retval=0
+
+    if (! /usr/bin/ls /usr/share/licenses/nvidia* >& /dev/null) ; then
+        STOP "no Nvidia driver is installed."
+    fi
 
     [ -r $ids ] || DIE "$ids does not exist!"
 
@@ -48,4 +57,5 @@ nvidia-site-checks "$@"
 #   0  no changes
 #   1  changes detected and copied to local db
 #   2  changes detected but not copied to local db
+#   3  no nvidia driver installed
 #  11  exit: a fatal error occurred
