@@ -134,7 +134,7 @@ prepare() {
 
     # partition.conf
     sed -i $_reponame/src/modules/partition/partition.conf \
-    -e 's|^efiSystemPartition:     "/boot/efi\$|efiSystemPartition:     "/boot"?"|' \
+    -e 's|^efiSystemPartition:     "/boot/efi$|efiSystemPartition:     "/boot"?"|' \
     -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M?"|' \
     -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI?"|'
 
