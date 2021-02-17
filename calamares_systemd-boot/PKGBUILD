@@ -129,11 +129,9 @@ prepare() {
     sed -i "s?fallback: \"\/initramfs-linux-fallback.img\".*?fallback: \"\/boot\/initramfs-linux-fallback.img\"?"  $_reponame/src/modules/bootloader/bootloader.conf
 
     sed -i $_reponame/src/modules/bootloader/bootloader.conf \
-    -e -i 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
-    -e -i 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \ 
-    -e -i 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
-
-    sed -i $_reponame/src/modules/bootloader/bootloader.conf \
+    -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
+    -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \ 
+    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|' \
     -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
     -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
     -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
