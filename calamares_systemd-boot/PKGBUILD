@@ -130,7 +130,7 @@ prepare() {
     -e 's|^fallback: "/initramfs-linux-fallback.img"$|fallback: "/boot/initramfs-linux-fallback.img\"|' \ 
     -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
     -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
-    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|' \
+    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
 
     # partition.conf
     sed -i $_reponame/src/modules/partition/partition.conf \
