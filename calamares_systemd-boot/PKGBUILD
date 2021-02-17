@@ -1,5 +1,7 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
 # Multipurpose installer for arch based distros
+# killajoe say: changes for testing systemd-boot option inside calamares i do use some temprary repos from my github:
+#   "git+https://github.com/killajoe/$_eos_changes.git#branch=master"
 
 pkgname=calamares_systemd-boot
 _eos_changes=Calamares_current
