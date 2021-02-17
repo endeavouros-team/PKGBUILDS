@@ -123,23 +123,20 @@ prepare() {
 
     # sed settings for systemd-boot
     # bootloader.conf
-    sed -i "s?efiBootLoader: \"grub\".*?efiBootLoader: \"systemd-boot\"?"  $_reponame/src/modules/bootloader/bootloader.conf
-    sed -i "s?kernel: \"\/vmlinuz-linux\".*?kernel: \"\/boot\/vmlinuz-linux\"?"  $_reponame/src/modules/bootloader/bootloader.conf
-    sed -i "s?img: \"\/initramfs-linux.img\".*?img: \"\/boot\/initramfs-linux.img\"?"  $_reponame/src/modules/bootloader/bootloader.conf
-    sed -i "s?fallback: \"\/initramfs-linux-fallback.img\".*?fallback: \"\/boot\/initramfs-linux-fallback.img\"?"  $_reponame/src/modules/bootloader/bootloader.conf
-
     sed -i $_reponame/src/modules/bootloader/bootloader.conf \
-    -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
-    -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \ 
-    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|' \
+    -e 's|^efiBootLoader: "grub"$|efiBootLoader: "systemd-boot"|' \
+    -e 's|^kernel: "/vmlinuz-linux\"$|kernel: "/boot/vmlinuz-linux"|' \
+    -e 's|^img: "/initramfs-linux.img"$|img: "/boot/initramfs-linux.img"|' \
+    -e 's|^fallback: "/initramfs-linux-fallback.img"$|fallback: "/boot/initramfs-linux-fallback.img\"|' \ 
     -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
     -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
-    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
+    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|' \
 
     # partition.conf
-    sed -i "s?efiSystemPartition:     \"\/boot\/efi\".*?efiSystemPartition:     \"\/boot\"?"  $_reponame/src/modules/partition/partition.conf
-    sed -i "s?# efiSystemPartitionSize:     300M.*?efiSystemPartitionSize:     512M?"  $_reponame/src/modules/partition/partition.conf
-    sed -i "s?# efiSystemPartitionName:     EFI.*?efiSystemPartitionName:     EFI?"  $_reponame/src/modules/partition/partition.conf
+    sed -i $_reponame/src/modules/partition/partition.conf \
+    -e 's|^efiSystemPartition:     "/boot/efi\$|efiSystemPartition:     "/boot"?"|' \
+    -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M?"|' \
+    -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI?"|'
 
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
