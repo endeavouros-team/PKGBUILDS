@@ -134,9 +134,9 @@ prepare() {
 
     # partition.conf
     sed -i $_reponame/src/modules/partition/partition.conf \
-    -e 's|^efiSystemPartition:     "/boot/efi"$|efiSystemPartition:     "/boot"?"|' \
-    -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M?"|' \
-    -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI?"|'
+    -e 's|^efiSystemPartition:     "/boot/efi"$|efiSystemPartition:     "/boot"|' \
+    -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M|' \
+    -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI?|'
 
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
