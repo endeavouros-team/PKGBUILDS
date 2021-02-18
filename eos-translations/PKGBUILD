@@ -1,8 +1,9 @@
+#!/bin/bash
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
-pkgver=1.1.11
+pkgver=1.1.12
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,6 +22,7 @@ source=(
   $url/translation-es.bash
   $url/translation-fi.bash
   $url/translation-fr.bash
+  $url/translation-hi.bash
   $url/translation-hr.bash
   $url/translation-it.bash
   $url/translation-pl.bash
@@ -41,6 +43,7 @@ sha512sums=('dacbbddc30d6c055c8bd530f8e0051cca917a26f0c8c35f08f00e2b241ebe6acbd7
             '7dcc1bdbf0ed77482c536860e1972994dfcc13dbd337314128eafb5dca2d10d024d2c5c83ac628547da1e0e0eee8833b9392e98dda1d1010effb33ee2ade8827'
             '8b6e437dff9f5868778a4ddf3f634171e98f5e41a387cdacd1c0842c2c30e28b02905e33a832dc95c639c22dfb367a16fe45ccd08133373259858efd16c73d8f'
             '221d4a57744a33758a915b6c28b4b16bfb2d221e4d797b17127372ff55013776e12ecb91093e13b4c7e3cfe585558c5dd135d0f9cf3e9359b602eeac49885688'
+            'a201a5257b1916e21b86936b75a8217d56a245b09ec80e62eee6bb8d3288a5023c2ba11ac86f03307e0ad01a1ad9216cfd2949fc72f15d931d0046bafc991eb8'
             'abb5158471d47dd200e23cc65f83ecae38d1b34f5d8429f84ac335309c9822f205217543aee6ee631ed73575819a9dd964e0367f40232dfbba48a1dc8da18f9f'
             '4d2397871c628bab0bdb2352c50d71a6f6e943d5e52292cbca0b84d41801b879b8bd70a0f22e002dbb64e27e3604d2f317e42dff04eff993938e75d1807d4779'
             '059470680fa82160c54d652e892454d442d7fb29ac0e07251e1ebc22cd5c51c7f09788d52eb8ef721f25305741a264dbc14664d61d16046148e279455d708bde'
@@ -55,17 +58,20 @@ sha512sums=('dacbbddc30d6c055c8bd530f8e0051cca917a26f0c8c35f08f00e2b241ebe6acbd7
             '5685cadbc9dc44c54d1b16204f55470a934881b4ceb02b9f4419d3ea557c39705bb311e43bbb0901e04438ac60683c1b2f84d32d6c63ba5f269e96cb4a3e64d4')
 package() {
 
-  ### Update variable 'languages' when new languages are added:
-  local languages="de en es fi fr hr it pl pt pt_BR ro rs ru se sk th zh"
-
-  local folderspec=/usr/share/endeavouros/scripts
-  local xx
+  local folderspec=usr/share/endeavouros/scripts
+  local lang xx
 
   install -d $pkgdir/$folderspec
 
   install -Dm644 translations.bash             $pkgdir/$folderspec/translations.bash
   install -Dm644 translations-reference.bash   $pkgdir/$folderspec/translations-reference.bash
-  for xx in $languages ; do
-    install -Dm644 translation-$xx.bash        $pkgdir/$folderspec/translation-$xx.bash
+
+  for xx in "${source[@]}" ; do
+    case "$xx" in
+      $url/translation-*.bash)
+        lang="$(basename "$xx" .bash | sed 's|translation-||')"
+        install -Dm644 translation-$lang.bash  $pkgdir/$folderspec/translation-$lang.bash
+        ;;
+    esac
   done
 }
