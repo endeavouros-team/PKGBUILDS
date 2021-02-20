@@ -4,8 +4,8 @@ pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=0.2.3
-pkgrel=3
+pkgver=0.3
+pkgrel=1
 
 arch=('any')
 license=('GPL')
@@ -19,8 +19,8 @@ source=(
     "$_url/$pkgname.completion"
     "$_url/$pkgname.install"
 )
-sha512sums=('dae3f6b64ae8fd5d21bde2a60fc916ab44b30afe09f894b5150c05ccfc0ec4ed3c346b470699d1191c5347e890ba82f963193452243ad29e74b117a9627ea8d8'
-            '8d6121338334798879bee60862c1faf9ecce16a83c59de0d7bb2d9c55c72e76c5b8fb046e2f5de3a339812807daa68d6f48f3624d5fddf73e4ef9bf6496f423c'
+sha512sums=('d088d875e47f80da5bbde231c9ea3939be9d5df83b45006a3d6839e9a594b6de6dba50224da48b04f4342bbc0b0f9b181746364dbe94a6c585cda1d21f5b01a3'
+            '74cc392d8c19e3ffc8338c99c8ded6e45eaef3c34bfe5eb39d6b0bbc6ceb23a2a7cf9df410c66ef9a88a42f3dbdd7e9db0aa12addd9622fa3d879199d147f4f6'
             '9b3864ccbc82528e3c31b177acdb480fac4a88c0e9834460243c0c37b875492c89dbbd6f2dc6ac80bd46c0c166e3df5e0df39e457d5134957ceeb9c14b946a60')
 
 package() {

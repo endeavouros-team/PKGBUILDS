@@ -29,10 +29,11 @@ Usage: $progname [options] [operation] [package]
 Note: bash command completion is available.
 
 Examples:
-    pahis --upgraded firefox
-    pahis --installed
-    pahis geany
-    pahis -everything
+    pahis --upgraded firefox    # shows info about firefox updates
+    pahis --installed           # shows info about installed packages
+    pahis --Running             # shows info about pacman commands used
+    pahis geany                 # shows info about operations on geany
+    pahis -everything           # shows info about all operations
 
 EOF
 }
@@ -61,8 +62,8 @@ Main()
                 return
                 ;;
             --operations)
-                line="--upgraded --downgraded --installed --removed --reinstalled"
-                line+=" -upgraded -downgraded -installed -removed -reinstalled"
+                line="--upgraded --downgraded --installed --removed --reinstalled --Running"
+                line+=" -upgraded -downgraded -installed -removed -reinstalled -Running"
                 echo "$line"
                 return
                 ;;
@@ -71,8 +72,8 @@ Main()
                 return
                 ;;
 
-            --upgraded | --downgraded | --installed | --removed | --reinstalled | \
-                -upgraded | -downgraded | -installed | -removed | -reinstalled)
+            --upgraded | --downgraded | --installed | --removed | --reinstalled | --Running | \
+                -upgraded | -downgraded | -installed | -removed | -reinstalled  | -Running)
                 op="${arg##*-}"   # not checking if operation is already given
                 ;;
             --no-pkgchk)  # useful for packages that existed but no more!
@@ -99,13 +100,23 @@ Main()
                 pacman -Si "$pkg" >& /dev/null || DIE "package '$pkg' does not exist."
             fi
             if [ -n "$op" ] ; then
-                output="$(grep " \[ALPM\] $op $pkg " $pacmanlog)"
+                case "$op" in
+                    Running)
+                        output="$(grep " \[PACMAN\] $op $pkg " $pacmanlog)" ;;
+                    *)
+                        output="$(grep " \[ALPM\] $op $pkg " $pacmanlog)" ;;
+                esac
             else
                 output="$(grep " \[ALPM\] [a-z]*ed $pkg " $pacmanlog)"
             fi
         else
             if [ -n "$op" ] ; then
-                output="$(grep " \[ALPM\] $op " $pacmanlog)"
+                case "$op" in
+                    Running)
+                        output="$(grep " \[PACMAN\] $op " $pacmanlog)" ;;
+                    *)
+                        output="$(grep " \[ALPM\] $op " $pacmanlog)" ;;
+                esac
             else
                 output="$(grep " \[ALPM\] [a-z]*ed " $pacmanlog)"
             fi
