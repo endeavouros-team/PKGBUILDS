@@ -26,7 +26,8 @@ Usage: $progname [options] [operation] [package]
     package:       Package name.
                    Default: all packages.
 
-Note: bash command completion is available.
+Note1: Bash command completion is available.
+Note2: Output is paged with '$pager'. Use the PAGER variable to set another pager.
 
 Examples:
     pahis --upgraded firefox    # shows info about firefox updates
@@ -47,11 +48,15 @@ Main()
     local pacmanlog=/var/log/pacman.log
     local pkgchk=1
     local everything=no
+    local pager="$PAGER"
+    local Default_pager=less
 
-    if [ -z "$1" ] ; then
-        Usage              # usage info doesn't hurt...
-        sleep 0.67
-    fi
+    [ -n "$pager" ] || pager=$Default_pager
+
+    #if [ -z "$1" ] ; then
+    #    Usage              # usage info doesn't hurt...
+    #    sleep 0.67
+    #fi
 
     for arg in "$@" ; do
         case "$arg" in
@@ -125,7 +130,7 @@ Main()
 
 
     if [ -n "$output" ] ; then
-        echo "$output" | tac | less
+        echo "$output" | tac | $pager
     else
         echo "Requested info is not available."
         echo "Probable reasons:"
