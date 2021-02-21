@@ -1069,7 +1069,13 @@ INSTALL() {
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
       --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
-      --field="_align(Install community editions)!$system_software_install!Community editions: Sway, Bspwm (online required)":fbtn 'bash -c yad_community_editions'
+  )
+  if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
+      tabcontents+=(
+          --field="_align(Install community editions)!$system_software_install!Community editions: Sway, Bspwm (online required)":fbtn 'bash -c yad_community_editions'
+      )
+  fi
+  tabcontents+=(
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
