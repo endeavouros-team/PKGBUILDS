@@ -1033,8 +1033,17 @@ GeneralInfo() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
+w_WARN() {
+    local msg="$1"
+    shift
+    eos_yad_WARN "$PRETTY_PROGNAME: ${FUNCNAME[1]}: $msg" --height=200 --width=500 "$@"
+}
+export -f w_WARN
+
 RunIfInstalled() {
-    local app pkg
+    # Usage: $FUNCNAME -a="app" [-p="pkg"] [app-parameters]
+
+    local app="" pkg=""
     local opt
 
     while [ -n "$1" ] ; do
@@ -1042,20 +1051,25 @@ RunIfInstalled() {
         case "$opt" in
             -a=*) app="${opt#*=}" ; shift ;;
             -p=*) pkg="${opt#*=}" ; shift ;;
-            -*) eos_yad_WARN "$FUNCNAME: unsupported option '$opt'" ; return ;;
+            -*) w_WARN "unsupported option '$opt'" --text="Option unsupported" ; return 1 ;;
             *) break ;;
         esac
     done
 
-    app="/usr/bin/$app"
-    if [ -x "$app" ] ; then
-        "$app" "$@"
-    else
-        test -n "$pkg" || pkg="$(basename $app)"
-        eos_yad_WARN "Sorry, application '$app' from package '$pkg' is needed." \
-                     --text="Application not installed" \
-                     --width=800 --height=200
+    if [ -z "$app" ] ; then
+        w_WARN "app parameter (required) is empty" --text="Application name is empty"
+        return 1
     fi
+    if [ -z "$(which "$app" 2> /dev/null)" ] ; then
+        if [ -n "$pkg" ] ; then
+            w_WARN "app '$app' (from package '$pkg') not found" --text="Application not installed" --width=600
+        else
+            w_WARN "app '$app' not found" --text="Application not installed"
+        fi
+        return 1
+    fi
+
+    "$app" "$@"
 }
 export -f RunIfInstalled
 
