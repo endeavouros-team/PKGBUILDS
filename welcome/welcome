@@ -191,11 +191,64 @@ Welog() {
 }
 export -f Welog
 
+yad_community_editions() {
+    local txt=""
+    local sway="" bspwm=""
+    local result retval
+    local impl=form  # form or list
+
+    sway+="A wayland window manager, like i3, but using wayland "
+    sway+="and will not work if Nvidia proprietary driver is in use."
+
+    bspwm+="A tiling window manager that represents windows "
+    bspwm+="as the leaves of a full binary tree."
+
+    txt+="<span font='Sans 16'>Install one of the official EndeavourOS Community Editions!</span>\n\n"
+
+    txt+="Choose and install Community Edition Environment and theming. "
+    txt+="Internet access is required.\n\n"
+
+    txt+="After choosing the edition and clicking the OK button, the installer "
+    txt+="will start to guide you to setup language, keyboard, partition and user settings, "
+    txt+="and then proceed an online install of the edition.\n\n"
+
+    txt+="<span font='Sans 14'>Choose from the following editions:</span>\n\n"
+    
+    txt+="<span font='Mono 14'>Sway</span>\n$sway\n\n"
+    txt+="<span font='Mono 14'>Bspwm</span>\n$bspwm\n"
+
+    local cmd=(
+        eos_yad --form --text="$txt" --width=800 --height=100
+        --title="Installing Community Editions" --image=dialog-question
+        --form
+        --button="Sway":0
+        --button="Bspwm":1
+        --button=yad-cancel:2
+        --buttons-layout=spread
+    )
+
+    result="$("${cmd[@]}")"
+    retval=$?
+
+    case "$retval" in
+        0) edition=sway ;;
+        1) edition=bspwm ;;
+        2) return ;;
+    esac
+
+    #eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
+    #return
+
+    yad_calamares $edition
+}
+export -f yad_community_editions
+
 yad_calamares() {
-    local mode="$1"                             # offline, online, choose
+    local mode="$1"                             # offline, online, choose; also wm name (tbd)
     local debug="$2"
     local prog=$INSTALLER_PROGRAM
     local debugging=no
+    local realmode
 
     if [ "$debug" = "stop" ] || [ "$show_installer" != "no" ] ; then
         debugging=yes
@@ -284,11 +337,29 @@ yad_calamares() {
 
         test -n "$answer" || return 1
         mode=$(echo "$answer" | cut -d '|' -f $field | tr [:upper:] [:lower:])
+    else
+        case "$mode" in
+            bspwm | sway)
+                local urlfolder=/home/$EOS_LIVEUSER/community_editions
+                local urlfile
+                for urlfile in $urlfolder/sway_setup.url $urlfolder/sway_netinstall-yaml.url ; do
+                    if [ ! -r $urlfile ] ; then
+                        eos_yad_WARN "community edition file $urlfile not found on the ISO!"
+                        return 1
+                    fi
+                done
+                sed -i /usr/bin/chrooted_cleaner_script.sh \
+                    -e 's|^#_setup_personal$|_setup_personal|' \
+                    -e 's|^_de_wm_config$|#_de_wm_config|'
+                cp /home/$EOS_LIVEUSER/community_editions/sway_setup.url           /home/liveuser/setup.url
+                cp /home/$EOS_LIVEUSER/community_editions/sway_netinstall-yaml.url /home/liveuser/netinstall-yaml.url
+                ;;
+        esac
     fi
 
     case "$mode" in
         offline) ;;
-        online)
+        online | sway | bspwm)
             eos_yad_check_internet_connection verbose || return 1
             ;;
         *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode'"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
@@ -297,6 +368,15 @@ yad_calamares() {
     esac
 
     echo "$mode" > /tmp/install_mode.txt
+
+    realmode="$mode"
+
+    case "$mode" in
+        sway | bspwm)
+            # Everything after this is normal online install, so we now change to the 'online' mode !!
+            mode=online
+            ;;
+    esac
 
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
@@ -329,7 +409,7 @@ yad_calamares() {
 ############## $INSTALL_LOG_FILE by $progname
 ############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
-Install mode: $mode
+Install mode: $realmode
 
 EOF
 
@@ -987,7 +1067,9 @@ INSTALL() {
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
+
       --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
+      --field="_align(Install community editions)!$system_software_install!Community editions: Sway, Bspwm (online required)":fbtn 'bash -c yad_community_editions'
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
