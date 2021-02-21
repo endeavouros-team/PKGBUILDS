@@ -208,8 +208,8 @@ yad_community_editions() {
     txt+="Choose and install Community Edition Environment and theming. "
     txt+="Internet access is required.\n\n"
 
-    txt+="After choosing the edition and clicking the OK button, the installer "
-    txt+="will start to guide you to setup language, keyboard, partition and user settings, "
+    txt+="After clicking the edition button below, the installer will start "
+    txt+="to guide you to setup language, keyboard, partition and user settings, "
     txt+="and then proceed an online install of the edition.\n\n"
 
     txt+="<span font='Sans 14'>Choose from the following editions:</span>\n\n"
@@ -236,8 +236,10 @@ yad_community_editions() {
         2) return ;;
     esac
 
-    #eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
-    #return
+    if [ "$EOS_TESTING_STOP" = "yes" ] ; then
+        eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
+        return
+    fi
 
     yad_calamares $edition
 }
@@ -348,9 +350,9 @@ yad_calamares() {
                         return 1
                     fi
                 done
-                sed -i /usr/bin/chrooted_cleaner_script.sh \
-                    -e 's|^#_setup_personal$|_setup_personal|' \
-                    -e 's|^_de_wm_config$|#_de_wm_config|'
+                sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
+                     -e 's|^#_setup_personal$|_setup_personal|' \
+                     -e 's|^_de_wm_config$|#_de_wm_config|'
                 cp /home/$EOS_LIVEUSER/community_editions/sway_setup.url           /home/liveuser/setup.url
                 cp /home/$EOS_LIVEUSER/community_editions/sway_netinstall-yaml.url /home/liveuser/netinstall-yaml.url
                 ;;
