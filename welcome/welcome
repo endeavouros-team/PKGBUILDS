@@ -196,6 +196,7 @@ yad_community_editions() {
     local sway="" bspwm=""
     local result retval
     local impl=form  # form or list
+    local edition=""
 
     sway+="A wayland window manager, like i3, but using wayland "
     sway+="and will not work if Nvidia proprietary driver is in use."
@@ -231,7 +232,12 @@ yad_community_editions() {
     retval=$?
 
     case "$retval" in
-        0) edition=sway ;;
+        0) if [ -n "$(lsmod | grep nvidia)" ] ; then
+               eos_yad_WARN "Nvidia drivers cannot be used with Sway" --height=200
+               return 1
+           fi
+           edition=sway
+           ;;
         1) edition=bspwm ;;
         2) return ;;
     esac
@@ -353,8 +359,8 @@ yad_calamares() {
                 sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
                      -e 's|^#_setup_personal$|_setup_personal|' \
                      -e 's|^_de_wm_config$|#_de_wm_config|'
-                cp /home/$EOS_LIVEUSER/community_editions/sway_setup.url           /home/liveuser/setup.url
-                cp /home/$EOS_LIVEUSER/community_editions/sway_netinstall-yaml.url /home/liveuser/netinstall-yaml.url
+                cp $urlfolder/sway_setup.url           /home/$EOS_LIVEUSER/setup.url
+                cp $urlfolder/sway_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
                 ;;
         esac
     fi
