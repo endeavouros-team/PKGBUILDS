@@ -823,7 +823,7 @@ yad_SystemUpdate() {
     if [ $hasupdates -eq 0 ] ; then
         eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                --button=yad-quit:0 --image="$(eos-FindAppIcon system-software-update)"
+                --button=yad-quit:0 --image="$(IconGrasp system-software-update)"
     fi
 }
 yad_SystemUpdate_fails() {
@@ -1067,8 +1067,8 @@ INSTALL() {
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local image=$system_software_install
-  local gparted="$(IconGrasp gparted)"       # "$(eos-FindAppIcon gparted)"
-  local reflector_simple="$(eos-FindAppIcon software-update-available)"
+  local gparted="$(IconGrasp gparted)"
+  local reflector_simple="$(IconGrasp software-update-available)"
   local user_info=info
   local tabcontents=(
       eos_yad
@@ -1170,10 +1170,28 @@ RunIfInstalled() {
 export -f RunIfInstalled
 
 IconGrasp() {
-    local differ="$1"
-    local desktop=$(/usr/bin/find /usr/share/applications -name \*$differ\*\.desktop | /usr/bin/head -n1)
-    local icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
-    echo "$icon"
+    local app desktop icon
+
+    for app in "$@" ; do
+        icon=$(eos-FindAppIcon "$app")
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+
+    return 1
+
+    # old stuff
+    for app in "$@" ; do
+        desktop=$(/usr/bin/find /usr/share/applications -name \*$app\*\.desktop | /usr/bin/head -n1)
+        icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+    return 1
 }
 
 AfterInstall() {
@@ -1284,15 +1302,9 @@ AddMoreApps() {
   local shown_app_buttons=0
   local DE="$(eos_yad_GetDesktopName)"
 
-  local gufw="$(IconGrasp gufw)"   # "$(eos-FindAppIcon gufw)"
-  test -n "$gufw" || gufw="$(eos-FindAppIcon network-firewall)"
-  test -n "$gufw" || gufw="$(eos-FindAppIcon firewall-config)"
-
-  local libreoffice="$(IconGrasp libreoffice-writer)"   # "$(eos-FindAppIcon libreoffice-writer)"
-  test -n "$libreoffice" || libreoffice="$(eos-FindAppIcon libreoffice)"
-
-  local chromium="$(IconGrasp chromium)"   # "$(eos-FindAppIcon chromium)"
-  test -n "$chromium" || chromium="$(eos-FindAppIcon web-browser)"
+  local gufw="$(IconGrasp gufw network-firewall firewall-config)"
+  local libreoffice="$(IconGrasp libreoffice-writer)"
+  local chromium="$(IconGrasp chromium web-browser)"
 
   local tabcontents=(
       eos_yad
@@ -1324,7 +1336,7 @@ AddMoreApps() {
             IsInstalled blueberry && break
             IsInstalled blueman && break
             ((shown_app_buttons+=2))
-            local bluetooth="$(eos-FindAppIcon bluetooth)"
+            local bluetooth="$(IconGrasp bluetooth)"
             tabcontents+=(
                 --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
                 --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
@@ -1767,9 +1779,9 @@ StartHere() {
     local max_button_name_length=0
 
     # common button icons
-    local user_info="$(eos-FindAppIcon user-info)"
-    local system_software_update="$(eos-FindAppIcon system-software-update)"
-    local system_software_install="$(eos-FindAppIcon system-software-install)"
+    local user_info="$(IconGrasp user-info)"
+    local system_software_update="$(IconGrasp system-software-update)"
+    local system_software_install="$(IconGrasp system-software-install)"
 
     for arg in "$@" ; do
         case "$arg" in
