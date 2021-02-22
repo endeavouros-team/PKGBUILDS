@@ -247,18 +247,18 @@ yad_community_editions() {
         return
     fi
 
-    yad_calamares $edition
+    yad_calamares $edition yes
 }
 export -f yad_community_editions
 
 yad_calamares() {
     local mode="$1"                             # offline, online, choose; also wm name (tbd)
-    local debug="$2"
+    local debug_terminal="$2"
     local prog=$INSTALLER_PROGRAM
     local debugging=no
     local realmode
 
-    if [ "$debug" = "stop" ] || [ "$show_installer" != "no" ] ; then
+    if [ "$debug_terminal" = "stop" ] || [ "$show_installer" != "no" ] ; then
         debugging=yes
     fi
 
@@ -482,7 +482,7 @@ EOF
 
     local only_one_output_window=yes   # yes=one, no=more than one
 
-    if [ "$debug" = "yes" ] ; then
+    if [ "$debug_terminal" = "yes" ] ; then
         touch $INSTALL_LOG_FILE        # just making sure the file exists now
         local how_to_show_terminal=a   # one of: a b c
 
