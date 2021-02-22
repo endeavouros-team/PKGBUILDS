@@ -213,7 +213,7 @@ yad_community_editions() {
     txt+="to guide you to setup language, keyboard, partition and user settings, "
     txt+="and then proceed an online install of the edition.\n\n"
 
-    txt+="<span font='Sans 14'>Choose from the following editions:</span>\n\n"
+    txt+="<span font='Sans 14'>Choose from the following Community Editions:</span>\n\n"
     
     txt+="<span font='Mono 14'>Sway</span>\n$sway\n\n"
     txt+="<span font='Mono 14'>Bspwm</span>\n$bspwm\n"
