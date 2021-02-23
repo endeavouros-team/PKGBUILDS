@@ -27,11 +27,11 @@ sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c4
 package() {
   install -d $pkgdir/etc/pacman.d/hooks
 
-  install -Dm644 lsb-release.hook $pkgdir/etc/pacman.d/hooks/lsb-release.hook
-  install -Dm644 os-release.hook  $pkgdir/etc/pacman.d/hooks/os-release.hook
-  install -Dm644 ${pkgname}.hook  $pkgdir/etc/pacman.d/hooks/${pkgname}.hook
+  install -Dm644 lsb-release.hook $pkgdir/usr/share/libalpm/hooks/lsb-release.hook
+  install -Dm644 os-release.hook  $pkgdir/usr/share/libalpm/hooks/os-release.hook
+  install -Dm644 ${pkgname}.hook  $pkgdir/usr/share/libalpm/hooks/${pkgname}.hook
 
-  install -Dm644 eos-reboot-required.hook  $pkgdir/etc/pacman.d/hooks/eos-reboot-required.hook
+  install -Dm644 eos-reboot-required.hook  $pkgdir/usr/share/libalpm/hooks/eos-reboot-required.hook
   install -Dm755 eos-reboot-required       $pkgdir/usr/bin/eos-reboot-required
 
   install -Dm755 ${pkgname}-runner $pkgdir/usr/bin/${pkgname}-runner
