@@ -28,4 +28,5 @@ Target = xorg-fonts*
 Description = Inform user to reboot after certain system package upgrades.
 When = PostTransaction
 Depends = libnotify
-Exec = /usr/bin/eos-reboot-required
+NeedsTargets
+Exec = /usr/bin/eos-reboot-required2
