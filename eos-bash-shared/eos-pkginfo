@@ -40,7 +40,7 @@ OpenUrl() {
         "") DIE "URL for package '$PKGNAME' not found" ;;
         *)  DIE "unsupported URL '$url'" ;;
     esac
-    /usr/bin/xdg-open "$url" >& /dev/null
+    $BROWSER "$url" >& /dev/null
 }
 
 Options() {
@@ -50,6 +50,7 @@ Options() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --browser=*) BROWSER="${arg#*=}" ;;
             -*) DIE "option $arg is not supported." ;;
             *)  PKGNAME="$arg" ;;
         esac
@@ -90,6 +91,7 @@ Main()
     local PKGNAME
     local HELPER
     local PKGINFO
+    local BROWSER=/usr/bin/xdg-open
 
     Helper
     Options "$@"
