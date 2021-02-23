@@ -120,24 +120,6 @@ prepare() {
     # sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
     sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
     #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
-
-    # sed settings for systemd-boot
-    # bootloader.conf
-    sed -i $_reponame/src/modules/bootloader/bootloader.conf \
-    -e 's|^efiBootLoader: "grub"$|efiBootLoader: "systemd-boot"|' \
-    -e 's|^kernel: "/vmlinuz-linux\"$|kernel: "/boot/vmlinuz-linux"|' \
-    -e 's|^img: "/initramfs-linux.img"$|img: "/boot/initramfs-linux.img"|' \
-    -e 's|^fallback: "/initramfs-linux-fallback.img"$|fallback: "/boot/initramfs-linux-fallback.img\"|'
-    #-e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
-    #-e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
-    #-e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
-
-    # partition.conf
-    sed -i $_reponame/src/modules/partition/partition.conf \
-    -e 's|^efiSystemPartition:     "/boot/efi"$|efiSystemPartition:     "/boot"|' \
-    -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M|' \
-    -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI|'
-
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
     cp $_reponame/src/branding/endeavouros/img/{state-error,state-warning}.svg  $_reponame/data/images
