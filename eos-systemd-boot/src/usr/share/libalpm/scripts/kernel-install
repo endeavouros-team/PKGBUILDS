@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+while read -r line; do
+    version=$(basename "${line%/vmlinuz}")
+    echo ":: Installing kernel $version"
+
+    kernel-install $1 "${version}" "${line}"
+done
