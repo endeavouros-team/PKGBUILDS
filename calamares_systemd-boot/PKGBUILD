@@ -4,7 +4,7 @@
 pkgname=calamares_systemd-boot
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.36
+pkgver=3.2.37
 pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
@@ -21,7 +21,7 @@ options=(!strip !emptydirs)
 source=(
   "git+https://github.com/killajoe/$_eos_changes.git#branch=master"
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
-  "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
+  "https://github.com/killajoe/calamares/archive/v3.2.37.tar.gz"
 )
 sha256sums=('SKIP'
             'SKIP'
@@ -127,10 +127,10 @@ prepare() {
     -e 's|^efiBootLoader: "grub"$|efiBootLoader: "systemd-boot"|' \
     -e 's|^kernel: "/vmlinuz-linux\"$|kernel: "/boot/vmlinuz-linux"|' \
     -e 's|^img: "/initramfs-linux.img"$|img: "/boot/initramfs-linux.img"|' \
-    -e 's|^fallback: "/initramfs-linux-fallback.img"$|fallback: "/boot/initramfs-linux-fallback.img\"|' \
-    -e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
-    -e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
-    -e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
+    -e 's|^fallback: "/initramfs-linux-fallback.img"$|fallback: "/boot/initramfs-linux-fallback.img\"|'
+    #-e 's|^# bootloaderEntryName: "Generic GNU/Linux"$|bootloaderEntryName: "EndeavourOS"|' \
+    #-e 's|^# kernelLine: ", with Stable-Kernel"$|kernelLine: ", with Latest-Kernel"|' \
+    #-e 's|^# fallbackKernelLine:  ", with Stable-Kernel (fallback initramfs)"$|fallbackKernelLine:  ", with Latest-Kernel (fallback initramfs)"|'
 
     # partition.conf
     sed -i $_reponame/src/modules/partition/partition.conf \
@@ -219,6 +219,7 @@ package() {
     cp -r $_reponame/settings.conf_{online,offline}           $_reponame/build/$pkgname/usr/share/calamares/
     cp -r $_reponame/src/modules/welcome/welcome.conf_{on,off}line    $_reponame/build/$pkgname/usr/share/calamares/modules/
     cp -r $_reponame/src/modules/packages/packages.conf_{on,off}line  $_reponame/build/$pkgname/usr/share/calamares/modules/
+   
 
     # pacstrap as bash script implementation 
     # maybe download base_install.sh everytime from calamares module so it can be updated on the go...
