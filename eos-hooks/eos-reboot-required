@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# To be called from /etc/pacman.d/hooks/eos-reboot-required.hook.
+# To be called from eos-reboot-required.hook.
 
 # Implementation using libnotify.
 
