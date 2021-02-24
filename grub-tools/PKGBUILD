@@ -2,7 +2,7 @@
 
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
-pkgver=1.6.1
+pkgver=1.6.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -25,9 +25,9 @@ sha512sums=('2062e58ae2c903187d98c05df6986d2a1a400fa9c35ffc5f91e31d3da0e779edf0b
 package() {
   cd $srcdir
 
-  install -d $pkgdir/etc/pacman.d/hooks
-  install -Dm644 grub-update-after-kernel.hook   $pkgdir/etc/pacman.d/hooks/grub-update-after-kernel.hook
-  install -Dm644 grub-fix-initrd-generation.hook $pkgdir/etc/pacman.d/hooks/grub-fix-initrd-generation.hook
+  install -d $pkgdir/usr/share/libalpm/hooks
+  install -Dm644 grub-update-after-kernel.hook   $pkgdir/usr/share/libalpm/hooks/grub-update-after-kernel.hook
+  install -Dm644 grub-fix-initrd-generation.hook $pkgdir/usr/share/libalpm/hooks/grub-fix-initrd-generation.hook
 
   install -d $pkgdir/usr/bin
   install -Dm755 grub-fix-initrd-generation    $pkgdir/usr/bin/grub-fix-initrd-generation
