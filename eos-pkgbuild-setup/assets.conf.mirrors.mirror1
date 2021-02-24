@@ -28,6 +28,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/inxi
     aur/mkinitcpio-openswap
     aur/paper-icon-theme
+    aur/polybar
     aur/yay
     akm
     endeavouros-keyring
