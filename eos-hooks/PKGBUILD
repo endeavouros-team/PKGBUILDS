@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.4.2
+pkgver=1.4.3
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
