@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.4.3
+pkgver=1.4.4
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
@@ -27,7 +27,7 @@ sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c4
             '368b4b3a3a7f9b3e323fba250516707f2d6bad16165d48d517a8ab553a02b0a1f4bae52326df3d4edc8e5d9d57e41c3b8e7dd88d9707b7bfff45aeec98b0d6de')
 
 package() {
-  install -d $pkgdir/etc/pacman.d/hooks
+  install -d $pkgdir/usr/share/libalpm/hooks
 
   install -Dm644 lsb-release.hook $pkgdir/usr/share/libalpm/hooks/lsb-release.hook
   install -Dm644 os-release.hook  $pkgdir/usr/share/libalpm/hooks/os-release.hook
