@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.4.5
+pkgver=1.4.6
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
@@ -10,8 +10,8 @@ url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 
 source=(
-  $_url/os-release.hook
-  $_url/lsb-release.hook
+  $_url/eos-os-release.hook
+  $_url/eos-lsb-release.hook
   $_url/${pkgname}.hook
   $_url/${pkgname}-runner
   $_url/eos-reboot-required2
@@ -27,15 +27,15 @@ sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c4
             '368b4b3a3a7f9b3e323fba250516707f2d6bad16165d48d517a8ab553a02b0a1f4bae52326df3d4edc8e5d9d57e41c3b8e7dd88d9707b7bfff45aeec98b0d6de')
 
 package() {
-  install -d $pkgdir/usr/share/libalpm/hooks
+  local hooks=$pkgdir/usr/share/libalpm/hooks
+  local bin=$pkgdir/usr/bin
 
-  install -Dm644 lsb-release.hook $pkgdir/usr/share/libalpm/hooks/lsb-release.hook
-  install -Dm644 os-release.hook  $pkgdir/usr/share/libalpm/hooks/os-release.hook
-  install -Dm644 ${pkgname}.hook  $pkgdir/usr/share/libalpm/hooks/${pkgname}.hook
+  install -Dm644 eos-lsb-release.hook      $hooks/eos-lsb-release.hook
+  install -Dm644 eos-os-release.hook       $hooks/eos-os-release.hook
+  install -Dm644 ${pkgname}.hook           $hooks/${pkgname}.hook
+  install -Dm644 eos-reboot-required.hook  $hooks/eos-reboot-required.hook
 
-  install -Dm644 eos-reboot-required.hook  $pkgdir/usr/share/libalpm/hooks/eos-reboot-required.hook
-  install -Dm755 eos-reboot-required       $pkgdir/usr/bin/eos-reboot-required
-  install -Dm755 eos-reboot-required2      $pkgdir/usr/bin/eos-reboot-required2
-
-  install -Dm755 ${pkgname}-runner $pkgdir/usr/bin/${pkgname}-runner
+  install -Dm755 eos-reboot-required       $bin/eos-reboot-required
+  install -Dm755 eos-reboot-required2      $bin/eos-reboot-required2
+  install -Dm755 ${pkgname}-runner         $bin/${pkgname}-runner
 }
