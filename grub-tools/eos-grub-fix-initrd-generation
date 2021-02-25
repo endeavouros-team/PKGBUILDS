@@ -69,7 +69,7 @@ _grub_mod1() {
     _backup $file grub
     sed -i $file \
         -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|" \
-        -e 's|LINITRD="${LINITRD#/boot}"$|LINITRD=($LINITRD); LINITRD=${LINITRD[@]/\/boot/}|'
+        -e 's|LINITRD="${LINITRD#/boot}"$|LINITRD=($LINITRD); LINITRD=${LINITRD[@]#/boot}|'
     _show_result $file
 }
 
