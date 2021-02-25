@@ -2,7 +2,7 @@
 
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
-pkgver=1.6.1
+pkgver=1.6.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -13,22 +13,21 @@ url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
-  $_url/grub-update-after-kernel.hook    # Automatically updates grub.cfg after a kernel is installed/uninstalled.
-  $_url/grub-fix-initrd-generation       # Command modifies os-prober and grub to fix 'initrd' line generation;
-                                         # re-run if grub or os-prober is updated (but not fixed upstream!).
-  $_url/grub-fix-initrd-generation.hook  # Calls the fixer after grub or os-prober upgrades.
+  $_url/eos-grub-update-after-kernel.hook    # Automatically updates grub.cfg after a kernel is installed/uninstalled.
+  $_url/eos-grub-fix-initrd-generation       # Command modifies os-prober and grub to fix 'initrd' line generation.
+  $_url/eos-grub-fix-initrd-generation.hook  # Calls the fixer after grub or os-prober upgrades.
 )
 sha512sums=('2062e58ae2c903187d98c05df6986d2a1a400fa9c35ffc5f91e31d3da0e779edf0b3ba21404769295dc34138ca9f6d94f12830ab3e203a4386571b05d346b4b6'
             'a6aa60d4df9b1f75f41d7c37116a0d935709a0de86e9cf1e5acbf33b75f4f074dbbbe1e5617a20da4e0437bcad5fecbf0af3283be92fcd17f5431c3a1ae6b017'
-            '9e660c77bd1b222a256d88c4f8a5475ae6ddf774c01b126784ccc116c89a07f0aaf17c5c76473f2eb5a2370754778198374d153d8a0ef5f9f8a183a60348d448')
+            'eca3b46a7e6281ebcf4f9227500feda5bac0f64c21823c866023ede4470b0a818c8ff259975ea98c2c69c67150129f9d277f0c0da290782281ebae3deecebb7b')
 
 package() {
   cd $srcdir
 
-  install -d $pkgdir/etc/pacman.d/hooks
-  install -Dm644 grub-update-after-kernel.hook   $pkgdir/etc/pacman.d/hooks/grub-update-after-kernel.hook
-  install -Dm644 grub-fix-initrd-generation.hook $pkgdir/etc/pacman.d/hooks/grub-fix-initrd-generation.hook
+  install -d $pkgdir/usr/share/libalpm/hooks
+  install -Dm644 eos-grub-update-after-kernel.hook   $pkgdir/usr/share/libalpm/hooks/eos-grub-update-after-kernel.hook
+  install -Dm644 eos-grub-fix-initrd-generation.hook $pkgdir/usr/share/libalpm/hooks/eos-grub-fix-initrd-generation.hook
 
   install -d $pkgdir/usr/bin
-  install -Dm755 grub-fix-initrd-generation    $pkgdir/usr/bin/grub-fix-initrd-generation
+  install -Dm755 eos-grub-fix-initrd-generation      $pkgdir/usr/bin/eos-grub-fix-initrd-generation
 }

@@ -16,6 +16,7 @@ pahis --upgraded firefox   # shows when firefox was upgraded
 pahis geany                # shows all operations on geany
 pahis --removed            # shows removals of packages
 pahis -installed           # shows installs of packages
+pahis --Running            # shows pacman commands used
 </pre>
 
 ## Screenshots after commands

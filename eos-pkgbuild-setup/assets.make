@@ -91,6 +91,21 @@ Popd()  {
     done
 }
 
+HandlePossibleEpoch() {
+    # Separate epoch value in the package name.
+    # Might be able to handle this here for every package?
+
+    local pkgname="$1"  # e.g. welcome
+    local pkg="$2"      # e.g. welcome-3.9.6-1-any.pkg.tar.zst
+    local hook="${ASSET_PACKAGE_EPOCH_HOOKS[$pkgname]}"
+
+    if [ -n "$hook" ] ; then
+        $hook "$pkg"
+    else
+        echo "$pkg"
+    fi
+}
+
 Build()
 {
     local pkgdirname="$1"
@@ -120,6 +135,7 @@ Build()
           makepkg --syncdeps --clean >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
       }
       pkg="$(ls -1 ${pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR)"
+      pkg="$(HandlePossibleEpoch "$pkgname" "$pkg")"
       mv $pkg "$assetsdir"
       pkg="$assetsdir/$pkg"
 

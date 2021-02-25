@@ -9,4 +9,4 @@ Target = os-prober
 Description = Fix 'grub' and 'os-prober' after upgrading either of them.
 When = PostTransaction
 Depends = grub
-Exec = /usr/bin/grub-fix-initrd-generation
+Exec = /usr/bin/eos-grub-fix-initrd-generation

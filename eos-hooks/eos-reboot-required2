@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Notify about reboot if a listed package is updated
+# excluding kernels that are *not* currently running.
+
+running_kernel() {
+    cat /proc/cmdline | sed 's|.*/vmlinuz-\(linux[a-z-]*\) .*|\1|'
+}
+
+Main() {
+    local targets=$(tee /dev/null)  # targets from the hook (stdin)
+    local tt
+    local notify=no
+    local runningKernel="$(running_kernel)"
+
+    for tt in $targets ; do
+        case "$tt" in
+            linux | linux-lts | linux-zen | linux-hardened)
+                # Note: only official kernels are checked.
+                if [ "$tt" = "$runningKernel" ] ; then
+                    notify=yes
+                    break
+                fi
+                ;;
+            *)
+                notify=yes
+                break
+                ;;
+        esac
+    done
+    if [ "$notify" = "yes" ] ; then
+        /usr/bin/eos-reboot-required
+    fi
+}
+
+Main "$@"

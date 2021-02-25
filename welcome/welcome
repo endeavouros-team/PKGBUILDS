@@ -191,13 +191,74 @@ Welog() {
 }
 export -f Welog
 
+yad_community_editions() {
+    local txt=""
+    local sway="" bspwm=""
+    local result retval
+    local impl=form  # form or list
+    local edition=""
+
+    sway+="A wayland window manager, like i3, but using wayland "
+    sway+="and will not work if Nvidia proprietary driver is in use."
+
+    bspwm+="A tiling window manager that represents windows "
+    bspwm+="as the leaves of a full binary tree."
+
+    txt+="<span font='Sans 16'>Install one of the official EndeavourOS Community Editions!</span>\n\n"
+
+    txt+="Choose and install Community Edition Environment and theming. "
+    txt+="Internet access is required.\n\n"
+
+    txt+="After clicking the edition button below, the installer will start "
+    txt+="to guide you to setup language, keyboard, partition and user settings, "
+    txt+="and then proceed an online install of the edition.\n\n"
+
+    txt+="<span font='Sans 14'>Choose from the following Community Editions:</span>\n\n"
+    
+    txt+="<span font='Mono 14'>Sway</span>\n$sway\n\n"
+    txt+="<span font='Mono 14'>Bspwm</span>\n$bspwm\n"
+
+    local cmd=(
+        eos_yad --form --text="$txt" --width=800 --height=100
+        --title="Installing Community Editions" --image=dialog-question
+        --form
+        --button="Sway":0
+        --button="Bspwm":1
+        --button=yad-cancel:2
+        --buttons-layout=spread
+    )
+
+    result="$("${cmd[@]}")"
+    retval=$?
+
+    case "$retval" in
+        0) if [ -n "$(lsmod | grep nvidia)" ] ; then
+               eos_yad_WARN "Nvidia drivers cannot be used with Sway" --height=200
+               return 1
+           fi
+           edition=sway
+           ;;
+        1) edition=bspwm ;;
+        2) return ;;
+    esac
+
+    if [ "$EOS_TESTING_STOP" = "yes" ] ; then
+        eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
+        return
+    fi
+
+    yad_calamares $edition yes
+}
+export -f yad_community_editions
+
 yad_calamares() {
-    local mode="$1"                             # offline, online, choose
-    local debug="$2"
+    local mode="$1"                             # offline, online, choose; also wm name (tbd)
+    local debug_terminal="$2"
     local prog=$INSTALLER_PROGRAM
     local debugging=no
+    local realmode
 
-    if [ "$debug" = "stop" ] || [ "$show_installer" != "no" ] ; then
+    if [ "$debug_terminal" = "stop" ] || [ "$show_installer" != "no" ] ; then
         debugging=yes
     fi
 
@@ -284,11 +345,29 @@ yad_calamares() {
 
         test -n "$answer" || return 1
         mode=$(echo "$answer" | cut -d '|' -f $field | tr [:upper:] [:lower:])
+    else
+        case "$mode" in
+            bspwm | sway)
+                local urlfolder=/home/$EOS_LIVEUSER/community_editions
+                local urlfile
+                for urlfile in $urlfolder/sway_setup.url $urlfolder/sway_netinstall-yaml.url ; do
+                    if [ ! -r $urlfile ] ; then
+                        eos_yad_WARN "community edition file $urlfile not found on the ISO!"
+                        return 1
+                    fi
+                done
+                sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
+                     -e 's|^#_setup_personal$|_setup_personal|' \
+                     -e 's|^_de_wm_config$|#_de_wm_config|'
+                cp $urlfolder/sway_setup.url           /home/$EOS_LIVEUSER/setup.url
+                cp $urlfolder/sway_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
+                ;;
+        esac
     fi
 
     case "$mode" in
         offline) ;;
-        online)
+        online | sway | bspwm)
             eos_yad_check_internet_connection verbose || return 1
             ;;
         *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode'"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
@@ -297,6 +376,15 @@ yad_calamares() {
     esac
 
     echo "$mode" > /tmp/install_mode.txt
+
+    realmode="$mode"
+
+    case "$mode" in
+        sway | bspwm)
+            # Everything after this is normal online install, so we now change to the 'online' mode !!
+            mode=online
+            ;;
+    esac
 
     local file=/usr/share/calamares/settings.conf_$mode
     if [ ! -r $file ] ; then
@@ -329,7 +417,7 @@ yad_calamares() {
 ############## $INSTALL_LOG_FILE by $progname
 ############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
-Install mode: $mode
+Install mode: $realmode
 
 EOF
 
@@ -394,7 +482,7 @@ EOF
 
     local only_one_output_window=yes   # yes=one, no=more than one
 
-    if [ "$debug" = "yes" ] ; then
+    if [ "$debug_terminal" = "yes" ] ; then
         touch $INSTALL_LOG_FILE        # just making sure the file exists now
         local how_to_show_terminal=a   # one of: a b c
 
@@ -735,7 +823,7 @@ yad_SystemUpdate() {
     if [ $hasupdates -eq 0 ] ; then
         eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                 --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                --button=yad-quit:0 --image="$(eos-FindAppIcon system-software-update)"
+                --button=yad-quit:0 --image="$(IconGrasp system-software-update)"
     fi
 }
 yad_SystemUpdate_fails() {
@@ -979,15 +1067,23 @@ INSTALL() {
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local image=$system_software_install
-  local gparted="$(IconGrasp gparted)"       # "$(eos-FindAppIcon gparted)"
-  local reflector_simple="$(eos-FindAppIcon software-update-available)"
+  local gparted="$(IconGrasp gparted)"
+  local reflector_simple="$(IconGrasp software-update-available)"
   local user_info=info
   local tabcontents=(
       eos_yad
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
+
       --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
+  )
+  if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
+      tabcontents+=(
+          --field="_align(Install community editions)!$system_software_install!Community editions: Sway, Bspwm (online required)":fbtn 'bash -c yad_community_editions'
+      )
+  fi
+  tabcontents+=(
       --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
       --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
@@ -1033,8 +1129,17 @@ GeneralInfo() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
+w_WARN() {
+    local msg="$1"
+    shift
+    eos_yad_WARN "$PRETTY_PROGNAME: ${FUNCNAME[1]}: $msg" --height=200 --width=500 "$@"
+}
+export -f w_WARN
+
 RunIfInstalled() {
-    local app pkg
+    # Usage: $FUNCNAME -a="app" [-p="pkg"] [app-parameters]
+
+    local app="" pkg=""
     local opt
 
     while [ -n "$1" ] ; do
@@ -1042,28 +1147,51 @@ RunIfInstalled() {
         case "$opt" in
             -a=*) app="${opt#*=}" ; shift ;;
             -p=*) pkg="${opt#*=}" ; shift ;;
-            -*) eos_yad_WARN "$FUNCNAME: unsupported option '$opt'" ; return ;;
+            -*) w_WARN "unsupported option '$opt'" --text="Option unsupported" ; return 1 ;;
             *) break ;;
         esac
     done
 
-    app="/usr/bin/$app"
-    if [ -x "$app" ] ; then
-        "$app" "$@"
-    else
-        test -n "$pkg" || pkg="$(basename $app)"
-        eos_yad_WARN "Sorry, application '$app' from package '$pkg' is needed." \
-                     --text="Application not installed" \
-                     --width=800 --height=200
+    if [ -z "$app" ] ; then
+        w_WARN "app parameter (required) is empty" --text="Application name is empty"
+        return 1
     fi
+    if [ -z "$(which "$app" 2> /dev/null)" ] ; then
+        if [ -n "$pkg" ] ; then
+            w_WARN "app '$app' (from package '$pkg') not found" --text="Application not installed" --width=600
+        else
+            w_WARN "app '$app' not found" --text="Application not installed"
+        fi
+        return 1
+    fi
+
+    "$app" "$@"
 }
 export -f RunIfInstalled
 
 IconGrasp() {
-    local differ="$1"
-    local desktop=$(/usr/bin/find /usr/share/applications -name \*$differ\*\.desktop | /usr/bin/head -n1)
-    local icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
-    echo "$icon"
+    local app desktop icon
+
+    for app in "$@" ; do
+        icon=$(eos-FindAppIcon "$app")
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+
+    return 1
+
+    # old stuff
+    for app in "$@" ; do
+        desktop=$(/usr/bin/find /usr/share/applications -name \*$app\*\.desktop | /usr/bin/head -n1)
+        icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+    return 1
 }
 
 AfterInstall() {
@@ -1174,15 +1302,9 @@ AddMoreApps() {
   local shown_app_buttons=0
   local DE="$(eos_yad_GetDesktopName)"
 
-  local gufw="$(IconGrasp gufw)"   # "$(eos-FindAppIcon gufw)"
-  test -n "$gufw" || gufw="$(eos-FindAppIcon network-firewall)"
-  test -n "$gufw" || gufw="$(eos-FindAppIcon firewall-config)"
-
-  local libreoffice="$(IconGrasp libreoffice-writer)"   # "$(eos-FindAppIcon libreoffice-writer)"
-  test -n "$libreoffice" || libreoffice="$(eos-FindAppIcon libreoffice)"
-
-  local chromium="$(IconGrasp chromium)"   # "$(eos-FindAppIcon chromium)"
-  test -n "$chromium" || chromium="$(eos-FindAppIcon web-browser)"
+  local gufw="$(IconGrasp gufw network-firewall firewall-config)"
+  local libreoffice="$(IconGrasp libreoffice-writer)"
+  local chromium="$(IconGrasp chromium web-browser)"
 
   local tabcontents=(
       eos_yad
@@ -1214,7 +1336,7 @@ AddMoreApps() {
             IsInstalled blueberry && break
             IsInstalled blueman && break
             ((shown_app_buttons+=2))
-            local bluetooth="$(eos-FindAppIcon bluetooth)"
+            local bluetooth="$(IconGrasp bluetooth)"
             tabcontents+=(
                 --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
                 --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
@@ -1657,9 +1779,9 @@ StartHere() {
     local max_button_name_length=0
 
     # common button icons
-    local user_info="$(eos-FindAppIcon user-info)"
-    local system_software_update="$(eos-FindAppIcon system-software-update)"
-    local system_software_install="$(eos-FindAppIcon system-software-install)"
+    local user_info="$(IconGrasp user-info)"
+    local system_software_update="$(IconGrasp system-software-update)"
+    local system_software_install="$(IconGrasp system-software-install)"
 
     for arg in "$@" ; do
         case "$arg" in

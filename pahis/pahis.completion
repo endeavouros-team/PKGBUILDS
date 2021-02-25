@@ -45,8 +45,8 @@ __pahis_() {
             ;;
         --operations | -h | --help | --all-options)
             ;;
-        --upgraded | --downgraded | --installed | --removed | --reinstalled | \
-            -upgraded | -downgraded | -installed | -removed | -reinstalled)
+        --upgraded | --downgraded | --installed | --removed | --reinstalled | --Running | \
+            -upgraded | -downgraded | -installed | -removed | -reinstalled  | -Running)
             __pahis_isPkgUsed "${words[@]}" && {
                 #echo "chk used ${words[*]}" >> $HOME/pahis.log
                 COMPREPLY=( $(compgen -W "$pkgs" -- "$cur"))
