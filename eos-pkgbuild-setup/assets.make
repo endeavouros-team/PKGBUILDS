@@ -97,6 +97,16 @@ HandlePossibleEpoch() {
 
     local pkgname="$1"  # e.g. welcome
     local pkg="$2"      # e.g. welcome-3.9.6-1-any.pkg.tar.zst
+
+    local epoch="$(/usr/bin/grep "^epoch=" PKGBUILD | /usr/bin/cut -d'=' -f2)"
+    if [ -z "$epoch" ] ; then
+        echo "$pkg"
+    else
+        echo "$pkg" | sed "s|\(${pkgname}-[0-9][0-9]*\)\.\(.*\)|\1:\2|"
+    fi
+    return
+
+    
     local hook="${ASSET_PACKAGE_EPOCH_HOOKS[$pkgname]}"
 
     if [ -n "$hook" ] ; then
