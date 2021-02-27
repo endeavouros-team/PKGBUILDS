@@ -1,0 +1,48 @@
+#!/bin/bash
+
+pre_upgrade() {
+    # Remove some files (possible leftovers from other packages).
+
+    local remove=(
+       /usr/share/endeavouros/backgrounds/endeavouros-wallpaper-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_plasma-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_openbox-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_mate-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_lxqt-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_i3-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_gnome-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_deepin-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_cinnamon-classic.png
+       /usr/share/endeavouros/backgrounds/endeavouros_budgie-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_xfce4-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros-wallpaper-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_plasma-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_openbox-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_mate-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_lxqt-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_i3-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_gnome-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_deepin-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_cinnamon-classic.png
+       /usr/share/endeavouros/backgrounds/arm-endeavouros_budgie-classic.png
+    )
+    local xx removed=()
+
+    # Test if the files to be removed really exist.
+    for xx in "${remove[@]}" ; do
+        test -r $xx && removed+=($xx)
+    done
+
+    # Now remove the ones that exist.
+    if [ -n "$removed" ] ; then
+        echo "Removing existing files:" >&2
+        for xx in "${removed[@]}" ; do
+            echo "    $xx" >&2
+            rm -f $xx
+        done
+    fi
+}
+
+pre_install() {
+    pre_upgrade
+}
