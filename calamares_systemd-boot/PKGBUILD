@@ -1,4 +1,5 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
+# modified to test EndeavourOS systemd-boot installs by joekamprad <joekamprad@endeavouros.com>
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_systemd-boot
