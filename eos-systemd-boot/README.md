@@ -1,7 +1,7 @@
 # EndeavourOS systemd-boot
 
 **original source:** https://gitlab.com/dalto.8/eos-systemd-boot
-
+**Repository for EndeavourOS:** https://github.com/endeavouros-team/eos-systemd-boot
 A package to enable systemd-boot automation using kernel-install on EndeavourOS
 
 The hooks were adapted from the AUR package originally written by Tilmann Meyer
