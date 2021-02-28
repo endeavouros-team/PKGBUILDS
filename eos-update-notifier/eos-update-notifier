@@ -54,7 +54,7 @@ log2() {
 }
 
 YadNonFocused() {
-    local opts=(--no-focus --geometry=650x${height}+20+20 --title="Updates available!")
+    local opts=(--no-focus --geometry=650x${height}+20+20 --title="$progname: updates available!")
     opts+=(--button="Dismiss!!Don't update, just close this window":1 --button="Update!!Close this window and update":0)
     opts+=(--fontname="$(FindAvailableMonoFont)")
 
@@ -64,19 +64,28 @@ YadNonFocused() {
 ShowTray() {
     # Tray notification may have issues on EOS...
     eos_yad --notification --image="system-software-update" \
-            --text="$update_count $source updates are available at $date"
+            --text="$progname: $update_count $source updates are available at $date"
 }
 ShowNotify() {
-    local ms=15000
+    local ms=30000
+    local msg="$update_count $source updates are available"
+
+    case "$ShowWhatAboutUpdates" in
+	number)
+	    msg="$(printf "$progname: $update_count $source updates available at $date.\n")" ;;
+	packages)
+	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$tmp\n")" ;;
+    esac
     /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
                          --app-name="EndeavourOS Update Notifier" \
                          "Updates available at $date" \
-                         "$update_count $source updates are available"
+			 "$msg"
 }
 
 ShowNonFocused() {
     local date="$(/usr/bin/date '+%x %X')"
     local source="$1"
+    local tmp="\n<tt>$updates</tt>"
 
     if [ "$pkgsonly" = "yes" ] ; then       # cmd line options override config file options
         ShowHowAboutUpdates=window
@@ -97,12 +106,13 @@ ShowNonFocused() {
             ;;
         window)
             local height limit=400
-            local tmp msg
+            local msg
 
             case "$ShowWhatAboutUpdates" in
                 packages)
-                    tmp="$(echo "$updates" | sed 's|^|    |')"
-                    height=$((10 * update_count + 120 + 20))
+                    #tmp="\n$(echo "$updates" | sed 's|^|    |')"
+                    tmp="\n$updates"
+                    height=$((10 * update_count + 120 + 40))
                     test $height -gt $limit && height=$limit
                     msg="$(printf "$update_count $source updates available at $date:\n$tmp\n")"
                     YadNonFocused
@@ -174,7 +184,7 @@ Update_common() {
             source=upstream
             cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER '/usr/bin/pacman -Syu'"
             eos_un_log "$source updates available: $updates"
-            eos_yad_RunCmdTermBash "echo Updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
+            eos_yad_RunCmdTermBash "echo $progname: updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
         fi
     fi
 
