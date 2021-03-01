@@ -256,7 +256,7 @@ ListNameToPkgName()
             yes)
                 rm -rf "$pkgname"
                 yay -Ga "$pkgname" >/dev/null || DIE "'yay -Ga $pkgname' failed."
-                rm -rf "$pkgname"/.git                          # not needed
+                #rm -rf "$pkgname"/.git                          # not needed
                 ;;
         esac
     fi
@@ -1157,6 +1157,15 @@ AssetsConfLocalVal() {
 }
 
 Main() {
+    local _first_arg="$1"
+    case "$_first_arg" in
+        --dir=*)
+            _first_arg="${_first_arg#*=}"
+            # [ ! -d "$_first_arg" ] || DIE "the folder in parameter '$1' is not found."
+            cd "$_first_arg" || DIE "'cd $_first_arg' failed."
+            shift
+            ;;
+    esac
     local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
     local PROGNAME="$(basename "$0")"
 
