@@ -453,16 +453,17 @@ EOF
                          -i $file \
                          -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
                 fi
-            elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
-                if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
-                    # allow nvidia install
-                    if [ -r $file ] ; then
-                        sudo sed \
-                             -i $file \
-                             -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
-                    fi
-                fi
             fi
+            #elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
+            #    if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
+            #        # allow nvidia install
+            #        if [ -r $file ] ; then
+            #            sudo sed \
+            #                 -i $file \
+            #                 -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
+            #        fi
+            #    fi
+            #fi
             ;;
     esac
 
