@@ -4,7 +4,7 @@
 pkgname=grub2-theme-endeavouros-classic
 pkgver=20210226
 pkgrel=1
-pkgdesc='EndeavourOS grub2 theme'
+pkgdesc='EndeavourOS grub2 theme – Old Theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'
 license=('GPL3')
