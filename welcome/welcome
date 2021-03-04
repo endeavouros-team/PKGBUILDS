@@ -423,14 +423,28 @@ EOF
 
     case "$mode" in
         online)
-            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
-                Welog "fetching netinstall.yaml."
-                sudo bash -c "cp -f netinstall.yaml /usr/share/calamares/ ; chown root:root /usr/share/calamares/netinstall.yaml"
-            }
-            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist && {
-                Welog "fetching update-mirrorlist."
-                sudo bash -c "cp -f update-mirrorlist /usr/bin/ ; chown root:root /usr/bin/update-mirrorlist ; chmod 0755 /usr/bin/update-mirrorlist"
-            }
+            local fetchurl=https://raw.githubusercontent.com/endeavouros-team/install-scripts/master
+            local fetchable="chrooted_cleaner_script.sh update-mirrorlist"
+            local fetched
+
+            fetched=netinstall.yaml
+            Welog "fetching $fetched."
+            if (wget -q $fetchurl/$fetched) ; then
+                sudo bash -c "cp -f $fetched /usr/share/calamares/ ; chown root:root /usr/share/calamares/$fetched ; chmod 0644 /usr/share/calamares/$fetched"
+                rm -f $fetched
+            else
+                Welog "==> Warning: fetching $fetched failed."
+            fi
+            for fetched in $fetchable ; do
+                Welog "fetching $fetched."
+                if (wget -q $fetchurl/$fetched) ; then
+                    sudo bash -c "cp -f $fetched /usr/bin/ ; chown root:root /usr/bin/$fetched ; chmod 0755 /usr/bin/$fetched"
+                    rm -f $fetched
+                else
+                    Welog "==> Warning: fetching $fetched failed."
+                fi
+            done
+
             if [ -n "$user_pkglist_url" ] ; then
                 Welog "fetching $user_pkglist_url."
                 if [ -d /home/$EOS_LIVEUSER ] ; then
