@@ -1470,7 +1470,7 @@ DIE() {
         echo "Error: $1."
         Usage
         break
-    done | eos_yad_problem "$title" "$@"
+    done | eos_yad_problem "$title" --fontname="Mono 10" --height=700 "$@"
     exit 1
 }
 
@@ -1833,6 +1833,7 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --help|-h) WelcomeHelp ; return ;;
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
