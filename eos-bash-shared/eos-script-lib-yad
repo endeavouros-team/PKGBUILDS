@@ -390,7 +390,7 @@ FindAvailableMonoFont() {
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
-    sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="/usr/bin/sudo bash -c" ;;
+    sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="sudo bash -c" ;;
     pkexec       | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
     su-c_wrapper)                                                export EOS_ROOTER="/usr/bin/su-c_wrapper bash -c" ;;
     *)
