@@ -7,13 +7,11 @@ arch=('any')
 replaces=('EndeavourOS-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
-
 source=(
   "${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz"
 )
 md5sums=('ff1a0a97314296899760da538f8af058')
 sha512sums=('067fc011ab5a4e5403c2c7f5da395597aa42bb5088435650100160fa531b3ac3f766a76e80d31560dace1e8e61b3c20502b88c7e2e3045e8a7e182fd3e743056')
-
 install=$pkgname.install
 
 package() {
