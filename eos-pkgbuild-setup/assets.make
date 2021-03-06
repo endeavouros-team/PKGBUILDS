@@ -344,6 +344,22 @@ Assets_clone()
         hub release download $xx
         test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
+
+    # because of possible epoch and github, some packages must be renamed
+    if [ -n "${ASSET_PACKAGE_EPOCH_HOOKS[*]}" ] ; then
+        local oldnames oldname newname
+        for xx in "${PKGNAMES[@]}" ; do
+            hook="${ASSET_PACKAGE_EPOCH_HOOKS[$xx]}"
+            if [ -n "$hook" ] ; then
+                oldnames="$(/usr/bin/ls -1 ${xx}-*)"  # files *.zst and *.zst.sig
+                for oldname in $oldnames ; do
+                    newname="$($hook "$oldname")"
+                    echo2 "renaming $oldname to $newname"
+                    mv "$oldname" "$newname" || DIE "renaming failed"
+                done
+            fi
+        done
+    fi
     sleep 1
 
     Popd
