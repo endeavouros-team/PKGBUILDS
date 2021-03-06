@@ -755,7 +755,7 @@ Main2()
         test -n "$tmpcurr" || DIE "LocalVersion for '$xx' failed"
         oldv["$pkgdirname"]="$tmpcurr"
         if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
-            echo2 "update pending to $tmp"
+            echo2 "update pending from $tmpcurr to $tmp"
             WantAurDiffs "$xx"
         else
             echo2 "OK ($tmpcurr)"
