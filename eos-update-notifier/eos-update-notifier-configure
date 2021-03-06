@@ -47,7 +47,7 @@ Main()
         --columns=2
 
         --field="Edit config!!<tt>View and modify configuration file /etc/$targetprog.conf with '$Editor'</tt>":fbtn \
-               "/usr/bin/RunInTerminal /usr/bin/su-c_wrapper -p $Editor /etc/$targetprog.conf 2>/dev/null"
+               "/usr/bin/RunInTerminalEx $EOS_ROOTER '$Editor /etc/$targetprog.conf'"
         --field="Schedule!!<tt>View and modify the schedule of update checks</tt>":fbtn \
                "/usr/bin/$targetprog --conf"
         --field="Reset!!<tt>Reset eos-update-notifier's systemd service files to defaults</tt>":fbtn \
