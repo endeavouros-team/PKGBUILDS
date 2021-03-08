@@ -219,15 +219,42 @@ Options() {
     done
 }
 
+AvailableKernelsAndHeaders() {
+
+    # Find kernel packages by finding packages which have words 'linux' and 'headers'
+    # From the output of 'pacman -Sl'
+    # - find lines that have words: 'linux' and 'headers'
+    # - drop lines containing 'testing' (=testing repo, causes duplicates) and 'linux-api-headers' (=not a kernel header)
+    # - show the (header) package names
+    # Now we have names of the "kernel headers".
+    # Then add the kernel packages to proper places and output the result.
+
+    local headers=$(pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | grep -Pv '^testing | linux-api-headers ' | awk '{print $2}')  # find linux*headers packages
+    local header
+    local kernel
+
+    for header in $headers ; do
+        kernel=$(echo "$header" | sed 's|-headers$||')
+        echo "$kernel $header"
+    done
+}
+
 Main()
 {
     local na="(-)"
-    local kernels=(
-        linux             linux-headers
-        linux-lts         linux-lts-headers
-        linux-zen         linux-zen-headers
-        linux-hardened    linux-hardened-headers
-    )
+    local kernels=()
+
+    if [ 1 -eq 1 ] ; then
+        echo "==> Info: detecting available kernel packages."
+        kernels=( $(AvailableKernelsAndHeaders) )
+    else
+        kernels=(
+            linux             linux-headers
+            linux-lts         linux-lts-headers
+            linux-zen         linux-zen-headers
+            linux-hardened    linux-hardened-headers
+        )
+    fi
     local functions=(  # order is important!
         Choose
         PkgName
