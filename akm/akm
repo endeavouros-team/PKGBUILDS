@@ -380,9 +380,9 @@ Main()
                 fi
                 ;;
             FALSE)
-                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=("$pkg")
+                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=($(basename "$pkg"))
                 if [ "$connect_header_with_kernel" = "yes" ] ; then
-                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=("$partner")
+                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=($(basename "$partner"))
                 fi
                 ;;
         esac
@@ -402,7 +402,7 @@ Main()
     fi
 
     if [ -n "$cmd" ] ; then
-        eos_yad_RunCmdTermBash "echo '${cmd[*]}' ; sudo bash -c '${cmd[*]}'"
+        RunInTerminal "echo '${cmd[*]}' ; sudo bash -c '${cmd[*]}'"
     fi
 }
 
