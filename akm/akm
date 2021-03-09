@@ -23,7 +23,10 @@ Header() {
     FormatVersion "$hdr"
 }
 
-LocalVersion() { /usr/bin/pacman -Q "$1" 2>/dev/null | /usr/bin/awk '{print $2}' ; }
+LocalVersion() {
+    local pkg="$(/usr/bin/basename "$1")"
+    /usr/bin/pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+}
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
 Choose() {
@@ -76,7 +79,7 @@ Stable() {
 }
 
 TestingVersion() {
-    local pkg="$1"
+    local pkg="$(/usr/bin/basename "$1")"
     echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^.*>\([0-9][0-9a-z\.\-]*\)<.*$|\1|'
 }
 
@@ -230,7 +233,7 @@ AvailableKernelsAndHeaders() {
     # Now we have names of the "kernel headers".
     # Then add the kernel packages to proper places and output the result.
 
-    local headers=$(pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | grep -Pv '^testing | linux-api-headers ' | awk '{print $2}')  # find linux*headers packages
+    local headers=$( pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | awk '{printf("%s/%s\n", $1, $2)}' | grep -Pv '^testing/|/linux-api-headers$')
     local header
     local kernel
 
@@ -314,7 +317,7 @@ Main()
 
     local cmd=(
         eos_yad
-        --width=800 --height=700  --scroll
+        --width=900 --height=700  --scroll
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
