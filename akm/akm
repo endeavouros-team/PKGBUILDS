@@ -56,13 +56,14 @@ Installed() {
 
 StableVersion() {
     local pkg="$1"
-    local repo
+    local repo=""
 
+    # prevent usage of the 'testing' repo:
     case "$pkg" in
-        linux | linux-headers | linux-lts*) repo=core ;;
-        linux-zen* | linux-hardened*)       repo=extra ;;
+        linux | linux-headers | linux-lts*) repo=core/ ;;
+        linux-zen* | linux-hardened*)       repo=extra/ ;;
     esac
-    LANG=C pacman -Si $repo/"$pkg" | grep ^Version | awk '{print $3}'
+    LANG=C pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
 }
 
 Stable() {
@@ -313,7 +314,7 @@ Main()
 
     local cmd=(
         eos_yad
-        --width=750
+        --width=800 --height=700  --scroll
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
