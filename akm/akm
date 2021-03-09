@@ -218,6 +218,15 @@ Options() {
         case "$arg" in
             --connect-header) connect_header_with_kernel=yes ;;
             --scroll) scroll=yes ;;
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options]
+options:
+    --connect-header      Make kernel and header package go together at install or uninstall.
+    --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
+EOF
+                exit 0
+                ;;
             -*) DIE "unsupported option '$arg'" ;;
             *) DIE "unsupported parameter '$arg'" ;;
         esac
@@ -246,8 +255,15 @@ AvailableKernelsAndHeaders() {
 
 Main()
 {
+    local progname="$(basename "$0")"
     local na="(-)"
     local kernels=()
+    local connect_header_with_kernel=no    # default, change with option --connect-header
+    local scroll=no
+
+    CommonStuff
+    AkmConfig
+    Options "$@"
 
     if [ 1 -eq 1 ] ; then
         echo "==> Info: detecting available kernel packages."
@@ -269,12 +285,6 @@ Main()
         KernelOrg
         KOVersion
     )
-    local connect_header_with_kernel=no    # default, change with option --connect-header
-    local scroll=no
-
-    CommonStuff
-    AkmConfig
-    Options "$@"
 
     # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
