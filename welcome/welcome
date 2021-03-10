@@ -358,11 +358,6 @@ yad_calamares() {
                         return 1
                     fi
                 done
-                sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
-                     -e 's|^#_setup_personal$|_setup_personal|' \
-                     -e 's|^_de_wm_config$|#_de_wm_config|'
-                cp $urlfolder/${mode}_setup.url           /home/$EOS_LIVEUSER/setup.url
-                cp $urlfolder/${mode}_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
                 ;;
         esac
     fi
@@ -426,7 +421,6 @@ EOF
     case "$mode" in
         online)
             local fetchurl=https://raw.githubusercontent.com/endeavouros-team/install-scripts/master
-            local fetchable="chrooted_cleaner_script.sh update-mirrorlist"
             local fetched
 
             fetched=netinstall.yaml
@@ -437,7 +431,7 @@ EOF
             else
                 Welog "==> Warning: fetching $fetched failed."
             fi
-            for fetched in $fetchable ; do
+            for fetched in chrooted_cleaner_script.sh update-mirrorlist ; do
                 Welog "fetching $fetched."
                 if (wget -q $fetchurl/$fetched) ; then
                     sudo bash -c "cp -f $fetched /usr/bin/ ; chown root:root /usr/bin/$fetched ; chmod 0755 /usr/bin/$fetched"
@@ -446,6 +440,15 @@ EOF
                     Welog "==> Warning: fetching $fetched failed."
                 fi
             done
+            case "$realmode" in
+                sway | bspwm)
+                    sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
+                         -e 's|^#_setup_personal$|_setup_personal|' \
+                         -e 's|^_de_wm_config$|#_de_wm_config|'
+                    cp $urlfolder/${mode}_setup.url           /home/$EOS_LIVEUSER/setup.url
+                    cp $urlfolder/${mode}_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
+                    ;;
+            esac
 
             if [ -n "$user_pkglist_url" ] ; then
                 Welog "fetching $user_pkglist_url."
