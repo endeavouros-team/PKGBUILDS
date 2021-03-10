@@ -242,9 +242,11 @@ yad_community_editions() {
         2) return ;;
     esac
 
-    if [ "$EOS_TESTING_STOP" = "yes" ] ; then
-        eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
-        return
+    if [ 0 -eq 1 ] ; then
+        if [ "$EOS_TESTING_STOP" = "yes" ] ; then
+            eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
+            return
+        fi
     fi
 
     yad_calamares $edition yes
