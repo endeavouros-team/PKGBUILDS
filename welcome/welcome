@@ -350,7 +350,7 @@ yad_calamares() {
             bspwm | sway)
                 local urlfolder=/home/$EOS_LIVEUSER/community_editions
                 local urlfile
-                for urlfile in $urlfolder/sway_setup.url $urlfolder/sway_netinstall-yaml.url ; do
+                for urlfile in $urlfolder/${mode}_setup.url $urlfolder/${mode}_netinstall-yaml.url ; do
                     if [ ! -r $urlfile ] ; then
                         eos_yad_WARN "community edition file $urlfile not found on the ISO!"
                         return 1
@@ -359,8 +359,8 @@ yad_calamares() {
                 sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
                      -e 's|^#_setup_personal$|_setup_personal|' \
                      -e 's|^_de_wm_config$|#_de_wm_config|'
-                cp $urlfolder/sway_setup.url           /home/$EOS_LIVEUSER/setup.url
-                cp $urlfolder/sway_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
+                cp $urlfolder/${mode}_setup.url           /home/$EOS_LIVEUSER/setup.url
+                cp $urlfolder/${mode}_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
                 ;;
         esac
     fi
