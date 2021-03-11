@@ -1,6 +1,6 @@
 # Base Maintainer: Filipe Laíns (FFY00) <lains@archlinux.org>
-# Original Sources: https://github.com/Se7endAY/grub2-theme-vimix; https://github.com/endeavouros-team/grub2-theme-endeavouros
-# Maintainer: LeSnake04 (dev.lesnake@gmail.com)
+# Original Sources: https://github.com/Se7endAY/grub2-theme-vimix
+# Maintainer: https://github.com/endeavouros-team/grub2-theme-endeavouros (EndeavourOS <info@endeavouros.com>)
 pkgname=grub2-theme-endeavouros-classic
 pkgver=20210226
 pkgrel=1
