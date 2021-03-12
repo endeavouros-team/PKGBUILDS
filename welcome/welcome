@@ -18,18 +18,6 @@ translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translation
 
 source $translations_dir/translations.bash
 
-case $WELCOME_LANG in
-    zh_HK | zh_TW)
-        export WELCOME_FONT="Noto Sans Mono CJK TC Regular 10"
-        ;;
-    zh_SG | zh_CN)
-        export WELCOME_FONT="Noto Sans Mono CJK SC Regular 10"
-        ;;
-    *)
-        export WELCOME_FONT="Mono 10"
-        ;;
-esac
-
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
 test -r  $EOS_SCRIPTS_YAD || {
@@ -109,6 +97,18 @@ AfterTranslations() {
     export AFTER_INSTALL_US_DONE="$(ltr after_install_us_done)"
     export AFTER_INSTALL_US_FAIL="$(ltr after_install_us_fail)"
 }
+
+case $lang in
+    zh_HK | zh_TW)
+        export WELCOME_FONT="Noto Sans Mono CJK TC Regular 10"
+        ;;
+    zh_SG | zh_CN)
+        export WELCOME_FONT="Noto Sans Mono CJK SC Regular 10"
+        ;;
+    *)
+        export WELCOME_FONT="Mono 10"
+        ;;
+esac
 
 export -f ltr
 export tr_strings
