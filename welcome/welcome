@@ -18,6 +18,17 @@ translations_dir=$EOS_SCRIPTS_DIR                 # used also by the translation
 
 source $translations_dir/translations.bash
 
+case $WELCOME_LANG in
+    zh_HK | zh_TW)
+        export WELCOME_FONT="Noto Sans Mono CJK TC Regular 10"
+        ;;
+    zh_SG | zh_CN)
+        export WELCOME_FONT="Noto Sans Mono CJK SC Regular 10"
+        ;;
+    *)
+        export WELCOME_FONT="Mono 10"
+        ;;
+esac
 
 #################################################################################
 EOS_SCRIPTS_YAD=$EOS_SCRIPTS_DIR/eos-script-lib-yad
@@ -1370,13 +1381,13 @@ DIE() {
         echo "Error: $1."
         Usage
         break
-    done | eos_yad_problem "$title" --fontname="Mono 10" --height=700 "$@"
+    done | eos_yad_problem "$title" --fontname=$WELCOME_FONT --height=700 "$@"
     exit 1
 }
 
 WelcomeHelp() {
     Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=700 --height=500 \
-                    --fontname="Mono 10" \
+                    --fontname=$WELCOME_FONT \
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
                     --image=help-about --button=yad-ok:0
