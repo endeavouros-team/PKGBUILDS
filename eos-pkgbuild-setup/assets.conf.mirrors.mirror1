@@ -87,13 +87,30 @@ _GetSource0() {
     echo "${source[0]}"
 }
 
+_fetch_that_file() {
+    local file="$1"
+    local url="$2"
+
+    [ -n "$file" ] || return 1
+    [ -n "$url" ] || return 1
+
+    if [ 1 -eq 1 ] ; then
+        local out=""
+        [ "$file" != "-" ] && out="--output '$file'"
+        curl --silent --location --max-time 10 $out "$url"
+    else
+        wget -q --timeout=10 -O"$file" "$url"
+    fi
+}
+
 _ckbcomp_hook() {
     local tool=ckbcomp
     local Dstdir="$PKGBUILD_ROOTDIR"/$tool
     local Pkgbuild="$Dstdir"/PKGBUILD
     local Url="$(_GetSource0 "$Pkgbuild")"
     Url="$(dirname "$Url")"
-    local newinfo="$(wget -q -O- "$Url")"
+    local newinfo="$(_fetch_that_file "-" "$Url")"
+    [ -n "$newinfo" ] || { printf "Error: $tool: fetching info failed! " >&2 ; return 1 ; }
     local newbase=console-setup_
     local newver="$(echo "$newinfo" | grep $newbase | grep "\.tar\.xz" | tail -n 1 | sed "s|^.*\"$newbase\([0-9\.]*\)\.tar.*$|\1|")"
     local curver="$(_Get_pkgver "$Pkgbuild")"
@@ -102,8 +119,8 @@ _ckbcomp_hook() {
     if [ "$newver" != "$curver" ] ; then
         local ff
         for ff in dsc tar.xz ; do
-            wget -q -O "$Dstdir/$filebase.$ff" "$Url"/$filebase.$ff || {
-                echo "Error: $tool: fetching $filebase.$ff failed." >&2
+            _fetch_that_file "$Dstdir/$filebase.$ff" "$Url"/$filebase.$ff || {
+                printf "Error: $tool: fetching $filebase.$ff failed. " >&2
                 return 1
             }
         done
@@ -146,7 +163,7 @@ _yay_hook_check_latest() {
     local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
-    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    tmpdata="$(_fetch_that_file "-" $url)"
     if [ $? -ne 0 ] ; then
         echo "cannot fetch info about $tool" >&2
         return 1
@@ -165,7 +182,7 @@ _yay_hook_check_latest_old() {
     local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
-    wget -q --timeout=10 -O $tmpfile $url || {
+    _fetch_that_file $tmpfile $url || {
         echo "cannot fetch info about $tool" >&2
         rm -f $tmpfile
         return 1
@@ -187,7 +204,7 @@ _nvidia-installer-db_hook() {
     mkdir -p "$(dirname "$store")"
     local tmpfile="$(mktemp "$store".tmp.XXXXX)"
 
-    wget -q -O "$tmpfile" $archive || {
+    _fetch_that_file "$tmpfile" $archive || {
         rm -f "$tmpfile"
         return 1
     }
@@ -211,7 +228,7 @@ _inxi_hook_check_latest() {
     local dev_version
     local prefer_dev_version=yes
 
-    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    tmpdata="$(_fetch_that_file - $url)"
     if [ $? -ne 0 ] ; then
         echo "cannot fetch info about $tool" >&2
         return 1
@@ -237,7 +254,7 @@ _downgrade_hook_check_latest() {
     local localversion=$(_Get_pkgver "$Pkgbuild")
     local dev_version
 
-    tmpdata="$(wget -q --timeout=10 -O- $url)"
+    tmpdata="$(_fetch_that_file - $url)"
     if [ $? -ne 0 ] ; then
         echo "cannot fetch info about $tool" >&2
         return 1
@@ -284,7 +301,7 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
     local new
     local diffs answer
 
-    new="$(wget -q --timeout=10 -O- "$url")"
+    new="$(_fetch_that_file - "$url")"
     if [ $? -ne 0 ] ; then
         echo "Warning: cannot fetch '$url'." >&2
         return 1
