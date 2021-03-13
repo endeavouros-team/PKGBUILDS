@@ -23,7 +23,7 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
     aur/arc-x-icons-theme
-    aur/ckbcomp
+#    aur/ckbcomp
     aur/downgrade
     aur/inxi
     aur/mkinitcpio-openswap
@@ -31,6 +31,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/polybar
     aur/yay
     akm
+    ckbcomp
     endeavouros-keyring
     endeavouros-mirrorlist
     endeavouros-theming
@@ -104,6 +105,21 @@ _fetch_that_file() {
 }
 
 _ckbcomp_hook() {
+    # new version info
+    local info=$(curl --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
+    local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
+
+    # current version info
+    local tool=ckbcomp
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
+    local Pkgver=$(_Get_pkgver "$Pkgbuild")
+
+    if [ "$newver" != "$Pkgver" ] ; then
+        echo "$tool: new version $newver is available." >&2
+    fi
+}
+
+_ckbcomp_hook_old() {
     local tool=ckbcomp
     local Dstdir="$PKGBUILD_ROOTDIR"/$tool
     local Pkgbuild="$Dstdir"/PKGBUILD
