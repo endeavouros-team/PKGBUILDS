@@ -1,21 +1,26 @@
-# Maintainer: Nissar Chababy <funilrys at outlook dot com>
-# Ex-Maintainer: 	Jeroen Bollen <jbinero at gmail dot comau>
+#!/bin/bash
 
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
+# Ex-Maintainer:  Nissar Chababy <funilrys at outlook dot com>
+# Ex-Maintainer:  Jeroen Bollen <jbinero at gmail dot comau>
+
 pkgname=ckbcomp
-pkgver=1.194
+_parentname=console-setup
+pkgver=1.201
 pkgrel=1
 pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or kbdcontrol"
 arch=(any)
-url="https://anonscm.debian.org/cgit/d-i/console-setup.git/"
+url=https://salsa.debian.org/installer-team/$_parentname
 license=('GPL2')
 depends=('perl')
-source=("http://ftp.de.debian.org/debian/pool/main/c/console-setup/console-setup_${pkgver}.tar.xz")
-sha512sums=('fe71480b45e8c88c9e46264f734d0eb21023a6afedfa6412551bb40f7525f14823befe726efc37f152a36d9a8de3aba00cd41f9fe42bcea2780c5cf8764a6b80')
+source=($url/-/archive/$pkgver/${_parentname}-$pkgver.tar.gz)
+sha512sums=('14dedf1339f18eef14894bd6a56d74b1e4b111113b19ac2c3f215047408e50acdb55e7c7e72c156f151afb080e905399d116233b374884609fab05640945727c')
 
 package() {
-    cd console-setup-${pkgver}
+    rm -f ../${_parentname}-$pkgver.tar.gz   # cleanup
+
+    cd ${_parentname}-$pkgver
     install -d ${pkgdir}/usr/bin/
     install -m755 Keyboard/ckbcomp ${pkgdir}/usr/bin/
 }
