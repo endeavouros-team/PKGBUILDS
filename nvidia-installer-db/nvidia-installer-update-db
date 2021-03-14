@@ -6,6 +6,12 @@
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/supportedchips.html
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/index.html
 
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
+    echo "Error: $(basename "$0"): file eos-script-lib-yad not found." >&2
+    exit 1
+}
+
 #LATEST_BRANCH1="Latest Long Lived Branch"
 #LATEST_BRANCH2="Latest Short Lived Branch"
 
@@ -215,7 +221,7 @@ CreateNvidiaDb()
     else
         # Now we need elevated privileges.
         echo2 "Adding NVIDIA graphics card ids to the local database."
-        sudo bash -c "$sudo_commands"
+        $EOS_ROOTER "$sudo_commands"
     fi
 }
 
