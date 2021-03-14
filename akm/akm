@@ -418,7 +418,7 @@ Main()
     fi
 
     if [ -n "$cmd" ] ; then
-        RunInTerminal "echo '${cmd[*]}' ; sudo bash -c '${cmd[*]}'"
+        RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
     fi
 }
 
