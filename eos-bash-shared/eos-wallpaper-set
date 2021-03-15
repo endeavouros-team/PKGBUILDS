@@ -286,9 +286,27 @@ Examples:
 EOF
 }
 
-#IsSway() { test -x /usr/bin/swaybg ; }
-IsSway()  { test "$DESKTOP_SESSION" = "sway"  || test "$XDG_SESSION_DESKTOP" = "sway" ; }
-IsBspwm() { test "$DESKTOP_SESSION" = "bspwm" || test "$XDG_SESSION_DESKTOP" = "bspwm" ; }
+IsSway()  {
+    case "$DESKTOP_SESSION" in
+        sway | */sway) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        sway | */sway) return 0 ;;
+    esac
+    [ -x /usr/bin/swaybg ] && return 0
+    return 1
+}
+
+IsBspwm() {
+    case "$DESKTOP_SESSION" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    [ -x /usr/bin/bspwm ] && return 0
+    return 1
+}
 
 GetDeOrWm() {
     local de="$(eos_yad_GetDesktopName)"
