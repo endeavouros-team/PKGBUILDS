@@ -239,7 +239,7 @@ yad_calamares() {
     fi
 
     if [ "$mode" = "choose" ] ; then
-        local t1="$CAL_INFO1"
+        local t1="" # "$CAL_INFO1"
         local t2="$CAL_INFO2"
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
