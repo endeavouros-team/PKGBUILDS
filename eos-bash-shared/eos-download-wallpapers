@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Copy additional wallpapers from Github's EOS site.
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+pushd() { command pushd "$@" >/dev/null ; }
+popd()  { command popd  "$@" >/dev/null ; }
+
+Options() {
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            -*) DIE "unsupported option: $arg" ;;
+            *)  subfolder="$arg" ;;
+        esac
+    done
+}
+
+GitClone() {
+    if [ "$TESTING" = "yes" ] ; then
+        # only TESTING !!!
+        mkdir -p $folder/legacy-wallpapers $folder/community-wallpapers
+        touch $folder/legacy-wallpapers/test1a $folder/legacy-wallpapers/test2a
+        touch $folder/community-wallpapers/test3b $folder/community-wallpapers/test4b
+        return
+    fi
+    git clone "$url"
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local url="https://github.com/endeavouros-team/additional-wallpapers.git"
+    local folder="$(basename "$url" .git)"
+    local targetroot=/usr/share/endeavouros/backgrounds
+    local subfolder=""
+    local cmd=":"
+    local cmd1
+    local TESTING=no    # in release this must be "no" !!
+
+    Options "$@"
+
+    local workdir=$(mktemp -d "$HOME/.cache/$progname.XXXXX")
+
+    pushd "$workdir"
+
+    GitClone
+
+    pushd "$folder"
+
+    # Copy new wallpapers into their place.
+    # Remove old wallpapers first.
+
+    for xx in $(/usr/bin/ls -1) ; do
+        if [ -d "$xx" ] ; then
+            if [ -d "$targetroot/$xx" ] ; then
+                cmd+=" ; rm -rf '$targetroot/$xx'"
+            fi
+            cmd+=" ; cp -r '$xx' $targetroot/"
+        fi
+    done
+    case "$cmd" in
+        ": ; "*) cmd="${cmd:4}" ;;
+    esac
+    RunInTerminal "echo 'Running the following commands:' ; echo '$cmd' ; $EOS_ROOTER '$cmd'"
+
+    popd
+    popd
+    rm -rf "$workdir"
+}
+
+Main "$@"
