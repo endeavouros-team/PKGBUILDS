@@ -968,9 +968,9 @@ INSTALL() {
   tabcontents+=(
 #      --field=" $(ltr ins_keys)!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
       --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
-      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
-      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
+      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://endeavouros.com/docs/installation"
+      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/docs/system-rescue"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -989,12 +989,12 @@ GeneralInfo() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-question
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
-      --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
-      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki"
-      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news"
-      --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com"
-      --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate"
-      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
+      --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
+      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/wiki"
+      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/news"
+      --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
+      --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
+      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/docs/applications/welcome"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -1146,16 +1146,16 @@ UsefulTips() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$user_info
       --text="<b>$(ltr useful_tips_text)</b>"
-      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
-      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
-      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
-      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
+      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/aur/yay"
+      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network"
+      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
   )
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
+      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
   tabcontents+=(
-      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
-      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn     "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
       --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
 
@@ -1214,11 +1214,11 @@ AddMoreApps() {
   esac
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
-      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinuxarm.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
   else
-      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
   fi
-  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages")
+  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
 
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
@@ -1263,7 +1263,7 @@ OwnCommands() {
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
           --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
-                  "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+                  "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
           --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
   fi
@@ -1338,11 +1338,16 @@ WelcomeChangelog() {
 }
 export -f WelcomeChangelog
 
+ImportantNews() {
+    $_WELCOME_BROWSER https://github.com/endeavouros-team/Important-news/blob/main/README.md
+}
+export -f ImportantNews
+
 SetBrowser() {
     local xx
     for xx in xdg-open exo-open firefox chromium ; do  # use one of these browser commands
         if [ -x /usr/bin/$xx ] ; then
-            _BROWSER=/usr/bin/$xx        # for showing external links
+            export _WELCOME_BROWSER=/usr/bin/$xx        # for showing external links
             return
         fi
     done
@@ -1766,6 +1771,7 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
+    notebook+=(--button="Software News!applications-development!Important news about EndeavourOS software":"bash -c ImportantNews")
     notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
     if [ "$is_installing" = "no" ] ; then
