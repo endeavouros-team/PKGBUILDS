@@ -164,7 +164,9 @@ eos_yad_RunCmdTermBash() {
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
-    local tmpfile=$(mktemp)
+    mkdir -p "$HOME/.cache"
+
+    local tmpfile=$(mktemp "$HOME/.cache/$FUNCNAME.XXXXX")
 
     echo "#!/bin/bash"                                   >> $tmpfile
     test -n "$prompt" && echo "echo $prompt"             >> $tmpfile
@@ -185,9 +187,14 @@ eos_yad_RunCmdTermBash() {
     echo "rm -f $tmpfile"                                >> $tmpfile
 
     chmod +x $tmpfile
+
+    # Try make sure terminal $term does not return to the caller immediately
+    # but waits until the commands from $tmpfile are executed.
     case "$term" in
         /usr/bin/gnome-terminal | gnome-terminal)
             $term $termopts --wait -- $tmpfile ;;
+        /usr/bin/xfce4-terminal | xfce4-terminal)
+            $term --disable-server $termopts -e $tmpfile ;;
         *)
             $term $termopts -e $tmpfile ;;
     esac

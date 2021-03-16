@@ -8,70 +8,61 @@ DIE() {
     echo "$progname: error: $1" >&2
     exit 1
 }
-
 pushd() { command pushd "$@" >/dev/null ; }
 popd()  { command popd  "$@" >/dev/null ; }
 
-Options() {
-    local arg
-    for arg in "$@" ; do
-        case "$arg" in
-            -*) DIE "unsupported option: $arg" ;;
-            *)  subfolder="$arg" ;;
-        esac
-    done
-}
+HandleWallpapers() {
+    # Copy new wallpapers into their place.
+    # Remove old wallpapers first.
 
-GitClone() {
-    if [ "$TESTING" = "yes" ] ; then
-        # only TESTING !!!
-        mkdir -p $folder/legacy-wallpapers $folder/community-wallpapers
-        touch $folder/legacy-wallpapers/test1a $folder/legacy-wallpapers/test2a
-        touch $folder/community-wallpapers/test3b $folder/community-wallpapers/test4b
-        return
-    fi
-    git clone "$url"
+    local url=https://github.com/EndeavourOS-Community-Editions/Community-wallpapers.git
+    local urlsubdirs=(
+        eos_wallpapers_classic
+        eos_wallpapers_community
+    )
+    local targetroot=/usr/share/endeavouros/backgrounds
+
+    local subdir
+    local cmd      # real commands here
+    local cmd2     # displayed commands here
+
+    git clone "$url" || DIE "fetching wallpapers from $url failed."
+
+    pushd "$(basename $url .git)"
+
+    # Collect all required commands into $cmd:
+
+    cmd="mkdir -p $targetroot"                           # collect all needed commands into $cmd
+
+    for subdir in "${urlsubdirs[@]}" ; do
+        [ -d "$subdir" ] || continue                     # skip if not folder
+        if [ -d "$targetroot/$subdir" ] ; then
+            echo "====> Note: will remove existing $targetroot/$subdir"
+            cmd+=" ; rm -rf '$targetroot/$subdir'"       # will remove old wallpapers
+        fi
+        cmd+=" ; cp -r '$PWD/$subdir' $targetroot/"      # will copy new wallpapers in place
+    done
+    cmd2=$(echo "$cmd" | sed 's| ; |\n|g')               # reformat commands suitable for displaying
+
+    # Now do the actual wallpaper changes:
+
+    RunInTerminal "echo 'Running the following commands:' ; echo '$cmd2' ; $EOS_ROOTER '$cmd'"
+
+    popd
 }
 
 Main()
 {
     local progname="$(basename "$0")"
-    local url="https://github.com/endeavouros-team/additional-wallpapers.git"
-    local folder="$(basename "$url" .git)"
-    local targetroot=/usr/share/endeavouros/backgrounds
-    local subfolder=""
-    local cmd=":"
-    local cmd1
-    local TESTING=no    # in release this must be "no" !!
-
-    Options "$@"
-
     local workdir=$(mktemp -d "$HOME/.cache/$progname.XXXXX")
 
     pushd "$workdir"
 
-    GitClone
-
-    pushd "$folder"
-
-    # Copy new wallpapers into their place.
-    # Remove old wallpapers first.
-
-    for xx in $(/usr/bin/ls -1) ; do
-        if [ -d "$xx" ] ; then
-            if [ -d "$targetroot/$xx" ] ; then
-                cmd+=" ; rm -rf '$targetroot/$xx'"
-            fi
-            cmd+=" ; cp -r '$xx' $targetroot/"
-        fi
-    done
-    case "$cmd" in
-        ": ; "*) cmd="${cmd:4}" ;;
-    esac
-    RunInTerminal "echo 'Running the following commands:' ; echo '$cmd' ; $EOS_ROOTER '$cmd'"
+    HandleWallpapers
 
     popd
-    popd
+
+    # Cleanup
     rm -rf "$workdir"
 }
 

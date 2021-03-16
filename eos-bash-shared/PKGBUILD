@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.6.1
+pkgver=1.6.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -47,9 +47,10 @@ source=(
   $_url/eos-pkg-changelog
   $_url/eos-sendlog
   $_url/eos-kbd-set
+  $_url/eos-download-wallpapers
 )
 
-sha512sums=('6a25fb5f163ebae72ff5e84ec1a4c396da9319c5140830ef6e9fbe319e651f379ddbb3215ac59a45d44638720a505e3cf9cfcbe8b743a4d71fc2c534191c4463'
+sha512sums=('1025c42ed3ba744eb8a2e67b50294907ed644a2da2fe88c21ac35b3aa1496d046195949430054d0e750f28300ea8c8177d134bad9b6bb6ef6108e50d1e528a4a'
             'e679164fb93707a756c2e896771160fbbcf6c102da2e1e76a8cdba7a56fd884d2536582ccd3e25474e0342cbc22add60f6876b2d9cd414af473c651f673c939f'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
@@ -68,7 +69,8 @@ sha512sums=('6a25fb5f163ebae72ff5e84ec1a4c396da9319c5140830ef6e9fbe319e651f379dd
             'd4a3786d5a6f0defcbaa463ab1cfb7f96faaad1040ab0ff6929b95a0193f4f2a62de5d70f35470bc66e04a994d094340dfb1ffe7502dda90a11c8a9703302261'
             '17c52a50e70bf925ccc985dcfb6be54d13c9caf159208e834d82f64203f2614861d627958aae22a3472da1c2f0d1dc3777f92d350226ef8dbe4809ffe7f298e6'
             '32db0f3dc1ce62d8370acdcd70810b849df4f3396f00db0827e3e0f3818c44a5cc57cb5e0062e39bae2edea43d28592367e54ea6466f13dbbbc6d83fffeb64fa'
-            'abee90db9af8d5a2a7b3a80151b858cfb31734496bde87b6f8388737e5a7dbdb8cbfea6b884d10df030da76c83af79b7b860b53022580914f53a08dd0231ff56')
+            'abee90db9af8d5a2a7b3a80151b858cfb31734496bde87b6f8388737e5a7dbdb8cbfea6b884d10df030da76c83af79b7b860b53022580914f53a08dd0231ff56'
+            '5bb2f48e0607d59952eeb123756aea54d379a5ad03adce3e18b451ffc11b3944227dfeb7c0f996c86a75a0362a102a5b883487db62dee280190a6db474fb8c95')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -89,6 +91,7 @@ package() {
   install -Dm755 UpdateInTerminal               $pkgdir/usr/bin/UpdateInTerminal
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
+  install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
