@@ -1120,7 +1120,7 @@ AfterInstall() {
   tabcontents+=(
       --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
       --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
-      --field=" Get more EOS wallpapers!preferences-desktop-wallpaper!Download legacy and EOS community and wallpapers":fbtn  'RunInTerminal eos-download-wallpapers'
+      --field=" Get more EOS wallpapers!preferences-desktop-wallpaper!Download legacy and EOS community wallpapers":fbtn  'RunInTerminal eos-download-wallpapers'
   )
 
   Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
