@@ -11,7 +11,7 @@ DIE() {
 pushd() { command pushd "$@" >/dev/null ; }
 popd()  { command popd  "$@" >/dev/null ; }
 
-HandleWallpapers() {
+FetchWallpapers() {
     # Copy new wallpapers into their place.
     # Remove old wallpapers first.
 
@@ -46,7 +46,11 @@ HandleWallpapers() {
 
     # Now do the actual wallpaper changes:
 
-    RunInTerminal "echo 'Running the following commands:' ; echo '$cmd2' ; $EOS_ROOTER '$cmd'"
+    echo ""
+    echo "Running the following commands:"
+    echo "$cmd2"
+    echo ""
+    $EOS_ROOTER "$cmd"
 
     popd
 }
@@ -57,13 +61,15 @@ Main()
     local workdir=$(mktemp -d "$HOME/.cache/$progname.XXXXX")
 
     pushd "$workdir"
-
-    HandleWallpapers
-
+    FetchWallpapers
     popd
 
-    # Cleanup
-    rm -rf "$workdir"
+    rm -rf "$workdir"    # cleanup
+
+    # Allow user to change the wallpaper:
+
+    echo "You can choose your new wallpaper now:"
+    /usr/bin/eos-wallpaper-set
 }
 
 Main "$@"
