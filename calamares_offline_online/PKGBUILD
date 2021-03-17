@@ -107,10 +107,13 @@ prepare() {
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
 
     sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
+    
+    # use duckduck to check internet connection
+    sed -i "s?internetCheckUrl:   http://example.com?internetCheckUrl:   https://duckduckgo.com?" $_reponame/src/modules/welcome/welcome.conf_online
 
     # netinstall module To give another name for the left panel requires translating the title somewhere so it adjusts to each language the installer supports
     #sed -i s"?sidebar:.*?sidebar: \"Choose Desktop\"?" $_reponame/src/modules/netinstall/netinstall.conf 
-    cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    #cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
     # Escape /? \
@@ -119,7 +122,7 @@ prepare() {
     # This is for using upstream file (github or server)
     sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
     # sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
-    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
     #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
