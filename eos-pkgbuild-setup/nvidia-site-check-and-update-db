@@ -22,7 +22,7 @@ nvidia-site-checks() {
     [ -r $ids ] || INFOln "$ids does not exist!"
 
     rm -f /tmp/nvidia*.ids
-    nvidia-installer-update-db --tmpdb 2>/dev/null
+    nvidia-installer-update-db --tmpdb #2>/dev/null
 
     [ -r $newids ] || DIE "$newids was not generated!"
 
