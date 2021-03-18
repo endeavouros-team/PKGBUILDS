@@ -107,6 +107,10 @@ _fetch_that_file() {
 _ckbcomp_hook() {
     # new version info
     local info=$(curl --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
+    [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] && {
+        printf "ckbcomp: fetching info failed. " >&2
+        return 1
+    }
     local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
 
     # current version info
