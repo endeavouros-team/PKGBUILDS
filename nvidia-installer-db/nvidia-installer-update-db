@@ -50,7 +50,8 @@ NvidiaIdsCommon() {
     local branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     if [ -z "$series" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
-        return   # not the latest branch pacman has currently
+        WARN "The nvidia.com site driver version is $branch, pacman version is $pacman_latest_branch."
+        return 1  # not the latest branch pacman has currently
     fi
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
@@ -66,6 +67,8 @@ NvidiaIdsLatest() {
             echo "==> $br: found!" >&2
             echo "$ids"
             return 0
+        else
+            return 1
         fi
     done
     DIE "$FUNCNAME: NvidiaIdsCommon failed."
@@ -80,7 +83,8 @@ NvidiaIdsLegacy() {
 }
 
 echo2()   { echo "$@" >&2 ; }
-DIE()     { echo2 "Error: $1" ; exit 1 ; }
+DIE()     { echo2 "$PROGNAME: error: $1" ; exit 1 ; }
+WARN()    { echo2 "$PROGNAME: warning: $1" ; }
 Info()    { test "$show_additional_info" = "yes" && echo2 "Info: $@" ; }
 
 Options() {

@@ -2,7 +2,7 @@
 # Initial Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
-pkgver=2.4.16
+pkgver=2.4.17
 pkgrel=1
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -20,7 +20,7 @@ source=(
 #  $_url/nvidia-390xx.ids
   $_url/nvidia.ids
 )
-sha256sums=('c00d4e920d41282fd3774cd8f0d00b01df9c86260db85c61e6d7660219579846'
+sha256sums=('c0d6cbd79a132c9aa485fdae3d4dba9d85633aca1b5dd606cfd4e1502d2c2feb'
             '76dbef4dd09a434ceba4744ee00d03482e8dafe9dd4a6461bdce5c9d23f0d886'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
