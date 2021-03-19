@@ -23,14 +23,11 @@ LATEST_LEGACY="Latest Legacy GPU version"
 GetNvidiaBranch() {
     local string="$1"
     local series="$2"
-    local processor="Linux x86_64/AMD64/EM64T"
-    local data="$(wget -q --timeout=10 -O- https://www.nvidia.com/en-us/drivers/unix)"
-    test -n "$data" || DIE "$FUNCNAME: fetching branch '$string' failed."
-    if [ -n "$series" ] ; then
-        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|^.*$string ($series)||" -e 's|</a>.*||' -e 's|.*">||'
-    else
-        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|.*$string||" -e 's|</a>.*$||' -e 's|^.*">||'
-    fi
+    local result="$(curl -Lsm 10 -o- https://www.nvidia.com/en-us/drivers/unix | sed 's|</a>|</a>\n|g' | grep "$string" | head -n1 | sed 's|.*>\([0-9.]*\)<.*|\1|')"
+
+    test -n "$result" || DIE "$FUNCNAME: fetching branch '$string' failed."
+    #echo "$result" >&2
+    echo "$result"
 }
 
 GetNvidiaIds() {
@@ -50,7 +47,7 @@ NvidiaIdsCommon() {
     local branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     if [ -z "$series" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
-        WARN "The nvidia.com site driver version is $branch, pacman version is $pacman_latest_branch."
+        WARN "The nvidia.com site driver version is '$branch', pacman version is '$pacman_latest_branch'."
         return 1  # not the latest branch pacman has currently
     fi
     local ids="$(GetNvidiaIds "$branch")"
@@ -154,7 +151,7 @@ CreateNvidiaDb()
     local xx
     local log=$(mktemp /tmp/$PROGNAME.log.XXXXX)
     local has_logs=no
-    local pacman_latest_branch=$(LANG=C pacman -Si nvidia-dkms | grep ^Version | awk '{print $NF}' | sed 's|-[0-9][0.9]*$||')
+    local pacman_latest_branch=$(LANG=C pacman -Si nvidia-dkms | grep ^Version | head -n1 | awk '{print $NF}' | sed 's|-[0-9][0.9]*$||')
 
     if [ "$targetdir" = "/tmp" ] ; then
         rm -f $target_latest $target_legacy  # option --tmpdb: always create new db into /tmp
