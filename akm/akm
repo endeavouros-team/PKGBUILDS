@@ -155,10 +155,34 @@ PaddingLines() {
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
+progress_bar() {         # This function was converted from the work of @Kresimir, thanks!
+    local msg="$1"
+    local percent="$2"
+    local barlen="$3"
+
+    printf "\r%s %3d%% [" "$1" $2
+    for ((c = 0; c < $3; c++)) ; do
+        if (( $c <= $2 * $3 / 100 )); then
+            echo -ne "#"
+        else
+            echo -ne " "
+        fi
+    done;
+    stdbuf -oL printf "]" # flush stdout
+}
+
 ShowFunctionLine() {
-    printf2 "%sGathering information: %3.f%%" $'\r' "$((100*SERVICES_DONE/SERVICES))"
+    if [ 0 -eq 1 ] ; then
+        printf2 "%sGathering information: %3.f%%" $'\r' "$((100*SERVICES_DONE/SERVICES))"
+    else
+        progress_bar "Gathering information:" "$(( 100 * SERVICES_DONE / SERVICES))" 50
+    fi
 }
 ShowFunctionStart() {
+    # progress bar initialization
+    trap 'printf "\x1B[?25h" ' EXIT # cursor on
+    printf "\x1B[?25l"              # cursor off
+
     SERVICES=${#functions[@]}
     SERVICES_DONE=0
     ShowFunctionLine
