@@ -23,7 +23,12 @@ rm -f PKGBUILD.yad
 ################## Modifications to the upstream PKGBUILD:
 
 # Mark this as patched
-pkgver+=".eos1"
+pkgver+=".eos2"
+
+# Add a missing dependency
+depends+=(gspell)
+
+sha256sums=('288142d338c055d3839083d8146c6f270bd5a17f78ff9cd2a3c41a8cf31a0e92')
 
 # The patch
 prepare() {
