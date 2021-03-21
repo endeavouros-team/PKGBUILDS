@@ -394,6 +394,31 @@ FindAvailableMonoFont() {
     echo "$font $size"
 }
 
+ProgressBar() {         # This function was converted from the work of @Kresimir, thanks!
+    local msg="$1"
+    local percent="$2"
+    local barlen="$3"
+    local c
+
+    printf "\r%-25s %3d%% [" "$msg" $percent >&2
+    for ((c = 0; c < $barlen; c++)) ; do
+        if (( $c <= $percent * $barlen / 100 )); then
+            echo -ne "#" >&2
+        else
+            echo -ne " " >&2
+        fi
+    done;
+    stdbuf -oL printf "]" >&2 # flush stdout
+}
+ProgressBarInit() {
+    # progress bar initialization
+    trap 'printf "\x1B[?25h" >&2' EXIT # cursor on
+    printf "\x1B[?25l" >&2              # cursor off
+}
+ProgressBarEnd() {
+    printf "\n" >&2
+}
+
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
