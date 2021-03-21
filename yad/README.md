@@ -11,6 +11,9 @@ User needs to edit file `/etc/pacman.conf` (with sudo or as root) and move the `
 
 ### Before
 ```
+#[testing]
+#Include = /etc/pacman.d/mirrorlist
+
 [community]
 Include = /etc/pacman.d/mirrorlist
 
@@ -29,11 +32,11 @@ Include = /etc/pacman.d/endeavouros-mirrorlist
 [endeavouros]
 Include = /etc/pacman.d/endeavouros-mirrorlist
 
-community]
-Include = /etc/pacman.d/mirrorlist
+#[testing]
+#Include = /etc/pacman.d/mirrorlist
 
-# If you want to run 32 bit applications on your x86_64 system,
-# enable the multilib repositories as required here.
+[community]
+Include = /etc/pacman.d/mirrorlist
 
 [multilib-testing]
 Include = /etc/pacman.d/mirrorlist
