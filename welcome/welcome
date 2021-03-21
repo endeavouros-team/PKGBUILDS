@@ -1622,12 +1622,31 @@ export -f Usage
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
 
+ShowProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+
+    local msg="$1"
+    local barlen=50
+    local percent_increment=17
+
+    ProgressBar "$msg" $pb_percent $barlen
+    ((pb_percent+=percent_increment))
+    [ $pb_percent -gt 100 ] && pb_percent=100
+}
+EndProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+    pb_percent=100
+    ShowProgress "Done."
+    ProgressBarEnd
+}
 
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
+    local pb_percent=0
+    local show_progress_bar=yes
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
@@ -1636,6 +1655,9 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --no-progress)
+                show_progress_bar=no
+                ;;
             --changelog)
                 WelcomeChangelog
                 return
@@ -1652,9 +1674,15 @@ StartHere() {
         esac
     done
 
+    [ "$show_progress_bar" = "yes" ] && ProgressBarInit
+
+    ShowProgress Translating...
+
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
     AfterTranslations
+
+    ShowProgress Processing...
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad > $yad_zombie_log
@@ -1676,7 +1704,7 @@ StartHere() {
             --installer) export show_installer=yes ;;
             --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=* | --tr-engine=* | --id=*) ;; # already handled!
+            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
@@ -1694,6 +1722,8 @@ StartHere() {
         source "$own_commands_conf"
     fi
 
+    ShowProgress "Creating commands..."
+
     CreateNotebookCommands
 
     if [ "$(WelcomeSettings check)" != "enable" ] ; then
@@ -1705,6 +1735,7 @@ StartHere() {
     test $? -eq 0 && is_installing=yes || is_installing=no
 
     if [ "$start_delay" != "0" ] ; then
+        ShowProgress "Sleeping..."
         sleep "$start_delay"
     fi
 
@@ -1715,6 +1746,8 @@ StartHere() {
         else
             verbosity=none
         fi
+        ShowProgress "Checking connection..."
+
         eos_yad_check_internet_connection $verbosity 20 "3s" "Welcome" || return 1
 
         if [ -n "$TERMINAL_AT_START" ] ; then
@@ -1745,6 +1778,7 @@ StartHere() {
     local tab tabname
     local notebook   # contains the main yad command
 
+    ShowProgress "Building yad window..."
     PrepareTabs "$handle" || DIE "PrepareTabs failed"
 
     # Create the yad command gradually into an array 'notebook':
@@ -1785,10 +1819,14 @@ StartHere() {
         yad_calamares choose
         return
     fi
+    ShowProgress "Showing window..."
 
     "${notebook[@]}"
 
     local result=$?
+
+    EndProgress
+
     case "$result" in
         5) WelcomeSettings disable ;;
         0|252) sleep 0.5 ; WelcomeSettings enable ;;
