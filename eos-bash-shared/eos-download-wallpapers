@@ -51,6 +51,7 @@ GetWallsCurl() {
             mkdir -p "$subfolder"
             pushd "$subfolder"
 
+            files=()
             for file in "${subfolderfiles[@]}" ; do
                 files+=("$directurl/$subfolder/$file")
             done
@@ -138,12 +139,15 @@ Options() {
         case "$arg" in
             --curl) implementation=curl ;;
             --git)  implementation=git ;;
+            --no-choose) make_choose=no ;;
             --help | -h)
                 cat <<EOF
 Usage: $progname [options]
 Options:
     --curl       Download using curl (should use less bandwidth). $( [ $implementation_default = curl ] && echo $default )
     --git        Download using git. $( [ $implementation_default = git ] && echo $default )
+    --no-choose  Do not make user to choose wallpaper right after downloading.
+    --help | -h  This help.
 EOF
                 exit 0
                 ;;
@@ -159,6 +163,7 @@ Main()
     local workdir
     local implementation_default="$EOS_WALLPAPER_FETCHER"
     local implementation=$implementation_default
+    local make_choose=yes
     local retval=0
     local oldies
 
@@ -188,9 +193,11 @@ Main()
 
     # Allow user to change the wallpaper:
 
-    if [ $retval -eq 0 ] ; then
-        echo2 "You can choose your new wallpaper now:"
-        /usr/bin/eos-wallpaper-set &
+    if [ "$make_choose" = "yes" ] ; then
+        if [ $retval -eq 0 ] ; then
+            echo2 "You can choose your new wallpaper now:"
+            /usr/bin/eos-wallpaper-set &
+        fi
     fi
 }
 

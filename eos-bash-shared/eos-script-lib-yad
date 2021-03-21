@@ -171,6 +171,7 @@ eos_yad_RunCmdTermBash() {
     echo "#!/bin/bash"                                   >> $tmpfile
     test -n "$prompt" && echo "echo $prompt"             >> $tmpfile
     echo "$cmd"                                          >> $tmpfile
+    echo "echo"                                          >> $tmpfile
     case "$term" in
         */deepin-terminal) ;;
         *)
