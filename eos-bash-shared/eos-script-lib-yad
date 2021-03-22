@@ -420,6 +420,21 @@ ProgressBarEnd() {
     printf "\n" >&2
 }
 
+YadProgressPulsate() {
+    local lockfile="$1"
+    local text="$2"
+
+    while true ; do
+        [ -r "$lockfile" ] || return
+        echo 0
+        sleep 0.1s
+    done | eos_yad --progress \
+                   --title="Progress indicator" \
+                   --text="$text" \
+                   --auto-close \
+                   --width=400 --hide-text --pulsate
+}
+
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
