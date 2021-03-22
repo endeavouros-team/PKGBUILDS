@@ -402,11 +402,6 @@ SaveMirrorlist() {
         opts+=(--fontname="$font")
     fi
 
-    if [ -n "$lockfile" ] ; then
-        sleep 0.5
-        rm -f "$lockfile"
-    fi
-
     eos_yad "${opts[@]}"
 
     case "$?" in
@@ -449,6 +444,7 @@ Main() {
     local http_selected=0
     local rsync_selected=0
     local country_exclude="--country-exclude"          # reflector does not have this option
+    local use_waiting_indicator=yes
 
     # Find countries with supported mirrors.
 
@@ -475,18 +471,17 @@ Main() {
 
     # Now all is ready, so just run the command.
 
-    local lockfile=""
-    if [ 0 -eq 1 ] ; then                            # lockfile feature no more working?
-        if [ ${#added_countries[@]} -gt 1 ] ; then
-            lockfile="$(mktemp)"
-            eos_yad_RunCmdTermBash "eos-waiting-indicator $lockfile '$progname is working, please wait ...'" \
-                                   "" \
-                                   "" \
-                                   "--no-enter-wait"
-        fi
+    if [ "$use_waiting_indicator" = "yes" ] ; then
+        local lockfile="$(mktemp "$HOME"/.lck.XXXXXXXX)"
+        YadProgressPulsate "$lockfile" "Ranking mirrors, please wait..." &
     fi
 
     "${reflector_cmd[@]}" > $tmpfile
+
+    if [ "$use_waiting_indicator" = "yes" ] ; then
+        #sleep 0.5
+        rm -f "$lockfile"
+    fi
 
     # Show the result and ask permission to save the mirrorlist.
 
