@@ -229,6 +229,7 @@ Usage: $progname [options]
 options:
     --connect-header      Make kernel and header package go together at install or uninstall.
     --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
+    --help | -h           This help.
 EOF
                 exit 0
                 ;;
@@ -265,22 +266,22 @@ Main()
     local kernels=()
     local connect_header_with_kernel=no    # default, change with option --connect-header
     local scroll=no
+    local nrofkernelitems                  # 8 with only upstream kernels
 
     CommonStuff
     AkmConfig
     Options "$@"
 
-    if [ 1 -eq 1 ] ; then
-        echo "==> Info: detecting available kernel packages."
-        kernels=( $(AvailableKernelsAndHeaders) )
-    else
-        kernels=(
-            linux             linux-headers
-            linux-lts         linux-lts-headers
-            linux-zen         linux-zen-headers
-            linux-hardened    linux-hardened-headers
-        )
-    fi
+    echo "==> Info: detecting available kernel packages."
+    kernels=( $(AvailableKernelsAndHeaders) )
+
+    #kernels=(
+    #    linux             linux-headers
+    #    linux-lts         linux-lts-headers
+    #    linux-zen         linux-zen-headers
+    #    linux-hardened    linux-hardened-headers
+    #)
+
     local functions=(  # order is important!
         Choose
         PkgName
@@ -290,6 +291,9 @@ Main()
         KernelOrg
         KOVersion
     )
+
+    nrofkernelitems=${#kernels[@]}
+    [ $nrofkernelitems -gt 8 ] && scroll=yes
 
     # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
@@ -342,7 +346,8 @@ Main()
         --button="Execute!system-run!Make your changes":0
     )
     if [ "$scroll" = "yes" ] ; then
-        cmd+=(--scroll #--height=700
+        cmd+=(--scroll
+              --height=700   # 660 is about the default
              )
     fi
 
