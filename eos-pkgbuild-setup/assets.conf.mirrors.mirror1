@@ -106,22 +106,41 @@ _fetch_that_file() {
 }
 
 _ckbcomp_hook() {
+    local tool=ckbcomp
+
     # new version info
     local info=$(curl --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
     [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] && {
-        printf "ckbcomp: fetching info failed. " >&2
+        printf "$tool: fetching info failed. " >&2
         return 1
     }
     local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
 
+    # NOTE: 1.196 - 1.202: 'ckbcomp' hasn't changed!
+
     # current version info
-    local tool=ckbcomp
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$tool/PKGBUILD
     local Pkgver=$(_Get_pkgver "$Pkgbuild")
 
-    if [ "$newver" != "$Pkgver" ] ; then
+    [ "$newver" = "$Pkgver" ] && return
+
+    pushd "$PKGBUILD_ROOTDIR"/$tool >/dev/null
+    cp -a PKGBUILD PKGBUILD.test
+    sed -i PKGBUILD.test -e "s|^pkgver=.*|pkgver=$newver|"
+    if (! updpkgsums PKGBUILD.test >& /dev/null) ; then
+        popd >/dev/null
+        echo "$tool: updpkgsums failed"
+        return 1
+    fi
+    if (! makepkg -p PKGBUILD.test >& /dev/null) ; then
+        popd >/dev/null
+        echo "$tool: makepkg failed"
+        return 1
+    fi
+    if (! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null) ; then
         echo "$tool: new version $newver is available." >&2
     fi
+    popd >/dev/null
 }
 
 _ckbcomp_hook_old() {
