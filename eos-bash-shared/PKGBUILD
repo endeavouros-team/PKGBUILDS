@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.6.8
+pkgver=1.6.9
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -48,6 +48,7 @@ source=(
   $_url/eos-sendlog
   $_url/eos-kbd-set
   $_url/eos-download-wallpapers
+  $_url/eos-send-gpuinfo
 )
 
 sha512sums=('5e4b2a7e8c5e6bf4dfe97637172c77bd72cb08584d1fdf09abd7bef479279ed4fe984f90ab007c7448354307c2783be55ba8c721036859ad2e21cb344bbf274a'
@@ -70,7 +71,8 @@ sha512sums=('5e4b2a7e8c5e6bf4dfe97637172c77bd72cb08584d1fdf09abd7bef479279ed4fe9
             '17c52a50e70bf925ccc985dcfb6be54d13c9caf159208e834d82f64203f2614861d627958aae22a3472da1c2f0d1dc3777f92d350226ef8dbe4809ffe7f298e6'
             '3acb0baea66f1ff4c99368d81b0ca5f32bfc76eaa8844876414b5eee30ec7f501b2293409fd73f6bbbc351a110737bfb2e0a2bc3258e55c54361f98572cf1197'
             'abee90db9af8d5a2a7b3a80151b858cfb31734496bde87b6f8388737e5a7dbdb8cbfea6b884d10df030da76c83af79b7b860b53022580914f53a08dd0231ff56'
-            '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f')
+            '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
+            'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -92,6 +94,7 @@ package() {
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
+  install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
