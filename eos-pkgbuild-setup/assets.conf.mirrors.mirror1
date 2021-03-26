@@ -27,7 +27,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/downgrade
     aur/inxi
     aur/mkinitcpio-openswap
-    aur/paper-icon-theme
+    #aur/paper-icon-theme-git
     aur/polybar
     aur/yay
     akm
@@ -50,6 +50,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer
     nvidia-installer-dkms
     pahis
+    paper-icon-theme
 #    reflector-auto
     reflector-bash-completion
     reflector-simple
@@ -104,6 +105,40 @@ _fetch_that_file() {
         wget -q --timeout=10 -O"$file" "$url"
     fi
 }
+
+__generic_get_pkgname() { local funcname="$1" ; echo "$funcname" | cut -d '_' -f 2 ; }
+
+
+_paper-icon-theme-git_hook() {
+    local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$Pkgname/PKGBUILD
+    local cleanup=""
+    local commits commit
+    local data=$(curl -s https://github.com/snwh/paper-icon-theme)
+
+    commits=$(echo "$data" | grep -B2 " commits$"   | head -n1 | sed 's|[ ]*<strong>\([0-9]*\)</strong>$|\1|')  # 832
+    commit=$( echo "$data" | grep ">Permalink<" | sed 's|.*/tree/\([0-9a-f]*\)".*|\1|')                         # aa3e8af7a1f0831a51fd7e638a4acb077a1e5188
+    commit=${commit::7}                                                                                         # aa3e8af
+
+    cleanup+='    local dir="$srcdir/../$pkgname"\n'
+    cleanup+='    [ -d "$dir" ] && rm -rf "$dir"'
+
+    # Changes:
+    # - remove reference to $srcdir
+    # - get pkgver from github info
+    # - remove pkgver()
+    # - conflicts with paper-icon-theme
+    # - add some cleanup
+
+    sed -i "$Pkgbuild" \
+        -e 's|^pkgname=.*|pkgname=paper-icon-theme|' \
+        -e 's|cd "$srcdir/$pkgname"$|cd "$pkgname"|' \
+        -e "s|^pkgver=.*|pkgver=1.5.0.$commits.$commit|" \
+        -e 's|^pkgver()|_pkgver_not_used()|' \
+        -e "/^provides=(/a \conflicts=(paper-icon-theme)" \
+        -e "/ ninja -C /a \    # cleanup\n$cleanup"
+}
+
 
 _ckbcomp_hook() {
     local tool=ckbcomp
@@ -374,7 +409,7 @@ ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 #ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
-
+#ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
 # Special hooks. Implemented via package hooks.
 
 _assets_download_break() {
