@@ -1,0 +1,58 @@
+#!/bin/bash
+
+_fetch_aur_pkgbuild() {
+    # Fetch PKGBUILD from AUR and change it.
+    # Changes:
+    # - rename to paper-icon-theme
+    # - remove reference to $srcdir
+    # - get pkgver from github info: 1.5.0.$commit_count.$latest_commit
+    # - remove pkgver()
+    # - conflicts with paper-icon-theme
+    # - add some cleanup
+
+    local PKGBUILD_AUR=PKGBUILD.aur
+
+    [ -r $PKGBUILD_AUR ] && return
+
+    #echo "====> Running: ${FUNCNAME}()" >&2
+
+    local addr="https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=paper-icon-theme-git"
+    wget -q --timeout=10 -O $PKGBUILD_AUR "$addr" || return 1
+
+    local sha512="6292b6d4766d99dc8a0306332b77590b9ff23f7bd076f672ba769c3bbda5de9f7dea91b3d44a624c30fbb4f011cde69c03f0e30ee6bff6c65cbd916dd511afca"
+    if (echo "$sha512  $PKGBUILD_AUR" | sha512sum -c >&/dev/null) ; then
+        :
+    else
+        echo "Error: paper-icon-theme-git: PKGBUILD sha512sum failed" >&2
+        return 1
+    fi
+
+    local git=$(grep ^url= $PKGBUILD_AUR | cut -d'=' -f2 | sed 's|^"\(.*\)"$|\1|')
+    local data=$(curl -Lsm 10 $git)
+    if [ -z "$data" ] ; then
+        echo "Error: paper-icon-theme: fetching latest version info from '$git' failed" >&2
+        return 1
+    fi
+    local commits commit
+    commits=$(echo "$data" | grep -B2 " commits$"   | head -n1 | sed 's|[ ]*<strong>\([0-9]*\)</strong>$|\1|')  # 832
+    commit=$( echo "$data" | grep ">Permalink<" | sed 's|.*/tree/\([0-9a-f]*\)".*|\1|')                         # aa3e8af7a1f0831a51fd7e638a4acb077a1e5188
+    commit=${commit::7}                                                                                         # aa3e8af
+
+    local cleanup=""
+    cleanup+='    local dir="$srcdir/../$pkgname"\n'
+    cleanup+='    [ -d "$dir" ] && rm -rf "$dir"'
+
+    sed -i "$PKGBUILD_AUR" \
+        -e 's|^pkgname=.*|pkgname=paper-icon-theme|' \
+        -e 's|cd "$srcdir/$pkgname"$|cd "$pkgname"|' \
+        -e "s|^pkgver=.*|pkgver=1.5.0.$commits.$commit|" \
+        -e 's|^pkgver()|_pkgver_not_used()|' \
+        -e "/^provides=(/a \conflicts=(paper-icon-theme)" \
+        -e "/ ninja -C /a \    # cleanup\n$cleanup"
+
+    source $PKGBUILD_AUR
+    rm -f $PKGBUILD_AUR
+}
+
+_fetch_aur_pkgbuild
+unset -f _fetch_aur_pkgbuild
