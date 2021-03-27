@@ -5,7 +5,7 @@ Main() {
         local country=$(curl -s https://ipinfo.io/country | tr '[:upper:]' '[:lower:]')
         case "$country" in
             de|fi|se)
-                echo "Setting keyboard layout to: $country"
+                echo "Setting keyboard layout to: $country" > /tmp/eos-kbd-set.log
                 setxkbmap $country
                 ;;
         esac
