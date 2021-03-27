@@ -400,8 +400,13 @@ ProgressBar() {         # This function was converted from the work of @Kresimir
     local percent="$2"
     local barlen="$3"
     local c
+    local columns="$COLUMNS"                                # nr of columns on the terminal
+    [ -n "$columns" ] || columns=80                         # guess nr of columns on the terminal
+    local msglen=$((columns - barlen - 9))                  # max space for the msg
+    [ "${#msg}" -gt "$msglen" ] && msg="${msg::$msglen}"    # msg must be truncated
+    [ "${msg: -1}" = ":" ] || msg+=":"                      # make sure a colon is after msg
 
-    printf "\r%-25s %3d%% [" "$msg" $percent >&2
+    printf "\r%-*s %3d%% [" "$msglen" "$msg" $percent >&2
     for ((c = 0; c < $barlen; c++)) ; do
         if (( $c <= $percent * $barlen / 100 )); then
             echo -ne "#" >&2
