@@ -3,7 +3,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.6.9
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -94,7 +94,7 @@ package() {
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
-  install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
+# install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
