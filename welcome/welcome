@@ -40,6 +40,7 @@ export -f eos_yad_WARN
 export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 export -f eos_GetArch
+export -f eos_select_browser
 #################################################################################
 
 export PROG_PACKAGENAME="welcome"
@@ -973,8 +974,8 @@ INSTALL() {
 #      --field=" $(ltr ins_keys)!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
       --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
       --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://endeavouros.com/docs/installation"
-      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/docs/system-rescue"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
+      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -994,11 +995,11 @@ GeneralInfo() {
       --image=dialog-question
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
       --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
-      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/wiki"
-      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/news"
+      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com"
+      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/blog"
       --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
       --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
-      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/docs/applications/welcome"
+      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/endeavouros-tools/welcome"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -1151,15 +1152,15 @@ UsefulTips() {
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$user_info
       --text="<b>$(ltr useful_tips_text)</b>"
-      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
-      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/aur/yay"
-      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network"
-      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=pacman'"
+      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
+      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
+      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/bluetooth'"
   )
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
+      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
-      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
       --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn     "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
       --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
   )
@@ -1350,13 +1351,8 @@ export -f ImportantNews
 
 SetBrowser() {
     local xx
-    for xx in xdg-open exo-open firefox chromium ; do  # use one of these browser commands
-        if [ -x /usr/bin/$xx ] ; then
-            export _WELCOME_BROWSER=/usr/bin/$xx        # for showing external links
-            return
-        fi
-    done
-    DIE "$FUNCNAME: cannot find a browser"
+    [ -n "$_WELCOME_BROWSER" ] && return
+    export _WELCOME_BROWSER="$(eos_select_browser)"
 }
 export -f SetBrowser
 
@@ -1650,7 +1646,7 @@ StartHere() {
     local tr_engine=bing
     local tr_prefer=manual
     local pb_percent=0
-    local show_progress_bar=yes
+    local show_progress_bar=no   # was: yes
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
