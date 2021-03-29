@@ -104,7 +104,7 @@ export -f ltr
 export tr_strings
 export SELECTED_EOS_WELCOME
 
-IsInstalled() { pacman -Q "$1" >& /dev/null ; }
+IsInstalled() { /usr/bin/pacman -Q "$1" >& /dev/null ; }
 export -f IsInstalled
 
 IsInstalling() {
@@ -725,14 +725,19 @@ export -f yad_InitializePacmanMirroring
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="eos_yad --text-info --title="$INSTALL_INSTALLER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd=(
+        eos_yad --text-info --width=600 --height=500 --title="$INSTALL_INSTALLER" --wrap --tail --button=yad-quit:0 --fontname="Mono 10"
+    )
 
     local pkg pkgs=()
     for pkg in "$@" ; do
-        IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg")
+        case "$pkg" in
+            -*) pkgs+=("${pkg:1}") ;;                                    # -$pkg: force install
+            *)  IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg") ;;
+        esac
     done
     test -z "$pkgs" && {
-        echo "$*: $INSTALL_ALREADY" | $yadcmd
+        echo "$*: $INSTALL_ALREADY" | "${yadcmd[@]}"
         return
     }
     while true ; do
@@ -740,7 +745,7 @@ yad_Install() {
         pkexec pacman -S --noconfirm "${pkgs[@]}"
         echo "$INSTALL_DONE"
         break
-    done |& $yadcmd
+    done |& "${yadcmd[@]}"
 }
 export -f yad_Install
 
@@ -752,14 +757,16 @@ yad_Remove() {
     local REMOVING="Removing"
     local NOT_INSTALLED="not installed"
 
-    local yadcmd="eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd=(
+        eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0 --fontname="Mono 10"
+    )
 
     local pkg pkgs=()
     for pkg in "$@" ; do
         IsInstalled "$pkg" >& /dev/null && pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
-        echo "$*: $NOT_INSTALLED" | $yadcmd
+        echo "$*: $NOT_INSTALLED" | "${yadcmd[@]}"
         return
     }
     while true ; do
@@ -767,7 +774,7 @@ yad_Remove() {
         pkexec pacman -Rdd --noconfirm "${pkgs[@]}"
         echo "$INSTALL_DONE"
         break
-    done |& $yadcmd
+    done |& "${yadcmd[@]}"
 }
 export -f yad_Remove
 
@@ -1168,6 +1175,27 @@ UsefulTips() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
+GetPkgVersion() {
+    local repo="$1"
+    local pkg="$2"
+    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
+}
+
+IsEosYadNewerThanInstalled() {
+    local installed_version="$(/usr/bin/pacman -Q yad | awk '{print $2}')"
+    if [ -z "$installed_version" ] ; then
+        return 2                             # yad is not installed
+    fi
+    local eos_version="$(GetPkgVersion endeavouros yad)"
+    local result="$(vercmp "$eos_version" "$installed_version")"
+
+    if [ $result -gt 0 ] ; then
+        return 0                             # eos yad is newer
+    else
+        return 1                             # eos yad is not newer
+    fi
+}
+
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
@@ -1218,6 +1246,11 @@ AddMoreApps() {
         done
         ;;
   esac
+
+  if (IsEosYadNewerThanInstalled) ; then
+      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install endeavouros/yad'")
+  fi
+  
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
@@ -1225,6 +1258,8 @@ AddMoreApps() {
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
   fi
   tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
+  
+  # Now we know if we have any apps in the install list.
 
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
