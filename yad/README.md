@@ -5,9 +5,12 @@ The patch fixes the window height issue of yad forms.
 
 ## How to use this `yad` version
 
-User needs to edit file `/etc/pacman.conf` (with sudo or as root) and move the `[endeavouros]` repository specification as the first repository in the file.
+There are many alternative ways:
+1. command `sudo pacman -S endeavouros/yad`
+2. in Welcome app, `Add More Apps` tab, button **Yad (patched)**
+3. (not really recommended) edit file `/etc/pacman.conf` (with sudo or as root) and move the `[endeavouros]` repository specification as the first repository in the file.
 
-## Example `/etc/pacman.conf`
+## Example: editing `/etc/pacman.conf`
 
 ### Before
 ```
