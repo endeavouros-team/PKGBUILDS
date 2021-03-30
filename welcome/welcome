@@ -728,12 +728,12 @@ yad_Install() {
     local yadcmd=(
         eos_yad --text-info --width=600 --height=500 --title="$INSTALL_INSTALLER" --wrap --tail --button=yad-quit:0 --fontname="Mono 10"
     )
-
     local pkg pkgs=()
+
     for pkg in "$@" ; do
         case "$pkg" in
-            -*) pkgs+=("${pkg:1}") ;;                                    # -$pkg: force install
-            *)  IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg") ;;
+            */*) pkgs+=("$pkg") ;;                                    # $repo/$pkg: force install
+            *)   IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg") ;;
         esac
     done
     test -z "$pkgs" && {
