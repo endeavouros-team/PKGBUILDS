@@ -531,6 +531,7 @@ RunPostHooks()
 
 WantAurDiffs() {
     local xx="$1"
+    local pkgdirname="$2"
     local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/?h=$pkgdirname&context=1"
 #   local diff_url="https://aur.archlinux.org/cgit/aur.git/commit/?h=$pkgdirname&context=1"
 #   local browser=/usr/bin/xdg-open   # firefox by default
@@ -552,6 +553,7 @@ WantAurDiffs() {
                 case "$xx" in
                     aur/*)
                         AUR_DIFFS+=("$diff_url")
+                        AUR_DIFF_PKGS+=("$pkgdirname")
                         #$browser "$diff_url" >& /dev/null
                         ;;
                 esac
@@ -573,15 +575,20 @@ Browser() {
 }
 
 ShowAurDiffs() {
-    if [ -d "$ASSETSDIR/AUR/$pkgdirname/.git" ] ; then
-        # If we have git source code available, then check diffs from that!
-        Pushd "$ASSETSDIR/AUR/$pkgdirname"
-        git pull >& /dev/null
-        gitk
-        Popd
-    else
-        Browser "${AUR_DIFFS[@]}" >& /dev/null   # xdg-open does not stop here...
-    fi
+    # If we have git source code available, then check diffs from that!
+    local xx ix
+
+    for ((ix=0; ix < ${#AUR_DIFFS[@]}; ix++)) ; do
+        xx="${AUR_DIFF_PKGS[$ix]}"
+        if [ -d "$ASSETSDIR/AUR/$xx/.git" ] ; then
+            Pushd "$ASSETSDIR/AUR/$xx"
+            git pull >& /dev/null
+            /usr/bin/gitk                              # gitk stops here
+            Popd
+        else
+            Browser "${AUR_DIFFS[$ix]}" >& /dev/null   # xdg-open does not stop here...
+        fi
+    done
 }
 
 Exit()
@@ -684,6 +691,7 @@ Main2()
     local use_filelist               # yes or no
     local ask_timeout=60
     local AUR_DIFFS=()
+    local AUR_DIFF_PKGS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
 
@@ -772,7 +780,7 @@ Main2()
         oldv["$pkgdirname"]="$tmpcurr"
         if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
             echo2 "update pending from $tmpcurr to $tmp"
-            WantAurDiffs "$xx"
+            WantAurDiffs "$xx" "$pkgdirname"
         else
             echo2 "OK ($tmpcurr)"
         fi
