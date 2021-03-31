@@ -1,8 +1,11 @@
 # eos-sendlog
 
-Sends a text file to pastebin, and saves the returned URL to **~/.config/eos-sendlog.txt**.
+Sends a (text) file from standard input to pastebin, and saves the returned URL<br>
+to **~/.config/eos-sendlog.txt**.
 
-## Example
+
+## Examples
 ```
 cat log.txt | eos-sendlog
+lspci-vnn | eos-sendlog
 ```
