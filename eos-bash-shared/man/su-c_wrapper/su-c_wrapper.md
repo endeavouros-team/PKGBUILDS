@@ -3,7 +3,7 @@
 A small utility to perform command "su -c" with slightly easier syntax.<br>
 Useful e.g. for users without sudoers rights.
 
-## Synposis
+## Synopsis
 
 ```
 su-c_wrapper <command-and-parameters>
