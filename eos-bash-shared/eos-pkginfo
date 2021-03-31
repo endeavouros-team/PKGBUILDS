@@ -16,6 +16,22 @@ Helper() {
 }
 
 FindUrl() {
+    # If $PKGNAME is not a package, then assume it is a file of an installed package and find the package name.
+
+    if (! /usr/bin/$HELPER -Q "$PKGNAME" >& /dev/null) ; then
+        if (! /usr/bin/$HELPER -Si "$PKGNAME" >& /dev/null) ; then
+            local item fail=no
+            case "${PKGNAME::1}" in
+                "/") item="$PKGNAME" ;;            # file name
+                *)   item="/usr/bin/$PKGNAME" ;;   # program name
+            esac
+            if [ -r "$item" ] ; then
+                PKGNAME="$(LANG=C /usr/bin/$HELPER -Qo "$item" 2>/dev/null | awk '{print $(NF-1)}')"
+                [ -z "$PKGNAME" ] && DIE "given name '$PKGNAME' does not refer to a package or an installed file."
+            fi
+        fi
+    fi
+
     PKGINFO="$(LANG=C $HELPER -Qi "$PKGNAME" 2>/dev/null)"
     if [ -z "$PKGINFO" ] ; then
         PKGINFO="$(LANG=C $HELPER -Si "$PKGNAME" 2>/dev/null)"
@@ -23,28 +39,50 @@ FindUrl() {
     [ -n "$PKGINFO" ] || DIE "package '$PKGNAME' not found"
 }
 
+IsEndeavourOSpkg() {
+    local pkg="$1"
+    local eos_pkg
+    local eos_pkgs
+
+    readarray -t eos_pkgs <<< $(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
+
+    for eos_pkg in "${eos_pkgs[@]}" ; do
+        if [ "$pkg" = "$eos_pkg" ] ; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 OpenUrl() {
     local url="$(echo "$PKGINFO" | /usr/bin/grep ^URL | /usr/bin/head -n1 | /usr/bin/awk '{print $NF}')"
     case "$url" in
-        http*)
-            echo "$url ..." >&2
-            case "$url" in
-                https://*) ;;
-                http://*)  read -p "Change http to https (Y/n)? " >&2
-                           case "$REPLY" in
-                               ""|[yY]*) url="${url/http:/https:}" ;;
-                           esac
-                           ;;
+        https://*) ;;
+        http://*)
+            read -p "Change $url to https based (Y/n)? " >&2
+            case "$REPLY" in
+                ""|[yY]*) url="${url/http:/https:}" ;;
             esac
             ;;
         "") DIE "URL for package '$PKGNAME' not found" ;;
         *)  DIE "unsupported URL '$url'" ;;
     esac
+    # PKGNAME and PKGNAME_ARG may be different. Then PKGNAME_ARG is a program name,
+    # and it may have a special man page.
+    if [ "$PKGNAME" != "$PKGNAME_ARG" ] ; then
+        if (IsEndeavourOSpkg "$PKGNAME") ; then
+            if (wget -q -O /tmp/$PKGNAME_ARG.md "$url"/man/$PKGNAME_ARG/$PKGNAME_ARG.md) ; then
+                url="$url"/man/$PKGNAME_ARG/$PKGNAME_ARG.md
+            fi
+        fi
+    fi
+    echo "$url" >&2
     $BROWSER "$url" >& /dev/null
 }
 
 Options() {
     PKGNAME=""
+    PKGNAME_ARG=""
 
     local arg
 
@@ -58,22 +96,7 @@ Options() {
 
     [ -n "$PKGNAME" ] || DIE "give package-name"
 
-    # If $PKGNAME is not a package, then assume it is a file of an installed package and find the package name.
-
-    if (! /usr/bin/$HELPER -Q "$PKGNAME" >& /dev/null) ; then
-        if (! /usr/bin/$HELPER -Si "$PKGNAME" >& /dev/null) ; then
-            local item fail=no
-            case "${PKGNAME::1}" in
-                "/") item="$PKGNAME" ;;            # file name
-                *)   item="/usr/bin/$PKGNAME" ;;   # program name
-            esac
-            if [ -r "$item" ] ; then
-                PKGNAME="$(LANG=C /usr/bin/$HELPER -Qo "$item" 2>/dev/null | awk '{print $(NF-1)}')"
-                [ -n "$PKGNAME" ] && return
-            fi
-            DIE "given name '$PKGNAME' does not refer to a package or an installed file."
-        fi
-    fi
+    PKGNAME_ARG="$PKGNAME"
 }
 
 Usage() {
@@ -89,6 +112,7 @@ Main()
 {
     local PROGNAME="$(/usr/bin/basename "$0")"
     local PKGNAME
+    local PKGNAME_ARG
     local HELPER
     local PKGINFO
     local BROWSER=/usr/bin/xdg-open

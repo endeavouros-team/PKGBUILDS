@@ -4,7 +4,7 @@ Sets the wallpaper from the given file, or lets user to select it from the given
 
 ## Synopsis
 ```
-eos-wallpaper-set [name \| file \| folder]
+eos-wallpaper-set [name | file | folder]
 ```
 
 ## Parameters

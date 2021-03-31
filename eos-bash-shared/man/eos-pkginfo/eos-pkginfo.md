@@ -6,7 +6,7 @@ Supports bash conpletion for file names. Note that for AUR packages completion i
 
 ## Synopsis
 ```
-eos-pkginfo [options] {<package-name> \| <program-name> \| <file path>`}
+eos-pkginfo [options] {<package-name> | <program-name> | <file path>`}
 ```
 
 ## Options
