@@ -2,7 +2,7 @@
 
 Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.
 
-Supports bash conpletion for file names. Note that for AUR packages completion is not supported.
+Supports bash completion for file names. Note that for AUR packages completion is not supported.
 
 ## Synopsis
 ```
