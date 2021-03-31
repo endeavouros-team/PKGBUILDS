@@ -54,6 +54,17 @@ IsEndeavourOSpkg() {
     return 1
 }
 
+Url2FileUrl() {
+    # https://github.com/endeavouros-team/PKGBUILDS/tree/master/eos-bash-shared
+    # to
+    # https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-bash-shared/man/$PKGNAME_ARG/$PKGNAME_ARG.md
+    local url="$1"
+    local appname="$2"
+
+    hlink="$(echo "$url" | sed -e 's|/github.com/|/raw.githubusercontent.com/|' -e 's|/tree/master/|/master/|')"
+    hlink+="/man/$appname/$appname.md"
+}
+
 OpenUrl() {
     local url="$(echo "$PKGINFO" | /usr/bin/grep ^URL | /usr/bin/head -n1 | /usr/bin/awk '{print $NF}')"
     case "$url" in
@@ -71,7 +82,9 @@ OpenUrl() {
     # and it may have a special man page.
     if [ "$PKGNAME" != "$PKGNAME_ARG" ] ; then
         if (IsEndeavourOSpkg "$PKGNAME") ; then
-            if (wget -q -O /tmp/$PKGNAME_ARG.md "$url"/man/$PKGNAME_ARG/$PKGNAME_ARG.md) ; then
+            local hlink="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$PKGNAME/man/$PKGNAME_ARG/$PKGNAME_ARG.md"
+            Url2FileUrl "$url" "$PKGNAME_ARG"
+            if (wget -q --timeout=5 -O /tmp/$PKGNAME_ARG.md "$hlink") ; then
                 url="$url"/man/$PKGNAME_ARG/$PKGNAME_ARG.md
             fi
         fi
