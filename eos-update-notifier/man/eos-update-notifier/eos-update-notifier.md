@@ -4,7 +4,7 @@ Checks the availability of package updates (EndeavourOS, Arch, and AUR), and off
 
 ## Synopsis
 ```
-eos-udpate-notifier [options]
+eos-update-notifier [options]
 ```
 ## Options
 ```

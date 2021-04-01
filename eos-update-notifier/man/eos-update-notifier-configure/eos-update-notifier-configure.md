@@ -1,4 +1,4 @@
-# eos-udpate-notifier-configure
+# eos-update-notifier-configure
 
 Manages and configures certain features of `eos-update-notifier` with a small GUI.
 
@@ -8,7 +8,7 @@ Manages and configures certain features of `eos-update-notifier` with a small GU
 
 ## Synopsis
 ```
-eos-udpate-notifier-configure
+eos-update-notifier-configure
 ```
 ## Tips
 Variable `EOS_SUDO_EDITORS` in configuration file
