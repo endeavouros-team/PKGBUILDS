@@ -9,7 +9,7 @@ Supports bash completion for
 - package names
 - full paths
 
-but (currently) not command names without full path.
+but (currently) bash completion is not supported command names without full path.
 
 Note that, for performance reasons, completion of the AUR packages is supported with a different command name, `eos-pkginfo-aur` (which can be a made symlink to `eos-pkginfo`, see the **Tips** below).
 
