@@ -44,7 +44,7 @@ IsEndeavourOSpkg() {
     local eos_pkg
     local eos_pkgs
 
-    readarray -t eos_pkgs <<< $(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
+    readarray -t eos_pkgs <<< $(/usr/bin/pacman -Slq endeavouros)
 
     for eos_pkg in "${eos_pkgs[@]}" ; do
         if [ "$pkg" = "$eos_pkg" ] ; then
@@ -54,15 +54,32 @@ IsEndeavourOSpkg() {
     return 1
 }
 
-Url2FileUrl() {
-    # https://github.com/endeavouros-team/PKGBUILDS/tree/master/eos-bash-shared
-    # to
-    # https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-bash-shared/man/$PKGNAME_ARG/$PKGNAME_ARG.md
-    local url="$1"
-    local appname="$2"
+FixUrl() {
+    # PKGNAME and PKGNAME_ARG may be different. Then PKGNAME_ARG is a program name,
+    # and it may have a special man page.
 
-    hlink="$(echo "$url" | sed -e 's|/github.com/|/raw.githubusercontent.com/|' -e 's|/tree/master/|/master/|')"
-    hlink+="/man/$appname/$appname.md"
+    IsEndeavourOSpkg "$PKGNAME" || return
+
+    # if pkg has several apps, or pkgname is also a special app:
+    # Here we handle EndeavourOS packages only.
+
+    # Change https://github.com/endeavouros-team/PKGBUILDS/tree/master/eos-bash-shared
+    # to https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/eos-bash-shared/man/$PKGNAME_ARG/$PKGNAME_ARG.md
+
+    local man="$(echo "$url" | sed -e 's|/github.com/|/raw.githubusercontent.com/|' -e 's|/tree/master/|/master/|')"
+    local man_add
+
+    case "$PKGNAME_ARG" in
+        eos-welcome | $PKGNAME)
+            man_add="/man/$PKGNAME/$PKGNAME.md"              # symlink at github doesn't work!
+            ;;
+        *)  man_add="/man/$PKGNAME_ARG/$PKGNAME_ARG.md"
+            ;;
+    esac
+    man+="$man_add"
+    if (wget -q --timeout=5 -O /dev/null "$man") ; then
+        url+="$man_add"
+    fi
 }
 
 OpenUrl() {
@@ -78,17 +95,9 @@ OpenUrl() {
         "") DIE "URL for package '$PKGNAME' not found" ;;
         *)  DIE "unsupported URL '$url'" ;;
     esac
-    # PKGNAME and PKGNAME_ARG may be different. Then PKGNAME_ARG is a program name,
-    # and it may have a special man page.
-    if [ "$PKGNAME" != "$PKGNAME_ARG" ] ; then
-        if (IsEndeavourOSpkg "$PKGNAME") ; then
-            local hlink="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$PKGNAME/man/$PKGNAME_ARG/$PKGNAME_ARG.md"
-            Url2FileUrl "$url" "$PKGNAME_ARG"
-            if (wget -q --timeout=5 -O /tmp/$PKGNAME_ARG.md "$hlink") ; then
-                url="$url"/man/$PKGNAME_ARG/$PKGNAME_ARG.md
-            fi
-        fi
-    fi
+
+    FixUrl
+
     #echo "$url" >&2
     $BROWSER "$url" >& /dev/null
 }
@@ -113,7 +122,7 @@ Options() {
 }
 
 Usage() {
-    cat <<EOF
+    cat <<EOF >&2
 Usage: $PROGNAME <name>
   <name>   A package name, program name, or a file path included in a package.
            Given program name or file path must exist in the current system.
