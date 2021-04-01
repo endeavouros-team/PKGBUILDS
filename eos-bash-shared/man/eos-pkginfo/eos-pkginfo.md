@@ -39,3 +39,13 @@ sudo ln -s /usr/bin/eos-pkginfo /usr/bin/eos-pkginfo-aur
 alias pkgi-aur=eos-pkginfo-aur
 complete -F _eos-pkginfo_aur pkgi-aur
 ```
+To include EndeavourOS packages and commands as a "part" of the `man` command, write the following function into your `~/.bashrc`:
+```
+man() {
+    /usr/bin/man "$@" 2>/dev/null || \
+        /usr/bin/eos-pkginfo "$@" 2>/dev/null || \
+        echo "No manual entry for $*"
+}
+```
+This works like `man` for Arch and AUR manual entries, and adds `eos-pkginfo` for the EndeavourOS entries.<br>
+Note that this may affect the usage of the `man` command in special cases, so consider using another name like `hlp` instead of `man`.
