@@ -16,6 +16,7 @@ Usage: $progname [options] [operation] [package]
 
     options:       -h | --help       This help.
                    --no-pkgchk       Do not pre-check the existence of the given package.
+                   --no-pager        Do not use a pager for the output.
                    --everything
                    -everything       Show all contents of pacman.log. Lots of material!
 
@@ -84,6 +85,9 @@ Main()
             --no-pkgchk)  # useful for packages that existed but no more!
                 pkgchk=0
                 ;;
+            --no-pager)
+                pager=""
+                ;;
             --everything | -everything)
                 everything=yes
                 ;;
@@ -102,7 +106,7 @@ Main()
     else
         if [ -n "$pkg" ] ; then
             if [ $pkgchk -eq 1 ] ; then
-                pacman -Si "$pkg" >& /dev/null || DIE "package '$pkg' does not exist."
+                yay -Si "$pkg" >& /dev/null || DIE "package '$pkg' does not exist."
             fi
             if [ -n "$op" ] ; then
                 case "$op" in
@@ -130,7 +134,11 @@ Main()
 
 
     if [ -n "$output" ] ; then
-        echo "$output" | tac | $pager
+        if [ -n "$pager" ] ; then
+            echo "$output" | tac | $pager
+        else
+            echo "$output" | tac
+        fi
     else
         echo "Requested info is not available."
         echo "Probable reasons:"
