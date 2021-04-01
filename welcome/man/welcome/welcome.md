@@ -103,3 +103,6 @@ eos-welcome --pkglist=https://github.com/<path-to-your-pkglist-file> &
 nano ~/user_pkglist.txt       # add some package names
 eos-welcome &
 ```
+## See also
+
+https://discovery.endeavouros.com/endeavouros-tools/welcome
