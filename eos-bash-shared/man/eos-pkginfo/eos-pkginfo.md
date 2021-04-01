@@ -2,7 +2,16 @@
 
 Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.
 
-Supports bash completion for file names. Note that for AUR packages completion is not supported.
+Note: EndeavourOS specific manual pages exist at the EndeavourOS pages (currently at github), and are shown from there.<br>
+Other manual pages are shown from their respective site.
+
+Supports bash completion for
+- package names
+- full paths
+
+but not e.g. commands without full path.
+
+Note that, for performance reasons, completion of the AUR packages is supported with a different command name, `eos-pkginfo-aur` (which can be a made symlink to `eos-pkginfo`, see the **Tips** below).
 
 ## Synopsis
 ```
