@@ -1,6 +1,10 @@
 # welcome
 
-Welcome is an application that helps users with useful tools and links for system management, customization, getting information, and more.
+Welcome is an application that helps users by providing
+- tools for system management and customization
+- links for additional information
+
+and more.
 
 Welcome has two main uses:
 - helps in the install phase
@@ -41,7 +45,7 @@ eos-welcome [options]
 
 To have Welcome app started when you log in, make sure
 - Welcome app is selected in the Autostart feature of the DE<br>
-    OR
+    or
 - `Hidden=false` is set in file `/etc/xdg/autostart/welcome.desktop`
 
 On DEs that do not work well with system's *Autostart* feature, you may also disable the Welcome app from the app itself
