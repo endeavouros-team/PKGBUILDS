@@ -82,7 +82,7 @@ If the extracted value is not supported by Welcome, English will be used.
 ### Software news
 
 Welcome app window includes a button **Software News** on the lower left corner.<br>
-It contains useful and important news about the EndeavourOS software, e.g. manual interventions or important code changes.
+It contains useful and important news for the user about the EndeavourOS software, e.g. manual interventions or important code changes.
 
 Make sure you click that button regularly!
 
