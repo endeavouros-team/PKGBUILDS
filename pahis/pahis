@@ -42,7 +42,7 @@ EOF
 
 Main()
 {
-    local op
+    local op=""
     local pkg
     local output
     local line
@@ -143,9 +143,10 @@ Main()
         echo "Requested info is not available."
         echo "Probable reasons:"
         echo "  - '$pkg' was never installed"
-        if [ "$op" != "installed" ] ; then
-            echo "  - '$pkg' was never $op"
-        fi
+        case "$op" in
+            "" | installed) ;;
+            *) echo "  - '$pkg' was never $op" ;;
+        esac
         echo "  - '$pkg' was installed while installing the system"
     fi
 }
