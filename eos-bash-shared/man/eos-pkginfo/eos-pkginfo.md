@@ -9,7 +9,7 @@ Supports bash completion for
 - package names
 - full paths
 
-but not e.g. commands without full path.
+but (currently) not command names without full path.
 
 Note that, for performance reasons, completion of the AUR packages is supported with a different command name, `eos-pkginfo-aur` (which can be a made symlink to `eos-pkginfo`, see the **Tips** below).
 
@@ -48,13 +48,20 @@ sudo ln -s /usr/bin/eos-pkginfo /usr/bin/eos-pkginfo-aur
 alias pkgi-aur=eos-pkginfo-aur
 complete -F _eos-pkginfo_aur pkgi-aur
 ```
-To include EndeavourOS packages and commands as a "part" of the `man` command, write the following function into your `~/.bashrc`:
+To support something similar to manual pages, write the following function into your `~/.bashrc`:
 ```
-man() {
+hlp() {
     /usr/bin/man "$@" 2>/dev/null || \
         /usr/bin/eos-pkginfo "$@" 2>/dev/null || \
         echo "No manual entry for $*"
 }
+
+# add bash completion support:
+complete -F _eos-pkginfo_ hlp
 ```
-This works like `man` for Arch and AUR manual entries, and adds `eos-pkginfo` for the EndeavourOS entries.<br>
-Note that this may affect the usage of the `man` command in special cases, so consider using another name like `hlp` instead of `man`.
+
+With this definition `hlp` works like `man` for Arch and AUR manual page entries, and supports EndeavourOS manual page entries via `eos-pkginfo`:
+```
+hlp ls
+hlp eos-pkginfo
+```
