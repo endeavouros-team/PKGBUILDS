@@ -200,7 +200,7 @@ Main()
         *) DIE "must run this program at an architecture specific folder (e.g. repo/endeavouros/x86_64)." ;;
     esac
     case "$(grep "/endeavouros-team/" ../../.git/config)" in
-        *https://github.com/endeavouros-team/repo) ;;
+        *https://github.com/endeavouros-team/repo.git) ;;
         *) DIE "this folder is not in endeavouros-team repo" ;;
     esac
 
