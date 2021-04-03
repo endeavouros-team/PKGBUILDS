@@ -24,7 +24,7 @@ _prepare_eos() {
     local prepare=""
     prepare+='prepare() {\n'
     prepare+='    cd ${_pkgname}-${pkgver}\n'
-    prepare+='    find common -type f -exec sed -i "s/5[cC]616[cC]/111521/gI" {} \\\;\n'
+    prepare+='    find common -type f -exec sed -i "s/5c616c/111521/gI" {} \\\;\n'
     prepare+='}\n'
     
     sed -i PKGBUILD.orig \
