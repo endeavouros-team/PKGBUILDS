@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+# Latest arc-gtk-theme release with a color patch.
+
+################## Fetch and source the upstream PKGBUILD:
+
+_prepare_eos() {
+    local _pkgname_orig=arc-gtk-theme
+
+    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD || exit 1
+    if [ -n "$(grep -w "^prepare" PKGBUILD.orig)" ] ; then
+        echo "Error: upstream $_pkgname_orig PKGBUILD has function 'prepare'!!" >&2
+        exit 1
+    fi
+
+    # Modifications to the original PKGBUILD:
+    # - add prepare()
+    # - change pkgname
+    # - change package_$pkgname() accordingly
+    # - remove package_arc-solid-gtk-theme() (maybe not have to remove)
+
+    local prepare=""
+    prepare+='prepare() {\n'
+    prepare+='    cd ${_pkgname}-${pkgver}\n'
+    prepare+='    find common -type f -exec sed -i "s/5[cC]616[cC]/111521/gI" {} \\\;\n'
+    prepare+='}\n'
+    
+    sed -i PKGBUILD.orig \
+        -e "/^build(/i \ \n$prepare" \
+        -e "s|^pkgname=.*|pkgname=(arc-gtk-theme-eos)|" \
+        -e 's|^package_arc-gtk-theme(|package_arc-gtk-theme-eos(|' \
+        -e '/^package_arc-gtk-theme/a \ \n    conflicts=(arc-gtk-theme)'
+
+#        -e '/^package_arc-solid/i \ \nif [ 0 -eq 1 ] ; then'
+#    echo "fi" >> PKGBUILD.orig
+}
+_prepare_eos
+
+source PKGBUILD.orig
+
+rm -f PKGBUILD.orig
