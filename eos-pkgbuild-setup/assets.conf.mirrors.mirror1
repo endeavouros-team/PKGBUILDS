@@ -30,6 +30,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     #aur/paper-icon-theme-git
     aur/polybar
     aur/yay
+    arc-gtk-theme-eos
     akm
     ckbcomp
     endeavouros-keyring
