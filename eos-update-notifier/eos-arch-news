@@ -90,7 +90,7 @@ EOF
 Main() {
     local progname="$(basename "$0")"
     local latestfile="$HOME/.config/EOS-arch-news.conf"
-    local url=https://www.archlinux.org/news
+    local url=https://archlinux.org/news
     local arg stop=no
     local keep_quiet=no
     local dates
