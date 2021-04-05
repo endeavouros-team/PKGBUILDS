@@ -31,7 +31,10 @@ _prepare_arc-gtk-theme-eos() {
 
     ################## more PKGBUILD additions:
     # - change the url to help with the manual page
+    # - change pkgrel because of url change
     # - add prepare()
+
+    pkgrel+=".1"
 
     url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
     prepare() {
