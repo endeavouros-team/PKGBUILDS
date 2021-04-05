@@ -7,5 +7,5 @@ to **~/.config/eos-sendlog.txt**.
 ## Examples
 ```
 cat log.txt | eos-sendlog
-lspci-vnn | eos-sendlog
+lspci -vnn | eos-sendlog
 ```

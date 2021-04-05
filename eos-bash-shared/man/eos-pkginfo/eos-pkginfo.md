@@ -3,7 +3,7 @@
 Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.
 
 Note: EndeavourOS specific manual pages exist at the EndeavourOS pages (currently at github), and are shown from there.<br>
-Other manual pages are shown from their respective site.
+Other manual pages are shown from their respective sites.
 
 Supports bash completion for
 - package names
@@ -15,7 +15,7 @@ Note that, for performance reasons, completion of the AUR packages is supported 
 
 ## Synopsis
 ```
-eos-pkginfo [options] {<package-name> | <program-name> | <file path>`}
+eos-pkginfo [options] {<package-name> | <program-name> | <file path>}
 ```
 
 ## Options
