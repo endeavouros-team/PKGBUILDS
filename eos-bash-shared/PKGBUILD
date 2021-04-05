@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.6.14
+pkgver=1.6.15
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -67,7 +67,7 @@ sha512sums=('cc135f0d71f2b0da3a5eac3f0d84ea97a4a9e6c4c594fde466f05b550c794ba25be
             '72ecda87cdb5da48cffac044da572ed66027737afe5000339aa3b28b922bf9564761d2c6abf43c3082030b30d8353b6d13a4c567f0b4b959dc3741c309916171'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '5d8e106252962eb1627813e2bf46dece99cddf13f5b243198bc10b8e8e5cb3ee69c1aa060c58da4be94761df4ff5963d8c694a24ee8388ce0fcf29a3c2f1313c'
-            'd4a3786d5a6f0defcbaa463ab1cfb7f96faaad1040ab0ff6929b95a0193f4f2a62de5d70f35470bc66e04a994d094340dfb1ffe7502dda90a11c8a9703302261'
+            '032774b2ecff80a7759f6e091a68204a492453e2023672ad74ff51b0ac14cf523708db07a1f8739cfbd11524fc7fa82735242d0c0110b70a8e35a0dea6c32992'
             '1d938d2c29b6302ca48cffa6b1cdef583fa89117a9bd9f46eb02b0f9ca1cd7d00da4a8c3dc0c05b310391f2e5dcf6bf9cbbdd564e63d7b28900af3c46dc30cf4'
             '3acb0baea66f1ff4c99368d81b0ca5f32bfc76eaa8844876414b5eee30ec7f501b2293409fd73f6bbbc351a110737bfb2e0a2bc3258e55c54361f98572cf1197'
             '5e7daaf9f13785958ab944a0a3254f658cd485462a0921da850c73e87db548567c6c2b3068893b905ff318910e534459f3440faebca06b49c5da5b4efd42a308'
@@ -101,5 +101,5 @@ package() {
   install -Dm755 eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo
   install -Dm644 eos-pkginfo.completion         $pkgdir/usr/share/bash-completion/completions/eos-pkginfo
 
-  ln -s /usr/bin/eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo-noaur
+  ln -s /usr/bin/eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo-aur
 }
