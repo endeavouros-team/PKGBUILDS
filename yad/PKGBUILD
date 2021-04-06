@@ -32,7 +32,7 @@ depends=($(for _xx in "${depends[@]}" ; do [ "$_xx" != "gtkspell3" ] && echo "$_
 # Add architectures
 arch+=(aarch64 armv7h)
 
-sha256sums=('288142d338c055d3839083d8146c6f270bd5a17f78ff9cd2a3c41a8cf31a0e92')
+sha256sums=('32f76fe5d68327b2dc1549c85cac6322086defca8a53a5466ffd0e2913856124')
 
 # The patch
 prepare() {
