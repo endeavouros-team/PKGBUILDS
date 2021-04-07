@@ -57,5 +57,3 @@ _yad-eos_prepare() {
 
 _yad-eos_prepare
 unset -f _yad-eos_prepare
-
-sha256sums=('32f76fe5d68327b2dc1549c85cac6322086defca8a53a5466ffd0e2913856124')
