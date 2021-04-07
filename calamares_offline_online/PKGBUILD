@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.34
-pkgrel=10
+pkgver=3.2.38.1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -165,9 +165,8 @@ prepare() {
     -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
+    #sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
     sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
-
-    sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
 
     sed -i "s?nonempty:?#nonempty:?" $_reponame/src/modules/users/users.conf
     sed -i "s?maxLength:?#maxLength:?" $_reponame/src/modules/users/users.conf
@@ -175,11 +174,11 @@ prepare() {
 
     sed -i "s?minLength:.*?minLength: 1?"  $_reponame/src/modules/users/users.conf
     sed -i "s?- minlen=0?#- minlen=0?" $_reponame/src/modules/users/users.conf 
-    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf   
-    
+    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf
+
     # set ESP partition size to recommended 512MB
     sed -i "s?# efiSystemPartitionSize:     300M?efiSystemPartitionSize:     512M?" $_reponame/src/modules/partition/partition.conf
-    
+ 
     echo -e "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     
     # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
