@@ -56,7 +56,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     reflector-bash-completion
     reflector-simple
     welcome
-    yad
+    #yad
+    yad-eos
 )
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
