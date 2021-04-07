@@ -1192,7 +1192,13 @@ IsEosYadInstalled() {
         yad-eos | "")
             return 0 ;;       # yad-eos is installed, or no yad alternative is installed
         *)
-            return 1 ;;       # some other yad alternative is installed
+            # some other yad alternative is installed
+            if (/usr/bin/pacman -Si yad-eos >& /dev/null) ; then
+                return 1  # yad-eos is available
+            else
+                return 0  # yad-eos is not available
+            fi
+            ;;
     esac
 }
 
