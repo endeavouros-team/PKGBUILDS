@@ -1177,25 +1177,23 @@ UsefulTips() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
-GetPkgVersion() {
-    local repo="$1"
-    local pkg="$2"
-    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
-}
+#GetPkgVersion() {
+#    local repo="$1"
+#    local pkg="$2"
+#    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
+#}
 
-IsEosYadNewerThanInstalled() {
-    local installed_version="$(/usr/bin/pacman -Q yad | awk '{print $2}')"
-    if [ -z "$installed_version" ] ; then
-        return 2                             # yad is not installed
-    fi
-    local eos_version="$(GetPkgVersion endeavouros yad)"
-    local result="$(vercmp "$eos_version" "$installed_version")"
+IsEosYadInstalled() {
+    # Determines if a patched EOS version of yad is installed.
 
-    if [ $result -gt 0 ] ; then
-        return 0                             # eos yad is newer
-    else
-        return 1                             # eos yad is not newer
-    fi
+    local installed_yad="$(LANG=C /usr/bin/pacman -Qi yad 2>/dev/null | /usr/bin/grep -w ^Name | /usr/bin/awk '{print $3}')"
+
+    case "$installed_yad" in
+        yad-eos | "")
+            return 0 ;;       # yad-eos is installed, or no yad alternative is installed
+        *)
+            return 1 ;;       # some other yad alternative is installed
+    esac
 }
 
 AddMoreApps() {
@@ -1249,8 +1247,8 @@ AddMoreApps() {
         ;;
   esac
 
-  if (IsEosYadNewerThanInstalled) ; then
-      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install endeavouros/yad'")
+  if (! IsEosYadInstalled) ; then
+      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install yad-eos'")
   fi
   
   # General app browsing buttons:
