@@ -270,3 +270,15 @@ _tr_add2 updt_press_enter         "Press ENTER to close this window"
 
 # 2020-Dec-11:
 _tr_add2 after_install_pacdiff_tip "Manage pacnew, pacorig $_and pacsave files with pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Configure"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Download more EndeavourOS wallpapers"
+_tr_add2 after_install_more_wall_tip  "Download EndeavourOS legacy and community wallpapers"
+_tr_add2 after_install_info           "information"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Software News"
+_tr_add2 butt_softnews_tip            "Important news about EndeavourOS software"
+
+_tr_add2 install_community            "Install community editions"
+_tr_add2 install_community_tip        "Community editions: Sway, Bspwm (note: online required)"
