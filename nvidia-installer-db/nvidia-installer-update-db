@@ -92,6 +92,8 @@ Options() {
                 show_additional_info_debug=yes ;;
             --tmpdb)
                 targetdir="/tmp" ;;
+            --here)
+                targetdir="." ;;
             -*)
                 DIE "unsupported option '$arg'" ;;
             *)
@@ -203,6 +205,23 @@ CreateNvidiaDb()
     fi
 
     # Now save the data into the local database.
+
+    case "$targetdir" in
+        .)
+            # save to current working folder
+            for xx in $target_latest $target_legacy ; do
+                if [ -r $xx ] ; then
+                    rm -f $xx
+                else
+                    WARN "$xx does not exist."
+                fi
+            done
+            mv $tmpfile1 $target_latest
+            mv $tmpfile2 $target_legacy
+            chmod 0644 $target_latest $target_legacy
+            return
+            ;;
+    esac
 
     sudo_commands+=" ; mkdir -p $targetdir"
     sudo_commands+=" ; if [ ! -d $bakdir ] ; then mkdir -p $bakdir ; cp -a $targetdir/*.ids $bakdir >& /dev/null ; fi"

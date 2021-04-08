@@ -1,40 +1,40 @@
+#!/bin/bash
+
 # Original Maintainer: Gustau Castells <karasu@antergos.com>
 # Initial Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
-pkgver=2.4.19
+pkgver=2.4.20
 pkgrel=1
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+_url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 arch=('any')
 license=('GPL2')
 
 source=(
-  $_url/nvidia-installer-update-db
-  $_url/nvidia-installer-check
-  $_url/amdgpu_exp.ids
-  $_url/amdgpu.ids
-  $_url/ati.ids
-  $_url/catalyst.ids
-#  $_url/nvidia-390xx.ids
-  $_url/nvidia.ids
+    $_url/nvidia-installer-update-db
+    $_url/nvidia-installer-check
+    $_url/amdgpu_exp.ids
+    $_url/amdgpu.ids
+    $_url/ati.ids
+    $_url/catalyst.ids
+    $_url/nvidia.ids
 )
-sha256sums=('a791ffbfc61e576f0df586d93e2303b3def9ba77ae4aed23337f811beac54f57'
+sha256sums=('25b760edaf42df13df3a44bd0cd9806d6718ef40c0ed281772b13f3792bdb229'
             '76dbef4dd09a434ceba4744ee00d03482e8dafe9dd4a6461bdce5c9d23f0d886'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
             'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'
             '246d9273fed6d232125476afc1a06dfceba4028fa3a6d6fd2c4c460187d3ee2f'
-            'be5d87a2b40f0965e0a30956d8b38e5f3a326956fa766bc63712191186ad6bd4')
+            '40ea3caaf1b5f38252a86e091f998dbbcef6fdf262a83d781efd2c307c8df0d0')
 
 package() {
-  install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
-  install -Dm755 nvidia-installer-check     $pkgdir/usr/bin/nvidia-installer-check
+    install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
+    install -Dm755 nvidia-installer-check     $pkgdir/usr/bin/nvidia-installer-check
 
-  install -d $pkgdir/var/lib/pci
-  local xx
-  for xx in *.ids ; do
-      install -Dm644 "$xx" "$pkgdir/var/lib/pci/$xx"
-  done
+    local xx
+    for xx in *.ids ; do
+        install -Dm644 "$xx" "$pkgdir/var/lib/pci/$xx"
+    done
 }
