@@ -136,7 +136,10 @@ prepare() {
 
     # remove some calamares modules we don't need
     rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview} ||true
-
+    
+    # remove default calamares branding // keep package small
+    rm -r $_reponame/src/branding/default
+    
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"             $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
