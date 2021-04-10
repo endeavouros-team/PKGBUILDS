@@ -91,7 +91,7 @@ CheckHeadlines()
     local headlines headline
     local dates date
     local ix matches
-    local news_source=https://www.archlinux.org
+    local news_source=https://archlinux.org
     local hlinfo=$(mktemp)
 
     wget -q -T 10 -O $hlinfo $news_source || {
@@ -205,7 +205,7 @@ Main()
         esac
     done
 
-    test -z "$days" && kalu=yes
+    #test -z "$days" && kalu=yes
 
     CheckHeadlines "$days" "$kalu"
 }

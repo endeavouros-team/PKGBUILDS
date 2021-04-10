@@ -36,7 +36,7 @@ A field definition consists of the following *elements*:
 
 Element | Purpose | Value in the example above
 :--- | :--- | :---
-name | button name (may add special _align(name) marking, see below) | Firefox web browser
+name | button name | Firefox web browser
 icon | name of an icon on the button (optional) | firefox-default
 description | useful info for the user (optional) | Browse the web with Firefox
 command string | actual command the button executes (can have parameters) | firefox
@@ -54,13 +54,12 @@ And because the added strings may contain space characters, always use quotes ("
 
 ### The **name** element and aligning
 
-If you want to left-align the texts on all buttons on your Personal Commands tab, you should use the `_align(name)` marking on each field.
-Otherwise texts will be centered. Marking simply makes button's **name** part to be processed by Welcome for left-alignment.<br>
-Left-aligning is useful especially if you have icons on the buttons.
-<br><sup>*Tip*: use `_align()` on *all* fields to make all left aligned. Mixing left-aligned and centered names may make button layout unappealing.</sup><br>
+Older versions of the `yad` program didn't support aligning text properly on buttons, so we used `_align(text)` marking for the text.<br>
+This is no more needed, but you may see old definitions using it, and it can be ignored and/or safely removed.
 
-An example field about the parameters in the command string:
+An example field about the parameters (using the obsolete _align() marking) in the command string:
 <pre>
+    # _align() is no more required
     --field="_align(EndeavourOS forum)!web-browser!Discussions at the EndeavourOS forum":fbtn
             "xdg-open https://forum.endeavouros.com"
 </pre>
@@ -96,9 +95,9 @@ Here is a full *example* file containing three commands/buttons, and activating 
 local welcome_own_commands=(
     # Legend: --field=" name!icon!description":fbtn "command"
 
-    --field="_align(A Kernel Manager)!system-software-install!Simple kernel manager and info source":fbtn  "akm"
-    --field="_align(Mousepad)!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
-    --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
+    --field=" A Kernel Manager!system-software-install!Simple kernel manager and info source":fbtn  "akm"
+    --field=" Mousepad!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
+    --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
 )
 
 local activate_own_commands_tab=yes
@@ -144,37 +143,21 @@ local welcome_own_commands=(
     # When using a bash function, the command string must be changed like this:
     #    "bash -c 'MyBashFunction parameters'"
 
-    --field="_align(Install example)!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
-)
-
-</pre>
-
-## Example: how to align texts on the buttons on the Personal Commands tab
-
-Welcome's version 3.2.14 added support to automatically align the texts on the buttons under a tab.<br>
-To align texts on the buttons, *mark* the **name** element with `_align(name)`.<br>
-The following code shows it:
-
-<pre>
-local welcome_own_commands=(
-    --field="_align(A Kernel Manager)!system-software-install!Simple kernel manager and info source":fbtn  "akm"
-    --field="_align(Mousepad)!accessories-text-editor!Mousepad text editor":fbtn                           "mousepad"
-    --field="_align(Firefox web browser)!firefox-default!Browse the web with Firefox":fbtn                 "firefox"
+    --field=" Install example!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
 </pre>
-<sup>*Tip*: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.</sup>
-<br>
+<sup>Tip: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.</sup>
 
-## Example: run commands in terminal with `RunInTerminal`
+## Example: field to run commands in terminal with `RunInTerminal`
 
 <pre>
-    --field="_align(Update system)!system-software-install!":fbtn \
+    --field=" Update system!system-software-install!":fbtn \
             "RunInTerminal 'checkupdates && sudo pacman -Syu || echo No updates.'"
 </pre>
 
 ## Drag & drop items into the configuration file!
 
-Starting with Welcome version 3.2-1 you may also drag & drop items like URLs, documents, files, and launchers (= .desktop files).<br>
+Starting with Welcome version 3.2-1 you may also drag & drop items like URLs, documents, files, and launchers (= .desktop files).
 Welcome has a new button **Personal Commands drag&drop** under the Tips tab:
 
 ![](welcome-dnd-tips.png)

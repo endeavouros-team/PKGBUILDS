@@ -5,9 +5,10 @@ DIE() {
     exit 1
 }
 
-SetBrowser() {
+SetBrowser() {    # should use eos_select_browser() instead...
     local browser
-    for browser in xdg-open exo-open firefox chromium vivaldi-stable opera ; do
+
+    for browser in $_WELCOME_BROWSER xdg-open exo-open firefox chromium vivaldi-stable opera ; do
         if [ -x /usr/bin/$browser ] ; then
             Browser=/usr/bin/$browser
             return

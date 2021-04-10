@@ -270,3 +270,15 @@ _tr_add2 updt_press_enter         "Paina ENTER-näppäintä sulkeaksesi tämän 
 
 # 2020-Dec-11:
 _tr_add2 after_install_pacdiff_tip "Hallitse tiedostoja pacnew, pacorig $_and pacsave sovelluksilla pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Asetuksia ohjelmalle"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Lataa lisää EndeavourOS-taustakuvia"
+_tr_add2 after_install_more_wall_tip  "Lataa EndeavourOS:n aiempia ja yhteisön tekemiä taustakuvia"
+_tr_add2 after_install_info           "tietoa"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Ohjelmistouutisia"
+_tr_add2 butt_softnews_tip            "Tärkeitä uutisia EndeavourOS:n ohjelmistosta"
+
+_tr_add2 install_community            "Asenna yhteisön kanssa tehty julkaisu"
+_tr_add2 install_community_tip        "Yhteisön kanssa tehdyt julkaisut: Sway, Bspwm (huomaa: internet-yhteys tarvitaan)"

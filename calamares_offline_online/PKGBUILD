@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.34
-pkgrel=10
+pkgver=3.2.38.1
+pkgrel=3
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -107,10 +107,13 @@ prepare() {
     cp $_reponame/src/modules/welcome/welcome.conf $_reponame/src/modules/welcome/welcome.conf_offline
 
     sed -i "s?# - root?# - root\n        - internet?" $_reponame/src/modules/welcome/welcome.conf_online
+    
+    # use duckduck to check internet connection
+    sed -i "s?internetCheckUrl:   http://example.com?internetCheckUrl:   https://duckduckgo.com?" $_reponame/src/modules/welcome/welcome.conf_online
 
     # netinstall module To give another name for the left panel requires translating the title somewhere so it adjusts to each language the installer supports
     #sed -i s"?sidebar:.*?sidebar: \"Choose Desktop\"?" $_reponame/src/modules/netinstall/netinstall.conf 
-    cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    #cp $_reponame/src/modules/netinstall/netinstall.conf $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
     # Escape /? \
@@ -119,7 +122,7 @@ prepare() {
     # This is for using upstream file (github or server)
     sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
     # sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
-    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
     #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
 
 
@@ -133,7 +136,10 @@ prepare() {
 
     # remove some calamares modules we don't need
     rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview} ||true
-
+    
+    # remove default calamares branding // keep package small
+    rm -r $_reponame/src/branding/default
+    
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"             $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
@@ -162,9 +168,8 @@ prepare() {
     -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
+    #sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
     sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
-
-    sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
 
     sed -i "s?nonempty:?#nonempty:?" $_reponame/src/modules/users/users.conf
     sed -i "s?maxLength:?#maxLength:?" $_reponame/src/modules/users/users.conf
@@ -172,7 +177,10 @@ prepare() {
 
     sed -i "s?minLength:.*?minLength: 1?"  $_reponame/src/modules/users/users.conf
     sed -i "s?- minlen=0?#- minlen=0?" $_reponame/src/modules/users/users.conf 
-    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf   
+    sed -i "s?- minclass=0?#- minclass=0?" $_reponame/src/modules/users/users.conf
+
+    # set ESP partition size to recommended 512MB
+    sed -i "s?# efiSystemPartitionSize:     300M?efiSystemPartitionSize:     512M?" $_reponame/src/modules/partition/partition.conf
  
     echo -e "    GRUB_ENABLE_CRYPTODISK: true" >>$_reponame/src/modules/grubcfg/grubcfg.conf
     

@@ -247,7 +247,7 @@ _tr_add2 add_more_apps_done2_tip2    "Para Instalar, use 'yay'"
 
 # 2020-Sep-11:
 _tr_add2 after_install_ew2        "Escolher um papel de parede EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2     "Escolher Papel de Parede"                          # was: "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ewtip2     "Escolher Papel de Parede"                  # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
@@ -255,3 +255,30 @@ _tr_add2 after_install_ewtip2     "Escolher Papel de Parede"                    
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "verificando atualizações"
+_tr_add2 updt_searching           "Checando"
+_tr_add2 updt_for_updates         "por atualizações"
+_tr_add2 updt_failure             "falha$_exclamation"
+_tr_add2 updt_nothing_todo        "não há nada a ser feito"
+_tr_add2 updt_press_enter         "Pressione ENTER para fechar essa janela"
+
+# 2020-Oct-24:
+#   IMPORTANT NOTE:
+#     - line 244: changed text of ‘add_more_apps_done2_text’
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Gerencie pacnew, pacorig $_and pacsave arquivos com pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Configurar"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Baixe mais papéis de parede do EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Baixe papéis de parede legados e da comunidade EndeavourOS"
+_tr_add2 after_install_info           "informação"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Notícias de software"
+_tr_add2 butt_softnews_tip            "Importantes novidades sobre o EndeavourOS software"
+
+_tr_add2 install_community            "Instale edições da comunidade"
+_tr_add2 install_community_tip        "Edições da comunidade: Sway, Bspwm (nota: requer online)"

@@ -97,6 +97,16 @@ HandlePossibleEpoch() {
 
     local pkgname="$1"  # e.g. welcome
     local pkg="$2"      # e.g. welcome-3.9.6-1-any.pkg.tar.zst
+
+    local epoch="$(/usr/bin/grep "^epoch=" PKGBUILD | /usr/bin/cut -d'=' -f2)"
+    if [ -z "$epoch" ] ; then
+        echo "$pkg"
+    else
+        echo "$pkg" | sed "s|\(${pkgname}-[0-9][0-9]*\)\.\(.*\)|\1:\2|"
+    fi
+    return
+
+    
     local hook="${ASSET_PACKAGE_EPOCH_HOOKS[$pkgname]}"
 
     if [ -n "$hook" ] ; then
@@ -246,7 +256,7 @@ ListNameToPkgName()
             yes)
                 rm -rf "$pkgname"
                 yay -Ga "$pkgname" >/dev/null || DIE "'yay -Ga $pkgname' failed."
-                rm -rf "$pkgname"/.git                          # not needed
+                #rm -rf "$pkgname"/.git                          # not needed
                 ;;
         esac
     fi
@@ -334,6 +344,22 @@ Assets_clone()
         hub release download $xx
         test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
+
+    # because of possible epoch and github, some packages must be renamed
+    if [ -n "${ASSET_PACKAGE_EPOCH_HOOKS[*]}" ] ; then
+        local oldnames oldname newname
+        for xx in "${PKGNAMES[@]}" ; do
+            hook="${ASSET_PACKAGE_EPOCH_HOOKS[$xx]}"
+            if [ -n "$hook" ] ; then
+                oldnames="$(/usr/bin/ls -1 ${xx}-*)"  # files *.zst and *.zst.sig
+                for oldname in $oldnames ; do
+                    newname="$($hook "$oldname")"
+                    echo2 "renaming $oldname to $newname"
+                    mv "$oldname" "$newname" || DIE "renaming failed"
+                done
+            fi
+        done
+    fi
     sleep 1
 
     Popd
@@ -505,6 +531,7 @@ RunPostHooks()
 
 WantAurDiffs() {
     local xx="$1"
+    local pkgdirname="$2"
     local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/?h=$pkgdirname&context=1"
 #   local diff_url="https://aur.archlinux.org/cgit/aur.git/commit/?h=$pkgdirname&context=1"
 #   local browser=/usr/bin/xdg-open   # firefox by default
@@ -526,6 +553,7 @@ WantAurDiffs() {
                 case "$xx" in
                     aur/*)
                         AUR_DIFFS+=("$diff_url")
+                        AUR_DIFF_PKGS+=("$pkgdirname")
                         #$browser "$diff_url" >& /dev/null
                         ;;
                 esac
@@ -547,15 +575,20 @@ Browser() {
 }
 
 ShowAurDiffs() {
-    if [ -d "$ASSETSDIR/AUR/$pkgdirname/.git" ] ; then
-        # If we have git source code available, then check diffs from that!
-        Pushd "$ASSETSDIR/AUR/$pkgdirname"
-        git pull >& /dev/null
-        gitk
-        Popd
-    else
-        Browser "${AUR_DIFFS[@]}" >& /dev/null   # xdg-open does not stop here...
-    fi
+    # If we have git source code available, then check diffs from that!
+    local xx ix
+
+    for ((ix=0; ix < ${#AUR_DIFFS[@]}; ix++)) ; do
+        xx="${AUR_DIFF_PKGS[$ix]}"
+        if [ -d "$ASSETSDIR/AUR/$xx/.git" ] ; then
+            Pushd "$ASSETSDIR/AUR/$xx"
+            git pull >& /dev/null
+            /usr/bin/gitk                              # gitk stops here
+            Popd
+        else
+            Browser "${AUR_DIFFS[$ix]}" >& /dev/null   # xdg-open does not stop here...
+        fi
+    done
 }
 
 Exit()
@@ -658,6 +691,7 @@ Main2()
     local use_filelist               # yes or no
     local ask_timeout=60
     local AUR_DIFFS=()
+    local AUR_DIFF_PKGS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
 
@@ -745,8 +779,8 @@ Main2()
         test -n "$tmpcurr" || DIE "LocalVersion for '$xx' failed"
         oldv["$pkgdirname"]="$tmpcurr"
         if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
-            echo2 "update pending to $tmp"
-            WantAurDiffs "$xx"
+            echo2 "update pending from $tmpcurr to $tmp"
+            WantAurDiffs "$xx" "$pkgdirname"
         else
             echo2 "OK ($tmpcurr)"
         fi
@@ -1147,6 +1181,15 @@ AssetsConfLocalVal() {
 }
 
 Main() {
+    local _first_arg="$1"
+    case "$_first_arg" in
+        --dir=*)
+            _first_arg="${_first_arg#*=}"
+            # [ ! -d "$_first_arg" ] || DIE "the folder in parameter '$1' is not found."
+            cd "$_first_arg" || DIE "'cd $_first_arg' failed."
+            shift
+            ;;
+    esac
     local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
     local PROGNAME="$(basename "$0")"
 

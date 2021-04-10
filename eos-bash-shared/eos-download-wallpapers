@@ -1,0 +1,204 @@
+#!/bin/bash
+
+# Copy additional wallpapers from Github's EOS site.
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+
+DIE()   { echo "$progname: error: $1" >&2 ; exit 1 ; }
+WARN()  { echo "$progname: warning: $1" >&2 ; }
+pushd() { command pushd "$@" >/dev/null ; }
+popd()  { command popd  "$@" >/dev/null ; }
+echo2() { echo "$@" >&2 ; }
+echo2i() { echo "$@" | sed 's|^|      |' >&2 ; }
+
+# TestingTimeStamp() { [ "$TESTING" = "yes" ] && date "+%H:%M:%S" ; }
+
+GetWallsCurl() {
+    local repofolders
+    local subfolder
+    local subfolderfiles
+    local directurl=https://raw.githubusercontent.com/EndeavourOS-Community-Editions/Community-wallpapers/main
+    local file files
+    local timeout=10            # for fetching info page
+    local timeoutfiles=30       # for fetching actual wallpaper files
+    local gotwalls=no
+
+    readarray -t repofolders <<< $(curl -Lsm $timeout "$repopage" | grep /tree/main/ | sed -e 's|.*.*/main/||' -e 's|".*||')
+    if [ -n "$repofolders" ] ; then
+        echo2 "====> The following wallpaper folders are available:"
+        for subfolder in "${repofolders[@]}" ; do
+            echo2i "$subfolder"
+        done
+        echo2 ""
+
+        mkdir -p $mainfolder
+        pushd $mainfolder
+
+        for subfolder in "${repofolders[@]}" ; do
+            read -p "====> Fetch wallpapers from $subfolder (Y/n)? " >&2
+            case "$REPLY" in
+                ""|[Yy]*) ;;
+                *) continue ;;
+            esac
+
+            echo2 "====> Fetching ..."
+            readarray -t subfolderfiles <<< $(curl -Lsm $timeout "$repopage/tree/main/$subfolder" | grep /blob/main/ | sed -e "s|.*/main/$subfolder/||" -e 's|".*||')
+            if [ -z "$subfolderfiles" ] ; then
+                WARN "$FUNCNAME: did not find files in '$repopage/$subfolder'."
+                continue
+            fi
+
+            mkdir -p "$subfolder"
+            pushd "$subfolder"
+
+            files=()
+            for file in "${subfolderfiles[@]}" ; do
+                files+=("$directurl/$subfolder/$file")
+            done
+            if (curl -Lsm $timeoutfiles --fail-early --remote-name-all "${files[@]}") ; then
+                gotwalls=yes
+            else
+                WARN "$FUNCNAME: fetching files from '$repopage/$subfolder' failed."
+                retval=1
+            fi
+
+            popd
+        done
+
+        popd
+    else
+        WARN "$FUNCNAME: fetching subfolder names from '$repopage' failed."
+        retval=1
+    fi
+
+    [ "$gotwalls" = "no" ] && retval=1
+}
+
+GetWalls() {
+    local retval=0
+
+    case "$implementation" in
+        curl) GetWallsCurl ;;
+        git)  git clone "$url" || retval=1 ;;
+    esac
+    return $retval
+}
+
+FetchWallpapers() {
+    # Copy new wallpapers into their place.
+    # Remove old wallpapers first.
+
+    local mainfolder=Community-wallpapers
+    local repopage=https://github.com/EndeavourOS-Community-Editions/$mainfolder
+    local url=$repopage.git
+    local urlsubdirs=(
+        eos_wallpapers_classic
+        eos_wallpapers_community
+    )
+    local targetroot=/usr/share/endeavouros/backgrounds
+
+    local subdir
+    local cmd      # real commands here
+    local cmd2     # displayed commands here
+
+    GetWalls || return 1
+
+    pushd "$mainfolder"
+
+    # Collect all required commands into $cmd:
+
+    cmd="mkdir -p $targetroot"                           # collect all needed commands into $cmd
+
+    for subdir in "${urlsubdirs[@]}" ; do
+        [ -d "$subdir" ] || continue                     # skip if not folder
+        if [ -d "$targetroot/$subdir" ] ; then
+            echo2 "====> Note: will remove existing $targetroot/$subdir"
+            cmd+=" ; rm -rf '$targetroot/$subdir'"       # will remove old wallpapers
+        fi
+        cmd+=" ; cp -r '$PWD/$subdir' $targetroot/"      # will copy new wallpapers in place
+    done
+    cmd2=$(echo "$cmd" | sed 's| ; |\n|g')               # reformat commands suitable for displaying
+
+
+    # Now do the actual wallpaper changes:
+
+    echo2 ""
+    echo2 "Running the following commands:"
+    echo2 "$cmd2"
+    echo2 ""
+    $EOS_ROOTER "$cmd"
+
+    popd
+}
+
+Options() {
+    local arg
+    local default="[default]"
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --curl) implementation=curl ;;
+            --git)  implementation=git ;;
+            --no-choose) make_choose=no ;;
+            --help | -h)
+                cat <<EOF
+Usage: $progname [options]
+Options:
+    --curl       Download using curl (should use less bandwidth). $( [ $implementation_default = curl ] && echo $default )
+    --git        Download using git. $( [ $implementation_default = git ] && echo $default )
+    --no-choose  Do not make user to choose wallpaper right after downloading.
+    --help | -h  This help.
+EOF
+                exit 0
+                ;;
+            *) DIE "unsupported parameter '$arg'" ;;
+        esac
+    done
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local tmpdirbase="$HOME/.cache/$progname"
+    local workdir
+    local implementation_default="$EOS_WALLPAPER_FETCHER"
+    local implementation=$implementation_default
+    local make_choose=yes
+    local retval=0
+    local oldies
+
+    [ -n "$implementation_default" ] || implementation_default=git
+
+    # options will override the default values
+    Options "$@"
+
+    workdir=$(mktemp -d "$tmpdirbase.XXXXX")
+
+    pushd "$workdir"
+    FetchWallpapers || retval=1
+    popd
+
+    rm -rf "$workdir"    # cleanup
+
+    oldies="$(/usr/bin/ls -1d "$tmpdirbase".* 2>/dev/null)"
+    if [ -n "$oldies" ] ; then
+        echo2 ""
+        echo2 "====> Warning: the following old temporary folders can be deleted."
+        echo2i "$oldies"
+        read -p "====> Delete now (Y/n)? " >&2
+        case "$REPLY" in
+            ""|[Yy]*) rm -rf $oldies ;;
+        esac
+    fi
+
+    # Allow user to change the wallpaper:
+
+    if [ "$make_choose" = "yes" ] ; then
+        if [ $retval -eq 0 ] ; then
+            echo2 "You can choose your new wallpaper now:"
+            /usr/bin/eos-wallpaper-set &
+        fi
+    fi
+}
+
+Main "$@"

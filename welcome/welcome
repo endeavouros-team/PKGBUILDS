@@ -8,6 +8,8 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
+export ENDEAVOUROS_TEAM=https://raw.githubusercontent.com/endeavouros-team
+
 export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 
@@ -38,6 +40,7 @@ export -f eos_yad_WARN
 export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 export -f eos_GetArch
+export -f eos_select_browser
 #################################################################################
 
 export PROG_PACKAGENAME="welcome"
@@ -101,7 +104,7 @@ export -f ltr
 export tr_strings
 export SELECTED_EOS_WELCOME
 
-IsInstalled() { pacman -Q "$1" >& /dev/null ; }
+IsInstalled() { /usr/bin/pacman -Q "$1" >& /dev/null ; }
 export -f IsInstalled
 
 IsInstalling() {
@@ -130,55 +133,15 @@ export -f eos_yad_WARN_debug
 _align_buttons_on_tab() {
     local -n arr="$1"
     local handle="$2"
-    local ix xx name newname len=0 le pad tmpname
+    local ix xx
 
-    if [ "$handle" = "calculate" ] ; then
-        for xx in "${arr[@]}" ; do
-            case "$xx" in
-                --field=*)
-                    name="${xx/*_align(/}"                # remove from left of name
-                    if [ "$name" != "$xx" ] ; then
-                        name="${name/)!*/}"               # remove from right of name
-                        le=${#name}
-                        test $le -gt $len && len=$le
-                    fi
-                    ;;
-            esac
-        done
-
-        # now we know $len
-
-        [ $max_button_name_length -lt $len ] && max_button_name_length=$len
-        return
-    fi
-
-    len=$max_button_name_length
-
+    # just remove possible legacy "_align(...) construct"
     ix=0
     for xx in "${arr[@]}" ; do
         case "$xx" in
             --field=*)
-                name="${xx/*_align(/}"                # remove from left of name
-                if [ "$name" != "$xx" ] ; then
-                    name="${name/)!*/}"               # remove from right of name
-                    pad=$((len - ${#name}))
-
-                    # The $pad must be bigger if special chars (like "&#33;" = "!") are present!
-                    # Some translations use special characters.
-                    tmpname="$name"
-                    while [ "${tmpname/&#??;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
-                        ((pad+=4))                                         # each "&#??;" turns to one char!
-                        tmpname="${tmpname/&#??;/}"
-                    done
-                    while [ "${tmpname/&#???;/}" != "$tmpname" ] && [ $pad -lt $len ] ; do
-                        ((pad+=5))                                         # each "&#???;" turns to one char!
-                        tmpname="${tmpname/&#???;/}"
-                    done
-
-                    newname="$name$(printf '%*s' $pad)"
-                    newname="$(printf '<tt> %-s</tt>' "$newname")"
-                    xx="${xx/_align($name)!/$newname!}"
-                    arr[$ix]="$xx"
+                if [ "$xx" != "${xx/*_align(/}" ] ; then
+                    arr[$ix]="$(echo "$xx" | sed 's|_align(\(.*\))!| \1!|')"
                 fi
                 ;;
         esac
@@ -242,9 +205,11 @@ yad_community_editions() {
         2) return ;;
     esac
 
-    if [ "$EOS_TESTING_STOP" = "yes" ] ; then
-        eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
-        return
+    if [ 0 -eq 1 ] ; then
+        if [ "$EOS_TESTING_STOP" = "yes" ] ; then
+            eos_yad_WARN "$edition: not implemented yet!" --text="Installing community edition '$edition': to be defined!" --height=200
+            return
+        fi
     fi
 
     yad_calamares $edition yes
@@ -256,7 +221,11 @@ yad_calamares() {
     local debug_terminal="$2"
     local prog=$INSTALLER_PROGRAM
     local debugging=no
-    local realmode
+
+    if [ ! -x $prog ] ; then
+        eos_yad_WARN_debug "Stopping $FUNCNAME."
+        return 1
+    fi
 
     if [ "$debug_terminal" = "stop" ] || [ "$show_installer" != "no" ] ; then
         debugging=yes
@@ -271,7 +240,7 @@ yad_calamares() {
     fi
 
     if [ "$mode" = "choose" ] ; then
-        local t1="$CAL_INFO1"
+        local t1="" # "$CAL_INFO1"
         local t2="$CAL_INFO2"
         local t3="$CAL_INFO3"
         local t4="$CAL_INFO4"
@@ -345,70 +314,36 @@ yad_calamares() {
 
         test -n "$answer" || return 1
         mode=$(echo "$answer" | cut -d '|' -f $field | tr [:upper:] [:lower:])
-    else
-        case "$mode" in
-            bspwm | sway)
-                local urlfolder=/home/$EOS_LIVEUSER/community_editions
-                local urlfile
-                for urlfile in $urlfolder/sway_setup.url $urlfolder/sway_netinstall-yaml.url ; do
-                    if [ ! -r $urlfile ] ; then
-                        eos_yad_WARN "community edition file $urlfile not found on the ISO!"
-                        return 1
-                    fi
-                done
-                sudo sed -i /usr/bin/chrooted_cleaner_script.sh \
-                     -e 's|^#_setup_personal$|_setup_personal|' \
-                     -e 's|^_de_wm_config$|#_de_wm_config|'
-                cp $urlfolder/sway_setup.url           /home/$EOS_LIVEUSER/setup.url
-                cp $urlfolder/sway_netinstall-yaml.url /home/$EOS_LIVEUSER/netinstall-yaml.url
-                ;;
-        esac
     fi
 
     case "$mode" in
-        offline) ;;
         online | sway | bspwm)
             eos_yad_check_internet_connection verbose || return 1
+            local fetchurl=$ENDEAVOUROS_TEAM/install-scripts/master
+            local fetched=prepare-calamares
+            if (wget -q $fetchurl/$fetched) ; then
+                sudo bash -c "cp -f $fetched /usr/bin/ ; chown root:root /usr/bin/$fetched ; chmod 0755 /usr/bin/$fetched"
+                rm -f $fetched
+            else
+                Welog "==> Error: fetching $fetched failed."
+                eos_yad_WARN "$FUNCNAME: fetching $fetched failed."
+                return 1
+            fi
             ;;
-        *)  eos_yad_WARN "$CAL_NOSUPPORT '$mode'"     # "$PROGNAME: $FUNCNAME: unsupported mode '$mode'."
-            return 1
+        offline)
+            if [ ! -r /usr/bin/prepare-calamares ] ; then
+                eos_yad_WARN "$FUNCNAME: /usr/bin/$fetched does not exist."  # must be in the ISO!
+                return 1
+            fi
             ;;
+        *) eos_yad_WARN "$FUNCNAME: unsupported mode $mode"
+           return 1
+           ;;
     esac
 
-    echo "$mode" > /tmp/install_mode.txt
+    prepare-calamares "$WELCOME_LANG" "$mode" || return 1
 
-    realmode="$mode"
-
-    case "$mode" in
-        sway | bspwm)
-            # Everything after this is normal online install, so we now change to the 'online' mode !!
-            mode=online
-            ;;
-    esac
-
-    local file=/usr/share/calamares/settings.conf_$mode
-    if [ ! -r $file ] ; then
-        eos_yad_WARN "$CAL_NOFILE '$file'"      #  "$PROGNAME: $FUNCNAME: required file '$file' does not exist!"
-        if [ "$show_installer" = "no" ] ; then
-            eos_yad_WARN_debug "Stopping $FUNCNAME (3)."
-            return 1
-        fi
-    fi
-
-    # Stop here if only debugging.
-    if [ "$debugging" = "yes" ] ; then
-        eos_yad_WARN_debug "Stopping $FUNCNAME (4)."
-        return
-    fi
-    if [ "$show_installer" != "no" ] ; then
-        # this 'if' could be removed
-        eos_yad_WARN_debug "Stopping $FUNCNAME (5)."
-        return
-    fi
-    if [ ! -x $prog ] ; then
-        eos_yad_WARN_debug "Stopping $FUNCNAME (6)."
-        return 1
-    fi
+    ##################### Prepare the loggging
 
     local progname="$PRETTY_PROGNAME"
     [ -n "$progname" ] || progname="Welcome"
@@ -417,68 +352,9 @@ yad_calamares() {
 ############## $INSTALL_LOG_FILE by $progname
 ############## $CAL_ISTARTED (UTC): $(date -u "+%Y-%m-%d %H:%M")
 
-Install mode: $realmode
+Install mode: $mode
 
 EOF
-
-    case "$mode" in
-        online)
-            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml && {
-                Welog "fetching netinstall.yaml."
-                sudo bash -c "cp -f netinstall.yaml /usr/share/calamares/ ; chown root:root /usr/share/calamares/netinstall.yaml"
-            }
-            wget -q https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist && {
-                Welog "fetching update-mirrorlist."
-                sudo bash -c "cp -f update-mirrorlist /usr/bin/ ; chown root:root /usr/bin/update-mirrorlist ; chmod 0755 /usr/bin/update-mirrorlist"
-            }
-            if [ -n "$user_pkglist_url" ] ; then
-                Welog "fetching $user_pkglist_url."
-                if [ -d /home/$EOS_LIVEUSER ] ; then
-                    wget -q --timeout=10 -O "/home/$EOS_LIVEUSER/user_pkglist.txt" "$user_pkglist_url"
-                else
-                    wget -q --timeout=10 -O "$HOME/user_pkglist.txt" "$user_pkglist_url"
-                fi
-            fi
-
-            file=/usr/share/calamares/modules/netinstall.conf
-            if [ ! -r $file ] ; then
-                Welog "warning: $file not found!"
-            fi
-            if [ -r "/home/$EOS_LIVEUSER/netinstall-yaml.url" ] ; then
-                # allow an own netinstall.yaml from a URL config file!
-                Welog "fetching using netinstall-yaml.url"
-                local netinstall_url=$(cat "/home/$EOS_LIVEUSER/netinstall-yaml.url")
-                if [ -r $file ] ; then
-                    sudo sed \
-                         -i $file \
-                         -e "s|^\([ ]*groupsUrl:\).*/endeavouros-team/.*/netinstall\.yaml$|\1 $netinstall_url|"
-                fi
-            elif [ -n "$(device-info --vga | grep NVIDIA)" ] ; then
-                if [ -n "$(lspci -k | grep -PA3 'VGA|3D' | grep "Kernel driver in use" | grep nvidia)" ] ; then
-                    # allow nvidia install
-                    if [ -r $file ] ; then
-                        sudo sed \
-                             -i $file \
-                             -e 's|^\([ ]*groupsUrl:.*/endeavouros-team/.*\)/netinstall\.yaml$|\1/netinstall_nvidia.yaml|'
-                    fi
-                fi
-            fi
-            ;;
-    esac
-
-    Welog "copying settings.conf files."
-    sudo cp -praf /usr/share/calamares/settings.conf_$mode         /usr/share/calamares/settings.conf
-    sudo cp -praf /usr/share/calamares/modules/packages.conf_$mode /usr/share/calamares/modules/packages.conf
-    sudo cp -praf /usr/share/calamares/modules/welcome.conf_$mode  /usr/share/calamares/modules/welcome.conf
-
-    case "$mode" in
-        online)
-            if [ -z "$(/usr/bin/grep "^update-mirrorlist$" /usr/bin/pacstrap_calamares)" ] ; then
-                Welog "updating mirrorlist, please wait ..."
-                /usr/bin/update-mirrorlist
-            fi
-            ;;
-    esac
 
     local only_one_output_window=yes   # yes=one, no=more than one
 
@@ -849,14 +725,19 @@ export -f yad_InitializePacmanMirroring
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
-    local yadcmd="eos_yad --text-info --title="$INSTALL_INSTALLER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
-
+    local yadcmd=(
+        eos_yad --text-info --width=600 --height=500 --title="$INSTALL_INSTALLER" --wrap --tail --button=yad-quit:0 --fontname="Mono 10"
+    )
     local pkg pkgs=()
+
     for pkg in "$@" ; do
-        IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg")
+        case "$pkg" in
+            */*) pkgs+=("$pkg") ;;                                    # $repo/$pkg: force install
+            *)   IsInstalled "$pkg" >& /dev/null || pkgs+=("$pkg") ;;
+        esac
     done
     test -z "$pkgs" && {
-        echo "$*: $INSTALL_ALREADY" | $yadcmd
+        echo "$*: $INSTALL_ALREADY" | "${yadcmd[@]}"
         return
     }
     while true ; do
@@ -864,7 +745,7 @@ yad_Install() {
         pkexec pacman -S --noconfirm "${pkgs[@]}"
         echo "$INSTALL_DONE"
         break
-    done |& $yadcmd
+    done |& "${yadcmd[@]}"
 }
 export -f yad_Install
 
@@ -876,14 +757,16 @@ yad_Remove() {
     local REMOVING="Removing"
     local NOT_INSTALLED="not installed"
 
-    local yadcmd="eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0"
+    local yadcmd=(
+        eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0 --fontname="Mono 10"
+    )
 
     local pkg pkgs=()
     for pkg in "$@" ; do
         IsInstalled "$pkg" >& /dev/null && pkgs+=("$pkg")
     done
     test -z "$pkgs" && {
-        echo "$*: $NOT_INSTALLED" | $yadcmd
+        echo "$*: $NOT_INSTALLED" | "${yadcmd[@]}"
         return
     }
     while true ; do
@@ -891,7 +774,7 @@ yad_Remove() {
         pkexec pacman -Rdd --noconfirm "${pkgs[@]}"
         echo "$INSTALL_DONE"
         break
-    done |& $yadcmd
+    done |& "${yadcmd[@]}"
 }
 export -f yad_Remove
 
@@ -1057,7 +940,7 @@ ShowChangeResoButton() {
 
     if [ "$show_reso_butt" = "yes" ] ; then
         local icon=preferences-desktop-display
-        tabcontents+=(--field="_align($(ltr ins_reso))!$icon!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+        tabcontents+=(--field=" $(ltr ins_reso)!$icon!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
     fi
 }
 export -f ShowChangeResoButton
@@ -1071,34 +954,36 @@ INSTALL() {
   local reflector_simple="$(IconGrasp software-update-available)"
   local user_info=info
   local tabcontents=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field="_align($(ltr ins_start))!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
+      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
   )
   if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
-          --field="_align(Install community editions)!$system_software_install!Community editions: Sway, Bspwm (online required)":fbtn 'bash -c yad_community_editions'
+          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'bash -c yad_community_editions'
+      )
+  fi
+  if [ 0 -eq 1 ] ; then
+      tabcontents+=(
+          --field=" $(ltr ins_up)!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
       )
   fi
   tabcontents+=(
-      --field="_align($(ltr ins_up))!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
-      --field="_align($(ltr after_install_um))!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
+      --field=" $(ltr after_install_um)!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
 
   ShowChangeResoButton
 
   tabcontents+=(
-#      --field="_align($(ltr ins_keys))!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
-      --field="_align($(ltr ins_pm))!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
-      --field="_align($(ltr ins_rel))!$user_info!$(ltr ins_reltip)":fbtn                      "$_BROWSER https://endeavouros.com/latest-release"
-      --field="_align($(ltr ins_tips))!$user_info!$(ltr ins_tipstip)":fbtn                    "$_BROWSER https://endeavouros.com/docs/installation"
-      --field="_align($(ltr ins_trouble))!$user_info!$(ltr ins_troubletip)":fbtn              "$_BROWSER https://endeavouros.com/docs/system-rescue"
+#      --field=" $(ltr ins_keys)!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
+      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
+      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
+      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
   )
-
-  _align_buttons_on_tab tabcontents "$handle"
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 
@@ -1112,19 +997,17 @@ GeneralInfo() {
       local user_info=info
   }
   local tabcontents=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-question
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
-      --field="_align($(ltr general_info_ws))!$user_info!https://endeavouros.com":fbtn          "$_BROWSER https://endeavouros.com"
-      --field="_align($(ltr general_info_wi))!$user_info!$(ltr general_info_witip)":fbtn        "$_BROWSER https://endeavouros.com/wiki"
-      --field="_align($(ltr general_info_ne))!$user_info!$(ltr general_info_netip)":fbtn        "$_BROWSER https://endeavouros.com/news"
-      --field="_align($(ltr general_info_fo))!$user_info!$(ltr general_info_fotip)":fbtn        "$_BROWSER https://forum.endeavouros.com"
-      --field="_align($(ltr general_info_do))!$user_info!$(ltr general_info_dotip)":fbtn        "$_BROWSER https://endeavouros.com/donate"
-      --field="_align($(ltr general_info_ab))!$user_info!$(ltr general_info_abtip)":fbtn        "$_BROWSER https://endeavouros.com/docs/applications/welcome"
+      --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
+      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com"
+      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/blog"
+      --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
+      --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
+      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/endeavouros-tools/welcome"
   )
-
-  _align_buttons_on_tab tabcontents "$handle"
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -1203,17 +1086,17 @@ AfterInstall() {
   local differ pdtext Icon=preferences-system
 
   local tabcontents=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-information
       --text="<b>$(ltr after_install_text)</b>"
   )
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
-     tabcontents+=(--field="_align($(ltr after_install_um))!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
+     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
   fi
   tabcontents+=(
-      --field="_align($(ltr after_install_us))!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
-      --field="_align($(ltr after_install_pclean))!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
@@ -1221,7 +1104,7 @@ AfterInstall() {
               meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
               kdiff3|kompare|diffuse) Icon=$differ ;;
           esac
-          tabcontents+=(--field="_align(Pacdiff $_and $differ)!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
+          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
           pdtext="Starting pacdiff as root ..."
           case "$differ" in
               meld)
@@ -1238,31 +1121,30 @@ AfterInstall() {
       fi
   done
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-      tabcontents+=(--field="_align(Configure eos-update-notifier)!preferences-system!Configure eos-update-notifier":fbtn "eos-update-notifier-configure")
+      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
 
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field="_align($(ltr after_install_cdm))!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
+      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
 
   ShowChangeResoButton
 
   tabcontents+=(
-      --field="_align($(ltr after_install_ew))!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
-      --field="_align($(ltr after_install_ew2))!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+      --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
+      --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+      --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
 
-  Check_r8168 && tabcontents+=(--field="_align(Ethernet issue? Remove r8168)!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
+  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
 
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
-            --field="_align($(ltr after_install_themevan))!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'bash -c yad_vanilla_xfce4_theme'
-            --field="_align($(ltr after_install_themedef))!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'bash -c yad_endeavouros_xfce4_theme'
+            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'bash -c yad_vanilla_xfce4_theme'
+            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'bash -c yad_endeavouros_xfce4_theme'
         )
         ;;
   esac
-
-  _align_buttons_on_tab tabcontents "$handle"
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -1272,27 +1154,52 @@ UsefulTips() {
   local tabnum="$2"
   local _and='&#38;'           # '&'
 
+
   local tabcontents+=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$user_info
       --text="<b>$(ltr useful_tips_text)</b>"
-      --field="_align($(ltr after_install_pm))!$user_info!$(ltr after_install_pmtip)":fbtn     "$_BROWSER https://endeavouros.com/docs/pacman/package-management-in-endeavouros"
-      --field="_align($(ltr after_install_ay))!$user_info!$(ltr after_install_aytip)":fbtn     "$_BROWSER https://endeavouros.com/docs/aur/yay"
-      --field="_align($(ltr after_install_hn))!$user_info!$(ltr after_install_hntip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network"
-      --field="_align($(ltr after_install_bt))!$user_info!$(ltr after_install_bttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/hardware-and-network/bluetooth"
+      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=pacman'"
+      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
+      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
+      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/bluetooth'"
   )
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field="_align($(ltr after_install_nv))!$user_info!$(ltr after_install_nvtip)":fbtn "$_BROWSER https://endeavouros.com/docs/hardware-and-network/nvidia-installer")
+      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
-      --field="_align($(ltr after_install_ft))!$user_info!$(ltr after_install_fttip)":fbtn     "$_BROWSER https://endeavouros.com/docs/forum/how-to-include-systemlogs-in-your-post"
-      --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn     "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
-      --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
+      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" EndeavourOS $_and ARM!system-run!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "$_WELCOME_BROWSER https://arm.endeavouros.com"
+      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn      "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
   )
 
-  _align_buttons_on_tab tabcontents "$handle"
-
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
+}
+
+#GetPkgVersion() {
+#    local repo="$1"
+#    local pkg="$2"
+#    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
+#}
+
+IsEosYadInstalled() {
+    # Determines if a patched EOS version of yad is installed.
+
+    local installed_yad="$(LANG=C /usr/bin/pacman -Qi yad 2>/dev/null | /usr/bin/grep -w ^Name | /usr/bin/awk '{print $3}')"
+
+    case "$installed_yad" in
+        yad-eos | "")
+            return 0 ;;       # yad-eos is installed, or no yad alternative is installed
+        *)
+            # some other yad alternative is installed
+            if (/usr/bin/pacman -Si yad-eos >& /dev/null) ; then
+                return 1  # yad-eos is available
+            else
+                return 0  # yad-eos is not available
+            fi
+            ;;
+    esac
 }
 
 AddMoreApps() {
@@ -1307,27 +1214,27 @@ AddMoreApps() {
   local chromium="$(IconGrasp chromium web-browser)"
 
   local tabcontents=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
   )
   IsInstalled libreoffice-fresh || {
       ((shown_app_buttons++))
-      tabcontents+=( --field="_align(LibreOffice)!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'bash -c "yad_Install libreoffice-fresh"')
+      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'bash -c "yad_Install libreoffice-fresh"')
   }
   IsInstalled chromium || {
       ((shown_app_buttons++))
-      tabcontents+=(--field="_align($(ltr add_more_apps_ch))!$chromium!$(ltr add_more_apps_chtip)":fbtn 'bash -c "yad_Install chromium"')
+      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'bash -c "yad_Install chromium"')
   }
   IsInstalled gufw || {
       ((shown_app_buttons++))
-      tabcontents+=(--field="_align($(ltr add_more_apps_fw))!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'bash -c "yad_Install gufw"')
+      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'bash -c "yad_Install gufw"')
   }
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       IsInstalled akm || {
           ((shown_app_buttons++))
-          tabcontents+=(--field="_align($(ltr add_more_apps_akm))!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"')
+          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"')
       }
   fi
   case "$DE" in
@@ -1338,20 +1245,27 @@ AddMoreApps() {
             ((shown_app_buttons+=2))
             local bluetooth="$(IconGrasp bluetooth)"
             tabcontents+=(
-                --field="_align($(ltr add_more_apps_bt))!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-                --field="_align($(ltr add_more_apps_bt_bm))!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
+                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
+                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
             )
             break
         done
         ;;
   esac
+
+  if (! IsEosYadInstalled) ; then
+      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install yad-eos'")
+  fi
+  
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
-      tabcontents+=(--field="_align($(ltr add_more_apps_arch))!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinuxarm.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
   else
-      tabcontents+=(--field="_align($(ltr add_more_apps_arch))!!$(ltr add_more_apps_done2_tip1)":fbtn "$_BROWSER https://www.archlinux.org/packages")
+      tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
   fi
-  tabcontents+=(--field="_align($(ltr add_more_apps_aur))!!$( ltr add_more_apps_done2_tip2)":fbtn "$_BROWSER https://aur.archlinux.org/packages")
+  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
+  
+  # Now we know if we have any apps in the install list.
 
   if [ $shown_app_buttons -eq 0 ] ; then
       tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
@@ -1359,15 +1273,12 @@ AddMoreApps() {
       tabcontents+=(--text="<b>$(ltr add_more_apps_text) $(ltr add_more_apps_done2_text)</b>")
   fi
 
-  _align_buttons_on_tab tabcontents "$handle"
-
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 OwnCommands() {
   local handle="$1"
   local tabnum="$2"
-  local _and='&#38;'           # '&'
   local cols="$columns_for_own_commands"
   local show_buttons="$show_predefined_buttons_at_own_commands"
 
@@ -1390,16 +1301,16 @@ OwnCommands() {
   done
 
   local tabcontents=(
-      eos_yad
+      eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
       --image=applications-other
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
   )
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
-          --field="_align($(ltr butt_owncmds_help))!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
-                  "$_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
-          --field="_align($(ltr butt_owncmds_dnd))!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
+          --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
+                  "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+          --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
   fi
   tabcontents+=("${welcome_own_commands[@]}")
@@ -1455,7 +1366,7 @@ DIE() {
         echo "Error: $1."
         Usage
         break
-    done | eos_yad_problem "$title" "$@"
+    done | eos_yad_problem "$title" --fontname="Mono 10" --height=700 "$@"
     exit 1
 }
 
@@ -1473,40 +1384,21 @@ WelcomeChangelog() {
 }
 export -f WelcomeChangelog
 
+ImportantNews() {
+    $_WELCOME_BROWSER https://github.com/endeavouros-team/Important-news/blob/main/README.md
+}
+export -f ImportantNews
+
 SetBrowser() {
     local xx
-    for xx in xdg-open exo-open firefox chromium ; do  # use one of these browser commands
-        if [ -x /usr/bin/$xx ] ; then
-            _BROWSER=/usr/bin/$xx        # for showing external links
-            return
-        fi
-    done
-    DIE "$FUNCNAME: cannot find a browser"
+    [ -n "$_WELCOME_BROWSER" ] && return
+    export _WELCOME_BROWSER="$(eos_select_browser)"
 }
 export -f SetBrowser
-
-CalculateMaxButtonNameLength() {
-    local conf="$HOME/.config/welcome.conf"
-    local translation_version="$(pacman -Q eos-translations | awk '{print $2}')"
-    if [ -r "$conf" ] ; then
-        source $conf                           # has: ConfVersion, MaxButtonNameLength
-        if [ "$ConfVersion" = "$translation_version" ] ; then
-            max_button_name_length="$MaxButtonNameLength"
-            return
-        fi
-    fi
-    local ix=1 xx
-    for xx in "${_NOTEBOOK_TABS[@]}" ; do
-        $xx "calculate" "$((ix++))"
-    done
-    printf "local ConfVersion=$translation_version\nlocal MaxButtonNameLength=$max_button_name_length\n" > "$conf"
-}
 
 PrepareTabs() {
     local handle="$1"
     local xx ix
-
-    CalculateMaxButtonNameLength
 
     ix=1
     for xx in "${_NOTEBOOK_TABS[@]}" ; do
@@ -1665,7 +1557,7 @@ MagicId() {
     fi
     local target=$HOME/user_pkglist.txt
     local time
-    local data="$(curl -s https://raw.githubusercontent.com/endeavouros-team/sandbox/master/pkg/list)"
+    local data="$(curl -s $ENDEAVOUROS_TEAM/sandbox/master/pkg/list)"
     if [ -z "$data" ] ; then
         echo "Error: list not found." >&2
         return 1
@@ -1695,7 +1587,7 @@ UpdateInstallScripts() {
         # the files below are needed only for installing
     fi
 
-    local URL=https://raw.githubusercontent.com/endeavouros-team/install-scripts/master
+    local URL=$ENDEAVOUROS_TEAM/install-scripts/master
     local scripts=(                        # may need to adjust files ...
         calamares_switcher
         chrooted_cleaner_script.sh
@@ -1770,13 +1662,31 @@ export -f Usage
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
 
+ShowProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+
+    local msg="$1"
+    local barlen=50
+    local percent_increment=17
+
+    ProgressBar "$msg" $pb_percent $barlen
+    ((pb_percent+=percent_increment))
+    [ $pb_percent -gt 100 ] && pb_percent=100
+}
+EndProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+    pb_percent=100
+    ShowProgress "Done."
+    ProgressBarEnd
+}
 
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
     local tr_prefer=manual
-    local max_button_name_length=0
+    local pb_percent=0
+    local show_progress_bar=no   # was: yes
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
@@ -1785,6 +1695,9 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --no-progress)
+                show_progress_bar=no
+                ;;
             --changelog)
                 WelcomeChangelog
                 return
@@ -1801,9 +1714,15 @@ StartHere() {
         esac
     done
 
+    [ "$show_progress_bar" = "yes" ] && ProgressBarInit
+
+    ShowProgress Translating...
+
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
     AfterTranslations
+
+    ShowProgress Processing...
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
     KillExtraYad > $yad_zombie_log
@@ -1818,18 +1737,20 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
+            --help|-h) WelcomeHelp ; return ;;
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
             --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=* | --tr-engine=* | --id=*) ;; # already handled!
+            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
     done
+    export WELCOME_LANG="$lang"
 
     if [ "$(WelcomeSettings continue)" = "no" ] ; then
         return
@@ -1840,6 +1761,8 @@ StartHere() {
     if [ -r    "$own_commands_conf" ] ; then
         source "$own_commands_conf"
     fi
+
+    ShowProgress "Creating commands..."
 
     CreateNotebookCommands
 
@@ -1852,6 +1775,7 @@ StartHere() {
     test $? -eq 0 && is_installing=yes || is_installing=no
 
     if [ "$start_delay" != "0" ] ; then
+        ShowProgress "Sleeping..."
         sleep "$start_delay"
     fi
 
@@ -1862,6 +1786,8 @@ StartHere() {
         else
             verbosity=none
         fi
+        ShowProgress "Checking connection..."
+
         eos_yad_check_internet_connection $verbosity 20 "3s" "Welcome" || return 1
 
         if [ -n "$TERMINAL_AT_START" ] ; then
@@ -1892,6 +1818,7 @@ StartHere() {
     local tab tabname
     local notebook   # contains the main yad command
 
+    ShowProgress "Building yad window..."
     PrepareTabs "$handle" || DIE "PrepareTabs failed"
 
     # Create the yad command gradually into an array 'notebook':
@@ -1919,6 +1846,7 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
+    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"bash -c ImportantNews")
     notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
     notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
     if [ "$is_installing" = "no" ] ; then
@@ -1931,10 +1859,14 @@ StartHere() {
         yad_calamares choose
         return
     fi
+    ShowProgress "Showing window..."
 
     "${notebook[@]}"
 
     local result=$?
+
+    EndProgress
+
     case "$result" in
         5) WelcomeSettings disable ;;
         0|252) sleep 0.5 ; WelcomeSettings enable ;;

@@ -19,6 +19,7 @@
 # export -f eos_yad__detectDE
 # export -f eos_yad_GetDesktopName
 # export -f eos_GetArch
+# export -f eos_select_browser
 #
 # The two last functions above do not use yad.
 
@@ -47,6 +48,24 @@ eos_GetArch() {
     printf "%s" "$arch"
 }
 
+eos_select_browser() {
+    # Select an existing browser.
+    # User may export a variable _WELCOME_BROWSER to use the preferred browser.
+
+    if [ -n "$_WELCOME_BROWSER" ] ; then
+        echo "$_WELCOME_BROWSER"
+        return
+    fi
+
+    local browser
+    for browser in xdg-open exo-open firefox chromium vivaldi-stable opera ; do
+        if (/usr/bin/which "$browser" >& /dev/null) ; then
+            echo "$browser"
+            return
+        fi
+    done
+    eos_yad_WARN "$FUNCNAME: cannot find a browser"
+}
 
 eos_yad_terminal() {
     local conf=/etc/eos-script-lib-yad.conf
@@ -164,11 +183,14 @@ eos_yad_RunCmdTermBash() {
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
-    local tmpfile=$(mktemp)
+    mkdir -p "$HOME/.cache"
+
+    local tmpfile=$(mktemp "$HOME/.cache/$FUNCNAME.XXXXX")
 
     echo "#!/bin/bash"                                   >> $tmpfile
     test -n "$prompt" && echo "echo $prompt"             >> $tmpfile
     echo "$cmd"                                          >> $tmpfile
+    echo "echo"                                          >> $tmpfile
     case "$term" in
         */deepin-terminal) ;;
         *)
@@ -185,9 +207,14 @@ eos_yad_RunCmdTermBash() {
     echo "rm -f $tmpfile"                                >> $tmpfile
 
     chmod +x $tmpfile
+
+    # Try make sure terminal $term does not return to the caller immediately
+    # but waits until the commands from $tmpfile are executed.
     case "$term" in
         /usr/bin/gnome-terminal | gnome-terminal)
             $term $termopts --wait -- $tmpfile ;;
+        /usr/bin/xfce4-terminal | xfce4-terminal)
+            $term --disable-server $termopts -e $tmpfile ;;
         *)
             $term $termopts -e $tmpfile ;;
     esac
@@ -200,8 +227,9 @@ eos_yad_RunCmdTermBash() {
 eos_yad_problem() {
     local title="$1"
     shift
-    eos_yad --text-info --title="$title" --tail --wrap --image=error \
+    eos_yad --text-info --title="$title" --wrap --image=error \
             --width=700 --height=500 --button=yad-quit:0 "$@"
+    # removed --tail
 }
 
 eos_yad_DIE() {
@@ -386,10 +414,55 @@ FindAvailableMonoFont() {
     echo "$font $size"
 }
 
+ProgressBar() {         # This function was converted from the work of @Kresimir, thanks!
+    local msg="$1"
+    local percent="$2"
+    local barlen="$3"
+    local c
+    local columns="$COLUMNS"                                # nr of columns on the terminal
+    [ -n "$columns" ] || columns=80                         # guess nr of columns on the terminal
+    local msglen=$((columns - barlen - 9))                  # max space for the msg
+    [ "${#msg}" -gt "$msglen" ] && msg="${msg::$msglen}"    # msg must be truncated
+    [ "${msg: -1}" = ":" ] || msg+=":"                      # make sure a colon is after msg
+
+    printf "\r%-*s %3d%% [" "$msglen" "$msg" $percent >&2
+    for ((c = 0; c < $barlen; c++)) ; do
+        if (( $c <= $percent * $barlen / 100 )); then
+            echo -ne "#" >&2
+        else
+            echo -ne " " >&2
+        fi
+    done;
+    stdbuf -oL printf "]" >&2 # flush stdout
+}
+ProgressBarInit() {
+    # progress bar initialization
+    trap 'printf "\x1B[?25h" >&2' EXIT # cursor on
+    printf "\x1B[?25l" >&2              # cursor off
+}
+ProgressBarEnd() {
+    printf "\n" >&2
+}
+
+YadProgressPulsate() {
+    local lockfile="$1"
+    local text="$2"
+
+    while true ; do
+        [ -r "$lockfile" ] || return
+        echo 0
+        sleep 0.1s
+    done | eos_yad --progress \
+                   --title="Progress indicator" \
+                   --text="$text" \
+                   --auto-close \
+                   --width=400 --hide-text --pulsate
+}
+
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
-    sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="/usr/bin/sudo bash -c" ;;
+    sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="sudo bash -c" ;;
     pkexec       | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
     su-c_wrapper)                                                export EOS_ROOTER="/usr/bin/su-c_wrapper bash -c" ;;
     *)

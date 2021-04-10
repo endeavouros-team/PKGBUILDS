@@ -6,25 +6,25 @@
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/supportedchips.html
 # https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/index.html
 
-#LATEST_BRANCH1="Latest Long Lived Branch"
-#LATEST_BRANCH2="Latest Short Lived Branch"
 
-LATEST_BRANCH1="Latest Production Branch Version"
-LATEST_BRANCH2="Latest New Feature Branch Version"
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
+    echo "Error: $(basename "$0"): file eos-script-lib-yad not found." >&2
+    exit 1
+}
+
+LATEST_BRANCH1="Latest Production Branch Version"         # "Latest Long Lived Branch"
+LATEST_BRANCH2="Latest New Feature Branch Version"        # "Latest Short Lived Branch"
 
 LATEST_LEGACY="Latest Legacy GPU version"
 
 GetNvidiaBranch() {
     local string="$1"
     local series="$2"
-    local processor="Linux x86_64/AMD64/EM64T"
-    local data="$(wget -q --timeout=10 -O- https://www.nvidia.com/en-us/drivers/unix)"
-    test -n "$data" || DIE "$FUNCNAME: fetching branch '$string' failed."
-    if [ -n "$series" ] ; then
-        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|^.*$string ($series)||" -e 's|</a>.*||' -e 's|.*">||'
-    else
-        echo "$data" | grep "$string" | grep "$processor" | sed -e "s|.*$string||" -e 's|</a>.*$||' -e 's|^.*">||'
-    fi
+    local result="$(curl -Lsm 10 -o- https://www.nvidia.com/en-us/drivers/unix | sed 's|</a>|</a>\n|g' | grep "$string" | head -n1 | sed 's|.*>\([0-9.]*\)<.*|\1|')"
+
+    test -n "$result" || DIE "$FUNCNAME: fetching branch '$string' failed."
+    Debug "$series branch: $result"
+    echo "$result"
 }
 
 GetNvidiaIds() {
@@ -43,8 +43,9 @@ NvidiaIdsCommon() {
     local series="$2"
     local branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
-    if [ -z "$series" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
-        return   # not the latest branch pacman has currently
+    if [ "$series" = "latest" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
+        WARN "The nvidia.com site driver version is '$branch', pacman version is '$pacman_latest_branch'."
+        return 1  # not the latest branch pacman has currently
     fi
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
@@ -55,11 +56,13 @@ NvidiaIdsCommon() {
 NvidiaIdsLatest() {
     local br ids
     for br in "$LATEST_BRANCH1" "$LATEST_BRANCH2" ; do
-        ids="$(NvidiaIdsCommon "$br")"
+        ids="$(NvidiaIdsCommon "$br" "latest")"
         if [ -n "$ids" ] ; then
-            echo "==> $br: found!" >&2
+            Info "$br: found!"
             echo "$ids"
             return 0
+        else
+            return 1
         fi
     done
     DIE "$FUNCNAME: NvidiaIdsCommon failed."
@@ -69,13 +72,15 @@ NvidiaIdsLegacy() {
     local series="$legacy_series.xx series"
     local ids="$(NvidiaIdsCommon "$LATEST_LEGACY" "$series")"
     test -n "$ids" || DIE "$FUNCNAME: NvidiaIdsCommon failed for Legacy $series."
-    echo "==> $LATEST_LEGACY: found!" >&2
+    Info "$LATEST_LEGACY: found!"
     echo "$ids"
 }
 
 echo2()   { echo "$@" >&2 ; }
-DIE()     { echo2 "Error: $1" ; exit 1 ; }
-Info()    { test "$show_additional_info" = "yes" && echo2 "Info: $@" ; }
+DIE()     { echo2 "$PROGNAME: error: $1" ; exit 1 ; }
+WARN()    { echo2 "$PROGNAME: warning: $1" ; }
+Info()    { test "$show_additional_info" = "yes" && echo2 "====> $@" ; }
+Debug()   { test "$show_additional_info_debug" = "yes" && echo2 "====> $@" ; }
 
 Options() {
     local arg
@@ -83,8 +88,12 @@ Options() {
         case "$arg" in
             -v | --verbose)
                 show_additional_info=yes ;;
+            --debug)
+                show_additional_info_debug=yes ;;
             --tmpdb)
                 targetdir="/tmp" ;;
+            --here)
+                targetdir="." ;;
             -*)
                 DIE "unsupported option '$arg'" ;;
             *)
@@ -124,7 +133,8 @@ CreateNvidiaDb()
 {
     local PROGNAME=nvidia-installer-update-db
     local exe_env=""
-    local show_additional_info=no                       #  "no" is the default, "yes" is TESTING!
+    local show_additional_info=no                       # "no" is the default, "yes" is TESTING!
+    local show_additional_info_debug=no                 # "no" is the default, "yes" is TESTING!
     local targetdir=/var/lib/pci                        # db directory
 
     Options "$@"
@@ -144,7 +154,10 @@ CreateNvidiaDb()
     local xx
     local log=$(mktemp /tmp/$PROGNAME.log.XXXXX)
     local has_logs=no
-    local pacman_latest_branch=$(LANG=C pacman -Si nvidia-dkms | grep ^Version | awk '{print $NF}' | sed 's|-[0-9][0.9]*$||')
+    local pacman_latest_branch=$(LANG=C pacman -Si nvidia-dkms | grep ^Version | head -n1 | awk '{print $NF}' | sed 's|-[0-9][0.9]*$||')
+    local legacy_version=""
+
+    Debug "pacman version: $pacman_latest_branch"
 
     if [ "$targetdir" = "/tmp" ] ; then
         rm -f $target_latest $target_legacy  # option --tmpdb: always create new db into /tmp
@@ -153,9 +166,12 @@ CreateNvidiaDb()
     # check that legacy driver is available either in the repos or AUR
     if [ -z "$(yay -S -s nvidia -s dkms -s "$legacy_series"xx -q)" ] ; then
         legacy_available=no  # not available
+    else
+        legacy_version=$(yay -Si nvidia-${legacy_series}xx-dkms | grep ^Version | awk '{print $3}' | sed 's|-[0-9][0-9]*$||')
+        Debug "legacy version: $legacy_version"
     fi
 
-    echo2 "Fetching NVIDIA graphics card ids from nvidia.com ..."
+    Info "Fetching NVIDIA graphics card ids from nvidia.com ..."
 
     nvidia_ids_latest="$(NvidiaIdsLatest)"
     test -n "$nvidia_ids_latest" || DIE "cannot fetch latest NVIDIA ids"
@@ -190,6 +206,23 @@ CreateNvidiaDb()
 
     # Now save the data into the local database.
 
+    case "$targetdir" in
+        .)
+            # save to current working folder
+            for xx in $target_latest $target_legacy ; do
+                if [ -r $xx ] ; then
+                    rm -f $xx
+                else
+                    WARN "$xx does not exist."
+                fi
+            done
+            mv $tmpfile1 $target_latest
+            mv $tmpfile2 $target_legacy
+            chmod 0644 $target_latest $target_legacy
+            return
+            ;;
+    esac
+
     sudo_commands+=" ; mkdir -p $targetdir"
     sudo_commands+=" ; if [ ! -d $bakdir ] ; then mkdir -p $bakdir ; cp -a $targetdir/*.ids $bakdir >& /dev/null ; fi"
     sudo_commands+=" ; mv $tmpfile1 $target_latest"
@@ -210,12 +243,12 @@ CreateNvidiaDb()
 
     if [ "$targetdir" = "/tmp" ] ; then
         # temporary files used, no sudo needed
-        echo2 "Adding NVIDIA graphics card ids to a temporary local database."
+        Info "Adding NVIDIA graphics card ids to a temporary local database."
         bash -c "$sudo_commands"
     else
         # Now we need elevated privileges.
-        echo2 "Adding NVIDIA graphics card ids to the local database."
-        sudo bash -c "$sudo_commands"
+        Info "Adding NVIDIA graphics card ids to the local database."
+        $EOS_ROOTER "$sudo_commands"
     fi
 }
 

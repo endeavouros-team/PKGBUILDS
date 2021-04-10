@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# Show information about GPUs and drivers
+# and send it to pastebin.
+#
+# Use option
+#    -n   for not to send to pastebin
+#    -h   for more information about the options
+#
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+Header() {
+    local header="$1"
+    printf "\n[%s]\n" "$header"
+}
+
+Date() {
+    Header "Date"
+    /usr/bin/date "+%Y-%m-%d"
+}
+GPUs() {
+    Header "Existing GPUs"
+    /usr/bin/lspci -vnn | /usr/bin/grep -P 'VGA|3D|Display'
+}
+GPUKernelModules() {
+    Header "GPU related kernel modules in use"
+    /usr/bin/lsmod | /usr/bin/grep -P 'nvidia|nouveau|radeon|amdgpu|i915'
+}
+DriverFilter() {
+    /usr/bin/grep -Pw "$pkgs_for_grep"
+}
+VideoDrivers() {
+    Header "Installed video drivers and related packages"
+    local pkg result
+    local pkg_specs=( xf86-video
+                      nvidia
+                      prime
+                      optimus
+                      bbswitch
+                      bumblebee )
+    local pkgs_for_grep="$(echo "${pkg_specs[*]}" | tr ' ' '|')"
+
+    for pkg in "${pkg_specs[@]}" ; do
+        if [ "$testing" = "yes" ] ; then
+            result=$(yay -Ss "$pkg" | grep ^[a-z]*/$pkg | DriverFilter)
+        else
+            result=$(/usr/bin/pacman -Qs "$pkg" | /usr/bin/grep ^local/ | /usr/bin/sed 's|^local/||' | DriverFilter)
+        fi
+        if [ -n "$result" ] ; then
+            echo "$result"
+        fi
+    done | /usr/bin/sort | /usr/bin/uniq
+}
+All() {
+    Date
+    GPUs
+    GPUKernelModules
+    VideoDrivers
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local testing="no"        # "no" for release, "yes" for dev testing
+    local send=yes
+
+    case "$1" in
+        -h | --help)
+            cat <<EOF
+Usage: $progname [options]
+Options:
+    --help         This help.
+    -h
+
+    --no-send      Don't send to pastebin
+    --dryrun
+    -n
+
+Without options the GPU info will be sent to pastebin which
+returns a URL where the information is saved.
+EOF
+            return
+            ;;
+        -n | --dryrun | --no-send)
+            send=no
+            ;;
+        "")
+            ;;
+        *)
+            DIE "unsupported parameter '$1'"
+            ;;
+    esac
+
+    local info=$(All)                                   # get GPU infos
+
+    echo "$info"                                        # show info locally
+    [ "$send" = "yes" ] && echo "$info" | eos-sendlog   # send info to pastebin
+}
+
+Main "$@"

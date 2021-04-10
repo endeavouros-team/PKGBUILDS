@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+# Latest yad release with a patch.
+
+################## Fetch and source the upstream PKGBUILD:
+
+curl -Lsm 10 -o PKGBUILD.yad https://github.com/archlinux/svntogit-community/raw/packages/yad/trunk/PKGBUILD || exit 1
+if [ -n "$(grep -w "^prepare" PKGBUILD.yad)" ] ; then
+    echo "Error: upstream yad PKGBUILD has function 'prepare'!!" >&2
+    exit 1
+fi
+
+# Prepare for marking this patched.
+_pkgver=$(grep ^pkgver= PKGBUILD.yad | cut -d'=' -f2)
+sed -i PKGBUILD.yad -e "s|\${pkgver}|${_pkgver}|g"
+
+source PKGBUILD.yad
+
+rm -f PKGBUILD.yad
+
+################## Modifications to the upstream PKGBUILD:
+
+# Mark this as patched
+pkgver+=".eos4"
+
+# Dependencies: add missing and remove unnecessary
+depends+=(gspell gtksourceview3)
+depends=($(for _xx in "${depends[@]}" ; do [ "$_xx" != "gtkspell3" ] && echo "$_xx" ; done))
+
+# Add architectures
+arch+=(aarch64 armv7h)
+
+sha256sums=('32f76fe5d68327b2dc1549c85cac6322086defca8a53a5466ffd0e2913856124')
+
+# The patch
+prepare() {
+    local file=${pkgname}-$_pkgver/src/main.c
+    local add_before_this_line="parse_geometry ();"         # line number 567 in version 9.0!
+    local pp="gtk_widget_set_size_request (dlg, nw, -1);"   # check with this string if this patch already exists
+    local patch=""
+    local color_red="$(printf "\e[1;35m")"
+    local color_reset="$(printf "\e[0m")"
+
+    if [ "$(grep "$pp" $file)" = "" ] ; then
+        echo "${color_red}====>${color_reset} $pkgname: patching $file" >&2
+
+        patch+="     gint mw, nw;\n\n"
+        patch+="      gtk_widget_get_preferred_width (dlg, &mw, &nw);\n"
+        patch+="      $pp\n"
+
+        sed -i $file -e "/$add_before_this_line/i \ $patch"
+    fi
+    rm -f ../yad-$_pkgver.tar.xz
+}

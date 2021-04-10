@@ -39,7 +39,9 @@ eos_yad_infomsg() {
 
 DIE() {
     Untagged "$1" >&2
-    eos_yad --form --text="$(Monospaced "$1")\n" --title="Error" --image=error --button=yad-ok:0
+    eos_yad --form --text="$(Monospaced "$1")\n" --title="$progname: error" \
+            --width=400 \
+            --image=error --button=yad-ok:0
     exit 1
 }
 
@@ -95,19 +97,12 @@ XfceSetWallpaper() {
     esac
 }
 
-IsSway() { test -x /usr/bin/swaybg ; }
-
 WallpaperSetCommon() {
     # Assume:
     #    - $pic is the picture file name
     #    - $DE is the desktop environment
 
     test -n "$pic" || DIE "no picture!"
-    if [ -z "$DE" ] ; then
-        if (! IsSway) ; then
-            DIE "no DE!"
-        fi
-    fi
 
     case "$DE" in
         BUDGIE)
@@ -148,15 +143,20 @@ WallpaperSetCommon() {
             AssertPicture endeavouros_xfce4.png no
             XfceSetWallpaper
             ;;
+
+        # Not DEs but WMs:
+
+        SWAY)
+            AssertPicture endeavouros-wallpaper.png no
+            killall swaybg   # otherwise wallpaper doesn't change!
+            swaybg -i "$pic"
+            ;;
+        BSPWM)
+            AssertPicture endeavouros-wallpaper.png no
+            nitrogen --set-auto "$pic"
+            ;;
         *)
-            # may be DM instead of DE
-            if (IsSway) ; then
-                AssertPicture endeavouros-wallpaper.png no
-                killall swaybg   # otherwise wallpaper doesn't change!
-                swaybg -i "$pic"
-            else
-                DIE "Sorry, desktop '$DE' is not supported."
-            fi
+            DIE "Sorry, desktop '$DE' is not supported."
             ;;
     esac
 }
@@ -286,10 +286,44 @@ Examples:
 EOF
 }
 
+IsSway()  {
+    case "$DESKTOP_SESSION" in
+        sway | */sway) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        sway | */sway) return 0 ;;
+    esac
+    [ -x /usr/bin/swaybg ] && return 0
+    return 1
+}
+
+IsBspwm() {
+    case "$DESKTOP_SESSION" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    [ -x /usr/bin/bspwm ] && return 0
+    return 1
+}
+
+GetDeOrWm() {
+    local de="$(eos_yad_GetDesktopName)"
+    if [ "$de" = "" ] ; then
+        if (IsSway) ; then
+            de=SWAY
+        elif (IsBspwm) ; then
+            de=BSPWM
+        fi
+    fi
+    echo "$de"
+}
+
 Main()
 {
     local progname="$(basename "$0")"
-    local DE="$(eos_yad_GetDesktopName)"
+    local DE="$(GetDeOrWm)"
     local picfolder=/usr/share/endeavouros/backgrounds
     local pic=""
 

@@ -52,7 +52,7 @@ Main() {
 
     if [ "$save" = "yes" ] ; then
         local tmpfile=$(mktemp $HOME/.config/eos-sendlog.XXXXX)
-        mv $db $tmpfile
+        [ -r $db ] && mv $db $tmpfile
         printf "%s: %s\n" "$(date +%Y%m%d-%H%M)" "$url" > $db
         cat $tmpfile >> $db
         rm -f $tmpfile

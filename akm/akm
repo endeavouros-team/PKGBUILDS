@@ -23,7 +23,10 @@ Header() {
     FormatVersion "$hdr"
 }
 
-LocalVersion() { /usr/bin/pacman -Q "$1" 2>/dev/null | /usr/bin/awk '{print $2}' ; }
+LocalVersion() {
+    local pkg="$(/usr/bin/basename "$1")"
+    /usr/bin/pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+}
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
 Choose() {
@@ -56,13 +59,14 @@ Installed() {
 
 StableVersion() {
     local pkg="$1"
-    local repo
+    local repo=""
 
+    # prevent usage of the 'testing' repo:
     case "$pkg" in
-        linux | linux-headers | linux-lts*) repo=core ;;
-        linux-zen* | linux-hardened*)       repo=extra ;;
+        linux | linux-headers | linux-lts*) repo=core/ ;;
+        linux-zen* | linux-hardened*)       repo=extra/ ;;
     esac
-    LANG=C pacman -Si $repo/"$pkg" | grep ^Version | awk '{print $3}'
+    LANG=C pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
 }
 
 Stable() {
@@ -75,7 +79,7 @@ Stable() {
 }
 
 TestingVersion() {
-    local pkg="$1"
+    local pkg="$(/usr/bin/basename "$1")"
     echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^.*>\([0-9][0-9a-z\.\-]*\)<.*$|\1|'
 }
 
@@ -152,9 +156,14 @@ echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
 ShowFunctionLine() {
-    printf2 "%sGathering information: %3.f%%" $'\r' "$((100*SERVICES_DONE/SERVICES))"
+    # message, percent, bar-length
+    ProgressBar "Gathering information:" \
+                "$(( 100 * SERVICES_DONE / SERVICES))" \
+                50
 }
 ShowFunctionStart() {
+    ProgressBarInit
+
     SERVICES=${#functions[@]}
     SERVICES_DONE=0
     ShowFunctionLine
@@ -213,21 +222,66 @@ Options() {
     for arg in "$@" ; do
         case "$arg" in
             --connect-header) connect_header_with_kernel=yes ;;
+            --scroll) scroll=yes ;;
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options]
+options:
+    --connect-header      Make kernel and header package go together at install or uninstall.
+    --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
+    --help | -h           This help.
+EOF
+                exit 0
+                ;;
             -*) DIE "unsupported option '$arg'" ;;
             *) DIE "unsupported parameter '$arg'" ;;
         esac
     done
 }
 
+AvailableKernelsAndHeaders() {
+
+    # Find kernel packages by finding packages which have words 'linux' and 'headers'
+    # From the output of 'pacman -Sl'
+    # - find lines that have words: 'linux' and 'headers'
+    # - drop lines containing 'testing' (=testing repo, causes duplicates) and 'linux-api-headers' (=not a kernel header)
+    # - show the (header) package names
+    # Now we have names of the "kernel headers".
+    # Then add the kernel packages to proper places and output the result.
+
+    local headers=$( pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | awk '{printf("%s/%s\n", $1, $2)}' | grep -Pv '^testing/|/linux-api-headers$')
+    local header
+    local kernel
+
+    for header in $headers ; do
+        kernel=$(echo "$header" | sed 's|-headers$||')
+        echo "$kernel $header"
+    done
+}
+
 Main()
 {
+    local progname="$(basename "$0")"
     local na="(-)"
-    local kernels=(
-        linux             linux-headers
-        linux-lts         linux-lts-headers
-        linux-zen         linux-zen-headers
-        linux-hardened    linux-hardened-headers
-    )
+    local kernels=()
+    local connect_header_with_kernel=no    # default, change with option --connect-header
+    local scroll=no
+    local nrofkernelitems                  # 8 with only upstream kernels
+
+    CommonStuff
+    AkmConfig
+    Options "$@"
+
+    echo "==> Info: detecting available kernel packages."
+    kernels=( $(AvailableKernelsAndHeaders) )
+
+    #kernels=(
+    #    linux             linux-headers
+    #    linux-lts         linux-lts-headers
+    #    linux-zen         linux-zen-headers
+    #    linux-hardened    linux-hardened-headers
+    #)
+
     local functions=(  # order is important!
         Choose
         PkgName
@@ -237,11 +291,9 @@ Main()
         KernelOrg
         KOVersion
     )
-    local connect_header_with_kernel=no    # default, change with option --connect-header
 
-    CommonStuff
-    AkmConfig
-    Options "$@"
+    nrofkernelitems=${#kernels[@]}
+    [ $nrofkernelitems -gt 8 ] && scroll=yes
 
     # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
@@ -286,13 +338,18 @@ Main()
 
     local cmd=(
         eos_yad
-        --width=750
+        --width=900
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
         --button="Cancel!gtk-cancel!Change nothing":1
         --button="Execute!system-run!Make your changes":0
     )
+    if [ "$scroll" = "yes" ] ; then
+        cmd+=(--scroll
+              --height=700   # 660 is about the default
+             )
+    fi
 
     for xx in "${functions[@]}" ; do
         ShowFunction
@@ -349,9 +406,9 @@ Main()
                 fi
                 ;;
             FALSE)
-                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=("$pkg")
+                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=($(basename "$pkg"))
                 if [ "$connect_header_with_kernel" = "yes" ] ; then
-                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=("$partner")
+                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=($(basename "$partner"))
                 fi
                 ;;
         esac
@@ -371,7 +428,7 @@ Main()
     fi
 
     if [ -n "$cmd" ] ; then
-        eos_yad_RunCmdTermBash "echo '${cmd[*]}' ; sudo bash -c '${cmd[*]}'"
+        RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
     fi
 }
 

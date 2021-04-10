@@ -83,6 +83,8 @@ Main() {
             $aur_helper -Sua
         } || {
             echo2 ":: Warning: no AUR helper found."
+            echo2 ":: Please check configuration file /etc/eos-script-lib-yad.conf,"
+            echo2 ":: and check that the configured AUR helper is installed."
         }
     fi
 }

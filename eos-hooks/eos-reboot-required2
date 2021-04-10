@@ -4,7 +4,7 @@
 # excluding kernels that are *not* currently running.
 
 running_kernel() {
-    cat /proc/cmdline | sed 's|.*/vmlinuz-\(linux[a-z-]*\) .*|\1|'
+    cat /proc/cmdline | sed 's|.*/vmlinuz-\(linux[a-z0-9-]*\) .*|\1|'
 }
 
 Main() {
@@ -15,8 +15,8 @@ Main() {
 
     for tt in $targets ; do
         case "$tt" in
-            linux | linux-lts | linux-zen | linux-hardened)
-                # Note: only official kernels are checked.
+            linux | linux-lts | linux-zen | linux-hardened | linux-lts?? | linux-lts???)
+                # Note: only official and older LTS kernels are checked.
                 if [ "$tt" = "$runningKernel" ] ; then
                     notify=yes
                     break

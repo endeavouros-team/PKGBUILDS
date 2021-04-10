@@ -20,6 +20,4 @@ On your system, find your NVIDIA card id with command:
 lspci -vnn | grep -P 'VGA|Display|3D' | grep 10de | sed 's|.* \[10de:\([0-9a-f]*\)\] .*|\1|'
 </pre>
 
-## Changelog
-2020-Mar-20, version 2.2-1:
-- updated to the latest NVIDIA driver database
+[**Changelog**](https://github.com/endeavouros-team/PKGBUILDS/commits/master/nvidia-installer-db)

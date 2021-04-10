@@ -4,7 +4,7 @@ Show pacman history for all or selected packages.
 ## Usage:
 Run command
 <pre>
-pahis
+pahis --help
 </pre>
 about how to use it.<br>
 Note: you can use bash completion (tab) to complete a partial words and options!

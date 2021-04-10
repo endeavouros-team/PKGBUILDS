@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Run a command in a terminal.
+# See also: RunInTerminalEx
+
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
     echo "Error: cannot source eos-script-lib-yad" >&2
     exit 1

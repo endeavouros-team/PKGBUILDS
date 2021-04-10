@@ -4,7 +4,8 @@
 # If it has, then offer to update the local database.
 
 DIE()  { echo "Error: $1" >&2 ; exit 11 ; }
-INFO() { echo "Info: $1" >&2 ; }
+INFO() { printf "Info: %s" "$1" >&2 ; }
+INFOln() { INFO "$1\n" ; }
 
 nvidia-site-checks() {
     local ids=/var/lib/pci/nvidia.ids
@@ -15,13 +16,13 @@ nvidia-site-checks() {
     [ -x $differ ] || DIE "package 'meld' is required."
 
     if (! /usr/bin/ls /usr/share/licenses/nvidia* >& /dev/null) ; then
-        INFO "no Nvidia driver is installed."
+        INFO "no Nvidia driver is installed. "
     fi
 
-    [ -r $ids ] || INFO "$ids does not exist!"
+    [ -r $ids ] || INFOln "$ids does not exist!"
 
     rm -f /tmp/nvidia*.ids
-    nvidia-installer-update-db --tmpdb 2>/dev/null
+    nvidia-installer-update-db --tmpdb #2>/dev/null
 
     [ -r $newids ] || DIE "$newids was not generated!"
 

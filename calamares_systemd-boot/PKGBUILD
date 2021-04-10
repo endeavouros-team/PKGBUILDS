@@ -1,4 +1,5 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS info@endeavouros.com
+# modified to test EndeavourOS systemd-boot installs by joekamprad <joekamprad@endeavouros.com>
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_systemd-boot
@@ -19,7 +20,7 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 # When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
-  "git+https://github.com/killajoe/$_eos_changes.git#branch=master"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=systemd-boot"
   "git+https://github.com/endeavouros-team/calamares_branding.git#branch=master"
   "https://github.com/killajoe/calamares/archive/v3.2.37.tar.gz"
 )
@@ -116,9 +117,9 @@ prepare() {
     # This is for using local .yaml file
     #sed -i "s?groupsUrl: local?groupsUrl: file:\/\/\/usr\/share\/calamares\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
     # This is for using upstream file (github or server)
-    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/systemd-boot\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
     # sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall.yaml?" $_reponame/src/modules/netinstall/netinstall.conf
-    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
+    sed -i "s?groupsUrl: local?groupsUrl: https:\/\/raw.githubusercontent.com\/endeavouros-team\/install-scripts\/systemd-boot\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
     #sed -i "s?groupsUrl: local?groupsUrl: https:\/\/github.com\/endeavouros-team\/install-scripts\/raw\/master\/netinstall_nvidia.yaml?" $_reponame/src/modules/netinstall/netinstall_nvidia.conf
     # branding files
     cp $_reponame/src/branding/endeavouros/img/restore.png                      $_reponame/src/modules/keyboard/images
@@ -177,6 +178,12 @@ prepare() {
 
     sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
     sed -i "s?pacman_flags,?pacman_flags, \"--needed\",?" $_reponame/src/modules/packages/main.py
+    
+    # partition.conf for systemd-boot
+    sed -i $_reponame/src/modules/partition/partition.conf \
+    -e 's|^efiSystemPartition:     "/boot/efi"$|efiSystemPartition:     "/efi"|' \
+    -e 's|^# efiSystemPartitionSize:     300M$|efiSystemPartitionSize:     512M|' \
+    -e 's|^# efiSystemPartitionName:     EFI$|efiSystemPartitionName:     EFI|'
 
 }
 
@@ -205,6 +212,9 @@ package() {
 
     # pacstrap as bash script implementation 
     # maybe download base_install.sh everytime from calamares module so it can be updated on the go...
+    # first line sed pacsrap to not install grub packages
+    sed -i $_reponame/src/modules/pacstrap/base_install.sh \
+    -e 's|^_packages_array=( base sudo grub endeavouros-keyring endeavouros-mirrorlist grub-tools os-prober grub2-theme-endeavouros xterm )|_packages_array=( base sudo endeavouros-keyring endeavouros-mirrorlist xterm )|'
     cp -r $_reponame/src/modules/pacstrap/base_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     cp -r $_reponame/src/modules/user_pkglist/pkglist_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh

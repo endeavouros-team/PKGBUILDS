@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.5.26
+pkgver=1.6.15
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -31,6 +31,7 @@ source=(
 
   $_url/eos-FindAppIcon
   $_url/RunInTerminal
+  $_url/RunInTerminalEx
   $_url/ksetwallpaper.py
   $_url/ChangeDisplayResolution
   $_url/device-info
@@ -46,27 +47,32 @@ source=(
   $_url/eos-pkg-changelog
   $_url/eos-sendlog
   $_url/eos-kbd-set
+  $_url/eos-download-wallpapers
+  $_url/eos-send-gpuinfo
 )
 
-sha512sums=('22016411565bbaaf090bfa8fbc2e58423d975212273d1efbd7cc0226f0a6db18c3d48f23dd67b9b4e6698aa1993cfef0124c3633946210ffc6bc8c27c9e98dfe'
-            '882e0f938ef30d9f5f4c0c5f2d2eae449ff9710a9b3acd3567f936dc851655e964392b9f2b836a9f26f281c5637fd6578ed1d73f8af7dbd2c7e968e142708d59'
+sha512sums=('cc135f0d71f2b0da3a5eac3f0d84ea97a4a9e6c4c594fde466f05b550c794ba25beeee191109977ee840b47fcc6e522a0c6ea6437b34a11daa4d3519a04175bb'
+            'b9ce5455f137cd47beddd4a2aa9850467b6570e829c5bc548488652e44a7d2d68f405ef9a9249864f297fed9b60123d9ef07c60acea48db1e19bec5befdaef8a'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
-            'b097c58d4e954ab86a07d685977b698645b1e2b49131ad76015e65b98e599c3b57728f4b2cfcf3a10527de23d7ba069ea4cf0dfddb8ee4587fc9815f4885dec7'
+            '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
+            'c7bd73ce346844624ae9f78c8a86e674e03548b7ef8497e6f78318387d4118f0037d67f9c6f4e1c64f382ac6a62d27f8f119f227d08c337970540e8122757b85'
             'a3488dab4b65f215ee1513c5ff4c81b1d9e43346abb3a1e9571271c8e60e13184bd826a6206938c14c004fa5adb4f629ea832a535a51972657adb2de5bc30634'
             '0193f851b4145cb761dc2e47f4bd2c00a028c016489bb2f053bba64ef88c08d02e81f9dc095ba3928de8fa0fbb1fd2b3e5289bb125fe7dcc31634b7afbf48818'
             '803ae582e1a170f5d1cea3f5f69e72a0de188c389e6fcd471a35471753158efd0cd5622d580fc86e71654765a041b83a217268be2a87bb3709af632cc02c442f'
             'c2939fc7843b3c34bcc192b849eec962e682bfeb0df1d38b9a991cab03060f1847f32502552d9b17c8333ad698840f851d10cbd5012c1618f3e81f040162bb3d'
             'dbe1c6e133ef46e64e8a826f20eb9777513cd738bf90ed28e18d0cb10dcfa5712ffa5b36b033c9c0b8c844ffdecc7c62fcd7076ff4138a67f3cef29531b61065'
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
-            'd0fe9b4d4bfdf7709ab042999f960fa96e1b8b07a28329a4fbbf0c2af6b39d2fe455952c854ee6c38c7c3518089a605912d389dd55368c8381dde499acbe69be'
-            '7c1c771c137212fb382f66347bc6765f1cc73f441dd0e646a76453027322bb2194b64e97d82016d372d8a6df055bd3b41a18a89dc95b4deaa76ce29e9d563fb4'
+            '037eb88ba22c024072db064ad4f6b1ce2c0b04f01f16f8cfca22bb3afeb4b64a207337e9e789b1fbcb7b20c23c1bf881ca80cb173a29ae90356ffdf848ffb119'
+            '9efd23d976a89455e9c17d82aa4d304fb43726b84b9ce8ad69b81b633b114ec9d220455c92b08f1a87da5a143b11e1c30a698e1f2505034783f1a10fd8ab4bf2'
             '72ecda87cdb5da48cffac044da572ed66027737afe5000339aa3b28b922bf9564761d2c6abf43c3082030b30d8353b6d13a4c567f0b4b959dc3741c309916171'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
-            '22726c757eeba2c94803550eb605a77354d361473bcd710cda0fa5361b3a2edadae9038c808eda5ff468aeaed862299fefd41de4fa72aeaef7a64d5d746a4104'
-            'd4a3786d5a6f0defcbaa463ab1cfb7f96faaad1040ab0ff6929b95a0193f4f2a62de5d70f35470bc66e04a994d094340dfb1ffe7502dda90a11c8a9703302261'
-            '17c52a50e70bf925ccc985dcfb6be54d13c9caf159208e834d82f64203f2614861d627958aae22a3472da1c2f0d1dc3777f92d350226ef8dbe4809ffe7f298e6'
-            '32db0f3dc1ce62d8370acdcd70810b849df4f3396f00db0827e3e0f3818c44a5cc57cb5e0062e39bae2edea43d28592367e54ea6466f13dbbbc6d83fffeb64fa'
-            'abee90db9af8d5a2a7b3a80151b858cfb31734496bde87b6f8388737e5a7dbdb8cbfea6b884d10df030da76c83af79b7b860b53022580914f53a08dd0231ff56')
+            '5d8e106252962eb1627813e2bf46dece99cddf13f5b243198bc10b8e8e5cb3ee69c1aa060c58da4be94761df4ff5963d8c694a24ee8388ce0fcf29a3c2f1313c'
+            '032774b2ecff80a7759f6e091a68204a492453e2023672ad74ff51b0ac14cf523708db07a1f8739cfbd11524fc7fa82735242d0c0110b70a8e35a0dea6c32992'
+            '1d938d2c29b6302ca48cffa6b1cdef583fa89117a9bd9f46eb02b0f9ca1cd7d00da4a8c3dc0c05b310391f2e5dcf6bf9cbbdd564e63d7b28900af3c46dc30cf4'
+            '3acb0baea66f1ff4c99368d81b0ca5f32bfc76eaa8844876414b5eee30ec7f501b2293409fd73f6bbbc351a110737bfb2e0a2bc3258e55c54361f98572cf1197'
+            '5e7daaf9f13785958ab944a0a3254f658cd485462a0921da850c73e87db548567c6c2b3068893b905ff318910e534459f3440faebca06b49c5da5b4efd42a308'
+            '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
+            'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -77,6 +83,7 @@ package() {
   install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog
   install -Dm755 eos-kbd-set                    $pkgdir/usr/bin/eos-kbd-set
   install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
+  install -Dm755 RunInTerminalEx                $pkgdir/usr/bin/RunInTerminalEx
   install -Dm755 ChangeDisplayResolution        $pkgdir/usr/bin/ChangeDisplayResolution
   install -Dm755 device-info                    $pkgdir/usr/bin/device-info
   install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
@@ -86,11 +93,13 @@ package() {
   install -Dm755 UpdateInTerminal               $pkgdir/usr/bin/UpdateInTerminal
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
+  install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
+# install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
   install -Dm755 eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo
   install -Dm644 eos-pkginfo.completion         $pkgdir/usr/share/bash-completion/completions/eos-pkginfo
 
-  ln -s /usr/bin/eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo-noaur
+  ln -s /usr/bin/eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo-aur
 }
