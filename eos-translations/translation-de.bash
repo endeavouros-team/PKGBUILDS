@@ -255,3 +255,29 @@ _tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Bildschirm-Hintergr�
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "Update-Check"
+_tr_add2 updt_searching           "Suche"
+_tr_add2 updt_for_updates         "nach Updates"
+_tr_add2 updt_failure             "Fehler$_exclamation"
+_tr_add2 updt_nothing_todo        "Es gibt nichts zu tun"
+_tr_add2 updt_press_enter         "Drücke ENTER um das Fenster zu schließen"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Verwalte pacnew, pacorig $_and pacsave Dateien mit pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Einstellungen"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Downloade mehr EndeavourOS Hintergründe"
+_tr_add2 after_install_more_wall_tip  "Downloade alte EndeavourOS und Community Hintergründe"
+_tr_add2 after_install_info           "Information"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Neuigkeiten über diese App"
+_tr_add2 butt_softnews_tip            "Wichtige Neuigkeuten über EndeavourOS Apps"
+
+_tr_add2 install_community            "Installiere Community Editionen"
+_tr_add2 install_community_tip        "Community Editionen: Sway, Bspwm (Bemerkung: Benötigt eine Internet Verbindung)"
