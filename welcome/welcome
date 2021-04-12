@@ -1101,7 +1101,7 @@ AfterInstall() {
 
 
   local root_start="" root_stop="" first_differ=""
-  local missing=()
+  local missing=() form=""
 
   case "$XDG_SESSION_TYPE" in
       wayland)
@@ -1118,11 +1118,13 @@ AfterInstall() {
           fi
           case "${#missing[@]}" in
               0) ;;
-              1)  eos_yad_WARN "For pacdiff, install package: ${missing[*]}." ;;
-              *)  eos_yad_WARN "For pacdiff, install packages: ${missing[*]}." ;;
+              1) form=package ;;
+              *) form=packages ;;
           esac
+          [ -n "$form" ] && eos_yad_WARN "For pacdiff, install $form: ${missing[*]}." --height=150 --width=500 --fontname="Mono 10"
           ;;
-      x11)      # nothing to do
+      x11)
+          # nothing to do
           ;;
   esac
   for differ in $first_differ "${differs[@]}" ; do
