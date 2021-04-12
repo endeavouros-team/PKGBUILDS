@@ -284,7 +284,7 @@ BuildReflectorCommand() {
     local ix_ext=""
     local ac
 
-    reflector_cmd=(reflector)
+    reflector_cmd=(reflector --verbose)
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         reflector_cmd+=($(cat $tmpconf | grep -v "^$country_exclude"))
@@ -444,7 +444,7 @@ Main() {
     local http_selected=0
     local rsync_selected=0
     local country_exclude="--country-exclude"          # reflector does not have this option
-    local use_waiting_indicator=yes
+    local use_pulsating_indicator=no  # yes or no
 
     # Find countries with supported mirrors.
 
@@ -471,14 +471,39 @@ Main() {
 
     # Now all is ready, so just run the command.
 
-    if [ "$use_waiting_indicator" = "yes" ] ; then
+    if [ "$use_pulsating_indicator" = "yes" ] ; then
         local lockfile="$(mktemp "$HOME"/.lck.XXXXXXXX)"
         YadProgressPulsate "$lockfile" "Ranking mirrors, please wait..." &
     fi
 
-    "${reflector_cmd[@]}" > $tmpfile
+    local ranklog=/tmp/mirror-rating.log
+    local progress_cmd=(
+        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 200 --auto-close
+        --width=900 --no-buttons
+        --image=applications-internet
+        --title="Mirror ranking"
+        --text="Rating mirrors, please wait...\nNote: rating log will be saved in file <b>$ranklog</b>."
+    )
+    
+    "${reflector_cmd[@]}" 2>&1 > $tmpfile | tee $ranklog | {
+        local line="" max_lines=0 value=0 line_count=-2
+        while read line ; do
+            if [[ "$line" == *"mirror(s) by"* ]]; then
+                max_lines=$(echo "$line" | sed -e 's/.*rating \(.*\) mirror.*/\1/')
+            fi
+            if [[ "$line" != *"WARNING:"* ]]; then
+                ((line_count++))
+            fi
+            echo "#<tt>$line</tt>"
+            if [ "$line_count" -ge 0 ]; then
+                value=$(( line_count*100/max_lines ))
+                echo "$((  value < 100 ? value : 99  ))"
+            fi
+        done
+        echo 100
+    } | "${progress_cmd[@]}"
 
-    if [ "$use_waiting_indicator" = "yes" ] ; then
+    if [ "$use_pulsating_indicator" = "yes" ] ; then
         #sleep 0.5
         rm -f "$lockfile"
     fi
