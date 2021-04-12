@@ -1098,7 +1098,34 @@ AfterInstall() {
       --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
       --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
-  for differ in "${differs[@]}" ; do
+
+
+  local root_start="" root_stop="" first_differ=""
+  local missing=()
+
+  case "$XDG_SESSION_TYPE" in
+      wayland)
+          if [ -x /usr/bin/xhost ] ; then
+              root_start=" ; xhost si:localuser:root"
+              root_stop=" ; xhost -si:localuser:root"
+          else
+              missing+=(xorg-host)
+          fi
+          if [ -x /usr/bin/diffuse ] ; then
+              first_differ=diffuse
+          else
+              missing+=(diffuse)
+          fi
+          case "${#missing[@]}" in
+              0) ;;
+              1)  eos_yad_WARN "For pacdiff, install package: ${missing[*]}." ;;
+              *)  eos_yad_WARN "For pacdiff, install packages: ${missing[*]}." ;;
+          esac
+          ;;
+      x11)      # nothing to do
+          ;;
+  esac
+  for differ in $first_differ "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
           case "$differ" in
               meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
@@ -1113,6 +1140,9 @@ AfterInstall() {
               vim | code)
                   tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
                   ;;
+              diffuse)
+                  tabcontents+=("RunInTerminal echo \'$pdtext\' $root_start ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null $root_stop")
+                  ;;
               *)
                   tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
                   ;;
@@ -1120,6 +1150,7 @@ AfterInstall() {
           break
       fi
   done
+
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
       tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
