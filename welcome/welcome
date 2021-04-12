@@ -1184,22 +1184,16 @@ UsefulTips() {
 #}
 
 IsEosYadInstalled() {
-    # Determines if a patched EOS version of yad is installed.
+    # Determines if yad-eos is installed.
+    # Some yad alternative must be installed if we can use this program!
 
     local installed_yad="$(LANG=C /usr/bin/pacman -Qi yad 2>/dev/null | /usr/bin/grep -w ^Name | /usr/bin/awk '{print $3}')"
 
-    case "$installed_yad" in
-        yad-eos | "")
-            return 0 ;;       # yad-eos is installed, or no yad alternative is installed
-        *)
-            # some other yad alternative is installed
-            if (/usr/bin/pacman -Si yad-eos >& /dev/null) ; then
-                return 1  # yad-eos is available
-            else
-                return 0  # yad-eos is not available
-            fi
-            ;;
-    esac
+    if [ "$installed_yad" = "yad-eos" ] ; then
+        return 0        # yad-eos is installed
+    else
+        return 1        # some other yad alternative is installed
+    fi
 }
 
 AddMoreApps() {
