@@ -29,6 +29,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/mkinitcpio-openswap
     #aur/paper-icon-theme-git
     aur/polybar
+    aur/virtualbox-ext-oracle
     aur/yay
     arc-gtk-theme-eos
     akm
@@ -110,6 +111,16 @@ _fetch_that_file() {
 
 __generic_get_pkgname() { local funcname="$1" ; echo "$funcname" | cut -d '_' -f 2 ; }
 
+
+_virtualbox-ext-oracle_hook() {
+    local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$Pkgname/PKGBUILD
+    local Pkgver=$(_Get_pkgver "$Pkgbuild")
+
+    # add a version check, virtualbox must be at least the same version
+    sed -i "$Pkgbuild" \
+        -e "s|^depends=('virtualbox'|depends=('virtualbox>=$Pkgver'|"
+}
 
 _paper-icon-theme-git_hook() {
     local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
@@ -409,6 +420,7 @@ ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper
 ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
 ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
+ASSET_PACKAGE_HOOKS["virtualbox-ext-oracle"]=_virtualbox-ext-oracle_hook
 #ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 #ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
