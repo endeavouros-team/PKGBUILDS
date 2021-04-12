@@ -276,8 +276,8 @@ _tr_add2 after_install_more_wall      "Downloade mehr EndeavourOS Hintergründe"
 _tr_add2 after_install_more_wall_tip  "Downloade alte EndeavourOS und Community Hintergründe"
 _tr_add2 after_install_info           "Information"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Neuigkeiten über diese App"
-_tr_add2 butt_softnews_tip            "Wichtige Neuigkeuten über EndeavourOS Apps"
+_tr_add2 butt_softnews                "Aktuelles über EndeavourOS Apps"
+_tr_add2 butt_softnews_tip            "Wichtige Meldungen über EndeavourOS Apps"
 
 _tr_add2 install_community            "Installiere Community Editionen"
 _tr_add2 install_community_tip        "Community Editionen: Sway, Bspwm (Bemerkung: Benötigt eine Internet Verbindung)"
