@@ -34,12 +34,12 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME app ist deaktiviert. Um sie trotzdem zu starten, benutze --enable."
+_tr_add2 welcome_disabled      "$PRETTY_PROGNAME App ist deaktiviert. Um sie zu starten, benutze --enable."
 
 _tr_add2 butt_later            "Bis Später"
 _tr_add2 butt_latertip         "Behalte $PRETTY_PROGNAME aktiviert"
 
-_tr_add2 butt_noshow           "Nicht mehr automatisch starten"
+_tr_add2 butt_noshow           "Nicht mehr starten"
 _tr_add2 butt_noshowtip        "Deaktiviere $PRETTY_PROGNAME"
 
 _tr_add2 butt_help             "Hilfe"
@@ -51,7 +51,7 @@ _tr_add2 nb_tab_AfterInstall   "Nach der Installation"
 _tr_add2 nb_tab_AddMoreApps    "Füge mehr Programme hinzu"
 
 
-_tr_add2 after_install_text    "Erledigungen nach der Installation"
+_tr_add2 after_install_text    "Aufgaben nach der Installation"
 
 _tr_add2 after_install_um      "Erneuere die Spiegelserver Liste"
 _tr_add2 after_install_umtip   "Erneuere die Liste der Spiegelserver vor dem Systemupdate"
@@ -59,16 +59,16 @@ _tr_add2 after_install_umtip   "Erneuere die Liste der Spiegelserver vor dem Sys
 _tr_add2 after_install_us      "System Update"
 _tr_add2 after_install_ustip   "System Software Update"
 
-_tr_add2 after_install_dsi     "Suche nach System Problemen"
+_tr_add2 after_install_dsi     "Suche nach Problemen"
 _tr_add2 after_install_dsitip  "Sucht nach Problemen mit Systemeinstellungen oder Paketen"
 
 _tr_add2 after_install_etl     "EndeavourOS auf dem letzten Stand$_question"
 _tr_add2 after_install_etltip  "Zeigt an was zu tun ist um das System auf den neuesten EndeavourOS Stand zu bringen"
 
-_tr_add2 after_install_cdm     "Ändere den Login-Manager"
+_tr_add2 after_install_cdm     "Ändere Login-Manager"
 _tr_add2 after_install_cdmtip  "benutze einen anderen Login-Manager"
 
-_tr_add2 after_install_ew      "EndeavourOS Bildschirm-Hintergrund"
+_tr_add2 after_install_ew      "EndeavourOS Hintergrund"
 _tr_add2 after_install_ewtip   "Benutze den EndeavourOS Bildschirm-Hintergrund"
 
 
@@ -91,7 +91,7 @@ _tr_add2 after_install_ft      "Forum Tipps"
 _tr_add2 after_install_fttip   "Hilf uns dir zu helfen$_exclamation"
 
 
-_tr_add2 general_info_text     "Finde dich auf der EndeavourOS Webseite zurecht$_exclamation"
+_tr_add2 general_info_text     "Erkunde die EndeavourOS Webseite$_exclamation"
 
 _tr_add2 general_info_ws       "Webseite"
 
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "Neuigkeiten"
 _tr_add2 general_info_netip    "Neuigkeiten und Berichte"
 
 _tr_add2 general_info_fo       "Forum"
-_tr_add2 general_info_fotip    "Erhalte Hilfe in unserem freundlichen und offenem Forum"
+_tr_add2 general_info_fotip    "Erhalte Hilfe im freundlichen und offenem Forum"
 
 _tr_add2 general_info_do       "Spenden"
 _tr_add2 general_info_dotip    "Unterstütze unsere Arbeit mit einer Spende"
@@ -111,7 +111,7 @@ _tr_add2 general_info_ab       "Über $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip    "Wichtige Informationen über diese App"
 
 
-_tr_add2 add_more_apps_text    "Installiere zusätzliche Programme"
+_tr_add2 add_more_apps_text    "Installiere nützliche Apps"
 
 _tr_add2 add_more_apps_lotip   "Office Anwendung (libreoffice-fresh)"
 
@@ -127,7 +127,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce4"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME wieder verfügbar zu machen führe diesen Befehl in einem Terminal aus: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME wieder zu starten führe diesen Befehl im Terminal aus: $PROGNAME --enable"
 _tr_add2 settings_dis_text       "Wiederaktivierung $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder Aktivieren?"
 _tr_add2 settings_dis_butt       "Ich werde mir das merken$_exclamation"
@@ -136,7 +136,7 @@ _tr_add2 settings_dis_buttip     "versprochen"
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Hilfe"
 _tr_add2 help_butt_text          "Mehr Informationen über das $PRETTY_PROGNAME Programm"
 
-_tr_add2 dm_title                "Wähle einen anderen Anmelde Manager"
+_tr_add2 dm_title                "Nutze anderen Anmelde Manager"
 _tr_add2 dm_col_name1            "Ausgewählt"
 _tr_add2 dm_col_name2            "DM Name"
 
@@ -221,13 +221,13 @@ _tr_add2 nb_tab_OwnCommands         "Persönliche Befehle"                   # m
 _tr_add2 nb_tab_owncmds_text        "Personalisierte Befehle"               # modified 2020-Jul-08
 
 # 2020-Jul-08:
-_tr_add2 nb_tab_owncmdstip          "Hilfestellung für persönliche Befehle"
+_tr_add2 nb_tab_owncmdstip          "Hilfe für persönliche Befehle"
 
 _tr_add2 add_more_apps_akm          "Ein Kernel Manager"
 _tr_add2 add_more_apps_akmtip       "Ein kleines Kernel Paket Manager und Info Tool"
 
 # 2020-Jul-15:
-_tr_add2 butt_owncmds_help        "Anleitung: Persönliche Befehle"
+_tr_add2 butt_owncmds_help        "HowTo: Persönliche Befehle"
 
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Persönliche Befehle drag${_and}drop"
@@ -246,8 +246,8 @@ _tr_add2 add_more_apps_done2_tip1    "Benutze 'pacman' oder 'yay' zum installier
 _tr_add2 add_more_apps_done2_tip2    "Benutze 'yay' zum installieren."
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2      "EndeavourOS Bildschirm-Hintergrund (Auswahl)"
-_tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Bildschirm-Hintergründen"
+_tr_add2 after_install_ew2      "EndeavourOS Hintergrund (Auswahl)"
+_tr_add2 after_install_ewtip2   "Wähle aus den EndeavourOS Hintergründen"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
@@ -276,7 +276,7 @@ _tr_add2 after_install_more_wall      "Downloade mehr EndeavourOS Hintergründe"
 _tr_add2 after_install_more_wall_tip  "Downloade alte EndeavourOS und Community Hintergründe"
 _tr_add2 after_install_info           "Information"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Aktuelles über EndeavourOS Apps"
+_tr_add2 butt_softnews                "Apps Neuigkeiten"
 _tr_add2 butt_softnews_tip            "Wichtige Meldungen über EndeavourOS Apps"
 
 _tr_add2 install_community            "Installiere Community Editionen"
