@@ -19,6 +19,9 @@ Server = https://mirror.easylee.nl/endeavouros/repo/$repo/$arch
 Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
 Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch
 
+## Canada
+Server = https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch
+
 ## China
 Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 
