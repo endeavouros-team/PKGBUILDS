@@ -44,8 +44,17 @@ NvidiaIdsCommon() {
     local branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     if [ "$series" = "latest" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
-        WARN "The nvidia.com site driver version is '$branch', pacman version is '$pacman_latest_branch'."
-        return 1  # not the latest branch pacman has currently
+        cat <<EOF >&2
+Warning from $PROGNAME:
+    The driver version from the nvidia.com site is '$branch', pacman version is '$pacman_latest_branch'.
+    Thus the updated database of card ids may not be fully accurate.
+    It is recommended to run this again after having the pacman version updated.
+EOF
+        read -p "Want to proceed with the db update (Y/n)? "
+        case "$REPLY" in
+            ""|[yY]*) ;;
+            *) return 1 ;;
+        esac
     fi
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
