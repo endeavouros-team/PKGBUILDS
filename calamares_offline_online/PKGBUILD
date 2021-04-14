@@ -4,8 +4,8 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.38.1
-pkgrel=3
+pkgver=3.2.39.3
+pkgrel=1
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -82,6 +82,9 @@ prepare() {
     # user_pkglist module
     sed -i "s?  - packages?  - packages\n  - user_pkglist?" $_reponame/settings.conf_online
 
+    # include sway in displaymanager list of environments    
+    sed -i "s?DesktopEnvironment('\/usr\/bin\/awesome', 'awesome'),?DesktopEnvironment('\/usr\/bin\/sway', 'sway'),?" $_reponame/src/modules/displaymanager/main.py
+
     # Create packages.conf
     echo -e "---\nbackend: pacman\nskip_if_no_internet: false\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_online 
     echo -e "---\nbackend: pacman\nskip_if_no_internet: true\nupdate_db: false\nupdate_system: false\nupdate_system: false" > $_reponame/src/modules/packages/packages.conf_offline
@@ -136,10 +139,9 @@ prepare() {
 
     # remove some calamares modules we don't need
     rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview} ||true
-    
-    # remove default calamares branding // keep package small
+    # remove default branding // keep package small
     rm -r $_reponame/src/branding/default
-    
+
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g"             $_reponame/CMakeLists.txt
     sed -i "s?username: live?username: liveuser?g"                              $_reponame/src/modules/removeuser/removeuser.conf
@@ -168,8 +170,8 @@ prepare() {
     -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
-    #sed -i "s?autologinGroup: autologin?#autologinGroup: autologin?" $_reponame/src/modules/users/users.conf
-    sed -i "s?doAutologin:.*?doAutologin: false?" $_reponame/src/modules/users/users.conf
+    sed -i "s?autologinGroup:.*?autoLoginGroup: autologin?" $_reponame/src/modules/users/users.conf
+    sed -i "s?doAutologin:.*?doAutoLogin: false?" $_reponame/src/modules/users/users.conf
 
     sed -i "s?nonempty:?#nonempty:?" $_reponame/src/modules/users/users.conf
     sed -i "s?maxLength:?#maxLength:?" $_reponame/src/modules/users/users.conf
