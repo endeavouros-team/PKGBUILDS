@@ -27,8 +27,12 @@ export -f eos_yad_GetDesktopName
 Main() {
     test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
 
-    local DE="$(eos_yad_GetDesktopName)"
+    local DE="$(eos_GetDeOrWm)"
     local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
+
+    case "$DE" in
+        SWAY | BSPWM) return ;;      # don't change wallpaper on community editions
+    esac
 
     case "$1" in
         -r)  /usr/bin/rm -f "$conf" ;;            # -r re-installs the default wallpaper now

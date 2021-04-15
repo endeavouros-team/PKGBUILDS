@@ -1118,8 +1118,10 @@ fi
 
 PacdiffCmd() {
     local differ="$1"
+    local root_start="$2"
+    local root_stop="$3"
     
-    if [ -n "$(echo q | /usr/bin/pacdiff)" ] ; then
+    if [ -n "$(echo q | DIFFPROG=diff /usr/bin/pacdiff)" ] ; then
         local pdtext="Starting pacdiff & $differ as root ..."
         case "$differ" in
             vim | code) differ+=" -d"
@@ -1188,7 +1190,7 @@ AfterInstall() {
               kdiff3|kompare|diffuse) Icon=$differ ;;
           esac
           tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
-          tabcontents+=("bash -c 'PacdiffCmd $differ'")
+          tabcontents+=("bash -c 'PacdiffCmd $differ \"$root_start\" \"$root_stop\"'")
           break
       fi
   done
