@@ -379,6 +379,40 @@ eos_yad_GetDesktopName() {      # return DE name in uppercase letters
     echo "$de"
 }
 
+eos_IsSway()  {
+    case "$DESKTOP_SESSION" in
+        sway | */sway) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        sway | */sway) return 0 ;;
+    esac
+    [ -x /usr/bin/swaybg ] && return 0
+    return 1
+}
+
+eos_IsBspwm() {
+    case "$DESKTOP_SESSION" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    [ -x /usr/bin/bspwm ] && return 0
+    return 1
+}
+
+eos_GetDeOrWm() {
+    local de="$(eos_yad_GetDesktopName)"
+    if [ "$de" = "" ] ; then
+        if (eos_IsSway) ; then
+            de=SWAY
+        elif (eos_IsBspwm) ; then
+            de=BSPWM
+        fi
+    fi
+    echo "$de"
+}
+
 # DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
 # WARN() { eos_yad_WARN "$@" ; }    # deprecated
 
