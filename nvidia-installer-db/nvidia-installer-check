@@ -88,7 +88,7 @@ Main()
     nvidia_info=$(echo "$vendorinfo" | cut -d '|' -f 1 | grep nvidia)
 
     if [ -n "$nvidia_info" ] ; then
-        nvidia-installer-update-db --tmpdb  >& /dev/null      # --tmpdb: files go to /tmp
+        nvidia-installer-update-db --tmpdb # >& /dev/null      # --tmpdb: files go to /tmp
         ret_ids="$(echo "$nvidia_info" | sed -e 's|^nvidia:||' -e 's|:| |')"
         for id in $ret_ids ; do
             if [ -n "$(grep -w "$id" $nvidia_id_file)" ] ; then

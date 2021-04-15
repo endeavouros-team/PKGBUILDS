@@ -50,11 +50,13 @@ Warning from $PROGNAME:
     Thus the updated database of card ids may not be fully accurate.
     It is recommended to run this again after having the pacman version updated.
 EOF
-        read -p "Want to proceed with the db update (Y/n)? "
-        case "$REPLY" in
-            ""|[yY]*) ;;
-            *) return 1 ;;
-        esac
+        if [ "$targetdir" != "/tmp" ] ; then
+            read -p "Want to proceed with the db update (Y/n)? "
+            case "$REPLY" in
+                ""|[yY]*) ;;
+                *) return 1 ;;
+            esac
+        fi
     fi
     local ids="$(GetNvidiaIds "$branch")"
     test -n "$ids" || DIE "$FUNCNAME: GetNvidiaIds failed."
