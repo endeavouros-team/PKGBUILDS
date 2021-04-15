@@ -41,7 +41,8 @@ GetNvidiaIds() {
 NvidiaIdsCommon() {
     local string="$1"
     local series="$2"
-    local branch="$(GetNvidiaBranch "$string" "$series")"
+    local branch="$3"
+    [ -n "$branch" ] || branch="$(GetNvidiaBranch "$string" "$series")"
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     if [ "$series" = "latest" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
         cat <<EOF >&2
@@ -65,17 +66,41 @@ EOF
 }
 
 NvidiaIdsLatest() {
-    local br ids
-    for br in "$LATEST_BRANCH1" "$LATEST_BRANCH2" ; do
-        ids="$(NvidiaIdsCommon "$br" "latest")"
-        if [ -n "$ids" ] ; then
-            Info "$br: found!"
-            echo "$ids"
-            return 0
-        else
-            return 1
-        fi
-    done
+    local br br1="" br2="" ids
+    local string
+
+    br1="$(GetNvidiaBranch "$LATEST_BRANCH1" "latest")"
+    if [ "$br1" != "$pacman_latest_branch" ] ; then
+        br2="$(GetNvidiaBranch "$LATEST_BRANCH2" "latest")"
+    fi
+    case "$pacman_latest_branch" in
+        "$br1") br="$br1"
+                string="$LATEST_BRANCH1"
+                ;;
+        "$br2") br="$br2"
+                string="$LATEST_BRANCH2"
+                ;;
+        *)
+            # use the latest of the available databases
+            local vercmp=$(vercmp "$br1" "$br2")
+            if [ $vercmp -ge 0 ] ; then
+                br="$br1"
+                string="$LATEST_BRANCH1"
+            else
+                br="$br2"
+                string="$LATEST_BRANCH2"
+            fi
+            ;;
+    esac
+    
+    ids="$(NvidiaIdsCommon "$string" "latest" "$br")"
+    if [ -n "$ids" ] ; then
+        Info "$string: found!"
+        echo "$ids"
+        return 0
+    else
+        return 1
+    fi
     DIE "$FUNCNAME: NvidiaIdsCommon failed."
 }
 
@@ -100,6 +125,7 @@ Options() {
             -v | --verbose)
                 show_additional_info=yes ;;
             --debug)
+                show_additional_info=yes
                 show_additional_info_debug=yes ;;
             --tmpdb)
                 targetdir="/tmp" ;;
