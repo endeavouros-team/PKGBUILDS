@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=3.11.12
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -14,6 +14,10 @@ optdepends=(
   'reflector-simple: for the Update Mirrors button'
   'yad: upstream yad provider'
   'yad-eos: alternative yad provider (includes fixes)'
+  'kdiff3: alternative app for pacdiff to use'
+  'meld: alternative app for pacdiff to use'
+  'diffuse: alternative app for pacdiff to use'
+  'vim: alternative app for pacdiff to use'
 )
 
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
