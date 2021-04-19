@@ -329,6 +329,7 @@ Main()
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
+        --button="Changelog!applications-development!Show latest changes of this program":"bash -c '/usr/bin/eos-pkg-changelog akm'"
         --button="Cancel!gtk-cancel!Change nothing":1
         --button="Execute!system-run!Make your changes":0
     )
