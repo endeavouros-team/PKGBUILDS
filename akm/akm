@@ -155,22 +155,6 @@ PaddingLines() {
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
-ShowFunctionLine() {
-    # message, percent, bar-length
-    ProgressBar "Gathering information:" \
-                "$(( 100 * SERVICES_DONE / SERVICES))" \
-                50
-}
-ShowFunctionStart() {
-    ProgressBarInit
-
-    SERVICES=${#functions[@]}
-    SERVICES_DONE=0
-    ShowFunctionLine
-}
-ShowFunction()      { ((SERVICES_DONE++)) ; ShowFunctionLine ; }
-ShowFunctionEnd()   { printf2 "\n" ; }
-
 CommonStuff() {
     local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
     if [ ! -f $EOS_SCRIPTS_YAD ] ; then
@@ -267,6 +251,13 @@ Main()
     local connect_header_with_kernel=no    # default, change with option --connect-header
     local scroll=no
     local nrofkernelitems                  # 8 with only upstream kernels
+    local progress_cmd=(
+        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
+        --width=400 --no-buttons
+        --image=user-info
+        --title="AKM progress"
+        --text="Fetching information, please wait..."
+    )
 
     CommonStuff
     AkmConfig
@@ -297,19 +288,15 @@ Main()
 
     # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
-    ShowFunctionStart
-
     local URL_timeout="--max-time 30"                      # used for all curl calls here
 
     local URL="https://www.kernel.org"
-    local kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
+    local kernelorg=""
     local org_kernels=(mainline stable longterm linux-next)
     local KOName="K.o.category"
     local KOVersionName="K.o.version"
     local xx
     local t1=""
-
-    test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
 
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
     t1+="You can install and/or uninstall kernel packages using the checkboxes on the left column.\n"
@@ -351,12 +338,29 @@ Main()
              )
     fi
 
-    for xx in "${functions[@]}" ; do
-        ShowFunction
-        $xx || DIE "Function '$xx' failed.\n"
-    done
-    ShowFunctionEnd
-
+    local ix=1 count=${#functions[@]} val
+    local cmdfile="$(mktemp $HOME/.config/akm.tmp.XXXXX)"
+    while true ; do
+        for xx in "${functions[@]}" ; do
+            echo "#$xx"
+            val="$(( ix < count ? ix*100/count : 99 ))"
+            ((ix++))
+            echo "$val"
+            if [ -z "$kernelorg" ] ; then
+                kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
+                test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
+            fi
+            $xx || DIE "Function '$xx' failed.\n"
+        done
+        echo "#===> Done."
+        # read -p "Press ENTER: " >&2  # testing only
+        echo 100
+        printf "%s\n" "${cmd[@]}" > "$cmdfile"
+        break
+    done | "${progress_cmd[@]}"
+    readarray -t cmd <<< $(cat "$cmdfile")
+    rm -f "$cmdfile"
+    
     local ix installed install=() uninstall=() pkg partner
     local result="$("${cmd[@]}")"
     declare -A pkgstatus
