@@ -1,3 +1,11 @@
+**Table of Contents**
+
+- [eos-pkginfo](#eos-pkginfo)
+  - [Synopsis](#Synopsis)
+  - [Options](#Options)
+  - [Examples](#Examples)
+  - [Tips](#Tips)
+
 # eos-pkginfo
 
 Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.
