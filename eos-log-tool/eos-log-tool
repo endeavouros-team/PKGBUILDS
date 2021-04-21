@@ -218,7 +218,7 @@ Main()
     helptext+="click the OK button and you will receive a URL\n"
     helptext+="that tells the internet address of the logs.\n\n"
     helptext+="Note1: personal data is automatically removed from logs before sending to internet.\n"
-    helptext+="Note2: remove personal data can be removed from the log file by selecting '$rdbut'.\n"
+    helptext+="Note2: personal data can be removed from the log file by selecting '$rdbut'.\n"
     helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
 
     local log_tool_cmd=(
