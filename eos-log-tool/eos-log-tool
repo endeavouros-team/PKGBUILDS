@@ -14,7 +14,7 @@ source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 
 export -f eos_yad
 
-Msg() {
+MsgOld() {
     local msg="$1"
     local title="$2"
     shift 2
@@ -27,6 +27,16 @@ Msg() {
 
     echo "$msg" | eos_yad --text-info --title="$title" --formatted --wrap \
                           --width=$width --height=100 --button=yad-quit "$@"
+}
+Msg() {
+    local msg="$1"
+    local title="$2"
+    shift 2
+    local cmd=(
+        eos_yad --form --title="$title" --text="$msg"
+        --image=user-info --button=yad-quit "$@"
+    )
+    "${cmd[@]}"
 }
 ErrorMsg() {
     local msg="$1"
@@ -153,6 +163,8 @@ RemovePersonalData() {
     removePersonalInfo=yes
 }
 
+IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
+
 Main()
 {
     case "$1" in
@@ -184,14 +196,15 @@ Main()
     local install="EndeavourOS install log"
     local fstab="/etc/fstab"
     local grub="/boot/grub/grub.cfg"
+    local pacmanconf="/etc/pacman.conf"
     local blame="systemd-analyze blame"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
-    #local inxi="inxi -Fzxxc0"                         # 'inxi' does not work here !!!
     local hwinfo="hwinfo --short"
     local rdbut="<b>Remove personal data from logs</b>"
     local slbut="<b>Send logs to internet</b>"
     local save="Save this log"
+    local inxi="inxi -Fxxc0z"
 
     local cmds
     local sendToInternet=no
@@ -208,29 +221,39 @@ Main()
     helptext+="Note2: remove personal data can be removed from the log file by selecting '$rdbut'.\n"
     helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
 
-    local result=$(
-        eos_yad --list --checklist --width=770 --height=600 --text="$helptext" \
-                --image=dialog-question --title="EndeavourOS log tools" \
-                --no-click --multiple \
-                --column=Select --column="Log contents" --column="Description of action" \
-                false "$journal0" "$save" \
-                false "$journal1" "$save" \
-                false "$journal2" "$save" \
-                false "$blame"    "$save" \
-                false "$lspci"    "$save" \
-                false "$lsusb"    "$save" \
-                false "$hwinfo"   "$save" \
-                false "$install"  "$save" \
-                false "$xsession" "$save" \
-                false "$Xorg"     "$save" \
-                false "$lightdm"  "$save" \
-                false "$lightdm2" "$save" \
-                false "$fstab"    "$save" \
-                false "$grub"     "$save" \
-                false "$rdbut"    "$rdtip" \
-                false "$slbut"    "$sltip"
-          )
+    local log_tool_cmd=(
+        eos_yad --list --checklist --text="$helptext" --height=620
+        --image=dialog-question --title="EndeavourOS log tools"
+        --no-click --multiple
+        --column=Select --column="Log contents" --column="Description of action"
+        false "$journal0"   "$save"
+        false "$journal1"   "$save"
+        false "$journal2"   "$save"
+        false "$blame"      "$save"
+        false "$lspci"      "$save"
+        false "$lsusb"      "$save"
+    )
 
+    # Note: inxi hasn't always been working reliably.
+    IsInstalled inxi && log_tool_cmd+=(false "$inxi" "$save")
+
+    log_tool_cmd+=(
+        false "$hwinfo"     "$save"
+        false "$install"    "$save"
+        false "$xsession"   "$save"
+        false "$Xorg"       "$save"
+        false "$lightdm"    "$save"
+        false "$lightdm2"   "$save"
+        false "$fstab"      "$save"
+    )
+    IsInstalled grub && log_tool_cmd+=(false "$grub" "$save")
+    log_tool_cmd+=(
+        false "$pacmanconf" "$save"
+        false "$rdbut"      "$rdtip"
+        false "$slbut"      "$sltip"
+    )
+
+    local result=$("${log_tool_cmd[@]}")
     if [ -z "$result" ] ; then
         return
     fi
@@ -249,10 +272,12 @@ Main()
             "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
             "$install")  Cmd cat /var/log/Calamares.log ;;
             "$fstab")    Cmd cat /etc/fstab ;;
+            "$pacmanconf") Cmd cat $pacmanconf ;;
             "$blame")    Cmd systemd-analyze blame ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
             "$hwinfo")   Cmd $xx ;;
+            "$inxi")     Cmd $xx ;;
         esac
     done
     if [ "$SUDO_CMDS" != ":" ] ; then
@@ -268,9 +293,9 @@ Main()
 
     if [ "$sendToInternet" = "no" ] ; then
         if [ "$removePersonalInfo" = "yes" ] ; then
-            Msg "Log file $FILE_OF_LOGS created. Personal data was removed." "Info"
+            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info"
         else
-            Msg "Log file $FILE_OF_LOGS created. Personal data was <b>not</b> removed." "Info"
+            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created.\n\nNote: personal data was <b><i>not</i></b> removed." "Info"
         fi
     fi
 }
