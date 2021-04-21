@@ -184,7 +184,7 @@ Main()
     rm -f "$FILE_OF_LOGS"
 
     local rdtip="Rename personal names to generic names"
-    local sltip="Send gathered logs to the internet (personal info always removed)"
+    local sltip="Send selected logs to the internet (personal info always removed)"
 
     local journal0="journalctl -b -0"
     local journal1="journalctl -b -1"
@@ -203,7 +203,6 @@ Main()
     local hwinfo="hwinfo --short"
     local rdbut="<b>Remove personal data from logs</b>"
     local slbut="<b>Send logs to internet</b>"
-    local save="Save this log"
     local inxi="inxi -Fxxc0z"
 
     local cmds
@@ -212,44 +211,45 @@ Main()
     local xx
     local helptext=""
 
-    helptext+="Selecting any of the boxes below (except the last two)\n"
-    helptext+="will add that particular log to a common log file (<b>$FILE_OF_LOGS2</b>).\n"
-    helptext+="Once you have selected the desired boxes, including '$slbut',\n"
-    helptext+="click the OK button and you will receive a URL\n"
-    helptext+="that tells the internet address of the logs.\n\n"
-    helptext+="Note1: personal data is automatically removed from logs before sending to internet.\n"
-    helptext+="Note2: personal data can be removed from the log file by selecting '$rdbut'.\n"
-    helptext+="Note3: a list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
+    helptext+="Selecting any of the boxes below (except the last two) will add\n"
+    helptext+="that particular log to a common log file <b>$FILE_OF_LOGS2</b>.\n"
+    helptext+="Once you have selected the desired boxes, including $slbut,\n"
+    helptext+="click the OK button and you will receive a URL that tells "
+    helptext+="the internet address of the logs.\n\n"
+    helptext+="Note1: You'll see the <i>default</i> selections below.\n"
+    helptext+="Note2: Personal data will be removed from the local log file by selecting $rdbut.\n"
+    helptext+="Note3: Personal data is <i>automatically</i> removed from logs before sending to internet.\n"
+    helptext+="Note4: A list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
 
     local log_tool_cmd=(
         eos_yad --list --checklist --text="$helptext" --height=620
         --image=dialog-question --title="EndeavourOS log tools"
         --no-click --multiple
-        --column=Select --column="Log contents" --column="Description of action"
-        false "$journal0"   "$save"
-        false "$journal1"   "$save"
-        false "$journal2"   "$save"
-        false "$blame"      "$save"
-        false "$lspci"      "$save"
-        false "$lsusb"      "$save"
+        --column=Select --column="Item!Command / File / Action" --column="Description"
+        true  "$journal0"   "Journal from the most recent boot"
+        false "$journal1"   "Journal from the second most recent boot"
+        false "$journal2"   "Journal from the third most recent boot"
+        false "$blame"      "Time that running units took to initialize"
+        false "$lspci"      "Information related to PCI devices"
+        false "$lsusb"      "Information related to USB devices"
     )
 
     # Note: inxi hasn't always been working reliably.
-    IsInstalled inxi && log_tool_cmd+=(false "$inxi" "$save")
+    IsInstalled inxi && log_tool_cmd+=(true "$inxi" "Inxi log, information about hardware and software")
 
     log_tool_cmd+=(
-        false "$hwinfo"     "$save"
-        false "$install"    "$save"
-        false "$xsession"   "$save"
-        false "$Xorg"       "$save"
-        false "$lightdm"    "$save"
-        false "$lightdm2"   "$save"
-        false "$fstab"      "$save"
+        false "$hwinfo"     "Summary of hardware"
+        false "$install"    "$install"
+        false "$xsession"   "X session errors"
+        false "$Xorg"       "Xorg log"
+        false "$lightdm"    "Display manager log"
+        false "$lightdm2"   "Display manager log, X server related"
+        false "$fstab"      "Static information about the filesystem"
     )
-    IsInstalled grub && log_tool_cmd+=(false "$grub" "$save")
+    IsInstalled grub && log_tool_cmd+=(false "$grub" "Grub configuration file")
     log_tool_cmd+=(
-        false "$pacmanconf" "$save"
-        false "$rdbut"      "$rdtip"
+        true  "$pacmanconf" "Pacman package manager configuration file"
+        true  "$rdbut"      "$rdtip"
         false "$slbut"      "$sltip"
     )
 
