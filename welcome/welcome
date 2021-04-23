@@ -1678,6 +1678,30 @@ UpdateInstallScripts() {
     rm -rf $tmpdir
 }
 
+#### Support for personal commands:
+
+personal_commands_add() {   # add one personal command
+    local command="$1"
+    local name="$2"
+    local icon="$3"
+    local description="$4"
+    local requirement="$5"
+
+    [ -n "$requirement" ] || requirement="$command"
+
+    if [ -x /usr/bin/"$requirement" ] ; then
+        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$command")
+    else
+        echo "$FUNCNAME: warning: command '$requirement' not found" >&2
+    fi
+}
+
+personal_commands_init() {  # initialize user settings for personal commands
+    activate_own_commands_tab="$1"
+    columns_for_own_commands="$2"
+}
+
+
 Usage() {
     cat <<EOF
 ===== $PROG_PACKAGENAME $PROG_VERSION =====
@@ -1756,6 +1780,11 @@ StartHere() {
     local tr_prefer=manual
     local pb_percent=0
     local show_progress_bar=no   # was: yes
+
+    local welcome_own_commands=()
+    local activate_own_commands_tab=""
+    local columns_for_own_commands=""
+
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
