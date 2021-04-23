@@ -3,9 +3,9 @@
 ## Overview
 You can personalize Welcome by adding new command buttons in the Welcome app. They will appear under tab **Personal Commands**.<br>
 To personalize Welcome, add your new commands into file
-<pre>
+```
 $HOME/.config/welcome-own-cmds.conf
-</pre>
+```
 
 ## Command syntax
 The Welcome app uses **yad forms** and bash language to create a simple GUI.
@@ -16,21 +16,21 @@ Simply follow this short tutorial.<br>
 </sup>
 
 Let's start with a simple Firefox example (this already works for Welcome!):
-<pre>
+```
 local welcome_own_commands=(
     --field=" Firefox web browser!!":fbtn "firefox"
 )
-</pre>
+```
 You will add commands to Welcome by adding <u>yad form fields</u> to a bash array variable named
-<pre>
+```
   welcome_own_commands
-</pre>
+```
 This variable (and possible other variables in this file) <u>should</u> be marked as a *local* variable in bash.<br>
 
 Buttons for Welcome are defined using specially crafted *fields*. Each field defines a command for a button, for example:
-<pre>
+```
     --field=" Firefox web browser!firefox-default!Browse the web with Firefox":fbtn  "firefox"
-</pre>
+```
 
 A field definition consists of the following *elements*:
 
@@ -58,11 +58,11 @@ Older versions of the `yad` program didn't support aligning text properly on but
 This is no more needed, but you may see old definitions using it, and it can be ignored and/or safely removed.
 
 An example field about the parameters (using the obsolete _align() marking) in the command string:
-<pre>
+```
     # _align() is no more required
     --field="_align(EndeavourOS forum)!web-browser!Discussions at the EndeavourOS forum":fbtn
             "xdg-open https://forum.endeavouros.com"
-</pre>
+```
 
 Other supported (but optional) variables are
 - `activate_own_commands_tab`: specifies whether the active tab in Welcome is your personal commands (instead of Welcome's default) when Welcome is started.
@@ -71,16 +71,16 @@ Other supported (but optional) variables are
 Note that the same two buttons exist on the **Tips** tab.
 
 For example:
-<pre>
+```
 local activate_own_commands_tab=yes               # "yes" or "no" (default: no)
 local columns_for_own_commands=4                  # a small positive number (default: 2)
 local show_predefined_buttons_at_own_commands=no  # "yes" or "no" (default:yes)
-</pre>
+```
 
 
 ## Example
 Here is a full *example* file containing three commands/buttons, and activating personal commands tab when starting Welcome:
-<pre>
+```
 #!/bin/bash
 
 # Contents of file $HOME/.config/welcome-own-cmds.conf.
@@ -103,7 +103,7 @@ local welcome_own_commands=(
 local activate_own_commands_tab=yes
 local columns_for_own_commands=2
 local show_predefined_buttons_at_own_commands=no
-</pre>
+```
 
 ## Example (advanced, assumes knowledge about bash language)
 
@@ -111,7 +111,7 @@ This example shows how to use bash functions in the command string.<br>
 After writing your bash function, there are two "additional" things to remember:
 - export your bash function with: `export -f`
 - command string structure changes to: `"bash -c 'MyBashFunction parameters'"`
-<pre>
+```
 
 Install_with_pacman() {
     # This bash function installs one or more given packages. Does not reinstall any packages.
@@ -145,15 +145,15 @@ local welcome_own_commands=(
 
     --field=" Install example!system-software-install!Install some popular packages":fbtn "bash -c 'Install_with_pacman code vlc'"
 )
-</pre>
+```
 <sup>Tip: If you start Welcome from the terminal with command `eos-welcome`, you can get some "debugging" output to the terminal that may be useful for later analysis.</sup>
 
 ## Example: field to run commands in terminal with `RunInTerminal`
 
-<pre>
+```
     --field=" Update system!system-software-install!":fbtn \
             "RunInTerminal 'checkupdates && sudo pacman -Syu || echo No updates.'"
-</pre>
+```
 
 ## Drag & drop items into the configuration file!
 
@@ -173,3 +173,59 @@ The new command will also appear on the Welcome app shortly (this feature was ad
 
 Feel free to copy these examples and modify them to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
+
+## New simpler API
+
+<small>Added in Welcome 3.12-1 at 23-Apr-2021</small><br>
+A new function based API for defining personal commands is described below.
+
+Personal commands user interface consists of the following functions:
+```
+personal_commands_init       Determines how personal commands will be shown.
+personal_commands_add        Adds a new personal command.
+```
+
+### Parameters for `personal_commands_init`
+
+Description | Values | Default
+:------ | :---- | :----
+Activate the personal commands tab at start | "yes" or "no" | no
+Columns for the personal commands tab | Small positive integer | 2
+
+<br>
+
+### Parameters for `personal_commands_add`
+
+Description | Example value | Required?
+:----- | :------ | :-----
+A command (including parameters, if any) | mousepad --line=5 | yes
+The button label ("button name") | Mousepad | yes
+Name of an icon (that exists in the system) | accessories-text-editor | yes
+A more detailed description for the button | Mousepad text editor | yes
+Actual command name only if first parameter has options  | mousepad | no
+
+<br>
+
+### Example: using the new API
+
+```
+# File: ~/.config/welcome-own-commands.conf
+
+personal_commands_init yes 2
+
+personal_commands_add "akm" \
+                      "A Kernel Manager" \
+                      "system-software-install" \
+                      "Simple kernel manager and info source"
+
+personal_commands_add "firefox" \
+                      "Firefox web browser" \
+                      "firefox-default" \
+                      "Browse the web with Firefox"
+
+personal_commands_add "xed --new-window" \
+                      "Xed" \
+                      "accessories-text-editor" \
+                      "Xed text editor with new window" \
+                      "xed"
+```
