@@ -1,3 +1,18 @@
+**Table of Contents**
+
+- [Personalizing Welcome](#Personalizing%20Welcome)
+  - [Overview](#Overview)
+  - [Command syntax](#Command%20syntax)
+    - [The **name** element and aligning](#The%20**name**%20element%20and%20aligning)
+  - [Example](#Example)
+  - [Example (advanced, assumes knowledge about bash language)](#Example%20(advanced,%20assumes%20knowledge%20about%20bash%20language))
+  - [Example: field to run commands in terminal with `RunInTerminal`](#Example:%20field%20to%20run%20commands%20in%20terminal%20with%20`RunInTerminal`)
+  - [Drag & drop items into the configuration file!](#Drag%20&%20drop%20items%20into%20the%20configuration%20file!)
+  - [New simpler API](#New%20simpler%20API)
+    - [Parameters for `personal_commands_init`](#Parameters%20for%20`personal_commands_init`)
+    - [Parameters for `personal_commands_add`](#Parameters%20for%20`personal_commands_add`)
+    - [Example: using the new API](#Example:%20using%20the%20new%20API)
+
 # Personalizing Welcome
 
 ## Overview
