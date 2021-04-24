@@ -6,11 +6,11 @@
     - [The **name** element and aligning](#The-**name**-element-and-aligning)
   - [Example](#Example)
   - [Example (advanced, assumes knowledge about bash language)](#Example-(advanced,-assumes-knowledge-about-bash-language))
-  - [Example: field to run commands in terminal with `RunInTerminal`](#Example-field-to-run-commands-in-terminal-with-`RunInTerminal`)
+  - [Example: field to run commands in terminal with `RunInTerminal`](#Example-field-to-run-commands-in-terminal-with-RunInTerminal)
   - [Drag & drop items into the configuration file!](#Drag-&-drop-items-into-the-configuration-file!)
   - [New simpler API](#New-simpler-API)
-    - [Parameters for `personal_commands_init`](#Parameters-for-`personal_commands_init`)
-    - [Parameters for `personal_commands_add`](#Parameters-for-`personal_commands_add`)
+    - [Parameters for `personal_commands_init`](#Parameters-for-personal_commands_init)
+    - [Parameters for `personal_commands_add`](#Parameters-for-personal_commands_add)
     - [Example: using the new API](#Example-using-the-new-API)
 
 # Personalizing Welcome
