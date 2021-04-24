@@ -11,7 +11,7 @@
   - [New simpler API](#New-simpler-API)
     - [Parameters for `personal_commands_init`](#Parameters-for-`personal_commands_init`)
     - [Parameters for `personal_commands_add`](#Parameters-for-`personal_commands_add`)
-    - [Example: using the new API](#Example%3a-using-the-new-API)
+    - [Example: using the new API](#Example:-using-the-new-API)
 
 # Personalizing Welcome
 
