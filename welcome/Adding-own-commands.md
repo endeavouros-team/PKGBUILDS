@@ -174,12 +174,18 @@ The new command will also appear on the Welcome app shortly (this feature was ad
 Feel free to copy these examples and modify them to match your needs.<br>
 If you have any questions about the syntax, please go to https://forum.endeavouros.com.
 
+<br>
+
 ## New simpler API
 
-<small>Added in Welcome 3.12-1 at 23-Apr-2021</small><br>
-A new function based API for defining personal commands is described below.
+<small>
 
-Note: the drag&drop feature may not currently work with the new API.
+- Added in Welcome 3.12-1 at 23-Apr-2021
+- The *drag&drop* support for the new API was added in Welcome version 3.12.4-1.
+
+</small>
+
+A new function based API for defining personal commands is described below.
 
 Personal commands user interface consists of the following functions:
 ```
