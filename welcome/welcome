@@ -1345,6 +1345,30 @@ AddMoreApps() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
+#### Support for personal commands:
+
+personal_commands_add() {   # add one personal command
+    local command="$1"
+    local name="$2"
+    local icon="$3"
+    local description="$4"
+    local requirement="$5"
+
+    [ -n "$requirement" ] || requirement="$command"
+
+    if [ -x /usr/bin/"$requirement" ] ; then
+        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$command")
+    else
+        printf "%s: %s\n    %s\n" "$(date "+%x %X")" "$FUNCNAME:" "warning: command '$requirement' not found" >> /tmp/welcome-personal-commands.log
+    fi
+}
+
+personal_commands_init() {  # initialize user settings for personal commands
+    [ -n "$1" ] && activate_own_commands_tab="$1"
+    [ -n "$2" ] && columns_for_own_commands="$2"
+    [ -n "$3" ] && show_predefined_buttons_at_own_commands="$3"
+}
+
 OwnCommands() {
   local handle="$1"
   local tabnum="$2"
@@ -1678,29 +1702,6 @@ UpdateInstallScripts() {
     rm -rf $tmpdir
 }
 
-#### Support for personal commands:
-
-personal_commands_add() {   # add one personal command
-    local command="$1"
-    local name="$2"
-    local icon="$3"
-    local description="$4"
-    local requirement="$5"
-
-    [ -n "$requirement" ] || requirement="$command"
-
-    if [ -x /usr/bin/"$requirement" ] ; then
-        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$command")
-    else
-        echo "$FUNCNAME: warning: command '$requirement' not found" >&2
-    fi
-}
-
-personal_commands_init() {  # initialize user settings for personal commands
-    activate_own_commands_tab="$1"
-    columns_for_own_commands="$2"
-}
-
 
 Usage() {
     cat <<EOF
@@ -1782,8 +1783,9 @@ StartHere() {
     local show_progress_bar=no   # was: yes
 
     local welcome_own_commands=()
-    local activate_own_commands_tab=""
-    local columns_for_own_commands=""
+    local activate_own_commands_tab="no"
+    local columns_for_own_commands="2"
+    local show_predefined_buttons_at_own_commands="yes"
 
 
     # common button icons

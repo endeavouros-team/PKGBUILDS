@@ -179,6 +179,8 @@ If you have any questions about the syntax, please go to https://forum.endeavour
 <small>Added in Welcome 3.12-1 at 23-Apr-2021</small><br>
 A new function based API for defining personal commands is described below.
 
+Note: the drag&drop feature may not currently work with the new API.
+
 Personal commands user interface consists of the following functions:
 ```
 personal_commands_init       Determines how personal commands will be shown.
@@ -191,6 +193,15 @@ Description | Values | Default
 :------ | :---- | :----
 Activate the personal commands tab at start | "yes" or "no" | no
 Columns for the personal commands tab | Small positive integer | 2
+Show predefined buttons in the personal commands tab | "yes" or "no" | yes
+
+If `personal_commands_init` is *not* called, then default values will be used.
+
+Note that if `personal_commands_init` is called with "empty" parameters, then respective default values will be used. For example:
+```
+personal_commands_init "" "" no
+```
+will preserve the defaults for the first two parameters, and change only the third.
 
 <br>
 
@@ -206,12 +217,17 @@ Actual command name only if first parameter has options  | mousepad | no
 
 <br>
 
+Note that if a given command does not exist, Welcome will add a log about it in file<br>
+`/tmp/welcome-personal-commands.log`.
+
+<br>
+
 ### Example: using the new API
 
 ```
 # File: ~/.config/welcome-own-commands.conf
 
-personal_commands_init yes 2
+personal_commands_init yes "" no
 
 personal_commands_add "akm" \
                       "A Kernel Manager" \
