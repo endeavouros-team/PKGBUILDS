@@ -1354,6 +1354,7 @@ personal_commands_add() {   # add one personal command
     local description="$4"
     local requirement="$5"
 
+    [ -n "$description" ] || description="$command"
     [ -n "$requirement" ] || requirement="$command"
 
     if [ -x /usr/bin/"$requirement" ] ; then
