@@ -209,24 +209,26 @@ will preserve the defaults for the first two parameters, and change only the thi
 
 Description | Example value | Required?
 :----- | :------ | :-----
-A command (including parameters, if any) | mousepad --line=5 | yes
+A command line (including parameters, if any) | mousepad --line=5 | yes
 The button label ("button name") | Mousepad | yes
-Name of an icon (that exists in the system) | accessories-text-editor | no, but recommended
+Name of an icon (that exists in the system) | accessories-text-editor | no (but recommended)
 A more detailed description for the button | Mousepad text editor | no
-Actual command name only if first parameter has options  | mousepad | no
+Actual program name (use only if first parameter is ambiguous)  | mousepad | no
 
 <br>
 
-Note that if a given command does not exist, Welcome will add a log about it in file<br>
-`/tmp/welcome-personal-commands.log`.
+Note about the first and the fifth parameter:<br>The actual program name will be parsed from the first parameter (i.e. the first word of it). After parsing, the personal command is handled as follows:
+- If the parsed program exists, the command will be accepted to the list of personal commands.
+- Otherwise, if the fifth parameter is used and it contains an existing program, the command will be accepted.
+- If both the first and the fifth parameter "fail", Welcome reports this in file<br>`/tmp/welcome-personal-commands.log`.
 
 <br>
 
 ### Example: using the new API
 
-```
-# File: ~/.config/welcome-own-commands.conf
+File `~/.config/welcome-own-commands.conf` might look like this:
 
+```
 personal_commands_init yes "" no
 
 personal_commands_add "akm" \
@@ -245,3 +247,4 @@ personal_commands_add "xed --new-window" \
                       "Xed text editor with new window" \
                       "xed"
 ```
+Note the last line of the example, the 5th parameter `"xed"`. Actually, in this particular case, it is not really needed, but serves only as an example.

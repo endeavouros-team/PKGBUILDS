@@ -1348,19 +1348,19 @@ AddMoreApps() {
 #### Support for personal commands:
 
 personal_commands_add() {   # add one personal command
-    local command="$1"
+    local commandline="$1"
     local name="$2"
     local icon="$3"
     local description="$4"
-    local requirement="$5"
+    local cmd="$5"
 
-    [ -n "$description" ] || description="$command"
-    [ -n "$requirement" ] || requirement="$command"
+    [ -n "$description" ] || description="$commandline"
+    [ -n "$cmd" ] || cmd="$(echo "$commandline" | /usr/bin/awk '{print $1}')"
 
-    if [ -x /usr/bin/"$requirement" ] ; then
-        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$command")
+    if (/usr/bin/which $cmd &> /dev/null) ; then
+        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$commandline")
     else
-        printf "%s: %s\n    %s\n" "$(date "+%x %X")" "$FUNCNAME:" "warning: command '$requirement' not found" >> /tmp/welcome-personal-commands.log
+        printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
     fi
 }
 
