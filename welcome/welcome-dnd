@@ -30,23 +30,45 @@ EOF
 
 DndAddField() {
     local configfile="$HOME/.config/welcome-own-cmds.conf"
-    local field="  --field=' $name!$icon!$description':fbtn '$command'"
+    local mode=""
 
-    # make sure the config file exists in a proper format
-    DndCreateConfigFile
+    # Check definitions (old or new). If you have both old and new definitions, then assume new.
 
-    # add a field line in the end of variable welcome_own_commands
-    sed -i "$configfile" -e "/^)$/i\  $field"
+    if [ -r "$configfile" ] ; then
+        /usr/bin/grep "^[ \t]*local[ \t][ \t]*welcome_own_commands" "$configfile" && mode=old
+        /usr/bin/grep "^[ \t]*personal_commands_init"               "$configfile" && mode=new
+        /usr/bin/grep "^[ \t]*personal_commands_add"                "$configfile" && mode=new
+    fi
+
+    case "$mode" in
+        old)
+            local field="  --field=' $name!$icon!$description':fbtn '$command'"
+            # make sure the config file exists in a proper format
+            DndCreateConfigFile
+            # add a field line in the end of variable welcome_own_commands
+            sed -i "$configfile" -e "/^)$/i\  $field"
+            ;;
+        *)
+            # new or empty
+            cat <<EOF >> "$configfile"
+
+personal_commands_add "$command" \\
+                      "$name" \\
+                      "$icon" \\
+                      "$description"
+EOF
+            ;;
+    esac
 }
 
 DndDesktopFile() {
     local file="${arg#file://}"
-    local icon="$(grep "^Icon=" $file | head -n 1 | cut -d '=' -f 2)"
-    local name="$(grep "^Name=" $file | head -n 1 | cut -d '=' -f 2)"
-    local generic_name="$(grep "^GenericName=" $file | head -n 1 | cut -d '=' -f 2)"
-    local comment="$(grep "^Comment=" $file | head -n 1 | cut -d '=' -f 2)"
+    local icon="$(grep "^Icon=" "$file" | head -n 1 | cut -d '=' -f 2)"
+    local name="$(grep "^Name=" "$file" | head -n 1 | cut -d '=' -f 2)"
+    local generic_name="$(grep "^GenericName=" "$file" | head -n 1 | cut -d '=' -f 2)"
+    local comment="$(grep "^Comment=" "$file" | head -n 1 | cut -d '=' -f 2)"
     local description="Description not available."
-    local command="xdg-open $file"
+    local command="xdg-open '$file'"
 
     if [ -n "$generic_name" ] ; then
         description="$generic_name"
@@ -59,7 +81,7 @@ DndDesktopFile() {
 
 DndDocumentFile() {
     local file="${arg#file://}"
-    local desktopfile="$(xdg-mime query default $(xdg-mime query filetype $file))"
+    local desktopfile="$(xdg-mime query default $(xdg-mime query filetype "$file"))"
     local dt2="$(find /usr/share/applications -name "$desktopfile")"
     test -n "$dt2" || dt2="$(find "$HOME/.local/share/applications" -name "$desktopfile")"
     case "$file" in
@@ -69,7 +91,7 @@ DndDocumentFile() {
     local ending="${file##*.}"
     local name="$(basename "$file")"
     local description="A $ending file"
-    local command="xdg-open $file"
+    local command="xdg-open '$file'"
     local icon="$(grep "^Icon=" "$dt2" | head -n 1 | cut -d '=' -f 2)"
 
     DndAddField
@@ -79,7 +101,7 @@ DndUrl() {
     local file="${arg}"
     local name="$file"
     local description="A URL"
-    local command="xdg-open $file"
+    local command="xdg-open '$file'"
     local icon="web-browser"
     #local desktopfile="$(xdg-mime query default $(xdg-mime query filetype $file))"
 
@@ -111,13 +133,16 @@ DndServerStart() {
 }
 
 RestartWelcomeAndDndServer() {
-    local progname=eos-welcome
+    local progname2=eos-welcome
+    local restart_welcome=no
 
-    pkill -f "$progname"
+    pkill -f "$progname2" && restart_welcome=yes
     pkill -f "/usr/bin/yad --window-icon=$EOS_WICON"
     sleep 0.5
-    $progname &
-    sleep 1
+    if [ "$restart_welcome" = "yes" ] ; then
+        $progname2 &
+        sleep 1
+    fi
     DndServerStart
 }
 
