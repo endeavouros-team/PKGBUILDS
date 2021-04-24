@@ -211,8 +211,8 @@ Description | Example value | Required?
 :----- | :------ | :-----
 A command (including parameters, if any) | mousepad --line=5 | yes
 The button label ("button name") | Mousepad | yes
-Name of an icon (that exists in the system) | accessories-text-editor | yes
-A more detailed description for the button | Mousepad text editor | yes
+Name of an icon (that exists in the system) | accessories-text-editor | no, but recommended
+A more detailed description for the button | Mousepad text editor | no
 Actual command name only if first parameter has options  | mousepad | no
 
 <br>
