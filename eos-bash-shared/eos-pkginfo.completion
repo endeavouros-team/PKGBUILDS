@@ -89,7 +89,7 @@ _eos-pkginfo_()
         pahis
         mirrorlist-rank-info
         reflector-simple
-        calamares-update
+        #calamares-update
         eos-kill-yad-zombies
         eos-welcome
         welcome-dnd
