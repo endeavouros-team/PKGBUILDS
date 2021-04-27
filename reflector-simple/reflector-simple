@@ -140,7 +140,8 @@ _get_reflector_x_configs() {
         case "$opt" in
             --sort)            conf_sort="$xx" ;;
             -a | --age)        conf_age="$xx" ;;
-            -n | --number)     conf_number="$xx" ;;
+            -n | --number)     [ "$use_number_instead_of_latest" = "yes" ] && conf_number="$xx" ;;
+            -l | --latest)     [ "$use_number_instead_of_latest" = "yes" ] || conf_number="$xx" ;;
             -p | --protocol)
                 list="$xx"
                 while [ -n "$list" ] ; do
@@ -263,7 +264,11 @@ AskCountriesAndOptions() {
     fi
     command+=(--field="Max hours from latest mirror sync":num $default_age)    # --age
     command+=(--field="Sort by":cb "$default_sort")                            # --sort
-    command+=(--field="Max number of mirrors":num $default_number)             # --number
+    if [ "$use_number_instead_of_latest" = "yes" ] ; then
+        command+=(--field="Max number of mirrors":num $default_number)         # --number
+    else
+        command+=(--field="Max number of freshed mirrors":num $default_number) # --latest
+    fi
 
     command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
 
@@ -324,7 +329,11 @@ BuildReflectorCommand() {
     reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
     reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
     ((ix++))
-    reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+    if [ "$use_number_instead_of_latest" = "yes" ] ; then
+        reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+    else
+        reflector_cmd+=(--latest "${reflector_info[$((ix++))]}")
+    fi
 }
 
 ShowMirrorlistSaved() {
@@ -440,11 +449,17 @@ Main() {
     local conf_number=""
     local conf_protocol=()
     local worldwide_selected=0
+    local use_number_instead_of_latest="$REFLECTOR_SIMPLE_PREFER_NUMBER"  # from exported env var
     local https_selected=0
     local http_selected=0
     local rsync_selected=0
     local country_exclude="--country-exclude"          # reflector does not have this option
     local use_pulsating_indicator=no  # yes or no
+
+    case "$use_number_instead_of_latest" in
+        yes | no) ;;
+        *) use_number_instead_of_latest=no ;;          # new default!
+    esac
 
     # Find countries with supported mirrors.
 
