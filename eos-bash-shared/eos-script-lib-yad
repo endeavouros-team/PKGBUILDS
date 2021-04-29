@@ -20,6 +20,7 @@
 # export -f eos_yad_GetDesktopName
 # export -f eos_GetArch
 # export -f eos_select_browser
+# export -f eos_yad_nothing_todo
 #
 # The two last functions above do not use yad.
 
@@ -426,6 +427,24 @@ eos_GetDeOrWm() {
 #    done
 #    DIE "$FUNCNAME: cannot find a browser"
 #}
+
+eos_yad_nothing_todo() {
+    local text="$1"
+    local timeout="$2"  # optional, default set below
+    local title="$3"    # optional, default set below
+    local image="$4"    # optional, default set below
+
+    [ -n "$timeout" ] || timeout=10
+    [ -n "$title" ]   || title="Info"
+    [ -n "$image" ]   || image=info
+
+    local cmd=(
+        eos_yad --form --text="$text" --title="$title" --no-focus
+                --height=100 --width=300 --timeout=$timeout --timeout-indicator=left
+                --button=yad-close:0
+    )
+    "${cmd[@]}"
+}
 
 
 FindAvailableMonoFont() {
