@@ -18,7 +18,12 @@ PacdiffCmd() {
             echo "$pdtext" $root_start ; DIFFPROG="/usr/bin/$differ" su-c_wrapper -p pacdiff 2>/dev/null $root_stop
         fi
     else
-        eos_yad_nothing_todo "<tt>eos-pacdiff: nothing to do.</tt>" 5
+        local msg="eos-pacdiff: nothing to do."
+        if [ $start_new_terminal = yes ] ; then
+            eos_yad_nothing_todo "<tt>$msg</tt>" 5
+        else
+            echo "$msg" >&2
+        fi
     fi
 }
 
