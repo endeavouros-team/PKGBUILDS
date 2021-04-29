@@ -41,6 +41,7 @@ export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 export -f eos_GetArch
 export -f eos_select_browser
+export -f eos_yad_nothing_todo
 #################################################################################
 
 export PROG_PACKAGENAME="welcome"
@@ -703,7 +704,7 @@ yad_SystemUpdate() {
     done
     if [ $hasupdates -eq 0 ] ; then
         if [ 1 -eq 1 ] ; then
-            yad_nothing_todo "$SYSUP_NO" 10 "$AFTER_INSTALL_US" "$(IconGrasp system-software-update)"
+            eos_yad_nothing_todo "$SYSUP_NO" 10 "$AFTER_INSTALL_US" "$(IconGrasp system-software-update)"
         else
             eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
                     --height=100 --width=300 --timeout=10 --timeout-indicator=left \
@@ -1083,25 +1084,6 @@ IconGrasp() {
     return 1
 }
 
-yad_nothing_todo() {
-    local text="$1"
-    local timeout="$2"  # optional, default set below
-    local title="$3"    # optional, default set below
-    local image="$4"    # optional, default set below
-
-    [ -n "$timeout" ] || timeout=10
-    [ -n "$title" ]   || title="Info"
-    [ -n "$image" ]   || image=info
-
-    local cmd=(
-        eos_yad --form --text="$text" --title="$title" --no-focus
-                --height=100 --width=300 --timeout=$timeout --timeout-indicator=left
-                --button=yad-close:0
-    )
-    "${cmd[@]}"
-}
-export -f yad_nothing_todo
-
 if [ 0 -eq 1 ] ; then
 NothingToDo_other() {
     local text="$1"
@@ -1116,30 +1098,11 @@ NothingToDo_other() {
 export -f NothingToDo_other
 fi
 
-PacdiffCmd() {
-    local differ="$1"
-    local root_start="$2"
-    local root_stop="$3"
-    
-    if [ -n "$(echo q | DIFFPROG=diff /usr/bin/pacdiff)" ] ; then
-        local pdtext="Starting pacdiff & $differ as root ..."
-        case "$differ" in
-            vim | code) differ+=" -d"
-        esac
-        RunInTerminal "echo '$pdtext' $root_start ; DIFFPROG='/usr/bin/$differ' su-c_wrapper -p pacdiff 2>/dev/null $root_stop"
-    else
-        yad_nothing_todo "<tt>Pacdiff: nothing to do.</tt>" 5
-    fi
-}
-export -f PacdiffCmd
-
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
-  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ Icon=preferences-system
 
   local tabcontents=(
       eos_yad --align-buttons
@@ -1155,45 +1118,21 @@ AfterInstall() {
       --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
-
-  local root_start="" root_stop="" first_differ=""
-  local missing=() form=""
-
-  case "$XDG_SESSION_TYPE" in
-      wayland)
-          if [ -x /usr/bin/xhost ] ; then
-              root_start=" ; xhost si:localuser:root"
-              root_stop=" ; xhost -si:localuser:root"
-          else
-              missing+=(xorg-host)
-          fi
-          if [ -x /usr/bin/diffuse ] ; then
-              first_differ=diffuse
-          else
-              missing+=(diffuse)
-          fi
-          case "${#missing[@]}" in
-              0) ;;
-              1) form=package ;;
-              *) form=packages ;;
-          esac
-          [ -n "$form" ] && eos_yad_WARN "For pacdiff, install $form: ${missing[*]}." --height=150 --width=500 --fontname="Mono 10"
-          ;;
-      x11)
-          # nothing to do
-          ;;
-  esac
-  for differ in $first_differ "${differs[@]}" ; do
+  # pacdiff stuff
+  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
+  local differ Icon=preferences-system
+  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
+  for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
           case "$differ" in
               meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
               kdiff3|kompare|diffuse) Icon=$differ ;;
           esac
-          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
-          tabcontents+=("bash -c 'PacdiffCmd $differ \"$root_start\" \"$root_stop\"'")
+          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
           break
       fi
   done
+
 
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
       tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
