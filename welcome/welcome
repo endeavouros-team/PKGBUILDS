@@ -1571,9 +1571,9 @@ EOF
 }
 
 Check_r8168() {
-    # return 0 if r8168 is installed and no internet connection
+    # return 0 if r8168 is installed and ethernet card is 8168
+    [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] || return 1
     IsInstalled r8168 >& /dev/null || return 1
-    eos_yad_check_internet_connection none 0 "0s" && return 1
     return 0
 }
 export -f Check_r8168
@@ -1828,7 +1828,7 @@ StartHere() {
         fi
         ShowProgress "Checking connection..."
 
-        eos_yad_check_internet_connection $verbosity 20 "3s" "Welcome" || return 1
+        eos_yad_check_internet_connection $verbosity 2 "3s" "Welcome" || return 1
 
         if [ -n "$TERMINAL_AT_START" ] ; then
             arg="$(echo "$TERMINAL_AT_START" | awk '{print $1}')"
