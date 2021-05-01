@@ -48,6 +48,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     grub-theme-endeavouros
     grub-tools
     keyserver-rank
+    nvidia-hook
     nvidia-installer-db
     nvidia-installer
     nvidia-installer-dkms
