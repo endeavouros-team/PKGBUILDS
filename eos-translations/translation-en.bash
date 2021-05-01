@@ -282,3 +282,9 @@ _tr_add2 butt_softnews_tip            "Important news about EndeavourOS software
 
 _tr_add2 install_community            "Install community editions"
 _tr_add2 install_community_tip        "Community editions: Sway, Bspwm (note: online required)"
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "How to share system logs"
+_tr_add2 ins_syslogtip                "Explains how you can share system logs when you need help"
+_tr_add2 ins_logtool                  "Logs for troubleshooting"
+_tr_add2 ins_logtooltip               "Select, create and share troubleshooting logs when asking for help"

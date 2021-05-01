@@ -282,3 +282,9 @@ _tr_add2 butt_softnews_tip            "Tärkeitä uutisia EndeavourOS:n ohjelmis
 
 _tr_add2 install_community            "Asenna yhteisön kanssa tehty julkaisu"
 _tr_add2 install_community_tip        "Yhteisön kanssa tehdyt julkaisut: Sway, Bspwm (huomaa: internet-yhteys tarvitaan)"
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Kuinka saan järjestelmän lokit"
+_tr_add2 ins_syslogtip                "Ohjeet kuinka saan järjestelmälokit luotua kun tarvitsen apua"
+_tr_add2 ins_logtool                  "Luo lokit ongelmatilanteessa"
+_tr_add2 ins_logtooltip               "Luo ja jakaa tarvittavat lokit kun haluat apua ongelman selvittämiseksi"
