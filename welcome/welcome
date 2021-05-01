@@ -833,6 +833,8 @@ AfterInstall() {
 
   Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
 
+  tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
