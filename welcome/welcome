@@ -664,11 +664,14 @@ INSTALL() {
 
   ShowChangeResoButton
 
+  local icon=face-worried #dialog-question
   tabcontents+=(
-      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
-      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
-      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                  'gparted'
+      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
+    # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_syslog)!$user_info!$(ltr ins_syslogtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr ins_logtool)!$icon!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
