@@ -131,25 +131,6 @@ eos_yad_WARN_debug() {
 export -f eos_yad_WARN_debug
 
 
-_align_buttons_on_tab() {
-    local -n arr="$1"
-    local handle="$2"
-    local ix xx
-
-    # just remove possible legacy "_align(...) construct"
-    ix=0
-    for xx in "${arr[@]}" ; do
-        case "$xx" in
-            --field=*)
-                if [ "$xx" != "${xx/*_align(/}" ] ; then
-                    arr[$ix]="$(echo "$xx" | sed 's|_align(\(.*\))!| \1!|')"
-                fi
-                ;;
-        esac
-        ((ix++))
-    done
-}
-
 Welog() {
     [ -d /home/$EOS_LIVEUSER ] && echo "$progname: " "$@" >> $INSTALL_LOG_FILE
 }
@@ -433,302 +414,6 @@ yad_calamares_debug() {
 }
 export -f yad_calamares_debug
 
-yad_UpdateMe() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-pkexec pacman -Sy $PROG_PACKAGENAME --needed --noconfirm >& /dev/null && {
-  pkill -f "$PROGNAME"
-  pkill -f "$EOS_YAD_STARTER_CMD"
-  $PROGNAME &
-}
-EOF
-    bash $tmpfile
-    sleep 2
-    rm -f $tmpfile
-}
-export -f yad_UpdateMe
-
-yad_UpdateEOStoLatest() {    # Show what to update in order to set any EOS install at the "latest level".
-    local removes=(kalu)
-    local installs=(eos-update-notifier reflector-simple)
-    local rem=() ins=()
-    local xx
-    for xx in "${removes[@]}" ; do
-        pacman -Q "$xx" >& /dev/null && rem+=("$xx")
-    done
-    for xx in "${installs[@]}" ; do
-        pacman -Q "$xx" >& /dev/null || ins+=("$xx")
-    done
-    
-    local t1="To have your EndeavourOS install on par with the latest and greatest, the following actions are needed:\n"
-    local t2="- uninstall packages: ${rem[*]}\n"
-    local t3="- install packages: ${ins[*]}\n"
-    local t="$t1"
-    test -n "$rem" && t+="$t2"
-    test -n "$ins" && t+="$t3"
-    test "$t" = "$t1" && t+="Your system is already at the latest level!"
-    eos_yad --text="$t" --title="Upgrading EndeavourOS level" --image=info --button=yad-ok:0
-}
-export -f yad_UpdateEOStoLatest
-
-yad_PkgsToLetGo() {
-    local xx yy
-    local pkgs2letgo
-
-    for xx in "$@" ; do
-        for yy in $EOS_KEEP_PKGS ; do
-            test "$xx" = "$yy" && break
-        done
-        if [ "$xx" != "$yy" ] ; then
-            if [ -z "$pkgs2letgo" ] ; then
-                pkgs2letgo="$xx"
-            else
-                pkgs2letgo+=" $xx"
-            fi
-        fi
-    done
-    echo "$pkgs2letgo"
-}
-export -f yad_PkgsToLetGo
-
-yad_PkgIssues() {
-    local cpu
-    local removes=()
-    local commands=":"                            # These commands will be run as root.
-    local title="$ISSUES_TITLE"
-    local intel=0 nvidia=0 amd=0 recreate_grub_cfg=0
-    local graphics
-    local xx pkg pkgs
-    local amd_ucode=0
-    local intel_ucode=0
-    local ok_checks=()
-    local graphics_issues=0
-    local broadcom_wireless_issues=0
-
-    ## Check some "conflicting" packages.
-
-    # Having both amd and intel microcode packages are not needed and may cause issues with grub.
-
-    pacman -Q amd-ucode   >& /dev/null && amd_ucode=1
-    pacman -Q intel-ucode >& /dev/null && intel_ucode=1
-    if [ $amd_ucode -eq 1 ] && [ $intel_ucode -eq 1 ] ; then
-        cpu=$(grep -w "^vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
-        case "$cpu" in
-            GenuineIntel)
-                pkg="$(yad_PkgsToLetGo amd-ucode)"
-                if [ -n "$pkg" ] ; then
-                    removes+=($pkg)
-                    recreate_grub_cfg=1
-                fi
-                ;;
-            *)
-                pkg="$(yad_PkgsToLetGo intel-ucode)"
-                if [ -n "$pkg" ] ; then
-                    removes+=($pkg)
-                    recreate_grub_cfg=1
-                fi
-                ;;
-        esac
-    else
-        ok_checks+=("Microcode package conflicts: no issue")
-    fi
-
-    # Detecting unnecessary video drivers.
-
-    graphics="$(device-info --vga ; device-info --display)"
-    test -n "$(echo "$graphics" | grep "Intel Corporation")" && intel=1
-    if [ -n "$(echo "$graphics" | grep "NVIDIA Corporation")" ] ; then
-        nvidia=1
-    elif [ -n "$(echo "$graphics" | grep "GeForce")" ] ; then
-        nvidia=1
-    fi
-    if [ -n "$(echo "$graphics" | grep "Advanced Micro Devices")" ] ; then
-        amd=1
-    elif [ -n "$(echo "$graphics" | grep "AMD/ATI")" ] ; then
-        amd=1
-    elif [ -n "$(echo "$graphics" | grep "Radeon")" ] ; then
-        amd=1
-    fi
-
-    if [ $intel -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-intel)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $nvidia -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $amd -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-amdgpu xf86-video-ati)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $graphics_issues -eq 0 ] ; then
-        ok_checks+=("Graphics package issues: no issue")
-    fi
-
-    # Remove Broadcom wifi driver if using another wifi card.
-
-    case "$EOS_WIFIDEV_CHECK" in
-        yes | no) ;;
-        *) EOS_WIFIDEV_CHECK=yes ;;
-    esac
-
-    if [ "$EOS_WIFIDEV_CHECK" = "yes" ] ; then
-        while true ; do
-            xx=broadcom-wl-dkms
-            pacman -Q $xx >& /dev/null && {
-                local wifi_pci="$(lspci -k | grep -A4 " Network controller: ")"
-                if [ -n "$(lsusb | grep " Broadcom ")" ] || [ -n "$(echo "$wifi_pci" | grep " Broadcom ")" ] ; then
-                    break
-                fi
-                local wifi_driver="$(echo "$wifi_pci" | grep "Kernel driver in use")"
-                if [ -n "$(echo "$wifi_driver" | grep "in use: wl$")" ] ; then
-                    break
-                fi
-                pkg="$(yad_PkgsToLetGo $xx)"
-                test -n "$pkg" && {
-                    removes+=($xx)
-                    ((broadcom_wireless_issues++))
-                }
-            }
-            break
-        done
-    fi
-    if [ $broadcom_wireless_issues -eq 0 ] ; then
-        ok_checks+=("Broadcom wireless driver: no issue")
-    fi
-
-    # Make package removals as a sequence of commands.
-
-    if [ -n "$removes" ] ; then
-        commands+=" ; pacman -Rsn ${removes[*]}"
-        if [ "$recreate_grub_cfg" = "1" ] ; then
-            if [ -x /usr/bin/grub-mkconfig ] ; then
-                commands+=" ; grub-mkconfig -o /boot/grub/grub.cfg"
-            else
-                eos_yad --text="$ISSUES_GRUB" --title="$title" --image=info --button=yad-ok:0
-            fi
-        fi
-    fi
-
-    ## Other commands to execute.
-
-    # systemd-time-wait-sync is not needed. See https://forum.endeavouros.com/t/welcome-enos-launcher/1654/82.
-    xx=systemd-time-wait-sync
-    systemctl status $xx >/dev/null && {
-        commands+=" ; systemctl disable $xx"
-    }
-
-    ## Now run all gathered commands.
-
-    local cmds_as_list="$(echo "${commands[*]}" | sed -e 's|^: ; ||' -e 's| ; |\n|g')"
-
-    if [ "$commands" != ":" ] ; then
-        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n%s\n' '$cmds_as_list' 'Elevated privileges required.' ; $EOS_ROOTER '$commands'"
-    else
-        local t="$ISSUES_NO"
-        t+="\n"
-        for xx in "${ok_checks[@]}" ; do
-            t+="\n$xx"
-        done
-        eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
-    fi
-}
-export -f yad_PkgIssues
-
-yad_SystemUpdate_old() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-_xx_main() {
-  local updates="\$(checkupdates)"
-  test -n "\$updates" && {
-      echo "\$updates"
-      $EOS_AUR_HELPER -Syu # --noconfirm
-  } || {
-      echo "$SYSUP_NO"
-  }
-}
-_xx_main
-EOF
-    chmod +x $tmpfile
-    eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
-}
-
-yad_SystemUpdate_fails() {
-    eos-update-notifier --pkgsonly  # code re-use!
-}
-
-yad_SystemUpdate() {
-    local cmd
-    local updates
-    local hasupdates=0
-    local source
-    local action
-
-    for source in upstream AUR ; do
-        case "$source" in
-            upstream)
-                updates="$(checkupdates)"
-                action="$EOS_ROOTER 'pacman -Syu'"
-                ;;
-            AUR)
-                updates="$($EOS_AUR_HELPER -Qua)"
-                action="$EOS_AUR_HELPER -Sua"
-                ;;
-        esac
-        if [ -n "$updates" ] ; then
-            hasupdates=1
-            cmd="echo '$AFTER_INSTALL_US_FROM $source:'"
-            cmd+=" ; echo '$updates'"
-            test "$source" = "upstream" && cmd+=" ; echo -n '$AFTER_INSTALL_US_EL '"
-            cmd+=" ; $action && printf '\n$source $AFTER_INSTALL_US_DONE\n' || printf '\n$source $AFTER_INSTALL_US_FAIL\n'"
-            eos_yad_RunCmdTermBash "$cmd"
-        fi
-    done
-    if [ $hasupdates -eq 0 ] ; then
-        if [ 1 -eq 1 ] ; then
-            eos_yad_nothing_todo "$SYSUP_NO" 10 "$AFTER_INSTALL_US" "$(IconGrasp system-software-update)"
-        else
-            eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
-                    --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                    --button=yad-quit:0 --image="$(IconGrasp system-software-update)"
-        fi
-    fi
-}
-export -f yad_SystemUpdate
-
-yad_InitializePacmanMirroring() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-haveged -w 1024
-pacman-key --init
-pacman-key --populate
-pacman-key --refresh-keys
-pkill haveged
-EOF
-    chmod +x $tmpfile
-    eos_yad_RunCmdTermBash "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
-}
-export -f yad_InitializePacmanMirroring
-
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
@@ -973,11 +658,6 @@ INSTALL() {
           --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'bash -c yad_community_editions'
       )
   fi
-  if [ 0 -eq 1 ] ; then
-      tabcontents+=(
-          --field=" $(ltr ins_up)!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
-      )
-  fi
   tabcontents+=(
       --field=" $(ltr after_install_um)!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
@@ -985,7 +665,6 @@ INSTALL() {
   ShowChangeResoButton
 
   tabcontents+=(
-#      --field=" $(ltr ins_keys)!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
       --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
       --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
       --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
@@ -1191,12 +870,6 @@ UsefulTips() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
-#GetPkgVersion() {
-#    local repo="$1"
-#    local pkg="$2"
-#    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
-#}
-
 IsEosYadInstalled() {
     # Determines if yad-eos is installed.
     # Some yad alternative must be installed if we can use this program!
@@ -1309,6 +982,27 @@ personal_commands_init() {  # initialize user settings for personal commands
     [ -n "$3" ] && show_predefined_buttons_at_own_commands="$3"
 }
 
+_align_buttons_on_tab() {
+    # handles old _align() marking in ~/.config/welcome-own-cmds.conf
+
+    local -n arr="$1"
+    local handle="$2"
+    local ix xx
+
+    # just remove possible legacy "_align(...) construct"
+    ix=0
+    for xx in "${arr[@]}" ; do
+        case "$xx" in
+            --field=*)
+                if [ "$xx" != "${xx/*_align(/}" ] ; then
+                    arr[$ix]="$(echo "$xx" | sed 's|_align(\(.*\))!| \1!|')"
+                fi
+                ;;
+        esac
+        ((ix++))
+    done
+}
+
 OwnCommands() {
   local handle="$1"
   local tabnum="$2"
@@ -1353,18 +1047,6 @@ OwnCommands() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
-About() {
-  local handle="$1"
-  local tabnum="$2"
-
-  Usage | eos_yad --plug="$handle" --tabnum="$tabnum" \
-                  --text-info \
-                  --text="<b>More info about the $PRETTY_PROGNAME app</b>" \
-                  --text-align=left \
-                  --image=help-about \
-      &> /dev/null &
-}
-
 
 # Fields explanation:
 # --field="ButtonName!IconName!Tooltip":fbtn "Command"
@@ -1383,7 +1065,6 @@ CreateNotebookCommands() {
             AfterInstall
             UsefulTips
             AddMoreApps
-            #About
         )
     }
     if [ -n "$welcome_own_commands" ] ; then
@@ -1613,33 +1294,22 @@ MagicId() {
     echo "$target: OK" >&2
 }
 
-UpdateInstallScripts() {
-    # IsInstalling || return
-    if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] ; then
-        return
-        # the files below are needed only for installing
-    fi
+ShowProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
 
-    local URL=$ENDEAVOUROS_TEAM/install-scripts/master
-    local scripts=(                        # may need to adjust files ...
-        calamares_switcher
-        chrooted_cleaner_script.sh
-        cleaner_script.sh
-        pacstrap_calamares
-        update-mirrorlist
-    )
-    local script
-    local tmpdir=$(mktemp -d)
+    local msg="$1"
+    local barlen=50
+    local percent_increment=17
 
-    for script in "${scripts[@]}"; do
-        wget -q --timeout=10 -O "$tmpdir/$script" "$URL/$script" || DIE "cannot fetch script '$script'."
-        chmod +x "$tmpdir/$script"
-    done
-    for script in "${scripts[@]}"; do
-        sudo rm -f /usr/bin/"$script"
-        sudo mv "$tmpdir/$script" /usr/bin
-    done
-    rm -rf $tmpdir
+    ProgressBar "$msg" $pb_percent $barlen
+    ((pb_percent+=percent_increment))
+    [ $pb_percent -gt 100 ] && pb_percent=100
+}
+EndProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+    pb_percent=100
+    ShowProgress "Done."
+    ProgressBarEnd
 }
 
 
@@ -1695,24 +1365,6 @@ export -f Usage
 # --tr-prefer=X     Prefer either 'manual' or 'generated' language on the user interface.
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
-
-ShowProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-
-    local msg="$1"
-    local barlen=50
-    local percent_increment=17
-
-    ProgressBar "$msg" $pb_percent $barlen
-    ((pb_percent+=percent_increment))
-    [ $pb_percent -gt 100 ] && pb_percent=100
-}
-EndProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-    pb_percent=100
-    ShowProgress "Done."
-    ProgressBarEnd
-}
 
 StartHere() {
     local arg lang
@@ -1849,8 +1501,6 @@ StartHere() {
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
         #fi
     fi
-
-    # UpdateInstallScripts
 
     SetBrowser
 
