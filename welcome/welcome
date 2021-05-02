@@ -1136,61 +1136,6 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
     fi
 }
 
-KillExtraYad() {
-    return         # no more needed ???
-    sleep 0.2
-    eos-kill-yad-zombies
-    return
-
-    # There may be an extra "yad" process in vain because
-    # the "save session" feature of Xfce has not stored the proper command for this app.
-    #
-    # The extra yad process will be eliminated by
-    #   - removing the extra "yad" command from the stored session
-    #   - killing the extra "yad" process if it exists
-
-    # Remove the extra "yad" command from the saved session.
-    local savefile="$(ls -1 "$HOME"/.cache/sessions/xfce4-session-* 2>/dev/null | grep -vP "\.bak$" | tail -n 1)"
-    if [ -n "$savefile" ] ; then
-        local count=$(grep ^LegacyCount= "$savefile" | cut -d '=' -f 2)
-        local endcount=$count
-        if [ "$(grep "^Legacy0_Command=yad$" "$savefile")" != "" ] || [ "$(grep "^Legacy0_Command=eos_yad$" "$savefile")" != "" ] ; then
-            ((endcount--))
-            sed -i "$savefile" \
-                -e 's|^Legacy0_Screen=.*$||' \
-                -e 's|^Legacy0_Command=.*$||' \
-                -e 's|^Legacy0_ClientMachine=.*$||'
-        fi
-        if [ $endcount -ne $count ] ; then
-            sed -i "$savefile" -e 's|^LegacyCount=.*$|LegacyCount='$endcount'|'
-        fi
-    fi
-
-    # Now check if an extra "yad" process is already running. If so, simply kill it.
-
-    sleep 0.1    # must wait a bit!
-
-    local yadlines yadline
-    local pid ppid lastword
-    local processes="$(ps -ef | grep -w yad | grep -v "grep -w yad" | grep -v "^root")"  # search 'yad' without 'root'
-    local problem_ppid=1
-
-    # search for the right "extra" yad process
-    if [ "$(echo "$processes" | awk '{print $NF}')" = "yad" ] ; then
-        readarray -t yadlines <<< "$(echo "$processes")"
-        for yadline in "${yadlines[@]}" ; do
-            lastword="$(echo "$yadline" | awk '{print $NF}')"
-            ppid="$(echo "$yadline" | awk '{print $3}')"
-            if [ "$lastword" = "yad" ] && [ "$ppid" = "$problem_ppid" ] ; then
-                # found the "extra" yad process
-                pid="$(echo "$yadline" | awk '{print $2}')"
-                kill $pid
-                echo "$yadline" > /tmp/save-session-zombie-yad-killed.log
-            fi
-        done
-    fi
-}
-
 
 WelcomeSettings() {
     local value="$1"   # enable, disable, check
@@ -1424,7 +1369,6 @@ StartHere() {
     ShowProgress Processing...
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
-    KillExtraYad > $yad_zombie_log
 
     export show_installer=no    # explicitly show the installer, for testing only
     export user_pkglist_url=""
