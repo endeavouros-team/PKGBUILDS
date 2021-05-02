@@ -2,17 +2,27 @@
 
 # Kill yad processes that have no options ("--notebook" or "--plug" etc.).
 
+Printf() {
+    [ "$silent" = "no" ] && /usr/bin/printf "$@"
+}
+
 Main()
 {
+    local silent=no
+
+    case "$1" in
+        --silent) silent=yes ;;
+    esac
+
     sleep 0.1
 
     local bad="$(/usr/bin/pgrep -u "$LOGNAME" -a yad | /usr/bin/grep -P "^[0-9]* /usr/bin/yad[ ]*$|^[0-9]* yad[ ]*$")"
     if [ -n "$bad" ] ; then
-        printf "Killing yad zombies:\n%s\n" "$bad"
+        Printf "Killing yad zombies:\n%s\n" "$bad"
         kill $(echo "$bad" | awk '{print $1}')
-        printf "%s: killed yad zombies:\n%s\n" "$(date '+%x %X%p')" "$bad"
+        Printf "%s: killed yad zombies:\n%s\n" "$(date '+%x %X%p')" "$bad"
     else
-        echo "No yad zombies."
+        Printf "No yad zombies.\n"
     fi
 }
 

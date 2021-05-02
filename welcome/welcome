@@ -646,16 +646,16 @@ INSTALL() {
   local reflector_simple="$(IconGrasp software-update-available)"
   local user_info=info
   local tabcontents=(
-      eos_yad --align-buttons
+      eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
+      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'yad_calamares_debug choose'
   )
   if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
-          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'bash -c yad_community_editions'
+          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'yad_community_editions'
       )
   fi
   tabcontents+=(
@@ -788,12 +788,13 @@ AfterInstall() {
 
   local tabcontents=(
       eos_yad --align-buttons
+      --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=dialog-information
       --text="<b>$(ltr after_install_text)</b>"
   )
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
-     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
+     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
   fi
   tabcontents+=(
       --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
@@ -821,7 +822,7 @@ AfterInstall() {
   fi
 
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
+      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
 
   ShowChangeResoButton
 
@@ -831,15 +832,15 @@ AfterInstall() {
       --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
 
-  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
+  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "yad_Remove r8168")
 
   tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
 
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
-            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'bash -c yad_vanilla_xfce4_theme'
-            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'bash -c yad_endeavouros_xfce4_theme'
+            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
+            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
         )
         ;;
   esac
@@ -900,27 +901,27 @@ AddMoreApps() {
   local chromium="$(IconGrasp chromium web-browser)"
 
   local tabcontents=(
-      eos_yad --align-buttons
+      eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
   )
   IsInstalled libreoffice-fresh || {
       ((shown_app_buttons++))
-      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'bash -c "yad_Install libreoffice-fresh"')
+      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'yad_Install libreoffice-fresh')
   }
   IsInstalled chromium || {
       ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'bash -c "yad_Install chromium"')
+      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
   }
   IsInstalled gufw || {
       ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'bash -c "yad_Install gufw"')
+      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
   }
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       IsInstalled akm || {
           ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"')
+          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
       }
   fi
   case "$DE" in
@@ -931,8 +932,8 @@ AddMoreApps() {
             ((shown_app_buttons+=2))
             local bluetooth="$(IconGrasp bluetooth)"
             tabcontents+=(
-                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
+                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
+                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
             )
             break
         done
@@ -940,7 +941,7 @@ AddMoreApps() {
   esac
 
   if (! IsEosYadInstalled) ; then
-      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install yad-eos'")
+      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
   fi
   
   # General app browsing buttons:
@@ -1136,6 +1137,7 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
 }
 
 KillExtraYad() {
+    return         # no more needed ???
     sleep 0.2
     eos-kill-yad-zombies
     return
@@ -1519,6 +1521,7 @@ StartHere() {
     # Create the yad command gradually into an array 'notebook':
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
+    notebook+=(--use-interp)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"
@@ -1541,9 +1544,9 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
-    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"bash -c ImportantNews")
-    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
-    notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
+    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"ImportantNews")
+    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"WelcomeChangelog")
+    notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
     if [ "$is_installing" = "no" ] ; then
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
     fi
@@ -1568,6 +1571,8 @@ StartHere() {
         *) echo "welcome exit code was: $result" >&2 ;;
     esac
 }
+
+trap "sleep 0.2 ; eos-kill-yad-zombies --silent" EXIT
 
 StartHere "$@"
 
