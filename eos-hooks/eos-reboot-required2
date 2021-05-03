@@ -1,23 +1,36 @@
 #!/bin/bash
 
-# Notify about reboot if a listed package is updated
-# excluding kernels that are *not* currently running.
+# Avoid unnecessary reboots: don't notify if an updated package is
+# - not currently running (e.g. alternative kernel)
+# - not in use (e.g. alternative driver)
 
-running_kernel() {
+RunningKernel() {
     cat /proc/cmdline | sed 's|.*/vmlinuz-\(linux[a-z0-9-]*\) .*|\1|'
 }
 
 Main() {
     local targets=$(tee /dev/null)  # targets from the hook (stdin)
-    local tt
+    local target
     local notify=no
-    local runningKernel="$(running_kernel)"
+    local runningKernel="$(RunningKernel)"
 
-    for tt in $targets ; do
-        case "$tt" in
+    for target in $targets ; do
+        case "$target" in
             linux | linux-lts | linux-zen | linux-hardened | linux-lts?? | linux-lts???)
                 # Note: only official and older LTS kernels are checked.
-                if [ "$tt" = "$runningKernel" ] ; then
+                if [ "$target" = "$runningKernel" ] ; then
+                    notify=yes
+                    break
+                fi
+                ;;
+            nvidia)
+                if [ "$runningKernel" = "linux" ] ; then
+                    notify=yes
+                    break
+                fi
+                ;;
+            nvidia-lts)
+                if [ "$runningKernel" = "linux-lts" ] ; then
                     notify=yes
                     break
                 fi
