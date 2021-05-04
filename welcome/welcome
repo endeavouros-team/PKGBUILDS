@@ -780,6 +780,23 @@ NothingToDo_other() {
 export -f NothingToDo_other
 fi
 
+PacdiffFieldAdd() {
+  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
+  local differ Icon=preferences-system
+  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
+  for differ in "${differs[@]}" ; do
+      if [ -x /usr/bin/$differ ] ; then
+          case "$differ" in
+              meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
+              kdiff3|kompare|diffuse) Icon=$differ ;;
+          esac
+          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
+          break
+      fi
+  done
+}
+export -f PacdiffFieldAdd
+
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
@@ -798,24 +815,11 @@ AfterInstall() {
   fi
   tabcontents+=(
       --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+  )
+  PacdiffFieldAdd
+  tabcontents+=(
       --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
-
-  # pacdiff stuff
-  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ Icon=preferences-system
-  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
-  for differ in "${differs[@]}" ; do
-      if [ -x /usr/bin/$differ ] ; then
-          case "$differ" in
-              meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
-              kdiff3|kompare|diffuse) Icon=$differ ;;
-          esac
-          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
-          break
-      fi
-  done
-
 
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
       tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
