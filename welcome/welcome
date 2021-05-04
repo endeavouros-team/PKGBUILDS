@@ -1470,6 +1470,7 @@ StartHere() {
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
     notebook+=(--use-interp)
+    notebook+=(--expand)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"
