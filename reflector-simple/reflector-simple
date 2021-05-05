@@ -114,7 +114,8 @@ _get_reflector_x_configs() {
         return
     fi
 
-    cat $REFLECTOR_X_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
+    # remove empty lines and comments
+    cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed 's|[ \t]*#.*||' > $tmpconf
     
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         name="${countrynames[$ix]}"

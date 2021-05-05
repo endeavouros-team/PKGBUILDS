@@ -2,7 +2,7 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.15.2
+pkgver=1.15.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -25,9 +25,9 @@ source=(
   $_url/$pkgname.conf
   $_url/mirrorlist-rank-info
 )
-sha512sums=('2aa4ae9c1a3bcbea31caea07e2330930644d729cbeaff8a541b003d410a8c0bd984bceaa46b9d73cc2f0c1d88f1c377bfe84a1b771e9c45b2ad64ad68f109891'
+sha512sums=('70f6f11a54a32bdbb4959a9b19f43d8afa5c5f8c2e346590f3ff56253c156323657e3a2aed067978ac237ddc125b725770b7eeacc350b9e70fa4d6de86f21588'
             'bed925140e7ff3e7093b8ac150e7aa8bcd398e0a72a9ec1ef412046d3ff01e0a817ada097f76595ffb5daef5980c1df4530ac534dac0f2f23d831984b888a196'
-            '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d'
+            '8c581124dc0a2d4b3b15a44f736d9f25643b172bf0f16a40a8b8846cfb6648409adea0b71a8e4c8537c3482f6dd26ee359d19c75754edd6580285914cd750bfd'
             'a32dbd88f336e07852e494efa47d2488c4f505f00e4ccfb8a298cf30b20cdf104af8da98e611dcce42b26886989d80ec87c71317a65c53501ac369525bdd69a8')
 
 package() {
