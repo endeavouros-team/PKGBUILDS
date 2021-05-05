@@ -1242,11 +1242,19 @@ MagicId() {
         echo "Moving existing $target to $target.$time" >&2
         mv $target $target.$time
     fi
-    wget -q -O $target "$url" || {
+    if (! wget -q -O $target "$url") ; then
         echo "Sorry, URL '$url' not found. " >&2
         [ -r $target.$time ] && mv $target.$time $target
         return 1
-    }
+    fi
+    case "$id" in
+        ma) if (! wget -q "$ENDEAVOUROS_TEAM/sandbox/master/pkg/pkglist_install.sh") ; then
+                echo "Warning: cannot fetch pkglist_install.sh from sandbox" >&2
+                return 1
+            fi
+            sudo cp pkglist_install.sh /usr/lib/calamares/modules/user_pkglist/
+            ;;
+    esac
     echo "$target: OK" >&2
 }
 
