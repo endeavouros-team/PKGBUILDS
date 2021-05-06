@@ -25,7 +25,7 @@ Header() {
 
 LocalVersion() {
     local pkg="$(/usr/bin/basename "$1")"
-    /usr/bin/pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+    $pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
 }
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
@@ -66,7 +66,7 @@ StableVersion() {
         linux | linux-headers | linux-lts*) repo=core/ ;;
         linux-zen* | linux-hardened*)       repo=extra/ ;;
     esac
-    LANG=C pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
+    LANG=C $pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
 }
 
 Stable() {
@@ -233,10 +233,16 @@ AvailableKernelsAndHeaders() {
     # Now we have names of the "kernel headers".
     # Then add the kernel packages to proper places and output the result.
 
-    local headers=$( pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | awk '{printf("%s/%s\n", $1, $2)}' | grep -Pv '^testing/|/linux-api-headers$')
     local header
     local kernel
 
+    # Get all kernel headers from configured repos.
+    # Remove packages that are not kernel headers from the list.
+    # Remove also testing packages.
+    local headers=$($pacman -Sl | grep -w linux | awk '{printf("%s/%s\n", $1, $2)}' | grep -w headers$)
+    headers=$(echo "$headers" | grep -Pv 'linux-api-headers$|^testing|glibc|peak-linux-headers$')
+
+    # Get kernel names from header names and display them all
     for header in $headers ; do
         kernel=$(echo "$header" | sed 's|-headers$||')
         echo "$kernel $header"
@@ -246,6 +252,7 @@ AvailableKernelsAndHeaders() {
 Main()
 {
     local progname="$(basename "$0")"
+    local pacman=/usr/bin/pacman
     local na="(-)"
     local kernels=()
     local connect_header_with_kernel=no    # default, change with option --connect-header
@@ -423,8 +430,8 @@ Main()
     UniqueArr uninstall
 
     cmd=()
-    test -n "$uninstall" && cmd+=(pacman -Rsn ${uninstall[*]} ";")
-    test -n "$install"   && cmd+=(pacman -S ${install[*]} ";")
+    test -n "$uninstall" && cmd+=($pacman -Rsn ${uninstall[*]} ";")
+    test -n "$install"   && cmd+=($pacman -S ${install[*]} ";")
 
     if [ 0 -eq 1 ] ; then
         echo "uninstall = ${uninstall[*]}"
