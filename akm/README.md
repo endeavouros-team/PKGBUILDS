@@ -54,3 +54,39 @@ Server = https://repo.m2x.dev/current/$repo/$arch
 
 This method of automatically detecting kernel names is limited because kernels can be named in various ways.<br>
 Use configuration variable AKM_KERNELS_HEADERS (mentioned above) to add a list of kernel and header names from an additional repository. This is useful if the automatic kernel name detection does not recognize certain kernel names.
+
+Just as an example, to use the info from the picture above, your `/etc/akm.conf` could look something like this:
+
+```
+#!/bin/bash
+
+### Config file for akm.
+
+# When installing/uninstalling a kernel, you may configure to
+# install/uninstall the related header too.
+# Values: "yes" or "no"
+# Default: no
+local KERNEL_HEADER_WITH_KERNEL=yes
+
+# List of kernel and header names when using additional repos.
+# Example:
+#   local AKM_KERNELS_HEADERS=(
+#       reponame/linux-xxx  reponame/linux-xxx-headers
+#       reponame/linux-yyy  reponame/linux-yyy-headers
+#       ...
+#   )
+# where
+#    reponame   The name of an additional repository.
+#    linux-xxx  The name of a kernel.
+#
+local AKM_KERNELS_HEADERS=(
+    kernel-lts/linux-lts414  kernel-lts/linux-lts414-headers
+    kernel-lts/linux-lts419  kernel-lts/linux-lts419-headers
+    kernel-lts/linux-lts44   kernel-lts/linux-lts44-headers
+    # and so on...
+)
+
+# Width of the akm window in pixels.
+# Default: 900
+local AKM_WINDOW_WIDTH=1000
+```
