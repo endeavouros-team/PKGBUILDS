@@ -29,14 +29,16 @@ Currently the supported configurations are:
 
 Variable | Description | Supported values
 :--- | :--- | :---
-KERNEL_HEADER_WITH_KERNEL | Tie header package with the kernel package. Does the same as option `--connect-header`. | "no" (=default) and "yes"
+KERNEL_HEADER_WITH_KERNEL | Tie header package with the kernel package.<br>Does the same as option `--connect-header`. | "no" (=default) and "yes"
+AKM_KERNELS_HEADERS | Additional kernel and header names. | List of `reponame/pkgname` entries.
+AKM_WINDOW_WIDTH | Width of the `akm` window in pixels. | A positive number, default is 900.
 
 <br>
 
 ## Advanced example: add a new (unofficial) package repository
 
 You can add more (unofficial) package repositories into `/etc/pacman.conf`.<br>
-If the repository contains linux kernel packages, `akm` tries to add them to the list.
+If the repository contains linux kernel packages, `akm` tries to automagically add them to the list.
 
 The picture below shows `akm` window after adding the following unofficial repo:
 ```
@@ -47,3 +49,8 @@ Server = https://repo.m2x.dev/current/$repo/$arch
 <br>
 
 ![](akm-added-repo.png)
+
+### Caveat
+
+This method of automatically detecting kernel names is limited because kernels can be named in various ways.<br>
+Use configuration variable AKM_KERNELS_HEADERS (mentioned above) to add a list of kernel and header names from an additional repository. This is useful if the automatic kernel name detection does not recognize certain kernel names.
