@@ -171,12 +171,13 @@ CommonStuff() {
 
 AkmConfig() {
     local conf=/etc/akm.conf
-    local xx
     if [ -f $conf ] ; then
         source $conf
 
-        xx="$KERNEL_HEADER_WITH_KERNEL"
-        [ -n "$xx" ] && connect_header_with_kernel="$xx"
+        [ -n "$KERNEL_HEADER_WITH_KERNEL" ] && connect_header_with_kernel="$KERNEL_HEADER_WITH_KERNEL"
+        [ -n "$AKM_KERNELS_HEADERS" ]       && akm_kernels_headers_user=("${AKM_KERNELS_HEADERS[@]}")
+        [ -n "$AKM_WINDOW_WIDTH" ]          && akm_window_width=$AKM_WINDOW_WIDTH
+
         echo "==> Config file $conf read." >&2
     fi
 }
@@ -225,28 +226,34 @@ EOF
 
 AvailableKernelsAndHeaders() {
 
-    # Find kernel packages by finding packages which have words 'linux' and 'headers'
+    # Find kernel packages by finding packages which have words 'linux' and 'headers'.
     # From the output of 'pacman -Sl'
     # - find lines that have words: 'linux' and 'headers'
     # - drop lines containing 'testing' (=testing repo, causes duplicates) and 'linux-api-headers' (=not a kernel header)
     # - show the (header) package names
-    # Now we have names of the "kernel headers".
+    # Now we have names of the kernel headers.
     # Then add the kernel packages to proper places and output the result.
+    # Then display possible kernels and headers added by the user.
+
+    # The output consists of a list of reponame and a package name formatted as: "reponame/pkgname"
+    # For example:
+    #    reponame/linux-xxx reponame/linux-xxx-headers
+    #    reponame/linux-yyy reponame/linux-yyy-headers
+    #    ...
 
     local header
     local kernel
-
-    # Get all kernel headers from configured repos.
-    # Remove packages that are not kernel headers from the list.
-    # Remove also testing packages.
-    local headers=$($pacman -Sl | grep -w linux | awk '{printf("%s/%s\n", $1, $2)}' | grep -w headers$)
-    headers=$(echo "$headers" | grep -Pv 'linux-api-headers$|^testing|glibc|peak-linux-headers$')
+    local pacman=/usr/bin/pacman
+    local headers=$($pacman -Sl | awk '{printf("%s/%s\n", $1, $2)}' | grep "/linux[^ ]*-headers$" | grep -Pv '^testing/|/linux-api-headers$')
 
     # Get kernel names from header names and display them all
     for header in $headers ; do
         kernel=$(echo "$header" | sed 's|-headers$||')
         echo "$kernel $header"
     done
+
+    # Display kernels added by the user
+    [ -n "${akm_kernels_headers_user}" ] && echo "${akm_kernels_headers_user[@]}"
 }
 
 Main()
@@ -256,6 +263,8 @@ Main()
     local na="(-)"
     local kernels=()
     local connect_header_with_kernel=no    # default, change with option --connect-header
+    local akm_kernels_headers_user=()
+    local akm_window_width=900
     local scroll=no
     local nrofkernelitems                  # 8 with only upstream kernels
     local progress_cmd=(
@@ -332,7 +341,7 @@ Main()
 
     local cmd=(
         eos_yad
-        --width=900
+        --width=$akm_window_width
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
@@ -440,7 +449,14 @@ Main()
     fi
 
     if [ -n "$cmd" ] ; then
-        RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
+        case "$pacman" in
+            yay | paru | /usr/bin/yay | /usr/bin/paru)
+                RunInTerminal "echo '${cmd[*]}' ; ${cmd[*]}"
+                ;;
+            pacman | /usr/bin/pacman)
+                RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
+                ;;
+        esac
     fi
 }
 

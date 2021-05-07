@@ -5,7 +5,7 @@ pkgname=akm
 pkgdesc="Arch kernel manager."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=2.8.5
+pkgver=2.8.6
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,8 +17,8 @@ source=(
     "$_url/$pkgname.conf"
     "$_url/$pkgname.desktop"
 )
-sha512sums=('301c24f9164271a3f60d3c909b6481b9e0bb97ecefcf6e6277248dc3c8c1902b5fce866f951e36d52acc9a54e6b0e8c7baf47e397722b9d8282eee99a154e126'
-            '2c109c185647dbb21b1ee7afbe13818515af1ab19271ac744d7888711862962f82036837b03a1385e60c81d0e321e809c024e5e54e9a2f5204b2b35bf1ccee61'
+sha512sums=('b8e49d4d04014cfd6e1c39d08129f39d8e982f8505fa2b562b6fcec29d5f97f021d4d106b4a4ff43776e8853b6e4a1e92e55502475249bf47e31defa7bed9db1'
+            '18eb2813b467294d3c80de62de8c40e2bcd199dd0009be1eba1ef42c7b040cdbb632e3c7de5ca16bf977dae63a174f306a8264707876f28c5bf3aeeaa4b7be6e'
             '1ea6e6cb6cffb7a515747355c4510b13b7b01a0d054a2867be4f75248ac433130d2caabd7e5a7cec0a726c0b82ead6691d3f112bb243e64a6780bb0f851dfaf5')
 
 package() {
