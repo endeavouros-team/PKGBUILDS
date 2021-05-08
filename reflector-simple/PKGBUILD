@@ -3,11 +3,11 @@
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
 pkgver=1.15.3
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
-  bash yad reflector whois geoip bind-tools
+  reflector whois geoip bind-tools
   eos-bash-shared
 )
 optdepends=(
