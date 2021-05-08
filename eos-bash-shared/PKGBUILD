@@ -3,12 +3,12 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.6.18
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
   bash
-  yad
+  yad-eos
   eos-translations
   python-dbus           # for ksetwallpaper.py
   xorg-xrandr           # for eos-wallpaper-set
