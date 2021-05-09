@@ -23,6 +23,7 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
     aur/arc-x-icons-theme
+    aur/bashdb
 #    aur/ckbcomp
     aur/downgrade
     aur/inxi
@@ -121,6 +122,26 @@ _virtualbox-ext-oracle_hook() {
     # add a version check, virtualbox must be at least the same version
     sed -i "$Pkgbuild" \
         -e "s|^depends=('virtualbox'|depends=('virtualbox>=$Pkgver'|"
+}
+
+_bashdb_hook() {
+    local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/$Pkgname/PKGBUILD
+
+    if [ "$(grep "^_ver=" "$Pkgbuild" | cut -d'=' -f2)" = "'5.0-1.1.2'" ] ; then
+        # support also bash version 5.1
+
+        local line="s/'5.0')/'5.0' | '5.1')/"
+
+        sed -i "$Pkgbuild" \
+            -e "/^[ ]*#sed /a \  sed -i configure -e \"$line\""
+
+        # show in pkgrel we changed this package
+        if [ "$(grep ^pkgrel= "$Pkgbuild" | cut -d'=' -f2)" = "'1'" ] ; then
+            sed -i "$Pkgbuild" \
+                -e 's|^pkgrel=.*|pkgrel=1.1|'
+        fi
+    fi
 }
 
 _paper-icon-theme-git_hook() {
@@ -414,6 +435,7 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
 }
 
 declare -A ASSET_PACKAGE_HOOKS
+ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
