@@ -2,8 +2,8 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.15.3
-pkgrel=2
+pkgver=1.16
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -13,7 +13,10 @@ depends=(
 optdepends=(
   'reflector-bash-completion: useful for plain reflector usage'
 )
-backup=(etc/$pkgname.conf)
+backup=(
+  etc/$pkgname.conf
+  etc/${pkgname}-tool.conf
+)
 
 #url=https://github.com/endeavouros-team/PKGBUILDS
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -23,11 +26,13 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.desktop
   $_url/$pkgname.conf
+  $_url/${pkgname}-tool.conf
   $_url/mirrorlist-rank-info
 )
-sha512sums=('70f6f11a54a32bdbb4959a9b19f43d8afa5c5f8c2e346590f3ff56253c156323657e3a2aed067978ac237ddc125b725770b7eeacc350b9e70fa4d6de86f21588'
+sha512sums=('de80695af009333ffb0ade21858624fc574e2a6f4075b24dffdb13c510b4fb26325aec7a400c63619d97f12a3f4db0d18cdb1c32446b2f06d52f16db3ce5cf13'
             'bed925140e7ff3e7093b8ac150e7aa8bcd398e0a72a9ec1ef412046d3ff01e0a817ada097f76595ffb5daef5980c1df4530ac534dac0f2f23d831984b888a196'
             '8c581124dc0a2d4b3b15a44f736d9f25643b172bf0f16a40a8b8846cfb6648409adea0b71a8e4c8537c3482f6dd26ee359d19c75754edd6580285914cd750bfd'
+            '9980417afc1a7d77d09f314a1a39e37d504493df018b84c4b32fff966ce783001ab811eff8e3e1b57fcbda25a66cd21c6a575eb0d1605703db2849efc429693d'
             'a32dbd88f336e07852e494efa47d2488c4f505f00e4ccfb8a298cf30b20cdf104af8da98e611dcce42b26886989d80ec87c71317a65c53501ac369525bdd69a8')
 
 package() {
@@ -42,6 +47,7 @@ package() {
   install -Dm755 $pkgname              $pkgdir/usr/bin/$pkgname
   install -Dm755 mirrorlist-rank-info  $pkgdir/usr/bin/mirrorlist-rank-info
   
-  install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
-  install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
+  install -Dm644 $pkgname.conf           $pkgdir/etc/$pkgname.conf
+  install -Dm644 ${pkgname}-tool.conf    $pkgdir/etc/${pkgname}-tool.conf
+  install -Dm644 $pkgname.desktop        $pkgdir/usr/share/applications/$pkgname.desktop
 }

@@ -13,6 +13,10 @@ DIE() {
     eos_yad --form --width=400 --title="reflector-simple problem" --image=error --text="$1" --button=yad-quit
     exit 1
 }
+WARN() {
+    echo "$progname: warning: $1" >&2
+    # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
+}
 
 REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
 REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
@@ -202,6 +206,17 @@ OptTypeNeeded() {
     esac
 }
 
+IsPositiveNumber() {
+    local val="$1"
+
+    if [ "$(echo "$val" | /usr/bin/sed 's|[0-9]*||g')" = "" ] ; then
+        if [ -n "$val" ] ; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 AskCountriesAndOptions() {
     local tips=(
         "Select countries to include in mirror ranking"
@@ -216,11 +231,43 @@ AskCountriesAndOptions() {
     fi
     local ix included xx tip
     local command
-    local columns=5
     local default_age=2
     local default_sort='age!^rate!country!score!delay'
     local default_number=10
     local use_saved=""
+    local def_width=1000
+    local def_height=750
+    local def_cols=5
+    local max_cols=8
+    local REFLECTOR_SIMPLE_WIDTH=$def_width
+    local REFLECTOR_SIMPLE_HEIGHT=$def_height
+    local REFLECTOR_SIMPLE_COLUMNS=$def_cols
+    local toolconf=/etc/reflector-simple-tool.conf
+
+    if [ -r $toolconf ] ; then
+        source $toolconf
+
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_WIDTH") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_WIDTH has an invalid value, using default"
+            REFLECTOR_SIMPLE_WIDTH=$def_width
+        fi
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_HEIGHT") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_HEIGHT has an invalid value, using default"
+            REFLECTOR_SIMPLE_HEIGHT=$def_height
+        fi
+
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_COLUMNS") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_COLUMNS has an invalid value, using default"
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+        if [ $REFLECTOR_SIMPLE_COLUMNS -gt $max_cols ] ; then
+            REFLECTOR_SIMPLE_COLUMNS=$max_cols
+        elif [ $REFLECTOR_SIMPLE_COLUMNS -lt $def_cols ] ; then
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+    fi
+    (( REFLECTOR_SIMPLE_WIDTH+=(100*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
+    (( REFLECTOR_SIMPLE_HEIGHT-=(60*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
 
     case "$(OptTypeNeeded)" in
         plain) ;;                         # no additional defaults
@@ -233,7 +280,8 @@ AskCountriesAndOptions() {
     [ -n "$conf_sort" ]    && default_sort="$(echo "$default_sort" | sed -e 's|\^||' -e "s|$conf_sort|^$conf_sort|")"
     
 
-    command=(eos_yad --form --columns=$columns --title="Select Arch mirrors with $progname v$VERSION_INFO")
+    command=(eos_yad --form --columns=$REFLECTOR_SIMPLE_COLUMNS --title="Select Arch mirrors with $progname v$VERSION_INFO")
+    command+=(--scroll --width=$REFLECTOR_SIMPLE_WIDTH --height=$REFLECTOR_SIMPLE_HEIGHT)
     tip=""
     for xx in "${tips[@]}" ; do
         tip+="${xx}\n"
