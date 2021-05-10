@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+# Latest yay release from yay-bin.
+
+_prepare_changes() {
+    # Download the original PKGBUILD from AUR.
+    # Modifications to original PKGBUILD:
+    #   - change package name from yay-bin to yay
+    #   - add more conflicts
+    #   - remove source archive after build
+    # Then source PKGBUILD.
+
+    curl -Lsm 10 -o PKGBUILD.AUR "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=yay-bin" || exit 1
+
+    sed -i PKGBUILD.AUR \
+        -e 's|^pkgname=yay-bin$|pkgname=yay|' \
+        -e '/^conflicts=/a \conflicts+=(yay-git yay-bin)' \
+        -e '/^package() {$/a \  rm -f ../${pkgname}_${pkgver}_$CARCH.tar.gz'
+
+    source PKGBUILD.AUR
+    
+    [ "$MAKEPKG_CLEANUP" != "no" ] && rm -f PKGBUILD.AUR
+}
+
+_prepare_changes
+unset -f _prepare_changes
