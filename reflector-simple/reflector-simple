@@ -18,10 +18,6 @@ WARN() {
     # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
 }
 
-REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
-REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
-
-
 CodeToCountry() {  # convert country code to country name
     local code="$1"
     echo "$REFLECTOR_COUNTRIES" | grep -wi "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
@@ -41,6 +37,13 @@ CCCheck() {   # check validity of country code
 
 GetYourCountryCode() {
     local IP code
+
+    Verbose "Fetching your country..."
+    code="$(curl -Lsm 10 https://ipinfo.io/country)"
+    Verbose "done."
+    CCCheck "$code" && {
+        echo "$code" ; return
+    }
 
     IP="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
     code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
@@ -62,7 +65,7 @@ GetYourCountryCode() {
         echo "$code" ; return
     }
 
-    code="$(curl -s https://ipinfo.io/country)"
+    code="$(curl -Lsm 10 https://ipinfo.io/country)"
     CCCheck "$code" && {
         echo "$code" ; return
     }
@@ -244,6 +247,8 @@ AskCountriesAndOptions() {
     local REFLECTOR_SIMPLE_COLUMNS=$def_cols
     local toolconf=/etc/reflector-simple-tool.conf
 
+    Verbose "Creating the yad command..."
+
     if [ -r $toolconf ] ; then
         source $toolconf
 
@@ -320,6 +325,7 @@ AskCountriesAndOptions() {
     fi
 
     command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
+    Verbose "done."
 
     reflector_info="$("${command[@]}")"
     case "$?" in
@@ -397,11 +403,15 @@ ShowMirrorlistSaved() {
 
 AddCountryNamesToMirrors() {
     local full_list=$(mktemp)
-    wget -q -O $full_list https://www.archlinux.org/mirrorlist/all || {
+
+    Verbose "Fetching Arch mirror list..."
+    #wget -q --timeout=10 -O $full_list https://www.archlinux.org/mirrorlist/all || {
+    curl -Lsm 10 -o $full_list https://www.archlinux.org/mirrorlist/all || {
         echo "Warning: cannot fetch Arch mirror list." >&2
         rm -f $full_list
         return 1
     }
+    Verbose "done."
 
     local selected_mirrors=$(grep "^Server = " $tmpfile | awk '{print $3}')
     local sel_mir
@@ -467,9 +477,24 @@ SaveMirrorlist() {
     esac
 }
 
+Verbose() {
+    #return
+    local time=$(date +%H:%M:%S)
+    echo "$time: $1" >&2
+}
+
 Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
+
+    Verbose "Fetching country names with reflector..."
+    local REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
+    Verbose "done."
+
+    if [ -z "$REFLECTOR_LIST_COUNTRIES" ] ; then
+        DIE "reflector: Fetching information from https://www.archlinux.org failed!"
+    fi
+    REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
 
     local REFLECTOR_SIMPLE_CONF=/etc/reflector-simple.conf
     local REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
@@ -517,7 +542,9 @@ Main() {
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         local tmpconf=$(mktemp)
+        Verbose "Reading config file..."
         _get_reflector_x_configs
+        Verbose "done."
     fi
 
     # Now we have info about supported countries.
@@ -548,7 +575,8 @@ Main() {
         --title="Mirror ranking"
         --text="Rating mirrors, please wait...\nNote: rating log will be saved in file <b>$ranklog</b>."
     )
-    
+
+    Verbose "Starting ranking..."
     "${reflector_cmd[@]}" 2>&1 > $tmpfile | tee $ranklog | {
         local line="" max_lines=0 value=0 line_count=-2
         while read line ; do
@@ -566,6 +594,7 @@ Main() {
         done
         echo 100
     } | "${progress_cmd[@]}"
+    Verbose "done."
 
     if [ "$use_pulsating_indicator" = "yes" ] ; then
         #sleep 0.5
@@ -583,8 +612,4 @@ Main() {
     fi
 }
 
-if [ -n "$REFLECTOR_LIST_COUNTRIES" ] ; then
-    Main "$@"
-else
-    DIE "reflector: Fetching information from https://www.archlinux.org failed!"
-fi
+Main "$@"
