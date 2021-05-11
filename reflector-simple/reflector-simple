@@ -18,6 +18,12 @@ WARN() {
     # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
 }
 
+Verbose() {
+    return
+    local time=$(date +%H:%M:%S)
+    echo "$time: $1" >&2
+}
+
 CodeToCountry() {  # convert country code to country name
     local code="$1"
     echo "$REFLECTOR_COUNTRIES" | grep -wi "$code" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|'
@@ -30,51 +36,94 @@ CountryToCode() {  # convert country name to country code
 
 CCCheck() {   # check validity of country code
     case "$1" in
-        [A-Z][A-Z]) test -n "$(CodeToCountry "$1")" && return 0 ;;
+        [A-Z][A-Z])
+            if [ -n "$(CodeToCountry "$1")" ] ; then
+                echo "$1"
+                return 0
+            fi
+            ;;
     esac
     return 1  # fail
 }
 
-GetYourCountryCode() {
-    local IP code
-
-    Verbose "Fetching your country..."
-    code="$(curl -Lsm 10 https://ipinfo.io/country)"
-    Verbose "done."
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
-    IP="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
-    code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
-    IP="$(dig -6 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv6 address
-    code="$(geoiplookup6 "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
-    code="$(curl -Lsm 10 https://ipinfo.io/country)"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
+Method0() {
+    # use https://ipinfo.io/country
+    local code="$(curl -Lsm 10 https://ipinfo.io/country)"
+    CCCheck "$code"
+}
+Method1() {
+    # use ipv4 and 'dig' with google, then 'geoiplookup'
+    Method12_IP || return 1
+    local code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code"
+}
+Method2() {
+    # use ipv4 and 'dig' with google, then 'whois'
+    Method12_IP || return 1
+    local code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code"
+}
+Method3() {
+    # use ipv6 and 'dig' with google, then 'geoiplookup6'; note that ipv6 may not be available
+    Method34_IP || return 1
+    local code="$(geoiplookup6 "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code"
+}
+Method4() {
+    # use ipv6 and 'dig' with google, then 'whois'; note that ipv6 may not be available
+    Method34_IP || return 1
+    local code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code"
+}
+Method5() {
     # net services failed, use local variables, but may be wrong
-    code="$(locale | grep ^LC_TIME | cut -d '"' -f 2 | sed 's|^.*_\([A-Z][A-Z]\)\..*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
+    local code="$(locale | grep ^LC_TIME | cut -d '"' -f 2 | sed 's|^.*_\([A-Z][A-Z]\)\..*$|\1|')"
+    CCCheck "$code"
+}
+
+Method12_IP() {
+    if [ -z "$IP_method12" ] ; then
+        local xx="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
+        if [ -n "$(echo "$xx" | sed 's|[0-9\.]*||g')" ] ; then
+            return 1   # is not an ipv4 address
+        fi
+        IP_method12="$xx"
+    fi
+    IP="$IP_method12"
+}
+
+Method34_IP() {
+    if [ -z "$IP_method34" ] ; then
+        local xx="$(dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv6 address (preferred)
+        if [ -n "$(echo "$xx" | sed 's|[0-9a-fA-f:]*||g')" ] ; then
+            return 1   # is not an ipv6 address
+        fi
+        IP_method34="$xx"
+    fi
+    IP="$IP_method34"
+}
+
+GetYourCountryCode() {
+    local IP
+    local IP_method12=""
+    local IP_method34=""
+
+    # try the preferred method first
+    case "$REFLECTOR_SIMPLE_COUNTRY_METHOD" in
+        default) ;;
+        [0-5]) Method$REFLECTOR_SIMPLE_COUNTRY_METHOD && return ;;
+        *) DIE "method $REFLECTOR_SIMPLE_COUNTRY_METHOD of REFLECTOR_SIMPLE_COUNTRY_METHOD in unsupported" ;;
+    esac
+
+    # come here if the preferred method failed, or default was chosen
+    local method
+    for method in $(seq 0 5) ; do
+        if [ "$method" != "$REFLECTOR_SIMPLE_COUNTRY_METHOD" ] ; then
+            Method$method && return
+        fi
+    done
+
+    DIE "failed to find country code"
 }
 
 ArgsYesNo() {
@@ -238,20 +287,11 @@ AskCountriesAndOptions() {
     local default_sort='age!^rate!country!score!delay'
     local default_number=10
     local use_saved=""
-    local def_width=1000
-    local def_height=750
-    local def_cols=5
     local max_cols=8
-    local REFLECTOR_SIMPLE_WIDTH=$def_width
-    local REFLECTOR_SIMPLE_HEIGHT=$def_height
-    local REFLECTOR_SIMPLE_COLUMNS=$def_cols
-    local toolconf=/etc/reflector-simple-tool.conf
 
     Verbose "Creating the yad command..."
 
     if [ -r $toolconf ] ; then
-        source $toolconf
-
         if (! IsPositiveNumber "$REFLECTOR_SIMPLE_WIDTH") ; then
             WARN "$toolconf: REFLECTOR_SIMPLE_WIDTH has an invalid value, using default"
             REFLECTOR_SIMPLE_WIDTH=$def_width
@@ -477,12 +517,6 @@ SaveMirrorlist() {
     esac
 }
 
-Verbose() {
-    #return
-    local time=$(date +%H:%M:%S)
-    echo "$time: $1" >&2
-}
-
 Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
@@ -497,8 +531,17 @@ Main() {
     REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
 
     local REFLECTOR_SIMPLE_CONF=/etc/reflector-simple.conf
+    local toolconf=/etc/reflector-simple-tool.conf
     local REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
     local REFLECTOR_X_CONF=$REFLECTOR_SIMPLE_CONF
+
+    local def_width=1000
+    local def_height=750
+    local def_cols=5
+    local REFLECTOR_SIMPLE_WIDTH=$def_width
+    local REFLECTOR_SIMPLE_HEIGHT=$def_height
+    local REFLECTOR_SIMPLE_COLUMNS=$def_cols
+    local REFLECTOR_SIMPLE_COUNTRY_METHOD=default
 
     [ -r "$REFLECTOR_X_CONF" ] || REFLECTOR_X_CONF=$REFLECTOR_AUTO_CONF
 
@@ -508,6 +551,10 @@ Main() {
     local showlist=$(ArgsYesNo -l "$@")
 
     test "$verbose" = "yes" && echo "Find your country ..." >&2
+
+    if [ -r $toolconf ] ; then
+        source $toolconf
+    fi
 
     local local_country_code="$(GetYourCountryCode)"
     local countrynames
