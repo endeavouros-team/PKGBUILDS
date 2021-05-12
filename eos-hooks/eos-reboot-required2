@@ -35,6 +35,12 @@ Main() {
                     break
                 fi
                 ;;
+            btrfs-progs)
+                if [ -n "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] ; then
+                    notify=yes
+                    break
+                fi
+                ;;
             *)
                 notify=yes
                 break
