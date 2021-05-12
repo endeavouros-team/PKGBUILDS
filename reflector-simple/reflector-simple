@@ -491,21 +491,27 @@ AddCountryNamesToMirrors() {
 }
 
 SaveMirrorlist() {
-    grep "^Server = [hr]" $tmpfile >/dev/null || {
-        echo "$progname: no mirrors found!" | \
-            eos_yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
+    local opts txt
+    local font="$(FindAvailableMonoFont)"
+
+    if (! grep "^Server = [hr]" $tmpfile >/dev/null) ; then
+        txt+="$progname: no mirrors found!\n\n"
+        txt+="You may need to change some option values,\n"
+        txt+="e.g. use bigger <i>age</i> for mirrors or add different/more countries."
+        txt=$(eos_FormMonoText "$txt")
+        opts=( --form --title="Error" --image=error --button=yad-quit --text="$txt")
+        eos_yad "${opts[@]}"
         return 1
-    }
+    fi
     AddCountryNamesToMirrors
 
-    local font="$(FindAvailableMonoFont)"
-    local opts=(--text-info
-                --width=750
-                --height=500
-                --title="New Arch mirrorlist"
-                --button=yad-quit:1 --button=" Save to $ml!document-save":0
-                --filename=$tmpfile
-               )
+    opts=(--text-info
+          --width=750
+          --height=500
+          --title="New Arch mirrorlist"
+          --button=yad-quit:1 --button=" Save to $ml!document-save":0
+          --filename=$tmpfile
+         )
     if [ -n "$font" ] ; then
         opts+=(--fontname="$font")
     fi
