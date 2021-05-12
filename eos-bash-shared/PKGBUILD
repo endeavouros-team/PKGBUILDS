@@ -2,8 +2,8 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.6.18
-pkgrel=2
+pkgver=1.6.19
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -52,7 +52,7 @@ source=(
   $_url/eos-pacdiff
 )
 
-sha512sums=('e7281f33cb3e09d523c33065cbed0a364f0ad49670ba31f2d75714ee463a7024deb474bc799e048340f6af37e94e29861a4b2557ed6372359129bcc9a09f7cbf'
+sha512sums=('baa784418299fa2cdf2d7781e9eb4b399da90031b366c016bfec967cea8c1f278962f03f3cfe204bf3827c0329cf047c437a302893025c44a704783750b58718'
             'b9ce5455f137cd47beddd4a2aa9850467b6570e829c5bc548488652e44a7d2d68f405ef9a9249864f297fed9b60123d9ef07c60acea48db1e19bec5befdaef8a'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'

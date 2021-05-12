@@ -512,6 +512,14 @@ YadProgressPulsate() {
                    --width=400 --hide-text --pulsate
 }
 
+eos_FormMonoText() {
+    local txt="$1"
+    local size="$2"   # optional
+
+    [ -n "$size" ] && size=" $size"
+    printf "<span font='Mono$size'>%s</span>" "$txt"
+}
+
 # check the config:
 case "$EOS_ROOTER" in
     su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
