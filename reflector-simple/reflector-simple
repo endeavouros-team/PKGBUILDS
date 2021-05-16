@@ -13,10 +13,16 @@ DIE() {
     eos_yad --form --width=400 --title="reflector-simple problem" --image=error --text="$1" --button=yad-quit
     exit 1
 }
+WARN() {
+    echo "$progname: warning: $1" >&2
+    # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
+}
 
-REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
-REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
-
+Verbose() {
+    return
+    local time=$(date +%H:%M:%S)
+    echo "$time: $1" >&2
+}
 
 CodeToCountry() {  # convert country code to country name
     local code="$1"
@@ -30,44 +36,94 @@ CountryToCode() {  # convert country name to country code
 
 CCCheck() {   # check validity of country code
     case "$1" in
-        [A-Z][A-Z]) test -n "$(CodeToCountry "$1")" && return 0 ;;
+        [A-Z][A-Z])
+            if [ -n "$(CodeToCountry "$1")" ] ; then
+                echo "$1"
+                return 0
+            fi
+            ;;
     esac
     return 1  # fail
 }
 
-GetYourCountryCode() {
-    local IP code
-
-    IP="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
-    code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
-    IP="$(dig -6 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv6 address
-    code="$(geoiplookup6 "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-    code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
-    code="$(curl -s https://ipinfo.io/country)"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
-
+Method0() {
+    # use https://ipinfo.io/country
+    local code="$(curl -Lsm 10 https://ipinfo.io/country)"
+    CCCheck "$code"
+}
+Method1() {
+    # use ipv4 and 'dig' with google, then 'geoiplookup'
+    Method12_IP || return 1
+    local code="$(geoiplookup "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code"
+}
+Method2() {
+    # use ipv4 and 'dig' with google, then 'whois'
+    Method12_IP || return 1
+    local code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code"
+}
+Method3() {
+    # use ipv6 and 'dig' with google, then 'geoiplookup6'; note that ipv6 may not be available
+    Method34_IP || return 1
+    local code="$(geoiplookup6 "$IP" | sed 's|^.*: \([A-Z][A-Z]\),.*$|\1|')"
+    CCCheck "$code"
+}
+Method4() {
+    # use ipv6 and 'dig' with google, then 'whois'; note that ipv6 may not be available
+    Method34_IP || return 1
+    local code="$(whois "$IP" | grep ^country: | awk '{print $NF}')"
+    CCCheck "$code"
+}
+Method5() {
     # net services failed, use local variables, but may be wrong
-    code="$(locale | grep ^LC_TIME | cut -d '"' -f 2 | sed 's|^.*_\([A-Z][A-Z]\)\..*$|\1|')"
-    CCCheck "$code" && {
-        echo "$code" ; return
-    }
+    local code="$(locale | grep ^LC_TIME | cut -d '"' -f 2 | sed 's|^.*_\([A-Z][A-Z]\)\..*$|\1|')"
+    CCCheck "$code"
+}
+
+Method12_IP() {
+    if [ -z "$IP_method12" ] ; then
+        local xx="$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv4 address
+        if [ -n "$(echo "$xx" | sed 's|[0-9\.]*||g')" ] ; then
+            return 1   # is not an ipv4 address
+        fi
+        IP_method12="$xx"
+    fi
+    IP="$IP_method12"
+}
+
+Method34_IP() {
+    if [ -z "$IP_method34" ] ; then
+        local xx="$(dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '"')"  # ipv6 address (preferred)
+        if [ -n "$(echo "$xx" | sed 's|[0-9a-fA-f:]*||g')" ] ; then
+            return 1   # is not an ipv6 address
+        fi
+        IP_method34="$xx"
+    fi
+    IP="$IP_method34"
+}
+
+GetYourCountryCode() {
+    local IP
+    local IP_method12=""
+    local IP_method34=""
+
+    # try the preferred method first
+    case "$REFLECTOR_SIMPLE_COUNTRY_METHOD" in
+        default) ;;
+        [0-5]) Method$REFLECTOR_SIMPLE_COUNTRY_METHOD && return ;;
+        *) DIE "method $REFLECTOR_SIMPLE_COUNTRY_METHOD of REFLECTOR_SIMPLE_COUNTRY_METHOD in unsupported" ;;
+    esac
+
+    # come here if the preferred method failed, or default was chosen
+    local method
+    for method in $(seq 0 5) ; do
+        if [ "$method" != "$REFLECTOR_SIMPLE_COUNTRY_METHOD" ] ; then
+            Method$method && return
+        fi
+    done
+
+    DIE "failed to find country code"
 }
 
 ArgsYesNo() {
@@ -114,7 +170,8 @@ _get_reflector_x_configs() {
         return
     fi
 
-    cat $REFLECTOR_X_CONF | grep -P -v "^[ \t]*#|^$" > $tmpconf
+    # remove empty lines and comments
+    cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed 's|[ \t]*#.*||' > $tmpconf
     
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         name="${countrynames[$ix]}"
@@ -140,7 +197,8 @@ _get_reflector_x_configs() {
         case "$opt" in
             --sort)            conf_sort="$xx" ;;
             -a | --age)        conf_age="$xx" ;;
-            -n | --number)     conf_number="$xx" ;;
+            -n | --number)     [ "$use_number_instead_of_latest" = "yes" ] && conf_number="$xx" ;;
+            -l | --latest)     [ "$use_number_instead_of_latest" = "yes" ] || conf_number="$xx" ;;
             -p | --protocol)
                 list="$xx"
                 while [ -n "$list" ] ; do
@@ -200,6 +258,17 @@ OptTypeNeeded() {
     esac
 }
 
+IsPositiveNumber() {
+    local val="$1"
+
+    if [ "$(echo "$val" | /usr/bin/sed 's|[0-9]*||g')" = "" ] ; then
+        if [ -n "$val" ] ; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 AskCountriesAndOptions() {
     local tips=(
         "Select countries to include in mirror ranking"
@@ -214,11 +283,36 @@ AskCountriesAndOptions() {
     fi
     local ix included xx tip
     local command
-    local columns=5
     local default_age=2
     local default_sort='age!^rate!country!score!delay'
     local default_number=10
     local use_saved=""
+    local max_cols=8
+
+    Verbose "Creating the yad command..."
+
+    if [ -r $toolconf ] ; then
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_WIDTH") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_WIDTH has an invalid value, using default"
+            REFLECTOR_SIMPLE_WIDTH=$def_width
+        fi
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_HEIGHT") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_HEIGHT has an invalid value, using default"
+            REFLECTOR_SIMPLE_HEIGHT=$def_height
+        fi
+
+        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_COLUMNS") ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_COLUMNS has an invalid value, using default"
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+        if [ $REFLECTOR_SIMPLE_COLUMNS -gt $max_cols ] ; then
+            REFLECTOR_SIMPLE_COLUMNS=$max_cols
+        elif [ $REFLECTOR_SIMPLE_COLUMNS -lt $def_cols ] ; then
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+    fi
+    (( REFLECTOR_SIMPLE_WIDTH+=(100*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
+    (( REFLECTOR_SIMPLE_HEIGHT-=(60*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
 
     case "$(OptTypeNeeded)" in
         plain) ;;                         # no additional defaults
@@ -231,7 +325,8 @@ AskCountriesAndOptions() {
     [ -n "$conf_sort" ]    && default_sort="$(echo "$default_sort" | sed -e 's|\^||' -e "s|$conf_sort|^$conf_sort|")"
     
 
-    command=(eos_yad --form --columns=$columns --title="Select Arch mirrors with $progname v$VERSION_INFO")
+    command=(eos_yad --form --columns=$REFLECTOR_SIMPLE_COLUMNS --title="Select Arch mirrors with $progname v$VERSION_INFO")
+    command+=(--scroll --width=$REFLECTOR_SIMPLE_WIDTH --height=$REFLECTOR_SIMPLE_HEIGHT)
     tip=""
     for xx in "${tips[@]}" ; do
         tip+="${xx}\n"
@@ -263,9 +358,14 @@ AskCountriesAndOptions() {
     fi
     command+=(--field="Max hours from latest mirror sync":num $default_age)    # --age
     command+=(--field="Sort by":cb "$default_sort")                            # --sort
-    command+=(--field="Max number of mirrors":num $default_number)             # --number
+    if [ "$use_number_instead_of_latest" = "yes" ] ; then
+        command+=(--field="Max number of mirrors":num $default_number)         # --number
+    else
+        command+=(--field="Max number of freshed mirrors":num $default_number) # --latest
+    fi
 
     command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
+    Verbose "done."
 
     reflector_info="$("${command[@]}")"
     case "$?" in
@@ -284,7 +384,7 @@ BuildReflectorCommand() {
     local ix_ext=""
     local ac
 
-    reflector_cmd=(reflector)
+    reflector_cmd=(reflector --verbose)
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         reflector_cmd+=($(cat $tmpconf | grep -v "^$country_exclude"))
@@ -324,7 +424,11 @@ BuildReflectorCommand() {
     reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
     reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
     ((ix++))
-    reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+    if [ "$use_number_instead_of_latest" = "yes" ] ; then
+        reflector_cmd+=(--number "${reflector_info[$((ix++))]}")
+    else
+        reflector_cmd+=(--latest "${reflector_info[$((ix++))]}")
+    fi
 }
 
 ShowMirrorlistSaved() {
@@ -339,11 +443,15 @@ ShowMirrorlistSaved() {
 
 AddCountryNamesToMirrors() {
     local full_list=$(mktemp)
-    wget -q -O $full_list https://www.archlinux.org/mirrorlist/all || {
+
+    Verbose "Fetching Arch mirror list..."
+    #wget -q --timeout=10 -O $full_list https://www.archlinux.org/mirrorlist/all || {
+    curl -Lsm 10 -o $full_list https://www.archlinux.org/mirrorlist/all || {
         echo "Warning: cannot fetch Arch mirror list." >&2
         rm -f $full_list
         return 1
     }
+    Verbose "done."
 
     local selected_mirrors=$(grep "^Server = " $tmpfile | awk '{print $3}')
     local sel_mir
@@ -383,21 +491,27 @@ AddCountryNamesToMirrors() {
 }
 
 SaveMirrorlist() {
-    grep "^Server = [hr]" $tmpfile >/dev/null || {
-        echo "$progname: no mirrors found!" | \
-            eos_yad --text-info --title="Error" --image=error --width=400 --height=300 --button=yad-quit:1
+    local opts txt
+    local font="$(FindAvailableMonoFont)"
+
+    if (! grep "^Server = [hr]" $tmpfile >/dev/null) ; then
+        txt+="$progname: no mirrors found!\n\n"
+        txt+="You may need to change some option values,\n"
+        txt+="e.g. use bigger <i>age</i> for mirrors or add different/more countries."
+        txt=$(eos_FormMonoText "$txt")
+        opts=( --form --title="Error" --image=error --button=yad-quit --text="$txt")
+        eos_yad "${opts[@]}"
         return 1
-    }
+    fi
     AddCountryNamesToMirrors
 
-    local font="$(FindAvailableMonoFont)"
-    local opts=(--text-info
-                --width=750
-                --height=500
-                --title="New Arch mirrorlist"
-                --button=yad-quit:1 --button=" Save to $ml!document-save":0
-                --filename=$tmpfile
-               )
+    opts=(--text-info
+          --width=750
+          --height=500
+          --title="New Arch mirrorlist"
+          --button=yad-quit:1 --button=" Save to $ml!document-save":0
+          --filename=$tmpfile
+         )
     if [ -n "$font" ] ; then
         opts+=(--fontname="$font")
     fi
@@ -413,9 +527,27 @@ Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
 
+    Verbose "Fetching country names with reflector..."
+    local REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
+    Verbose "done."
+
+    if [ -z "$REFLECTOR_LIST_COUNTRIES" ] ; then
+        DIE "reflector: Fetching information from https://www.archlinux.org failed!"
+    fi
+    REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
+
     local REFLECTOR_SIMPLE_CONF=/etc/reflector-simple.conf
+    local toolconf=/etc/reflector-simple-tool.conf
     local REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
     local REFLECTOR_X_CONF=$REFLECTOR_SIMPLE_CONF
+
+    local def_width=1000
+    local def_height=750
+    local def_cols=5
+    local REFLECTOR_SIMPLE_WIDTH=$def_width
+    local REFLECTOR_SIMPLE_HEIGHT=$def_height
+    local REFLECTOR_SIMPLE_COLUMNS=$def_cols
+    local REFLECTOR_SIMPLE_COUNTRY_METHOD=default
 
     [ -r "$REFLECTOR_X_CONF" ] || REFLECTOR_X_CONF=$REFLECTOR_AUTO_CONF
 
@@ -425,6 +557,10 @@ Main() {
     local showlist=$(ArgsYesNo -l "$@")
 
     test "$verbose" = "yes" && echo "Find your country ..." >&2
+
+    if [ -r $toolconf ] ; then
+        source $toolconf
+    fi
 
     local local_country_code="$(GetYourCountryCode)"
     local countrynames
@@ -440,11 +576,17 @@ Main() {
     local conf_number=""
     local conf_protocol=()
     local worldwide_selected=0
+    local use_number_instead_of_latest="$REFLECTOR_SIMPLE_PREFER_NUMBER"  # from exported env var
     local https_selected=0
     local http_selected=0
     local rsync_selected=0
     local country_exclude="--country-exclude"          # reflector does not have this option
-    local use_waiting_indicator=yes
+    local use_pulsating_indicator=no  # yes or no
+
+    case "$use_number_instead_of_latest" in
+        yes | no) ;;
+        *) use_number_instead_of_latest=no ;;          # new default!
+    esac
 
     # Find countries with supported mirrors.
 
@@ -453,7 +595,9 @@ Main() {
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         local tmpconf=$(mktemp)
+        Verbose "Reading config file..."
         _get_reflector_x_configs
+        Verbose "done."
     fi
 
     # Now we have info about supported countries.
@@ -471,14 +615,41 @@ Main() {
 
     # Now all is ready, so just run the command.
 
-    if [ "$use_waiting_indicator" = "yes" ] ; then
+    if [ "$use_pulsating_indicator" = "yes" ] ; then
         local lockfile="$(mktemp "$HOME"/.lck.XXXXXXXX)"
         YadProgressPulsate "$lockfile" "Ranking mirrors, please wait..." &
     fi
 
-    "${reflector_cmd[@]}" > $tmpfile
+    local ranklog=/tmp/mirror-rating.log
+    local progress_cmd=(
+        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 200 --auto-close
+        --width=900 --no-buttons
+        --image=applications-internet
+        --title="Mirror ranking"
+        --text="Rating mirrors, please wait...\nNote: rating log will be saved in file <b>$ranklog</b>."
+    )
 
-    if [ "$use_waiting_indicator" = "yes" ] ; then
+    Verbose "Starting ranking..."
+    "${reflector_cmd[@]}" 2>&1 > $tmpfile | tee $ranklog | {
+        local line="" max_lines=0 value=0 line_count=-2
+        while read line ; do
+            if [[ "$line" == *"mirror(s) by"* ]]; then
+                max_lines=$(echo "$line" | sed -e 's/.*rating \(.*\) mirror.*/\1/')
+            fi
+            if [[ "$line" != *"WARNING:"* ]]; then
+                ((line_count++))
+            fi
+            echo "#<tt>$line</tt>"
+            if [ "$line_count" -ge 0 ]; then
+                value=$(( line_count*100/max_lines ))
+                echo "$((  value < 100 ? value : 99  ))"
+            fi
+        done
+        echo 100
+    } | "${progress_cmd[@]}"
+    Verbose "done."
+
+    if [ "$use_pulsating_indicator" = "yes" ] ; then
         #sleep 0.5
         rm -f "$lockfile"
     fi
@@ -494,8 +665,4 @@ Main() {
     fi
 }
 
-if [ -n "$REFLECTOR_LIST_COUNTRIES" ] ; then
-    Main "$@"
-else
-    DIE "reflector: Fetching information from https://www.archlinux.org failed!"
-fi
+Main "$@"

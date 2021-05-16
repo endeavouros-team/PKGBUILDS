@@ -90,7 +90,7 @@ OneMirror() {
     mirror_url="$(echo "$mirror_url" | sed "s|\$repo|$repo|")"
 
     echo2 "$reponame:"
-    remotefilelist="$(curl -s "$mirror_url" | grep '<a href="[a-zA-Z]' |  sed -e 's|^.*<a href="||' -e 's|">.*$||')"
+    remotefilelist="$(curl -s "$mirror_url" | grep -Pw 'tar|db|files' | sed 's|.*<a href="\([^"]*\)".*|\1|')"
     test -n "$remotefilelist" || DIE "cannot fetch package info from $mirror_url."
 
     pushd "$folder" >/dev/null
@@ -171,7 +171,7 @@ Main()
     local reponame
     local arg
     local conf=/etc/eos-mirrorcheck.conf
-    local arch=$(basename "$PWD")   #x86_64
+    local arch=""
     local supported_params=(
         "<folder-name>"
         --slow
@@ -194,6 +194,9 @@ Main()
             *) folder="$arg" ;;
         esac
     done
+
+    [ -n "$folder" ] && cd "$folder"
+    arch=$(basename "$PWD")   #x86_64
 
     case "$arch" in
         x86_64 | aarch64 | armv7h) ;;

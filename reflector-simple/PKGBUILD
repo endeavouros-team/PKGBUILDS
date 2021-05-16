@@ -2,18 +2,21 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=1.15
+pkgver=1.16.2
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
-  bash yad reflector whois geoip bind-tools
+  reflector whois geoip bind-tools
   eos-bash-shared
 )
 optdepends=(
   'reflector-bash-completion: useful for plain reflector usage'
 )
-backup=(etc/$pkgname.conf)
+backup=(
+  etc/$pkgname.conf
+  etc/${pkgname}-tool.conf
+)
 
 #url=https://github.com/endeavouros-team/PKGBUILDS
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -23,11 +26,13 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.desktop
   $_url/$pkgname.conf
+  $_url/${pkgname}-tool.conf
   $_url/mirrorlist-rank-info
 )
-sha512sums=('a0006c278f5d8409afc5e69de1de80a0ca460ee256c0aac4907c3b2c11e45b9a860491ad75e66cedc87d5d0017c74d99a7837ff4e4d88869d4350990011318af'
+sha512sums=('9be6cb41388eddc6e60ef6105479ae8dc0f596736efa0882be60c593010dd6ee0e099d14ed6fb799d830af05ded8b1e3ccd397206c14d894cb80563a8a209b92'
             'bed925140e7ff3e7093b8ac150e7aa8bcd398e0a72a9ec1ef412046d3ff01e0a817ada097f76595ffb5daef5980c1df4530ac534dac0f2f23d831984b888a196'
-            '140f5caa704bbc5811f4c177120b8bbc97c80322add2db7bb4b38205f9692428fd5dec0615acc1503afb7067c59ee8cfdd803907cd7a64cdfe1d0b5d4920b32d'
+            '7b4988ff1ee58781f9a9550b6c2cbb95d21456c38a4586f7082f76675860538110dd9f9a1efdbd14a6d16901bbe1b1988e93cc406df944ac4b5894f274d745db'
+            '9c209d38732d40f92254f3eaa3cde2efdb0fc60ebb8a9f2709b2d37f110062775962db6b179a27c52fff0d77c968032856a870931d6990f784f4f464fa606685'
             'a32dbd88f336e07852e494efa47d2488c4f505f00e4ccfb8a298cf30b20cdf104af8da98e611dcce42b26886989d80ec87c71317a65c53501ac369525bdd69a8')
 
 package() {
@@ -42,6 +47,7 @@ package() {
   install -Dm755 $pkgname              $pkgdir/usr/bin/$pkgname
   install -Dm755 mirrorlist-rank-info  $pkgdir/usr/bin/mirrorlist-rank-info
   
-  install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
-  install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
+  install -Dm644 $pkgname.conf           $pkgdir/etc/$pkgname.conf
+  install -Dm644 ${pkgname}-tool.conf    $pkgdir/etc/${pkgname}-tool.conf
+  install -Dm644 $pkgname.desktop        $pkgdir/usr/share/applications/$pkgname.desktop
 }

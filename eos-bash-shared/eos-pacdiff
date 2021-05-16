@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# Pacdiff for EndeavourOS.
+
+PacdiffCmd() {
+    local differ="$1"
+    local root_start="$2"
+    local root_stop="$3"
+    
+    if [ -n "$(echo q | DIFFPROG=diff /usr/bin/pacdiff)" ] ; then
+        local pdtext="Starting pacdiff & $differ as root ..."
+        case "$differ" in
+            vim | code) differ+=" -d"
+        esac
+        if [ $start_new_terminal = yes ] ; then
+            RunInTerminal "echo '$pdtext' $root_start ; DIFFPROG='/usr/bin/$differ' su-c_wrapper -p pacdiff 2>/dev/null $root_stop"
+        else
+            echo "$pdtext" $root_start ; DIFFPROG="/usr/bin/$differ" su-c_wrapper -p pacdiff 2>/dev/null $root_stop
+        fi
+    else
+        local msg="eos-pacdiff: nothing to do."
+        if [ $start_new_terminal = yes ] ; then
+            eos_yad_nothing_todo "<tt>$msg</tt>" 5
+        else
+            echo "$msg" >&2
+        fi
+    fi
+}
+
+Main()
+{
+    local start_new_terminal=no
+    [ "$1" = "--nt" ] && start_new_terminal=yes
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    export -f eos_yad
+    export -f eos_yad_nothing_todo
+
+    local root_start="" root_stop=""
+    local missing=() form=""
+    local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
+
+    case "$XDG_SESSION_TYPE" in
+        wayland)
+            # wayland needs some help
+            if [ -x /usr/bin/xhost ] ; then
+                root_start=" ; xhost si:localuser:root"
+                root_stop=" ; xhost -si:localuser:root"
+            else
+                missing+=(xorg-host)
+            fi
+            if [ -x /usr/bin/diffuse ] ; then
+                differs=(diffuse "${differs[@]}")   # prefer diffuse in wayland
+            else
+                missing+=(diffuse)
+            fi
+            case "${#missing[@]}" in
+                0) ;;
+                1) form=package ;;
+                *) form=packages ;;
+            esac
+            [ -n "$form" ] && eos_yad_WARN "For pacdiff, install $form: ${missing[*]}." --height=150 --width=500 --fontname="Mono 10"
+            ;;
+    esac
+
+    for differ in "${differs[@]}" ; do
+        if [ -x /usr/bin/$differ ] ; then
+            PacdiffCmd $differ "$root_start" "$root_stop"
+            break
+        fi
+    done
+}
+
+Main "$@"

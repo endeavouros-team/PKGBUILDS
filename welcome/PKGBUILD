@@ -2,18 +2,22 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.11.7
-pkgrel=1
+pkgver=3.12.10
+pkgrel=3
 arch=('any')
 license=('GPL')
 depends=(
-  bash systemd eos-bash-shared eos-translations
+  systemd eos-bash-shared eos-translations
 )
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
   'reflector-simple: for the Update Mirrors button'
   'yad: upstream yad provider'
   'yad-eos: alternative yad provider (includes fixes)'
+  'kdiff3: alternative app for pacdiff to use'
+  'meld: alternative app for pacdiff to use'
+  'diffuse: alternative app for pacdiff to use'
+  'vim: alternative app for pacdiff to use'
 )
 
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -28,8 +32,9 @@ source=(
   $_url/wallpaper-once.desktop
   $_url/eos-kill-yad-zombies
   $_url/welcome-dnd
-  $_url/calamares-update
   $_url/$pkgname.install
+
+#  $_url/calamares-update
 
 #  $_url/eos-set-background-picture
 #  $_url/changelog.md
@@ -44,13 +49,12 @@ source=(
 #  $_url/welcome-dnd-tips.png
 #  $_url/welcome-dnd-window.png
 )
-sha512sums=('8a34901049d4a437aeb55cfccd244cb654fcf1a937d537881f3d7d026633a27d2e9b3485bceeb9b789e347361e7ffbd9df90be08c7cf0d4331197c31619d5af3'
+sha512sums=('91cd06e60a1e963311ebf6e15c90ea2c383b2a0f185ee0010601cf61761625d54dcf6cd66f615b07b7cd892692a0245984248291821dacb1df54e57312cb0f68'
             'c715c96cbd96befbf744603d3e5162f728468cb0b81a91474523cbd9e2ad3ffae79048caa0174ee0983ab05dc1dbdc560bc6c6d8fb7bf43586e4c989c0fbcc2a'
-            'c1ba5ed5004243163af25db03dbbb23587895be804eb42e4df658ba4e451fc490aa77357d2e4324bca31a076a2aa9f1884b1288e4da4fbe8376af5465f23380b'
+            'cdfe56ddd154b5c7f5d237e381091b11c106f2244cd9ac3983ea40c3eae72383cfa204f737bc238cbc7e809049856ea40445f9ac3ad76b6ffa6dfc701d64eb20'
             '3761a92815ae08990e43c9b7879850873089478f7f9013e2af070769a317d56230444856378ab4d36981e0816dcdb2c8d991b2fcd845819df31008bae51abadb'
-            '47382fe6431ae179f991980b2bf2f4d4ad56bfba70873659c3a7720de2fca90a60fa6033fb4cfe313e87d771312c0c80feb1617a64885362763f4b66e62543b8'
-            '7449221c2aa0033d04b4d14453c3963cbac86b7820868372f7b4e11f6ba80a069f7db91ea2f8a356b0e7c1ff4c71bba406f852e37036d9349811ef52068153d7'
-            '0191d609f0444ce7e120effedf890579455b8094f987f0a47bcecc0581caa7c7030799f600d9f7b705d857b7990c7eb2bba64705b1277538db9206a50bcc97c2'
+            '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
+            '9f0cd5edabf93439656046c60dc6a29f439a9d8b7afab8ec03b9470321ba98fc53b927944e2f68b5b152c150cca76913490eaab4256a5699da5960f860d81e81'
             '94254041be0757b9be01d12bd95fcaccf5ce7b1f4a7bb67cf2b39918a8ab538d6c963bc29a850244e46f7f1625ad6d25c0ea5d5c6cccfb38be2291baa6163272')
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
@@ -61,8 +65,8 @@ package() {
   ln -s /usr/share/endeavouros/scripts/$pkgname $pkgdir/usr/bin/eos-$pkgname
 
 #  install -Dm755 eos-set-background-picture     $pkgdir/usr/bin/eos-set-background-picture
+#  install -Dm755 calamares-update               $pkgdir/usr/bin/calamares-update
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
-  install -Dm755 calamares-update               $pkgdir/usr/bin/calamares-update
   install -Dm755 welcome-dnd                    $pkgdir/usr/bin/welcome-dnd
 
   install -d $pkgdir/etc/xdg/autostart

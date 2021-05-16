@@ -98,7 +98,7 @@ OpenUrl() {
 
     FixUrl
 
-    #echo "$url" >&2
+    #echo "$BROWSER" "$url" >&2
     $BROWSER "$url" >& /dev/null
 }
 

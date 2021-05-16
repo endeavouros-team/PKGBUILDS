@@ -25,7 +25,7 @@ Header() {
 
 LocalVersion() {
     local pkg="$(/usr/bin/basename "$1")"
-    /usr/bin/pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+    $pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
 }
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
@@ -66,7 +66,7 @@ StableVersion() {
         linux | linux-headers | linux-lts*) repo=core/ ;;
         linux-zen* | linux-hardened*)       repo=extra/ ;;
     esac
-    LANG=C pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
+    LANG=C $pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
 }
 
 Stable() {
@@ -155,22 +155,6 @@ PaddingLines() {
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
-ShowFunctionLine() {
-    # message, percent, bar-length
-    ProgressBar "Gathering information:" \
-                "$(( 100 * SERVICES_DONE / SERVICES))" \
-                50
-}
-ShowFunctionStart() {
-    ProgressBarInit
-
-    SERVICES=${#functions[@]}
-    SERVICES_DONE=0
-    ShowFunctionLine
-}
-ShowFunction()      { ((SERVICES_DONE++)) ; ShowFunctionLine ; }
-ShowFunctionEnd()   { printf2 "\n" ; }
-
 CommonStuff() {
     local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
     if [ ! -f $EOS_SCRIPTS_YAD ] ; then
@@ -187,12 +171,13 @@ CommonStuff() {
 
 AkmConfig() {
     local conf=/etc/akm.conf
-    local xx
     if [ -f $conf ] ; then
         source $conf
 
-        xx="$KERNEL_HEADER_WITH_KERNEL"
-        [ -n "$xx" ] && connect_header_with_kernel="$xx"
+        [ -n "$KERNEL_HEADER_WITH_KERNEL" ] && connect_header_with_kernel="$KERNEL_HEADER_WITH_KERNEL"
+        [ -n "$AKM_KERNELS_HEADERS" ]       && akm_kernels_headers_user=("${AKM_KERNELS_HEADERS[@]}")
+        [ -n "$AKM_WINDOW_WIDTH" ]          && akm_window_width=$AKM_WINDOW_WIDTH
+
         echo "==> Config file $conf read." >&2
     fi
 }
@@ -241,32 +226,59 @@ EOF
 
 AvailableKernelsAndHeaders() {
 
-    # Find kernel packages by finding packages which have words 'linux' and 'headers'
+    # Find kernel packages by finding packages which have words 'linux' and 'headers'.
     # From the output of 'pacman -Sl'
     # - find lines that have words: 'linux' and 'headers'
     # - drop lines containing 'testing' (=testing repo, causes duplicates) and 'linux-api-headers' (=not a kernel header)
     # - show the (header) package names
-    # Now we have names of the "kernel headers".
+    # Now we have names of the kernel headers.
     # Then add the kernel packages to proper places and output the result.
+    # Then display possible kernels and headers added by the user.
 
-    local headers=$( pacman -Sl | grep "^[^ ]* linux[^ ]*headers" | awk '{printf("%s/%s\n", $1, $2)}' | grep -Pv '^testing/|/linux-api-headers$')
+    # The output consists of a list of reponame and a package name formatted as: "reponame/pkgname"
+    # For example:
+    #    reponame/linux-xxx reponame/linux-xxx-headers
+    #    reponame/linux-yyy reponame/linux-yyy-headers
+    #    ...
+
     local header
     local kernel
+    local pacman=/usr/bin/pacman
+    local headers=$($pacman -Sl | awk '{printf("%s/%s\n", $1, $2)}' | grep "/linux[^ ]*-headers$" | grep -Pv '^testing/|/linux-api-headers$')
 
+    # Get kernel names from header names and display them all
     for header in $headers ; do
         kernel=$(echo "$header" | sed 's|-headers$||')
         echo "$kernel $header"
     done
+
+    # Display kernels added by the user
+    [ -n "${akm_kernels_headers_user}" ] && echo "${akm_kernels_headers_user[@]}"
 }
+
+Manual() {
+    xdg-open https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md
+}
+export -f Manual
 
 Main()
 {
     local progname="$(basename "$0")"
+    local pacman=/usr/bin/pacman
     local na="(-)"
     local kernels=()
     local connect_header_with_kernel=no    # default, change with option --connect-header
+    local akm_kernels_headers_user=()
+    local akm_window_width=900
     local scroll=no
     local nrofkernelitems                  # 8 with only upstream kernels
+    local progress_cmd=(
+        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
+        --width=400 --no-buttons
+        --image=user-info
+        --title="AKM progress"
+        --text="Fetching information, please wait..."
+    )
 
     CommonStuff
     AkmConfig
@@ -297,19 +309,15 @@ Main()
 
     # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
 
-    ShowFunctionStart
-
     local URL_timeout="--max-time 30"                      # used for all curl calls here
 
     local URL="https://www.kernel.org"
-    local kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
+    local kernelorg=""
     local org_kernels=(mainline stable longterm linux-next)
     local KOName="K.o.category"
     local KOVersionName="K.o.version"
     local xx
     local t1=""
-
-    test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
 
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
     t1+="You can install and/or uninstall kernel packages using the checkboxes on the left column.\n"
@@ -338,10 +346,12 @@ Main()
 
     local cmd=(
         eos_yad
-        --width=900
+        --width=$akm_window_width
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
+        --button=" Changelog!applications-development!Show latest changes of this program":"bash -c '/usr/bin/eos-pkg-changelog akm'"
+        --button=" Help!help-contents!Helps to use $progname":"bash -c Manual"
         --button="Cancel!gtk-cancel!Change nothing":1
         --button="Execute!system-run!Make your changes":0
     )
@@ -351,12 +361,29 @@ Main()
              )
     fi
 
-    for xx in "${functions[@]}" ; do
-        ShowFunction
-        $xx || DIE "Function '$xx' failed.\n"
-    done
-    ShowFunctionEnd
-
+    local ix=1 count=${#functions[@]} val
+    local cmdfile="$(mktemp $HOME/.config/akm.tmp.XXXXX)"
+    while true ; do
+        for xx in "${functions[@]}" ; do
+            echo "#$xx"
+            val="$(( ix < count ? ix*100/count : 99 ))"
+            ((ix++))
+            echo "$val"
+            if [ -z "$kernelorg" ] ; then
+                kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
+                test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
+            fi
+            $xx || DIE "Function '$xx' failed.\n"
+        done
+        echo "#===> Done."
+        # read -p "Press ENTER: " >&2  # testing only
+        echo 100
+        printf "%s\n" "${cmd[@]}" > "$cmdfile"
+        break
+    done | "${progress_cmd[@]}"
+    readarray -t cmd <<< $(cat "$cmdfile")
+    rm -f "$cmdfile"
+    
     local ix installed install=() uninstall=() pkg partner
     local result="$("${cmd[@]}")"
     declare -A pkgstatus
@@ -418,8 +445,8 @@ Main()
     UniqueArr uninstall
 
     cmd=()
-    test -n "$uninstall" && cmd+=(pacman -Rsn ${uninstall[*]} ";")
-    test -n "$install"   && cmd+=(pacman -S ${install[*]} ";")
+    test -n "$uninstall" && cmd+=($pacman -Rsn ${uninstall[*]} ";")
+    test -n "$install"   && cmd+=($pacman -S ${install[*]} ";")
 
     if [ 0 -eq 1 ] ; then
         echo "uninstall = ${uninstall[*]}"
@@ -428,7 +455,14 @@ Main()
     fi
 
     if [ -n "$cmd" ] ; then
-        RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
+        case "$pacman" in
+            yay | paru | /usr/bin/yay | /usr/bin/paru)
+                RunInTerminal "echo '${cmd[*]}' ; ${cmd[*]}"
+                ;;
+            pacman | /usr/bin/pacman)
+                RunInTerminal "echo '${cmd[*]}' ; $EOS_ROOTER '${cmd[*]}'"
+                ;;
+        esac
     fi
 }
 

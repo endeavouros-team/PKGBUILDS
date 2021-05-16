@@ -20,6 +20,7 @@
 # export -f eos_yad_GetDesktopName
 # export -f eos_GetArch
 # export -f eos_select_browser
+# export -f eos_yad_nothing_todo
 #
 # The two last functions above do not use yad.
 
@@ -379,6 +380,40 @@ eos_yad_GetDesktopName() {      # return DE name in uppercase letters
     echo "$de"
 }
 
+eos_IsSway()  {
+    case "$DESKTOP_SESSION" in
+        sway | */sway) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        sway | */sway) return 0 ;;
+    esac
+    [ -x /usr/bin/swaybg ] && return 0
+    return 1
+}
+
+eos_IsBspwm() {
+    case "$DESKTOP_SESSION" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    case "$XDG_SESSION_DESKTOP" in
+        bspwm | */bspwm) return 0 ;;
+    esac
+    [ -x /usr/bin/bspwm ] && return 0
+    return 1
+}
+
+eos_GetDeOrWm() {
+    local de="$(eos_yad_GetDesktopName)"
+    if [ "$de" = "" ] ; then
+        if (eos_IsSway) ; then
+            de=SWAY
+        elif (eos_IsBspwm) ; then
+            de=BSPWM
+        fi
+    fi
+    echo "$de"
+}
+
 # DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
 # WARN() { eos_yad_WARN "$@" ; }    # deprecated
 
@@ -392,6 +427,24 @@ eos_yad_GetDesktopName() {      # return DE name in uppercase letters
 #    done
 #    DIE "$FUNCNAME: cannot find a browser"
 #}
+
+eos_yad_nothing_todo() {
+    local text="$1"
+    local timeout="$2"  # optional, default set below
+    local title="$3"    # optional, default set below
+    local image="$4"    # optional, default set below
+
+    [ -n "$timeout" ] || timeout=10
+    [ -n "$title" ]   || title="Info"
+    [ -n "$image" ]   || image=info
+
+    local cmd=(
+        eos_yad --form --text="$text" --title="$title" --no-focus
+                --height=100 --width=300 --timeout=$timeout --timeout-indicator=left
+                --button=yad-close:0
+    )
+    "${cmd[@]}"
+}
 
 
 FindAvailableMonoFont() {
@@ -457,6 +510,14 @@ YadProgressPulsate() {
                    --text="$text" \
                    --auto-close \
                    --width=400 --hide-text --pulsate
+}
+
+eos_FormMonoText() {
+    local txt="$1"
+    local size="$2"   # optional
+
+    [ -n "$size" ] && size=" $size"
+    printf "<span font='Mono$size'>%s</span>" "$txt"
 }
 
 # check the config:

@@ -41,6 +41,7 @@ export -f eos_yad__detectDE
 export -f eos_yad_GetDesktopName
 export -f eos_GetArch
 export -f eos_select_browser
+export -f eos_yad_nothing_todo
 #################################################################################
 
 export PROG_PACKAGENAME="welcome"
@@ -129,25 +130,6 @@ eos_yad_WARN_debug() {
 }
 export -f eos_yad_WARN_debug
 
-
-_align_buttons_on_tab() {
-    local -n arr="$1"
-    local handle="$2"
-    local ix xx
-
-    # just remove possible legacy "_align(...) construct"
-    ix=0
-    for xx in "${arr[@]}" ; do
-        case "$xx" in
-            --field=*)
-                if [ "$xx" != "${xx/*_align(/}" ] ; then
-                    arr[$ix]="$(echo "$xx" | sed 's|_align(\(.*\))!| \1!|')"
-                fi
-                ;;
-        esac
-        ((ix++))
-    done
-}
 
 Welog() {
     [ -d /home/$EOS_LIVEUSER ] && echo "$progname: " "$@" >> $INSTALL_LOG_FILE
@@ -432,296 +414,6 @@ yad_calamares_debug() {
 }
 export -f yad_calamares_debug
 
-yad_UpdateMe() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-pkexec pacman -Sy $PROG_PACKAGENAME --needed --noconfirm >& /dev/null && {
-  pkill -f "$PROGNAME"
-  pkill -f "$EOS_YAD_STARTER_CMD"
-  $PROGNAME &
-}
-EOF
-    bash $tmpfile
-    sleep 2
-    rm -f $tmpfile
-}
-export -f yad_UpdateMe
-
-yad_UpdateEOStoLatest() {    # Show what to update in order to set any EOS install at the "latest level".
-    local removes=(kalu)
-    local installs=(eos-update-notifier reflector-simple)
-    local rem=() ins=()
-    local xx
-    for xx in "${removes[@]}" ; do
-        pacman -Q "$xx" >& /dev/null && rem+=("$xx")
-    done
-    for xx in "${installs[@]}" ; do
-        pacman -Q "$xx" >& /dev/null || ins+=("$xx")
-    done
-    
-    local t1="To have your EndeavourOS install on par with the latest and greatest, the following actions are needed:\n"
-    local t2="- uninstall packages: ${rem[*]}\n"
-    local t3="- install packages: ${ins[*]}\n"
-    local t="$t1"
-    test -n "$rem" && t+="$t2"
-    test -n "$ins" && t+="$t3"
-    test "$t" = "$t1" && t+="Your system is already at the latest level!"
-    eos_yad --text="$t" --title="Upgrading EndeavourOS level" --image=info --button=yad-ok:0
-}
-export -f yad_UpdateEOStoLatest
-
-yad_PkgsToLetGo() {
-    local xx yy
-    local pkgs2letgo
-
-    for xx in "$@" ; do
-        for yy in $EOS_KEEP_PKGS ; do
-            test "$xx" = "$yy" && break
-        done
-        if [ "$xx" != "$yy" ] ; then
-            if [ -z "$pkgs2letgo" ] ; then
-                pkgs2letgo="$xx"
-            else
-                pkgs2letgo+=" $xx"
-            fi
-        fi
-    done
-    echo "$pkgs2letgo"
-}
-export -f yad_PkgsToLetGo
-
-yad_PkgIssues() {
-    local cpu
-    local removes=()
-    local commands=":"                            # These commands will be run as root.
-    local title="$ISSUES_TITLE"
-    local intel=0 nvidia=0 amd=0 recreate_grub_cfg=0
-    local graphics
-    local xx pkg pkgs
-    local amd_ucode=0
-    local intel_ucode=0
-    local ok_checks=()
-    local graphics_issues=0
-    local broadcom_wireless_issues=0
-
-    ## Check some "conflicting" packages.
-
-    # Having both amd and intel microcode packages are not needed and may cause issues with grub.
-
-    pacman -Q amd-ucode   >& /dev/null && amd_ucode=1
-    pacman -Q intel-ucode >& /dev/null && intel_ucode=1
-    if [ $amd_ucode -eq 1 ] && [ $intel_ucode -eq 1 ] ; then
-        cpu=$(grep -w "^vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
-        case "$cpu" in
-            GenuineIntel)
-                pkg="$(yad_PkgsToLetGo amd-ucode)"
-                if [ -n "$pkg" ] ; then
-                    removes+=($pkg)
-                    recreate_grub_cfg=1
-                fi
-                ;;
-            *)
-                pkg="$(yad_PkgsToLetGo intel-ucode)"
-                if [ -n "$pkg" ] ; then
-                    removes+=($pkg)
-                    recreate_grub_cfg=1
-                fi
-                ;;
-        esac
-    else
-        ok_checks+=("Microcode package conflicts: no issue")
-    fi
-
-    # Detecting unnecessary video drivers.
-
-    graphics="$(device-info --vga ; device-info --display)"
-    test -n "$(echo "$graphics" | grep "Intel Corporation")" && intel=1
-    if [ -n "$(echo "$graphics" | grep "NVIDIA Corporation")" ] ; then
-        nvidia=1
-    elif [ -n "$(echo "$graphics" | grep "GeForce")" ] ; then
-        nvidia=1
-    fi
-    if [ -n "$(echo "$graphics" | grep "Advanced Micro Devices")" ] ; then
-        amd=1
-    elif [ -n "$(echo "$graphics" | grep "AMD/ATI")" ] ; then
-        amd=1
-    elif [ -n "$(echo "$graphics" | grep "Radeon")" ] ; then
-        amd=1
-    fi
-
-    if [ $intel -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-intel)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $nvidia -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-nouveau nvidia nvidia-dkms nvidia-390xx nvidia-390xx-dkms nvidia-lts nvidia-installer-dkms nvidia-settings)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $amd -eq 0 ] ; then
-        pkgs="$(yad_PkgsToLetGo xf86-video-amdgpu xf86-video-ati)"
-        for xx in $pkgs ; do
-            pacman -Q $xx >& /dev/null && {
-                removes+=($xx)
-                ((graphics_issues++))
-            }
-        done
-    fi
-    if [ $graphics_issues -eq 0 ] ; then
-        ok_checks+=("Graphics package issues: no issue")
-    fi
-
-    # Remove Broadcom wifi driver if using another wifi card.
-
-    case "$EOS_WIFIDEV_CHECK" in
-        yes | no) ;;
-        *) EOS_WIFIDEV_CHECK=yes ;;
-    esac
-
-    if [ "$EOS_WIFIDEV_CHECK" = "yes" ] ; then
-        while true ; do
-            xx=broadcom-wl-dkms
-            pacman -Q $xx >& /dev/null && {
-                local wifi_pci="$(lspci -k | grep -A4 " Network controller: ")"
-                if [ -n "$(lsusb | grep " Broadcom ")" ] || [ -n "$(echo "$wifi_pci" | grep " Broadcom ")" ] ; then
-                    break
-                fi
-                local wifi_driver="$(echo "$wifi_pci" | grep "Kernel driver in use")"
-                if [ -n "$(echo "$wifi_driver" | grep "in use: wl$")" ] ; then
-                    break
-                fi
-                pkg="$(yad_PkgsToLetGo $xx)"
-                test -n "$pkg" && {
-                    removes+=($xx)
-                    ((broadcom_wireless_issues++))
-                }
-            }
-            break
-        done
-    fi
-    if [ $broadcom_wireless_issues -eq 0 ] ; then
-        ok_checks+=("Broadcom wireless driver: no issue")
-    fi
-
-    # Make package removals as a sequence of commands.
-
-    if [ -n "$removes" ] ; then
-        commands+=" ; pacman -Rsn ${removes[*]}"
-        if [ "$recreate_grub_cfg" = "1" ] ; then
-            if [ -x /usr/bin/grub-mkconfig ] ; then
-                commands+=" ; grub-mkconfig -o /boot/grub/grub.cfg"
-            else
-                eos_yad --text="$ISSUES_GRUB" --title="$title" --image=info --button=yad-ok:0
-            fi
-        fi
-    fi
-
-    ## Other commands to execute.
-
-    # systemd-time-wait-sync is not needed. See https://forum.endeavouros.com/t/welcome-enos-launcher/1654/82.
-    xx=systemd-time-wait-sync
-    systemctl status $xx >/dev/null && {
-        commands+=" ; systemctl disable $xx"
-    }
-
-    ## Now run all gathered commands.
-
-    local cmds_as_list="$(echo "${commands[*]}" | sed -e 's|^: ; ||' -e 's| ; |\n|g')"
-
-    if [ "$commands" != ":" ] ; then
-        eos_yad_RunCmdTermBash "printf '$ISSUES_RUN\n%s\n%s\n' '$cmds_as_list' 'Elevated privileges required.' ; $EOS_ROOTER '$commands'"
-    else
-        local t="$ISSUES_NO"
-        t+="\n"
-        for xx in "${ok_checks[@]}" ; do
-            t+="\n$xx"
-        done
-        eos_yad --text="$t" --title="$title" --image=info --button=yad-ok:0
-    fi
-}
-export -f yad_PkgIssues
-
-yad_SystemUpdate_old() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-_xx_main() {
-  local updates="\$(checkupdates)"
-  test -n "\$updates" && {
-      echo "\$updates"
-      $EOS_AUR_HELPER -Syu # --noconfirm
-  } || {
-      echo "$SYSUP_NO"
-  }
-}
-_xx_main
-EOF
-    chmod +x $tmpfile
-    eos_yad_RunCmdTermBash "echo $SYSUP_CHECK ; $tmpfile ; rm -f $tmpfile"
-}
-yad_SystemUpdate() {
-    local cmd
-    local updates
-    local hasupdates=0
-    local source
-    local action
-
-    for source in upstream AUR ; do
-        case "$source" in
-            upstream)
-                updates="$(checkupdates)"
-                action="$EOS_ROOTER 'pacman -Syu'"
-                ;;
-            AUR)
-                updates="$($EOS_AUR_HELPER -Qua)"
-                action="$EOS_AUR_HELPER -Sua"
-                ;;
-        esac
-        if [ -n "$updates" ] ; then
-            hasupdates=1
-            cmd="echo '$AFTER_INSTALL_US_FROM $source:'"
-            cmd+=" ; echo '$updates'"
-            test "$source" = "upstream" && cmd+=" ; echo -n '$AFTER_INSTALL_US_EL '"
-            cmd+=" ; $action && printf '\n$source $AFTER_INSTALL_US_DONE\n' || printf '\n$source $AFTER_INSTALL_US_FAIL\n'"
-            eos_yad_RunCmdTermBash "$cmd"
-        fi
-    done
-    if [ $hasupdates -eq 0 ] ; then
-        eos_yad --form --text="$SYSUP_NO" --title="$AFTER_INSTALL_US" --no-focus \
-                --height=100 --width=300 --timeout=10 --timeout-indicator=left \
-                --button=yad-quit:0 --image="$(IconGrasp system-software-update)"
-    fi
-}
-yad_SystemUpdate_fails() {
-    eos-update-notifier --pkgsonly  # code re-use!
-}
-export -f yad_SystemUpdate
-
-yad_InitializePacmanMirroring() {
-    local tmpfile=$(mktemp)
-    cat <<EOF > $tmpfile
-#!/bin/bash
-haveged -w 1024
-pacman-key --init
-pacman-key --populate
-pacman-key --refresh-keys
-pkill haveged
-EOF
-    chmod +x $tmpfile
-    eos_yad_RunCmdTermBash "echo 'Initializing mirroring for pacman...' ; pkexec $tmpfile ; rm -f $tmpfile"
-}
-export -f yad_InitializePacmanMirroring
-
 yad_Install() {
     # Install one or more given packages. Does not reinstall any packages.
 
@@ -954,21 +646,16 @@ INSTALL() {
   local reflector_simple="$(IconGrasp software-update-available)"
   local user_info=info
   local tabcontents=(
-      eos_yad --align-buttons
+      eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'bash -c "yad_calamares_debug choose"'
+      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'yad_calamares_debug choose'
   )
   if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
-          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'bash -c yad_community_editions'
-      )
-  fi
-  if [ 0 -eq 1 ] ; then
-      tabcontents+=(
-          --field=" $(ltr ins_up)!$system_software_update!$(ltr ins_uptip)":fbtn                        'bash -c yad_UpdateMe'
+          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'yad_community_editions'
       )
   fi
   tabcontents+=(
@@ -977,12 +664,14 @@ INSTALL() {
 
   ShowChangeResoButton
 
+  local icon=face-worried #dialog-question
   tabcontents+=(
-#      --field=" $(ltr ins_keys)!$system_software_update!$(ltr ins_keystip)":fbtn                   'bash -c yad_InitializePacmanMirroring'
-      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                          'gparted'
-      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn                      "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn                    "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
-      --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn              "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                  'gparted'
+      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
+    # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_syslog)!$user_info!$(ltr ins_syslogtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr ins_logtool)!$icon!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -1077,55 +766,67 @@ IconGrasp() {
     return 1
 }
 
-AfterInstall() {
-  local handle="$1"
-  local tabnum="$2"
-  local _exclamation='&#33;'   # '!'
-  local _and='&#38;'           # '&'
-  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ pdtext Icon=preferences-system
+if [ 0 -eq 1 ] ; then
+NothingToDo_other() {
+    local text="$1"
+    local timeout="$2"
+    local sleep=$(echo "scale=3; $timeout*2/100" | bc -l)
+    local ix
+    for ((ix=0; ix<=100; ix+=2)) ; do
+        echo $ix
+        sleep 0.1
+    done | eos_yad --progress --auto-close --width=200 --text="$text" --title="Info" --hide-text
+}
+export -f NothingToDo_other
+fi
 
-  local tabcontents=(
-      eos_yad --align-buttons
-      --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=dialog-information
-      --text="<b>$(ltr after_install_text)</b>"
-  )
-  if [ "$(eos_GetArch)" != "armv7h" ] ; then
-     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "bash -c 'RunIfInstalled -a=reflector-simple'")
-  fi
-  tabcontents+=(
-      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
-      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
-  )
+PacdiffFieldAdd() {
+  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
+  local differ Icon=preferences-system
+  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
           case "$differ" in
               meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
               kdiff3|kompare|diffuse) Icon=$differ ;;
           esac
-          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn)
-          pdtext="Starting pacdiff as root ..."
-          case "$differ" in
-              meld)
-                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=\'dbus-launch $differ\' su-c_wrapper -p pacdiff 2>/dev/null")
-                  ;;
-              vim | code)
-                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=\'$differ -d\' su-c_wrapper pacdiff")
-                  ;;
-              *)
-                  tabcontents+=("RunInTerminal echo \'$pdtext\' ; DIFFPROG=$differ su-c_wrapper -p pacdiff 2>/dev/null")
-                  ;;
-          esac
+          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
           break
       fi
   done
+}
+export -f PacdiffFieldAdd
+
+AfterInstall() {
+  local handle="$1"
+  local tabnum="$2"
+  local _exclamation='&#33;'   # '!'
+  local _and='&#38;'           # '&'
+
+  local tabcontents=(
+      eos_yad --align-buttons
+      --use-interp  # don't need explicit 'bash -c' construct when calling functions
+      --plug="$handle" --tabnum="$tabnum" --form --columns=2
+      --image=dialog-information
+      --text="<b>$(ltr after_install_text)</b>"
+  )
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
+     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
+  fi
+  tabcontents+=(
+      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+  )
+  PacdiffFieldAdd
+  tabcontents+=(
+      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+  )
+
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
       tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
 
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'bash -c yad_ChangeDisplayManager')
+      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
 
   ShowChangeResoButton
 
@@ -1135,13 +836,15 @@ AfterInstall() {
       --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
 
-  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing r8168 may fix your ethernet issue (reboot required)":fbtn "bash -c 'yad_Remove r8168'")
+  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "yad_Remove r8168")
+
+  tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
 
   case "$(eos_yad_GetDesktopName)" in
     XFCE)
         tabcontents+=(
-            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'bash -c yad_vanilla_xfce4_theme'
-            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'bash -c yad_endeavouros_xfce4_theme'
+            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
+            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
         )
         ;;
   esac
@@ -1177,29 +880,17 @@ UsefulTips() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
-#GetPkgVersion() {
-#    local repo="$1"
-#    local pkg="$2"
-#    /usr/bin/pacman -Sl "$repo" 2> /dev/null | /usr/bin/grep -w "$pkg" | /usr/bin/awk '{print $3}'
-#}
-
 IsEosYadInstalled() {
-    # Determines if a patched EOS version of yad is installed.
+    # Determines if yad-eos is installed.
+    # Some yad alternative must be installed if we can use this program!
 
     local installed_yad="$(LANG=C /usr/bin/pacman -Qi yad 2>/dev/null | /usr/bin/grep -w ^Name | /usr/bin/awk '{print $3}')"
 
-    case "$installed_yad" in
-        yad-eos | "")
-            return 0 ;;       # yad-eos is installed, or no yad alternative is installed
-        *)
-            # some other yad alternative is installed
-            if (/usr/bin/pacman -Si yad-eos >& /dev/null) ; then
-                return 1  # yad-eos is available
-            else
-                return 0  # yad-eos is not available
-            fi
-            ;;
-    esac
+    if [ "$installed_yad" = "yad-eos" ] ; then
+        return 0        # yad-eos is installed
+    else
+        return 1        # some other yad alternative is installed
+    fi
 }
 
 AddMoreApps() {
@@ -1214,27 +905,27 @@ AddMoreApps() {
   local chromium="$(IconGrasp chromium web-browser)"
 
   local tabcontents=(
-      eos_yad --align-buttons
+      eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
   )
   IsInstalled libreoffice-fresh || {
       ((shown_app_buttons++))
-      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'bash -c "yad_Install libreoffice-fresh"')
+      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'yad_Install libreoffice-fresh')
   }
   IsInstalled chromium || {
       ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'bash -c "yad_Install chromium"')
+      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
   }
   IsInstalled gufw || {
       ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'bash -c "yad_Install gufw"')
+      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
   }
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       IsInstalled akm || {
           ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'bash -c "yad_Install akm"')
+          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
       }
   fi
   case "$DE" in
@@ -1245,8 +936,8 @@ AddMoreApps() {
             ((shown_app_buttons+=2))
             local bluetooth="$(IconGrasp bluetooth)"
             tabcontents+=(
-                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'bash -c "yad_Install blueberry bluez-utils"'
-                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'bash -c "yad_Install blueman bluez-utils pulseaudio-bluetooth"'
+                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
+                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
             )
             break
         done
@@ -1254,7 +945,7 @@ AddMoreApps() {
   esac
 
   if (! IsEosYadInstalled) ; then
-      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "bash -c 'yad_Install yad-eos'")
+      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
   fi
   
   # General app browsing buttons:
@@ -1274,6 +965,52 @@ AddMoreApps() {
   fi
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
+}
+
+#### Support for personal commands:
+
+personal_commands_add() {   # add one personal command
+    local commandline="$1"
+    local name="$2"
+    local icon="$3"
+    local description="$4"
+    local cmd="$5"
+
+    [ -n "$description" ] || description="$commandline"
+    [ -n "$cmd" ] || cmd="$(echo "$commandline" | /usr/bin/awk '{print $1}')"
+
+    if (/usr/bin/which $cmd &> /dev/null) ; then
+        welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$commandline")
+    else
+        printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
+    fi
+}
+
+personal_commands_init() {  # initialize user settings for personal commands
+    [ -n "$1" ] && activate_own_commands_tab="$1"
+    [ -n "$2" ] && columns_for_own_commands="$2"
+    [ -n "$3" ] && show_predefined_buttons_at_own_commands="$3"
+}
+
+_align_buttons_on_tab() {
+    # handles old _align() marking in ~/.config/welcome-own-cmds.conf
+
+    local -n arr="$1"
+    local handle="$2"
+    local ix xx
+
+    # just remove possible legacy "_align(...) construct"
+    ix=0
+    for xx in "${arr[@]}" ; do
+        case "$xx" in
+            --field=*)
+                if [ "$xx" != "${xx/*_align(/}" ] ; then
+                    arr[$ix]="$(echo "$xx" | sed 's|_align(\(.*\))!| \1!|')"
+                fi
+                ;;
+        esac
+        ((ix++))
+    done
 }
 
 OwnCommands() {
@@ -1320,18 +1057,6 @@ OwnCommands() {
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
-About() {
-  local handle="$1"
-  local tabnum="$2"
-
-  Usage | eos_yad --plug="$handle" --tabnum="$tabnum" \
-                  --text-info \
-                  --text="<b>More info about the $PRETTY_PROGNAME app</b>" \
-                  --text-align=left \
-                  --image=help-about \
-      &> /dev/null &
-}
-
 
 # Fields explanation:
 # --field="ButtonName!IconName!Tooltip":fbtn "Command"
@@ -1350,7 +1075,6 @@ CreateNotebookCommands() {
             AfterInstall
             UsefulTips
             AddMoreApps
-            #About
         )
     }
     if [ -n "$welcome_own_commands" ] ; then
@@ -1413,60 +1137,6 @@ SeparateWordsWithSpaces() { # add a space before a capital letter inside a word
         echo "$tabname"           # all capital letters ==> don't change
     else
         echo "$tabname" | sed -e 's|\([A-Z]\)| \1|g' -e 's|^ ||'  # add space before capital letters
-    fi
-}
-
-KillExtraYad() {
-    sleep 0.2
-    eos-kill-yad-zombies
-    return
-
-    # There may be an extra "yad" process in vain because
-    # the "save session" feature of Xfce has not stored the proper command for this app.
-    #
-    # The extra yad process will be eliminated by
-    #   - removing the extra "yad" command from the stored session
-    #   - killing the extra "yad" process if it exists
-
-    # Remove the extra "yad" command from the saved session.
-    local savefile="$(ls -1 "$HOME"/.cache/sessions/xfce4-session-* 2>/dev/null | grep -vP "\.bak$" | tail -n 1)"
-    if [ -n "$savefile" ] ; then
-        local count=$(grep ^LegacyCount= "$savefile" | cut -d '=' -f 2)
-        local endcount=$count
-        if [ "$(grep "^Legacy0_Command=yad$" "$savefile")" != "" ] || [ "$(grep "^Legacy0_Command=eos_yad$" "$savefile")" != "" ] ; then
-            ((endcount--))
-            sed -i "$savefile" \
-                -e 's|^Legacy0_Screen=.*$||' \
-                -e 's|^Legacy0_Command=.*$||' \
-                -e 's|^Legacy0_ClientMachine=.*$||'
-        fi
-        if [ $endcount -ne $count ] ; then
-            sed -i "$savefile" -e 's|^LegacyCount=.*$|LegacyCount='$endcount'|'
-        fi
-    fi
-
-    # Now check if an extra "yad" process is already running. If so, simply kill it.
-
-    sleep 0.1    # must wait a bit!
-
-    local yadlines yadline
-    local pid ppid lastword
-    local processes="$(ps -ef | grep -w yad | grep -v "grep -w yad" | grep -v "^root")"  # search 'yad' without 'root'
-    local problem_ppid=1
-
-    # search for the right "extra" yad process
-    if [ "$(echo "$processes" | awk '{print $NF}')" = "yad" ] ; then
-        readarray -t yadlines <<< "$(echo "$processes")"
-        for yadline in "${yadlines[@]}" ; do
-            lastword="$(echo "$yadline" | awk '{print $NF}')"
-            ppid="$(echo "$yadline" | awk '{print $3}')"
-            if [ "$lastword" = "yad" ] && [ "$ppid" = "$problem_ppid" ] ; then
-                # found the "extra" yad process
-                pid="$(echo "$yadline" | awk '{print $2}')"
-                kill $pid
-                echo "$yadline" > /tmp/save-session-zombie-yad-killed.log
-            fi
-        done
     fi
 }
 
@@ -1538,9 +1208,9 @@ EOF
 }
 
 Check_r8168() {
-    # return 0 if r8168 is installed and no internet connection
+    # return 0 if r8168 is installed and ethernet card is 8168
+    [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] || return 1
     IsInstalled r8168 >& /dev/null || return 1
-    eos_yad_check_internet_connection none 0 "0s" && return 1
     return 0
 }
 export -f Check_r8168
@@ -1572,42 +1242,40 @@ MagicId() {
         echo "Moving existing $target to $target.$time" >&2
         mv $target $target.$time
     fi
-    wget -q -O $target "$url" || {
+    if (! wget -q -O $target "$url") ; then
         echo "Sorry, URL '$url' not found. " >&2
         [ -r $target.$time ] && mv $target.$time $target
         return 1
-    }
+    fi
+    case "$id" in
+        ma) if (! wget -q "$ENDEAVOUROS_TEAM/sandbox/master/pkg/pkglist_install.sh") ; then
+                echo "Warning: cannot fetch pkglist_install.sh from sandbox" >&2
+                return 1
+            fi
+            sudo cp pkglist_install.sh /usr/lib/calamares/modules/user_pkglist/
+            ;;
+    esac
     echo "$target: OK" >&2
 }
 
-UpdateInstallScripts() {
-    # IsInstalling || return
-    if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] ; then
-        return
-        # the files below are needed only for installing
-    fi
+ShowProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
 
-    local URL=$ENDEAVOUROS_TEAM/install-scripts/master
-    local scripts=(                        # may need to adjust files ...
-        calamares_switcher
-        chrooted_cleaner_script.sh
-        cleaner_script.sh
-        pacstrap_calamares
-        update-mirrorlist
-    )
-    local script
-    local tmpdir=$(mktemp -d)
+    local msg="$1"
+    local barlen=50
+    local percent_increment=17
 
-    for script in "${scripts[@]}"; do
-        wget -q --timeout=10 -O "$tmpdir/$script" "$URL/$script" || DIE "cannot fetch script '$script'."
-        chmod +x "$tmpdir/$script"
-    done
-    for script in "${scripts[@]}"; do
-        sudo rm -f /usr/bin/"$script"
-        sudo mv "$tmpdir/$script" /usr/bin
-    done
-    rm -rf $tmpdir
+    ProgressBar "$msg" $pb_percent $barlen
+    ((pb_percent+=percent_increment))
+    [ $pb_percent -gt 100 ] && pb_percent=100
 }
+EndProgress() {
+    [ "$show_progress_bar" = "yes" ] || return
+    pb_percent=100
+    ShowProgress "Done."
+    ProgressBarEnd
+}
+
 
 Usage() {
     cat <<EOF
@@ -1662,24 +1330,6 @@ export -f Usage
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
 
-ShowProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-
-    local msg="$1"
-    local barlen=50
-    local percent_increment=17
-
-    ProgressBar "$msg" $pb_percent $barlen
-    ((pb_percent+=percent_increment))
-    [ $pb_percent -gt 100 ] && pb_percent=100
-}
-EndProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-    pb_percent=100
-    ShowProgress "Done."
-    ProgressBarEnd
-}
-
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
@@ -1687,6 +1337,12 @@ StartHere() {
     local tr_prefer=manual
     local pb_percent=0
     local show_progress_bar=no   # was: yes
+
+    local welcome_own_commands=()
+    local activate_own_commands_tab="no"
+    local columns_for_own_commands="2"
+    local show_predefined_buttons_at_own_commands="yes"
+
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
@@ -1725,7 +1381,6 @@ StartHere() {
     ShowProgress Processing...
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
-    KillExtraYad > $yad_zombie_log
 
     export show_installer=no    # explicitly show the installer, for testing only
     export user_pkglist_url=""
@@ -1788,7 +1443,7 @@ StartHere() {
         fi
         ShowProgress "Checking connection..."
 
-        eos_yad_check_internet_connection $verbosity 20 "3s" "Welcome" || return 1
+        eos_yad_check_internet_connection $verbosity 2 "3s" "Welcome" || return 1
 
         if [ -n "$TERMINAL_AT_START" ] ; then
             arg="$(echo "$TERMINAL_AT_START" | awk '{print $1}')"
@@ -1810,8 +1465,6 @@ StartHere() {
         #fi
     fi
 
-    # UpdateInstallScripts
-
     SetBrowser
 
     local handle="$(shuf -i 700000-999999 -n 1)"
@@ -1824,6 +1477,8 @@ StartHere() {
     # Create the yad command gradually into an array 'notebook':
 
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
+    notebook+=(--use-interp)
+    notebook+=(--expand)
 
     for tab in "${_NOTEBOOK_TABS[@]}" ; do
         tabname="$(ltr nb_tab_$tab)"
@@ -1846,9 +1501,9 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
-    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"bash -c ImportantNews")
-    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"bash -c WelcomeChangelog")
-    notebook+=(--button=" $(ltr butt_help)!help-contents!":"bash -c WelcomeHelp")
+    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"ImportantNews")
+    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"WelcomeChangelog")
+    notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
     if [ "$is_installing" = "no" ] ; then
         notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
     fi
@@ -1873,6 +1528,8 @@ StartHere() {
         *) echo "welcome exit code was: $result" >&2 ;;
     esac
 }
+
+trap "sleep 0.2 ; eos-kill-yad-zombies --silent" EXIT
 
 StartHere "$@"
 

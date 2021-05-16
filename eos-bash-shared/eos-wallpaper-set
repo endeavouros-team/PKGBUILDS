@@ -286,44 +286,10 @@ Examples:
 EOF
 }
 
-IsSway()  {
-    case "$DESKTOP_SESSION" in
-        sway | */sway) return 0 ;;
-    esac
-    case "$XDG_SESSION_DESKTOP" in
-        sway | */sway) return 0 ;;
-    esac
-    [ -x /usr/bin/swaybg ] && return 0
-    return 1
-}
-
-IsBspwm() {
-    case "$DESKTOP_SESSION" in
-        bspwm | */bspwm) return 0 ;;
-    esac
-    case "$XDG_SESSION_DESKTOP" in
-        bspwm | */bspwm) return 0 ;;
-    esac
-    [ -x /usr/bin/bspwm ] && return 0
-    return 1
-}
-
-GetDeOrWm() {
-    local de="$(eos_yad_GetDesktopName)"
-    if [ "$de" = "" ] ; then
-        if (IsSway) ; then
-            de=SWAY
-        elif (IsBspwm) ; then
-            de=BSPWM
-        fi
-    fi
-    echo "$de"
-}
-
 Main()
 {
     local progname="$(basename "$0")"
-    local DE="$(GetDeOrWm)"
+    local DE="$(eos_GetDeOrWm)"
     local picfolder=/usr/share/endeavouros/backgrounds
     local pic=""
 
