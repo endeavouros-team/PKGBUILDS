@@ -282,3 +282,9 @@ _tr_add2 butt_softnews_tip            "Notícias importantes sobre o software do
 
 _tr_add2 install_community            "Instalar edições da comunidade"
 _tr_add2 install_community_tip        "Edições da comunidade: Sway, Bspwm (nota: requer ligação à Internet)"
+
+# 2021-May-01:
+_tr_add2 ins_syslog                   "Como partilhar os registos do sistema"
+_tr_add2 ins_syslogtip                "Explica como pode partilhar os registos do sistema quando necessita de ajuda"
+_tr_add2 ins_logtool                  "Registos para resolução de problemas"
+_tr_add2 ins_logtooltip               "Selecionar, criar e partilhar registos de resolução de problemas ao pedir ajuda"
