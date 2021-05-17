@@ -278,3 +278,9 @@ _tr_add2 butt_softnews_tip            "Nouvelles importantes sur les logiciels d
 
 _tr_add2 install_community            "Installer édition communautaire"
 _tr_add2 install_community_tip        "Éditions communautaire : Sway, Bspwm (note: connexion internet requise)"
+
+# 1er-mai-2021
+_tr_add2 ins_syslog                   "Partager les logs système"
+_tr_add2 ins_syslogtip                "Explique comment vous pouvez partager les logs systèmes quand vous avez besoin d'aide"
+_tr_add2 ins_logtool                  "Logs pour le dépannage"
+_tr_add2 ins_logtooltip               "Sélectionne, crée et partage les logs de dépannage quand vous demandez de l'aide"
