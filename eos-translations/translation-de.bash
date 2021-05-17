@@ -281,3 +281,9 @@ _tr_add2 butt_softnews_tip            "Wichtige Meldungen über EndeavourOS Apps
 
 _tr_add2 install_community            "Installiere Community Editionen"
 _tr_add2 install_community_tip        "Community Editionen: Sway, Bspwm (Bemerkung: Benötigt eine Internet Verbindung)"
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Wie teile ich Systemlogs ?"
+_tr_add2 ins_syslogtip                "Wie Du Systemlogs freigeben kannst, um Hilfe zu bekommen"
+_tr_add2 ins_logtool                  "Logs zur Fehlerbehebung"
+_tr_add2 ins_logtooltip               "Wähle Fehlerbehebungsprotokolle aus, erstelle sie und gebe sie frei, wenn Du Hilfe brauchst"
