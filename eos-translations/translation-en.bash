@@ -288,3 +288,9 @@ _tr_add2 ins_syslog                   "How to share system logs"
 _tr_add2 ins_syslogtip                "Explains how you can share system logs when you need help"
 _tr_add2 ins_logtool                  "Logs for troubleshooting"
 _tr_add2 ins_logtooltip               "Select, create and share troubleshooting logs when asking for help"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Assistant"
+_tr_add2 daily_assistant_text        "Tools for useful and/or daily tasks"
+_tr_add2 after_install_itab          "Select initial Welcome tab"
+_tr_add2 after_install_itab_tip      "Sets the tab Welcome shows when started"

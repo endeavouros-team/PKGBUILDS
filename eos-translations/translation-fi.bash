@@ -288,3 +288,9 @@ _tr_add2 ins_syslog                   "Kuinka saan järjestelmän lokit"
 _tr_add2 ins_syslogtip                "Ohjeet kuinka saan järjestelmälokit luotua kun tarvitsen apua"
 _tr_add2 ins_logtool                  "Luo lokit ongelmatilanteessa"
 _tr_add2 ins_logtooltip               "Luo ja jakaa tarvittavat lokit kun haluat apua ongelman selvittämiseksi"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Apuri"
+_tr_add2 daily_assistant_text        "Työkaluja hyödyllisiin ja/tai usein tehtäviin asioihin"
+_tr_add2 after_install_itab          "Valitse oletuksena näkyvä välilehti"
+_tr_add2 after_install_itab_tip      "Asettaa välilehden joka näkyy aina kun Welcome käynnistetään"
