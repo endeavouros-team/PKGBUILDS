@@ -800,57 +800,141 @@ export -f PacdiffFieldAdd
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
+  local realfunc="$3"
+
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
 
   local tabcontents=(
       eos_yad --align-buttons
       --use-interp  # don't need explicit 'bash -c' construct when calling functions
-      --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=dialog-information
-      --text="<b>$(ltr after_install_text)</b>"
+      --plug="$handle" --tabnum="$tabnum" --form --image=dialog-information
   )
-  if [ "$(eos_GetArch)" != "armv7h" ] ; then
-     tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
+  if [ "$realfunc" = "AfterInstall" ] ; then
+      tabcontents+=(--text="<b>$(ltr after_install_text)</b>" --columns=2)
   fi
-  tabcontents+=(
-      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
-  )
-  PacdiffFieldAdd
-  tabcontents+=(
-      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
-  )
-
-  if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
+  if [ "$realfunc" = "DailyAssistant" ] ; then
+      tabcontents+=(--text="<b>$(ltr daily_assistant_text)</b>" --columns=2)
   fi
 
-  test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
+  if [ "$realfunc" = "AfterInstall" ] ; then
+      if [ "$(eos_GetArch)" != "armv7h" ] ; then
+          tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
+      fi
+  fi
+  #if [ "$realfunc" = "DailyAssistant" ] ; then
+      tabcontents+=(
+          --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      )
+  #fi
+  if [ "$realfunc" = "DailyAssistant" ] ; then
+      if [ "$(eos_GetArch)" != "armv7h" ] ; then
+          tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
+      fi
+  fi
+  if [ "$realfunc" = "DailyAssistant" ] ; then
+      PacdiffFieldAdd
+  fi
+  if [ "$realfunc" = "AfterInstall" ] ; then
+      tabcontents+=(
+          --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+      )
 
-  ShowChangeResoButton
+      if [ -x /usr/bin/eos-update-notifier-configure ] ; then
+          tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
+      fi
 
-  tabcontents+=(
-      --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
-      --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
-      --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
-  )
+      test "$(eos_GetArch)" != "armv7h" && \
+          tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
 
-  Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "yad_Remove r8168")
+      ShowChangeResoButton
 
-  tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+      tabcontents+=(
+          --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
+          --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+          --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
+      )
+      Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "yad_Remove r8168")
+  fi
 
-  case "$(eos_yad_GetDesktopName)" in
-    XFCE)
-        tabcontents+=(
-            --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
-            --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
-        )
-        ;;
-  esac
+  #if [ "$realfunc" = "AfterInstall" ] ; then
+      tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  #fi
+
+  if [ "$realfunc" = "AfterInstall" ] ; then
+      case "$(eos_yad_GetDesktopName)" in
+          XFCE)
+              tabcontents+=(
+                  --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
+                  --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
+              )
+              ;;
+      esac
+  fi
+
+  if [ "$realfunc" = "DailyAssistant" ] ; then
+      # General app browsing buttons:
+      if [ "$(eos_GetArch)" = "armv7h" ] ; then
+          tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
+      else
+          tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
+      fi
+      tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
+  fi
+  if [ "$realfunc" = "AfterInstall" ] ; then
+      tabcontents+=(--field=" $(ltr after_install_itab)!preferences-system!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
+  fi
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
+
+DailyAssistant() {
+  local handle="$1"
+  local tabnum="$2"
+
+  AfterInstall "$handle" "$tabnum" "$FUNCNAME"
+}
+
+WelcomeInitialTab() {
+    ## Welcome tabs are numbered starting from 1.
+    ## Note1: This setting is not used while installing.
+    ## Note2: This overrides the related setting 'activate_own_commands_tab'
+    ##        or the first parameter in call to personal_commands_init()
+    ##        in file ~/.config/welcome-own-cmds.conf.
+
+    if [ ! -r "$welcome_configurator" ] ; then
+        echo "EOS_WELCOME_ACTIVE_TAB_NUMBER=2  # default: 2 (=After Install)" > $welcome_configurator
+    fi
+    source "$welcome_configurator"
+    [ -z "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] && export EOS_WELCOME_ACTIVE_TAB_NUMBER=2
+
+    local count="$_NOTEBOOK_TABS_COUNT"
+    local txt=""
+    txt+="Welcome tabs are numbered from 1 to $count.\n"
+    txt+="For example, the <b>After Install</b> tab is number 2.\n"
+    txt+="Select the number of the Welcome tab to show initially.\n"
+    txt+="After selecting the initial tab, Welcome will be restarted.\n"
+    local cmd=(
+        eos_yad --form --align-buttons --use-interp --title="Welcome initial tab"
+        --text="$txt" --image=system-preferences
+        --field="Initial tab number\t\t":num "$EOS_WELCOME_ACTIVE_TAB_NUMBER!1..$count!1"
+    )
+    local result="$("${cmd[@]}" | cut -d '|' -f1)"
+    [ -z "$result" ] && return
+    sed -i $welcome_configurator -e "s|^EOS_WELCOME_ACTIVE_TAB_NUMBER=[0-9]*|EOS_WELCOME_ACTIVE_TAB_NUMBER=$result|"
+
+    local tmpfile=$(mktemp $HOME/.cache/.greeter_restart.XXXXX)
+    cat <<EOF > $tmpfile
+pkill -f "/usr/bin/yad --window-icon=$EOS_WICON"
+sleep 0.2
+eos-welcome ${WELCOME_ARGS} &
+sleep 0.5
+rm -f $tmpfile
+EOF
+    chmod +x $tmpfile
+    $tmpfile
+}
+export -f WelcomeInitialTab
 
 UsefulTips() {
   local handle="$1"
@@ -947,7 +1031,7 @@ AddMoreApps() {
   if (! IsEosYadInstalled) ; then
       tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
   fi
-  
+
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
@@ -1073,6 +1157,7 @@ CreateNotebookCommands() {
         _NOTEBOOK_TABS=(                             # names of functions above
             GeneralInfo
             AfterInstall
+            DailyAssistant
             UsefulTips
             AddMoreApps
         )
@@ -1080,6 +1165,7 @@ CreateNotebookCommands() {
     if [ -n "$welcome_own_commands" ] ; then
         _NOTEBOOK_TABS+=(OwnCommands)
     fi
+    export _NOTEBOOK_TABS_COUNT=${#_NOTEBOOK_TABS[@]}
 }
 
 ####################### DO NOT CHANGE ANYTHING AFTER THIS LINE! ######################################################
@@ -1126,7 +1212,7 @@ PrepareTabs() {
 
     ix=1
     for xx in "${_NOTEBOOK_TABS[@]}" ; do
-        $xx "$handle" "$((ix++))"
+        $xx "$handle" "$((ix++))" "$xx"
     done
 }
 
@@ -1343,6 +1429,7 @@ StartHere() {
     local columns_for_own_commands="2"
     local show_predefined_buttons_at_own_commands="yes"
 
+    export WELCOME_ARGS="$*"
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
@@ -1381,6 +1468,15 @@ StartHere() {
     ShowProgress Processing...
 
     local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
+    export welcome_configurator="$HOME/.config/welcome.conf"  # another welcome config... should combine these
+
+    if [ -r "$welcome_configurator" ] ; then
+        source "$welcome_configurator"
+    fi
+    if [ -z "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] ; then
+        EOS_WELCOME_ACTIVE_TAB_NUMBER=2
+    fi
+    export EOS_WELCOME_ACTIVE_TAB_NUMBER
 
     export show_installer=no    # explicitly show the installer, for testing only
     export user_pkglist_url=""
@@ -1488,16 +1584,21 @@ StartHere() {
 
     # Set the active tab number.
     local active_tab_nr=2                             # 2 = the After Install tab
-    test "$is_installing" = "yes" && active_tab_nr=1
-    if [ -n "$welcome_own_commands" ] ; then
-        # 'activate_own_commands_tab' may have been set
-        # in the "$own_commands_conf" file
-        case "$activate_own_commands_tab" in
-            [Yy][Ee][Ss])
-                active_tab_nr=5                       # 5 = the Personal Commands tab
-                test "$is_installing" = "yes" && active_tab_nr=3
-                ;;
-        esac
+    if [ "$is_installing" = "yes" ] ; then
+        active_tab_nr=1
+    elif [ -n "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] ; then
+        active_tab_nr=$EOS_WELCOME_ACTIVE_TAB_NUMBER
+    else
+        if [ -n "$welcome_own_commands" ] ; then
+            # 'activate_own_commands_tab' may have been set
+            # in the "$own_commands_conf" file
+            case "$activate_own_commands_tab" in
+                [Yy][Ee][Ss])
+                    active_tab_nr=6                       # 6 = the Personal Commands tab
+                    #test "$is_installing" = "yes" && active_tab_nr=3
+                    ;;
+            esac
+        fi
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
