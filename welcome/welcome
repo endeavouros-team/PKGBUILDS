@@ -1471,6 +1471,13 @@ StartHere() {
     export welcome_configurator="$HOME/.config/welcome.conf"  # another welcome config... should combine these
 
     if [ -r "$welcome_configurator" ] ; then
+        if [ -n "$(grep "^local ConfVersion" "$welcome_configurator")" ] || [ -n "$(grep "^local MaxButtonNameLength" "$welcome_configurator")" ] ; then
+            # this is an old config file, just delete the file
+            rm -f "$welcome_configurator"
+        fi
+    fi
+
+    if [ -r "$welcome_configurator" ] ; then
         source "$welcome_configurator"
     fi
     if [ -z "$EOS_WELCOME_ACTIVE_TAB_NUMBER" ] ; then
