@@ -1624,6 +1624,9 @@ StartHere() {
     fi
     ShowProgress "Showing window..."
 
+    local error_log=/tmp/$PROGNAME.log
+    local comment=""
+
     "${notebook[@]}"
 
     local result=$?
@@ -1633,8 +1636,12 @@ StartHere() {
     case "$result" in
         5) WelcomeSettings disable ;;
         0|252) sleep 0.5 ; WelcomeSettings enable ;;
-        143) ;; # probably restarting
-        *) echo "welcome exit code was: $result" >&2 ;;
+        *)
+            case "$result" in
+                143) comment="   # likely caused by restarting the Welcome app" ;;
+            esac
+            echo "$(/usr/bin/date "+%x %X"): welcome exit code was: $result$comment" >> $error_log
+            ;;
     esac
 }
 
