@@ -275,6 +275,17 @@ ListNameToPkgName()
     echoreturn "$pkgname"
 }
 
+HubRelease() {
+    if [ "$REPONAME" = "endeavouros_calamares" ] && [ -x /usr/local/bin/asset-prefs ] ; then
+        local GITHUB_USER GITHUB_TOKEN
+        GITHUB_USER="$(/usr/local/bin/asset-prefs user)" \
+        GITHUB_TOKEN="$(/usr/local/bin/asset-prefs token)" \
+        hub release "$@"
+    else
+        hub release "$@"
+    fi
+}
+
 Assets_clone()
 {
     if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
@@ -314,7 +325,7 @@ Assets_clone()
         local remotes remote
         local waittime=30
         for tag in "${RELEASE_TAGS[@]}" ; do
-            remotes="$(hub release show -f %as%n $tag | sed 's|^.*/||')"
+            remotes="$(HubRelease show -f %as%n $tag | sed 's|^.*/||')"
             for remote in $remotes ; do
                 if [ ! -r $remote ] ; then
                     break
@@ -341,7 +352,7 @@ Assets_clone()
     echo2 "Fetching all github assets..."
     hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
-        hub release download $xx
+        HubRelease download $xx
         test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
 
@@ -1048,7 +1059,7 @@ ManualCheckOfAssets() {
     sleep 1
     while true ; do
         if [ 0 -eq 1 ] ; then
-            hub release show -f %as%n $tag | sed 's|^.*/||' >&2
+            HubRelease show -f %as%n $tag | sed 's|^.*/||' >&2
             printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
         else
             : #printf2 "\n%s "  "Is $op OK (y/n)?"
