@@ -284,3 +284,9 @@ _tr_add2 ins_syslog                   "Partager les logs système"
 _tr_add2 ins_syslogtip                "Explique comment vous pouvez partager les logs systèmes quand vous avez besoin d'aide"
 _tr_add2 ins_logtool                  "Logs pour le dépannage"
 _tr_add2 ins_logtooltip               "Sélectionne, crée et partage les logs de dépannage quand vous demandez de l'aide"
+
+# 20-mai-2021
+_tr_add2 nb_tab_DailyAssistant       "Assistant"
+_tr_add2 daily_assistant_text        "Outils pour les tâches utiles et/ou quotidienne"
+_tr_add2 after_install_itab          "Selection onglet initial Welcome"
+_tr_add2 after_install_itab_tip      "Définit l'onglet que Welcome affiche au démarrage"
