@@ -48,7 +48,7 @@ prepare() {
     mkdir -p $_reponame/build/$pkgname
 
     # remove some calamares modules we don't need
-    rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview,welcomeq,finishedq,keyboardq,license,localeq,notesqml,oemid,plasmalnf,usersq} ||true
+    rm -r $_reponame/src/modules/{dracut,dracutlukscfg,dummycpp,dummyprocess,dummypython,dummypythonqt,initramfs,plymouthcfg,tracking,webview,welcomeq,finishedq,keyboardq,license,localeq,notesqml,oemid,plasmalnf,usersq,services-openrc,openrcdmcryptcfg} ||true    
     # remove default branding // keep package small
     rm -r $_reponame/src/branding/default
 
