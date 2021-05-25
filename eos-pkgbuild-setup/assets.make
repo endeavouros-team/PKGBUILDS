@@ -276,11 +276,9 @@ ListNameToPkgName()
 }
 
 HubRelease() {
-    if [ "$REPONAME" = "endeavouros_calamares" ] && [ -x /usr/local/bin/asset-prefs ] ; then
-        local GITHUB_USER GITHUB_TOKEN
-        GITHUB_USER="$(/usr/local/bin/asset-prefs user)" \
-        GITHUB_TOKEN="$(/usr/local/bin/asset-prefs token)" \
-        hub release "$@"
+    if [ -x "$HOME/bin/hub-release" ] ; then
+        Debug "$FUNCNAME: go"
+        "$HOME/bin/hub-release" "$@"
     else
         hub release "$@"
     fi
@@ -445,10 +443,26 @@ Constructor()
 
 }
 
+DebugInit() {
+    : # rm -f /tmp/assets-make-foo.log
+}
+Debug() {
+    :
+    # local date="$(date)"
+    # echo "$date: $1" >> /tmp/assets-make-foo.log
+}
+
 Destructor()
 {
     #test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
     test -n "$buildsavedir" && rm -rf "$buildsavedir"
+
+    Debug "$FUNCNAME: start, keep_info = $keep_info"
+
+    if [ -x "$HOME/bin/hub-release" ] && [ "$keep_info" = "no" ] ; then
+        Debug "$FUNCNAME: off"
+        "$HOME/bin/hub-release" --off
+    fi
 }
 
 ShowOldCompressedPackages() {
@@ -678,6 +692,7 @@ Options:
     --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
     --repoup                    (Advanced) Force update of repository database files.
     --aurdiff                   Show PKGBUILD diff for AUR packages.
+    --keep                      Don't delete info.
 EOF
 #   --versuffix=X    Append given suffix (X) to pkgver of PKGBUILD.
 
@@ -693,6 +708,7 @@ Main2()
     local cmd=""
     local xx yy zz
     local repoup=0
+    local keep_info=no
     local pkgver_suffix=""
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
     local use_local_assets=0         # 0 = offer to fetch assets
@@ -730,6 +746,7 @@ Main2()
                     aurdiff=1 ;;
                 --versuffix=*)
                     pkgver_suffix="${xx#*=}" ;;  # currently not used!
+                --keep) keep_info=yes ;;
                 *) Usage 0  ;;
             esac
         done
@@ -1243,6 +1260,8 @@ Main() {
         echo2 "VERSION: $(grep ^VERSION= $verfile | cut -d '=' -f 2)"
     fi
 
+    DebugInit
+    
     Main2 "$@"
 }
 
