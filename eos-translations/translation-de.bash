@@ -292,5 +292,5 @@ _tr_add2 ins_logtooltip               "Wähle Fehlerbehebungsprotokolle aus, ers
 # 2021-May-20
 _tr_add2 nb_tab_DailyAssistant       "Assistent"
 _tr_add2 daily_assistant_text        "Tools für nützliche und / oder tägliche Aufgaben"
-_tr_add2 after_install_itab          "Wähle bevorzugten Welcome Tab "
+_tr_add2 after_install_itab          "Wähle bevorzugten Welcome Tab"
 _tr_add2 after_install_itab_tip      "Legt den Tab fest, den Welcome beim Start anzeigt"
