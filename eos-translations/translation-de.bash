@@ -287,3 +287,10 @@ _tr_add2 ins_syslog                   "Wie teile ich Systemlogs ?"
 _tr_add2 ins_syslogtip                "Wie Du Systemlogs freigeben kannst, um Hilfe zu bekommen"
 _tr_add2 ins_logtool                  "Logs zur Fehlerbehebung"
 _tr_add2 ins_logtooltip               "Wähle Fehlerbehebungsprotokolle aus, erstelle sie und gebe sie frei, wenn Du Hilfe brauchst"
+
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Assistent"
+_tr_add2 daily_assistant_text        "Tools für nützliche und / oder tägliche Aufgaben"
+_tr_add2 after_install_itab          "Wähle bevorzugten Welcome Tab "
+_tr_add2 after_install_itab_tip      "Legt den Tab fest, den Welcome beim Start anzeigt"
