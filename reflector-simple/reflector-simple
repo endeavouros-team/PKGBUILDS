@@ -265,7 +265,8 @@ ChangeNamesToCodes() {
         if [ -z "$name" ] && [ -n "$list" ] ; then
             name="$list"
             list=""
-        else
+        fi
+        if [ -z "$name" ] && [ -z "$list" ] ; then
             break
         fi
         case "$name" in
