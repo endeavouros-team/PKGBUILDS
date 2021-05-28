@@ -11,6 +11,7 @@ export -f eos_yad_RunCmdTermBash
 
 DIE() {
     eos_yad --form --width=400 --title="reflector-simple problem" --image=error --text="$1" --button=yad-quit
+    Destructor
     exit 1
 }
 WARN() {
@@ -157,6 +158,10 @@ GetListToken() {
     __lista__="$(echo "$__lista__" | sed 's|^[^,]*[,]*||')"
 }
 
+Destructor() {
+    [ -n "$tmpconf" ] && rm -f $tmpconf
+}
+
 # Conf limitations:
 # - nothing known!
 
@@ -172,16 +177,16 @@ _get_reflector_x_configs() {
 
     # remove empty lines and comments
     cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed 's|[ \t]*#.*||' > $tmpconf
-    
+
+    # change country names to country codes in $tmpconf
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         name="${countrynames[$ix]}"
-        #if [ "${name% *}" != "$name" ] ; then                # $name contains space(s)
-            code="${countrycodes[$ix]}"
-            sed -i $tmpconf \
-                -e "s|'$name'|$code|g" \
-                -e "s|\"$name\"|$code|g" \
-                -e 's|'"$name"'|'$code'|g'                    # country name without quotes!
-        #fi
+        code="${countrycodes[$ix]}"
+        sed -i $tmpconf \
+            -e "s|'$name'|$code|g" \
+            -e "s|\"$name\"|$code|g" \
+            -e "s|\([, \t]\)$name[ \t]*$|\1$code|g" \
+            -e "s|\([, \t]\)$name,|\1$code,|g"
     done
 
     local xx list yy opt=""
@@ -191,6 +196,10 @@ _get_reflector_x_configs() {
             -p?* | -c?* | -a?* | -n?*)
                 opt="${xx::2}"
                 xx="${xx:2}"
+                ;;
+            $country_exclude=*)
+                opt="$country_exclude"
+                xx="${xx:18}"
                 ;;
         esac
 
@@ -207,11 +216,29 @@ _get_reflector_x_configs() {
                 done
                 ;;
             $country_exclude)                                  # extension
-                conf_dropped_countries+=("$xx")
-                conf_dropped_countries+=("$(CodeToCountry "$xx")")
+                case "$xx" in
+                    [a-zA-Z][a-zA-Z])
+                        yy="$(CodeToCountry "$xx")"
+                        [ -n "$yy" ] || DIE "Unrecognized country code '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                        xx="$(echo "$xx" | tr "[:lower:]" "[:upper:]")"
+                        conf_dropped_countries+=("$xx")
+                        conf_dropped_countries+=("$yy")
+                        ;;
+                    [A-Z][a-z]*)
+                        xx="$(FixCountryName "$xx")"
+                        yy="$(CountryToCode "$xx")"
+                        [ -n "$yy" ] || DIE "Unrecognized country name '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                        conf_dropped_countries+=("$xx")
+                        conf_dropped_countries+=("$yy")
+                        ;;
+                    *)
+                        DIE "Unrecognized country '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                        ;;
+                esac
                 ;;
             -c | --country)
                 # list or single value: "GB,FR,DE" or "GB"
+                xx="$(ChangeNamesToCodes "$xx")"
                 list="$xx"
                 while [ -n "$list" ] ; do
                     GetListToken list yy
@@ -227,6 +254,65 @@ _get_reflector_x_configs() {
         IsDroppedCountry "$xx" || zz+=("$(CodeToCountry "$xx")")
     done
     conf_selected_countries=("${zz[@]}")
+}
+
+ChangeNamesToCodes() {
+    local list="$1"
+    local newlist=""
+    local name
+    for ((ix=1; ; ix++)) ; do
+        name="$(echo "$list" | cut -s -d ',' -f $ix)"
+        if [ -z "$name" ] && [ -n "$list" ] ; then
+            name="$list"
+            list=""
+        else
+            break
+        fi
+        case "$name" in
+            [a-zA-Z][a-zA-Z])
+                ;;
+            *)
+                name="$(FixCountryName "$name")"
+                name="$(CountryToCode "$name")"
+                ;;
+        esac
+        [ $ix -eq 1 ] && newlist+="$name" || newlist+=",$name"
+    done
+    echo "$newlist"
+}
+
+FixCountryName() {   # ad hoc fixes to country name to be the same as in 'reflector --list-countries'
+    local name="$1"
+
+    if [ -z "$(CountryToCode "$name")" ] ; then
+        local ix len=${#name} newname=""
+        local wordstart prev cur=""
+        for ((ix=0; ix<len ; ix++)) ; do
+            prev="$cur"
+            cur="${name:$ix:1}"
+            case "$cur" in
+                " ")
+                    case "$prev" in
+                        " ") continue ;;  # bypass multiple spaces
+                    esac
+                    ;;
+                *)
+                    case "$prev" in
+                        " " | "")
+                            wordstart=yes ;;
+                        *)
+                            wordstart=no ;;
+                    esac
+                    ;;
+            esac
+            case "$wordstart" in
+                yes) newname+="$(echo "$cur" | tr "[:lower:]" "[:upper:]")" ;;
+                no)  newname+="$(echo "$cur" | tr "[:upper:]" "[:lower:]")" ;;
+            esac
+        done
+        name="$newname"
+    fi
+    echo "$name"
 }
 
 IsInSelectedCountries() {
@@ -337,7 +423,9 @@ AskCountriesAndOptions() {
     for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
         included=false
         IsInSelectedCountries "${countrynames[$ix]}" && included=true
-        test "${countrycodes[$ix]}" = "$local_country_code" && included=true
+        if [ "${countrycodes[$ix]}" = "$local_country_code" ] && (! IsDroppedCountry "$local_country_code") ; then
+            included=true
+        fi
         command+=(--field="${countrynames[$ix]}:chk" $included)
     done
     command+=(--separator=" ")                      # assumes all returned values lack spaces
@@ -369,8 +457,8 @@ AskCountriesAndOptions() {
 
     reflector_info="$("${command[@]}")"
     case "$?" in
-        1) exit 1 ;;
-        2) eos-pkg-changelog $progname ; exit 0 ;;
+        1) Destructor ; exit 1 ;;
+        2) eos-pkg-changelog $progname ; Destructor ; exit 0 ;;
     esac
     test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
     if [ "$(echo "$reflector_info" | wc -l)" != "1" ] ; then
@@ -661,7 +749,7 @@ Main() {
     # cleanup
     rm -f $tmpfile
     if [ -r "$REFLECTOR_X_CONF" ] ; then
-        rm -f $tmpconf
+        Destructor
     fi
 }
 
