@@ -175,18 +175,18 @@ _get_reflector_x_configs() {
         return
     fi
 
-    # remove empty lines and comments
-    cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed 's|[ \t]*#.*||' > $tmpconf
+    # Remove empty lines and comments. Remove quotes.
+    cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed -e 's|[ \t]*#.*||' -e '/^$/d' | tr -d "'\""  > $tmpconf
 
     # change country names to country codes in $tmpconf
     for ((ix=0; ix<${#countrycodes[@]}; ix++)) ; do
         name="${countrynames[$ix]}"
         code="${countrycodes[$ix]}"
         sed -i $tmpconf \
-            -e "s|'$name'|$code|g" \
-            -e "s|\"$name\"|$code|g" \
-            -e "s|\([, \t]\)$name[ \t]*$|\1$code|g" \
-            -e "s|\([, \t]\)$name,|\1$code,|g"
+            -e "s|'$name'|$code|gI" \
+            -e "s|\"$name\"|$code|gI" \
+            -e "s|\([, \t]\)$name[ \t]*$|\1$code|gI" \
+            -e "s|\([, \t]\)$name,|\1$code,|gI"
     done
 
     local xx list yy opt=""
@@ -282,36 +282,18 @@ ChangeNamesToCodes() {
     echo "$newlist"
 }
 
-FixCountryName() {   # ad hoc fixes to country name to be the same as in 'reflector --list-countries'
+FixCountryName() {   # simple fix to country name to be the same as in 'reflector --list-countries'
     local name="$1"
 
     if [ -z "$(CountryToCode "$name")" ] ; then
-        local ix len=${#name} newname=""
-        local wordstart prev cur=""
-        for ((ix=0; ix<len ; ix++)) ; do
-            prev="$cur"
-            cur="${name:$ix:1}"
-            case "$cur" in
-                " ")
-                    case "$prev" in
-                        " ") continue ;;  # bypass multiple spaces
-                    esac
-                    ;;
-                *)
-                    case "$prev" in
-                        " " | "")
-                            wordstart=yes ;;
-                        *)
-                            wordstart=no ;;
-                    esac
-                    ;;
-            esac
-            case "$wordstart" in
-                yes) newname+="$(echo "$cur" | tr "[:lower:]" "[:upper:]")" ;;
-                no)  newname+="$(echo "$cur" | tr "[:upper:]" "[:lower:]")" ;;
-            esac
+        local official_name
+        name=${name,,}  # make lowercase
+        for official_name in "${countrynames[@]}" ; do
+            if [ "$name" = "${official_name,,}" ] ; then
+                name="$official_name"
+                break
+            fi
         done
-        name="$newname"
     fi
     echo "$name"
 }
