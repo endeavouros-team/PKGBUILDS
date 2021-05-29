@@ -25,3 +25,21 @@ REFLECTOR_SIMPLE_PREFER_NUMBER=yes reflector-simple
 ```
 
 Version 1.16.1-1 changed the method of finding the country code of a user. Now user can change the value of variable `REFLECTOR_SIMPLE_COUNTRY_METHOD` in file `/etc/reflector-simple-tool.conf` and see what's the best (=fastest) method (number from 0 to 5) of fetching the country code. This may have a great effect on how quickly `reflector-simple` shows its first window when started.
+
+## Tips
+
+- import reflector options from another configuration file with a normal `reflector` syntax: `@/path/to/another/config.conf`
+- to exclude a country from ranking, use option `--country-exclude` (this option is not found in `reflector`)
+
+### Example configuration file
+```
+# A part of file /etc/reflector-simple.conf:
+
+# ...
+
+@/etc/reflector_excludes.conf
+-c DE,FR,"United Kingdom"
+--country-exclude LU
+
+# ...
+```
