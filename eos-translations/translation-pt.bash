@@ -288,3 +288,9 @@ _tr_add2 ins_syslog                   "Como partilhar os registos do sistema"
 _tr_add2 ins_syslogtip                "Explica como pode partilhar os registos do sistema quando necessita de ajuda"
 _tr_add2 ins_logtool                  "Registos para resolução de problemas"
 _tr_add2 ins_logtooltip               "Selecionar, criar e partilhar registos de resolução de problemas ao pedir ajuda"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Assistente"
+_tr_add2 daily_assistant_text        "Ferramentas para tarefas úteis e/ou diárias"
+_tr_add2 after_install_itab          "Selecionar o separador inicial de Bem-vindo"
+_tr_add2 after_install_itab_tip      "Define o separador de bem-vindo no arranque"
