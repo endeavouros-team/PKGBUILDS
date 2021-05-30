@@ -261,6 +261,55 @@ Manual() {
 }
 export -f Manual
 
+FindNewRepoLineNumber() {
+    local linenr="$(grep -n '^# An example of ' /etc/pacman.conf | cut -d':' -f1)"
+    if [ -n "$linenr" ] ; then
+        ((linenr = linenr - 1))
+    else
+        linenr="$(grep -n '^\[endeavouros\]' /etc/pacman.conf | cut -d':' -f1)"
+        if [ -n "$linenr" ] ; then
+            ((linenr = linenr + 3))
+        else
+            linenr=1
+        fi
+    fi
+    echo "$linenr"
+}
+
+GetSudoEditor() {
+    local editor ed1
+
+    for editor in "${EOS_SUDO_EDITORS[@]}" "$SUDO_EDITOR" "$VISUAL" "$EDITOR" nano ; do
+        ed1="$(echo "$editor" | awk '{print $1}')"
+        if (/usr/bin/which "$ed1" >& /dev/null) ; then
+            case "$ed1" in
+                mousepad | /usr/bin/mousepad)
+                    Editor="/usr/bin/dbus-launch $editor" ;;
+                *)
+                    Editor="$editor" ;;
+            esac
+            echo "$Editor"
+            return
+        fi
+    done
+    DIE "suitable editor not found"
+}
+
+PacmanConfEditor() {
+    local linenr="$1"
+    local editor="$(GetSudoEditor)"
+    local ed1="$(echo "$editor" | awk '{print $1}')"
+
+    case "$ed1" in
+        emacs|vim|nano | /usr/bin/emacs|/usr/bin/vim|/usr/bin/nano)
+            echo "$editor +$linenr"
+            ;;
+        *)
+            echo "$editor"
+            ;;
+    esac
+}
+
 Main()
 {
     local progname="$(basename "$0")"
@@ -343,6 +392,8 @@ Main()
         t1+="You have configured the header and kernel to install/uninstall separately (default behavior).\n"
         t1+="See file /etc/akm.conf for more info.\n"
     fi
+    local linenr="$(FindNewRepoLineNumber)"
+    local editor="$(PacmanConfEditor $linenr)"
 
     local cmd=(
         eos_yad
@@ -351,6 +402,7 @@ Main()
         --text="$t1"
         --image=system-software-update
         --button=" Changelog!applications-development!Show latest changes of this program":"bash -c '/usr/bin/eos-pkg-changelog akm'"
+        # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" Help!help-contents!Helps to use $progname":"bash -c Manual"
         --button="Cancel!gtk-cancel!Change nothing":1
         --button="Execute!system-run!Make your changes":0
