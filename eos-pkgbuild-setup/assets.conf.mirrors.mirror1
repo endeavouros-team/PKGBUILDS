@@ -33,7 +33,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     #aur/paper-icon-theme-git
     aur/polybar
     aur/virtualbox-ext-oracle
-    #aur/yay
+    aur/yay
     arc-gtk-theme-eos
     akm
     ckbcomp
@@ -63,7 +63,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     welcome
     #yad
     yad-eos
-    yay
+#    yay
 )
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
@@ -448,7 +448,7 @@ ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 ASSET_PACKAGE_HOOKS["virtualbox-ext-oracle"]=_virtualbox-ext-oracle_hook
 #ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
-#ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
+ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 #ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
 # Special hooks. Implemented via package hooks.
 
