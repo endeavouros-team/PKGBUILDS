@@ -1,9 +1,7 @@
-# Maintainer: EndeavourOS <info@endeavouros.com>, killajoe <archlinux@kamprad.net>
-# EndeavourOS specific branding and configuration for calamares
-
+# Maintainer: joekamprad    <joekamprad@endeavouros.com>
 pkgname=calamares_config_next
 pkgver=1.1
-pkgrel=1
+pkgrel=3
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -17,9 +15,19 @@ prepare() {
     sed -i $srcdir/calamares_config_next/calamares/branding/endeavouros/branding.desc \
     -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
+mkdir $srcdir/bin
+cd $srcdir/bin/
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/cleaner_script.sh
+wget https://raw.githubusercontent.com/killajoe/install-scripts/next/chrooted_cleaner_script.sh
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/pacstrap_calamares
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/update-mirrorlist
+chmod +x cleaner_script.sh chrooted_cleaner_script.sh pacstrap_calamares update-mirrorlist
+cd $srcdir
 }
 
 package() {
     install -dm 755 $pkgdir/etc/calamares
     cp -r --no-preserve=ownership $srcdir/calamares_config_next/calamares $pkgdir/etc/
+    install -dm 755 $pkgdir/usr/local/bin
+    cp -r --no-preserve=ownership $srcdir/bin $pkgdir/usr/local/
 }
