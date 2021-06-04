@@ -1,7 +1,7 @@
 # Maintainer: joekamprad    <joekamprad@endeavouros.com>
 pkgname=calamares_config_next
 pkgver=1.1
-pkgrel=3
+pkgrel=4
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -18,10 +18,10 @@ prepare() {
 mkdir $srcdir/bin
 cd $srcdir/bin/
 wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/cleaner_script.sh
-wget https://raw.githubusercontent.com/killajoe/install-scripts/next/chrooted_cleaner_script.sh
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/pacstrap_calamares
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/chrooted_cleaner_script.sh
 wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/update-mirrorlist
-chmod +x cleaner_script.sh chrooted_cleaner_script.sh pacstrap_calamares update-mirrorlist
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/pacstrap_calamares
+chmod +x cleaner_script.sh chrooted_cleaner_script.sh update-mirrorlist pacstrap_calamares
 cd $srcdir
 }
 
