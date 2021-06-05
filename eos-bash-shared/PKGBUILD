@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.6.19
+pkgver=1.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -20,7 +20,10 @@ optdepends=(
   "yay:      an AUR helper supported by eos-pkginfo"
   "paru:     an AUR helper supported by eos-pkginfo"
 )
-backup=(etc/eos-script-lib-yad.conf)
+backup=(
+  etc/eos-script-lib-yad.conf
+  etc/eos-sendlog.conf
+)
 #url=https://github.com/endeavouros-team/PKGBUILDS/$pkgname
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
@@ -46,6 +49,7 @@ source=(
   $_url/eos-pkginfo.completion
   $_url/eos-pkg-changelog
   $_url/eos-sendlog
+  $_url/eos-sendlog.conf
   $_url/eos-kbd-set
   $_url/eos-download-wallpapers
   $_url/eos-send-gpuinfo
@@ -70,7 +74,8 @@ sha512sums=('baa784418299fa2cdf2d7781e9eb4b399da90031b366c016bfec967cea8c1f27896
             'e672d4b90494ab7c8ba1a8ae837ae96efc2d1a51c80798fd5b5dcd0fb225e6a99420105747c122803666046398b3fcb51d80e3126faa1aff86da789fc17f8e8a'
             'f3922129c3cc27c33fc0da754542d5603bd364da5fd845fa787a8f27d3e9b64b07200c6f592da8363b97bb1e7164e31282e8b971db78f2742fe1c83e1b094da0'
             '1d938d2c29b6302ca48cffa6b1cdef583fa89117a9bd9f46eb02b0f9ca1cd7d00da4a8c3dc0c05b310391f2e5dcf6bf9cbbdd564e63d7b28900af3c46dc30cf4'
-            '3acb0baea66f1ff4c99368d81b0ca5f32bfc76eaa8844876414b5eee30ec7f501b2293409fd73f6bbbc351a110737bfb2e0a2bc3258e55c54361f98572cf1197'
+            'd2255457290fb5ba7b71318bfb58a0ea0fbae59d55f1c4f4310b70700e2bdfa1a401378dce7fc44dac556eadd1394f416b60d4214a1b2d18b6011c1972ad0242'
+            '6579c085ed59fea008d87608c1a35d42a65465403437818568a5d1382be04c2f0111293c2f400e37e034195d8de4a4705620de0271c4ea21da9bd565e82bc51b'
             '5e7daaf9f13785958ab944a0a3254f658cd485462a0921da850c73e87db548567c6c2b3068893b905ff318910e534459f3440faebca06b49c5da5b4efd42a308'
             '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
@@ -80,6 +85,7 @@ package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
   install -Dm755 ksetwallpaper.py               $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
+  install -Dm644 eos-sendlog.conf               $pkgdir/etc/eos-sendlog.conf
 
   install -Dm755 eos-FindAppIcon                $pkgdir/usr/bin/eos-FindAppIcon
   install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog

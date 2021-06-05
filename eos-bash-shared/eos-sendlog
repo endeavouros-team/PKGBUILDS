@@ -11,19 +11,24 @@ Options() {
         case "$arg" in
             -h | --help)
                 cat <<EOF
-Directs standard input into $serviceuri, and saves returned URLs
+Directs standard input into $EOS_SENDLOG_URI, and saves returned URLs
 into file $db.
 
 Usage: $progname [options]
 options:
     -n | --nosave   Don't save returned URL.
     -h | --help     This help.
-    --man           Show manual at $serviceuri.
+    --man           Show manual at $EOS_SENDLOG_URI.
+
+Configuration file $configfile (bash syntax) can be used to set variable
+EOS_SENDLOG_URI.
+Supported values: ${supported_uris[*]}
+Default: ${supported_uris[0]}
 EOF
                 exit 0
                 ;;
             --man)
-                xdg-open $serviceuri
+                xdg-open "$EOS_SENDLOG_URI"
                 exit 0
                 ;;
             -n | --nosave)
@@ -36,14 +41,45 @@ EOF
 }
 
 SendToNet() {
-    url=$(curl -F 'f:1=<-' $serviceuri)
+    url=$(curl -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+}
+
+Init() {
+    local ix
+
+    [ -r $configfile ] && source $configfile
+
+    for ((ix=0; ix < ${#supported_uris[@]}; ix++)) ; do
+        if [ "$EOS_SENDLOG_URI" = "${supported_uris[$ix]}" ] ; then
+            EOS_SENDLOG_FORM="${supported_forms[$ix]}"
+            return
+        fi
+    done
+    # use default:
+    EOS_SENDLOG_URI="${supported_uris[0]}"
+    EOS_SENDLOG_FORM="${supported_forms[0]}"
 }
 
 Main() {
     local progname="$(basename "$0")"
+    local configfile=/etc/eos-sendlog.conf
+
+    # from config file (if values are set, they must be correct!):
+    local EOS_SENDLOG_URI=""
+    local EOS_SENDLOG_FORM=""
+
+    local supported_uris=(
+        "http://ix.io"
+        "https://clbin.com"
+    )
+    local supported_forms=(
+        "f:1"
+        "clbin"
+    )
+
+    Init
     local save=yes
     local db=$HOME/.config/$progname.txt
-    local serviceuri=http://ix.io
     local url
 
     Options "$@"
