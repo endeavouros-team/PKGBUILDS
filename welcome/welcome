@@ -1556,6 +1556,10 @@ StartHere() {
                 echo "Warning: terminal '$arg' (setting TERMINAL_AT_START) in file /etc/eos-script-lib-yad.conf is not supported." >&2
             }
         fi
+        if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
+            local msgvb="To enable virtualbox guest services, run command:\n<tt> systemctl enable --now vboxservice.service</tt>"
+            eos_yad --form --title="Info" --text="$msgvb" --image=$user_info --button=yad-quit:0 &
+        fi
     else
         eos-kbd-set
         if [ -r /etc/pacman.d/mirrorlist ] && [ ! -r /tmp/mirrorlist.bu ] ; then
