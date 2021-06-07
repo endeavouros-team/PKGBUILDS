@@ -1375,6 +1375,11 @@ VboxGuestEnable() {
     fi
 }
 
+KillExtraYad() {
+    sleep 0.2
+    eos-kill-yad-zombies
+}
+
 Usage() {
     cat <<EOF
 ===== $PROG_PACKAGENAME $PROG_VERSION =====
@@ -1476,6 +1481,8 @@ StartHere() {
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
     AfterTranslations
+
+    KillExtraYad > /tmp/yad-zombies.log
 
     ShowProgress Processing...
 
