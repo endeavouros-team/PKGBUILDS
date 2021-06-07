@@ -882,6 +882,7 @@ AfterInstall() {
       tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
   fi
   if [ "$realfunc" = "AfterInstall" ] ; then
+      VboxGuestEnable
       tabcontents+=(--field=" $(ltr after_install_itab)!preferences-system!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
   fi
 
@@ -1362,6 +1363,17 @@ EndProgress() {
     ProgressBarEnd
 }
 
+VboxGuestEnable() {
+    if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
+        local label="Enable VirtualBox Guest utilities"
+        local msg1="To enable VirtualBoxGuest utilities, select <b>AfterInstall</b> tab and click button "
+        local cmd="systemctl enable --now vboxservice.service"
+        local msgvb="$msg1\n<tt> $label</tt>"
+        local icon=user-info
+        eos_yad --form --title="Info" --text="$msgvb" --image=$icon --button=yad-quit:0 &
+        tabcontents+=(--field=" $label!preferences-system!$cmd":fbtn "RunInTerminal $cmd")
+    fi
+}
 
 Usage() {
     cat <<EOF
@@ -1555,10 +1567,6 @@ StartHere() {
             } || {
                 echo "Warning: terminal '$arg' (setting TERMINAL_AT_START) in file /etc/eos-script-lib-yad.conf is not supported." >&2
             }
-        fi
-        if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
-            local msgvb="To enable virtualbox guest services, run command:\n<tt> systemctl enable --now vboxservice.service</tt>"
-            eos_yad --form --title="Info" --text="$msgvb" --image=$user_info --button=yad-quit:0 &
         fi
     else
         eos-kbd-set
