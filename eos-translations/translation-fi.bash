@@ -294,3 +294,10 @@ _tr_add2 nb_tab_DailyAssistant       "Apuri"
 _tr_add2 daily_assistant_text        "Työkaluja hyödyllisiin ja/tai usein tehtäviin asioihin"
 _tr_add2 after_install_itab          "Valitse oletuksena näkyvä välilehti"
 _tr_add2 after_install_itab_tip      "Asettaa välilehden joka näkyy aina kun Welcome käynnistetään"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Sovellukset luokiteltuina"
+_tr_add2 daily_assist_apps_tip       "Sovellukset lajiteltu luokituksen mukaan"
+
+_tr_add2 after_install_vbox1         "Käynnistä VirtualBox Guest -toiminnot"
+_tr_add2 after_install_vbox2         "Käynnistääksesi VirtualBox Guest -toiminnot, mene <b>AfterInstall</b> välilehdelle ja klikkaa painiketta "

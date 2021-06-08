@@ -294,3 +294,10 @@ _tr_add2 nb_tab_DailyAssistant       "Assistant"
 _tr_add2 daily_assistant_text        "Tools for useful and/or daily tasks"
 _tr_add2 after_install_itab          "Select initial Welcome tab"
 _tr_add2 after_install_itab_tip      "Sets the tab Welcome shows when started"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Application categories"
+_tr_add2 daily_assist_apps_tip       "Applications sorted by category"
+
+_tr_add2 after_install_vbox1         "Enable VirtualBox Guest utilities"
+_tr_add2 after_install_vbox2         "To enable VirtualBox Guest utilities, select the <b>AfterInstall</b> tab and click button "
