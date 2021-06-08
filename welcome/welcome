@@ -1365,7 +1365,7 @@ EndProgress() {
 }
 
 VboxGuestEnable() {
-    #if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
+    if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
         local label="$(ltr after_install_vbox1)"
         local msg1="$(ltr after_install_vbox2)"
         local cmd="systemctl enable --now vboxservice.service"
@@ -1373,7 +1373,7 @@ VboxGuestEnable() {
         local icon=user-info
         eos_yad --form --title="Info" --text="$msgvb" --image=$icon --button=yad-quit:0 &
         tabcontents+=(--field=" $label!preferences-system!$cmd":fbtn "RunInTerminal $cmd")
-    #fi
+    fi
 }
 
 KillExtraYad() {
