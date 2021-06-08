@@ -880,6 +880,7 @@ AfterInstall() {
           tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
       fi
       tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
+      tabcontents+=(--field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "$_WELCOME_BROWSER https://wiki.archlinux.org/title/List_of_applications")
   fi
   if [ "$realfunc" = "AfterInstall" ] ; then
       VboxGuestEnable
@@ -1364,15 +1365,15 @@ EndProgress() {
 }
 
 VboxGuestEnable() {
-    if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
-        local label="Enable VirtualBox Guest utilities"
-        local msg1="To enable VirtualBoxGuest utilities, select <b>AfterInstall</b> tab and click button "
+    #if [ -n "$(systemctl status vboxservice 2>/dev/null | grep "inactive (dead)")" ] ; then
+        local label="$(ltr after_install_vbox1)"
+        local msg1="$(ltr after_install_vbox2)"
         local cmd="systemctl enable --now vboxservice.service"
-        local msgvb="$msg1\n<tt> $label</tt>"
+        local msgvb="$msg1\n<b>$label</b>"
         local icon=user-info
         eos_yad --form --title="Info" --text="$msgvb" --image=$icon --button=yad-quit:0 &
         tabcontents+=(--field=" $label!preferences-system!$cmd":fbtn "RunInTerminal $cmd")
-    fi
+    #fi
 }
 
 KillExtraYad() {
