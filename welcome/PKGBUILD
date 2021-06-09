@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.12.20
+pkgver=3.13
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -49,7 +49,7 @@ source=(
 #  $_url/welcome-dnd-tips.png
 #  $_url/welcome-dnd-window.png
 )
-sha512sums=('0ed87b09d27d9cd7329ae17e24768f3a31d4e910c82d91072457219559b85a4b0b22cfd2e50dc55d7f6745c34a46594cd175a17bd299fe0445a1508d35ae1a6d'
+sha512sums=('59385c73c6f3bf2d6a0f8aff930843d28505a11740b5da7d9d922494ba97a913337fb0cca5447c4d6e8ffc35e57daf70c1cb470977ca0522e65ef21aa2b36bc8'
             'c715c96cbd96befbf744603d3e5162f728468cb0b81a91474523cbd9e2ad3ffae79048caa0174ee0983ab05dc1dbdc560bc6c6d8fb7bf43586e4c989c0fbcc2a'
             'cdfe56ddd154b5c7f5d237e381091b11c106f2244cd9ac3983ea40c3eae72383cfa204f737bc238cbc7e809049856ea40445f9ac3ad76b6ffa6dfc701d64eb20'
             '3761a92815ae08990e43c9b7879850873089478f7f9013e2af070769a317d56230444856378ab4d36981e0816dcdb2c8d991b2fcd845819df31008bae51abadb'
