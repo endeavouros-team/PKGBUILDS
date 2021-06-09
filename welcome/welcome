@@ -1631,11 +1631,21 @@ StartHere() {
 
     notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"ImportantNews")
     notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"WelcomeChangelog")
-    if [ "$is_installing" = "no" ] ; then
-        notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
-    fi
-    #notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
-    notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
+    case "$EOS_WELCOME_HAS_SEE_YOU_LATER_BUTTON" in
+        yes)
+            notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
+            if [ "$is_installing" = "no" ] ; then
+                notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+            fi
+            notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
+            ;;
+        no|*)
+            if [ "$is_installing" = "no" ] ; then
+                notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+            fi
+            notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
+            ;;
+    esac
 
     if [ 0 -eq 1 ] ; then
         # TESTING !!!
