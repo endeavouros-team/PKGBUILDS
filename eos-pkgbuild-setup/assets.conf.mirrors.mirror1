@@ -184,7 +184,7 @@ _ckbcomp_hook() {
     # new version info
     local info=$(curl --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
     [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] && {
-        printf "$tool: fetching info failed. " >&2
+        printf "fetching info failed. " >&2
         return 1
     }
     local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
@@ -202,16 +202,26 @@ _ckbcomp_hook() {
     sed -i PKGBUILD.test -e "s|^pkgver=.*|pkgver=$newver|"
     if (! updpkgsums PKGBUILD.test >& /dev/null) ; then
         popd >/dev/null
-        echo "$tool: updpkgsums failed"
+        printf "updpkgsums failed " >&2
         return 1
     fi
     if (! makepkg -p PKGBUILD.test >& /dev/null) ; then
         popd >/dev/null
-        echo "$tool: makepkg failed"
+        printf "makepkg failed " >&2
         return 1
     fi
-    if (! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null) ; then
-        echo "$tool: new version $newver is available." >&2
+
+    if [ "$newver" != "$Pkgver" ] ; then
+        printf "new version $newver is available. " >&2
+    else
+        if [ ! -x /usr/bin/$tool ] ; then
+            # Cannot compare with non-existing /usr/bin/ckbcomp !!!
+            printf "sorry, ckbcomp is not installed, cannot compare. " >&2
+        else
+            if (! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null) ; then
+                printf "new version $newver is available. " >&2
+            fi
+        fi
     fi
     popd >/dev/null
 }
