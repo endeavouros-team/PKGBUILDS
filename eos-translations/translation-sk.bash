@@ -270,3 +270,34 @@ _tr_add2 updt_press_enter         "Toto okno zavriete klávesou ENTER"
 
 # 2020-Dec-11:
 _tr_add2 after_install_pacdiff_tip "Spravovať pacnew, pacorig $_and pacsave súbory s pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Štelovať"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Stiahnúť viac pozadí EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Stiahnúť tradičné, a komunitné pozadia EndeavourOS"
+_tr_add2 after_install_info           "informácie"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Softvérové novinky"
+_tr_add2 butt_softnews_tip            "Dôležité správy o softvéri EndeavourOS"
+
+_tr_add2 install_community            "Inštalovať komunitné edície"
+_tr_add2 install_community_tip        "Komunitné edície: Sway, Bspwm (poznámka: potreba byť online)"
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Ako zdieľať systémové záznamy"
+_tr_add2 ins_syslogtip                "Vysvetľuje, ako môžete zdieľať záznamy o systéme v prípade, že potrebujete pomoc"
+_tr_add2 ins_logtool                  "Záznamy k riešeniu problémov"
+_tr_add2 ins_logtooltip               "Vyberte, či vytvorte a zdieľajte záznamy k riešenu problémov, keď žiadáte o pomoc"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Asistencia"
+_tr_add2 daily_assistant_text        "Nástroje užitočné pre každodenné úlohy"
+_tr_add2 after_install_itab          "Vybrať počiatočnú uvítaciu položku"
+_tr_add2 after_install_itab_tip      "Nastaví, ktorá položka sa zobrazí ako uvítacia pri štarte"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Kategórie programov"
+_tr_add2 daily_assist_apps_tip       "Aplikácie zoradené podľa kategórií"
+
+_tr_add2 after_install_vbox1         "Povoliť nástroje pre návštevu cez VirtualBox"
+_tr_add2 after_install_vbox2         "Pre povolenie nástrojov návštevy cez VirtualBox, VirtualBox Guest, vyberte prosím záložku <b>Po inštalácii</b> a kliknite na tlačítko "
