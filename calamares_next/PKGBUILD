@@ -47,7 +47,7 @@ prepare() {
     
     # recheck if InitcpioJob.cpp, locale, luksbootkeyfile, grub are still needed
 
-    sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
+    #sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
     sed -i "s?pacman_flags,?pacman_flags, \"--needed\",?" $_reponame/src/modules/packages/main.py
 
 
