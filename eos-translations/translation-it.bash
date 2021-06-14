@@ -195,3 +195,109 @@ _tr_add2 after_install_us_from    "Aggiornamenti da"                            
 _tr_add2 after_install_us_el      "Sono richiesti privilegi elevati."
 _tr_add2 after_install_us_done    "Aggiornamento fatto."
 _tr_add2 after_install_us_fail    "Aggiornamento non riuscito$_exclamation"
+
+# 2020-May-14:
+
+_tr_add2 nb_tab_UsefulTips     "Consigli"
+_tr_add2 useful_tips_text      "Consigli Utili"
+
+# 2020-May-16:
+
+_tr_add2 butt_changelog        "Registro delle modifiche"
+_tr_add2 butt_changelogtip     "Mostra il registro delle modifiche di Benvenuto"
+
+_tr_add2 after_install_themevan      "Tema di vanilla per Xfce"
+_tr_add2 after_install_themevantip   "Usa il tema di vanilla per Xfce"
+
+_tr_add2 after_install_themedef     "Tema di default per EndeavourOS di Xfce"
+_tr_add2 after_install_themedeftip  "Usa il tema di default per EndeavourOS di Xfce"
+
+# 2020-Jun-28:
+_tr_add2 after_install_pclean       "Configurazione della pulizia dei pachetti"
+_tr_add2 after_install_pcleantip    "Configura la pulizia del servizio di pulizia della cache dei pacchetti."
+
+# 2020-Jul-04:
+_tr_add2 nb_tab_OwnCommands         "Comandi Personali"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Comandi Personalizzati"               # modified 2020-Jul-08
+
+# 2020-Jul-08:
+_tr_add2 nb_tab_owncmdstip          "Aiuto sull'inserimento dei conmandi personali"
+
+_tr_add2 add_more_apps_akm          "Un gestore del Kernel"
+_tr_add2 add_more_apps_akmtip       "Un piccolo programme di gestione del Kernel linux e informazione dei sorgenti"
+
+# 2020-Jul-15:
+_tr_add2 butt_owncmds_help        "Tutorial: Comandi Personali"
+
+# 2020-Aug-05:
+_tr_add2 butt_owncmds_dnd         "Comandi Personali drag${_and}drop"
+_tr_add2 butt_owncmds_dnd_help    "Mostra una finestra dove trascinare gli elementi per i nuovi pulsanti"
+
+# 2020-Sep-03:
+_tr_add2 ins_reso                 "Cambia la risoluzione del monitor"
+_tr_add2 ins_resotip              "Cambia la risoluzione del monitor"
+
+# 2020-Sep-08:
+_tr_add2 add_more_apps_arch          "Mostra tutti i pacchetti di Arch"
+_tr_add2 add_more_apps_aur           "Mostra tutti i pacchetti di AUR"
+_tr_add2 add_more_apps_done1_text    "Programmi suggeriti già istallati$_exclamation"
+_tr_add2 add_more_apps_done2_text    "o mostra tutti i pacchetti Arch e AUR"
+_tr_add2 add_more_apps_done2_tip1    "Per installare, usa 'pacman' o 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Per installare, usa 'yay'"
+
+# 2020-Sep-11:
+_tr_add2 after_install_ew2        "Scegli uno sfondo per EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Scegli uno sfondo"                          # was: "Choose from EndeavourOS default wallpapers"
+
+# 2020-Sep-15:
+#    IMPORTANT NOTE:
+#       - line 71:  changed text of 'after_install_ew'
+#       - line 72:  changed text of 'after_install_ewtip'
+#       - line 249: changed text of 'after_install_ew2'
+#       - line 250: changed text of 'after_install_ewtip2'
+
+# 2020-Oct-23:
+_tr_add2 updt_update_check        "controllo gli aggiornamenti"
+_tr_add2 updt_searching           "Sto cercando su"
+_tr_add2 updt_for_updates         "gli aggiornamenti"
+_tr_add2 updt_failure             "fallimento$_exclamation"
+_tr_add2 updt_nothing_todo        "non c'è nulla da fare"
+_tr_add2 updt_press_enter         "Premi INVIO per chiudere questa finestra"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Gestisce i file pacnew, pacorig $_and pacsave con pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Configura"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Scarica più sfondi per EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Scarica gli sfondi per EndeavourOS e dalla comunità"
+_tr_add2 after_install_info           "informazione"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Notizie sui programmi"
+_tr_add2 butt_softnews_tip            "Importanti notizie sui programmi di EndeavourOS"
+
+_tr_add2 install_community            "Installa le versioni della Communità"
+_tr_add2 install_community_tip        "Versioni della Comunità: Sway, Bspwm (nota: richiesta la connessione internet)"
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Come condividere i registri di sistema"
+_tr_add2 ins_syslogtip                "Spiega come condividere i registri di sistema per quando ne avrai bisogno"
+_tr_add2 ins_logtool                  "Registri per la risoluzione dei problemi"
+_tr_add2 ins_logtooltip               "Seleziona, crea e condividi i registri della risoluzione dei problemi per quando ne avrai bisogno"
+ 
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Assistenza"
+_tr_add2 daily_assistant_text        "Strumenti utili per le attività quotidiane"
+_tr_add2 after_install_itab          "Seleziona la scheda iniziale di Benvenuto"
+_tr_add2 after_install_itab_tip      "Imposta la scheda iniziale di Benvenuto all'avvio"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Categorie delle applicazioni"
+_tr_add2 daily_assist_apps_tip       "Applicazioni ordinate per categoria"
+
+_tr_add2 after_install_vbox1         "Abilità le utilità VirtualBox"
+_tr_add2 after_install_vbox2         "Per abilitare le utilità di VirtualBox, selezionare <b>dopo l'installazione</b> la scheda e fare click sul pulsante"
