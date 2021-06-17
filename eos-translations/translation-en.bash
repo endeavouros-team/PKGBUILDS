@@ -301,3 +301,7 @@ _tr_add2 daily_assist_apps_tip       "Applications sorted by category"
 
 _tr_add2 after_install_vbox1         "Enable VirtualBox Guest utilities"
 _tr_add2 after_install_vbox2         "To enable VirtualBox Guest utilities, select the <b>AfterInstall</b> tab and click button "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Ethernet issue$_question Remove r8168$_exclamation"
+_tr_add2 after_install_r8168_tip     "Removing package <b>r8168</b> may fix failing wired connection (reboot required)"

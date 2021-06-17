@@ -301,3 +301,7 @@ _tr_add2 daily_assist_apps_tip       "Sovellukset lajiteltu luokituksen mukaan"
 
 _tr_add2 after_install_vbox1         "Käynnistä VirtualBox Guest -toiminnot"
 _tr_add2 after_install_vbox2         "Käynnistääksesi VirtualBox Guest -toiminnot, mene <b>AfterInstall</b> välilehdelle ja klikkaa painiketta "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Ethernet-ongelma$_question Poista paketti r8168$_exclamation"
+_tr_add2 after_install_r8168_tip     "Paketin <b>r8168</b> poistaminen <i>saattaa</i> korjata langallisen yhteyden (uudelleenkäynnistys tarvitaan)"
