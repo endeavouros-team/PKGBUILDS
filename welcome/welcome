@@ -854,7 +854,7 @@ AfterInstall() {
           --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
           --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
       )
-      Check_r8168 && tabcontents+=(--field=" Ethernet issue? Remove r8168!$system_software_update!Removing package r8168 may fix your ethernet issue (reboot required)":fbtn "yad_Remove r8168")
+      Check_r8168 && tabcontents+=(--field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "yad_Remove r8168")
   fi
 
   #if [ "$realfunc" = "AfterInstall" ] ; then
@@ -1296,6 +1296,9 @@ EOF
 }
 
 Check_r8168() {
+    if [ 0 -eq 1 ] && [ "$testing" = "yes" ] ; then
+        return 0
+    fi
     # return 0 if r8168 is installed and ethernet card is 8168
     [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] || return 1
     IsInstalled r8168 >& /dev/null || return 1
@@ -1441,6 +1444,7 @@ StartHere() {
     local tr_prefer=manual
     local pb_percent=0
     local show_progress_bar=no   # was: yes
+    local testing=no
 
     local welcome_own_commands=()
     local activate_own_commands_tab="no"
@@ -1523,6 +1527,7 @@ StartHere() {
             --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
+            --testing) testing=yes ;;
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
