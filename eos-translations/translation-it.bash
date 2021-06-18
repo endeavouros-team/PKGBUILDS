@@ -56,7 +56,7 @@ _tr_add2 after_install_text       "Dopo le attività di installazione"
 _tr_add2 after_install_um         "Aggiorna i Mirrors"
 _tr_add2 after_install_umtip      "Aggiorna l'elenco dei mirror prima dell'aggiornamento del sistema"
 
-_tr_add2 after_install_us         "Aggiornamento Sistema"
+_tr_add2 after_install_us         "Aggiorna il Sistema"
 _tr_add2 after_install_ustip      "Aggiorna software di sistema"
 
 _tr_add2 after_install_dsi        "Rileva errore Sistema"
@@ -68,11 +68,11 @@ _tr_add2 after_install_etltip     "Mostra cosa fare per portare il tuo sistema a
 _tr_add2 after_install_cdm        "Cambia Display Manager"
 _tr_add2 after_install_cdmtip     "Utilizzare un display manager diverso"
 
-_tr_add2 after_install_ew         "EndeavourOS sfondi"
+_tr_add2 after_install_ew         "Ripristina lo sfondo di EndeavourOS"
 _tr_add2 after_install_ewtip      "Cambia lo sfondo del desktop con l'impostazione predefinita EOS"
 
 
-_tr_add2 after_install_pm         "Gestione Pacchetti"
+_tr_add2 after_install_pm         "Gestione dei Pacchetti"
 _tr_add2 after_install_pmtip      "Come gestire i pacchetti con pacman"
 
 _tr_add2 after_install_ay         "AUR $_and yay$_exclamation"
@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip      "Consigli sul bluetooth"
 _tr_add2 after_install_nv         "Utenti NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip      "Utilizzare il programma di installazione NVIDIA"
 
-_tr_add2 after_install_ft         "Suggerimenti Forum"
+_tr_add2 after_install_ft         "Suggerimenti dal Forum"
 _tr_add2 after_install_fttip      "Aiutaci ad aiutarti$_exclamation"
 
 
@@ -107,7 +107,7 @@ _tr_add2 general_info_fotip       "Chiedi, commenta e chatta nel nostro amichevo
 _tr_add2 general_info_do          "Donazione"
 _tr_add2 general_info_dotip       "Aiutaci a far funzionare EndeavourOS"
 
-_tr_add2 general_info_ab          "About $PRETTY_PROGNAME"
+_tr_add2 general_info_ab          "Info su $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip       "Maggiori informazioni su questa app"
 
 
@@ -130,19 +130,19 @@ _tr_add2 add_more_apps_bt_bm      "Bluetooth (blueman) per Xfce"
 _tr_add2 settings_dis_contents    "Per eseguire nuovamente $PRETTY_PROGNAME, avviare un terminale ed eseguire: $PROGNAME --enable"
 _tr_add2 settings_dis_text        "Riattivazione $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title       "Come riattivare $PRETTY_PROGNAME"
-_tr_add2 settings_dis_butt        "Io ricordo"
-_tr_add2 settings_dis_buttip      "lo prometto"
+_tr_add2 settings_dis_butt        "Lo ricordo"
+_tr_add2 settings_dis_buttip      "Lo prometto"
 
 _tr_add2 help_butt_title          "$PRETTY_PROGNAME Aiuto"
 _tr_add2 help_butt_text           "Maggiori informazioni su $PRETTY_PROGNAME app"
 
 _tr_add2 dm_title                 "Seleziona Display Manager"
 _tr_add2 dm_col_name1             "Seleziona"
-_tr_add2 dm_col_name2             "Nome DM"
+_tr_add2 dm_col_name2             "Nome del DM"
 
 _tr_add2 dm_reboot_required       "È necessario riavviare per rendere effettive le modifiche."
-_tr_add2 dm_changed               "DM modificato in: "
-_tr_add2 dm_failed                "Modifica DM non riuscita."
+_tr_add2 dm_changed               "DM cambiato in: "
+_tr_add2 dm_failed                "Modifica del DM non riuscita."
 _tr_add2 dm_warning_title         "Attenzione"
 
 _tr_add2 install_installer        "Installer"
@@ -299,5 +299,9 @@ _tr_add2 after_install_itab_tip      "Imposta la scheda iniziale di Benvenuto al
 _tr_add2 daily_assist_apps           "Categorie delle applicazioni"
 _tr_add2 daily_assist_apps_tip       "Applicazioni ordinate per categoria"
 
-_tr_add2 after_install_vbox1         "Abilità le utilità VirtualBox"
+_tr_add2 after_install_vbox1         "Abilità le utilità di VirtualBox"
 _tr_add2 after_install_vbox2         "Per abilitare le utilità di VirtualBox, selezionare <b>dopo l'installazione</b> la scheda e fare click sul pulsante"
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Problemi con la rete Lan (Ethernet)$_question Rimuovi il driver realtek r8168$_exclamation"
+_tr_add2 after_install_r8168_tip     "Rimuovendo il pacchetto driver realtek <b>r8168</b> potrebbe risolvere il problema della connessione (riavvio richiesto)"
