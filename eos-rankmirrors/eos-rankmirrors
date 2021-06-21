@@ -3,38 +3,62 @@
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
 
+echo2() {
+    echo "$1" >&2
+}
+
+DeleteTmpFiles() {
+    if [ -n "$delete_at_end" ] ; then
+        echo2 "Deleting temporary files: ${delete_at_end[*]}"
+        rm -f "${delete_at_end[@]}"
+    fi
+}
+export -f DeleteTmpFiles
+
 DIE() {
-    echo "Error: $1" >&2
+    echo2 "$progname: error: $1"
+    DeleteTmpFiles
     exit 1
 }
 
-Main()
-{
+ShowArray() {
+    local item
+    for item in "$@" ; do
+        echo $item
+    done | /usr/bin/column -t
+}
+
+SimpleRank() {
+    # Rank mirrors from the latest available mirrorlist file.
+    #
+    # The resulting mirrorlist will contain:
+    # - the latest available endeavouros-mirrorlist (mirrors commented out)
+    # - the results of ranking
+    # - the ranked mirrorlist
+
     local pkgname=endeavouros-mirrorlist
-    local eos=/etc/pacman.d/$pkgname
-
-    if [ ! -r "$eos" ] ; then               # this test is not really needed...
-        DIE "no local mirrorlist found, please install package '$pkgname'."
-    fi
-    if [ ! -x /usr/bin/rankmirrors ] ; then
-        DIE "ranking failed because package 'pacman-contrib' is not installed."
-    fi
-    local new=$(mktemp)
-    local cur_ml=$(mktemp)
     local url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname"
+    local result
 
-    wget -q --timeout=5 -O $cur_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
-    rankmirrors --verbose --max-time 5 --repo endeavouros $cur_ml > $new
-    rm -f $cur_ml
+    latest_ml=$(/usr/bin/mktemp) ; delete_at_end+=("$latest_ml")
 
-    echo "RESULT OF RANKING:" >&2
-    cat $new | sed 's|^|    |' >&2
-    echo "" >&2
+    echo2 "Fetching the latest available endeavouros-mirrorlist ..."
+    /usr/bin/curl -Lsm 5 -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
 
-    if [ -z "$(grep "^Server = https://" $new)" ] ; then
-        DIE "ranking failed, no mirrors found!"
-    fi
+    # $result will contain an array of lines like: "mirror : time"
+    echo2 "Ranking EndeavourOS mirrors, please wait ..."
+    readarray -t result <<< $(/usr/bin/rankmirrors -t --max-time 5 --repo endeavouros $latest_ml | /usr/bin/tail -n +4)
 
+    /usr/bin/cat $latest_ml | /usr/bin/sed 's|^Server = |#Server = |'
+
+    printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
+    ShowArray "${result[@]}" | /usr/bin/sed 's|^|# |'
+
+    printf "\n# EndeavourOS mirrorlist:\n"
+    ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
+}
+
+WriteSystemMirrorlist() {
     echo "Writing new mirrorlist to $eos." >&2
 
     local libhelper=/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -45,5 +69,37 @@ Main()
     fi
     $cmd "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local pkgname=endeavouros-mirrorlist
+    local eos=/etc/pacman.d/$pkgname
+    local new=""
+    local latest_ml=""
+    local delete_at_end=()
+
+    if [ ! -r "$eos" ] ; then               # this test is not really needed...
+        DIE "no local mirrorlist found, please install package '$pkgname'."
+    fi
+    if [ ! -x /usr/bin/rankmirrors ] ; then
+        DIE "ranking failed because package 'pacman-contrib' is not installed."
+    fi
+
+    new=$(/usr/bin/mktemp) ; delete_at_end+=("$new")
+
+    SimpleRank > $new
+    cat $new
+
+    if [ -z "$(grep "^Server = " $new)" ] ; then
+        DIE "ranking failed, no mirrors found!"
+    fi
+
+    WriteSystemMirrorlist
+
+    DeleteTmpFiles
+}
+
+trap "sleep 0.2 ; DeleteTmpFiles" EXIT
 
 Main "$@"
