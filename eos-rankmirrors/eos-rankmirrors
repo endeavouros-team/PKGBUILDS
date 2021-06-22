@@ -1,15 +1,25 @@
 #!/bin/bash
+
 #
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+export -f eos_GetArch
 
 echo2() {
     echo "$1" >&2
 }
 
+debug() {
+    if [ "$debugging" = "yes" ] ; then
+        echo2 "$1"
+    fi
+}
+
 DeleteTmpFiles() {
     if [ -n "$delete_at_end" ] ; then
-        echo2 "Deleting temporary files: ${delete_at_end[*]}"
+        debug "Deleting temporary files: ${delete_at_end[*]}"
         rm -f "${delete_at_end[@]}"
     fi
 }
@@ -26,6 +36,82 @@ ShowArray() {
     for item in "$@" ; do
         echo $item
     done | /usr/bin/column -t
+}
+ShowArray2() {
+    ShowArray "$@" >&2
+}
+
+RankPerTime() {
+    # latest_ml : in     # servers not commented!
+    # result    : out
+
+    readarray -t result <<< $(/usr/bin/rankmirrors -t --max-time 5 --repo endeavouros $latest_ml | /usr/bin/tail -n +4)
+    # - $result will contain an array of lines like:
+    #      mirror : time
+    # - "time" can be "unreachable", and that line will be in the end of array
+    # - $result is sorted based on time, fastest first
+}
+
+RankPerAge() {
+    # latest_ml : in     # servers not commented!
+    # result    : out
+    local repo=endeavouros
+    local arch=$(eos_GetArch)
+    local mirror m m2 nr_time
+    local marr
+    local sortopts=""
+    local sort_rate="-k3,3 -k2r,2"
+    local sort_age="-k2r,2 -k3,3"
+
+    case "$sort" in
+        rate | fastest | speed)
+            sortopts="$sort_rate" ;;
+        age | latest)
+            sortopts="$sort_age" ;;
+        *)
+            echo2 "====> value '$sort' of option --sort is unsupported, using 'age'."
+            sortopts="$sort_age"
+            ;;
+    esac
+
+    readarray -t marr <<< $(grep "^Server = " $latest_ml)
+
+    readarray -t result <<< $(
+        for mirror in "${marr[@]}" ; do
+            m=$(echo "$mirror" | /usr/bin/awk '{print $3}')           # mirror value (with variables)
+            m2=$(echo "$m" | /usr/bin/sed 's|/$repo/$arch$||')        # mirror url (without variables)
+            GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
+        done | LC_ALL=C /usr/bin/sort -g $sortopts
+    )
+}
+
+GetUpdateNumberAndTime() {
+    local url="$1"
+    local mirror="$2"
+    local tmpfile="$HOME/.eos-rank-state.123456"
+    local result=0
+    local time
+    local nr
+
+    time=$(curl -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
+    result=$?
+    case "$result" in
+        0)
+            nr="$(cat "$tmpfile" | head -n1)"
+            result="$nr $time"
+            ;;
+        *)
+            result=""
+            ;;
+    esac
+
+    rm -f "$tmpfile"
+    
+    if [ -n "$result" ] ; then
+        echo "$mirror $result"      # "mirror nr time"
+    else
+        echo2 "====> Fail: $mirror"
+    fi
 }
 
 SimpleRank() {
@@ -45,21 +131,33 @@ SimpleRank() {
     echo2 "Fetching the latest available endeavouros-mirrorlist ..."
     /usr/bin/curl -Lsm 5 -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
 
-    # $result will contain an array of lines like: "mirror : time"
+    # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
     echo2 "Ranking EndeavourOS mirrors, please wait ..."
-    readarray -t result <<< $(/usr/bin/rankmirrors -t --max-time 5 --repo endeavouros $latest_ml | /usr/bin/tail -n +4)
+    if [ 0 -eq 1 ] ; then
+        RankPerTime
+    else
+        RankPerAge
+    fi
 
+    # show the original list (mirrors commented out)
     /usr/bin/cat $latest_ml | /usr/bin/sed 's|^Server = |#Server = |'
 
+    # show the results of ranking (in comments)
     printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
+    printf "# The following fields are shown for each mirror:\n"
+    printf "#   URL             The mirror address\n"
+    printf "#   update-number   Ordinal number of the latest update (larger is newer)\n"
+    printf "#   fetch-time      Measures the speed of the mirror (smaller is faster)\n"
+    printf "#\n"
     ShowArray "${result[@]}" | /usr/bin/sed 's|^|# |'
 
+    # this is the actual ranked result
     printf "\n# EndeavourOS mirrorlist:\n"
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
 }
 
 WriteSystemMirrorlist() {
-    echo "Writing new mirrorlist to $eos." >&2
+    echo2 "Writing new mirrorlist to $eos."
 
     local libhelper=/usr/share/endeavouros/scripts/eos-script-lib-yad
     local cmd="pkexec bash -c"
@@ -70,6 +168,51 @@ WriteSystemMirrorlist() {
     $cmd "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
 
+Options() {
+    local opts
+
+    opts=$(getopt -o=ht: --longoptions debug,help,timeout:,sort: --name "$progname" -- "$@")
+    case "$?" in
+        0) ;;
+        *) DIE "cannot continue." ;;
+    esac
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --debug)
+                debugging=yes ;;
+            --sort)
+                sort="$2" ; shift ;;
+            --timeout | -t)
+                timeout="$2" ; shift ;;
+            --help | -h)
+                cat <<EOF
+Usage: $progname [options]
+
+Options:
+  --sort=X      How to sort mirrors. Values for X: "rate" or "age".
+                Default: $sort_default.
+  --timeout=X   Set the timeout value X (in seconds) for each mirror check.
+                Default: $timeout_default.
+  -t X          -"-
+  --debug       Show debugging output.
+  --help        This help.
+  -h            -"-
+EOF
+                exit 0
+                ;;
+
+            --)
+                shift ; break ;;
+            *)
+                DIE "unsupported option '$1'" ;;
+        esac
+        shift
+    done
+}
+
 Main()
 {
     local progname="$(basename "$0")"
@@ -78,6 +221,16 @@ Main()
     local new=""
     local latest_ml=""
     local delete_at_end=()
+    local arg
+    local timeout_default=2                   # in seconds
+    local sort_default=age                    # age or rate
+
+    # option-related variables
+    local debugging=no
+    local timeout=$timeout_default
+    local sort=$sort_default
+
+    Options "$@"
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
