@@ -7,9 +7,8 @@
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 export -f eos_GetArch
 
-echo2() {
-    echo "$1" >&2
-}
+echo2()   { echo "$1" >&2 ; }
+printf2() { printf "$@" >&2 ; }
 
 debug() {
     if [ "$debugging" = "yes" ] ; then
@@ -79,6 +78,7 @@ RankPerAge() {
     readarray -t result <<< $(
         for mirror in "${marr[@]}" ; do
             m=$(echo "$mirror" | /usr/bin/awk '{print $3}')           # mirror value (with variables)
+            debug "  $m"
             m2=$(echo "$m" | /usr/bin/sed 's|/$repo/$arch$||')        # mirror url (without variables)
             GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
         done | LC_ALL=C /usr/bin/sort -g $sortopts
@@ -157,15 +157,11 @@ SimpleRank() {
 }
 
 WriteSystemMirrorlist() {
-    echo2 "Writing new mirrorlist to $eos."
+    local eos="$1"
+    local new="$2"
 
-    local libhelper=/usr/share/endeavouros/scripts/eos-script-lib-yad
-    local cmd="pkexec bash -c"
-    if [ -r $libhelper ] ; then
-        source $libhelper
-        cmd="$EOS_ROOTER"
-    fi
-    $cmd "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+    printf2 "\nWriting new mirrorlist to %s.\n" "$eos"
+    $EOS_ROOTER "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
 
 Options() {
@@ -248,7 +244,7 @@ Main()
         DIE "ranking failed, no mirrors found!"
     fi
 
-    WriteSystemMirrorlist
+    WriteSystemMirrorlist "$eos" "$new"
 
     DeleteTmpFiles
 }
