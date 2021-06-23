@@ -199,7 +199,7 @@ _get_reflector_x_configs() {
                 ;;
             $country_exclude=*)
                 opt="$country_exclude"
-                xx="${xx:18}"
+                xx="${xx#*=}"
                 ;;
         esac
 
