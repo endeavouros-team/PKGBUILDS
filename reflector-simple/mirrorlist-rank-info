@@ -45,7 +45,8 @@ Age_Fetchtime()
         *) echo "fail" ; return 1 ;;
     esac
 
-    fetchtime="$(Us2S ${output[0]})"
+    #fetchtime="$(Us2S ${output[0]})"
+    fetchtime="${output[0]}"
     
     timestamp="$(cat $ofile)"
     rm -f $ofile
@@ -118,12 +119,12 @@ Main() {
         age)
             for line in "${results[@]}" ; do
                 echo "$line"
-            done | sort -k2n -k3d | column -t   # -n or -g works
+            done | sort -g -k2,2 -k3,3 | column -t   # -n or -g works
             ;;
         rate)
             for line in "${results[@]}" ; do
                 echo "$line"
-            done | sort -k3d -k2n | column -t   # -V or -d works
+            done | sort -g -k3,3 -k2,2 | column -t   # -V or -d works
             ;;
     esac
 }
