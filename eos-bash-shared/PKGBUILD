@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.7.1
+pkgver=1.8
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -54,6 +54,7 @@ source=(
   $_url/eos-download-wallpapers
   $_url/eos-send-gpuinfo
   $_url/eos-pacdiff
+  $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
 sha512sums=('baa784418299fa2cdf2d7781e9eb4b399da90031b366c016bfec967cea8c1f278962f03f3cfe204bf3827c0329cf047c437a302893025c44a704783750b58718'
@@ -79,7 +80,8 @@ sha512sums=('baa784418299fa2cdf2d7781e9eb4b399da90031b366c016bfec967cea8c1f27896
             '5e7daaf9f13785958ab944a0a3254f658cd485462a0921da850c73e87db548567c6c2b3068893b905ff318910e534459f3440faebca06b49c5da5b4efd42a308'
             '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
-            '686c3aac806e5b073b29a829be80c44beb7bbecd582292a3d278247081fbcf41477663f30942dbf172d31bba8e22da8f678a3ee08da7c0021a879f48088528f5')
+            '686c3aac806e5b073b29a829be80c44beb7bbecd582292a3d278247081fbcf41477663f30942dbf172d31bba8e22da8f678a3ee08da7c0021a879f48088528f5'
+            'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
 package() {
   install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -103,6 +105,7 @@ package() {
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $pkgdir/usr/bin/eos-pacdiff
+  install -Dm755 grub-colour-chooser            $pkgdir/usr/bin/grub-colour-chooser
 # install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop

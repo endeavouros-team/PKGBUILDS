@@ -1,0 +1,165 @@
+#/bin/bash
+
+# Choose grub menu colours with arrow keys in the preview.
+# Changes will be saved in file /etc/default/grub.
+# After reboot you'll see the changes in the grub menu.
+
+etcdefaultgrubfile="/etc/default/grub"
+grubconffile="/boot/grub/grub.cfg"
+
+function cleanup() {
+  rm -f -- "$tmpfile"
+  printf '\e[?25h' # unhide cursor
+  stty echo
+}
+trap cleanup EXIT
+
+readonly tmpfile="$(mktemp default-grub-temp-XXXXXX)"
+
+set -e # fail on first error
+
+stty -echo
+printf '\e[?25l' # hide cursor
+
+CSI_fg=$'\e[38;2;'
+CSI_bg=$'\e[48;2;'
+esc_reset=$'\e[0m'
+
+esc=(
+  "0;0;0m"         # black
+  "0;0;168m"       # blue
+  "0;168;0m"       # green
+  "0;168;168m"     # cyan
+  "168;0;0m"       # red
+  "168;0;168m"     # magenta
+  "168;84;0m"      # brown
+  "168;168;168m"   # light-gray
+  "84;84;84m"      # dark-gray
+  "84;84;254m"     # light-blue
+  "84;254;84m"     # light-green
+  "84;254;254m"    # light-cyan
+  "254;84;84m"     # light-red
+  "254;84;254m"    # light-magenta
+  "254;254;84m"    # yellow
+  "254;254;254m"   # white
+)
+
+# make black opaque for truecolor terminal emulators:
+[[ $COLORTERM = "truecolor" ]] && esc[0]="1;1;1m"
+
+cname=(
+  "black"
+  "blue"
+  "green"
+  "cyan"
+  "red"
+  "magenta"
+  "brown"
+  "light-gray"
+  "dark-gray"
+  "light-blue"
+  "light-green"
+  "light-cyan"
+  "light-red"
+  "light-magenta"
+  "yellow"
+  "white"
+)
+
+val=(0 9 1 11) #normal bg, normal fg, highlighted bg, highlighted fg
+selected=0;
+
+print_menu() {
+  gb=$CSI_bg${esc[0]}$CSI_fg${esc[7]}
+  no=$CSI_bg${esc[${val[0]}]}$CSI_fg${esc[${val[1]}]}
+  hl=$CSI_bg${esc[${val[2]}]}$CSI_fg${esc[${val[3]}]}
+
+  cat \
+<< EOF
+$gb          Colour Chooser for GRUB - PREVIEW           $esc_reset
+$gb    $no┌────────────────────────────────────────────┐$gb    $esc_reset
+$gb    $no│ Normal option                              │$gb    $esc_reset
+$gb    $no│ Normal option                              │$gb    $esc_reset
+$gb    $no│$hl Highlighted option                         $no│$gb    $esc_reset
+$gb    $no│ Normal option                              │$gb    $esc_reset
+$gb    $no│                                            │$gb    $esc_reset
+$gb    $no│                                            │$gb    $esc_reset
+$gb    $no│                                            │$gb    $esc_reset
+$gb    $no└────────────────────────────────────────────┘$gb    $esc_reset
+$gb    Use the arrow keys to change the values below.    $esc_reset
+$gb    Press ENTER when done.                            $esc_reset
+$gb                                                      $esc_reset
+EOF
+
+  local SO
+  local SC
+  SO[$selected]='>'
+  SC[$selected]='<'
+
+  printf "%s      Normal background:      %-2s%-14s%s%2s    %s\n" \
+    "$gb" "${SO[0]}" "${cname[${val[0]}]}" "$CSI_fg${esc[${val[0]}]}██$gb" \
+    "${SC[0]}" "$esc_reset"
+  printf "%s      Normal foreground:      %-2s%-14s%s%2s    %s\n" \
+    "$gb" "${SO[1]}" "${cname[${val[1]}]}" "$CSI_fg${esc[${val[1]}]}██$gb" \
+    "${SC[1]}" "$esc_reset"
+  printf "%s      Highlighted background: %-2s%-14s%s%2s    %s\n" \
+    "$gb" "${SO[2]}" "${cname[${val[2]}]}" "$CSI_fg${esc[${val[2]}]}██$gb" \
+    "${SC[2]}" "$esc_reset"
+  printf "%s      Highlighted foreground: %-2s%-14s%s%2s    %s\n" \
+    "$gb" "${SO[3]}" "${cname[${val[3]}]}" "$CSI_fg${esc[${val[3]}]}██$gb" \
+    "${SC[3]}" "$esc_reset"
+}
+
+move_cursor_top() {
+  printf "\e[17A\r"
+}
+
+
+while true; do
+  print_menu
+  # wait for input
+  read -rsn1 key
+  [[ $key = $'' ]] && break
+  [[ $key = $'\u1b' ]] && {
+    read -rsn2 key
+  }
+  [[ -n $key ]] && {
+    case "$key" in
+      '[D'|h ) val[$selected]=$(((val[selected]+15)%16)) ;;
+      '[B'|j ) selected=$((selected >= 3 ? 3 : selected+1)) ;;
+      '[A'|k ) selected=$((selected <= 0 ? 0 : selected-1)) ;;
+      '[C'|l ) val[$selected]=$(((val[selected]+1) % 16)) ;;
+    esac
+  }
+  move_cursor_top
+done
+
+move_cursor_top
+selected=5
+print_menu
+
+timestamp="$(date +'%Y-%m-%d %H:%M')"
+
+sedscript="/^GRUB_COLOR_NORMAL=/i \# commented out by grub-colour-chooser, $timestamp:
+s|^GRUB_COLOR_NORMAL=|\#GRUB_COLOR_NORMAL=|
+/^GRUB_COLOR_HIGHLIGHT=/i \# commented out by grub-colour-chooser, $timestamp:
+s|^GRUB_COLOR_HIGHLIGHT=|\#GRUB_COLOR_HIGHLIGHT=|
+/^GRUB_THEME=/i \# commented out by grub-colour-chooser, $timestamp:
+s|^GRUB_THEME=|\#GRUB_THEME=|"
+
+sed "$sedscript" "$etcdefaultgrubfile" > "$tmpfile"
+printf "\n#Added by grub-colour-chooser, %s:\nGRUB_COLOR_NORMAL=\"%s\"\nGRUB_COLOR_HIGHLIGHT=\"%s\"\n" \
+  "$timestamp" \
+  "${cname[${val[1]}]}/${cname[${val[0]}]}" \
+  "${cname[${val[3]}]}/${cname[${val[2]}]}"  >> "$tmpfile"
+
+printf "\nThe following changes to %s are proposed:\n\n" "$etcdefaultgrubfile"
+diff --color=auto "$etcdefaultgrubfile" "$tmpfile" && true
+
+printf '\e[?25h\n' # unhide cursor and print new line
+stty echo
+read -p "Apply these changes and run grub-mkconfig [y/N]? " response
+if [[ $response =~ ^(yes|y|Y|Yes)$ ]]; then
+  sudo cp -- "$tmpfile" "$etcdefaultgrubfile" || exit
+  sudo grub-mkconfig -o "$grubconffile"
+fi
