@@ -67,16 +67,24 @@ ShowTray() {
             --text="$progname: $update_count $source updates are available at $date"
 }
 ShowNotify() {
-    local ms=30000
+    local expiretime="$1"   # milliseconds or 0 (=for a long time)
     local msg="$update_count $source updates are available"
+
+    case "$expiretime" in
+        *h) expiretime=$((1000*3600*${expiretime:: -1})) ;;
+        *m) expiretime=$((1000*60*${expiretime:: -1})) ;;
+        *s) expiretime=$((1000*${expiretime:: -1})) ;;
+        0)  ;;
+    esac
+    expiretime="--expire-time=$expiretime"
 
     case "$ShowWhatAboutUpdates" in
 	number)
 	    msg="$(printf "$progname: $update_count $source updates available at $date.\n")" ;;
 	packages)
-	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$tmp\n")" ;;
+	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
-    /usr/bin/notify-send --icon=system-software-update --urgency=normal --expire-time=$ms \
+    /usr/bin/notify-send --icon=system-software-update --urgency=normal $expiretime \
                          --app-name="EndeavourOS Update Notifier" \
                          "Updates available at $date" \
 			 "$msg"
@@ -85,7 +93,7 @@ ShowNotify() {
 ShowNonFocused() {
     local date="$(/usr/bin/date '+%x %X')"
     local source="$1"
-    local tmp="\n<tt>$updates</tt>"
+    local pkgs="\n<tt>$updates</tt>"        # for notify and notify+tray
 
     if [ "$pkgsonly" = "yes" ] ; then       # cmd line options override config file options
         ShowHowAboutUpdates=window
@@ -94,14 +102,14 @@ ShowNonFocused() {
 
     case "$ShowHowAboutUpdates" in
         notify)
-            ShowNotify
-            return 11   # don't start updating
+            ShowNotify 30s  # was 30s
+            return 11       # don't start updating
             ;;
         tray)
             ShowTray
             ;;
         "notify+tray")
-            ShowNotify
+            ShowNotify 30s   # was 30s
             ShowTray
             ;;
         window)
@@ -110,11 +118,10 @@ ShowNonFocused() {
 
             case "$ShowWhatAboutUpdates" in
                 packages)
-                    #tmp="\n$(echo "$updates" | sed 's|^|    |')"
-                    tmp="\n$updates"
+                    pkgs="\n$updates"
                     height=$((10 * update_count + 120 + 40))
                     test $height -gt $limit && height=$limit
-                    msg="$(printf "$update_count $source updates available at $date:\n$tmp\n")"
+                    msg="$(printf "$update_count $source updates available at $date:\n$pkgs\n")"
                     YadNonFocused
                     ;;
                 number | *)
