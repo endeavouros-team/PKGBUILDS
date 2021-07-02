@@ -32,6 +32,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/mkinitcpio-openswap
     #aur/paper-icon-theme-git
     aur/polybar
+    aur/rate-mirrors-bin
     aur/virtualbox-ext-oracle
     aur/yay
     arc-gtk-theme-eos
