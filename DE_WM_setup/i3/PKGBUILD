@@ -1,0 +1,15 @@
+# Maintainer: joekamprad    <joekamprad@endeavouros.com>
+pkgname=endeavouros-i3-config
+pkgver=1.0
+pkgrel=2
+pkgdesc='Default EndeavourOS i3 config files'
+arch=('any')
+url='https://www.endeavouros.com'
+license=('GPL3')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.${pkgrel}.tar.gz")
+sha512sums=('38728f27f6447d19541d0789b7922a55474d5be747ef896a2e6269225b4207c40c5b4439935f1c6ec7de5d7a2eff05ffcc65d376e788cc5ce3c778bd04922117')
+
+package() {
+    install -dm 755 $pkgdir/etc/skel
+    cp -r --no-preserve=ownership endeavouros-i3-config-${pkgver}.${pkgrel}/etc/skel $pkgdir/etc/
+}
