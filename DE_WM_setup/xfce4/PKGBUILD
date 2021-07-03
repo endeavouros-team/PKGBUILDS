@@ -6,7 +6,7 @@ pkgdesc='Default EndeavourOS xfce4 config files'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.${pkgrel}.tar.gz")
+source=("${pkgname}-${pkgver}.${pkgrel}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.${pkgrel}.tar.gz")
 sha512sums=('refill')
 
 package() {
