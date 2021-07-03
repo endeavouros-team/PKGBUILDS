@@ -99,6 +99,8 @@ AfterTranslations() {
     export AFTER_INSTALL_US_EL="$(ltr after_install_us_el)"
     export AFTER_INSTALL_US_DONE="$(ltr after_install_us_done)"
     export AFTER_INSTALL_US_FAIL="$(ltr after_install_us_fail)"
+    export UPDT_NOTHING_TODO="$(ltr updt_nothing_todo)"
+    export UPDT_UPDATE_CHECK="$(ltr updt_update_check):"
 }
 
 export -f ltr
@@ -783,6 +785,7 @@ fi
 PacdiffFieldAdd() {
   local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
   local differ Icon=preferences-system
+
   [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
@@ -797,10 +800,47 @@ PacdiffFieldAdd() {
 }
 export -f PacdiffFieldAdd
 
+UpdateWithAurHelper() {
+    local helper="$1"
+    local opts="-Syu --nocombinedupgrade"        # first pacman update, then AUR update
+    declare -A has_updates
+    local updates=""
+
+    echo "$UPDT_UPDATE_CHECK"
+
+    # check AUR updates
+    updates="$($helper -Qua)"
+    if [ -n "$updates" ] ; then
+        has_updates[aur]=yes
+    else
+        has_updates[aur]=no
+    fi
+
+    # if no AUR updates, check pacman updates
+    if [ "${has_updates[aur]}" = "no" ] ; then
+        checkupdates > /dev/null
+        case "$?" in
+            0) has_updates[main]=yes ;;
+            1) return 1 ;;                  # an error!
+            2) has_updates[main]=no ;;
+        esac
+    fi
+
+    [ "${has_updates[main]}" = "yes" ] && echo "Official updates available."
+    [ "${has_updates[aur]}"  = "yes" ] && echo "AUR updates available."
+
+    if [ "${has_updates[main]}" = "yes" ] || [ "${has_updates[aur]}" = "yes" ] ; then
+        echo "\$ $helper $opts"
+        $helper $opts
+    else
+        echo "$UPDT_NOTHING_TODO"
+    fi
+}
+export -f UpdateWithAurHelper
+
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
-  local realfunc="$3"
 
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
@@ -809,83 +849,49 @@ AfterInstall() {
       eos_yad --align-buttons
       --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=dialog-information
+      --text="<b>$(ltr after_install_text)</b>" --columns=2
   )
-  if [ "$realfunc" = "AfterInstall" ] ; then
-      tabcontents+=(--text="<b>$(ltr after_install_text)</b>" --columns=2)
-  fi
-  if [ "$realfunc" = "DailyAssistant" ] ; then
-      tabcontents+=(--text="<b>$(ltr daily_assistant_text)</b>" --columns=2)
-  fi
-
-  if [ "$realfunc" = "AfterInstall" ] ; then
-      if [ "$(eos_GetArch)" != "armv7h" ] ; then
-          tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
-      fi
-  fi
-  #if [ "$realfunc" = "DailyAssistant" ] ; then
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
       tabcontents+=(
-          --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
       )
-  #fi
-  if [ "$realfunc" = "DailyAssistant" ] ; then
-      if [ "$(eos_GetArch)" != "armv7h" ] ; then
-          tabcontents+=(--field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple")
-      fi
   fi
-  if [ "$realfunc" = "DailyAssistant" ] ; then
-      PacdiffFieldAdd
+  tabcontents+=(
+      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+  )
+
+  if [ -x /usr/bin/eos-update-notifier-configure ] ; then
+      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
-  if [ "$realfunc" = "AfterInstall" ] ; then
+
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
+      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
+  fi
+
+  ShowChangeResoButton
+
+  tabcontents+=(
+      --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
+      --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+      --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
+  )
+  if (Check_r8168) ; then
       tabcontents+=(
-          --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+          --field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "yad_Remove r8168"
       )
-
-      if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-          tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
-      fi
-
-      test "$(eos_GetArch)" != "armv7h" && \
-          tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
-
-      ShowChangeResoButton
-
-      tabcontents+=(
-          --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
-          --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
-          --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
-      )
-      Check_r8168 && tabcontents+=(--field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "yad_Remove r8168")
   fi
-
-  #if [ "$realfunc" = "AfterInstall" ] ; then
-      tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
-  #fi
-
-  if [ "$realfunc" = "AfterInstall" ] ; then
-      case "$(eos_yad_GetDesktopName)" in
-          XFCE)
-              tabcontents+=(
-                  --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
-                  --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
-              )
-              ;;
-      esac
-  fi
-
-  if [ "$realfunc" = "DailyAssistant" ] ; then
-      # General app browsing buttons:
-      if [ "$(eos_GetArch)" = "armv7h" ] ; then
-          tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages")
-      else
-          tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
-      fi
-      tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
-      tabcontents+=(--field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "$_WELCOME_BROWSER https://wiki.archlinux.org/title/List_of_applications")
-  fi
-  if [ "$realfunc" = "AfterInstall" ] ; then
-      VboxGuestEnable
-      tabcontents+=(--field=" $(ltr after_install_itab)!preferences-system!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
-  fi
+  tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  case "$(eos_yad_GetDesktopName)" in
+      XFCE)
+          tabcontents+=(
+              --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
+              --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
+          )
+          ;;
+  esac
+  VboxGuestEnable
+  tabcontents+=(--field=" $(ltr after_install_itab)!preferences-system!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -894,7 +900,53 @@ DailyAssistant() {
   local handle="$1"
   local tabnum="$2"
 
-  AfterInstall "$handle" "$tabnum" "$FUNCNAME"
+  local _exclamation='&#33;'   # '!'
+  local _and='&#38;'           # '&'
+
+  local tabcontents=(
+      eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
+      --plug="$handle" --tabnum="$tabnum" --form --image=dialog-information
+      --text="<b>$(ltr daily_assistant_text)</b>" --columns=2
+      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+  )
+  if [ "$EOS_WELCOME_USE_AUR_HELPERS_TESTING" = "yes" ] ; then
+      if [ -x /usr/bin/yay ] ; then
+          tabcontents+=(
+              --field=" $(ltr after_install_us) (yay)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper yay"
+          )
+      fi
+      if [ -x /usr/bin/paru ] ; then
+          tabcontents+=(
+              --field=" $(ltr after_install_us) (paru)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper paru"
+          )
+      fi
+  fi
+  if [ "$(eos_GetArch)" != "armv7h" ] ; then
+      tabcontents+=(
+          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
+      )
+  fi
+  PacdiffFieldAdd
+  tabcontents+=(
+      --field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+  )
+
+  # General app browsing buttons:
+  if [ "$(eos_GetArch)" = "armv7h" ] ; then
+      tabcontents+=(
+          --field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinuxarm.org/packages"
+      )
+  else
+      tabcontents+=(
+          --field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages"
+      )
+  fi
+  tabcontents+=(
+      --field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages"
+      --field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "$_WELCOME_BROWSER https://wiki.archlinux.org/title/List_of_applications"
+  )
+
+  [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
 WelcomeInitialTab() {
