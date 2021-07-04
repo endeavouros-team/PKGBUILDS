@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=endeavouros-theming
 pkgver=6.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
 replaces=('EndeavourOS-theming')
@@ -22,7 +22,7 @@ package() {
 
   install -Dm644 *.png *.svg           "${pkgdir}/usr/share/endeavouros"
   install -Dm644 endeavouros.{svg,png} "${pkgdir}/usr/share/pixmaps"
-  install -Dm644 endeavouros-icon.png "${pkgdir}/usr/share/pixmaps"
+  install -Dm644 endeavouros-icon.png  "${pkgdir}/usr/share/pixmaps"
   
   cd backgrounds
   install -Dm644 *.png                 "${pkgdir}/usr/share/endeavouros/backgrounds"
