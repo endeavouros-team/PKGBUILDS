@@ -29,7 +29,7 @@ Age_Fetchtime()
     [ -n "$mirror" ] || DIE "parameter 'mirror' missing"
     [ -n "$now" ]    || now=$(date +%s)
 
-    IFS=' ' output=($(curl -s -m 10 -w "%{time_total} %{http_code}" "$mirror"/$file -o$ofile))
+    IFS=' ' output=($(curl -Lsm 10 -w "%{time_total} %{http_code}" "$mirror"/$file -o$ofile))
     case "$?" in
         0)
             case "${output[1]}" in
