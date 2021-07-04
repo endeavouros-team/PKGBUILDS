@@ -54,6 +54,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/rate-mirrors-bin
     reflector-bash-completion
     reflector-simple
+    setup-i3
+    setup-xfce4
     aur/virtualbox-ext-oracle
     welcome
     yad-eos
