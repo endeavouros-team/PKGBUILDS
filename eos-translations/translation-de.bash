@@ -36,7 +36,7 @@ _question='&#63;'      # '?'
 
 _tr_add2 welcome_disabled      "$PRETTY_PROGNAME App ist deaktiviert. Um sie zu starten, benutze --enable."
 
-_tr_add2 butt_later            "Bis Später"
+_tr_add2 butt_later            "Bis später"
 _tr_add2 butt_latertip         "Behalte $PRETTY_PROGNAME aktiviert"
 
 _tr_add2 butt_noshow           "Nicht mehr starten"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "Neuigkeiten"
 _tr_add2 general_info_netip    "Neuigkeiten und Berichte"
 
 _tr_add2 general_info_fo       "Forum"
-_tr_add2 general_info_fotip    "Erhalte Hilfe im freundlichen und offenem Forum"
+_tr_add2 general_info_fotip    "Erhalte Hilfe im freundlichen und offenen Forum"
 
 _tr_add2 general_info_do       "Spenden"
 _tr_add2 general_info_dotip    "Unterstütze unsere Arbeit mit einer Spende"
@@ -127,9 +127,9 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce4"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME wieder zu starten führe diesen Befehl im Terminal aus: $PROGNAME --enable"
-_tr_add2 settings_dis_text       "Wiederaktivierung $PRETTY_PROGNAME:"
-_tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder Aktivieren?"
+_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME erneut zu starten führe diesen Befehl im Terminal aus: $PROGNAME --enable"
+_tr_add2 settings_dis_text       "Reaktiviere $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder aktivieren?"
 _tr_add2 settings_dis_butt       "Ich werde mir das merken$_exclamation"
 _tr_add2 settings_dis_buttip     "versprochen"
 
@@ -140,7 +140,7 @@ _tr_add2 dm_title                "Nutze anderen Anmelde Manager"
 _tr_add2 dm_col_name1            "Ausgewählt"
 _tr_add2 dm_col_name2            "DM Name"
 
-_tr_add2 dm_reboot_required      "Neustart ist erforderlich um die Änderungen anzuwenden."
+_tr_add2 dm_reboot_required      "Ein Neustart ist erforderlich um die Änderungen anzuwenden."
 _tr_add2 dm_changed              "Neuer DM: "
 _tr_add2 dm_failed               "Änderung des DM fehlgeschlagen."
 _tr_add2 dm_warning_title        "Warnung"
@@ -156,7 +156,7 @@ _tr_add2 sysup_check             "Überprüfe auf neue Updates..."
 _tr_add2 issues_title            "Überprüfe auf Paketprobleme"
 _tr_add2 issues_grub             "WICHTIG: Eine manuelle Neuerstellung des Bootmenüs ist erforderlich."
 _tr_add2 issues_run              "Führe Befehle aus:"
-_tr_add2 issues_no               "Es wurden keine wichtigen Systemprobleme festgestellt."
+_tr_add2 issues_no               "Es wurden keine schwerwiegende Systemprobleme festgestellt."
 
 _tr_add2 cal_noavail            "Nicht verfügbar: "        # installer program
 _tr_add2 cal_warn               "Warnung"
@@ -271,7 +271,7 @@ _tr_add2 updt_press_enter         "Drücke ENTER um das Fenster zu schließen"
 _tr_add2 after_install_pacdiff_tip "Verwalte pacnew, pacorig $_and pacsave Dateien mit pacdiff $_and"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Einstellungen"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_conf           "Konfiguriere"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Downloade mehr EndeavourOS Hintergründe"
 _tr_add2 after_install_more_wall_tip  "Downloade alte EndeavourOS und Community Hintergründe"
 _tr_add2 after_install_info           "Information"                           # last word on a sentence, means just any information
@@ -294,3 +294,14 @@ _tr_add2 nb_tab_DailyAssistant       "Assistent"
 _tr_add2 daily_assistant_text        "Tools für nützliche und / oder tägliche Aufgaben"
 _tr_add2 after_install_itab          "Wähle bevorzugten Welcome Tab"
 _tr_add2 after_install_itab_tip      "Legt den Tab fest, den Welcome beim Start anzeigt"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Applikationskategorien"
+_tr_add2 daily_assist_apps_tip       "Applikationen sortiert nach Kategorie"
+
+_tr_add2 after_install_vbox1         "Aktiviere VirtualBox Gast Erweiterung"
+_tr_add2 after_install_vbox2         "Um die VirtualBox Gast Erweiterungen zu aktivieren, selektiere den <b>AfterInstall</b> tab und klicke den Button "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Netzwerk-Probleme$_question Entferne r8168$_exclamation"
+_tr_add2 after_install_r8168_tip     "Entfernen von Paket <b>r8168</b> könnte Probleme mit der Kabelverbindung beheben (Neustart erforderlich)"
