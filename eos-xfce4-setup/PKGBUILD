@@ -1,0 +1,15 @@
+# Maintainer: joekamprad    <joekamprad@endeavouros.com>
+pkgname=endeavouros-xfce4-config
+pkgver=1.0
+pkgrel=1
+pkgdesc='Default EndeavourOS xfce4 config files'
+arch=('any')
+url='https://www.endeavouros.com'
+license=('GPL3')
+source=("${pkgname}-${pkgver}.${pkgrel}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.${pkgrel}.tar.gz")
+sha512sums=('29408fd92222d59ff875d512dcfd0e54669eee0a9f5ee82e0d022345a25063b83cdf33f3a94064b4939e172418c72ac6faf8e9abfd8eda935269858a5bf6d351')
+
+package() {
+    install -dm 755 $pkgdir/etc/skel
+    cp -r --no-preserve=ownership endeavouros-xfce4-config-${pkgver}.${pkgrel}/etc/skel $pkgdir/etc/
+}
