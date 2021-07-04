@@ -11,5 +11,5 @@ sha512sums=('137b26ee8762da5b717c32f4ca1354e73ac92867474ad76af20083c421cd9adc5dc
 
 package() {
     install -dm 755 $pkgdir/etc/skel
-    cp -r --no-preserve=ownership {pkgname}-${pkgver}.${pkgrel}/etc/skel $pkgdir/etc/
+    cp -r --no-preserve=ownership ${pkgname}-${pkgver}.${pkgrel}/etc/skel $pkgdir/etc/
 }
