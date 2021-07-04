@@ -290,3 +290,14 @@ _tr_add2 nb_tab_DailyAssistant       "Assistant"
 _tr_add2 daily_assistant_text        "Outils pour les tâches utiles et/ou quotidienne"
 _tr_add2 after_install_itab          "Selection onglet initial Welcome"
 _tr_add2 after_install_itab_tip      "Définit l'onglet que Welcome affiche au démarrage"
+
+# 08-juin-2021
+_tr_add2 daily_assist_apps           "Catégories d'applications"
+_tr_add2 daily_assist_apps_tip       "Applications triées par categorie"
+
+_tr_add2 after_install_vbox1         "Activer outils invités VirtualBox"
+_tr_add2 after_install_vbox2         "Pour activer les outils invités de VirtualBox, selectionner l'onglet <b>Post-Installation</b> et cliquer sur le bouton"
+
+# 17-juin-2021
+_tr_add2 after_install_r8168         "Problème ethernet $_question Enlever r8168 $_exclamation"
+_tr_add2 after_install_r8168_tip     "Enlever le paquet <b>r8168</b> pourrait corriger des problèmes de connexion filaire (redémarrage requis)"
