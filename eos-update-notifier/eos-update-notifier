@@ -102,14 +102,14 @@ ShowNonFocused() {
 
     case "$ShowHowAboutUpdates" in
         notify)
-            ShowNotify 30s  # was 30s
+            ShowNotify "$UN_NotifyTimeout"
             return 11       # don't start updating
             ;;
         tray)
             ShowTray
             ;;
         "notify+tray")
-            ShowNotify 30s   # was 30s
+            ShowNotify "$UN_NotifyTrayTimeout"
             ShowTray
             ;;
         window)
@@ -258,10 +258,7 @@ CheckArchNews() {
     if [ "$AllowNewsCheckWhileUpdating" = "no" ] ; then
         test -e $system_lockfile && return
     fi
-    local CheckArchNewsForYou
-    local ArchNewsProg
 
-    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
     test -n "$CheckArchNewsForYou" || CheckArchNewsForYou=yes
     test -n "$ArchNewsProg"        || ArchNewsProg=arch-news-for-you          # original default
 
@@ -301,18 +298,39 @@ SystemLockActive() {
     fi
 }
 
+CheckTimeoutVal() {
+    local val="$1"
+
+    if [ "${!val}" != "0" ] ; then
+        if [ -n "$(echo "${!val}" | sed 's|[0-9][0-9]*[smh]||')" ] ; then
+            eos_yad_DIE "'${!val}': unsupported value for variable $val."
+        fi
+    fi
+}
+
 Main2() {
     local CheckAurUpdates=yes
+    local CheckArchNewsForYou=yes
+    local ArchNewsProg=eos-arch-news
+    local UN_NotifyTimeout=30s
+    local UN_NotifyTrayTimeout=30s
     local system_lockfile=/var/lib/pacman/db.lck
     local pids
-
     local AurUpdaterProg="$EOS_AUR_HELPER"
+
+    # Make sure values from config files are valid.
+
     [ -n "$AurUpdaterProg" ] || AurUpdaterProg=yay
 
-    test -r $EOS_UPDATE_NOTIFIER_CONF && source $EOS_UPDATE_NOTIFIER_CONF
+    [ -r $EOS_UPDATE_NOTIFIER_CONF ] && source $EOS_UPDATE_NOTIFIER_CONF
+
+    CheckTimeoutVal UN_NotifyTimeout
+    CheckTimeoutVal UN_NotifyTrayTimeout
+
+    # Config file values should be OK.
 
     if [ "$pkgsonly" = "no" ] ; then
-        CheckArchNews   # also reads config file
+        CheckArchNews
     fi
 
     # check package manager lock
