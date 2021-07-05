@@ -1,0 +1,183 @@
+#!/bin/bash
+
+# New script for using calamares.
+#
+# Note that this script can be called directly from the terminal,
+# or it can be called from the Welcome app.
+
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+#source /usr/share/endeavouros/scripts/translations.bash || exit 1
+
+export -f eos_yad
+
+GUIDIE() {
+    # show error in the terminal and log
+    echo "$progname: $1" | sed -e 's|<tt>||g' -e 's|</tt>||g'  # remove some formatting tags
+
+    # show the error in a yad window
+    local cmd=(
+        eos_yad --form --title="Error detected"
+        --text="<tt>$progname</tt>:\n$1\n"
+        --button=yad-quit:1
+    )
+    "${cmd[@]}"
+
+    exit 1
+}
+
+### Provides the install log contents. ###
+FollowFile() {
+    local tailfile="$1"
+    local term_title="$2"
+    local xpos="$3"
+    local ypos="$4"
+
+    xfce4-terminal -T "$term_title" --geometry=120x20+$xpos+$ypos -x tail -f "$tailfile" &
+}
+
+### Provides the pacman log. ###
+CatchChrootedPacmanLog() {
+    local pacmanlog=""
+    local lockfile="$HOME/.$progname.lck"
+
+    # wait until pacman.log is available in the chrooted system, then follow the log in background
+    while true ; do
+        sleep 2
+        pacmanlog="$(/usr/bin/ls -1 /tmp/calamares-root-*/var/log/pacman.log 2>/dev/null | /usr/bin/tail -n 1)"
+        if [ -n "$pacmanlog" ] ; then
+            # pacman.log detected!
+            [ -r "$lockfile" ] && return
+            /usr/bin/touch "$lockfile"
+            FollowFile "$pacmanlog" "Pacman log" 400 50
+            break
+        fi
+    done
+}
+
+### Starts logging into the install log. ###
+InstallLog_Start() {
+    cat <<EOF > $log
+########## $log by $progname
+########## Started (UTC): $(date -u "+%x %X")
+########## Install mode: $mode
+EOF
+    FollowFile "$log" "Install log" 20 20
+}
+
+### Starts calamares and runs it in the background. ###
+Calamares_Start() {
+    pkexec calamares -style kvantum -c /etc/calamares/ -d >> $log &
+}
+
+### Dialog that asks for the official or community edition. ###
+AskMode() {
+    local inet_no="Internet connection is not required"
+    local inet_yes="Internet connection is required"
+    local ret=0
+    local official_online="Official (online)"
+    local official_offline="Official (offline)"
+    local community="Community"
+    local txt
+
+    txt=""
+    txt+="Installing <b>EndeavourOS</b> to your system.\n\n"
+    txt+="Please select one of the following alternatives:\n\n"
+    txt+="<b>$official_online</b>\n"
+    txt+="<tt>  </tt>- <tt>Xfce, KDE, GNOME, MATE, Budgie, LXQt,</tt> and more\n"
+    txt+="<tt>  </tt>- Vanilla theming\n"
+    txt+="<tt>  </tt>- $inet_yes\n\n"
+    txt+="<b>$official_offline</b>\n"
+    txt+="<tt>  </tt>- <tt>Xfce</tt>\n"
+    txt+="<tt>  </tt>- EndeavourOS theming\n"
+    txt+="<tt>  </tt>- $inet_no\n\n"
+    txt+="<b>$community</b>\n"
+    txt+="<tt>  </tt>- Currently available: <tt>Sway, Bspwm</tt>\n"
+    txt+="<tt>  </tt>- $inet_yes\n\n"
+    txt+="Later you will select more details (like desktop or window manager),\n"
+    txt+="except if you select to install <tt>Xfce</tt> in offline mode.\n\n"
+
+    local cmd=(
+        eos_yad --form --title="Select what to install" --image=dialog-question
+        --text="$txt"
+        --button="$official_online!!EndeavourOS team edition, vanilla theming, online install.":11
+        --button="$official_offline!!EndeavourOS team edition (Xfce), special theming, offline install.":13
+        --button="$community!!EndeavourOS community edition, online install.":15
+    )
+
+    "${cmd[@]}"       # ask mode from the user
+
+    ret=$?
+
+    # set the install mode, or exit on error
+    case "$ret" in
+        11) mode=online ;;
+        13) mode=offline ;;
+        15) mode=community ;;
+        252|*) exit $ret ;;
+    esac
+}
+
+### Starts the calamares installer process and logging. ###
+InstallWithLogs() {
+    InstallLog_Start
+    Calamares_Start
+
+    case "$mode" in
+        online | community)
+            CatchChrootedPacmanLog
+            ;;
+        offline)
+            # no pacman log for offline install
+            ;;
+    esac
+}
+
+CopyFile() {
+    local filefrom="$1"   # source file
+    local fileto="$2"     # destination file (not folder!)
+    local folderto="$(dirname "$fileto")"
+
+    [ -r "$filefrom" ] || GUIDIE "File <tt>$filefrom</tt> does not exist."
+    [ -d "$folderto" ] || GUIDIE "Folder <tt>$folderto</tt> does not exist."
+
+    pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
+}
+
+###  Runs the online install. ###
+Online() {
+    CopyFile $cfolder/settings_online.conf $cfolder/settings.conf
+}
+
+###  Runs the offline install. ###
+Offline() {
+    CopyFile $cfolder/settings_offline.conf $cfolder/settings.conf
+}
+
+###  Runs the Community editions install. ###
+Community() {
+    CopyFile $cfolder/settings_community.conf $cfolder/settings.conf
+}
+
+###  Everything starts in the Main function. ###
+Main() {
+    local progname="$(basename "$0")"           # for help and messages
+    local Home=/home/liveuser                   # liveuser's home folder
+    local log=$Home/endeavour-install.log       # install log
+    local mode=""                               # one of: offline, online, sway, bspwm
+    local cfolder=/etc/calamares                # folder for calamares configuration files
+
+    # sets the value for $mode
+    AskMode
+
+    # copy config files based on $mode
+    case "$mode" in
+        online)    Online ;;
+        offline)   Offline ;;
+        community) Community ;;
+    esac
+
+    # finally: run calamares with logs (install, pacman)
+    InstallWithLogs
+}
+
+Main "$@"
