@@ -80,7 +80,7 @@ AskMode() {
     local txt
 
     txt=""
-    txt+="Installing <b>EndeavourOS</b> to your system.\n\n"
+    txt+="<span font='Sans 14'>Installing <b>EndeavourOS</b> to your system.</span>\n\n"
     txt+="Please select one of the following alternatives:\n\n"
     txt+="<b>$official_online</b>\n"
     txt+="<tt>  </tt>- <tt>Xfce, KDE, GNOME, MATE, Budgie, LXQt,</tt> and more\n"
@@ -93,12 +93,12 @@ AskMode() {
     txt+="<b>$community</b>\n"
     txt+="<tt>  </tt>- Currently available: <tt>Sway, Bspwm</tt>\n"
     txt+="<tt>  </tt>- $inet_yes\n\n"
-    txt+="Later you will select more details (like desktop or window manager),\n"
-    txt+="except if you select to install <tt>Xfce</tt> in offline mode.\n\n"
+    txt+="Later you'll get to select more details.\n\n"
 
     local cmd=(
         eos_yad --form --title="Select what to install" --image=dialog-question
         --text="$txt"
+        --buttons-layout=spread
         --button="$official_online!!EndeavourOS team edition, vanilla theming, online install.":11
         --button="$official_offline!!EndeavourOS team edition (Xfce), special theming, offline install.":13
         --button="$community!!EndeavourOS community edition, online install.":15
