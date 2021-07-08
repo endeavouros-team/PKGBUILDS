@@ -11,19 +11,17 @@ Options() {
         case "$arg" in
             -h | --help)
                 cat <<EOF
-Directs standard input into $EOS_SENDLOG_URI, and saves returned URLs
-into file $db.
+Directs standard input into a service at address
+    $EOS_SENDLOG_URI
+and saves returned URLs into file
+    $db2
+See file $configfile about how to configure the service address.
 
 Usage: $progname [options]
 options:
     -n | --nosave   Don't save returned URL.
     -h | --help     This help.
     --man           Show manual at $EOS_SENDLOG_URI.
-
-Configuration file $configfile (bash syntax) can be used to set variable
-EOS_SENDLOG_URI.
-Supported values: ${supported_uris[*]}
-Default: ${supported_uris[0]}
 EOF
                 exit 0
                 ;;
@@ -56,8 +54,8 @@ Init() {
         fi
     done
     # use default:
-    EOS_SENDLOG_URI="${supported_uris[0]}"
-    EOS_SENDLOG_FORM="${supported_forms[0]}"
+    EOS_SENDLOG_URI="${supported_uris[$default_ix]}"
+    EOS_SENDLOG_FORM="${supported_forms[$default_ix]}"
 }
 
 Main() {
@@ -76,10 +74,12 @@ Main() {
         "f:1"
         "clbin"
     )
+    local default_ix=1      # was 0
 
     Init
     local save=yes
     local db=$HOME/.config/$progname.txt
+    local db2='$HOME'/.config/$progname.txt
     local url
 
     Options "$@"
