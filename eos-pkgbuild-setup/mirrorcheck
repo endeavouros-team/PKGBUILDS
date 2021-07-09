@@ -130,7 +130,8 @@ OneMirror() {
     if [ -z "$problemfiles" ] ; then
         echo2i "==> No issues."
     else
-        :
+        echo2i "==> Not yet ready."
+
         #echo2i "==> Problematic files: "
         #for arg in $problemfiles ; do
         #    echoi -l3 "$arg"
