@@ -294,3 +294,14 @@ _tr_add2 nb_tab_DailyAssistant       "Assistente"
 _tr_add2 daily_assistant_text        "Ferramentas para tarefas úteis e/ou diárias"
 _tr_add2 after_install_itab          "Selecionar o separador inicial de Bem-vindo"
 _tr_add2 after_install_itab_tip      "Define o separador de bem-vindo no arranque"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Categorias de aplicações"
+_tr_add2 daily_assist_apps_tip       "Aplicações ordenadas por categoria"
+
+_tr_add2 after_install_vbox1         "Ativar utilitários VirtualBox Guest"
+_tr_add2 after_install_vbox2         "Para ativar os utilitários VirtualBox Guest, selecione o separador <b>ApósInstalação</b> e clique no botão "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Ethernet issue$_question Remover r8168$_exclamation"
+_tr_add2 after_install_r8168_tip     "A remoção do pacote <b>r8168</b> pode corrigir falha de ligação por cabo (necessário reiniciar)"
