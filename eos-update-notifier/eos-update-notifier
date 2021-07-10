@@ -233,6 +233,9 @@ Update_common() {
         $AdditionalEosUpdater "$EOS_UPDATE_NOTIFIER_LOG"
         external_updater_code=$?
     fi
+    if [ $hasupdates -ne 0 ] && [ "$SyncAfterUpdate" = "yes" ] ; then
+        sync
+    fi
 
     if [ $hasupdates -eq 0 ] && [ $external_updater_code -ne 0 ] ; then
         local msg="No updates available."
@@ -314,6 +317,7 @@ Main2() {
     local ArchNewsProg=eos-arch-news
     local UN_NotifyTimeout=30s
     local UN_NotifyTrayTimeout=30s
+    local SyncAfterUpdate=no
     local system_lockfile=/var/lib/pacman/db.lck
     local pids
     local AurUpdaterProg="$EOS_AUR_HELPER"
