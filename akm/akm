@@ -369,7 +369,7 @@ Main()
     local t1=""
 
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
-    t1+="You can install and/or uninstall kernel packages using the checkboxes on the left column.\n"
+    t1+="You can install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n"
     t1+="\n"
     t1+="Column headers:\n"
     t1+="<tt>"
