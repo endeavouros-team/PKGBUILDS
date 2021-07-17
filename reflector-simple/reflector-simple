@@ -14,15 +14,17 @@ DIE() {
     Destructor
     exit 1
 }
+echo2() { echo "$@" >&2; }
+INFO() { echo2 "$progname: info: $1"; }
 WARN() {
-    echo "$progname: warning: $1" >&2
+    echo2 "$progname: warning: $1"
     # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
 }
 
 Verbose() {
     return
     local time=$(date +%H:%M:%S)
-    echo "$time: $1" >&2
+    echo2 "$time: $1"
 }
 
 CodeToCountry() {  # convert country code to country name
@@ -171,9 +173,7 @@ _get_reflector_x_configs() {
     # into file '$tmpconf'.
     local name code ix
 
-    if [ ! -r "$REFLECTOR_X_CONF" ] ; then
-        return
-    fi
+    INFO "reading file $REFLECTOR_X_CONF"
 
     # Remove empty lines and comments. Remove quotes.
     cat $REFLECTOR_X_CONF | grep -v "^[ \t]*$" | sed -e 's|[ \t]*#.*||' -e '/^$/d' | tr -d "'\""  > $tmpconf
@@ -348,7 +348,7 @@ AskCountriesAndOptions() {
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         tips+=("\nNote: configuration file <b>$REFLECTOR_X_CONF</b> options are in use.")
     else
-        tips+=("\nNote: configuration file <b>$REFLECTOR_SIMPLE_CONF</b> is unavailable, using $progname defaults.")
+        tips+=("\nNote: configuration file <b>$REFLECTOR_X_CONF</b> is unavailable, using $progname defaults.")
     fi
     local ix included xx tip
     local command
@@ -356,38 +356,16 @@ AskCountriesAndOptions() {
     local default_sort='age!^rate!country!score!delay'
     local default_number=10
     local use_saved=""
-    local max_cols=8
 
     Verbose "Creating the yad command..."
 
-    if [ -r $toolconf ] ; then
-        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_WIDTH") ; then
-            WARN "$toolconf: REFLECTOR_SIMPLE_WIDTH has an invalid value, using default"
-            REFLECTOR_SIMPLE_WIDTH=$def_width
-        fi
-        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_HEIGHT") ; then
-            WARN "$toolconf: REFLECTOR_SIMPLE_HEIGHT has an invalid value, using default"
-            REFLECTOR_SIMPLE_HEIGHT=$def_height
-        fi
-
-        if (! IsPositiveNumber "$REFLECTOR_SIMPLE_COLUMNS") ; then
-            WARN "$toolconf: REFLECTOR_SIMPLE_COLUMNS has an invalid value, using default"
-            REFLECTOR_SIMPLE_COLUMNS=$def_cols
-        fi
-        if [ $REFLECTOR_SIMPLE_COLUMNS -gt $max_cols ] ; then
-            REFLECTOR_SIMPLE_COLUMNS=$max_cols
-        elif [ $REFLECTOR_SIMPLE_COLUMNS -lt $def_cols ] ; then
-            REFLECTOR_SIMPLE_COLUMNS=$def_cols
-        fi
+    if [ "$use_age" = "yes" ] ; then
+        case "$(OptTypeNeeded)" in
+            plain) ;;                         # no additional defaults
+            "")         default_age=1 ;;      # country not directly supported by Arch
+            [A-Z][A-Z]) default_age=8 ;;      # country may lack https mirrors
+        esac
     fi
-    (( REFLECTOR_SIMPLE_WIDTH+=(100*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
-    (( REFLECTOR_SIMPLE_HEIGHT-=(60*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
-
-    case "$(OptTypeNeeded)" in
-        plain) ;;                         # no additional defaults
-        "")         default_age=1 ;;      # country not directly supported by Arch
-        [A-Z][A-Z]) default_age=8 ;;      # country may lack https mirrors
-    esac
 
     [ -n "$conf_age" ]     && default_age="$conf_age"
     [ -n "$conf_number" ]  && default_number="$conf_number"
@@ -427,12 +405,14 @@ AskCountriesAndOptions() {
     if [ "$rsync_supported" = "yes" ] ; then
 	command+=(--field="Include rsync mirrors:chk" false)
     fi
-    command+=(--field="Max hours from latest mirror sync":num $default_age)    # --age
-    command+=(--field="Sort by":cb "$default_sort")                            # --sort
+    if [ "$use_age" = "yes" ] ; then
+        command+=(--field="Max hours from latest mirror sync":num $default_age)    # --age
+    fi
+    command+=(--field="Sort by":cb "$default_sort")                                # --sort
     if [ "$use_number_instead_of_latest" = "yes" ] ; then
-        command+=(--field="Max number of mirrors":num $default_number)         # --number
+        command+=(--field="Max number of mirrors":num $default_number)             # --number
     else
-        command+=(--field="Max number of freshed mirrors":num $default_number) # --latest
+        command+=(--field="Max number of freshest mirrors":num $default_number)    # --latest
     fi
 
     command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
@@ -492,7 +472,9 @@ BuildReflectorCommand() {
     test "$rsync_supported" = "yes" && {
         test "${reflector_info[$((ix++))]}" = "TRUE" && { reflector_cmd+=(--protocol rsync) ; rsync_selected=1 ; }
     }
-    reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
+    if [ "$use_age" = "yes" ] ; then
+        reflector_cmd+=(--age "${reflector_info[$((ix++))]}")
+    fi
     reflector_cmd+=(--sort $(echo "${reflector_info[$ix]}" | tr -d '|'))  # with echo incrementing ix with ++ does not work
     ((ix++))
     if [ "$use_number_instead_of_latest" = "yes" ] ; then
@@ -503,7 +485,7 @@ BuildReflectorCommand() {
 }
 
 ShowMirrorlistSaved() {
-    echo "New $ml saved." >&2
+    INFO "New $ml saved."
     return  # showing dialog not really needed...
 
     echo "New $ml saved." | \
@@ -516,9 +498,8 @@ AddCountryNamesToMirrors() {
     local full_list=$(mktemp)
 
     Verbose "Fetching Arch mirror list..."
-    #wget -q --timeout=10 -O $full_list https://www.archlinux.org/mirrorlist/all || {
     curl -Lsm 10 -o $full_list https://www.archlinux.org/mirrorlist/all || {
-        echo "Warning: cannot fetch Arch mirror list." >&2
+        WARN "cannot fetch Arch mirror list."
         rm -f $full_list
         return 1
     }
@@ -594,6 +575,47 @@ SaveMirrorlist() {
     esac
 }
 
+ReadToolConf() {
+    local def_width=1000
+    local def_height=750
+    local def_cols=5
+    local max_cols=8
+
+    REFLECTOR_SIMPLE_WIDTH=$def_width
+    REFLECTOR_SIMPLE_HEIGHT=$def_height
+    REFLECTOR_SIMPLE_COLUMNS=$def_cols
+    REFLECTOR_SIMPLE_COUNTRY_METHOD=default
+
+    if [ -r $toolconf ] ; then
+        INFO "reading file $toolconf"
+        source $toolconf
+        if ! IsPositiveNumber "$REFLECTOR_SIMPLE_WIDTH" ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_WIDTH has an invalid value, using default ($def_width)"
+            REFLECTOR_SIMPLE_WIDTH=$def_width
+        fi
+        if ! IsPositiveNumber "$REFLECTOR_SIMPLE_HEIGHT" ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_HEIGHT has an invalid value, using default ($def_height)"
+            REFLECTOR_SIMPLE_HEIGHT=$def_height
+        fi
+
+        if ! IsPositiveNumber "$REFLECTOR_SIMPLE_COLUMNS" ; then
+            WARN "$toolconf: REFLECTOR_SIMPLE_COLUMNS has an invalid value, using default ($def_cols)"
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+        if [ $REFLECTOR_SIMPLE_COLUMNS -gt $max_cols ] ; then
+            WARN "setting value of REFLECTOR_SIMPLE_COLUMNS to $max_cols"
+            REFLECTOR_SIMPLE_COLUMNS=$max_cols
+        elif [ $REFLECTOR_SIMPLE_COLUMNS -lt $def_cols ] ; then
+            WARN "setting value of REFLECTOR_SIMPLE_COLUMNS to $def_cols"
+            REFLECTOR_SIMPLE_COLUMNS=$def_cols
+        fi
+    else
+        INFO "file $toolconf not found, using defaults."
+    fi
+    (( REFLECTOR_SIMPLE_WIDTH+=(100*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
+    (( REFLECTOR_SIMPLE_HEIGHT-=(60*(REFLECTOR_SIMPLE_COLUMNS - def_cols)) ))
+}
+
 Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
@@ -612,26 +634,26 @@ Main() {
     local REFLECTOR_AUTO_CONF=/etc/reflector-auto.conf
     local REFLECTOR_X_CONF=$REFLECTOR_SIMPLE_CONF
 
-    local def_width=1000
-    local def_height=750
-    local def_cols=5
-    local REFLECTOR_SIMPLE_WIDTH=$def_width
-    local REFLECTOR_SIMPLE_HEIGHT=$def_height
-    local REFLECTOR_SIMPLE_COLUMNS=$def_cols
-    local REFLECTOR_SIMPLE_COUNTRY_METHOD=default
+    local REFLECTOR_SIMPLE_WIDTH
+    local REFLECTOR_SIMPLE_HEIGHT
+    local REFLECTOR_SIMPLE_COLUMNS
+    local REFLECTOR_SIMPLE_COUNTRY_METHOD
 
-    [ -r "$REFLECTOR_X_CONF" ] || REFLECTOR_X_CONF=$REFLECTOR_AUTO_CONF
+    if [ ! -r "$REFLECTOR_X_CONF" ] ; then
+        if [ -r $REFLECTOR_AUTO_CONF ] ; then
+            REFLECTOR_X_CONF=$REFLECTOR_AUTO_CONF
+            WARN "Config file$REFLECTOR_SIMPLE_CONF not found, using $REFLECTOR_AUTO_CONF instead."
+        fi
+    fi
 
     local rsync_supported=no   # yes or no
 
     local verbose=$(ArgsYesNo -v "$@")
     local showlist=$(ArgsYesNo -l "$@")
 
-    test "$verbose" = "yes" && echo "Find your country ..." >&2
+    test "$verbose" = "yes" && echo2 "Find your country ..."
 
-    if [ -r $toolconf ] ; then
-        source $toolconf
-    fi
+    ReadToolConf
 
     local local_country_code="$(GetYourCountryCode)"
     local countrynames
@@ -642,6 +664,7 @@ Main() {
     local conf_selected_countries=()
     local conf_dropped_countries=()
     local added_countries=()           # used in removing duplicates in given countries!
+    local use_age=no                   # was yes; now we use --latest, so --age is not needed
     local conf_age=""
     local conf_sort=""
     local conf_number=""
@@ -653,6 +676,7 @@ Main() {
     local rsync_selected=0
     local country_exclude="--country-exclude"          # reflector does not have this option
     local use_pulsating_indicator=no  # yes or no
+    local tmpconf=""
 
     case "$use_number_instead_of_latest" in
         yes | no) ;;
@@ -665,10 +689,12 @@ Main() {
     readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
-        local tmpconf=$(mktemp)
+        tmpconf=$(mktemp)
         Verbose "Reading config file..."
         _get_reflector_x_configs
         Verbose "done."
+    else
+        INFO "file $REFLECTOR_X_CONF not found, using defaults."
     fi
 
     # Now we have info about supported countries.
