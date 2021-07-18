@@ -133,7 +133,7 @@ SimpleRank() {
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
     echo2 "Ranking EndeavourOS mirrors, please wait ..."
-    if [ 0 -eq 1 ] ; then
+    if [ "$use_rankmirrors" = "yes" ] ; then
         RankPerTime
     else
         RankPerAge
@@ -220,6 +220,7 @@ Main()
     local arg
     local timeout_default=2                   # in seconds
     local sort_default=age                    # age or rate
+    local use_rankmirrors=no
 
     # option-related variables
     local debugging=no
@@ -231,7 +232,7 @@ Main()
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
     fi
-    if [ ! -x /usr/bin/rankmirrors ] ; then
+    if [ "$use_rankmirrors" = "yes" ] && [ ! -x /usr/bin/rankmirrors ] ; then
         DIE "ranking failed because package 'pacman-contrib' is not installed."
     fi
 
