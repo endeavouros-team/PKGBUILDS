@@ -10,15 +10,16 @@ export -f eos_GetArch
 echo2()   { echo "$1" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
-debug() {
-    if [ "$debugging" = "yes" ] ; then
-        echo2 "$1"
+verbose() {
+    if [ "$verbose" = "yes" ] ; then
+        echo2 "  $1"
     fi
 }
 
 DeleteTmpFiles() {
     if [ -n "$delete_at_end" ] ; then
-        debug "Deleting temporary files: ${delete_at_end[*]}"
+        echo2 ""
+        verbose "Deleting temporary files: ${delete_at_end[*]}"
         rm -f "${delete_at_end[@]}"
     fi
 }
@@ -78,7 +79,7 @@ RankPerAge() {
     readarray -t result <<< $(
         for mirror in "${marr[@]}" ; do
             m=$(echo "$mirror" | /usr/bin/awk '{print $3}')           # mirror value (with variables)
-            debug "  $m"
+            verbose "$m"
             m2=$(echo "$m" | /usr/bin/sed 's|/$repo/$arch$||')        # mirror url (without variables)
             GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
         done | LC_ALL=C /usr/bin/sort -g $sortopts
@@ -159,51 +160,64 @@ SimpleRank() {
 WriteSystemMirrorlist() {
     local eos="$1"
     local new="$2"
+    local bak="$eos.$(date +%Y.%m.%d-%H.%M.%S)"
 
-    printf2 "\nWriting new mirrorlist to %s.\n" "$eos"
-    $EOS_ROOTER "rm -f $eos.bak ; mv $eos $eos.bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+    printf2 "\nMoving old mirrorlist to %s.\n" "$bak"
+    printf2 "Writing new mirrorlist to %s.\n" "$eos"
+    $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
 }
 
 Options() {
     local opts
 
-    opts=$(getopt -o=ht: --longoptions debug,help,timeout:,sort: --name "$progname" -- "$@")
+    opts=$(getopt -o=ht: --longoptions verbose,help,_help_,timeout:,sort: --name "$progname" -- "$@")
     case "$?" in
         0) ;;
-        *) DIE "cannot continue." ;;
+        *) DIE "getopt detected unsupported option, cannot continue." ;;
     esac
 
     eval set -- "$opts"
 
     while true ; do
         case "$1" in
-            --debug)
-                debugging=yes ;;
-            --sort)
-                sort="$2" ; shift ;;
-            --timeout | -t)
-                timeout="$2" ; shift ;;
-            --help | -h)
+            --_help_)
                 cat <<EOF
 Usage: $progname [options]
 
 Options:
-  --sort=X      How to sort mirrors. Values for X: "rate" or "age".
-                Default: $sort_default.
-  --timeout=X   Set the timeout value X (in seconds) for each mirror check.
-                Default: $timeout_default.
-  -t X          -"-
-  --debug       Show debugging output.
-  --help        This help.
-  -h            -"-
+  --sort <value>
+             Primary key for sorting the mirrors.
+             Supported key values:
+                 age     (latest first)
+                 rate    (fastest first)
+             Default: $sort_default.
+
+  --timeout <value>
+  -t <value>
+             Set the timeout value (in seconds) for checking a mirror.
+             Default: $timeout_default.
+
+  --verbose
+             Show more detailed output.
+
+  --help
+  -h
+             This help.
 EOF
+                ;;
+            --help | -h)
+                $FUNCNAME --_help_
                 exit 0
                 ;;
 
+            --sort)
+                sort="$2" ; shift ;;
+            --timeout | -t)
+                timeout="$2" ; shift ;;
+            --verbose)
+                verbose=yes ;;
             --)
                 shift ; break ;;
-            *)
-                DIE "unsupported option '$1'" ;;
         esac
         shift
     done
@@ -223,7 +237,7 @@ Main()
     local use_rankmirrors=no
 
     # option-related variables
-    local debugging=no
+    local verbose=no
     local timeout=$timeout_default
     local sort=$sort_default
 
