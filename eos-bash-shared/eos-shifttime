@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# This script enables an after-the-fact timeshift equivalent for Arch systems
+# Give it a date (as in 2020-09-20) and it will use the Arch archive repos 
+# to revert to the package state that applied on that date.
+#
+# Note: no AUR package will be reverted.
+#
+# 21 September 2020 - freebird54
+# 21 July 2021 - changes by manuel
+#
+
+# Get some useful definitions:
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+export -f eos_yad
+export -f eos_GetProgName
+# EOS_ROOTER
+
+DIE() {
+    local msg="$1"
+    local title="$2"    # optional, default is "Error"
+    [ -n "$title" ] || title="Error"
+    echo "$1" | eos_yad --text-info --title="$title" --text="Message from '$progname':" --image=error --button=yad-quit
+    exit 1
+}
+STOP() { DIE "$1" Warning; }
+
+DateValidityCheck() {
+    [ -n "$REVERTDATE" ] || exit 1                           # No date selected.
+    [ "$REVERTDATE" = "$stopdate" ] && STOP "Current date selected, nothing to do."
+    curl -Lsm 10 -o/dev/null --fail "$urlbase" || DIE "Archive at $REVERTDATE not found!"
+}
+
+Main()
+{
+    local progname="$(eos_GetProgName)"
+    local date=$(/usr/bin/date +%Y%m%d-%H%M)        # for temporary backup file
+    local stopdate="$(/usr/bin/date +%Y/%m/%d)"     # for checking if user gave this date
+    local mlist=/etc/pacman.d/mirrorlist
+    local bak="$mlist.$progname.$date"
+    local txt="This app can revert (downgrade) the packages of this system to the state\nthey were in on the selected date.\n\n"
+          txt+="Please select the date to revert your packages to.\n"
+    local REVERTDATE=$(eos_yad --calendar --title "Select Date" --text="$txt" --image=dialog-question --date-format=%C%y/%m/%d \
+                               --button='yad-cancel!!Do nothing':1 --button='Revert!dialog-yes!Downgrade':0)
+    local urlbase="https://archive.archlinux.org/repos/$REVERTDATE"
+    local cmd=""
+    local cmd2=""
+    local tmpmlist
+
+    DateValidityCheck
+
+    # Create a temporary mirrorlist for the specified date.
+    tmpmlist=$(mktemp)
+    printf "## Reversion mirrorlist\n\n" > $tmpmlist
+    printf "%s\n\n" "Server = $urlbase/\$repo/os/\$arch" >> $tmpmlist
+
+    cmd="mv $mlist '$bak'"         # Backups original mirrorlist and
+    cmd+=";mv $tmpmlist $mlist"    # uses the reverted list.
+    cmd+=";pacman -Syyuu"          # Runs the 'downdate' command.
+    cmd+=";mv '$bak' $mlist"       # Restores the original mirrorlist from backup.
+    cmd+=";chmod 0644 $mlist"      # Make sure mirrorlist has proper permissions.
+
+    cmd2="$(echo "$cmd" | tr ';' '\n' | sed 's|^|  |')"
+    RunInTerminal "printf 'Reverting all packages to $REVERTDATE\n\n'; echo 'Need elevated privileges to run commands:'; echo '$cmd2'; $EOS_ROOTER '$cmd'"
+}
+
+Main "$@"
