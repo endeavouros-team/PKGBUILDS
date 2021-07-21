@@ -14,6 +14,7 @@
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 export -f eos_yad
 export -f eos_GetProgName
+export -f eos_GetArch
 # EOS_ROOTER
 
 DIE() {
@@ -34,6 +35,10 @@ DateValidityCheck() {
 Main()
 {
     local progname="$(eos_GetProgName)"
+    case "$(eos_GetArch)" in
+        x86_64) ;;
+        *) DIE "This program is supported only on x86_64 machines." ;;   # because of mirrors...
+    esac
     local date=$(/usr/bin/date +%Y%m%d-%H%M)        # for temporary backup file
     local stopdate="$(/usr/bin/date +%Y/%m/%d)"     # for checking if user selected this date
     local mlist=/etc/pacman.d/mirrorlist
