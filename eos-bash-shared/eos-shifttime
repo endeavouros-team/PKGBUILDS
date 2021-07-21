@@ -35,10 +35,11 @@ Main()
 {
     local progname="$(eos_GetProgName)"
     local date=$(/usr/bin/date +%Y%m%d-%H%M)        # for temporary backup file
-    local stopdate="$(/usr/bin/date +%Y/%m/%d)"     # for checking if user gave this date
+    local stopdate="$(/usr/bin/date +%Y/%m/%d)"     # for checking if user selected this date
     local mlist=/etc/pacman.d/mirrorlist
     local bak="$mlist.$progname.$date"
-    local txt="This app can revert (downgrade) the packages of this system to the state\nthey were in on the selected date.\n\n"
+    local txt="This app can revert (downgrade) packages of this system to the state they were in\non the selected date.\n"
+          txt+="Note: AUR packages will <i>not</i> be reverted.\n\n"
           txt+="Please select the date to revert your packages to.\n"
     local REVERTDATE=$(eos_yad --calendar --title "Select Date" --text="$txt" --image=dialog-question --date-format=%C%y/%m/%d \
                                --button='yad-cancel!!Do nothing':1 --button='Revert!dialog-yes!Downgrade':0)
