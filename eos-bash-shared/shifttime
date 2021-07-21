@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# This script enables an after-the-fact timeshift equivalent for Arch systems
+# Give it a date (as in 2020-09-20) and it will use the Arch archive repos 
+# to revert to the package state that applied on that date.
+#
+# 21 September 2020 - freebird54
+# 21 July 2021 - changes by manuel
+#
+
+# Get some common definitions:
+source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+export -f eos_yad
+export -f eos_GetProgName
+# EOS_ROOTER
+
+
+DIE() {
+    #echo "$progname: error: $1" >&2
+    echo "$1" | eos_yad --text-info --title="Error" --text="Message from '$progname':" --image=error --button=yad-quit
+    exit 1
+}
+
+DateValidityCheck() {
+    [ -n "$REVERTDATE" ] || DIE "No date selected!"
+    curl -Lsm 10 -o/dev/null --fail "$urlbase" || DIE "Archive at $REVERTDATE not found!"
+}
+
+Main()
+{
+    local progname="$(eos_GetProgName)"
+    local date=$(date +%Y%m%d-%H%M)
+    local mlist=/etc/pacman.d/mirrorlist
+    local bak=$mlist.$progname.$date
+    local txt="Select the date to revert your packages to.\n"
+          txt+="Packages will be reverted to the state they were in on the selected date.\n"
+    local REVERTDATE=$(eos_yad --calendar --title "Select Date" --text="$txt" --image=dialog-question --date-format=%C%y/%m/%d)
+    local urlbase="https://archive.archlinux.org/repos/$REVERTDATE"
+    local cmd=""
+    local cmd2=""
+    local tmpmlist
+
+    DateValidityCheck
+
+    # copy $mlist to backup
+    cmd="mv $mlist $bak"
+
+    # building the repo entry for the specified date, and temporarily making it the mirrorlist
+    tmpmlist=$(mktemp)
+    printf "## Reversion mirrorlist\n\n" > $tmpmlist
+    printf "%s\n\n" "Server = $urlbase/\$repo/os/\$arch" >> $tmpmlist
+    cmd+=";cp $tmpmlist $mlist;rm $tmpmlist"
+
+    # run the 'downdate' command
+    cmd+=";pacman -Syyuu"
+
+    # Restoring the backup mirrorlist...
+    cmd+=";cp $bak $mlist;chmod 0644 $mlist;rm $bak"
+    cmd2="$(echo "$cmd" | tr ';' '\n' | sed 's|^|  |')"
+    RunInTerminal "printf 'Reverting all packages to $REVERTDATE\n\n'; echo 'Need elevated privileges to run commands:'; echo '$cmd2'; $EOS_ROOTER '$cmd'"
+}
+
+Main "$@"

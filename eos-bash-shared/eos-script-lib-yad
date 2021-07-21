@@ -49,6 +49,8 @@ eos_GetArch() {
     printf "%s" "$arch"
 }
 
+eos_GetProgName() { /usr/bin/basename "$0" ; }
+
 eos_select_browser() {
     # Select an existing browser.
     # User may export a variable _WELCOME_BROWSER to use the preferred browser.
