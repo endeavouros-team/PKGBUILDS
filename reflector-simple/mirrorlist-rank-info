@@ -60,6 +60,18 @@ Age_Fetchtime()
     echo "$output"
 }
 
+ShowLines() {
+    # Testing material:
+    # echo "atest1 110 0.50000"
+    # echo "atest2 10000 0.010000"
+
+    echo "Mirror Age(sec) Rate(sec)"
+    echo "~~~~~~ ~~~~~~~~ ~~~~~~~~~"  # for sorting: tilde (~) is after Z in ascii table
+    for line in "${results[@]}" ; do
+        echo "$line"
+    done
+}
+
 Options() {
     local arg
     for arg in "$@" ; do
@@ -86,7 +98,7 @@ Main() {
     local mlfile=/etc/pacman.d/mirrorlist
 
     local mirrors="$(grep "^Server = " $mlfile | awk '{print $NF}' | sed 's|/$repo/os/$arch$||')"
-    local mirror
+    local mirror m
     local now=$(date +%s)
     local result age fetchtime
     local results=()
@@ -94,6 +106,7 @@ Main() {
     local file=lastupdate
     local line
     local ix=0
+    local count="$(echo "$mirrors" | wc -l)"
 
     printf2 "Show up-to-date ranking information about mirrors in file $mlfile.\n"
 
@@ -102,30 +115,22 @@ Main() {
     printf2 "==> Use option --help for more info.\n"
 
     for mirror in $mirrors ; do
-        printf2 "\r%2d ranking..."  "$((++ix))"
+        printf2 "\r==> %d/%d ranking..."  "$((++ix))" "$count"
         result="$(Age_Fetchtime "$mirror" "$now")"
         if [ "$result" != "fail" ] ; then
             age=$(      echo "$result" | cut -d '|' -f1)
             fetchtime=$(echo "$result" | cut -d '|' -f2)
-            results+=("$mirror $age $fetchtime")
+            m="$mirror"'/$repo/os/$arch'
+            results+=("$m $age $fetchtime")
         else
             WARN "fetching file '$mirror/$file' failed."
         fi
     done
-    printf2 "\n"
-    printf2 "==> Sorting by $sort.\n"
-    printf2 "==> Showing fields: mirror url, age (sec), fetch-time (sec)\n\n"
+    printf2 "\n==> Sorting by %s.\n\n" "$sort"
+
     case "$sort" in
-        age)
-            for line in "${results[@]}" ; do
-                echo "$line"
-            done | sort -g -k2,2 -k3,3 | column -t   # -n or -g works
-            ;;
-        rate)
-            for line in "${results[@]}" ; do
-                echo "$line"
-            done | sort -g -k3,3 -k2,2 | column -t   # -V or -d works
-            ;;
+        age)  ShowLines | sort -n -k2,2 -k3,3 | column -t ;;
+        rate) ShowLines | sort -n -k3,3 -k2,2 | column -t ;;
     esac
 }
 
