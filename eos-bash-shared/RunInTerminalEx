@@ -18,7 +18,11 @@ Main()
     local xx cmd=""
 
     for xx in "$@" ; do
-        cmd+="'$xx' "
+        case "" in
+            -*) cmd+="$xx " ;;
+            *) cmd+="'$xx' " ;;
+        esac
+        
     done
 
     eos_yad_RunCmdTermBash "$cmd"

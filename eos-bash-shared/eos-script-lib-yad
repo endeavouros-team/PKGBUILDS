@@ -177,17 +177,40 @@ eos_yad_GetArgVal() {
     #e cho "$1" | cut -d '=' -f 2
 }
 
-eos_yad_RunCmdTermBash() {
-    local cmd="$1"
-    local prompt="$2"
-    local termopts="$3"
-    local waitopt="$4"
+eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certain options
+    local cmd=""
+    local prompt=""
+    local termopts=""
+    local waitopt=""
+    local opts
 
+    # Handle options for variables cmd ... waitopt.
+    opts="$(getopt -o=p:t:w:E --longoptions prompt:,term:,wait:,no-enter-wait --name "$FUNCNAME" -- "$@")"
+    [ $? -eq 0 ] || return 1
+    eval set -- "$opts"
+    while true ; do
+        case "$1" in
+            --prompt | -p)
+                prompt="$2" ; shift ;;
+            --term | -t)
+                termopts="$2" ; shift ;;        # e.g. --term="-T 'my title' --geometry=100x200"
+            --wait | -w)
+                waitopt="$2" ; shift ;;         # e.g. --wait="--no-enter-wait"
+            --no-enter-wait | -E)
+                waitopt="--no-enter-wait" ;;    # alternative to --wait
+            --)
+                shift; break ;;
+        esac
+        shift
+    done
+    cmd="$*"
+    [ -n "$cmd" ] || { echo "$FUNCNAME: warning: required command is missing." >&2; return 1; }
+
+    # Get the available/configured terminal.
     local term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
     mkdir -p "$HOME/.cache"
-
     local tmpfile=$(mktemp "$HOME/.cache/$FUNCNAME.XXXXX")
 
     echo "#!/bin/bash"                                   >> $tmpfile
@@ -195,19 +218,15 @@ eos_yad_RunCmdTermBash() {
     echo "$cmd"                                          >> $tmpfile
     echo "echo"                                          >> $tmpfile
     case "$term" in
-        */deepin-terminal) ;;
+        /usr/bin/deepin-terminal | deepin-terminal) ;;
         *)
-            if [ 0 -eq 1 ] ; then
-                echo "read -p 'Press ENTER to close this window: '"  >> $tmpfile
-            else
-                _init_translations
-                if [ "$waitopt" != "--no-enter-wait" ] ; then
-                    echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
-                fi
+            _init_translations
+            if [ "$waitopt" != "--no-enter-wait" ] ; then
+                echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
             fi
             ;;
     esac
-    echo "rm -f $tmpfile"                                >> $tmpfile
+    echo "rm -f $tmpfile"                                >> $tmpfile                    # this may cause issues in very special cases!
 
     chmod +x $tmpfile
 
@@ -225,6 +244,15 @@ eos_yad_RunCmdTermBash() {
     # The following DOES NOT WORK with plain gnome-terminal:
     #echo "Deleting '$tmpfile'."
     #rm -f $tmpfile
+}
+
+eos_yad_RunCmdTermBash() {
+    local cmd="$1"
+    local prompt="$2"
+    local termopts="$3"
+    local waitopt="$4"
+
+    eos_yad_RunCmdTermBashOpt --prompt="$prompt" --term="$termopts" --wait="$waitopt" "$cmd"
 }
 
 eos_yad_problem() {

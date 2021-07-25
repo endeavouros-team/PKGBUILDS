@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.8.5
+pkgver=1.8.6
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -34,6 +34,7 @@ source=(
 
   $_url/eos-FindAppIcon
   $_url/RunInTerminal
+  $_url/RunInTerminalOpt
   $_url/RunInTerminalEx
   $_url/ksetwallpaper.py
   $_url/ChangeDisplayResolution
@@ -58,11 +59,12 @@ source=(
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
-sha512sums=('065547403cd9d70f26b46421e82db72aaf6de31f03e6e689c65ce5efff5f3324361aa0207bf5768b43e01edda64ac7ff648c315d50b72c658f4078abcb2b0649'
+sha512sums=('7cc7ef5c99b0ba3cb797e4fd4f8955c45e1cc55b151d1c3aa5d04f7ca1f45d0fdb648d1e6c612ee1576fed2ce013591464cada737bb5cae9b0e007d1261fcdec'
             'e8df7655ee2cbcd4f6a6c29714f70992c48fc3e471b8b059d18db7e7972f33197fa618361d9363e7817ce91c863d692b6ac737243d4c12a6b2f2031d8787b156'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
-            'c7bd73ce346844624ae9f78c8a86e674e03548b7ef8497e6f78318387d4118f0037d67f9c6f4e1c64f382ac6a62d27f8f119f227d08c337970540e8122757b85'
+            '9ab3a10987d264f5fb639127e215c6dd915e5e847733cba0310d3c070aad624ec206da08f69e0cfd85bd3cb59c2c6d890daea93c8fea1536840805f5a8a113fd'
+            'a67976cb1aab264585a671c9f773bce6a033b66acdfeaac34a62f61818fabb176cb3437b9a5e42f62e6b24c2b8d9bfec850eea4d3c8f8d56804a4d43495187ed'
             'a3488dab4b65f215ee1513c5ff4c81b1d9e43346abb3a1e9571271c8e60e13184bd826a6206938c14c004fa5adb4f629ea832a535a51972657adb2de5bc30634'
             '0193f851b4145cb761dc2e47f4bd2c00a028c016489bb2f053bba64ef88c08d02e81f9dc095ba3928de8fa0fbb1fd2b3e5289bb125fe7dcc31634b7afbf48818'
             '803ae582e1a170f5d1cea3f5f69e72a0de188c389e6fcd471a35471753158efd0cd5622d580fc86e71654765a041b83a217268be2a87bb3709af632cc02c442f'
@@ -95,6 +97,7 @@ package() {
   install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog
   install -Dm755 eos-kbd-set                    $pkgdir/usr/bin/eos-kbd-set
   install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
+  install -Dm755 RunInTerminalOpt               $pkgdir/usr/bin/RunInTerminalOpt
   install -Dm755 RunInTerminalEx                $pkgdir/usr/bin/RunInTerminalEx
   install -Dm755 ChangeDisplayResolution        $pkgdir/usr/bin/ChangeDisplayResolution
   install -Dm755 device-info                    $pkgdir/usr/bin/device-info
