@@ -270,7 +270,19 @@ Main()
             "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
             "$xsession") Cmd cat ~/.xsession-errors ;;
             "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
-            "$install")  Cmd cat /var/log/Calamares.log ;;
+            "$install")
+                local fname
+                for fname in /var/log/endeavour-install.log /var/log/Calamares.log ; do
+                    if [ -r $fname ] ; then
+                        Cmd cat $fname
+                        break
+                    fi
+                done
+                if [ ! -r $fname ] ; then
+                    WarningMsg "no EndeavourOS install log found!"
+                    echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
+                fi
+                ;;
             "$fstab")    Cmd cat /etc/fstab ;;
             "$pacmanconf") Cmd cat $pacmanconf ;;
             "$blame")    Cmd systemd-analyze blame ;;
