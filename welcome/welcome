@@ -51,12 +51,6 @@ export EOS_KEEP_PKGS
 export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
 export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
-#export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
-#eos_yad() {
-#    GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@"
-#}
-#export -f eos_yad
-
 
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
@@ -102,10 +96,6 @@ AfterTranslations() {
     export UPDT_NOTHING_TODO="$(ltr updt_nothing_todo)"
     export UPDT_UPDATE_CHECK="$(ltr updt_update_check):"
 }
-
-export -f ltr
-export tr_strings
-export SELECTED_EOS_WELCOME
 
 IsInstalled() { /usr/bin/pacman -Q "$1" >& /dev/null ; }
 export -f IsInstalled
@@ -201,6 +191,17 @@ yad_community_editions() {
 export -f yad_community_editions
 
 yad_calamares() {
+    local new_installer=/usr/bin/eos-install-mode-run-calamares
+
+    if [ -x $new_installer ] ; then
+        $new_installer
+    else
+        yad_calamares_2021_04_17 "$@"   # old installer
+    fi
+}
+export -f yad_calamares
+
+yad_calamares_2021_04_17() {
     local mode="$1"                             # offline, online, choose; also wm name (tbd)
     local debug_terminal="$2"
     local prog=$INSTALLER_PROGRAM
@@ -409,7 +410,7 @@ EOF
         # test $netlog -eq 1 && cat $INSTALL_LOG_FILE | curl -F 'f:1=<-' ix.io
     fi
 }
-export -f yad_calamares
+export -f yad_calamares_2021_04_17
 
 yad_calamares_debug() {
     yad_calamares "$1" yes
