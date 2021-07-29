@@ -69,39 +69,33 @@ Calamares_Start() {
     pkexec calamares -style kvantum -c /etc/calamares/ -d >> $log &
 }
 
-### Dialog that asks for the official or community edition. ###
+### Dialog that asks for the online or offline edition. ###
 AskMode() {
     local inet_no="Internet connection is not required"
     local inet_yes="Internet connection is required"
     local ret=0
-    local official_online="Official (online)"
-    local official_offline="Official (offline)"
-    local community="Community"
+    local official_online="Online"
+    local official_offline="Offline"
     local txt
 
     txt=""
     txt+="<span font='Sans 14'>Installing <b>EndeavourOS</b> to your system.</span>\n\n"
-    txt+="Please select one of the following alternatives:\n\n"
+    txt+="Please select <i>online</i> or <i>offline</i> install mode (you'll select details later):\n\n"
     txt+="<b>$official_online</b>\n"
     txt+="<tt>  </tt>- <tt>Xfce, KDE, GNOME, MATE, Budgie, LXQt,</tt> and more\n"
-    txt+="<tt>  </tt>- Vanilla theming\n"
+    txt+="<tt>  </tt>- Theming: vanilla\n"
     txt+="<tt>  </tt>- $inet_yes\n\n"
     txt+="<b>$official_offline</b>\n"
     txt+="<tt>  </tt>- <tt>Xfce</tt>\n"
-    txt+="<tt>  </tt>- EndeavourOS theming\n"
+    txt+="<tt>  </tt>- Theming: EndeavourOS\n"
     txt+="<tt>  </tt>- $inet_no\n\n"
-    txt+="<b>$community</b>\n"
-    txt+="<tt>  </tt>- Currently available: <tt>Sway, Bspwm</tt>\n"
-    txt+="<tt>  </tt>- $inet_yes\n\n"
-    txt+="Later you'll get to select more details.\n\n"
 
     local cmd=(
         eos_yad --form --title="Select what to install" --image=dialog-question
         --text="$txt"
         --buttons-layout=spread
-        --button="$official_online!!EndeavourOS team edition, vanilla theming, online install.":11
-        --button="$official_offline!!EndeavourOS team edition (Xfce), special theming, offline install.":13
-        --button="$community!!EndeavourOS community edition, online install.":15
+        --button="$official_online!!Vanilla theming, online install.":11
+        --button="$official_offline!!Xfce, special theming, offline install.":13
     )
 
     "${cmd[@]}"       # ask mode from the user
@@ -112,7 +106,6 @@ AskMode() {
     case "$ret" in
         11) mode=online ;;
         13) mode=offline ;;
-        15) mode=community ;;
         252|*) exit $ret ;;
     esac
 }
@@ -160,20 +153,23 @@ Community() {
 
 ###  Everything starts in the Main function. ###
 Main() {
+    local mode="$1"                             # one of: offline, online, community, or "" (empty)
     local progname="$(basename "$0")"           # for help and messages
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
-    local mode=""                               # one of: offline, online, sway, bspwm
     local cfolder=/etc/calamares                # folder for calamares configuration files
 
-    # sets the value for $mode
-    AskMode
+    # asks the value for $mode
+    case "$mode" in
+        "" | test) AskMode ;;
+    esac
 
     # copy config files based on $mode
     case "$mode" in
         online)    Online ;;
         offline)   Offline ;;
         community) Community ;;
+        *) GUIDIE "unsupported mode '$mode'" ;;
     esac
 
     # finally: run calamares with logs (install, pacman)
