@@ -47,7 +47,10 @@ GetGpuIds() {
             vendorinfo="$id"
             ;;
         *)
-            printf2 "Warning: unsupported parameter '$1' is ignored.\n\n"
+            case "$1" in
+                -h | --help) ;;
+                *) printf2 "Warning: unsupported parameter '$1' is ignored.\n\n" ;;
+            esac
             Usage2
             exit 1
             ;;
