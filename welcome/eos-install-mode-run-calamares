@@ -6,7 +6,7 @@
 # or it can be called from the Welcome app.
 
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
-#source /usr/share/endeavouros/scripts/translations.bash || exit 1
+source /usr/share/endeavouros/scripts/translations.bash || exit 1
 
 export -f eos_yad
 
@@ -79,23 +79,16 @@ AskMode() {
     local txt
 
     txt=""
-    txt+="<span font='Sans 14'>Installing <b>EndeavourOS</b> to your system.</span>\n\n"
-    txt+="Please select <i>online</i> or <i>offline</i> install mode (you'll select details later):\n\n"
-    txt+="<b>$official_online</b>\n"
-    txt+="<tt>  </tt>- <tt>Xfce, KDE, GNOME, MATE, Budgie, LXQt,</tt> and more\n"
-    txt+="<tt>  </tt>- Theming: vanilla\n"
-    txt+="<tt>  </tt>- $inet_yes\n\n"
-    txt+="<b>$official_offline</b>\n"
-    txt+="<tt>  </tt>- <tt>Xfce</tt>\n"
-    txt+="<tt>  </tt>- Theming: EndeavourOS\n"
-    txt+="<tt>  </tt>- $inet_no\n\n"
+    txt+="$(ltr cal_info3)"
+    txt+="$(ltr cal_info2)"
 
     local cmd=(
-        eos_yad --form --title="Select what to install" --image=dialog-question
+        eos_yad --form --title="$(ltr cal_choose)"
+        --image=system-os-installer
         --text="$txt"
         --buttons-layout=spread
-        --button="$official_online!!Vanilla theming, online install.":11
-        --button="$official_offline!!Xfce, special theming, offline install.":13
+        --button="Online!!Vanilla theming, internet required":11
+        --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
     )
 
     "${cmd[@]}"       # ask mode from the user
@@ -121,6 +114,7 @@ InstallWithLogs() {
             ;;
         offline)
             # no pacman log for offline install
+            CatchChrootedPacmanLog
             ;;
     esac
 }
@@ -136,28 +130,16 @@ CopyFile() {
     pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
 }
 
-###  Runs the online install. ###
-Online() {
-    CopyFile $cfolder/settings_online.conf $cfolder/settings.conf
-}
-
-###  Runs the offline install. ###
-Offline() {
-    CopyFile $cfolder/settings_offline.conf $cfolder/settings.conf
-}
-
-###  Runs the Community editions install. ###
-Community() {
-    CopyFile $cfolder/settings_community.conf $cfolder/settings.conf
-}
-
 ###  Everything starts in the Main function. ###
 Main() {
-    local mode="$1"                             # one of: offline, online, community, or "" (empty)
+    local lang="$1"
+    local mode="$2"                             # one of: offline, online, community, or "" (empty)
     local progname="$(basename "$0")"           # for help and messages
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
+
+    _init_translations $lang || { GUIDIE "$progname: language init failed" ; }
 
     # asks the value for $mode
     case "$mode" in
@@ -166,10 +148,12 @@ Main() {
 
     # copy config files based on $mode
     case "$mode" in
-        online)    Online ;;
-        offline)   Offline ;;
-        community) Community ;;
-        *) GUIDIE "unsupported mode '$mode'" ;;
+        online | offline | community)
+            CopyFile $cfolder/settings_$mode.conf $cfolder/settings.conf
+            ;;
+        *)
+            GUIDIE "unsupported mode '$mode'"
+            ;;
     esac
 
     # finally: run calamares with logs (install, pacman)

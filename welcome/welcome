@@ -365,11 +365,11 @@ INSTALL() {
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 'eos-install-mode-run-calamares'
+      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 "eos-install-mode-run-calamares '$lang' ''"
   )
   if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
-          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn 'eos-install-mode-run-calamares community'
+          --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' 'community'"
       )
   fi
   tabcontents+=(
