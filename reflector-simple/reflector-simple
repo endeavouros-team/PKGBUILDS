@@ -498,11 +498,19 @@ AddCountryNamesToMirrors() {
     local full_list=$(mktemp)
 
     Verbose "Fetching Arch mirror list..."
-    curl -Lsm 10 -o $full_list https://www.archlinux.org/mirrorlist/all || {
-        WARN "cannot fetch Arch mirror list."
-        rm -f $full_list
-        return 1
-    }
+    if [ 0 -eq 1 ] ; then
+        curl -Lsm 10 -o $full_list $ARCH_SITE/mirrorlist/all || {
+            WARN "cannot fetch Arch mirror list."
+            rm -f $full_list
+            return 1
+        }
+    else
+        eos-latest-arch-mirrorlist $full_list || {
+            WARN "cannot fetch Arch mirror list."
+            rm -f $full_list
+            return 1
+        }
+    fi
     Verbose "done."
 
     local selected_mirrors=$(grep "^Server = " $tmpfile | awk '{print $3}')
@@ -619,13 +627,14 @@ ReadToolConf() {
 Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
+    local ARCH_SITE=https://www.archlinux.org
 
     Verbose "Fetching country names with reflector..."
     local REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
     Verbose "done."
 
     if [ -z "$REFLECTOR_LIST_COUNTRIES" ] ; then
-        DIE "reflector: Fetching information from https://www.archlinux.org failed!"
+        DIE "reflector: Fetching information from $ARCH_SITE failed!"
     fi
     REFLECTOR_COUNTRIES="$(echo "Worldwide WW 0" ; echo "$REFLECTOR_LIST_COUNTRIES")"
 
