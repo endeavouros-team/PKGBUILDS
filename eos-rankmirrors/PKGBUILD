@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-rankmirrors
-pkgver=2.0.3
+pkgver=2.0.4
 pkgrel=1
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
@@ -14,7 +14,7 @@ depends=(eos-bash-shared)
 options=(!strip !emptydirs)
 
 source=($url/$pkgname)
-sha512sums=('707c1d03a8027af8bf443b1d38e5c4fc79fcb8eae58ef31fd3ea50702e9f5dd826ffc149694b1510ff3a42797c87b3fd10937a642a40f0b5620913e3a32d37d3')
+sha512sums=('af2363387e659cf9b1283d8fe9932bca04f4b88e7a15822ee5d739006b8b60b0656087fc61eb8b1d19743ae1be315612bb40fc52ad609baaf6f87080218c6f31')
 
 package() {
  install -d $pkgdir/usr/bin
