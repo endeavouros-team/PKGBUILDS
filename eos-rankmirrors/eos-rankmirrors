@@ -149,12 +149,12 @@ SimpleRank() {
     printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
     printf "# The following fields are shown for each mirror:\n"
     printf "#   mirror:          The mirror address\n"
-    printf "#   update-number:   Ordinal number of the latest update (larger is newer)\n"
+    printf "#   update-level:    Ordinal number of the latest update (larger is newer)\n"
     printf "#   fetch-time:      Measures the speed of the mirror (smaller is faster)\n"
     printf "#\n"
     while true ; do
-        echo "mirror update-number fetch-time"
-        echo "~~~~~~ ~~~~~~~~~~~~~ ~~~~~~~~~~"
+        echo "mirror update-level fetch-time"
+        echo "~~~~~~ ~~~~~~~~~~~~ ~~~~~~~~~~"
         ShowArray "${result[@]}"
         break
     done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
