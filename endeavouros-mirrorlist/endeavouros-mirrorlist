@@ -8,13 +8,17 @@
 ###     SigLevel = PackageRequired
 ###     Include = /etc/pacman.d/endeavouros-mirrorlist
 ######################################################
+### Tip: Use the 'eos-rankimirrors' program to rank
+###      these mirrors or re-order them manually.
+######################################################
 
 ## Germany
 Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
 Server = https://de.freedif.org/EndeavourOS/repo/$repo/$arch
+Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
 
 ## Netherlands
-Server = https://mirror.easylee.nl/endeavouros/repo/$repo/$arch
+Server = https://mirror.erickochen.nl/endeavouros/repo/repo/$repo/$arch
 
 ## Sweden
 Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
