@@ -177,7 +177,7 @@ WriteSystemMirrorlist() {
 Options() {
     local opts
 
-    opts=$(getopt -o=ht: --longoptions verbose,help,_help_,timeout:,sort: --name "$progname" -- "$@")
+    opts=$(getopt -o=hnt: --longoptions verbose,help,_help_,no-save,timeout:,sort: --name "$progname" -- "$@")
     case "$?" in
         0) ;;
         *) DIE "getopt detected unsupported option, cannot continue." ;;
@@ -204,6 +204,10 @@ Options:
              Set the timeout value (in seconds) for checking a mirror.
              Default: $timeout_default.
 
+  --no-save
+  -n
+             Don't save the generated mirrorlist.
+
   --verbose
              Show more detailed output.
 
@@ -223,6 +227,9 @@ EOF
                 timeout="$2" ; shift ;;
             --verbose)
                 verbose=yes ;;
+            --no-save)
+                save=no
+                ;;
             --)
                 shift ; break ;;
         esac
@@ -242,6 +249,7 @@ Main()
     local timeout_default=2                   # in seconds
     local sort_default=age                    # age or rate
     local use_rankmirrors=no
+    local save=yes
 
     # option-related variables
     local verbose=no
@@ -266,7 +274,9 @@ Main()
         DIE "ranking failed, no mirrors found!"
     fi
 
-    WriteSystemMirrorlist "$eos" "$new"
+    if [ "$save" = "yes" ] ; then
+        WriteSystemMirrorlist "$eos" "$new"
+    fi
 
     DeleteTmpFiles
 }
