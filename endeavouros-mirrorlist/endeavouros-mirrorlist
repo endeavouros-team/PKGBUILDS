@@ -18,7 +18,7 @@ Server = https://de.freedif.org/EndeavourOS/repo/$repo/$arch
 Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
 
 ## Netherlands
-Server = https://mirror.erickochen.nl/endeavouros/repo/repo/$repo/$arch
+Server = https://mirror.erickochen.nl/endeavouros/repo/$repo/$arch
 
 ## Sweden
 Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
