@@ -1066,7 +1066,7 @@ ManualCheckOfAssets() {
         else
             : #printf2 "\n%s "  "Is $op OK (y/n)?"
         fi
-        read2 -t 10 -p "Is $op OK (Y/n)? "
+        read2 -t 10 -p "$tag: Is $op OK (Y/n)? "
         case "$REPLY" in
             [yY]* | "") break ;;
             *) ;;
