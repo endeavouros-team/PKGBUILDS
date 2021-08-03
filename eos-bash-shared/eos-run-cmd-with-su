@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Show whose password is needed and run 'su -c'.
+
+Main()
+{
+    printf "Root "
+    /usr/bin/su -c "$@"
+}
+
+Main "$@"

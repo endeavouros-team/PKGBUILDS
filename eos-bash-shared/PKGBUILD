@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.8.9
+pkgver=1.8.10
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -42,6 +42,7 @@ source=(
   $_url/eos-connection-checker
   $_url/paccache-service-manager
   $_url/su-c_wrapper
+  $_url/eos-run-cmd-with-su
   $_url/eos-wallpaper-set
   $_url/UpdateInTerminal
   $_url/UpdateInTerminal.desktop
@@ -59,7 +60,7 @@ source=(
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
-sha512sums=('90c44e4bea76f189be9bec4f8c29e49870d440d966f2b0e68d4f2c8d955792df6dff20015c3bac9a4ae72883501a7323641b268d6bf4d0d0631dfe14e84b2dd9'
+sha512sums=('2445463f75f4441fbb7dcd41521a6ad7f89c7e4a3f931300565869e01a8dd4de06cb43a603fae501a9012bc4319d5c5387dfbacf7a4d502084f51c7a8277b92b'
             'e8df7655ee2cbcd4f6a6c29714f70992c48fc3e471b8b059d18db7e7972f33197fa618361d9363e7817ce91c863d692b6ac737243d4c12a6b2f2031d8787b156'
             'a009fccdc852ddfa228139da8a7e0d49391d87d1a53f9b58aac467e0e3e8711d01213e5689f64ab4103b5aa4c4c3dc58ac93bdc030670cf06f71bf3af3d2120b'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
@@ -71,6 +72,7 @@ sha512sums=('90c44e4bea76f189be9bec4f8c29e49870d440d966f2b0e68d4f2c8d955792df6df
             '864e9d1f563fe50c71b49105d0f8e056a51273510f6a70a2f82619da6b543c0406c2ecedc9d599345a84a98aa9c68ed41469c7ce29f1ab4201be61fc5fff3451'
             'dbe1c6e133ef46e64e8a826f20eb9777513cd738bf90ed28e18d0cb10dcfa5712ffa5b36b033c9c0b8c844ffdecc7c62fcd7076ff4138a67f3cef29531b61065'
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
+            'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '790c15dfa97cc0558666616bdc362b62e40c55e06921a7a8fa9d784a536c9f6b27c8d34825ce518a2177075cd009cea77b7dfbaba21df2508dc9875b8c15972d'
             '9efd23d976a89455e9c17d82aa4d304fb43726b84b9ce8ad69b81b633b114ec9d220455c92b08f1a87da5a143b11e1c30a698e1f2505034783f1a10fd8ab4bf2'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'
@@ -104,6 +106,7 @@ package() {
   install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
   install -Dm755 paccache-service-manager       $pkgdir/usr/bin/paccache-service-manager
   install -Dm755 su-c_wrapper                   $pkgdir/usr/bin/su-c_wrapper
+  install -Dm755 eos-run-cmd-with-su            $pkgdir/usr/bin/eos-run-cmd-with-su
   install -Dm755 eos-wallpaper-set              $pkgdir/usr/bin/eos-wallpaper-set
   install -Dm755 UpdateInTerminal               $pkgdir/usr/bin/UpdateInTerminal
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
