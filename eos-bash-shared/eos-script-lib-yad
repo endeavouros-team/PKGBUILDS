@@ -550,9 +550,15 @@ eos_FormMonoText() {
     printf "<span font='Mono$size'>%s</span>" "$txt"
 }
 
+eos-run-cmd-with-su() {
+    printf "Root "
+    /usr/bin/su -c "$*"
+}
+export -f eos-run-cmd-with-su
+
 # check the config:
 case "$EOS_ROOTER" in
-    su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="/usr/bin/su -c" ;;          # default!
+    su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="eos-run-cmd-with-su" ;;          # default!
     sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="sudo bash -c" ;;
     pkexec       | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
     su-c_wrapper)                                                export EOS_ROOTER="/usr/bin/su-c_wrapper bash -c" ;;
