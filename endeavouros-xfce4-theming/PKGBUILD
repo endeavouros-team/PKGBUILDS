@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-xfce4-theming
-pkgver=r26.c4a7f2d
+pkgver=26.c4a7f2d
 pkgrel=1
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=('any')
@@ -16,7 +16,7 @@ sha256sums=('SKIP')
 
 pkgver() {
   cd "$_pkgname"
-  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 package() {
