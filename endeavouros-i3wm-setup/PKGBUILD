@@ -9,7 +9,7 @@ pkgdesc="setup for i3-wm under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${pkgname}"
-license=('custom:BSD')
+license=('GPL')
 depends=('git')
 source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git")
 sha256sums=('SKIP')
@@ -28,4 +28,5 @@ package() {
     install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
     install -Dm644 "setup.sh" "${pkgdir}${PREFIX}/setup.sh"
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
