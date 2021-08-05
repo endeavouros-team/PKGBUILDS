@@ -11,7 +11,7 @@ groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${pkgname}"
 license=('GPL')
 depends=('git')
-source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git")
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=next")
 sha256sums=('SKIP')
 
 pkgver() {
