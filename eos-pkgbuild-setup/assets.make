@@ -677,11 +677,11 @@ $PROGNAME [ options ]
 Options:
     -n  | -nl | --dryrun-local  Show what would be done, but do nothing. Use local assets.
     -nn | -nr | --dryrun        Show what would be done, but do nothing.
-    --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
     --repoup                    (Advanced) Force update of repository database files.
     --aurdiff                   Show PKGBUILD diff for AUR packages.
 EOF
-#   --versuffix=X    Append given suffix (X) to pkgver of PKGBUILD.
+#   --versuffix=X               Append given suffix (X) to pkgver of PKGBUILD.
+#   --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
 
     test -n "$1" && exit "$1"
 }
