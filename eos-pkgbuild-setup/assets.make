@@ -669,6 +669,18 @@ TimeStamp() {
     esac
 }
 
+Vercmp() {
+    # like vercmp, but "$notexist" is always older
+
+    if [ "$1" = "$notexist" ]; then
+        echo '-1'
+    elif [ "$2" = "$notexist" ]; then
+        echo '1'
+    else
+        vercmp "$1" "$2"
+    fi
+}
+
 Usage() {
     cat <<EOF >&2
 $PROGNAME: Build packages and transfer results to github.
@@ -772,6 +784,7 @@ Main2()
     local pkgname
     local buildsavedir          # tmp storage for built packages
     local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
+    local notexist='<non-existing>'
 
     echo2 "Finding package info ..."
 
@@ -789,9 +802,15 @@ Main2()
         # get current versions from local asset files
         pkgname="$(PkgBuildName "$pkgdirname")"
         tmpcurr="$(LocalVersion "$ASSETSDIR/$pkgname")"
-        test -n "$tmpcurr" || DIE "LocalVersion for '$xx' failed"
+        case "$tmpcurr" in
+            "") DIE "LocalVersion for '$xx' failed" ;;
+            "-")
+                # package (and version) not found
+                tmpcurr="$notexist"
+                ;;
+        esac
         oldv["$pkgdirname"]="$tmpcurr"
-        if [ $(vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
+        if [ $(Vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
             echo2 "update pending from $tmpcurr to $tmp"
             WantAurDiffs "$xx" "$pkgdirname"
         else
@@ -818,7 +837,7 @@ Main2()
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
-        if [ $(vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
+        if [ $(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
 
             # old pkg
             pkgname="$(PkgBuildName "$pkgdirname")"

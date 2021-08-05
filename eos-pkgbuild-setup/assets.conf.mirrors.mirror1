@@ -30,6 +30,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/bashdb
     ckbcomp
     aur/downgrade
+    endeavouros-i3wm-setup
     endeavouros-keyring
     endeavouros-mirrorlist
     endeavouros-theming
@@ -54,8 +55,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/rate-mirrors-bin
     reflector-bash-completion
     reflector-simple
-    setup-i3
-    setup-xfce4
+    # setup-i3
+    # setup-xfce4
     aur/virtualbox-ext-oracle
     welcome
     yad-eos
