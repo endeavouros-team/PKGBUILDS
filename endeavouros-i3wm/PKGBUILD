@@ -1,0 +1,32 @@
+# Maintainer: joekamprad <joekamprad@endeavouros.com>
+# Contributor: The-Repo-Club <The-Repo-Club@github.com>
+
+_pkgname=endeavouros-i3wm-setup
+pkgname=endeavouros-i3wm
+pkgver=138.6dc7019
+pkgrel=1
+pkgdesc="pre user creation skel setup for i3-wm under EndeavourOS"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+depends=('git')
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=next")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/" "${pkgdir}${PREFIX}/"
+    install -Dm644 ".gtkrc-2.0" "${pkgdir}${PREFIX}/.gtkrc-2.0"
+    install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
+    install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh"
+    install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
