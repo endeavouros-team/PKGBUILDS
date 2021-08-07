@@ -28,5 +28,4 @@ package() {
     install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
     install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh"
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
-    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
