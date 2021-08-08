@@ -29,7 +29,8 @@ Main()
             # not needed here or deprecated:
             ckbcomp | eos-waiting-indicator | eos-FindAppIcon | eos-kbd-set | eos-hooks-runner | eos-reboot-required* | eos-arch-news \
                 | eos-grub-fix-initrd-generation | keyserver-rank* | nvidia-installer-update-db | polybar-msg | eos-kill-yad-zombies \
-                | welcome-dnd | yad-settings | yad-tools)
+                | welcome-dnd | yad-settings | yad-tools | eos-latest-arch-mirrorlist | eos-apps-info-helper | eos-install-mode-run-calamares \
+                | eos-run-cmd-with-su)
                 continue ;;
 
             # no support currently:
