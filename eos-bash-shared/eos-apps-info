@@ -1,0 +1,52 @@
+#!/bin/bash
+
+Main()
+{
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local txt=""
+    txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n\n"
+    txt+="Click an app button and an information window opens.\n\n"
+    txt+="Note: you may have to run command\n<tt>  sudo pacman -Fy</tt>\nfirst to detect EndeavourOS commands.\n\n"
+    txt+="<i>The information window(s) can contain different formats:\n"
+    txt+="  - web browser\n"
+    txt+="  - a pager on a terminal\n"
+    txt+="  - small yad window\n"
+    txt+="due to various ways the information is available.</i>\n"
+
+    local cmd=(
+        eos_yad --form --title="EndeavourOS apps info" --text="$txt" --columns=4 --no-buttons --align-buttons --image=dialog-information
+    )
+    local packages=$(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
+    local apps=()
+    local pkg app app2
+
+    readarray -t app <<< $(/usr/bin/pacman -Fl $packages 2>/dev/null | /usr/bin/grep "usr/bin/" | /usr/bin/grep -v "usr/bin/$" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's|usr/bin/||' | /usr/bin/sort)
+    [ -n "$app" ] || return 1
+    apps+=("${app[@]}")
+
+    for app in "${apps[@]}" ; do
+        case "$app" in
+            # not needed here or deprecated:
+            ckbcomp | eos-waiting-indicator | eos-FindAppIcon | eos-kbd-set | eos-hooks-runner | eos-reboot-required* | eos-arch-news \
+                | eos-grub-fix-initrd-generation | keyserver-rank* | nvidia-installer-update-db | polybar-msg | eos-kill-yad-zombies \
+                | welcome-dnd | yad-settings | yad-tools)
+                continue ;;
+
+            # no support currently:
+            device-info | RunInTerminalEx | RunInTerminalOpt)
+                continue ;;
+
+            # rename:
+            eos-pkginfo-aur)  app2=eos-pkginfo ;;
+            eos-welcome)      app2=welcome ;;
+            su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character !!
+            *)
+                app2="$app" ;;
+        esac
+        cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")
+    done
+
+    "${cmd[@]}"
+}
+
+Main "$@"
