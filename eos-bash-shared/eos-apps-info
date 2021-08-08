@@ -1,8 +1,30 @@
 #!/bin/bash
 
+CheckDatabaseUpdate() {
+    local txt=""
+    local cmd
+
+    if [ -z "$(/usr/bin/pacman -Fl eos-bash-shared 2>/dev/null)" ] ; then
+        # need to run pacman -Fy
+        txt+="\nPacman database needs updating using command:\n"
+        txt+="<tt>  pacman -Fy</tt>\n"
+        cmd=(
+            eos_yad --form --title="Database update needed" --text="$txt" --image=dialog-information
+            --button=yad-quit:11 --button="Update database now!system-run!":13
+        )
+        "${cmd[@]}"
+        case "$?" in
+            13) pkexec pacman -Fy ;;
+            11 | *) exit ;;
+        esac
+    fi
+}
+
 Main()
 {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    CheckDatabaseUpdate
+
     local txt=""
     txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n\n"
     txt+="Click an app button and an information window opens.\n\n"
