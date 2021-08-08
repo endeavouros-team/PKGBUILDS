@@ -30,12 +30,14 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/bashdb
     ckbcomp
     aur/downgrade
-    endeavouros-i3wm-setup
+    # endeavouros-i3wm-setup
+    endeavouros-i3wm
     endeavouros-keyring
     endeavouros-mirrorlist
     endeavouros-theming
-    # endeavouros-xfce4-theming
+    endeavouros-xfce4
     endeavouros-xfce4-terminal-colors
+    # endeavouros-xfce4-theming
     eos-bash-shared
     eos-hooks
     eos-log-tool
