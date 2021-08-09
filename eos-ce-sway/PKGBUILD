@@ -26,6 +26,7 @@ package() {
     mkdir -p "${pkgdir}${PREFIX}/.config/"
     cp -R ".config/" "${pkgdir}${PREFIX}/"
     install -Dm644 ".gtkrc-2.0" "${pkgdir}${PREFIX}/.gtkrc-2.0"
+    install -Dm644 ".profile" "${pkgdir}${PREFIX}/.profile"
     install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
     install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh"
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
