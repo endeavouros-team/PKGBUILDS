@@ -70,14 +70,8 @@ Main()
                 continue ;;
 
             # no support currently:
-            device-info | RunInTerminalEx | RunInTerminalOpt)
+            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb)
                 continue ;;
-
-            # local man pages exist only for installed packages:
-            bashdb | downgrade | inxi | yay)  # yad ?
-                [ -x /usr/bin/$app ] || continue
-		app2="$app"
-                ;;
 
             # rename:
             eos-pkginfo-aur)  app2=eos-pkginfo ;;
