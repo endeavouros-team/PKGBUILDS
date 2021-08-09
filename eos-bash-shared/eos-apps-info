@@ -76,6 +76,7 @@ Main()
             # local man pages exist only for installed packages:
             bashdb | downgrade | inxi | yay)  # yad ?
                 [ -x /usr/bin/$app ] || continue
+		app2="$app"
                 ;;
 
             # rename:
