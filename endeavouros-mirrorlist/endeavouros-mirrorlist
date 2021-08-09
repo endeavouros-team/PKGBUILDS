@@ -34,5 +34,6 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
 
 ## Github
-Server = https://raw.githubusercontent.com/endeavouros-team/repo/master/$repo/$arch
+Server = https://mirror.therepo.club/$arch
+Server = https://github.com/endeavouros-team/repo/raw/master/$repo/$arch
 
