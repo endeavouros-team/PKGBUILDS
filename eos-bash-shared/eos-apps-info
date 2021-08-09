@@ -1,5 +1,9 @@
 #!/bin/bash
 
+UpdateDatabase() {
+    pkexec pacman -Fy >/dev/null
+}
+
 CheckDatabaseUpdate() {
     local txt=""
     local cmd
@@ -14,7 +18,7 @@ CheckDatabaseUpdate() {
         )
         "${cmd[@]}"
         case "$?" in
-            13) pkexec pacman -Fy ;;
+            13) UpdateDatabase ;;
             11 | *) exit ;;
         esac
     fi
@@ -25,10 +29,17 @@ Main()
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     CheckDatabaseUpdate
 
+    local update_label="Update database"
+
     local txt=""
-    txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n\n"
-    txt+="Click an app button and an information window opens.\n\n"
-    txt+="Note: you may have to run command\n<tt>  sudo pacman -Fy</tt>\nfirst to detect EndeavourOS commands.\n\n"
+    txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
+    txt+="Click an app button and an information window opens.\n"
+    txt+="\n"
+    if [ 0 -eq 1 ] ; then
+        txt+="Note: you may have to run command\n<tt>  sudo pacman -Fy</tt>\nfirst to detect EndeavourOS commands.\n\n"
+    else
+        txt+="Note: you may need to click the <b>$update_label</b> button below to update your package database.\n\n"
+    fi
     txt+="<i>The information window(s) can contain different formats:\n"
     txt+="  - web browser\n"
     txt+="  - a pager on a terminal\n"
@@ -36,7 +47,10 @@ Main()
     txt+="due to various ways the information is available.</i>\n"
 
     local cmd=(
-        eos_yad --form --title="EndeavourOS apps info" --text="$txt" --columns=4 --no-buttons --align-buttons --image=dialog-information
+        eos_yad --form --title="EndeavourOS apps info" --text="$txt" --columns=4 --align-buttons --image=dialog-information
+        # --no-buttons
+        --button="$update_label!!Updates package database and restarts this app":11
+        --buttons-layout=center
     )
     local packages=$(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
     local apps=()
@@ -74,7 +88,13 @@ Main()
         cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")
     done
 
-    "${cmd[@]}"
+    while true ; do
+        "${cmd[@]}"
+        case "$?" in
+            11) UpdateDatabase ;;
+            *) break ;;
+        esac
+    done
 }
 
 Main "$@"
