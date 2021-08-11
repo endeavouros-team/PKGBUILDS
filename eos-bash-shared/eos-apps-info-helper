@@ -118,8 +118,8 @@ Main()
             echo2 "==> '$url'"
             break
         elif [ -x "$dir/$name.helpcmd" ] ; then
-            "$dir/$name.helpcmd"
-            return
+            url="$("$dir/$name.helpcmd")"
+            [ -z "$url" ] && return
         fi
     done
     if [ -z "$url" ] ; then
