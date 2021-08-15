@@ -833,6 +833,7 @@ personal_commands_add() {   # add one personal command
         welcome_own_commands+=(--field=" $name!$icon!$description":fbtn "$commandline")
     else
         printf "%s: %s\n    %s\n" "$(/usr/bin/date "+%x %X")" "$FUNCNAME:" "warning: command '$cmd' not found" >> /tmp/welcome-personal-commands.log
+        echo "$FUNCNAME: warning: command '$cmd' not found" >&2
     fi
 }
 
