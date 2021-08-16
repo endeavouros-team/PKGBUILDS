@@ -2,8 +2,6 @@
 
 Manages and configures certain features of `eos-update-notifier` with a small GUI.
 
-<br>
-
 ![](eos-update-notifier-configure.png)
 
 ## Synopsis
