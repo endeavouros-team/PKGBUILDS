@@ -1,0 +1,119 @@
+#!/bin/bash
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+Md2html() {
+    local app="$1"
+    local dir="$2"
+    local pkgbuilds=../..
+    [ -n "$dir" ] && dir="/$dir"
+    mkdir -p $app
+
+    /usr/bin/ls $pkgbuilds$dir/$app/*.png >& /dev/null && /usr/bin/cp $pkgbuilds$dir/$app/*.png $app
+    /usr/bin/pandoc -f gfm $pkgbuilds$dir/$app/*.md -o $app/$app.html
+
+    echo "$app" >&2
+}
+
+Man2html() {
+    local app="$1"
+
+    /usr/bin/pacman -Q $app >& /dev/null || {
+        echo "$FUNCNAME: sorry, '$app' not installed." >&2
+        return 1
+    }
+    local section=$(/usr/bin/man -w "$app" 2>/dev/null | /usr/bin/cut -d '.' -f2)
+    if [ 0 -eq 1 ] ; then
+        case "$section" in
+            "") case "$app" in
+                    downgrade|yay) section=8 ;;
+                    yad|inxi|polybar) section=1 ;;
+                esac
+                ;;
+        esac
+    fi
+    /usr/bin/mkdir -p $app
+
+    /usr/bin/cp /usr/share/man/man$section/$app.$section.gz . || DIE "copying man page failed."
+    /usr/bin/gunzip $app.$section.gz
+    /usr/bin/pandoc -f man $app.$section -o $app/$app.html
+    /usr/bin/rm -f $app.$section.gz $app.$section
+
+    echo "$app" >&2
+}
+
+Help2html() {
+    :  # TODO!
+}
+
+
+Main()
+{
+    local progname="$(/usr/bin/basename "$0")"
+    local app
+    local appname=eos-apps-info
+    local infos_folder=pageinfo
+
+    if [ "$(basename "$PWD")" != "$appname" ] ; then
+        DIE "you must run this in folder '$appname'"
+    fi
+
+    mkdir -p $infos_folder || DIE "creating folder '$infos_folder' failed"
+    cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
+
+    # direct pages
+    for app in akm eos-log-tool eos-rankmirrors pahis reflector-simple
+    do
+        Md2html $app
+    done
+
+    # indirect via man folder
+    # note: added 'rate-mirrors' here!
+    for app in ChangeDisplayResolution \
+                   $appname \
+                   eos-connection-checker \
+                   eos-download-wallpapers \
+                   eos-pacdiff \
+                   eos-pkginfo \
+                   eos-pkg-changelog \
+                   eos-sendlog \
+                   eos-shifttime \
+                   eos-wallpaper-set \
+                   grub-colour-chooser \
+                   paccache-service-manager \
+                   rate-mirrors \
+                   su-c_wrapper \
+                   RunInTerminal \
+                   UpdateInTerminal
+    do
+        Md2html $app $appname/man
+    done
+
+    for app in checkupdatesext eos-update-notifier eos-update-notifier-configure
+    do
+        Md2html $app eos-update-notifier/man
+    done
+
+    Md2html mirrorlist-rank-info   reflector-simple/man
+    Md2html nvidia-installer-check nvidia-installer-db/man
+    Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
+    Md2html welcome                welcome/man
+
+
+    # man page to html
+    for app in downgrade inxi polybar yad yay ; do
+        Man2html $app
+    done
+
+    # update the tar.gz archive
+    cd ..
+    local archive=${appname}-pages.tar.gz
+    rm -f $archive
+    tar cvfz $archive $infos_folder
+    rm -rf $infos_folder
+}
+
+Main "$@"
