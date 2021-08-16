@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 DIE() {
@@ -39,8 +40,28 @@ Man2html() {
 
     /usr/bin/cp /usr/share/man/man$section/$app.$section.gz . || DIE "copying man page failed."
     /usr/bin/gunzip $app.$section.gz
-    /usr/bin/pandoc -f man $app.$section -o $app/$app.html
-    /usr/bin/rm -f $app.$section.gz $app.$section
+
+    if [ 0 -eq 1 ] ; then
+        /usr/bin/pandoc -f man $app.$section -o $app/$app.html
+    else
+        case "$app" in
+            downgrade)
+                printf "# NAME\n\n" > $app/$app.md
+                sed -i $app.$section -e 's|^\.SH USAGE$|.SH SYNOPSIS|'
+                ;;
+            *)
+                /usr/bin/rm -f $app/$app.md
+                ;;
+        esac
+        /usr/bin/pandoc -f man $app.$section -t gfm >> $app/$app.md
+        /usr/bin/sed -i $app/$app.md \
+                     -e 's|^# \([A-Z]\)\(.*\)|## \1\L\2|' \
+                     -e "s|^## Name$|# $app|"
+        /usr/bin/pandoc -f gfm $app/$app.md -o $app/$app.html
+        rm -f $app/$app.md
+    fi
+
+    /usr/bin/rm -f $app.$section
 
     echo "$app" >&2
 }
