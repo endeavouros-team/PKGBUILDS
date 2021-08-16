@@ -2,8 +2,8 @@
 
 pkgname=eos-apps-info
 pkgdesc="Documentation about apps in the EndeavourOS repository."
-pkgver=1
-pkgrel=1.1
+pkgver=1.0.1
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
