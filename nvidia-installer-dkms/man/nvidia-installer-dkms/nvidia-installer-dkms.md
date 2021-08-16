@@ -6,12 +6,14 @@
 
 Note that bumblebee is suitable mostly for older machines.<br>
 
-## Usage
+## Synopsis
 
 ```
 nvidia-installer-dkms [-h] [-b] [-f] [-t] [-q] [-n]
+```
 
-Options
+## Options
+```
   -h, --help       Show this help message and exit
   -b, --bumblebee  For Nvidia Optimus cards (Bumblebee + proprietary Nvidia drivers)
   -f, --force      Force driver installation even if a nvidia card is not detected
