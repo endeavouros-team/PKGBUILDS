@@ -641,6 +641,7 @@ DailyAssistant() {
   PacdiffFieldAdd
   tabcontents+=(
       --field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" EndeavourOS apps help!endeavouros-icon!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
   )
 
   # General app browsing buttons:
