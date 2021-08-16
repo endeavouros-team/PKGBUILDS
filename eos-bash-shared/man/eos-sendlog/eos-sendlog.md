@@ -9,7 +9,7 @@ Configurable variables in file `/etc/eos-sendlog.conf`:
 
 Variable | Description
 :--- | :---
-EOS_SENDLOG_URI | URI of the service that saves files.<br>Supported values:<br>http://ix.io  (default)<br>https://clbin.com
+EOS_SENDLOG_URI | URI of the service that saves files.<br>Supported values:<br>- http://ix.io  (default)<br>- https://clbin.com
 
 Configuration file example:<br>
 ```
