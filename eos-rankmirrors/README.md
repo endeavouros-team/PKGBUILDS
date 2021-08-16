@@ -2,11 +2,13 @@
 
 `eos-rankmirrors` ranks the mirrors that provide the EndeaavourOS repository.<br>
 
-## Usage
+## Synopsis
 ```
 eos-rankmirrors [options]
+```
 
-Options:
+## Options
+```
   --sort <value>
              Primary key for sorting the mirrors.
              Supported key values:
