@@ -22,12 +22,11 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
-#    aur/ckbcomp
     aur/mkinitcpio-openswap                         # openswap: EOS has a minor change
 
-    calamares_august_2020
+#    calamares_august_2020                          # no need for this anymore
+#    calamares_next
     calamares_offline_online
-#    calamares_test
 )
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
@@ -37,6 +36,11 @@ local ASSET_HOOKS=(
 )
 
 # Package hooks
+
+_calamares_next_change_pkgname() {
+    local Pkgbuild="$PKGBUILD_ROOTDIR"/calamares_next/PKGBUILD
+    sed -i "$Pkgbuild" -e 's|^pkgname=calamares_current$|pkgname=calamares_next|'
+}
 
 _mkinitcpio-openswap_change_pkgrel() {
     # Change 'pkgrel' from 3 to 4.
@@ -76,3 +80,4 @@ _mkinitcpio-openswap_change_pkgrel() {
 
 declare -A ASSET_PACKAGE_HOOKS
 ASSET_PACKAGE_HOOKS["mkinitcpio-openswap"]=_mkinitcpio-openswap_change_pkgrel
+ASSET_PACKAGE_HOOKS["calamares_next"]=_calamares_next_change_pkgname

@@ -39,6 +39,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-xfce4-terminal-colors
     # endeavouros-xfce4-theming
     eos-bash-shared
+    eos-ce-bspwm
+    eos-ce-sway
     eos-hooks
     eos-log-tool
     eos-rankmirrors
