@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.9.6
+pkgver=1.9.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,12 +21,9 @@ optdepends=(
   "paru:     an AUR helper supported by eos-pkginfo"
 )
 
-_appsinfodir=etc/eos-apps-info
-
 backup=(
   etc/eos-script-lib-yad.conf
   etc/eos-sendlog.conf
-  $_appsinfodir/eos-apps-info.conf
 )
 #url=https://github.com/endeavouros-team/PKGBUILDS/$pkgname
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -60,12 +57,7 @@ source=(
   $_url/eos-download-wallpapers
   $_url/eos-send-gpuinfo
   $_url/eos-pacdiff
-  $_url/eos-apps-info
-  $_url/eos-apps-info-helper
-  $_url/eos-apps-info.conf
-  $_url/eos-apps-info.desktop
-  $_url/eos-apps-info-pages.tar.gz
-  $_url/eos-shifttime                # Thanks, @freebird54
+  $_url/eos-shifttime                # Thanks, @freebird54!
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
@@ -95,11 +87,6 @@ sha512sums=('2445463f75f4441fbb7dcd41521a6ad7f89c7e4a3f931300565869e01a8dd4de06c
             '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
             'c3d77f940ca6df9263127b276676505c8e7e3112b45f9b3fe7f799bc3f52a912f77153d3a38b4700350f0c0aa77064f256fc8c4bab178e304fa3e7dd0b70e17f'
-            '2273581f3766b6d6b86eeb19c5ec5d1e6bf0922545f62197cd5e51aecaea7ffbfdced1f191aff3ccfe02051838e037f3dbb1126fa50d6f260c9b2dbfc9d0970d'
-            'd564a53b5c3f61d8cfbd0172aa36b61cb1f8120e0d8f8560e88878af527bbcd98d0defd5e48e105763519d52350e28295e362b4c549ba2d71691d50a4c6506c6'
-            'ea4eabd57386cc887a89d11791cce6ceb17b20906764c3ace748c68867b392512ae3d8f6eb8203f03e9f93e316320775e31fa81a840558ca1af7452804f9c94f'
-            '8a0692ff5e714a0690c7a90d04a928b2edf2e01515f8707b345d0da36ee95cab7f4f9badf3dca6cbd280438a08519957c5852be92e7936da9f0affef3d895b17'
-            'a556177a2adc2df9fe091115e58c94f13213702036b2147acb5a7b6b4063d9c414cf946a5211e08f665b9fe6c26ade7db79fe40a64de70e903b44f17eb98e65e'
             'ba055d67ba50959cf9c63e456ee3ddd470a8ee2f9a1042bbc5f650e4f00ca2c56738b5170189455b5b510a505308c612a284a3c1077219ffbeaf4370ba5451ff'
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
@@ -108,7 +95,6 @@ package() {
   install -Dm755 ksetwallpaper.py               $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
   install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
   install -Dm644 eos-sendlog.conf               $pkgdir/etc/eos-sendlog.conf
-  install -Dm644 eos-apps-info.conf             $pkgdir/$_appsinfodir/eos-apps-info.conf
 
   install -Dm755 eos-FindAppIcon                $pkgdir/usr/bin/eos-FindAppIcon
   install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog
@@ -128,28 +114,14 @@ package() {
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $pkgdir/usr/bin/eos-pacdiff
-  install -Dm755 eos-apps-info                  $pkgdir/usr/bin/eos-apps-info
-  install -Dm755 eos-apps-info-helper           $pkgdir/usr/bin/eos-apps-info-helper
   install -Dm755 eos-shifttime                  $pkgdir/usr/bin/eos-shifttime
   install -Dm755 grub-colour-chooser            $pkgdir/usr/bin/grub-colour-chooser
 # install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
 
   install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
-  install -Dm644 eos-apps-info.desktop          $pkgdir/usr/share/applications/eos-apps-info.desktop
 
   install -Dm755 eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo
   install -Dm644 eos-pkginfo.completion         $pkgdir/usr/share/bash-completion/completions/eos-pkginfo
 
   ln -s /usr/bin/eos-pkginfo                    $pkgdir/usr/bin/eos-pkginfo-aur
-
-  install -d $pkgdir/$_appsinfodir
-  local xx
-  for xx in pageinfo/* ; do
-      case "$xx" in
-          *.helpcmd)
-              install -Dm755 "$xx" "$pkgdir/$_appsinfodir/$xx" ;;
-          *.url | *)
-              install -Dm644 "$xx" "$pkgdir/$_appsinfodir/$xx" ;;
-      esac
-  done
 }
