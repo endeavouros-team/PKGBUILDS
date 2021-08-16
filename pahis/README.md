@@ -1,7 +1,7 @@
 # pahis
 Show pacman history for all or selected packages.
 
-## Usage:
+## Usage
 Run command
 <pre>
 pahis --help
