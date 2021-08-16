@@ -778,6 +778,10 @@ AddMoreApps() {
           tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
       }
   fi
+  IsInstalled eos-apps-info || {
+      ((shown_app_buttons++))
+      tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
+  }
   case "$DE" in
     XFCE)
         while true ; do                       # Show buttons only if none of them are installed.
