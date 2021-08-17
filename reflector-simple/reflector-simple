@@ -415,6 +415,12 @@ AskCountriesAndOptions() {
         command+=(--field="Max number of freshest mirrors":num $default_number)    # --latest
     fi
 
+    local free_params=""
+    if [ -r "$free_params_file" ] ; then
+        free_params="$(/usr/bin/cat "$free_params_file" | tr '\n' ' ')"
+    fi
+    command+=(--field="Optional reflector params" " $free_params")    # note the initial space in value !!!
+
     command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
     Verbose "done."
 
@@ -482,6 +488,15 @@ BuildReflectorCommand() {
     else
         reflector_cmd+=(--latest "${reflector_info[$((ix++))]}")
     fi
+
+    # add optional free parameters to the command and save free params to file
+    printf "" > "$free_params_file"
+    while true ; do
+        xx="${reflector_info[$((ix++))]}"
+        [ -n "$xx" ] || break
+        reflector_cmd+=("$xx")
+        echo "$xx" >> "$free_params_file"
+    done
 }
 
 ShowMirrorlistSaved() {
@@ -628,6 +643,7 @@ Main() {
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
     local ARCH_SITE=https://www.archlinux.org
+    local free_params_file="$HOME/.config/reflector-simple-free-params.txt"
 
     Verbose "Fetching country names with reflector..."
     local REFLECTOR_LIST_COUNTRIES="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed '1d')"
