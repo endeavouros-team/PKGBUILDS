@@ -197,16 +197,20 @@ Main()
     done
 
     [ -n "$folder" ] && cd "$folder"
-    arch=$(basename "$PWD")   #x86_64
 
-    case "$arch" in
-        x86_64 | aarch64 | armv7h) ;;
-        *) DIE "must run this program at an architecture specific folder (e.g. repo/endeavouros/x86_64)." ;;
-    esac
-    case "$(grep "/endeavouros-team/" ../../.git/config)" in
-        *https://github.com/endeavouros-team/repo | *https://github.com/endeavouros-team/repo.git) ;;
-        *) DIE "this folder is not in endeavouros-team repo" ;;
-    esac
+    if [ -r assets.conf ] && [ -d PKG_ARCHIVE ] ; then
+        arch=x86_64                # we are in the original build folder
+    else
+        arch=$(basename "$PWD")    # x86_64
+        case "$arch" in
+            x86_64 | aarch64 | armv7h) ;;
+            *) DIE "must run this program at an architecture specific folder (e.g. repo/endeavouros/x86_64)." ;;
+        esac
+        case "$(grep "/endeavouros-team/" ../../.git/config)" in
+            *https://github.com/endeavouros-team/repo | *https://github.com/endeavouros-team/repo.git) ;;
+            *) DIE "this folder is not in endeavouros-team repo" ;;
+        esac
+    fi
 
     test -r $conf || DIE "configuration file $conf is required but not found."
 
