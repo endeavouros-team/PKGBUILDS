@@ -1,5 +1,6 @@
 # Original Maintainer: Gustau Castells <karasu@antergos.com>
-# Maintainer: joekamprad <archlinux@kamprad.net>
+# Maintainer: @manuel
+# Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-installer-dkms
 pkgver=3.3.8
