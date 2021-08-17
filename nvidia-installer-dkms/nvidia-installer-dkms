@@ -300,11 +300,12 @@ def patch_nvidia_settings(patch=True):
 
 def remove_file(path):
     """ Removes file if exists """
-    if os.path.exists(path):
-        log_info("Removing {} file...".format(path))
-        os.remove(path)
-    else:
-        log_info("{} not found. That's ok.".format(path))
+    log_info("Removing {} file...".format(path))
+    if not TEST:
+        if os.path.exists(path):
+            os.remove(path)
+        else:
+            log_info("{} not found. That's ok.".format(path))
 
 
 def create_nvidia_conf(path):
