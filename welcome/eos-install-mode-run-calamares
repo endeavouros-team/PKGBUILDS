@@ -87,26 +87,41 @@ AskMode() {
         --image=system-os-installer
         --text="$txt"
         --buttons-layout=spread
-        --button="Online!!Vanilla theming, internet required":11
-        --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
+        --button="Online!!Vanilla theming, internet required":12
+        --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
+    )
+    cmd+=(
+        --field=' Show Install Log!Show overall logs about install on a terminal':CHK $ShowInstallLog
+        --field=' Show Pacman Log!Show package management log on a terminal':CHK      $ShowPacmanLog
+        --field='':LBL ""
     )
 
-    "${cmd[@]}"       # ask mode from the user
+    local result
+    result="$("${cmd[@]}")"       # ask mode from the user
 
     ret=$?
 
     # set the install mode, or exit on error
     case "$ret" in
-        11) mode=online ;;
-        13) mode=offline ;;
+        11|12) mode=online ;;
+        13|14) mode=offline ;;
         252|*) exit $ret ;;
     esac
+    ShowInstallLog=$(echo "$result" | cut -d'|' -f1)
+    ShowPacmanLog=$( echo "$result" | cut -d'|' -f2)
 }
 
 ### Starts the calamares installer process and logging. ###
 InstallWithLogs() {
-    InstallLog_Start
+    if [ "$ShowInstallLog" = "TRUE" ] ; then
+        InstallLog_Start
+    fi
     Calamares_Start
+
+    if [ "$ShowPacmanLog" = "FALSE" ] ; then
+        sleep 5
+        return
+    fi
 
     case "$mode" in
         online | community)
@@ -133,7 +148,9 @@ CopyFile() {
 ###  Everything starts in the Main function. ###
 Main() {
     local lang="$1"
-    local mode="$2"                             # one of: offline, online, community, or "" (empty)
+    local mode="$2"                             # 'community' or '' (empty)
+    local ShowInstallLog="$3"
+    local ShowPacmanLog="$4"
     local progname="$(basename "$0")"           # for help and messages
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
