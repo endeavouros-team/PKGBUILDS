@@ -1,7 +1,7 @@
 # su-c_wrapper
 
 A small utility to perform command "su -c" with slightly easier syntax.<br>
-Useful e.g. for users without sudoers rights.
+Useful e.g. for users without sudo privileges.
 
 ## Synopsis
 
