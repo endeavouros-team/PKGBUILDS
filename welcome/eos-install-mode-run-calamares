@@ -91,8 +91,8 @@ AskMode() {
         --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
     )
     cmd+=(
-        --field=' Show Install Log!Show overall logs about install on a terminal':CHK $ShowInstallLog
-        --field=' Show Pacman Log!Show package management log on a terminal':CHK      $ShowPacmanLog
+        --field=' Install Log on Terminal!Show overall log about install on a terminal':CHK $ShowInstallLog
+        --field=' Pacman Log on Terminal!Show package management log on a terminal':CHK      $ShowPacmanLog
         --field='':LBL ""
     )
 
