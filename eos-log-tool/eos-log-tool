@@ -271,8 +271,14 @@ Main()
             "$xsession") Cmd cat ~/.xsession-errors ;;
             "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
             "$install")
+                local install_logs=(
+                    /var/log/endeavour-install.log
+                    /var/log/Calamares.log
+                    /home/liveuser/endeavour-install.log
+                    $HOME/endeavour-install.log
+                )
                 local fname
-                for fname in /var/log/endeavour-install.log /var/log/Calamares.log ; do
+                for fname in "${install_logs[@]}" ; do
                     if [ -r $fname ] ; then
                         Cmd cat $fname
                         break
