@@ -1,0 +1,140 @@
+#!/bin/bash
+
+# "Sync" local ISO files (with .sha512sums etc) with github repo.
+#
+# Note1: ISO files are assumed to be named strictly in ascending order,
+#        e.g. using a contant part and a date (in fixed format) in the file name.
+#        Otherwise wrong files will be deleted as "old".
+#
+# Note2: program 'hub' is used, it creates an account token at first run
+#       and saves it into file ~/.config/hub.
+#
+# Unless you already have the account token, maybe the easiest way to create it
+# is to run commands:
+#    # assume this github repo is already created!
+#    reponame=weekly-ISOs-repo                      # This is the name of the github repo
+#                                                   # where the ISOs will be stored.
+#    git clone https://github.com/endeavouros-team/$reponame.git
+#    cd $reponame
+#    hub release
+#
+# Later, to sync the new local ISOs to github, you simply go to this folder
+# and run this program.
+
+MSG()  { echo "$progname: $1: $2" >&2 ; }                # $1=title $2=msg
+DIE()  { MSG error   "$1" ; Usage; exit 1 ; }
+WARN() { MSG warning "$1" ; }
+INFO() { MSG info    "$1" ; }
+
+RemoveOldRemotesAndLocals() {
+    local re ix=0
+
+    UpdateRemotesInfo
+
+    # remove oldest files and leave no more than $remote_iso_count_max files
+    for ((ix=0; remote_iso_count > remote_iso_count_max; ix++)) ; do
+        re="${remote_iso_files[ix]}"
+        #ShowOp delete "$re"
+        delete-release-assets --quietly $tag "$re"  # deletes all remote files starting with name "$re"
+        rm -f "$re" "$re".*
+        ((remote_iso_count--))
+    done
+}
+
+ShowOp() {
+    local op="$1"
+    local file="$2"
+    echo "==> $op $file ..." >&2
+}
+
+AddNewRemotes() {
+    local local_iso_files="$(/usr/bin/ls *.iso 2>/dev/null)"
+    local lo re="" xx assets=()
+
+    [ -n "$local_iso_files" ] || DIE "no local ISO files found."
+
+    readarray -t local_iso_files <<< $(echo "$local_iso_files")
+
+    # local files that don't exist on remote will be sent to remote
+    for lo in "${local_iso_files[@]}" ; do
+        if [ -n "$remote_iso_files" ] ; then
+            for re in "${remote_iso_files[@]}" ; do
+                [ "$lo" = "$re" ] && break
+            done
+        fi
+        if [ "$lo" != "$re" ] ; then
+            if [ $(/usr/bin/stat -c %s "$lo" ) -eq 0 ] ; then
+                WARN "ignoring empty file '$lo'."
+                continue
+            fi
+            assets=()
+            # local file(s) didn't exist on remote, so push them
+            for xx in "$lo" $(ls "$lo".* 2>/dev/null) ; do
+                ShowOp push "$xx"
+                assets+=("$xx")
+            done
+            add-release-assets --quietly $tag "${assets[@]}"     # add all files related to this ISO
+        fi
+    done
+    sleep 1  # give github some time to relax...
+}
+
+UpdateRemotesInfo() {
+    remote_iso_files="$(/usr/bin/release-asset-names "$tag" | /usr/bin/grep '\.iso$')"
+    if [ -n "$remote_iso_files" ] ; then
+        readarray -t remote_iso_files <<< $(echo "$remote_iso_files")
+        #remote_iso_count=$(echo "${remote_iso_files[@]}" | wc -l)
+        remote_iso_count=${#remote_iso_files[@]}
+    else
+        INFO "remote ISO files not found."
+    fi
+    sleep 1  # give github some time to relax...
+}
+
+Usage() {
+    cat <<EOF >&2
+
+Usage: $progname tag [max_count [workdir]]
+Parameters:
+    tag         Release assets tag in the repository, e.g. '0-EndeavourOS-development-ISO-releases'.
+                This is a mandatory parameter.
+    max_count   Max number of ISO files that will be kept. Default is $remote_iso_count_max_default.
+                Older files will be deleted from the local folder and from Github.
+    workdir     A debugging parameter only, not normally used. Some bash debuggers may need it.
+
+You should run this program in the folder where the local ISO files exist.
+
+This folder should be cloned from the Github repository where the ISO files
+will be stored. So this folder must contain a subfolder named .git.
+
+Copy new ISO files and their additional files like .sha512sum etc. into this folder.
+Then run this program. New ISO files will be pushed to Github, and oldest ISO files
+will be deleted if there are more ISO files than the 'max_count' value.
+
+EOF
+}
+
+Main()
+{
+    local tag="$1"                        # github's release asset tag
+    local remote_iso_count_max="$2"       # max allowed number of remote ISO files
+    local workdir="$3"                    # for debugging only, normally not used
+    local remote_iso_files
+    local remote_iso_count=0
+    local remote_iso_count_max_default=4
+    local progname=$(/usr/bin/basename "$0")
+
+    [ -n "$workdir" ] && cd "$workdir"
+    [ -n "$remote_iso_count_max" ] || remote_iso_count_max=$remote_iso_count_max_default
+
+    [ -n "$tag" ] || DIE "please give the release tag."
+
+    # check that the current folder has .git subfolder (and ISO files)
+    [ -d .git ] || DIE "sorry, current folder should have a '.git' subfolder."
+
+    UpdateRemotesInfo
+    AddNewRemotes
+    RemoveOldRemotesAndLocals
+}
+
+Main "$@"

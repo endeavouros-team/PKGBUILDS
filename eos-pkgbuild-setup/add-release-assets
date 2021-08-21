@@ -27,6 +27,11 @@ DIE() {
 }
 
 Main() {
+    local quietly=no
+    if [ "$1" = "--quietly" ] ; then
+        quietly=yes
+        shift
+    fi
     local TAG="$1"
     test -n "$TAG" || DIE "TAG is missing."
     test -n "$2" || DIE "assets are missing."
@@ -55,14 +60,18 @@ Main() {
         for asset in "$@" ; do
             test -r "$asset" || DIE "asset '$asset' does not exist."
             assets+=("-a" "$asset")
-            echo "adding asset $(basename "$asset")" >&2
+            [ $quietly = no ] && echo "adding asset $(basename "$asset")" >&2
         done
-        hub release edit "${assets[@]}" -m "" $TAG
+        if [ $quietly = no ] ; then
+            hub release edit "${assets[@]}" -m "" "$TAG"
+        else
+            hub release edit "${assets[@]}" -m "" "$TAG" 2> /dev/null
+        fi
     else
         for asset in "$@" ; do
             test -r "$asset" || DIE "asset '$asset' does not exist."
             if [ -z "$(release-asset-names "$TAG" "$asset")" ] ; then
-                echo "adding asset $(basename "$asset") to '$TAG'" >&2
+                [ $quietly = no ] && echo "adding asset $(basename "$asset") to '$TAG'" >&2
                 hub release edit -a "$asset" -m "" "$TAG"
                 sleep 0.5
             else
