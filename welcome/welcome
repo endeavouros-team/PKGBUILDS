@@ -498,7 +498,7 @@ PacdiffFieldAdd() {
   local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
   local differ Icon=preferences-system
 
-  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
+#  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
   for differ in "${differs[@]}" ; do
       if [ -x /usr/bin/$differ ] ; then
           case "$differ" in
