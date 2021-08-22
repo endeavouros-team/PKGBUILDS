@@ -4,7 +4,7 @@
 # Initial Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
-pkgver=2.4.24
+pkgver=2.4.25
 pkgrel=1
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -20,21 +20,23 @@ source=(
     $_url/ati.ids
     $_url/catalyst.ids
     $_url/nvidia.ids
+    $_url/nvidia.ids.metainfo
 )
-sha256sums=('7619d15c46f21269ba918bae25049a806247aa6511ecd85b442650f99dc8afd5'
+sha256sums=('3bf1a1cb72d72129964ee9686b12ee0f145870fc1a5592f4de55e4d1f32f4da0'
             '8b9dff914528737c92f4fb78699efcf49813931961d9b8cef3a3527761a99661'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
             'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'
             '246d9273fed6d232125476afc1a06dfceba4028fa3a6d6fd2c4c460187d3ee2f'
-            '40ea3caaf1b5f38252a86e091f998dbbcef6fdf262a83d781efd2c307c8df0d0')
+            '10dc57c0dc7c0bb658048b5f4721e201ce0604cc20ba641534547cdf8175f735'
+            '2bace35def6c1ed373bfb8b5a583cd58f64152eee944873d560877dfebcfccdf')
 
 package() {
     install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
     install -Dm755 nvidia-installer-check     $pkgdir/usr/bin/nvidia-installer-check
 
     local xx
-    for xx in *.ids ; do
+    for xx in *.ids *.metainfo ; do
         install -Dm644 "$xx" "$pkgdir/var/lib/pci/$xx"
     done
 }
