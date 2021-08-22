@@ -50,17 +50,19 @@ Main()
                     else
                         missing+=(xorg-xhost)
                     fi
-                    if [ -x /usr/bin/diffuse ] ; then
-                        differs=(diffuse "${differs[@]}")   # prefer diffuse in wayland
-                    else
-                        missing+=(diffuse)
+                    if [ 0 -eq 1 ] ; then                   # rely on EOS_WELCOME_PACDIFFERS value!
+                        if [ -x /usr/bin/diffuse ] ; then
+                            differs=(diffuse "${differs[@]}")   # prefer diffuse in wayland
+                        else
+                            missing+=(diffuse)
+                        fi
                     fi
                     case "${#missing[@]}" in
                         0) ;;
                         1) form=package ;;
                         *) form=packages ;;
                     esac
-                    [ -n "$form" ] && eos_yad_WARN "For pacdiff, install $form: ${missing[*]}." --height=150 --width=500 --fontname="Mono 10"
+                    [ -n "$form" ] && eos_yad_WARN "For pacdiff, please install $form: ${missing[*]}." --height=150 --width=500 --fontname="Mono 10"
                     ;;
             esac
             ;;
