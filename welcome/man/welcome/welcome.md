@@ -29,15 +29,6 @@ eos-welcome [options]
 --changelog       Show the changelog of this package.
 
 ```
-### Install time options
-```
---pkglist=URL     User can give an URL to a file that contains a list of additional packages
-                  to install. Package names are listed as one package name per line.
-                  Empty lines and comments (lines starting with character #) are allowed.
-                  Wildcards are not supported.
-                  Note: currently the URL cannot refer to a local file.
-                  Note2: this feature is available only in the 'online' install mode.
-```
 
 ## Description
 
@@ -86,25 +77,22 @@ It contains useful and important news for the user about the EndeavourOS softwar
 
 Make sure you click that button regularly!
 
-### Add favorite packages at install phase
+### Add favorite packages at install time
 
-To customize the online mode install phase, there are *alternative* ways to add your favorite packages to the EndeavourOS default set of packages:
-
-1. You can directly modify file `$HOME/user_pkglist.txt` and add package names as described with option `--pkglist`.
-2. If you have a file in the internet that contains a list of packages, use option `--pkglist` as described above.
+To customize the *online* mode install phase, you can directly modify file `$HOME/user_pkglist.txt` and add package names to that file. Note that only Arch and EndeavourOS packages are supported, but not AUR packages.
 
 ## Examples
 ```
 eos-welcome --lang=en         # use English instead of the local language
+eos-welcome --disable         # disable Welcome from starting automatically
 eos-welcome --enable          # re-enable Welcome after disabling it
 
-# Starting the install from the terminal on the ISO.
-# Close the Welcome app first, then commmand:
-eos-welcome --pkglist=https://github.com/<path-to-your-pkglist-file> &
+# Adding packages at install. Close Welcome app first, then commmand:
 
-# Another way to add packages at install.
-# Close the Welcome app first, then commmand:
-nano ~/user_pkglist.txt       # add some package names
+cat <<EOF >> ~/user_pkglist.txt
+  gufw
+  emacs
+EOF
 eos-welcome &
 ```
 ## See also
