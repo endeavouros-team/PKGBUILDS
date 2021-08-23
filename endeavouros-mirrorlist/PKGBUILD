@@ -16,7 +16,7 @@ conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
 source=($_url/$pkgname)
-sha512sums=('8bc56000977179351cc88f6cd900014c36cd8d3a11f8a7af2ce382cf7d460316fd8c0bb49f80bf34629f16001f13c90244249f3f08d657ea02c121e96106fbfc')
+sha512sums=('704dc00617fa066a2c650361483629065186008136c64d072f2a2ca335553b3aa04fae1067c8c12a699ecfd0e84af1c093bdbe53a9f2850ecb256d412124bdd6')
 
 package() {
  #install -d "$pkgdir/etc/pacman.d"
