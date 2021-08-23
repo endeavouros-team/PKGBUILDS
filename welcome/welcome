@@ -1173,11 +1173,6 @@ Options:
 --lang=X          Use language X on the user interface.
 --changelog       Show the changelog of this package.
 
-Install time options:
---pkglist=URL     User can give an URL to a file that contains a list of additional packages
-                  to install. Package names are listed as one package name per line.
-                  Empty lines and comments (lines starting with character #) are allowed.
-
 Experimental options:
 --genlang=X       Generate language X support for the user interface of the Welcome app.
                   X is a shorthand of two lowercase letters, like de, en, or fr.
@@ -1210,6 +1205,12 @@ export -f Usage
 # --tr-prefer=X     Prefer either 'manual' or 'generated' language on the user interface.
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
+
+#Install time options:
+#--pkglist=URL     User can give an URL to a file that contains a list of additional packages
+#                  to install. Package names are listed as one package name per line.
+#                  Empty lines and comments (lines starting with character #) are allowed.
+
 
 StartHere() {
     local arg lang
@@ -1298,7 +1299,7 @@ StartHere() {
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) export show_installer=yes ;;
-            --pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
+            #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
             --testing) testing=yes ;;
