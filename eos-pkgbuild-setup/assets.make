@@ -518,8 +518,12 @@ RunPostHooks()
     local newrepodir
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
         case "$REPONAME" in
-            endeavouros) newrepodir="$ASSETSDIR/../../repo" ;;
-            *)           newrepodir="$GITDIR" ;;
+            endeavouros)
+                newrepodir="$ASSETSDIR/../../repo" ;;
+            endeavouros-testing-dev)
+                newrepodir="$ASSETSDIR/../../eos-tools" ;;
+            *)
+                newrepodir="$GITDIR" ;;
         esac
         if [ -e "$newrepodir/.GitUpdate" ] ; then
             if [ -x /usr/bin/GitUpdate ] ; then
