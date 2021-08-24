@@ -12,7 +12,7 @@ url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 conflicts=('endeavouros-i3wm') 
 depends=('git')
-source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git")
 sha256sums=('SKIP')
 
 package() {
