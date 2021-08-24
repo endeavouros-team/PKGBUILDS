@@ -1,0 +1,27 @@
+# Maintainer: joekamprad <joekamprad@endeavouros.com>
+# Contributor: The-Repo-Club <The-Repo-Club@github.com>
+
+_pkgname=endeavouros-xfce4-theming
+pkgname=endeavouros-skel-xfce4
+pkgver=1
+pkgrel=1
+pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+conflicts=('endeavouros-xfce4')
+depends=('git')
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=master")
+sha256sums=('SKIP')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/" "${pkgdir}${PREFIX}/"
+    install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
+    install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh"
+    install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+    install -Dm644 "mousepad.dconf" "${pkgdir}${PREFIX}/mousepad.dconf"
+}
