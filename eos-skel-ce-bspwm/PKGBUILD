@@ -16,11 +16,6 @@ depends=('git')
 source=("${_pkgname}::git+https://github.com/EndeavourOS-Community-Editions/${_pkgname}.git")
 sha256sums=('SKIP')
 
-pkgver() {
-  cd "$_pkgname"
-  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
-}
-
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
