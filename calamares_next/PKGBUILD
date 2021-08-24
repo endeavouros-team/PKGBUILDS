@@ -5,13 +5,13 @@
 pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
-pkgver=3.2.40
-pkgrel=5
+pkgver=3.2.41.1
+pkgrel=8
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
-optdepends=('update-mirrorlist')
+optdepends=('update-mirrorlist' 'mkinitcpio-openswap' 'calamares_config_next')
 makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current' 'calamares_test') 
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'qt5ct' 'solid' 'qt5-tools')
@@ -19,7 +19,7 @@ provides=("${pkgname}")
 options=(!strip !emptydirs)
 # When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=next"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=(
@@ -51,7 +51,6 @@ prepare() {
     # sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
     sed -i "s?pacman_flags,?pacman_flags, \"--needed\",?" $_reponame/src/modules/packages/main.py
 
-
 }
 
 
@@ -77,7 +76,9 @@ package() {
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
     cp -r $_reponame/src/modules/user_pkglist/pkglist_install.sh             $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
     chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
-    
+    # fix for networkcfg module
+    cp $_reponame/src/modules/main.py $_reponame/build/$pkgname/usr/lib/calamares/modules/networkcfg/main.py
+    rm $_reponame/src/modules/main.py
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"*                   "${pkgdir}${destdir}"
 
