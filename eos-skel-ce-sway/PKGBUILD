@@ -13,7 +13,7 @@ url="https://github.com/EndeavourOS-Community-Editions/${pkgname}"
 license=('GPL')
 conflicts=('eos-ce-sway')
 depends=('git')
-source=("${_pkgname}::git+https://github.com/EndeavourOS-Community-Editions/${_pkgname}.git#branch=next")
+source=("${_pkgname}::git+https://github.com/EndeavourOS-Community-Editions/${_pkgname}.git")
 sha256sums=('SKIP')
 
 package() {
