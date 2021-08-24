@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_next
-pkgver=2.0
-pkgrel=4
+pkgver=2.2
+pkgrel=6
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -17,13 +17,13 @@ prepare() {
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 mkdir $srcdir/bin
 cd $srcdir/bin/
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/cleaner_script.sh
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/chrooted_cleaner_script.sh
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/update-mirrorlist
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/pacstrap_calamares
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/cleaner_script.sh
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/chrooted_cleaner_script.sh
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/update-mirrorlist
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/pacstrap_calamares
 chmod +x cleaner_script.sh chrooted_cleaner_script.sh update-mirrorlist pacstrap_calamares
 cd $srcdir/calamares_config_next/calamares/modules
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/next/netinstall.yaml
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts/master/netinstall.yaml
 wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/main/netinstall_ce.yaml
 cd $srcdir
 }
