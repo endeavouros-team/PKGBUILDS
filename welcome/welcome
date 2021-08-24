@@ -283,7 +283,7 @@ yad_endeavouros_xfce4_theme() {
                     # Fetch the EndeavourOS default Xfce theme from github.
                     local tmpdir=$(mktemp -d)
                     pushd $tmpdir >/dev/null
-                    git clone https://github.com/endeavouros-team/EndeavourOS-archiso.git 2>/dev/null
+                    git clone https://github.com/endeavouros-team/EndeavourOS-iso-next.git 2>/dev/null
                     mv EndeavourOS-archiso/airootfs/etc/skel/.config/xfce4   "$(dirname "$conf")"
                     mv EndeavourOS-archiso/airootfs/etc/skel/.config/gtk-3.0 "$(dirname "$conf")"
                     popd >/dev/null
