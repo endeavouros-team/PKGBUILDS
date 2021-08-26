@@ -6,20 +6,19 @@ pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.41.1
-pkgrel=8
+pkgrel=9
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
-optdepends=('update-mirrorlist' 'mkinitcpio-openswap' 'calamares_config_next')
+optdepends=('update-mirrorlist' 'mkinitcpio-openswap' 'calamares_config_next' 'ckbcomp')
 makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current' 'calamares_test') 
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'qt5ct' 'solid' 'qt5-tools')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
-# When stable merge to master branch and use "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=08-2021"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
 )
 sha256sums=(
