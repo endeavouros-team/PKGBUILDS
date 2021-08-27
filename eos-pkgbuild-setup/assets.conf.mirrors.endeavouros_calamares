@@ -22,11 +22,11 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
-    aur/mkinitcpio-openswap                         # openswap: EOS has a minor change
+    #aur/mkinitcpio-openswap                         # openswap: EOS has a minor change
 
 #    calamares_august_2020                          # no need for this anymore
 #    calamares_next
-    calamares_offline_online
+    #calamares_offline_online
 )
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
