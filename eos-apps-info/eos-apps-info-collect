@@ -1,9 +1,13 @@
-
 #!/bin/bash
 
 DIE() {
     echo "$progname: error: $1" >&2
     exit 1
+}
+
+MakePicSmaller() {
+    local picfile="$1"
+    /usr/bin/convert "$picfile" -depth 3 "$picfile"
 }
 
 Md2html() {
@@ -13,7 +17,12 @@ Md2html() {
     [ -n "$dir" ] && dir="/$dir"
     mkdir -p $app
 
-    /usr/bin/ls $pkgbuilds$dir/$app/*.png >& /dev/null && /usr/bin/cp $pkgbuilds$dir/$app/*.png $app
+    /usr/bin/ls $pkgbuilds$dir/$app/*.png >& /dev/null && {
+        /usr/bin/cp $pkgbuilds$dir/$app/*.png $app
+        for xx in $app/*.png ; do
+            MakePicSmaller "$xx"
+        done
+    }
     /usr/bin/pandoc -f gfm $pkgbuilds$dir/$app/*.md -o $app/$app.html
 
     echo "$app" >&2
