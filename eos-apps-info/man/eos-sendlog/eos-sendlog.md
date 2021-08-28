@@ -1,7 +1,9 @@
 # eos-sendlog
 
-Sends a (text) file from standard input to pastebin, and saves the returned URL<br>
+Sends a (text) file from standard input to pastebin, shows the service URL where the file is stored, and saves the returned URL<br>
 to **~/.config/eos-sendlog.txt**.
+
+![](eos-sendlog.png)
 
 ## Configuration
 

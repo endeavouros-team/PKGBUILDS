@@ -4,6 +4,8 @@ This utility can choose grub menu colours by using the arrow keys to select from
 Changes can be saved in `/etc/default/grub`.<br>
 After reboot you will see the changes in the grub menu.
 
+![](grub-colour-chooser.png)
+
 ## Synopsis
 ```
 Usage:  grub-colour-chooser

@@ -11,5 +11,5 @@ UpdateInTerminal [options]
 ```
 --noup   Don't check Arch & EndeavourOS updates.
 --noaur  Don't check AUR updates.
---nt     Check updates in a new terminal window.
+--nt     Start a new terminal window for checking updates.
 ```

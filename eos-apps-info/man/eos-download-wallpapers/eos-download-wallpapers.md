@@ -6,7 +6,7 @@
 
 to your system.<br>
 
-Note: the number of wallpapers is currently limited.
+Note: the number of available wallpapers is limited.
 
 ## Synopsis
 ```

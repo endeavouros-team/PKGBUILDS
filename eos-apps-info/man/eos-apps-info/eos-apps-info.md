@@ -2,6 +2,8 @@
 
 Shows information (resembles man pages) about the apps in the Endeavouros repository.
 
+![](eos-apps-info.png)
+
 ## Synopsis
 ```
 eos-apps-info

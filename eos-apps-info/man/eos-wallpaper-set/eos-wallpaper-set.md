@@ -2,6 +2,8 @@
 
 Sets the wallpaper from the given file, or lets user to select it from the given folder.
 
+![](eos-wallpaper-set.png)
+
 ## Synopsis
 ```
 eos-wallpaper-set [name | file | folder]

@@ -1,6 +1,6 @@
 # eos-pkg-changelog
 
-Show the changelog of (most) EndeavourOS packages.
+Show the changelog of (most) EndeavourOS packages using a web browser.
 
 ## Synopsis
 ```

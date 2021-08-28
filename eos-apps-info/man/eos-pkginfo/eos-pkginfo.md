@@ -1,6 +1,6 @@
 # eos-pkginfo
 
-Show usage and/or developer information about an EndeavourOS/Arch/AUR package.<br>Package can be identified by its name, included program, or file path.
+Show usage and/or developer information about an EndeavourOS/Arch/AUR package using information on the internet.<br>Package can be identified by its name, included program, or file path.
 
 Note: EndeavourOS specific manual pages exist at the EndeavourOS pages (currently at github), and are shown from there.<br>
 Other manual pages are shown from their respective sites.
@@ -65,3 +65,6 @@ With this definition `hlp` works like `man` for Arch and AUR manual page entries
 hlp ls
 hlp eos-pkginfo
 ```
+
+## See also
+eos-apps-info

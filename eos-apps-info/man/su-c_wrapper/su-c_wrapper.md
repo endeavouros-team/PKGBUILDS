@@ -20,3 +20,8 @@ alias root=su-c_wrapper
 ```
 su-c_wrapper ls -la
 ```
+
+## See also
+```
+man su
+```
