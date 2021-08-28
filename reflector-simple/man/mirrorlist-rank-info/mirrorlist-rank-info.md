@@ -1,6 +1,8 @@
 # mirrorlist-rank-info
 
-`mirrorlist-rank-info` shows up-to-date ranking information about the mirrors in file `/etc/pacman.d/mirrorlist`.<br>
+`mirrorlist-rank-info` shows up-to-date ranking information about the mirrors in file `/etc/pacman.d/mirrorlist`.
+
+![](mirrorlist-rank-info.png)
 
 ## Synopsis
 ```
