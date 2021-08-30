@@ -3,7 +3,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.9.9
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -14,8 +14,6 @@ depends=(
   xorg-xrandr           # for eos-wallpaper-set
   endeavouros-theming   # for eos-wallpaper-set
   xdg-utils             # for eos-pkginfo
-
-  exfatprogs            # temporary workaround until the next ISO after 2021-08-27
 )
 optdepends=(
   "neofetch: for additional DE detection"
