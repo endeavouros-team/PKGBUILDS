@@ -2,7 +2,8 @@
 
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
-DIE()     { echo2 "Error: $1" ; Usage ; exit 1 ; }
+DIE()     { echo2 "$progname: error: $1" ; Usage ; exit 1 ; }
+WARN()    { echo2 "====> $progname: warning: $1" ; }
 
 translations_dir=/usr/share/endeavouros/scripts  # needed in translations.bash
 
@@ -15,6 +16,49 @@ source $translations_dir/translations.bash || {
 
 export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
+
+Checkupdates() {
+    # On nvidia gpu machines, if a kernel is updated, the nvidia package(s) should be updated too.
+    # This function checks this.
+    # Note that if nvidia-dkms is installed, check is not needed.
+
+    local updates
+    local retval
+    local linux_lts=no
+    local linux=no
+    local nvidia_lts=no
+    local nvidia=no
+    local nvidias
+
+    updates=$(checkupdates)
+    retval=$?
+
+    echo "$updates"
+
+    case "$retval" in
+        0)
+	    nvidias="$(/usr/bin/pacman -Qq nvidia-dkms nvidia nvidia-lts 2>/dev/null)"
+	    if [ -n "$nvidias" ] && [ -z "$(echo "$nvidias" | /usr/bin/grep nvidia-dkms)" ] ; then
+		updates=$(echo "$updates" | /usr/bin/awk '{print $1}')
+		for pkg in $updates ; do
+		    case "$pkg" in
+			linux-lts)  linux_lts=yes ;;
+			linux)      linux=yes ;;
+			nvidia-lts) nvidia_lts=yes ;;
+			nvidia)     nvidia=yes ;;
+		    esac
+		done
+		if [ "$linux_lts" = "yes" ] && [ "$nvidia_lts" = "no" ] ; then
+		    WARN "linux-lts will be upgraded but nvidia-lts not."
+		fi
+		if [ "$linux" = "yes" ] && [ "$nvidia" = "no" ] ; then
+		    WARN "linux will be upgraded but nvidia not."
+		fi
+	    fi
+	    ;;
+    esac
+    return $retval
+}
 
 Options() {
     local pp
@@ -68,7 +112,7 @@ Main() {
     if [ "$checkArchEos" = "yes" ] ; then
         echo2 "$upname $(ltr updt_update_check):"
         echo2 ":: $(ltr updt_searching) $upname $(ltr updt_for_updates)..."
-        checkupdates
+        Checkupdates
         case "$?" in
             0) $EOS_ROOTER 'pacman -Syu' ;;
             1) DIE "checkupdates: $(ltr updt_failure)" ;;
