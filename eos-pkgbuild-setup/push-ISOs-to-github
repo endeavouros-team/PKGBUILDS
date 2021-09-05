@@ -195,7 +195,7 @@ Build_the_ISO() {
 
     # Building the ISO
 
-    local tmpdir=$(mktemp $HOME/.tmpdir.XXXX)
+    local tmpdir=$(mktemp -d $HOME/.tmpdir.XXXX)
     cp -R "$EOS_ISO_REPOPATH" $tmpdir/
     cd $tmpdir
     git pull                                         # make sure it has the latest from github
