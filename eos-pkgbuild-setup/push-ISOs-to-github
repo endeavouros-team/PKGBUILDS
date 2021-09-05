@@ -193,7 +193,7 @@ Build_the_ISO() {
     cd "$EOS_ISO_REPOPATH"
 
     sudo ./fix_permissions.sh
-    sudo ./mkarchiso -o "$EOS_UPLOAD_PATH" .
+    time sudo ./mkarchiso -o "$EOS_UPLOAD_PATH" .
 
     if [ -f "$EOS_UPLOAD_PATH/$isofilename" ] ; then
         sudo chown $LOGNAME "$EOS_UPLOAD_PATH/$isofilename"
