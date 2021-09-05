@@ -215,6 +215,7 @@ Build_the_ISO() {
             time sudo ./mkarchiso .
             ;;
         yes)
+            mkdir -p out
             echo "faked ISO" > out/endeavouros-${date}-x86_64.iso
             ;;
     esac
