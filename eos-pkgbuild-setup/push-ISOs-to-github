@@ -7,7 +7,7 @@
 #        Otherwise wrong files will be deleted as "old".
 #
 # Note2: program 'hub' is used, it creates an account token at first run
-#       and saves it into file ~/.config/hub.
+#        and saves it into file ~/.config/hub.
 #
 # Unless you already have the account token, maybe the easiest way to create it
 # is to run commands:
@@ -20,9 +20,20 @@
 #
 # Later, to sync the new local ISOs to github, you simply go to this folder
 # and run this program.
+#
+# Note3: config file $HOME/.config/$progname/$progname.conf contains important variables that
+#        must be properly set.
+#
+# Note4: exit codes:
+#           0 = success, ISO was built and sent to github
+#           1 = failure, see the log file at $HOME/.config/$progname/log.txt for more info
+#           2 = need to reboot and then build the ISO (see also the log file)
+#
+# Note5: file /usr/share/libalpm/hooks/eos-reboot-required.hook from package eos-hooks is required.
+#
 
-MSG()  { echo "$progname: $1: $2" >&2 ; }                # $1=title $2=msg
-DIE()  { MSG error   "$1" ; Usage; exit 1 ; }
+MSG()  { echo "==> $progname: $1: $2" >&2 ; }                # $1=title $2=msg
+DIE()  { MSG error   "$1" ; Options -h; exit 1 ; }
 WARN() { MSG warning "$1" ; }
 INFO() { MSG info    "$1" ; }
 
@@ -31,14 +42,24 @@ RemoveOldRemotesAndLocals() {
 
     UpdateRemotesInfo
 
-    # remove oldest files and leave no more than $remote_iso_count_max files
-    for ((ix=0; remote_iso_count > remote_iso_count_max; ix++)) ; do
+    # remove oldest files and leave no more than $EOS_REMOTE_ISO_MAX_COUNT files
+    for ((ix=0; remote_iso_count > EOS_REMOTE_ISO_MAX_COUNT; ix++)) ; do
         re="${remote_iso_files[ix]}"
-        #ShowOp delete "$re"
-        delete-release-assets --quietly $tag "$re"  # deletes all remote files starting with name "$re"
+        Log remove "$re"
+        delete-release-assets --quietly $EOS_RELEASE_TAG "$re"  # deletes all remote files starting with name "$re"
         rm -f "$re" "$re".*
         ((remote_iso_count--))
     done
+}
+
+Log() {
+    local op="$1"
+    local file="$2"
+    echo "$datetime: $op $file" >> "$logfile"
+}
+
+SendLogToRemote() {
+    add-release-assets --quietly $EOS_RELEASE_TAG "$logfile"
 }
 
 ShowOp() {
@@ -73,14 +94,15 @@ AddNewRemotes() {
                 ShowOp push "$xx"
                 assets+=("$xx")
             done
-            add-release-assets --quietly $tag "${assets[@]}"     # add all files related to this ISO
+            Log upload "$lo"
+            add-release-assets --quietly $EOS_RELEASE_TAG "${assets[@]}"     # add all files related to this ISO
         fi
     done
     sleep 1  # give github some time to relax...
 }
 
 UpdateRemotesInfo() {
-    remote_iso_files="$(/usr/bin/release-asset-names "$tag" | /usr/bin/grep '\.iso$')"
+    remote_iso_files="$(release-asset-names "$EOS_RELEASE_TAG" | /usr/bin/grep '\.iso$')"
     if [ -n "$remote_iso_files" ] ; then
         readarray -t remote_iso_files <<< $(echo "$remote_iso_files")
         #remote_iso_count=$(echo "${remote_iso_files[@]}" | wc -l)
@@ -91,50 +113,218 @@ UpdateRemotesInfo() {
     sleep 1  # give github some time to relax...
 }
 
+UpdateSystem_or_InformAboutRebootAndStop() {
+    local must_reboot=no
+    local hook=/usr/share/libalpm/hooks/eos-reboot-required.hook
+
+    [ -f $hook ] || DIE "System file $hook is required. Please install package eos-hooks."
+
+    local updates=$(checkupdates | awk '{print $1}')
+
+    # Update the system and also check if system updates contain packages that require a reboot.
+
+    if [ -n "$updates" ] ; then
+        local must_update_pkgs=$(grep "^Target = " $hook | awk '{print $3}')
+        local upkg mpkg
+        for upkg in $updates ; do
+            for mpkg in $must_update_pkgs ; do
+                if [ "$upkg" = "$mpkg" ] ; then
+                    must_reboot=yes
+                    break
+                fi
+            done
+            [ $must_reboot = yes ] && break
+        done
+        sudo pacman -Syu --noconfirm
+    fi
+
+    if [ $must_reboot = yes ] ; then
+        WARN "Must reboot before building the ISO."
+        Log  "Must reboot before building file" ${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
+        exit 2     # must reboot first, then build the ISO 
+    fi
+}
+
+CheckVar() {
+    local varname="$1"
+    [ -n "${!varname}" ] || DIE "variable $varname missing from $configfile."
+}
+
+CheckVars() {
+    CheckVar "EOS_UPLOAD_PATH"
+    CheckVar "EOS_ISO_REPOPATH"
+    CheckVar "EOS_RELEASE_TAG"
+    CheckVar "EOS_REMOTE_ISO_MAX_COUNT"
+    CheckVar "EOS_ISO_NAME_PREFIX"
+
+    [ -d .git ] || DIE "current folder is not a git folder (does not have a .git subfolder)."
+    local url_line="$(grep "/endeavouros-team/$(basename "$EOS_UPLOAD_PATH").git" .git/config)"
+    [ -n "$url_line" ] || DIE "current folder's .git/config file has wrong url!"   # didn't find correct path in .git/config
+
+    local def=4 min=1 max=10
+    if [ $EOS_REMOTE_ISO_MAX_COUNT -lt 1 ] || [ $EOS_REMOTE_ISO_MAX_COUNT -gt 10 ] ; then
+        WARN "EOS_REMOTE_ISO_MAX_COUNT should be $min..$max, was $EOS_REMOTE_ISO_MAX_COUNT, setting it to $def."
+        EOS_REMOTE_ISO_MAX_COUNT=$def
+    fi
+}
+
+Build_the_ISO() {
+
+    # If build succeeds: return 0
+    # If build fails:    return 1 or 2
+
+    local retval=0
+
+    # First, do some ad hoc sanity checks about folders, files and configuration.
+
+    local isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
+
+    [ -d "$EOS_ISO_REPOPATH" ] || DIE "local folder $EOS_ISO_REPOPATH does not exist."
+    [ -d "$EOS_UPLOAD_PATH" ] || DIE "local folder $EOS_UPLOAD_PATH does not exist."
+    [ "$EOS_UPLOAD_PATH" -ef "$PWD" ] || DIE "ISO build must be done in folder $EOS_UPLOAD_PATH."
+
+    # Preparations for ISO build
+
+    # UpdateSystem_or_InformAboutRebootAndStop       # either update system, or inform about mandatory reboot after updating
+    # sudo pacman --noconfirm -Scc                   # clean up package cache
+
+    # Building the ISO
+
+    cd "$EOS_ISO_REPOPATH"
+
+    sudo ./fix_permissions.sh
+    sudo ./mkarchiso -o "$EOS_UPLOAD_PATH" .
+
+    if [ -f "$EOS_UPLOAD_PATH/$isofilename" ] ; then
+        sudo chown $LOGNAME "$EOS_UPLOAD_PATH/$isofilename"
+    else
+        retval=1
+    fi
+
+    sudo rm -rf out work
+
+    # Create check files (.sig .sha512sum .torrent) for the ISO
+
+    cd "$EOS_UPLOAD_PATH"
+
+    if [ $retval -eq 0 ] ; then
+        CreateIsoCheckfiles
+    else
+        Log "Failed to build file" $isofilename
+        DIE "ISO building failed."
+    fi
+
+    return $retval
+}
+
+CreateIsoCheckfiles() {
+    local isobase=$(basename $isofilename .iso)
+
+    sha512sum $isofilename > $isofilename.sha512sum
+
+    gpg --default-key info@endeavouros.com --detach-sign --output $isofilename.sig $isofilename
+
+    mktorrent -p -v \
+              --announce=udp://tracker.openbittorrent.com:80 \
+              -a udp://tracker.torrent.eu.org:451/announce \
+              -a udp://thetracker.org:80/announce \
+              -a udp://tracker.dutchtracking.com:6969/announce \
+              -a udp://tracker.opentrackr.org:1337/announce \
+              -c $isobase.tar \
+              -n $isobase.tar \
+              -o $isobase.tar.torrent \
+              -w https://mirror.alpix.eu/endeavouros/iso/$isofilename \
+              $HOME/Documents/$isobase.tar
+}
+
 Usage() {
     cat <<EOF >&2
 
-Usage: $progname tag [max_count [workdir]]
-Parameters:
-    tag         Release assets tag in the repository, e.g. '0-EndeavourOS-development-ISO-releases'.
-                This is a mandatory parameter.
-    max_count   Max number of ISO files that will be kept. Default is $remote_iso_count_max_default.
-                Older files will be deleted from the local folder and from Github.
-    workdir     A debugging parameter only, not normally used. Some bash debuggers may need it.
+Overview
+    This program creates a new ISO file and the additional
+    files (.sha512sum, .sig and .torrent) into this folder.
 
-You should run this program in the folder where the local ISO files exist.
+    Then new ISO files will be pushed to Github, and oldest ISO files
+    will be deleted if there are more ISO files than \$EOS_REMOTE_ISO_MAX_COUNT (see below).
 
-This folder should be cloned from the Github repository where the ISO files
-will be stored. So this folder must contain a subfolder named .git.
+Tips
+    Configuration file $configfile2
+    is required to have proper contents for variables:
+       Name                           Example value(s)
+       ----                           ----------------
+       EOS_RELEASE_TAG                test1
+       EOS_UPLOAD_PATH                "\$PWD" or "\$HOME/EOS/test-fake-stuff"
+       EOS_ISO_REPOPATH               \$EOS_UPLOAD_PATH/../EndeavourOS-iso-next
+       EOS_REMOTE_ISO_MAX_COUNT       4
+       EOS_ISO_NAME_PREFIX            endeavouros-weekly
 
-Copy new ISO files and their additional files like .sha512sum etc. into this folder.
-Then run this program. New ISO files will be pushed to Github, and oldest ISO files
-will be deleted if there are more ISO files than the 'max_count' value.
+    Run this program in the folder where the local ISO file(s) exist (i.e. \$EOS_UPLOAD_PATH).
+
+    This folder must be git clone'd from the Github repository where the ISO files
+    will be stored.
+    EOS_RELEASE_TAG refers to the related Github release tag.
 
 EOF
 }
 
+Options() {
+    local opts
+    opts="$(/usr/bin/getopt -o=h --longoptions help --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options]
+Options:
+  -h | --help     This help.
+EOF
+                Usage
+                exit 0
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+}
+
 Main()
 {
-    local tag="$1"                        # github's release asset tag
-    local remote_iso_count_max="$2"       # max allowed number of remote ISO files
-    local workdir="$3"                    # for debugging only, normally not used
+    local progname=$(/usr/bin/basename "$0")
     local remote_iso_files
     local remote_iso_count=0
-    local remote_iso_count_max_default=4
-    local progname=$(/usr/bin/basename "$0")
+    local date=$(date +%Y.%m.%d)
+    local datetime="${date}_$(date +%H:%M)"
+    local logfile="$HOME/.config/$progname/log.txt"
+    local configfile="$HOME/.config/$progname/$progname.conf"
+    local configfile2="\$HOME/.config/$progname/$progname.conf"
 
-    [ -n "$workdir" ] && cd "$workdir"
-    [ -n "$remote_iso_count_max" ] || remote_iso_count_max=$remote_iso_count_max_default
+    Options "$@"
 
-    [ -n "$tag" ] || DIE "please give the release tag."
+    # variables in the $configfile:
+    local EOS_RELEASE_TAG=""
+    local EOS_UPLOAD_PATH=""
+    local EOS_ISO_REPOPATH=""
+    local EOS_REMOTE_ISO_MAX_COUNT=4
+    local EOS_ISO_NAME_PREFIX=""
 
-    # check that the current folder has .git subfolder (and ISO files)
-    [ -d .git ] || DIE "sorry, current folder should have a '.git' subfolder."
+    /usr/bin/mkdir -p $(/usr/bin/dirname "$logfile")  # creates also dir for $configfile!
+
+    source "$configfile" || DIE "reading config file $configfile failed."
+    CheckVars
+
+    Build_the_ISO || return 1
 
     UpdateRemotesInfo
     AddNewRemotes
     RemoveOldRemotesAndLocals
+    SendLogToRemote
 }
 
 Main "$@"
