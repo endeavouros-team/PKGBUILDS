@@ -149,7 +149,7 @@ UpdateSystem_or_InformAboutRebootAndStop() {
             done
             [ $must_reboot = yes ] && break
         done
-        sudo pacman -Syu --noconfirm
+        sudo pacman -Syu   # --noconfirm
     fi
 
     if [ $must_reboot = yes ] ; then
@@ -197,18 +197,27 @@ Build_the_ISO() {
 
     # Preparations for ISO build
 
-    # UpdateSystem_or_InformAboutRebootAndStop       # either update system, or inform about mandatory reboot after updating
-    # sudo pacman --noconfirm -Scc                   # clean up package cache
+    if [ "$interactive" = "yes" ] ; then
+        UpdateSystem_or_InformAboutRebootAndStop       # either update system, or inform about mandatory reboot after updating
+        sudo pacman --noconfirm -Scc                   # clean up package cache
+    fi
 
     # Building the ISO
 
     local tmpdir=$(mktemp -d $HOME/.tmpdir.XXXX)
     cp -R "$EOS_ISO_REPOPATH" $tmpdir/
     cd $tmpdir/$(basename "$EOS_ISO_REPOPATH")
-    git pull                                         # make sure it has the latest from github
 
-    sudo ./fix_permissions.sh
-    time sudo ./mkarchiso .
+    case "$fake" in
+        no)
+            git pull                                         # make sure it has the latest from github
+            sudo ./fix_permissions.sh
+            time sudo ./mkarchiso .
+            ;;
+        yes)
+            echo "faked ISO" > out/endeavouros-${date}-x86_64.iso
+            ;;
+    esac
 
     local filename="$(/usr/bin/ls out/endeavouros-*.iso 2>/dev/null)"
     local isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
@@ -296,7 +305,7 @@ EOF
 
 Options() {
     local opts
-    opts="$(/usr/bin/getopt -o=h --longoptions help --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=hi --longoptions fake,help,interactive --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -304,12 +313,19 @@ Options() {
 
     while true ; do
         case "$1" in
+            --fake)
+                fake=yes
+                ;;
+            --interactive | -i)
+                interactive=yes
+                ;;
 
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options]
 Options:
-  -h | --help     This help.
+  -h | --help           This help.
+  -i | --interactive    Interactive mode, update system first.
 EOF
                 Usage
                 exit 0
@@ -331,6 +347,8 @@ Main()
     local logfile="$HOME/.config/$progname/log.txt"
     local configfile="$HOME/.config/$progname/$progname.conf"
     local configfile2="\$HOME/.config/$progname/$progname.conf"
+    local fake=no
+    local interactive=no
 
     Options "$@"
 
