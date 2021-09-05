@@ -195,8 +195,8 @@ Build_the_ISO() {
 
     # Building the ISO
 
-    cp -R "$EOS_ISO_REPOPATH" /tmp/
-    local tmpdir="/tmp/$(basename "$EOS_ISO_REPOPATH")"
+    local tmpdir=$(mktemp $HOME/.tmpdir.XXXX)
+    cp -R "$EOS_ISO_REPOPATH" $tmpdir/
     cd $tmpdir
     git pull                                         # make sure it has the latest from github
 
@@ -213,12 +213,10 @@ Build_the_ISO() {
         retval=1
     fi
 
-    cd /tmp
-    sudo rm -rf $tmpdir # out work
-
     # Create check files (.sig .sha512sum .torrent) for the ISO
 
     cd "$EOS_UPLOAD_PATH"
+    sudo rm -rf $tmpdir
 
     if [ $retval -eq 0 ] ; then
         CreateIsoCheckfiles
