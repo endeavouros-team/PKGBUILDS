@@ -65,6 +65,13 @@ DieLog() {
     DIE "$op $file"
 }
 
+WarnLog() {
+    local op="$1"
+    local file="$2"
+    Log "$op" "$file"
+    WARN "$op $file"
+}
+
 SendLogToRemote() {
     add-release-assets --quietly $EOS_RELEASE_TAG "$logfile"
 }
@@ -203,12 +210,12 @@ Build_the_ISO() {
     sudo ./fix_permissions.sh
     time sudo ./mkarchiso .
 
-    local filename="$(/usr/bin/ls endeavouros-*.iso 2>/dev/null)"
+    local filename="$(/usr/bin/ls out/endeavouros-*.iso 2>/dev/null)"
     local isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
 
     if [ -n "$filename" ] ; then
-        sudo chown $LOGNAME "$filename"
-        /usr/bin/mv "$filename" "$EOS_UPLOAD_PATH/$isofilename"
+        sudo mv "$filename" "$EOS_UPLOAD_PATH/$isofilename"
+        sudo chown $LOGNAME "$EOS_UPLOAD_PATH/$isofilename"
     else
         retval=1
     fi
@@ -238,7 +245,7 @@ CreateIsoCheckfiles() {
     echo "$sum" > $isofilename.sha512sum
 
     gpg --default-key info@endeavouros.com --detach-sign --output $isofilename.sig $isofilename || {
-        DieLog "failed to sign" $isofilename
+        WarnLog "failed to sign" $isofilename
     }
 
     mktorrent -p -v \
@@ -253,7 +260,7 @@ CreateIsoCheckfiles() {
               -w https://mirror.alpix.eu/endeavouros/iso/$isofilename \
               $HOME/Documents/$isobase.tar
     if [ $? -ne 0 ] ; then
-        DieLog "failed to create torrent file for" $isofilename
+        WarnLog "failed to create torrent file for" $isofilename
     fi
 }
 
