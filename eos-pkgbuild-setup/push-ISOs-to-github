@@ -326,6 +326,7 @@ Usage: $progname [options]
 Options:
   -h | --help           This help.
   -i | --interactive    Interactive mode, update system first.
+       --fake           Fake ISO build (is fast to test).
 EOF
                 Usage
                 exit 0
