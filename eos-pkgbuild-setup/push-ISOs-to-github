@@ -61,14 +61,14 @@ Log() {
 DieLog() {
     local op="$1"
     local file="$2"
-    Log "$op" "$file"
+    Log "==> $op" "$file"
     DIE "$op $file"
 }
 
 WarnLog() {
     local op="$1"
     local file="$2"
-    Log "$op" "$file"
+    Log "==> $op" "$file"
     WARN "$op $file"
 }
 
