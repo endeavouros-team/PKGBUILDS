@@ -7,16 +7,30 @@
 #        Otherwise wrong files will be deleted as "old".
 #
 # Note2: program 'hub' is used, it creates an account token at first run
-#        and saves it into file ~/.config/hub.
+#        and saves it into the hub config file ~/.config/hub.
 #
 # Unless you already have the account token, maybe the easiest way to create it
 # is to run commands:
 #    # assume this github repo is already created!
 #    reponame=weekly-ISOs-repo                      # This is the name of the github repo
 #                                                   # where the ISOs will be stored.
+#                                                   # Note that it may have changed already .
 #    git clone https://github.com/endeavouros-team/$reponame.git
 #    cd $reponame
 #    hub release
+#    If this works no more, you can create the token at github and copy it to he hub config file.
+#
+#    The file looks like this (note: github.com starts at the beginning of the line):
+#
+#        github.com:
+#        - user: <your-github-username>
+#          oauth_token: <your-github-token>
+#          protocol: https
+#
+#   The <your-github-token> starts with:
+#        ghp_
+#   and contains letters and numbers.
+#
 #
 # Later, to sync the new local ISOs to github, you simply go to this folder
 # and run this program.
@@ -29,7 +43,7 @@
 #           1 = failure, see the log file at $HOME/.config/$progname/log.txt for more info
 #           2 = need to reboot and then build the ISO (see also the log file)
 #
-# Note5: file /usr/share/libalpm/hooks/eos-reboot-required.hook from package eos-hooks is required.
+# Note5: file /usr/share/libalpm/hooks/eos-reboot-required.hook from package 'eos-hooks' is required.
 #
 
 MSG()  { echo "==> $progname: $1: $2" >&2 ; }                # $1=title $2=msg
@@ -245,8 +259,11 @@ Build_the_ISO() {
 }
 
 CreateIsoCheckfiles() {
-    local isobase=$(basename $isofilename .iso)
+
+    local web_seed=https://mirror.alpix.eu/endeavouros/iso/$isofilename  # for torrent
     local sum
+
+    # Calculate sha512sum into $isofilename.sha512sum
 
     sum="$(sha512sum $isofilename)"
     if [ $? -ne 0 ] ; then
@@ -254,9 +271,13 @@ CreateIsoCheckfiles() {
     fi
     echo "$sum" > $isofilename.sha512sum
 
+    # Sign with gpg into $isofilename.sig
+
     gpg --default-key info@endeavouros.com --detach-sign --output $isofilename.sig $isofilename || {
         WarnLog "failed to sign" $isofilename
     }
+
+    # Create a torrent file $isofilename.torrent
 
     mktorrent -p -v \
               --announce=udp://tracker.openbittorrent.com:80 \
@@ -264,14 +285,12 @@ CreateIsoCheckfiles() {
               -a udp://thetracker.org:80/announce \
               -a udp://tracker.dutchtracking.com:6969/announce \
               -a udp://tracker.opentrackr.org:1337/announce \
-              -c $isobase.tar \
-              -n $isobase.tar \
-              -o $isobase.tar.torrent \
-              -w https://mirror.alpix.eu/endeavouros/iso/$isofilename \
-              $HOME/Documents/$isobase.tar
-    if [ $? -ne 0 ] ; then
-        WarnLog "failed to create torrent file for" $isofilename
-    fi
+              -c $isofilename \
+              -n $isofilename \
+              -o $isofilename.torrent \
+              -w $web_seed \
+              $isofilename
+    [ $? -eq 0 ] || WarnLog "failed to create torrent file for" $isofilename
 }
 
 Usage() {
