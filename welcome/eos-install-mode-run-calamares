@@ -145,6 +145,15 @@ CopyFile() {
     pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
 }
 
+run_hotfix_start() {
+    local file=hotfix-start.bash
+    local url=https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file
+    wget --timeout=30 -q -O $file $url && {
+        bash $file
+    }
+}
+
+
 ###  Everything starts in the Main function. ###
 Main() {
     local lang="$1"
@@ -166,6 +175,7 @@ Main() {
     # copy config files based on $mode
     case "$mode" in
         online | offline | community)
+            eos-connection-checker && run_hotfix_start    
             CopyFile $cfolder/settings_$mode.conf $cfolder/settings.conf
             ;;
         *)
