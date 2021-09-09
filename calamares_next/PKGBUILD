@@ -6,13 +6,13 @@ pkgname=calamares_current
 _eos_changes=Calamares_current
 _reponame=calamares
 pkgver=3.2.42
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
 optdepends=('update-mirrorlist' 'mkinitcpio-openswap' 'calamares_config_next' 'ckbcomp')
-makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore' 'boost')
+makedepends=('git' 'cmake' 'boost-libs' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
 conflicts=('calamares_offline' 'calamares_netinstall_test' 'calamares_netinstall' 'calamares_current' 'calamares_test') 
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
@@ -22,8 +22,10 @@ options=(!strip !emptydirs)
 source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=08-2021"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
+  "efi-boot-mountpoint.patch"
 )
 sha256sums=(
+'SKIP'
 'SKIP'
 'SKIP'
 )
@@ -48,6 +50,9 @@ prepare() {
     # sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
     # set pacman flag --needed to be used per default
     sed -i "s?pacman_flags,?pacman_flags, \"--needed\",?" $_reponame/src/modules/packages/main.py
+    
+    # apply patch to enable /boot as a selectable option in manual partition gui
+    patch -u $_reponame/src/modules/partition/gui/PartitionDialogHelpers.cpp -i efi-boot-mountpoint.patch
 
 }
 
@@ -65,8 +70,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DINSTALL_CONFIG=OFF \
     -DWEBVIEW_FORCE_WEBKIT=OFF \
-	  -DWITH_PYTHONQT=OFF \
-	  -DWITH_KF5DBus=OFF \
+	-DWITH_PYTHONQT=OFF \
+	-DWITH_KF5DBus=OFF \
     cmake .. \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
