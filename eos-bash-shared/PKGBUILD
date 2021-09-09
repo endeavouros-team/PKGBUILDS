@@ -2,7 +2,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.9.10
+pkgver=1.10
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -57,6 +57,7 @@ source=(
   $_url/eos-download-wallpapers
   $_url/eos-send-gpuinfo
   $_url/eos-pacdiff
+  $_url/eos-kernel-nvidia-update-check
   $_url/eos-shifttime                # Thanks, @freebird54!
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
@@ -75,7 +76,7 @@ sha512sums=('2445463f75f4441fbb7dcd41521a6ad7f89c7e4a3f931300565869e01a8dd4de06c
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '790c15dfa97cc0558666616bdc362b62e40c55e06921a7a8fa9d784a536c9f6b27c8d34825ce518a2177075cd009cea77b7dfbaba21df2508dc9875b8c15972d'
-            'b7c79d4afb4a036ba9157bfd0a9f3ce978c871bb950341a371d2c22b5824d57f1539abce458a103115cbd3141eceb997817f0cfacb0c1e19edb39164c8ad6d30'
+            '3edd9532958f85503b4480349d8310271aaf911c8cda7784fa7e13c8d0fa0aa05e3c074c8c25a0e07ee069a03c46510097caa3788f1a76968d44d4123add054f'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             'e672d4b90494ab7c8ba1a8ae837ae96efc2d1a51c80798fd5b5dcd0fb225e6a99420105747c122803666046398b3fcb51d80e3126faa1aff86da789fc17f8e8a'
@@ -87,6 +88,7 @@ sha512sums=('2445463f75f4441fbb7dcd41521a6ad7f89c7e4a3f931300565869e01a8dd4de06c
             '58b101ead0ef26d47c7d4fbf8c2228dc432d3c8f62240e808808de76e1f8c161d125918fddd23726a6ca14a2c1a2b0443aa24a81c80cd7e4f8dd4bda7e54008f'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
             '36073cb07c72b964e4f8b727e8f3a3b392977662340389526d07596a20b646331f09ebd8ef2057063e8c47010ea67c35b963bf386402defb51166195d4d3f371'
+            '2937c93d54d3092d19e15492e4fbc32d389dfd7aa0fb80ee2ee7d6278fad3c7764d73398e396d5405d0733a4f48430c21bf2426c90c93044a8a69c25021f1cc9'
             'ba055d67ba50959cf9c63e456ee3ddd470a8ee2f9a1042bbc5f650e4f00ca2c56738b5170189455b5b510a505308c612a284a3c1077219ffbeaf4370ba5451ff'
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
@@ -114,6 +116,7 @@ package() {
   install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $pkgdir/usr/bin/eos-pacdiff
+  install -Dm755 eos-kernel-nvidia-update-check $pkgdir/usr/bin/eos-kernel-nvidia-update-check
   install -Dm755 eos-shifttime                  $pkgdir/usr/bin/eos-shifttime
   install -Dm755 grub-colour-chooser            $pkgdir/usr/bin/grub-colour-chooser
 # install -Dm755 eos-send-gpuinfo               $pkgdir/usr/bin/eos-send-gpuinfo
