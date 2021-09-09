@@ -185,6 +185,8 @@ CheckVars() {
     CheckVar "EOS_REMOTE_ISO_MAX_COUNT"
     CheckVar "EOS_ISO_NAME_PREFIX"
 
+    cd "$EOS_UPLOAD_PATH"
+
     [ -d .git ] || DIE "current folder is not a git folder (does not have a .git subfolder)."
     local url_line="$(grep "/endeavouros-team/$(basename "$EOS_UPLOAD_PATH").git" .git/config)"
     [ -n "$url_line" ] || DIE "current folder's .git/config file has wrong url!"   # didn't find correct path in .git/config
