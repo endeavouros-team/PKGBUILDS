@@ -48,6 +48,7 @@ build() {
     local build_rootdir="$srcdir/.."
     local cleanup="$build_rootdir/cleanup.bash"
     local basedir=$srcdir/$pkgname
+    local date iso
 
     _create_cleanup_script
 
@@ -62,13 +63,38 @@ build() {
 
     local tmpdir=$(mktemp -d)
     cp -R "$PWD" $tmpdir/ || return 1
+
+    date=$(date +%Y.%m.%d)
+    
     pushd $tmpdir/$pkgname
     sudo ./fix_permissions.sh
     time sudo ./mkarchiso -o $build_rootdir .
     popd
     sudo rm -rf $tmpdir
     cd ../..
-    sudo chown $LOGNAME *.iso
+
+    iso=endeavouros-${date}-x86_64.iso
+    [ -n "$iso" ] || {
+        # maybe the iso has the next date?
+        date=$(date +%Y.%m.%d)
+        iso=endeavouros-${date}-x86_64.iso
+    }
+    [ -n "$iso" ] || {
+        # iso may have a different naming structure
+        iso="$(/usr/bin/ls -1 endeavouros-*-x86_64.iso | tail -n1)"
+    }
+    [ -n "$iso" ] || {
+        echo "ISO build failed." >&2
+        return 1
+    }
+
+    sudo chown $LOGNAME $iso
+
+    if [ -L testing.iso ] ; then
+        # create a symlink if it already exists
+        rm -f testing.iso
+        ln -s $iso testing.iso
+    fi
 
     sync
 
