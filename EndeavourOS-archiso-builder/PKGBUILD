@@ -65,15 +65,19 @@ build() {
     cp -R "$PWD" $tmpdir/ || return 1
 
     date=$(date +%Y.%m.%d)
+    iso=endeavouros-${date}-x86_64.iso
     
     pushd $tmpdir/$pkgname
-    sudo ./fix_permissions.sh
-    time sudo ./mkarchiso -o $build_rootdir .
+    if [ "$FAKE_BUILD_TEST" != "yes" ] ; then
+        sudo ./fix_permissions.sh
+        time sudo ./mkarchiso -o $build_rootdir .
+    else
+        touch $build_rootdir/$iso
+    fi
     popd
     sudo rm -rf $tmpdir
     cd ../..
 
-    iso=endeavouros-${date}-x86_64.iso
     [ -n "$iso" ] || {
         # maybe the iso has the next date?
         date=$(date +%Y.%m.%d)
@@ -87,6 +91,8 @@ build() {
         echo "ISO build failed." >&2
         return 1
     }
+
+    _ISOFILE=$iso
 
     sudo chown $LOGNAME $iso
 
@@ -108,7 +114,7 @@ build() {
     echo "#######################################################################"
     echo ""
     echo "The new ISO is here:"
-    ls -1 "$build_rootdir"/*.iso
+    ls -1 "$build_rootdir"/$iso
     echo ""
     echo "To clean up all except the ISO, run command:"
     echo "    bash $cleanup"
@@ -121,34 +127,34 @@ package() {
 
     cd $srcdir/..
 
-    local isofile=$(ls -1 endeavouros-*-x86_64.iso | grep -v devel | tail -n1)   # $isofile = endeavouros-<date>-x86_64.iso
+    local isofile=$_ISOFILE                                                      # $isofile = endeavouros-<date>-x86_64.iso
     local isobase=$(basename $isofile .iso)                                      # $isobase = endeavouros-<date>-x86_64
     local date=$(echo $isofile | sed 's|endeavouros-\([0-9][0-9.]*\)-.*|\1|')    # date from the ISO file name
 
-    echo "Create the sha512sum file:"
-    sha512sum $isofile > $isofile.sha512sum
+    printf "Create the sha512sum file ... "
+    sha512sum $isofile 2>/dev/null > $isofile.sha512sum || true
+    [ -r $isofile.sha512sum ] && echo "done" || echo "FAILED"
 
-    echo "Create the signature file:"
+    printf  "Create the signature file ... "
     gpg --default-key info@endeavouros.com \
         --detach-sign \
         --output $isofile.sig \
-        $isofile
+        $isofile >& /dev/null || true
+    [ -r $isofile.sig ] && echo "done" || echo "FAILED"
 
-    if [ "$HOME" = "/home/joekamprad" ] ; then
-
-        echo "Create the torrent file:"
-        mktorrent -p -v \
-                  --announce=udp://tracker.openbittorrent.com:80 \
-                  -a udp://tracker.torrent.eu.org:451/announce \
-                  -a udp://thetracker.org:80/announce \
-                  -a udp://tracker.dutchtracking.com:6969/announce \
-                  -a udp://tracker.opentrackr.org:1337/announce \
-                  -c $isobase.tar \
-                  -n $isobase.tar \
-                  -o $isobase.tar.torrent \
-                  -w https://mirror.alpix.eu/endeavouros/iso/$isofile \
-                  $HOME/Documents/$isobase.tar
-    fi
+    echo "Create the torrent file:"
+    mktorrent -p -v \
+              --announce=udp://tracker.openbittorrent.com:80 \
+              -a udp://tracker.torrent.eu.org:451/announce \
+              -a udp://thetracker.org:80/announce \
+              -a udp://tracker.dutchtracking.com:6969/announce \
+              -a udp://tracker.opentrackr.org:1337/announce \
+              -c $isofile \
+              -n $isofile \
+              -o $isofile.torrent \
+              -w https://mirror.alpix.eu/endeavouros/iso/$isofile \
+              $isofile >& /dev/null || true
+    [ -r $isofile.torrent ] && echo "done" || echo "FAILED"
 
     echo Done.
 }
