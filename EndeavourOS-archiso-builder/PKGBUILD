@@ -67,14 +67,14 @@ build() {
     date=$(date +%Y.%m.%d)
     iso=endeavouros-${date}-x86_64.iso
     
-    pushd $tmpdir/$pkgname
+    pushd $tmpdir/$pkgname >/dev/null
     if [ "$FAKE_BUILD_TEST" != "yes" ] ; then
         sudo ./fix_permissions.sh
         time sudo ./mkarchiso -o $build_rootdir .
     else
         touch $build_rootdir/$iso
     fi
-    popd
+    popd >/dev/null
     sudo rm -rf $tmpdir
     cd ../..
 
