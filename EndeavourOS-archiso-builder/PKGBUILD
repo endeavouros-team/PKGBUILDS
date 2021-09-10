@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-iso-next
 pkgver=0.10
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS-iso-next"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
@@ -25,10 +25,10 @@ _create_cleanup_script() {
 
     cat <<EOF > "$cleanup"
 #!/bin/bash
-sudo rm -f  $build_rootdir/${pkgname}-*.pkg.tar.*
-sudo rm -rf $build_rootdir/${pkgname}
-sudo rm -rf $build_rootdir/pkg
-sudo rm -rf $build_rootdir/src
+rm -f  ${pkgname}-*.pkg.tar.*
+rm -rf ${pkgname}
+rm -rf pkg
+rm -rf src
 
 # pushd /usr/bin
 # sudo rm -fv "${installer_files[@]}"
