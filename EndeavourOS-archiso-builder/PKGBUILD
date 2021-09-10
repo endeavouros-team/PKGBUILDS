@@ -2,41 +2,14 @@
 
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-pkgname=EndeavourOS-archiso
-pkgver=0.9.1
+pkgname=EndeavourOS-iso-next
+pkgver=0.10
 pkgrel=1
-pkgdesc="Build EndeavourOS-archiso"
+pkgdesc="Build EndeavourOS-iso-next"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
-source=(git+https://github.com/endeavouros-team/EndeavourOS-archiso.git)
+source=(git+https://github.com/endeavouros-team/$pkgname.git)
 sha512sums=('SKIP')
-
-
-_check_repo_in_pacman_conf() {
-    local reponame="endeavouros_calamares"
-    local conf=/etc/pacman.conf
-
-    if [ -z "$(grep "^\[$reponame\]$" $conf)" ] ; then
-        echo "Sorry, repo [$reponame] is not found in $conf." >&2
-        read -p "Add it now and update system (Y/n)? " >&2
-        case "$REPLY" in
-            [yY]* | "")
-                local conftmp="$(mktemp -u "$HOME"/pacman.conf.tmp.XXXX)"
-                cp $conf $conftmp
-                cat <<EOF >> $conftmp
-
-[$reponame]
-Server = https://github.com/endeavouros-team/mirrors/releases/download/\$repo
-EOF
-                sudo cp $conftmp $conf || { rm -f $conftmp ; return 1 ; }
-                rm -f $conftmp
-                ;;
-            *)
-                return 1
-                ;;
-        esac
-    fi
-}
 
 _create_cleanup_script() {
     # There may be lots of files to delete:
@@ -67,34 +40,7 @@ EOF
     chmod +x "$cleanup"
 }
 
-_select_calamares_type() {
-    local timeout=60
-    while true ; do
-        read -t $timeout -p "[${timeout}sec] Build with calamares 'test' or 'current'? [current] " >&2
-        case "$REPLY" in
-            "" | current)
-                sed -i packages.x86_64 \
-                    -e 's|^#[ ]*calamares_current[ ]*$|calamares_current|' \
-                    -e 's|^[ ]*calamares_test[ ]*$|#calamares_test|'
-                break
-                ;;
-            test)
-                sed -i packages.x86_64 \
-                    -e 's|^[ ]*calamares_current[ ]*$|#calamares_current|' \
-                    -e 's|^#[ ]*calamares_test[ ]*$|calamares_test|'
-                break
-                ;;
-        esac
-    done
-}
-
 build() {
-    ###################################################
-    # Check that we have calamares repo properly set up.
-    ###################################################
-
-    _check_repo_in_pacman_conf
-
     ###################################################
     # Create a cleanup script.
     ###################################################
@@ -111,14 +57,16 @@ build() {
 
     cd $basedir
 
-    _select_calamares_type   # current or test
-
     sudo pacman -Syyu || return 1
-    
+
+    local tmpdir=$(mktemp -d)
+    cp -R "$PWD" $tmpdir/ || return 1
+    pushd $tmpdir
     sudo ./fix_permissions.sh
-    sudo ./build.sh -v |& tee $HOME/iso-build-log.txt
+    time sudo ./mkarchiso -o $build_rootdir .
+    popd
+    sudo rm -rf $tmpdir
     cd ../..
-    sudo mv $srcdir/$pkgname/out/*.iso .
     sudo chown $LOGNAME *.iso
 
     sync
