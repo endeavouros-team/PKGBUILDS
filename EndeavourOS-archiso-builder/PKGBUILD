@@ -55,7 +55,8 @@ build() {
     # Build.
     ###################################################
 
-    cd $basedir
+    cd $srcdir/$pkgname
+    pwd
 
     sudo pacman -Syyu || return 1
 
