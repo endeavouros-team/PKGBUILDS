@@ -62,7 +62,7 @@ build() {
 
     local tmpdir=$(mktemp -d)
     cp -R "$PWD" $tmpdir/ || return 1
-    pushd $tmpdir
+    pushd $tmpdir/$pkgname
     sudo ./fix_permissions.sh
     time sudo ./mkarchiso -o $build_rootdir .
     popd
