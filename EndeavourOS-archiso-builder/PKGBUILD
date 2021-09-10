@@ -10,7 +10,6 @@ arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/$pkgname.git)
 sha512sums=('SKIP')
-_ISOFILE=""
 
 _create_cleanup_script() {
     # There may be lots of files to delete:
@@ -93,8 +92,6 @@ build() {
         return 1
     }
 
-    _ISOFILE=$iso
-
     sudo chown $LOGNAME $iso
 
     if [ -L testing.iso ] ; then
@@ -129,7 +126,6 @@ package() {
     cd $srcdir/..
 
     local isofile=$(ls -1 endeavouros-*-x86_64.iso | grep -v devel | tail -n1)   # $isofile = endeavouros-<date>-x86_64.iso
-    isofile=$_ISOFILE
     [ -n "$isofile" ] || {
         echo "no isofile"
         return 1
