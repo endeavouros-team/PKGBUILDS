@@ -28,7 +28,7 @@ Os_release() {
 
     # bugs=https://github.com/endeavouros-team
 
-    [ -n "$wiki" ] || wiki=https://discovery.endeavouros.com
+    [ -n "$doc" ] || doc=https://discovery.endeavouros.com
 
     sed -i $file \
         -e "s|^NAME=.*$|NAME='EndeavourOS'|" \
