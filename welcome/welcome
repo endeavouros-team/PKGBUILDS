@@ -1089,6 +1089,14 @@ export -f IsR8168Card
 
 ethernet_use_8168() {
     local cmds="sed -i /usr/lib/modprobe.d/r8168.conf -e 's| r8168$| r8169$|'; modprobe -r r8169 2>/dev/null; modprobe r8168; systemctl restart NetworkManager"
+    if (! IsInstalled r8168) ; then
+        if (eos-connection-checker) ; then
+            cmds="pacman -S r8168; $cmds"
+        else
+            w_WARN "sorry, cannot install r8168 because there's no internet connection."
+            return 1
+        fi
+    fi
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
 export -f ethernet_use_8168
