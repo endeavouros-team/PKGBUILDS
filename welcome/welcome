@@ -1092,13 +1092,13 @@ Check_r8168() {
 export -f Check_r8168
 
 ethernet_use_8168() {
-    local cmds="pacman -S --noconfirm r8168; modprobe -r r8169; modprobe r8168"
+    local cmds="pacman -S --noconfirm r8168; modprobe -r r8169 2>/dev/null; modprobe r8168"
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
 export -f ethernet_use_8168
 
 ethernet_use_8169() {
-    local cmds="pacman -Rsn --noconfirm r8168; modprobe -r r8168; modprobe r8169"
+    local cmds="pacman -Rsn --noconfirm r8168; modprobe -r r8168 2>/dev/null; modprobe r8169"
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
 export -f ethernet_use_8169
