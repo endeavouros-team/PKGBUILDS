@@ -589,14 +589,10 @@ AfterInstall() {
       --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
       --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
-  if (Check_r8168) ; then
-      if (IsInstalled r8168 >& /dev/null) ; then
+  if (IsR8168Card) ; then
+      if [ -n "$(lsmod | grep r8169)" ] ; then
           tabcontents+=(
-              --field=" Wired net issues$_question Use r8169$_exclamation!$system_software_update!Changing to r8169. Reboot required.":fbtn "ethernet_use_8169"
-          )
-      else
-          tabcontents+=(
-              --field=" Wired net issues$_question Use r8168$_exclamation!$system_software_update!Changing to r8168. Reboot required.":fbtn "ethernet_use_8168"
+              --field=" Wired net issues$_question Try r8168 driver$_exclamation!$system_software_update!Changing to r8168 driver.":fbtn "ethernet_use_8168"
           )
       fi
   fi
@@ -1076,7 +1072,7 @@ EOF
     esac
 }
 
-Check_r8168() {
+IsR8168Card() {
     # Return 0 if ethernet card is realtek 8168.
 
     if [ 0 -eq 1 ] && [ "$testing" = "yes" ] ; then   # this is only for testing
@@ -1089,19 +1085,19 @@ Check_r8168() {
         return 1
     fi
 }
-export -f Check_r8168
+export -f IsR8168Card
 
 ethernet_use_8168() {
-    local cmds="pacman -S --noconfirm r8168; modprobe -r r8169 2>/dev/null; modprobe r8168"
+    local cmds="sed -i /usr/lib/modprobe.d/r8168.conf -e 's| r8168$| r8169$|'; modprobe -r r8169 2>/dev/null; modprobe r8168; systemctl restart NetworkManager"
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
 export -f ethernet_use_8168
 
-ethernet_use_8169() {
-    local cmds="pacman -Rsn --noconfirm r8168; modprobe -r r8168 2>/dev/null; modprobe r8169"
-    RunInTerminal "$EOS_ROOTER '$cmds'"
-}
-export -f ethernet_use_8169
+#ethernet_use_8169() {
+#    local cmds="sed -i /usr/lib/modprobe.d/r8168.conf -e 's| r8169$| r8168$|'; modprobe -r r8168 2>/dev/null; modprobe r8169; systemctl restart NetworkManager"
+#    RunInTerminal "$EOS_ROOTER '$cmds'"
+#}
+#export -f ethernet_use_8169
 
 MagicId() {
     if (! IsInstalling) ; then
