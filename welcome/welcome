@@ -556,6 +556,7 @@ AfterInstall() {
 
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
+  local _question='&#63;'      # '?'
 
   local tabcontents=(
       eos_yad --align-buttons
@@ -589,9 +590,15 @@ AfterInstall() {
       --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
   if (Check_r8168) ; then
-      tabcontents+=(
-          --field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "yad_Remove r8168"
-      )
+      if (IsInstalled r8168 >& /dev/null) ; then
+          tabcontents+=(
+              --field=" Wired net issues$_question Use r8169$_exclamation!$system_software_update!Changing to r8169. Reboot required.":fbtn "ethernet_use_8169"
+          )
+      else
+          tabcontents+=(
+              --field=" Wired net issues$_question Use r8168$_exclamation!$system_software_update!Changing to r8168. Reboot required.":fbtn "ethernet_use_8168"
+          )
+      fi
   fi
   tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   case "$(eos_yad_GetDesktopName)" in
@@ -1070,15 +1077,31 @@ EOF
 }
 
 Check_r8168() {
-    if [ 0 -eq 1 ] && [ "$testing" = "yes" ] ; then
+    # Return 0 if ethernet card is realtek 8168.
+
+    if [ 0 -eq 1 ] && [ "$testing" = "yes" ] ; then   # this is only for testing
         return 0
     fi
-    # return 0 if r8168 is installed and ethernet card is 8168
-    [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] || return 1
-    IsInstalled r8168 >& /dev/null || return 1
-    return 0
+
+    if [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] ; then
+        return 0
+    else
+        return 1
+    fi
 }
 export -f Check_r8168
+
+ethernet_use_8168() {
+    local cmds="pacman -S --noconfirm r8168; modprobe -r r8169; modprobe r8168"
+    RunInTerminal "$EOS_ROOTER '$cmds'"
+}
+export -f ethernet_use_8168
+
+ethernet_use_8169() {
+    local cmds="pacman -Rsn --noconfirm r8168; modprobe -r r8168; modprobe r8169"
+    RunInTerminal "$EOS_ROOTER '$cmds'"
+}
+export -f ethernet_use_8169
 
 MagicId() {
     if (! IsInstalling) ; then
