@@ -112,9 +112,8 @@ alias pacdiff=eos-pacdiff
 alias df='df -hT'
 
 EOF
-fi
-
 chown $user:$user $home/.bashrc             # make sure ~/.bashrc has the right owner
+fi
 ```
 
 
