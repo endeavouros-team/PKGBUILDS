@@ -81,6 +81,48 @@ Make sure you click that button regularly!
 
 To customize the *online* mode install phase, you can directly modify file `$HOME/user_pkglist.txt` and add package names to that file. Note that only Arch and EndeavourOS packages are supported, but not AUR packages.
 
+### Add commands at install time (*Advanced*)
+
+To customize the *online* mode install phase, you can directly modify file<br>
+```
+/home/liveuser/user_commands.bash
+```
+and add almost any commands to that file. See more instructions in this file.
+
+Examples of things you can do with the commands in `user_commands.bash`:
+- install or remove packages
+- enable or disable systemd services
+- customize new user's personal files at $HOME
+- and more!
+
+Here's an example code for `user_commands.bash`. It will be called with the bash interpreter, so it must have bash syntax:
+```
+#!/bin/bash
+
+pacman -R --noconfirm xed                   # uninstall packages
+pacman -S --noconfirm --needed geany gufw   # install packages
+systemctl enable ufw                        # enable a systemd service
+
+user=$(cat /tmp/new_username.txt)           # get the new username!
+home=/home/$user                            # get the $HOME folder path
+if [ "$user" != "" ] ; then
+  cat <<EOF >> $home/.bashrc                # add more configuration to your ~/.bashrc
+
+alias pacdiff=eos-pacdiff
+alias df='df -hT'
+
+EOF
+fi
+
+chown $user:$user $home/.bashrc             # make sure ~/.bashrc has the right owner
+```
+
+
+Examples of commands that *cannot* be used here:
+- yay
+- makepkg
+
+
 ## Examples
 ```
 eos-welcome --lang=en         # use English instead of the local language
