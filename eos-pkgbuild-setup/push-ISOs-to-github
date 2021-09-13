@@ -90,6 +90,12 @@ SendLogToRemote() {
     add-release-assets --quietly $EOS_RELEASE_TAG "$logfile"
 }
 
+CopyLogToLocal() {
+    cd "$EOS_UPLOAD_PATH"
+    rm -f $(basename "$logfile")
+    cp "$logfile" ./
+}
+
 ShowOp() {
     local op="$1"
     local file="$2"
@@ -187,8 +193,7 @@ CheckVars() {
 
     cd "$EOS_UPLOAD_PATH"
 
-    isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
-
+    [ -z "$isofilename" ] && isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
     [ -r "$isofilename" ] && DieLog "file '$isofilename' and friends already exist. Remove and try again?"
 
     [ -d .git ] || DIE "current folder is not a git folder (does not have a .git subfolder)."
@@ -330,7 +335,7 @@ EOF
 
 Options() {
     local opts
-    opts="$(/usr/bin/getopt -o=hi --longoptions fake,help,help-stay,interactive --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=hi --longoptions fake,help,help-stay,interactive,isoname: --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -344,6 +349,10 @@ Options() {
             --interactive | -i)
                 interactive=yes
                 ;;
+            --isoname)                   # use this only if more than one ISO built in a day
+                isofilename="$2"
+                shift
+                ;;
 
             -h | --help)
                 Options --help-stay
@@ -351,11 +360,18 @@ Options() {
                 ;;
             --help-stay)                 # internal option only, not for users
                 cat <<EOF >&2
+
 Usage: $progname [options]
 Options:
-  -h | --help           This help.
-  -i | --interactive    Interactive mode, update system first.
-       --fake           Fake ISO build (is fast to test).
+  --help | -h             This help.
+
+  --isoname <name>        Set the filename for the ISO file.
+                          Useful if more than one ISO file would be built at the same day.
+
+  --fake                  Fake ISO build (is fast to test!).
+
+  --interactive | -i      Interactive mode, updates system packages first.
+                          Not meant for unattended use.
 EOF
                 Usage
                 # don't exit!
@@ -365,6 +381,9 @@ EOF
         esac
         shift
     done
+    if [ -n "$1" ] ; then
+        DIE "unrecognized parameters: $*"
+    fi
 }
 
 Main()
@@ -373,13 +392,13 @@ Main()
     local remote_iso_files
     local remote_iso_count=0
     local date=$(date +%Y.%m.%d)
-    local datetime="${date}_$(date +%H:%M)"
-    local logfile="$HOME/.config/$progname/log.txt"
-    local configfile="$HOME/.config/$progname/$progname.conf"
-    local configfile2="\$HOME/.config/$progname/$progname.conf"
+    local datetime="${date}--$(date +%H:%M:%S)"
+    local configfile="$HOME/.config/$progname.conf"
+    local configfile2="\$HOME/.config/$progname.conf"
+    local logfile="$HOME/.config/$progname.log"
     local fake=no
     local interactive=no
-    local isofilename=""   # value set in CheckVars
+    local isofilename=""                                   # value set in CheckVars
 
     Options "$@"
 
@@ -389,8 +408,6 @@ Main()
     local EOS_ISO_REPOPATH=""
     local EOS_REMOTE_ISO_MAX_COUNT=4
     local EOS_ISO_NAME_PREFIX=""
-
-    /usr/bin/mkdir -p $(/usr/bin/dirname "$logfile")  # creates also dir for $configfile!
 
     source "$configfile" || DIE "reading config file $configfile failed."
 
@@ -402,6 +419,7 @@ Main()
     AddNewRemotes
     RemoveOldRemotesAndLocals
     SendLogToRemote
+    CopyLogToLocal
 }
 
 Main "$@"
