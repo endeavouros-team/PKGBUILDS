@@ -187,6 +187,10 @@ CheckVars() {
 
     cd "$EOS_UPLOAD_PATH"
 
+    isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
+
+    [ -r "$isofilename" ] && DieLog "file '$isofilename' and friends already exist. Remove and try again?"
+
     [ -d .git ] || DIE "current folder is not a git folder (does not have a .git subfolder)."
     local url_line="$(grep "/endeavouros-team/$(basename "$EOS_UPLOAD_PATH").git" .git/config)"
     [ -n "$url_line" ] || DIE "current folder's .git/config file has wrong url!"   # didn't find correct path in .git/config
@@ -237,7 +241,6 @@ Build_the_ISO() {
     esac
 
     local filename="$(/usr/bin/ls out/endeavouros-*.iso 2>/dev/null)"
-    local isofilename=${EOS_ISO_NAME_PREFIX}-${date}-x86_64.iso
 
     if [ -n "$filename" ] ; then
         sudo mv "$filename" "$EOS_UPLOAD_PATH/$isofilename"
@@ -376,6 +379,7 @@ Main()
     local configfile2="\$HOME/.config/$progname/$progname.conf"
     local fake=no
     local interactive=no
+    local isofilename=""   # value set in CheckVars
 
     Options "$@"
 
@@ -389,6 +393,7 @@ Main()
     /usr/bin/mkdir -p $(/usr/bin/dirname "$logfile")  # creates also dir for $configfile!
 
     source "$configfile" || DIE "reading config file $configfile failed."
+
     CheckVars
 
     Build_the_ISO || return 1
