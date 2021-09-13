@@ -47,7 +47,7 @@
 #
 
 MSG()  { echo "==> $progname: $1: $2" >&2 ; }                # $1=title $2=msg
-DIE()  { MSG error   "$1" ; Options -h; exit 1 ; }
+DIE()  { MSG error   "$1" ; Options --help-stay; exit 1 ; }
 WARN() { MSG warning "$1" ; }
 INFO() { MSG info    "$1" ; }
 
@@ -327,7 +327,7 @@ EOF
 
 Options() {
     local opts
-    opts="$(/usr/bin/getopt -o=hi --longoptions fake,help,interactive --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=hi --longoptions fake,help,help-stay,interactive --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -343,6 +343,10 @@ Options() {
                 ;;
 
             -h | --help)
+                Options --help-stay
+                exit 0
+                ;;
+            --help-stay)                 # internal option only, not for users
                 cat <<EOF >&2
 Usage: $progname [options]
 Options:
@@ -351,7 +355,7 @@ Options:
        --fake           Fake ISO build (is fast to test).
 EOF
                 Usage
-                exit 0
+                # don't exit!
                 ;;
             
             --) shift ; break ;;
