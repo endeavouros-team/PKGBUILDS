@@ -21,7 +21,7 @@ Os_release() {
 
     # Get URLs from the EndeavourOS web site!
     local home=https://endeavouros.com
-    local data=$(wget -q --timeout=10 -O- $home)
+    local data=$(curl -Lsm 10 -o- $home)
     local doc=$(echo "$data" | grep ">Wiki<" | sed 's|.*\(https://[^"]*\).*|\1|')
     local support=https://forum.endeavouros.com
     local bugs=https://forum.endeavouros.com/c/arch-based-related-questions/bug-reports
