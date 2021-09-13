@@ -54,7 +54,8 @@ NameCheck() {
 ContentsCheck() {
     local xx
     for xx in "$@" ; do
-        wget -q --timeout=10 -O $tmpdir/$xx $mirror_url/$xx || {
+        #wget -q --timeout=10 -O $tmpdir/$xx $mirror_url/$xx || {
+        curl -Lfsm 10 -o $tmpdir/$xx $mirror_url/$xx || {
             echo2i "FAIL: $xx fetching failed."
             problemfiles+="$xx "
             continue
