@@ -115,7 +115,12 @@ EOF
 chown $user:$user $home/.bashrc             # make sure ~/.bashrc has the right owner
 fi
 ```
-
+Yet another tip: download *your* `user_commands.bash` from your website! For example:
+```
+$ pwd
+/home/liveuser
+$ wget -O user_commands.bash https://<your-website>/user_commands.bash
+```
 
 Examples of commands that *cannot* be used here:
 - yay
