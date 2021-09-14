@@ -4,24 +4,19 @@ pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=0.3.3
+pkgver=0.3.4
 pkgrel=1
 
 arch=('any')
 license=('GPL')
 depends=('bash' 'pacman')
 
-install=pahis.install
-[ -r $install ] || curl -o $install -s --max-time 30 $url/$install
-
 source=(
     "$_url/$pkgname"
     "$_url/$pkgname.completion"
-    "$_url/$pkgname.install"
 )
 sha512sums=('2964b910708e4f348ead17f5326256c8c3d80b0fabcf6632f5a4eadae3705b5be282637d96875e3be9aad152b8a4844a1e18a02441e4d51548c9c8196a70ea9f'
-            '74cc392d8c19e3ffc8338c99c8ded6e45eaef3c34bfe5eb39d6b0bbc6ceb23a2a7cf9df410c66ef9a88a42f3dbdd7e9db0aa12addd9622fa3d879199d147f4f6'
-            '9b3864ccbc82528e3c31b177acdb480fac4a88c0e9834460243c0c37b875492c89dbbd6f2dc6ac80bd46c0c166e3df5e0df39e457d5134957ceeb9c14b946a60')
+            '74cc392d8c19e3ffc8338c99c8ded6e45eaef3c34bfe5eb39d6b0bbc6ceb23a2a7cf9df410c66ef9a88a42f3dbdd7e9db0aa12addd9622fa3d879199d147f4f6')
 
 package() {
   install -Dm755 $pkgname             $pkgdir/usr/bin/$pkgname
