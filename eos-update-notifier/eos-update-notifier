@@ -343,43 +343,55 @@ Main2() {
     Update_common
 }
 
-FetchAndCheck() {
+UseInitialFiles() {
     local configdir="$1"
     local progname="$2"
-    local url="$3"
-    local sha512sums xx
-    local ixt ixs
-
-    test -x /usr/bin/wget || eos_yad_DIE "$FUNCNAME: sorry, package 'wget' is required but not installed."
+    local file
 
     pushd "$configdir" >/dev/null
 
-    wget -q --timeout=10 -O $progname.service.pacnew $url/$progname.service || eos_yad_DIE "$FUNCNAME: wget 'service' failed."
-    wget -q --timeout=10 -O $progname.timer.pacnew   $url/$progname.timer   || eos_yad_DIE "$FUNCNAME: wget 'timer' failed."
-    wget -q --timeout=10 $url/PKGBUILD                                      || eos_yad_DIE "$FUNCNAME: wget 'PKGBUILD' failed."
-
-    source PKGBUILD
-    rm -f PKGBUILD
-
-    for ((xx=0; xx < ${#source[@]}; xx++)) ; do
-        case "${source[$xx]}" in
-            *.timer)   ixt=$xx ;;
-            *.service) ixs=$xx ;;
-        esac
-    done
-    
-    echo "${sha512sums[$ixt]}  $progname.timer.pacnew"   | sha512sum -c || \
-        eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.timer"
-    echo "${sha512sums[$ixs]}  $progname.service.pacnew" | sha512sum -c || \
-        eos_yad_DIE "$FUNCNAME: checksum failed for the new $progname.service"
-
-    for xx in timer service ; do
-        rm -f $progname.$xx.bak
-        test -r $progname.$xx && mv $progname.$xx $progname.$xx.bak
-        mv $progname.$xx.pacnew $progname.$xx
+    for file in $progname.timer $progname.service ; do
+        [ -r /etc/skel/.config/systemd/user/$file ] || eos_yad_DIE "$FUNCNAME: file /etc/skel/.config/systemd/user/$file does not exist."
+        rm -f $file.bak
+        test -r $file && mv $file $file.bak
+        cp /etc/skel/.config/systemd/user/$file .
     done
 
     popd >/dev/null
+}
+
+Initialize() {    # initialize service and timer for the current user
+
+    local modify_service=0
+    local fetch_files=0
+
+    case "$arg" in
+        -init-force | --init-force | -conf | --conf) modify_service=1 ;;
+    esac
+    case "$arg" in
+        -init-force | --init-force) fetch_files=1 ;;
+    esac
+    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
+        fetch_files=1
+    fi
+
+    if [ "$fetch_files" = "1" ] || [ "$modify_service" = "1" ]
+    then
+        systemctl --user status $progname.timer >/dev/null && {
+            systemctl --user stop    $progname.timer
+            systemctl --user disable $progname.timer
+        }
+        test "$fetch_files" = "1" && UseInitialFiles "$configdir" "$progname"
+        case "$arg" in
+            -conf | --conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
+        esac
+        systemctl --user enable $progname.timer
+        systemctl --user start  $progname.timer
+        systemctl --user daemon-reload
+        debug "New '$configdir/$progname.service' successfully set up."
+        debug "New '$configdir/$progname.timer' successfully set up."
+        debug "$progname service initialized for user '$(basename "$HOME")'."
+    fi
 }
 
 CheckInternetConnection() {
@@ -400,41 +412,6 @@ CheckInternetConnection() {
         debug "Warning: eos-update-notifier: internet connection is not available!"
         return 1
     }
-}
-
-Initialize() {    # initialize service and timer for the current user
-
-    local url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$progname
-    local modify_service=0
-    local fetch_files=0
-
-    case "$arg" in
-        -init-force | --init-force | -conf | --conf) modify_service=1 ;;
-    esac
-    case "$arg" in
-        -init-force | --init-force) fetch_files=1 ;;
-    esac
-    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
-        fetch_files=1
-    fi
-
-    if [ "$fetch_files" = "1" ] || [ "$modify_service" = "1" ]
-    then
-        systemctl --user status $progname.timer >/dev/null && {
-            systemctl --user stop    $progname.timer
-            systemctl --user disable $progname.timer
-        }
-        test "$fetch_files" = "1" && FetchAndCheck "$configdir" "$progname" "$url"
-        case "$arg" in
-            -conf | --conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
-        esac
-        systemctl --user enable $progname.timer
-        systemctl --user start  $progname.timer
-        systemctl --user daemon-reload
-        debug "New '$configdir/$progname.service' successfully set up."
-        debug "New '$configdir/$progname.timer' successfully set up."
-        debug "$progname service initialized for user '$(basename "$HOME")'."
-    fi
 }
 
 Configure() {
