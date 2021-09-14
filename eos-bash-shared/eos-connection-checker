@@ -8,20 +8,13 @@
 #    eos-connection-checker || echo connection is OFF
 
 Main() {
-    local eml=/etc/pacman.d/endeavouros-mirrorlist
-    local default=https://duckduckgo.com
-    local url="$default"
+    # This address will be used for checking the availability of internet access.
+    # If you have issues with the address, please report this at this site:
+    #     https://forum.endeavouros.com
+    #
+    local URL=https://geoip.kde.org/v1/calamares
 
-    if [ -r "$eml" ] ; then
-        url="$(/usr/bin/grep "^Server = " "$eml" | /usr/bin/head -n 1 | /usr/bin/awk '{print $3}' | /usr/bin/sed 's|/$repo/$arch$||')"
-        case "$url" in
-            https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo) ;;
-            *) url=$default ;;
-        esac
-    fi
-
-    /usr/bin/curl --silent --fail --connect-timeout 8 "$url" >/dev/null
-    return $?
+    /usr/bin/curl --silent --fail --connect-timeout 8 "$URL" >/dev/null
 }
 
 Main "$@"
