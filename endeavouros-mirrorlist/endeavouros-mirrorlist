@@ -40,6 +40,3 @@ Server = http://mirror.jingk.ai/endeavouros/repo/$repo/$arch
 ## France
 Server = https://endeavour.remi.lu/repo/$repo/$arch
 
-## Github
-Server = https://raw.githubusercontent.com/endeavouros-team/repo/master/$repo/$arch
-
