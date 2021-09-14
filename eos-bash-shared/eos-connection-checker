@@ -8,13 +8,27 @@
 #    eos-connection-checker || echo connection is OFF
 
 Main() {
-    # This address will be used for checking the availability of internet access.
-    # If you have issues with the address, please report this at this site:
+    # These addresses will be used for checking the availability of internet access.
+    # If you have issues with the addresses, please report this at this site:
     #     https://forum.endeavouros.com
     #
-    local URL=https://geoip.kde.org/v1/calamares
+    local URLs=(
+        # This should work globally.
+        https://geoip.kde.org/v1/calamares
 
-    /usr/bin/curl --silent --fail --connect-timeout 8 "$URL" >/dev/null
+        # EndeavourOS mirrors.
+        # Tip: move the mirror that works the best as the first in file /etc/pacman.d/endeavouros-mirrorlist.
+        $(/usr/bin/grep ^Server /etc/pacman.d/endeavouros-mirrorlist | /usr/bin/sed 's|^Server[ ]*=[ ]*\([^$]*\)/\$.*|\1|')
+    )
+    local URL
+    local retval
+
+    for URL in "${URLs[@]}" ; do
+        /usr/bin/curl --silent --fail --connect-timeout 8 "$URL" >/dev/null
+        retval=$?
+        [ $retval -eq 0 ] && break
+    done
+    return $retval
 }
 
 Main "$@"
