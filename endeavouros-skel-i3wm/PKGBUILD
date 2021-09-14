@@ -4,7 +4,7 @@
 _pkgname=endeavouros-i3wm-setup
 pkgname=endeavouros-skel-i3wm
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 pkgdesc="pre user creation skel setup for i3-wm under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
