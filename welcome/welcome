@@ -8,8 +8,6 @@
 # TODO:
 # - add icons to buttons once proper supported exists in yad
 
-export ENDEAVOUROS_TEAM=https://raw.githubusercontent.com/endeavouros-team
-
 export PROGNAME=eos-welcome
 export PRETTY_PROGNAME="Welcome"
 
@@ -283,7 +281,7 @@ yad_endeavouros_xfce4_theme() {
                     # Fetch the EndeavourOS default Xfce theme from github.
                     local tmpdir=$(mktemp -d)
                     pushd $tmpdir >/dev/null
-                    git clone https://github.com/endeavouros-team/EndeavourOS-iso-next.git 2>/dev/null
+                    git clone $(Github2Gitlab https://github.com/endeavouros-team/EndeavourOS-iso-next.git) 2>/dev/null
                     mv EndeavourOS-iso-next/airootfs/etc/skel/.config/xfce4   "$(dirname "$conf")"
                     mv EndeavourOS-iso-next/airootfs/etc/skel/.config/gtk-3.0 "$(dirname "$conf")"
                     popd >/dev/null
@@ -710,6 +708,22 @@ EOF
 }
 export -f WelcomeInitialTab
 
+Github2Gitlab() {
+    local url="$1"
+    
+    case "$EOS_FILESERVER_SITE" in
+        gitlab)
+            echo "$url" | sed -e 's|/github\.com/|/gitlab.com/|' \
+                              -e 's|/endeavouros-team/|/endeavouros-filemirror/|' \
+                              -e 's|/blob/master/|/-/blob/master/|'
+            ;;
+        github | *)
+            echo "$url"
+            ;;
+    esac
+}
+export -f Github2Gitlab
+
 UsefulTips() {
   local handle="$1"
   local tabnum="$2"
@@ -731,7 +745,7 @@ UsefulTips() {
   tabcontents+=(
       --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
       --field=" EndeavourOS $_and ARM!system-run!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "$_WELCOME_BROWSER https://arm.endeavouros.com"
-      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn      "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn      "$_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
       --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
   )
 
@@ -909,7 +923,7 @@ OwnCommands() {
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
           --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
-                  "$_WELCOME_BROWSER https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md"
+                  "$_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
           --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
   fi
@@ -974,7 +988,7 @@ WelcomeChangelog() {
 export -f WelcomeChangelog
 
 ImportantNews() {
-    $_WELCOME_BROWSER https://github.com/endeavouros-team/Important-news/blob/main/README.md
+    $_WELCOME_BROWSER "$(Github2Gitlab https://github.com/endeavouros-team/Important-news/blob/main/README.md)"
 }
 export -f ImportantNews
 
@@ -1107,6 +1121,7 @@ ethernet_use_8168() {
 export -f ethernet_use_8168
 
 MagicId() {
+    local ENDEAVOUROS_TEAM=https://raw.githubusercontent.com/endeavouros-team
     if (! IsInstalling) ; then
         echo "Sorry, option --id is only an install feature." >&2
         return 1
@@ -1252,7 +1267,10 @@ StartHere() {
     local columns_for_own_commands="2"
     local show_predefined_buttons_at_own_commands="yes"
 
+    [ -z "$EOS_FILESERVER_SITE" ] && EOS_FILESERVER_SITE="gitlab"
+
     export WELCOME_ARGS="$*"
+    export EOS_FILESERVER_SITE
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
