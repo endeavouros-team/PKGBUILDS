@@ -107,10 +107,33 @@ _grub_mod3() {
     _show_result $file
 }
 
+_grub_mod4() {
+    # Add a setting that can re-enable os-prober.
+
+    local file=/etc/default/grub
+    local var=GRUB_DISABLE_OS_PROBER
+
+    _backup $file grub
+
+    if [ -r $file ] ; then
+        if [ -z "$(grep "^[ ]*${var}=" $file)" ] ; then
+            cat <<EOF >> $file
+
+# To enable usage of os-prober, set ${var} to 'false'.
+# Note: enabling os-prober creates a potential security risk!
+# More info: https://www.gnu.org/software/grub/manual/grub/grub.html
+${var}=true
+EOF
+        fi
+    fi
+    _show_result $file
+}
+
 _grub_mods() {
     _grub_mod1  # this is related to _os_prober_mod !
     _grub_mod2
     _grub_mod3
+    _grub_mod4
 }
 
 _os_prober_mod() {
