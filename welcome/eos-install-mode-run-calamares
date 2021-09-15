@@ -145,10 +145,26 @@ CopyFile() {
     pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
 }
 
+Github2Gitlab_local() {
+    local url="$1"
+    
+    case "$EOS_FilESERVER_SITE" in
+        gitlab)
+            echo "$url" | sed -e 's|/raw\.githubusercontent\.com/|/gitlab.com/|' \
+                              -e 's|/endeavouros-team/|/endeavouros-filemirror/|' \
+                              -e 's|/main/|/-/raw/main/|'
+        ;;
+        github | *)
+            echo "$url"
+            ;;
+    esac
+}
+
 run_hotfix_start() {
     local file=hotfix-start.bash
     local url=https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file
-    wget --timeout=30 -q -O $file $url && {
+    #                  https://gitlab.com/endeavouros-filemirror/ISO-hotfixes/-/raw/main/$file
+    wget --timeout=30 -q -O $file $(Github2Gitlab_local $url) && {
         bash $file
     }
 }
