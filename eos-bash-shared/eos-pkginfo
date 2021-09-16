@@ -55,6 +55,12 @@ IsEndeavourOSpkg() {
 }
 
 Github2Gitlab_local() {
+    echo "$url"
+    return
+
+    eos-github2gitlab "$@"
+    return
+
     local url="$1"
 
     case "$EOS_FILESERVER_SITE" in
@@ -73,8 +79,6 @@ FixUrl() {
     # PKGNAME and PKGNAME_ARG may be different. Then PKGNAME_ARG is a program name,
     # and it may have a special man page.
 
-    IsEndeavourOSpkg "$PKGNAME" || return
-
     # if pkg has several apps, or pkgname is also a special app:
     # Here we handle EndeavourOS packages only.
 
@@ -91,8 +95,8 @@ FixUrl() {
     man="$(Github2Gitlab_local "$url")"
     man+="$man_add"
     if (wget -q --timeout=5 -O /dev/null "$man") ; then
-        #url+="$man_add"
-        url="$man"
+        url+="$man_add"
+        #url="$man"
     fi
 }
 
@@ -110,10 +114,13 @@ OpenUrl() {
         *)  DIE "unsupported URL '$url'" ;;
     esac
 
-    FixUrl
-
-    #echo "$BROWSER" "$url" >&2
-    $BROWSER "$url" >& /dev/null
+    if (IsEndeavourOSpkg "$PKGNAME_ARG") ; then
+        eos-apps-info-helper "$PKGNAME"
+    else
+        FixUrl
+        #echo "$BROWSER" "$url" >&2
+        $BROWSER "$url" >& /dev/null
+    fi
 }
 
 Options() {

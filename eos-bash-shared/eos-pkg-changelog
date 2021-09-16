@@ -47,11 +47,12 @@ Main()
     local Browser=""
 
     SetBrowser
+    urlbase=$(eos-github2gitlab "$urlbase")
 
     if (HasPkgbuild) ; then
         [ -n "$Browser" ] && $Browser "$urlbase/$pkgname" >& /dev/null
-    else
-        eos-pkginfo "$pkgname"
+    #else
+    #    eos-pkginfo "$pkgname"
     fi
 }
 
