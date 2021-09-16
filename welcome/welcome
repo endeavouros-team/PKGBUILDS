@@ -709,18 +709,7 @@ EOF
 export -f WelcomeInitialTab
 
 Github2Gitlab() {
-    local url="$1"
-    
-    case "$EOS_FILESERVER_SITE" in
-        gitlab)
-            echo "$url" | sed -e 's|/github\.com/|/gitlab.com/|' \
-                              -e 's|/endeavouros-team/|/endeavouros-filemirror/|' \
-                              -e 's|/blob/master/|/-/blob/master/|'
-            ;;
-        github | *)
-            echo "$url"
-            ;;
-    esac
+    eos-github2gitlab "$@"
 }
 export -f Github2Gitlab
 
