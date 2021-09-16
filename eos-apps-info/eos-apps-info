@@ -70,6 +70,9 @@ Main()
                 | welcome-dnd | yad-settings | yad-tools | eos-latest-arch-mirrorlist | eos-apps-info-helper | eos-install-mode-run-calamares \
                 | eos-run-cmd-with-su | *.sh | *calamares* | update-mirrorlist)
                 continue ;;
+            eos-pkginfo | eos-pkg-changelog)
+                # deprecated for now
+                continue ;;
 
             # no support currently:
             device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur)
