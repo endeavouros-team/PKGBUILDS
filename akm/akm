@@ -257,9 +257,14 @@ AvailableKernelsAndHeaders() {
 }
 
 Manual() {
-    xdg-open https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md
+    xdg-open $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md)
 }
 export -f Manual
+
+Changelog() {
+    xdg-open $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm)
+}
+export -f Changelog
 
 FindNewRepoLineNumber() {
     local linenr="$(grep -n '^# An example of ' /etc/pacman.conf | cut -d':' -f1)"
@@ -398,10 +403,11 @@ Main()
     local cmd=(
         eos_yad
         --width=$akm_window_width
+        --use-interp
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=system-software-update
-        --button=" Changelog!applications-development!Show latest changes of this program":"bash -c '/usr/bin/eos-pkg-changelog akm'"
+        --button=" Changelog!applications-development!Show latest changes of this program":"Changelog"
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" Help!help-contents!Helps to use $progname":"bash -c Manual"
         --button="Cancel!gtk-cancel!Change nothing":1
