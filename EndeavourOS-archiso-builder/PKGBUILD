@@ -61,7 +61,15 @@ build() {
 
     sudo pacman -Syyu || return 1
 
-    local tmpdir=$(mktemp -d)
+    local tmpdir
+    local tmpsize=$(LANG=C /usr/bin/df | grep -w /tmp | awk '{print $4}')
+
+    if [ $tmpsize -lt $((10*1000*1000)) ] ; then
+	tmpdir=$(mktemp -d $HOME/.cache/foobar.XXXXX)
+    else
+	tmpdir=$(mktemp -d)
+    fi
+
     cp -R "$PWD" $tmpdir/ || return 1
 
     date=$(date +%Y.%m.%d)
