@@ -15,6 +15,7 @@ Github2Gitlab() {
                 sed+=(-e 's|/raw\.githubusercontent\.com/|/gitlab.com/|')
                 sed+=(-e 's|/main/|/-/raw/main/|' )
                 sed+=(-e 's|/master/|/-/raw/main/|')
+                sed+=(-e 's|/install-scripts-next/|/install-scripts-next/-/raw/|')
             else
                 sed+=(-e 's|/github\.com/|/gitlab.com/|')
             fi
