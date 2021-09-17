@@ -3,25 +3,27 @@
 Github2Gitlab() {
     local url="$1"
 
-    source /etc/eos-script-lib-yad.conf       # caller already has done this...
+    source /etc/eos-script-lib-yad.conf
 
     case "$EOS_FILESERVER_SITE" in
         github)
             echo "$url"
             ;;
         gitlab | *)
-            local sed=(
-                sed
-                -e 's|/raw\.githubusercontent\.com/|/gitlab.com/|'
-                -e 's|/github\.com/|/gitlab.com/|'
+            local sed=(sed)
+            if [ -n "$(echo "$url" | grep "/raw\.githubusercontent\.com/")" ] ; then
+                sed+=(-e 's|/raw\.githubusercontent\.com/|/gitlab.com/|')
+                sed+=(-e 's|/main/|/-/raw/main/|' )
+                sed+=(-e 's|/master/|/-/raw/main/|')
+            else
+                sed+=(-e 's|/github\.com/|/gitlab.com/|')
+            fi
+            sed+=(
                 -e 's|/endeavouros-team/|/endeavouros-filemirror/|'
                 -e 's|/tree/master/|/-/blob/master/|'
                 -e 's|/blob/master/|/-/blob/master/|'
                 -e 's|/eos-bash-shared$|/eos-apps-info|'
             )
-            if [ -n "$(echo "$url" | grep "/raw\.githubusercontent\.com/")" ] ; then
-                sed+=(-e 's|/main/|/-/raw/main/|' )
-            fi
             echo "$url" | "${sed[@]}"
             ;;
     esac

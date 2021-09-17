@@ -54,9 +54,14 @@ eos_GetProgName() { /usr/bin/basename "$0" ; }
 eos_select_browser() {
     # Select an existing browser.
     # User may export a variable _WELCOME_BROWSER to use the preferred browser.
+    # Additionally, variable _WELCOME_BROWSER_OPTIONS may include browser options.
 
     if [ -n "$_WELCOME_BROWSER" ] ; then
-        echo "$_WELCOME_BROWSER"
+        if [ -n "$_WELCOME_BROWSER_OPTIONS" ] ; then
+            echo "$_WELCOME_BROWSER $_WELCOME_BROWSER_OPTIONS"
+        else
+            echo "$_WELCOME_BROWSER"
+        fi
         return
     fi
 
