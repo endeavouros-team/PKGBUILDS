@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-iso-next
 pkgver=0.10
-pkgrel=2
+pkgrel=3
 pkgdesc="Build EndeavourOS-iso-next"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
