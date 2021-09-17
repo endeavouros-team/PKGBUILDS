@@ -427,7 +427,9 @@ AskCountriesAndOptions() {
     reflector_info="$("${command[@]}")"
     case "$?" in
         1) Destructor ; exit 1 ;;
-        2) eos-pkg-changelog $progname ; Destructor ; exit 0 ;;
+        2)
+            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/reflector-simple)
+            Destructor ; exit 0 ;;
     esac
     test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
     if [ "$(echo "$reflector_info" | wc -l)" != "1" ] ; then
