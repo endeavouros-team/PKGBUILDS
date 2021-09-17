@@ -972,7 +972,7 @@ WelcomeHelp() {
 export -f WelcomeHelp
 
 WelcomeChangelog() {
-    /usr/bin/eos-pkg-changelog welcome
+    $_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/welcome)
 }
 export -f WelcomeChangelog
 
