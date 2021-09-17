@@ -71,6 +71,10 @@ Main()
                 echo "${folders[1]}"   # for bash completion
                 return
                 ;;
+            --show-bonus)
+                echo "grub linux linux-lts nvidia virtualbox"  # supported bonus apps!
+                return
+                ;;
             -* )
                 echo "Sorry, option '$arg' is not supported."; return 1
                 ;;
@@ -133,13 +137,26 @@ Main()
     if [ -z "$url" ] ; then
         # Find the section of the man page
         section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/cut -d '.' -f2)
-        url="https://man.archlinux.org/man/$name.$section"
+        if [ -n "$section" ] ; then
+            url="https://man.archlinux.org/man/$name.$section"
+        else
+            # ad hoc urls. See option --show-bonus above.
+            case "$name" in
+                grub)          url=https://www.gnu.org/software/grub/manual/grub/grub.html;;
+                #libreoffice)  url=https://documentation.libreoffice.org/en/english-documentation;;
+                linux)         url=https://www.kernel.org;;
+                linux-lts)     url=https://www.kernel.org;;
+                nvidia)        url=https://www.nvidia.com/en-us/drivers/unix;;
+                virtualbox)    url=https://www.virtualbox.org/manual/UserManual.html;;
+                *)             url="" ;;
+            esac
+        fi
     fi
 
     if [ -n "$url" ] ; then
         /usr/bin/setsid $br "$url" 2>/dev/null &
     else
-        eos-pkginfo --browser="$br" "$name" && return
+        #eos-pkginfo --browser="$br" "$name" && return
         echo2 "Sorry, no info found."
     fi
 }

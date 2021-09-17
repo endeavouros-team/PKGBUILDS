@@ -33,6 +33,7 @@ Main()
 
     local txt=""
     txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
+    txt+="<b>New</b>: a special selection of <i>bonus</i> app infos is appended!\n"
     txt+="Click an app button and an information window opens.\n"
     txt+="\n"
     if [ 0 -eq 1 ] ; then
@@ -61,6 +62,8 @@ Main()
     readarray -t app <<< $(/usr/bin/pacman -Fl $packages 2>/dev/null | /usr/bin/grep "usr/bin/" | /usr/bin/grep -v "usr/bin/$" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's|usr/bin/||' | /usr/bin/sort)
     [ -n "$app" ] || return 1
     apps+=("${app[@]}")
+
+    apps+=($(eos-apps-info-helper --show-bonus))  # bonus apps!
 
     for app in "${apps[@]}" ; do
         case "$app" in
