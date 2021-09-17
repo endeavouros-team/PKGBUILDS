@@ -591,7 +591,7 @@ Main()
                 return
                 ;;
             --changelog)
-                /usr/bin/eos-pkg-changelog $progname
+                $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/eos-update-notifier)
                 return
                 ;;
             -iw=*)
