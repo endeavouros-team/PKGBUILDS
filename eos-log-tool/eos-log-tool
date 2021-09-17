@@ -169,7 +169,7 @@ Main()
 {
     case "$1" in
         --changelog)
-            /usr/bin/eos-pkg-changelog eos-log-tool
+            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/eos-log-tool)
             return
             ;;
     esac
