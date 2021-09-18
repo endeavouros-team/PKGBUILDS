@@ -74,6 +74,26 @@ GetWallsCurl() {
     [ "$gotwalls" = "no" ] && retval=1
 }
 
+gh2gl() {
+    local url="$1"
+
+    case "$EOS_FILESERVER_SITE" in
+        github)
+            echo "$url"
+            ;;
+        gitlab | *)
+            case "$url" in
+                "https://github.com/EndeavourOS-Community-Editions/Community-wallpapers")
+                    echo "https://gitlab.com/endeavouros-filemirror/Community-wallpapers"
+                    ;;
+                *)
+                    DIE "sorry, this program can't use 'curl' with gitlab. Use 'git' instead."
+                    ;;
+            esac
+            ;;
+    esac
+}
+
 GetWalls() {
     local retval=0
 
@@ -89,7 +109,7 @@ FetchWallpapers() {
     # Remove old wallpapers first.
 
     local mainfolder=Community-wallpapers
-    local repopage=https://github.com/EndeavourOS-Community-Editions/$mainfolder
+    local repopage=$(gh2gl https://github.com/EndeavourOS-Community-Editions/$mainfolder)
     local url=$repopage.git
     local urlsubdirs=(
         eos_wallpapers_classic
@@ -171,6 +191,13 @@ Main()
 
     # options will override the default values
     Options "$@"
+
+    if [ "$EOS_FILESERVER_SITE" != "github" ] ; then
+        if [ "$implementation" != "git" ] ; then
+            echo2 "$progname: info: using 'git' instead of 'curl'."
+            implementation=git
+        fi
+    fi
 
     workdir=$(mktemp -d "$tmpdirbase.XXXXX")
 
