@@ -119,6 +119,7 @@ RemovePersonalData() {
         exit 1
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
+    local user
 
     # hide real user names (that are found in /etc/passwd) from logs
     for user in $(UserNames 1000 50000) ; do
@@ -138,7 +139,12 @@ RemovePersonalData() {
             -e 's| '$user'(| _user_(|g' \
             -e "s|‘$user:|‘_user_:|g" \
             -e "s|\[$user\]|[_user_]|g" \
-            -e 's|'$user'"|_user_"|g'
+            -e 's|'$user'"|_user_"|g' \
+            -e "s|LOGNAME=$user|LOGNAME=_user_|" \
+            -e "s|USERNAME=$user|USERNAME=_user_|" \
+            -e "s|USER=$user|USER=_user_|" \
+            -e 's|192\.168\.[0-9]*\.[0-9]*|_ipv4_address_|' \
+            -e 's| fe80::[0-9a-f:]*\([ \.]\)|_ipv6_address_\1|'
     done
 
     # hide hostname from logs
