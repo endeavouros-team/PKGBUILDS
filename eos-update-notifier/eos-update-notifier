@@ -175,6 +175,19 @@ Update_common() {
     GetUpdateCount
 
     if [ -n "$updates" ] ; then
+        local retvalue=0
+        local tmpfile=$(mktemp)
+        eos-kernel-nvidia-update-check "$(echo "$updates" | tail -n +3 | awk '{print $1}')" 2> $tmpfile || {
+            cat $tmpfile | eos_yad_problem "Warning" --text="Update conflict detected. Do you want to continue (not recommended)?" \
+                                           --width=800 --height=300 \
+                                           --button=' Continue!system-run!Ignore this warning and continue':2
+            retvalue=$?
+        }
+        rm -f $tmpfile
+        case "$retvalue" in
+            0) exit 1 ;;
+            *) retvalue=0 ;;
+        esac
         if [ $update_focused -eq 0 ] ; then
             SystemLockActive b || return
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
