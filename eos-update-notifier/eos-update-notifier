@@ -396,7 +396,12 @@ Initialize() {    # initialize service and timer for the current user
         }
         test "$fetch_files" = "1" && UseInitialFiles "$configdir" "$progname"
         case "$arg" in
-            -conf | --conf) sed -i "$configdir"/$progname.timer -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' ;;
+            -conf | --conf)
+                sed -i "$configdir"/$progname.timer \
+                    -e "s|^OnStartupSec=.*|OnStartupSec=$onstartupsec|" \
+                    -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' \
+                    -e "s|^Persistent=.*|Persistent=$persistent|"
+                ;;
         esac
         systemctl --user enable $progname.timer
         systemctl --user start  $progname.timer
@@ -428,93 +433,119 @@ CheckInternetConnection() {
 }
 
 Configure() {
-    local current_value=$(grep "^OnCalendar=" $configdir/$progname.timer | cut -d '=' -f 2)
-    local oncalendar
-    local result retval
+    local result retval cmd=()
 
-    if [ 1 -eq 1 ] ; then
-        # backup old timer file:
-        cp $configdir/$progname.timer $configdir/$progname.timer.bak."$(date +%x-%X)"
-
-        local xx
-        local periods=(
-            hourly daily weekly monthly
-            # quarterly semiannually yearly   # not sensible values!?
-        )
-        local defaultperiod=daily
-        local cmd=(
-            eos_yad --list --radiolist --column=Select --column=Period --width=400 --height=250
-            --image=preferences-system
-            --title="Configure update check schedule"
-            --text="Select the period for system updates"
-            --button="Set to default":10 --button=yad-cancel:1 --button=yad-ok:0
-        )
-        # Convert from the old settings:
-        case "$current_value" in
-            hourly | daily | weekly | monthly) ;;
-            *) current_value=$defaultperiod ;;
-        esac
-        # build selections:
-        for xx in "${periods[@]}" ; do
-            case "$xx" in
-                $current_value) cmd+=(true  "$xx") ;;
-                *)              cmd+=(false "$xx") ;;
+    case "0" in
+        0)
+            local times="hourly!daily!weekly!monthly"
+            case "$oncalendar" in
+                hourly | daily | weekly | monthly) ;;
+                *) oncalendar=daily ;;
             esac
-        done
+            times=$(echo "$times" | sed "s|$oncalendar|^$oncalendar|")
+            cmd=(
+                eos_yad
+                --form
+                --title="Configure updates"
+                --text="Configure the schedule of system update checks"
+                --field="First check after system startup!!See 'man systemd.time' how to set time" "$onstartupsec"
+                --field="Check period!!How often checks will be executed":CB "$times"
+                --field="Persistent!!If selected and checks are missed, a check will be done at next login":CHK "$persistent"
+                --button=yad-ok
+            )
+            result=$("${cmd[@]}")
+            retval=$?
+            [ "$retval" -eq 0 ] || return 1
 
-        # ask user
-        result=$("${cmd[@]}")
-        retval=$?
+            onstartupsec=$(echo "$result" | cut -d'|' -f1)
+            oncalendar=$(  echo "$result" | cut -d'|' -f2)
+            persistent=$(  echo "$result" | cut -d'|' -f3)
+            ;;
+        1)
+            # backup old timer file:
+            cp $configdir/$progname.timer $configdir/$progname.timer.bak."$(date +%x-%X)"
 
-        case "$retval" in
-            0)  oncalendar=$(echo "$result" | cut -d '|' -f 2) ;;
-            10) oncalendar=$defaultperiod ;;
-            1) return 1 ;;
-        esac
-    else
-        local current_interval=$(echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 2)
-        local current_initial=$( echo $current_value | cut -d ':' -f 1 | cut -d '/' -f 1)
-        local current_minute=$(  echo $current_value | cut -d ':' -f 2)
+            local xx
+            local periods=(
+                hourly daily weekly monthly
+                # quarterly semiannually yearly   # not sensible values!?
+            )
+            local defaultperiod=daily
+            cmd=(
+                eos_yad --list --radiolist --column=Select --column=Period --width=400 --height=250
+                --image=preferences-system
+                --title="Configure update check schedule"
+                --text="Select the period for system updates"
+                --button="Set to default":10 --button=yad-cancel:1 --button=yad-ok:0
+            )
+            # Convert from the old settings:
+            case "$oncalendar" in
+                hourly | daily | weekly | monthly) ;;
+                *) oncalendar="$defaultperiod" ;;
+            esac
+            # build selections:
+            for xx in "${periods[@]}" ; do
+                case "$xx" in
+                    "$oncalendar") cmd+=(true  "$xx") ;;
+                    *)             cmd+=(false "$xx") ;;
+                esac
+            done
 
-        local tips="Tips:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n"
-        tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
+            # ask user
+            result=$("${cmd[@]}")
+            retval=$?
 
-        result=$(
-            eos_yad --form --title="Configure update check schedule" --width=400 \
-                    --text="$tips" --window-icon=$EOS_WICON \
-                    --field="Interval in hours":num           $current_interval \
-                    --field="Initial hour":num                $current_initial \
-                    --field="Minute offset":ro                $current_minute \
-                    --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
-              )
-        retval=$?
-        test $retval -eq 1 && return 1
+            case "$retval" in
+                0)  oncalendar=$(echo "$result" | cut -d '|' -f 2) ;;
+                10) oncalendar="$defaultperiod" ;;
+                1) return 1 ;;
+            esac
+            ;;
+        2)
+            local current_interval=$(echo "$oncalendar" | cut -d ':' -f 1 | cut -d '/' -f 2)
+            local current_initial=$( echo "$oncalendar" | cut -d ':' -f 1 | cut -d '/' -f 1)
+            local current_minute=$(  echo "$oncalendar" | cut -d ':' -f 2)
 
-        local new_interval=$(echo "$result" | cut -d '|' -f 1)
-        local new_initial=$( echo "$result" | cut -d '|' -f 2)
-        local new_minute=$(shuf -i0-59 -n1)                      # try make users start at different times...
+            local tips="Tips:\n- <i>Initial hour</i> means the first triggering hour within 24 hours.\n"
+            tips+="- <i>Minute offset</i> is the current randomized minute value and cannot be changed.\n"
 
-        case $retval in
-            10)
-                local default_interval=2
-                local default_initial=0
-                local default_minute=$(shuf -i0-59 -n1)          # try make users start at different times...
-                
-                if [ $new_interval -eq $default_interval ] && [ $new_initial -eq $default_initial ] && [ $new_minute -eq $default_minute ]
-                then
-                    return  # nothing to do
-                fi
-                oncalendar="$default_initial/$default_interval:$default_minute:00"
-                ;;
-            0)  
-                if [ $new_interval -eq $current_interval ] && [ $new_initial -eq $current_initial ] && [ $new_minute -eq $current_minute ]
-                then
-                    return  # nothing to do
-                fi
-                oncalendar="$new_initial/$new_interval:$new_minute:00"
-                ;;
-        esac
-    fi
+            result=$(
+                eos_yad --form --title="Configure update check schedule" --width=400 \
+                        --text="$tips" --window-icon=$EOS_WICON \
+                        --field="Interval in hours":num           $current_interval \
+                        --field="Initial hour":num                $current_initial \
+                        --field="Minute offset":ro                $current_minute \
+                        --button="Set to defaults":10 --button=yad-cancel:1 --button=yad-ok:0
+                  )
+            retval=$?
+            test $retval -eq 1 && return 1
+
+            local new_interval=$(echo "$result" | cut -d '|' -f 1)
+            local new_initial=$( echo "$result" | cut -d '|' -f 2)
+            local new_minute=$(shuf -i0-59 -n1)                      # try make users start at different times...
+
+            case $retval in
+                10)
+                    local default_interval=2
+                    local default_initial=0
+                    local default_minute=$(shuf -i0-59 -n1)          # try make users start at different times...
+                    
+                    if [ $new_interval -eq $default_interval ] && [ $new_initial -eq $default_initial ] && [ $new_minute -eq $default_minute ]
+                    then
+                        return  # nothing to do
+                    fi
+                    oncalendar="$default_initial/$default_interval:$default_minute:00"
+                    ;;
+                0)  
+                    if [ $new_interval -eq $current_interval ] && [ $new_initial -eq $current_initial ] && [ $new_minute -eq $current_minute ]
+                    then
+                        return  # nothing to do
+                    fi
+                    oncalendar="$new_initial/$new_interval:$new_minute:00"
+                    ;;
+            esac
+            ;;
+    esac
 
     echo2 "New OnCalendar value: $oncalendar"
     Initialize
@@ -584,6 +615,13 @@ Main()
     local EOS_UPDATE_NOTIFIER_CONF=/etc/$progname.conf
     #local NOTIFIER_LOG_FILE=/tmp/$progname.log
 
+    local oncalendar="$(  grep "^OnCalendar="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+    local onstartupsec="$(grep "^OnStartupSec=" $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+    local persistent="$(  grep "^Persistent="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+
+    [ -n "$oncalendar" ]   || oncalendar=daily
+    [ -n "$onstartupsec" ] || onstartupsec=30sec
+    [ -n "$persistent" ]   || persistent=true
 
     mkdir -p "$configdir"
 
