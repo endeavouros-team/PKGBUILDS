@@ -377,6 +377,7 @@ Initialize() {    # initialize service and timer for the current user
 
     local modify_service=0
     local fetch_files=0
+    local timer="$configdir"/$progname.timer
 
     case "$arg" in
         -init-force | --init-force | -conf | --conf) modify_service=1 ;;
@@ -384,7 +385,7 @@ Initialize() {    # initialize service and timer for the current user
     case "$arg" in
         -init-force | --init-force) fetch_files=1 ;;
     esac
-    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$configdir"/$progname.timer ] ; then
+    if [ ! -r "$configdir"/$progname.service ] || [ ! -r "$timer" ] ; then
         fetch_files=1
     fi
 
@@ -397,7 +398,12 @@ Initialize() {    # initialize service and timer for the current user
         test "$fetch_files" = "1" && UseInitialFiles "$configdir" "$progname"
         case "$arg" in
             -conf | --conf)
-                sed -i "$configdir"/$progname.timer \
+                # add any missing setting
+                [ -n "$(grep "^Persistent="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \Persistent=$persistent"
+                [ -n "$(grep "^OnCalendar="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnCalendar=$oncalendar"
+                [ -n "$(grep "^OnStartupSec=" "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnStartupSec=$onstartupsec"
+                # write new settings
+                sed -i "$timer" \
                     -e "s|^OnStartupSec=.*|OnStartupSec=$onstartupsec|" \
                     -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' \
                     -e "s|^Persistent=.*|Persistent=$persistent|"
