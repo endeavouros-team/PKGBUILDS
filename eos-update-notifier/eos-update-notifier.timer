@@ -2,7 +2,7 @@
 Description=Run EOS update notifier periodically
 
 [Timer]
-OnStartupSec=30sec
+OnStartupSec=30 seconds
 OnCalendar=daily
 Persistent=true
  

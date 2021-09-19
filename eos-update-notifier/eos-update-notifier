@@ -446,11 +446,12 @@ Configure() {
             cmd=(
                 eos_yad
                 --form
-                --title="Configure updates"
-                --text="Configure the schedule of system update checks"
-                --field="First check after system startup!!See 'man systemd.time' how to set time" "$onstartupsec"
-                --field="Check period!!How often checks will be executed":CB "$times"
-                --field="Persistent!!If selected and checks are missed, a check will be done at next login":CHK "$persistent"
+                --title="Configure update checking"
+                --text="$progname: configure the schedule of system update checks."
+                --image=preferences-system
+                --field="First check after system startup!See <b>man systemd.time</b> how to set time" "$onstartupsec"
+                --field="Check period!How often checks will be executed":CB "$times"
+                --field="Persistent!If selected and checks are missed, a check will be done at next login":CHK "$persistent"
                 --button=yad-ok
             )
             result=$("${cmd[@]}")
@@ -459,7 +460,7 @@ Configure() {
 
             onstartupsec=$(echo "$result" | cut -d'|' -f1)
             oncalendar=$(  echo "$result" | cut -d'|' -f2)
-            persistent=$(  echo "$result" | cut -d'|' -f3)
+            persistent=$(  echo "$result" | cut -d'|' -f3 | tr '[:upper:]' '[:lower:]')
             ;;
         1)
             # backup old timer file:
