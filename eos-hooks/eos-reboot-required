@@ -5,14 +5,19 @@
 # Implementation using libnotify.
 
 _other_reboot_required() {
-    local xx
+    local msg="Reboot is recommended due to the upgrade of core system package(s)."
+    local title="Reboot recommended!"
 
+    # at TTY
+    echo "==> INFO: $msg" >&2
+
+    # notification
+    local xx
     for xx in "$DESKTOP_SESSION" "$XDG_CURRENT_DESKTOP" ; do
         if [ -n "$xx" ] ; then
             break
         fi
     done
-
     if [ -n "$xx" ] ; then
         local user userid cmd
 
@@ -20,13 +25,10 @@ _other_reboot_required() {
             userid=$(/usr/bin/id -u $user)
             cmd=(DISPLAY=:0 DBUS_SESSION_ADDRESS=unix:path=/run/user/$userid/bus /usr/bin/notify-send)
             cmd+=(--icon=system-reboot --urgency=critical)
-            cmd+=("\"Reboot recommended!\"")
-            cmd+=("\"Reboot is recommended because of recent core system package upgrades.\"")
+            cmd+=("\"$title\"")
+            cmd+=("\"$msg\"")
             /usr/bin/su $user -c "${cmd[*]}"
         done
-    else
-        # at TTY
-        echo "Reboot is recommended because of recent core system package upgrades." >&2
     fi
 }
 _other_reboot_required
