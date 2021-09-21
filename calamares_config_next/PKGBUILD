@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_next
 pkgver=2.3
-pkgrel=7
+pkgrel=8
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -24,7 +24,8 @@ wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-
 chmod +x cleaner_script.sh chrooted_cleaner_script.sh update-mirrorlist pacstrap_calamares
 cd $srcdir/calamares_config_next/calamares/modules
 wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/netinstall.yaml
-wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/08-2021/netinstall_ce.yaml
+#wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/08-2021/netinstall_ce.yaml
+wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/08-2021/netinstall-ce-base.yaml
 cd $srcdir
 }
 
