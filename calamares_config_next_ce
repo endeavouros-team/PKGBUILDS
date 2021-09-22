@@ -1,0 +1,25 @@
+# Maintainer: joekamprad <joekamprad@endeavouros.com>
+pkgname=calamares_config_next_ce
+pkgver=1.0
+pkgrel=1
+pkgdesc='EndeavourOS calamares configuration files for Community Editions'
+arch=('any')
+url='https://www.endeavouros.com'
+license=('GPL3')
+source=('git+https://github.com/endeavouros-team/calamares_config_next.git#branch=test')
+sha512sums=('SKIP')
+
+prepare() {
+mkdir -p $srcdir/calamares_config_next_ce/calamares/modules
+cd $srcdir/calamares_config_next_ce/calamares/modules
+wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-packagechooser/main/netinstall-ce-base.yaml
+cp $srcdir/calamares_config_next/calamares/modules/{contextualprocess.conf,packagechooser.conf} $srcdir/calamares_config_next_ce/calamares/modules/
+cp -R $srcdir/calamares_config_next/calamares/images $srcdir/calamares_config_next_ce/calamares/
+cp -R $srcdir/calamares_config_next/calamares/ce $srcdir/calamares_config_next_ce/calamares/
+cd $srcdir
+}
+
+package() {
+    install -dm 755 $pkgdir/etc/calamares
+    cp -r --no-preserve=ownership $srcdir/calamares_config_next_ce/calamares $pkgdir/etc/
+}
