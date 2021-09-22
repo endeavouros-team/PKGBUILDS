@@ -136,41 +136,31 @@ run_hotfix_start() {
 
     if wget --timeout=30 -q -O $file $url ; then
         all_sudo_commands+="; bash $PWD/$file"
+        all_sudo_commands+="; echo '===> Hotfixes definition file fetched and executed.'"
+    else
+        all_sudo_commands+="; echo '===> Fetching the hotfixes definition file failed!'"
     fi
 }
 
-run_community_script() {
+fetch_community_files() {
     local url=""
 
     if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
         url=https://github.com/endeavouros-team/calamares_config_next
         svn checkout $url/trunk/calamares/{ce,modules,images} || GUIDIE "svn checkout '$url' failed."
         
-        all_sudo_commands+="; cp -R $workdir/ce      /etc/calamares/"
-        all_sudo_commands+="; cp -R $workdir/modules /etc/calamares/"
-        all_sudo_commands+="; cp -R $workdir/images  /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/ce      /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/modules /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/images  /etc/calamares/"
     else
         url=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next.git)
         git clone $url || GUIDIE "git clone '$url' failed."
     
-        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/ce      /etc/calamares/"
-        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/modules /etc/calamares/"
-        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/images  /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/ce      /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/modules /etc/calamares/"
+        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/images  /etc/calamares/"
     fi
-    all_sudo_commands+="; echo '##### Configurations and package lists were successfully updated! #####'"
-}
-
-CopyFile() {
-    local filefrom="$1"   # source file
-    local fileto="$2"     # destination file (not folder!)
-    local folderto="$(dirname "$fileto")"
-
-    [ -r "$filefrom" ] || GUIDIE "File <tt>$filefrom</tt> does not exist."
-    [ -d "$folderto" ] || GUIDIE "Folder <tt>$folderto</tt> does not exist."
-
-    all_sudo_commands+="; cp $filefrom $fileto"
-
-    #pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
+    all_sudo_commands+="; echo '===> Community configurations and package lists were successfully updated!'"
 }
 
 ###  Everything starts in the Main function. ###
@@ -187,12 +177,12 @@ Main() {
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
-    local all_sudo_commands=":"
+    local all_sudo_commands=":"                 # all root commands will be collected to this variable!
     local workdir=""
 
     if [ "$I_am_only_testing" = "true" ] ; then
         Home=$HOME
-        EOS_FILESERVER_SITE=gitlab
+        EOS_FILESERVER_SITE=github
         mode=community
         lang=en
         ShowInstallLog=FALSE
@@ -213,11 +203,13 @@ Main() {
     pushd $workdir 2>/dev/null || GUIDIE "cannot go to folder $workdir"
 
     case "$mode" in
-        online | offline)
-            CopyFile $cfolder/settings_$mode.conf $cfolder/settings.conf
-            ;;
-        community)
-            run_community_script
+        community) fetch_community_files ;;
+    esac
+
+    case "$mode" in
+        online | offline | community)
+            all_sudo_commands+="; cp $cfolder/settings_$mode.conf $cfolder/settings.conf"
+            all_sudo_commands+="; echo '===> File settings.conf updated.'"
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
