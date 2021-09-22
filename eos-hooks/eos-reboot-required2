@@ -4,52 +4,43 @@
 # - not currently running (e.g. alternative kernel)
 # - not in use (e.g. alternative driver)
 
-RunningKernel() {
-    cat /proc/cmdline | sed 's|.*/vmlinuz-\(linux[a-z0-9-]*\) .*|\1|'
+IsRunningKernel() {
+    if [ -z "$running_kernel" ] ; then
+        running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')
+    fi
+    test "$1" =  "$running_kernel"
 }
 
+DoNotify() { /usr/bin/eos-reboot-required ; exit 0 ; }
+
 Main() {
-    local targets=$(tee /dev/null)  # targets from the hook (stdin)
+    local targets=$(cat)  # list of updated package names from the hook (stdin)
     local target
-    local notify=no
-    local runningKernel="$(RunningKernel)"
+    local running_kernel=""
 
     for target in $targets ; do
         case "$target" in
             linux | linux-lts | linux-zen | linux-hardened | linux-lts?? | linux-lts???)
                 # Note: only official and older LTS kernels are checked.
-                if [ "$target" = "$runningKernel" ] ; then
-                    notify=yes
-                    break
-                fi
+                IsRunningKernel "$target" && DoNotify
                 ;;
             nvidia)
-                if [ "$runningKernel" = "linux" ] ; then
-                    notify=yes
-                    break
-                fi
+                IsRunningKernel linux && DoNotify
                 ;;
             nvidia-lts)
-                if [ "$runningKernel" = "linux-lts" ] ; then
-                    notify=yes
-                    break
-                fi
+                IsRunningKernel linux-lts && DoNotify
                 ;;
             btrfs-progs)
+                # Notify only if btrfs is in use
                 if [ -n "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] ; then
-                    notify=yes
-                    break
+                    DoNotify
                 fi
                 ;;
             *)
-                notify=yes
-                break
+                DoNotify
                 ;;
         esac
     done
-    if [ "$notify" = "yes" ] ; then
-        /usr/bin/eos-reboot-required
-    fi
 }
 
 Main "$@"
