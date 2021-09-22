@@ -5,11 +5,6 @@
 # Note that this script can be called directly from the terminal,
 # or it can be called from the Welcome app.
 
-source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
-source /usr/share/endeavouros/scripts/translations.bash || exit 1
-
-export -f eos_yad
-
 GUIDIE() {
     # show error in the terminal and log
     echo "$progname: $1" | sed -e 's|<tt>||g' -e 's|</tt>||g'  # remove some formatting tags
@@ -134,6 +129,37 @@ InstallWithLogs() {
     esac
 }
 
+run_hotfix_start() {
+    local file=hotfix-start.bash
+    local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
+    #                  https://gitlab.com/endeavouros-filemirror/ISO-hotfixes/-/raw/main/$file
+
+    if wget --timeout=30 -q -O $file $url ; then
+        all_sudo_commands+="; bash $PWD/$file"
+    fi
+}
+
+run_community_script() {
+    local url=""
+
+    if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
+        url=https://github.com/endeavouros-team/calamares_config_next
+        svn checkout $url/trunk/calamares/{ce,modules,images} || GUIDIE "svn checkout '$url' failed."
+        
+        all_sudo_commands+="; cp -R $workdir/ce      /etc/calamares/"
+        all_sudo_commands+="; cp -R $workdir/modules /etc/calamares/"
+        all_sudo_commands+="; cp -R $workdir/images  /etc/calamares/"
+    else
+        url=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next.git)
+        git clone $url || GUIDIE "git clone '$url' failed."
+    
+        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/ce      /etc/calamares/"
+        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/modules /etc/calamares/"
+        all_sudo_commands+="; cp -R $workdir/calamares_config_next/calamares/images  /etc/calamares/"
+    fi
+    all_sudo_commands+="; echo '##### Configurations and package lists were successfully updated! #####'"
+}
+
 CopyFile() {
     local filefrom="$1"   # source file
     local fileto="$2"     # destination file (not folder!)
@@ -142,25 +168,17 @@ CopyFile() {
     [ -r "$filefrom" ] || GUIDIE "File <tt>$filefrom</tt> does not exist."
     [ -d "$folderto" ] || GUIDIE "Folder <tt>$folderto</tt> does not exist."
 
-    pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
-}
+    all_sudo_commands+="; cp $filefrom $fileto"
 
-Github2Gitlab_local() {
-    eos-github2gitlab "$@"
+    #pkexec cp $filefrom $fileto || GUIDIE "Failed to copy <tt>$filefrom</tt> to <tt>$fileto</tt>"
 }
-
-run_hotfix_start() {
-    local file=hotfix-start.bash
-    local url=https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file
-    #                  https://gitlab.com/endeavouros-filemirror/ISO-hotfixes/-/raw/main/$file
-    wget --timeout=30 -q -O $file $(Github2Gitlab_local $url) && {
-        bash $file
-    }
-}
-
 
 ###  Everything starts in the Main function. ###
 Main() {
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+    source /usr/share/endeavouros/scripts/translations.bash || exit 1
+    export -f eos_yad
+
     local lang="$1"
     local mode="$2"                             # 'community' or '' (empty)
     local ShowInstallLog="$3"
@@ -169,8 +187,21 @@ Main() {
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
+    local all_sudo_commands=":"
+    local workdir=""
 
-    _init_translations $lang || { GUIDIE "$progname: language init failed" ; }
+    if [ "$I_am_only_testing" = "true" ] ; then
+        Home=$HOME
+        EOS_FILESERVER_SITE=gitlab
+        mode=community
+        lang=en
+        ShowInstallLog=FALSE
+        ShowPacmanLog=FALSE
+    fi
+
+    workdir=$(mktemp -d $Home/work.XXXXX) || GUIDIE "creating work folder failed."
+
+    _init_translations $lang || { GUIDIE "language init failed" ; }
 
     # asks the value for $mode
     case "$mode" in
@@ -178,15 +209,33 @@ Main() {
     esac
 
     # copy config files based on $mode
+
+    pushd $workdir 2>/dev/null || GUIDIE "cannot go to folder $workdir"
+
     case "$mode" in
-        online | offline | community)
-            eos-connection-checker && run_hotfix_start    
+        online | offline)
             CopyFile $cfolder/settings_$mode.conf $cfolder/settings.conf
+            ;;
+        community)
+            run_community_script
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
             ;;
     esac
+
+    if eos-connection-checker ; then
+        run_hotfix_start
+    fi
+
+    sudo bash -c "${all_sudo_commands[*]}"
+
+    popd 2>/dev/null
+    rm -rf $workdir
+
+    if [ "$I_am_only_testing" = "true" ] ; then
+        return
+    fi
 
     # finally: run calamares with logs (install, pacman)
     InstallWithLogs
