@@ -182,12 +182,14 @@ Update_common() {
                                            --width=800 --height=300 \
                                            --button=' Continue!system-run!Ignore this warning and continue':2
             retvalue=$?
+            case "$retvalue" in
+                0) retvalue=1 ;;    # eos_yad_problem returns 0 when quitting!
+                *) retvalue=0 ;;    # the above code returns 2 when continuing
+            esac
         }
         rm -f $tmpfile
-        case "$retvalue" in
-            0) exit 1 ;;
-            *) retvalue=0 ;;
-        esac
+        [ $retvalue -ne 0 ] && exit 1
+
         if [ $update_focused -eq 0 ] ; then
             SystemLockActive b || return
             ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
