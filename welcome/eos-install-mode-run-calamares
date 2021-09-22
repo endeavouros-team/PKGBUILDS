@@ -143,7 +143,35 @@ run_hotfix_start() {
 }
 
 fetch_community_files() {
-    local url=""
+    local head=""
+    local urls=()
+
+    if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
+        head=https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares
+    else
+        head=https://gitlab.com/endeavouros-filemirror/calamares_config_next/raw/master/calamares
+    fi
+    urls=(
+        $head/modules/packagechooser.conf
+        $head/modules/contextualprocess.conf
+        $head/ce/bspwm.txt
+        $head/ce/sway.txt
+        $head/images/bspwm.jpg
+        $head/images/community.jpg
+        $head/images/sway.jpg
+    )
+    curl -Lsm 20 --remote-name-all "${urls[@]}" || GUIDIE "Fetching community files failed."
+
+    all_sudo_commands+="; mkdir -p /etc/calamares/{ce,modules,images}"
+    all_sudo_commands+="; cp $PWD/*.txt  /etc/calamares/ce/"
+    all_sudo_commands+="; cp $PWD/*.conf /etc/calamares/modules/"
+    all_sudo_commands+="; cp $PWD/*.jpg  /etc/calamares/images/"
+    all_sudo_commands+="; echo '===> Community configurations and package lists were successfully updated!'"
+
+    return
+
+
+    # The following code is obsolete.
 
     if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
         url=https://github.com/endeavouros-team/calamares_config_next
@@ -153,12 +181,31 @@ fetch_community_files() {
         all_sudo_commands+="; cp -R $PWD/modules /etc/calamares/"
         all_sudo_commands+="; cp -R $PWD/images  /etc/calamares/"
     else
-        url=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next.git)
-        git clone $url || GUIDIE "git clone '$url' failed."
+        if [ 1 -eq 1 ] ; then
+            local head=https://gitlab.com/endeavouros-filemirror/calamares_config_next/raw/master/calamares
+            local urls=(
+                $head/modules/packagechooser.conf
+                $head/modules/contextualprocess.conf
+                $head/ce/bspwm.txt
+                $head/ce/sway.txt
+                $head/images/bspwm.jpg
+                $head/images/community.jpg
+                $head/images/sway.jpg
+            )
+            curl -Lsm 20 --remote-name-all "${urls[@]}" || GUIDIE "Fetching community files failed."
+
+            all_sudo_commands+="; mkdir -p /etc/calamares/{ce,modules,images}"
+            all_sudo_commands+="; cp $PWD/*.txt  /etc/calamares/ce/"
+            all_sudo_commands+="; cp $PWD/*.conf /etc/calamares/modules/"
+            all_sudo_commands+="; cp $PWD/*.jpg  /etc/calamares/images/"
+        else
+            url=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next.git)
+            git clone $url || GUIDIE "git clone '$url' failed."
     
-        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/ce      /etc/calamares/"
-        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/modules /etc/calamares/"
-        all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/images  /etc/calamares/"
+            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/ce      /etc/calamares/"
+            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/modules /etc/calamares/"
+            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/images  /etc/calamares/"
+        fi
     fi
     all_sudo_commands+="; echo '===> Community configurations and package lists were successfully updated!'"
 }
@@ -182,7 +229,7 @@ Main() {
 
     if [ "$I_am_only_testing" = "true" ] ; then
         Home=$HOME
-        EOS_FILESERVER_SITE=github
+        #EOS_FILESERVER_SITE=github
         mode=community
         lang=en
         ShowInstallLog=FALSE
