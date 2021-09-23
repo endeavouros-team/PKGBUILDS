@@ -8,7 +8,7 @@ IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
         running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')
     fi
-    test "$1" =  "$running_kernel"
+    test "$1" = "$running_kernel"
 }
 
 DoNotify() { /usr/bin/eos-reboot-required ; exit 0 ; }
@@ -22,13 +22,19 @@ Main() {
         case "$target" in
             linux | linux-lts | linux-zen | linux-hardened | linux-lts?? | linux-lts???)
                 # Note: only official and older LTS kernels are checked.
-                IsRunningKernel "$target" && DoNotify
+                if IsRunningKernel "$target" ; then
+                    DoNotify
+                fi
                 ;;
             nvidia)
-                IsRunningKernel linux && DoNotify
+                if IsRunningKernel linux ; then
+                    DoNotify
+                fi
                 ;;
             nvidia-lts)
-                IsRunningKernel linux-lts && DoNotify
+                if IsRunningKernel linux-lts ; then
+                    DoNotify
+                fi
                 ;;
             btrfs-progs)
                 # Notify only if btrfs is in use
