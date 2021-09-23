@@ -1,12 +1,12 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_next
 pkgver=2.3
-pkgrel=8
+pkgrel=9
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=('git+https://github.com/endeavouros-team/calamares_config_next.git#branch=08-2021')
+source=('git+https://github.com/endeavouros-team/calamares_config_next.git#branch=master')
 sha512sums=('SKIP')
 
 prepare() {
@@ -17,15 +17,14 @@ prepare() {
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 mkdir $srcdir/bin
 cd $srcdir/bin/
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/cleaner_script.sh
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/chrooted_cleaner_script.sh
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/update-mirrorlist
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/pacstrap_calamares
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/master/cleaner_script.sh
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/master/chrooted_cleaner_script.sh
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/master/update-mirrorlist
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/master/pacstrap_calamares
 chmod +x cleaner_script.sh chrooted_cleaner_script.sh update-mirrorlist pacstrap_calamares
 cd $srcdir/calamares_config_next/calamares/modules
-wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/08-2021/netinstall.yaml
-#wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/08-2021/netinstall_ce.yaml
-wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-netinstall/08-2021/netinstall-ce-base.yaml
+wget https://raw.githubusercontent.com/endeavouros-team/install-scripts-next/master/netinstall.yaml
+wget https://raw.githubusercontent.com/EndeavourOS-Community-Editions/calamares-packagechooser/main/netinstall-ce-base.yaml
 cd $srcdir
 }
 
