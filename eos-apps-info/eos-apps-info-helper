@@ -48,7 +48,7 @@ Main()
         $HOME/.config/$real_progname
         /etc/$real_progname
     )
-    local section
+    local section=""
     local url=""
     local br_default="/usr/bin/xdg-open"
     local br="$br_default"
@@ -139,21 +139,32 @@ Main()
         fi
     done
     if [ -z "$url" ] ; then
-        # Find the section of the man page
-        section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/cut -d '.' -f2)
-        if [ -n "$section" ] ; then
-            url="https://man.archlinux.org/man/$name.$section"
-        else
-            # ad hoc urls. See option --show-bonus above.
-            case "$name" in
-                grub)          url=https://www.gnu.org/software/grub/manual/grub/grub.html;;
-                #libreoffice)  url=https://documentation.libreoffice.org/en/english-documentation;;
-                linux)         url=https://www.kernel.org;;
-                linux-lts)     url=https://www.kernel.org;;
-                nvidia)        url=https://www.nvidia.com/en-us/drivers/unix;;
-                virtualbox)    url=https://www.virtualbox.org/manual/UserManual.html;;
-                *)             url="" ;;
-            esac
+        # ad hoc urls. See option --show-bonus above.
+        case "$name" in
+            bashdb)
+                if [ "$SUPPORT_MAN_BASHDB" = "yes" ] ; then
+                    # Fetch the http document to your home folder
+                    url="$HOME/.config/$real_progname/bashdb.html"
+                    if [ ! -r "$url" ] ; then
+                        local url2=http://bashdb.sourceforge.net/bashdb.html
+                        mkdir -p "$(dirname "$url")"
+                        wget --user-agent="" -q --timeout=10 -O "$url" $url2 || url=""
+                    fi
+                fi
+                ;;
+            grub)          url=https://www.gnu.org/software/grub/manual/grub/grub.html;;
+            #libreoffice)  url=https://documentation.libreoffice.org/en/english-documentation;;
+            linux)         url=https://www.kernel.org;;
+            linux-lts)     url=https://www.kernel.org;;
+            nvidia)        url=https://www.nvidia.com/en-us/drivers/unix;;
+            virtualbox)    url=https://www.virtualbox.org/manual/UserManual.html;;
+        esac
+        if [ -z "$url" ] ; then
+            # Find the section of the man page
+            section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/cut -d '.' -f2)
+            if [ -n "$section" ] ; then
+                url="https://man.archlinux.org/man/$name.$section"
+            fi
         fi
     fi
 
