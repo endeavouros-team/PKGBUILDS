@@ -132,7 +132,6 @@ InstallWithLogs() {
 run_hotfix_start() {
     local file=hotfix-start.bash
     local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
-    #                  https://gitlab.com/endeavouros-filemirror/ISO-hotfixes/-/raw/main/$file
 
     if wget --timeout=30 -q -O $file $url ; then
         all_sudo_commands+="; bash $PWD/$file"
@@ -143,15 +142,8 @@ run_hotfix_start() {
 }
 
 fetch_community_files() {
-    local head=""
-    local urls=()
-
-    if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
-        head=https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares
-    else
-        head=https://gitlab.com/endeavouros-filemirror/calamares_config_next/raw/master/calamares
-    fi
-    urls=(
+    local head=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares)
+    local urls=(
         $head/modules/packagechooser.conf
         $head/modules/contextualprocess.conf
         $head/ce/bspwm.txt
