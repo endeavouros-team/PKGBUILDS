@@ -78,7 +78,7 @@ Main()
                 continue ;;
 
             # no support currently:
-            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur)
+            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur | eos-github2gitlab | eos-kernel-nvidia-update-check)
                 continue ;;
 
             # rename:

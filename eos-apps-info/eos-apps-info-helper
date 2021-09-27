@@ -42,6 +42,7 @@ Main()
     local real_progname=${progname%-helper}
     local name=""
     local find_other_info=yes   # default: will find other web info if $name has no man page
+    local return_url=no
 
     local folders=(
         $HOME/.config/$real_progname
@@ -60,6 +61,9 @@ Main()
             -h | --help)
                 Usage
                 return
+                ;;
+            --return-url)
+                return_url=yes
                 ;;
             --find-other-info)
                 find_other_info=yes
@@ -154,7 +158,11 @@ Main()
     fi
 
     if [ -n "$url" ] ; then
-        /usr/bin/setsid $br "$url" 2>/dev/null &
+        if [ "$return_url" = "yes" ] ; then
+            echo "$url"
+        else
+            /usr/bin/setsid $br "$url" 2>/dev/null &
+        fi
     else
         #eos-pkginfo --browser="$br" "$name" && return
         echo2 "Sorry, no info found."
