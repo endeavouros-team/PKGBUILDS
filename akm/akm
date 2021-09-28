@@ -411,7 +411,7 @@ Main()
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" Help!help-contents!Helps to use $progname":"bash -c Manual"
         --button="Cancel!gtk-cancel!Change nothing":1
-        --button="Execute!system-run!Make your changes":0
+        --button="Execute!system-run!Make your changes":3
     )
     if [ "$scroll" = "yes" ] ; then
         cmd+=(--scroll
