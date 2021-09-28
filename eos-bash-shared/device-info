@@ -47,10 +47,25 @@ CPU_info() {
 }
 
 InVirtualBox() {
-    test -n "$(lspci | grep "VirtualBox Graphics Adapter")" && echo yes || echo no
+    if "$(InVm)" = "virtualbox" ; then
+        echo yes
+    else
+        echo no
+    fi
+    #test -n "$(lspci | grep "VirtualBox Graphics Adapter")" && echo yes || echo no
 }
 
 InVm() {
+    local vmname="$(systemd-detect-virt --vm)"
+    case "$vmname" in
+        oracle)
+            echo virtualbox ;;
+        qemu | kvm | vmware)
+            echo $vmname ;;
+    esac
+    return
+
+    # old implementation:
     case "$(lspci -vnn)" in
         *" QEMU "*)   echo qemu ;;
         *VirtualBox*) echo virtualbox ;;
