@@ -332,10 +332,9 @@ ShowChangeResoButton() {
     local show_reso_butt="$(WelcomeDevelConf _show_change_reso no)"
 
     if [ "$show_reso_butt" = "no" ] ; then
-        case "$(lspci -vnn)" in
-            *" QEMU "* | *VMware* | *VirtualBox*)
-                show_reso_butt=yes                  # in a VM always show the button
-                ;;
+        case "$(device-info --vm)" in
+            virtualbox | qemu | kvm | vmware)
+                show_reso_butt=yes ;;                  # in a VM always show the button
         esac
     fi
     if [ -x $INSTALLER_PROGRAM ] || [ "$LOGNAME" = "$EOS_LIVEUSER" ] || [ "$show_installer" = "yes" ] ; then
