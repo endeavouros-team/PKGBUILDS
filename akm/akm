@@ -1,5 +1,8 @@
 #!/bin/bash
 
+Line2()   { echo "$@" >&2 ; }
+Printf2() { printf "$@" >&2 ; }
+
 # use monospace (non-proportional) fonts!
 #FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
 FormatVersion()     { printf "%s  " "$1" ; }
@@ -152,13 +155,10 @@ PaddingLines() {
     done
 }
 
-echo2()   { echo "$@" >&2 ; }
-printf2() { printf "$@" >&2 ; }
-
 CommonStuff() {
     local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
     if [ ! -f $EOS_SCRIPTS_YAD ] ; then
-        echo2 "Sorry, package 'eos-bash-shared' is not installed."
+        Line2 "Sorry, package 'eos-bash-shared' is not installed."
         exit 1
     fi
     source $EOS_SCRIPTS_YAD
@@ -178,7 +178,7 @@ AkmConfig() {
         [ -n "$AKM_KERNELS_HEADERS" ]       && akm_kernels_headers_user=("${AKM_KERNELS_HEADERS[@]}")
         [ -n "$AKM_WINDOW_WIDTH" ]          && akm_window_width=$AKM_WINDOW_WIDTH
 
-        echo "==> Config file $conf read." >&2
+        Line2 "==> Config file $conf read."
     fi
 }
 
@@ -326,19 +326,12 @@ Main()
     local akm_window_width=900
     local scroll=no
     local nrofkernelitems                  # 8 with only upstream kernels
-    local progress_cmd=(
-        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
-        --width=400 --no-buttons
-        --image=user-info
-        --title="AKM progress"
-        --text="Fetching information, please wait..."
-    )
 
     CommonStuff
     AkmConfig
     Options "$@"
 
-    echo "==> Info: detecting available kernel packages."
+    Line2 "==> Info: detecting available kernel packages."
     kernels=( $(AvailableKernelsAndHeaders) )
 
     #kernels=(
@@ -361,7 +354,7 @@ Main()
     nrofkernelitems=${#kernels[@]}
     [ $nrofkernelitems -gt 8 ] && scroll=yes
 
-    # echo "connect_header_with_kernel = $connect_header_with_kernel" >&2
+    # Line2 "connect_header_with_kernel = $connect_header_with_kernel"
 
     local URL_timeout="--max-time 30"                      # used for all curl calls here
 
@@ -409,9 +402,9 @@ Main()
         --image=system-software-update
         --button=" Changelog!applications-development!Show latest changes of this program":"Changelog"
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
-        --button=" Help!help-contents!Helps to use $progname":"bash -c Manual"
-        --button="Cancel!gtk-cancel!Change nothing":1
-        --button="Execute!system-run!Make your changes":3
+        --button=" Help!help-contents!Helps to use $progname":"Manual"
+        --button=' Cancel!gtk-cancel!Change nothing':1
+        --button=' Execute!system-run!Make your changes':0
     )
     if [ "$scroll" = "yes" ] ; then
         cmd+=(--scroll
@@ -419,6 +412,13 @@ Main()
              )
     fi
 
+    local progress_cmd=(
+        eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
+        --width=400 --no-buttons
+        --image=user-info
+        --title="AKM progress"
+        --text="Fetching information, please wait..."
+    )
     local ix=1 count=${#functions[@]} val
     local cmdfile="$(mktemp $HOME/.config/akm.tmp.XXXXX)"
     while true ; do
@@ -442,17 +442,26 @@ Main()
     readarray -t cmd <<< $(cat "$cmdfile")
     rm -f "$cmdfile"
     
-    local ix installed install=() uninstall=() pkg partner
-    local result="$("${cmd[@]}")"
-    declare -A pkgstatus
+    local installed install=() uninstall=() pkg partner result result1="" retval
+    result="$("${cmd[@]}")"
+    retval=$?
+    [ $retval -ne 0 ] && return
     test -z "$result" && return
 
+    # For some users the yad output contains 2 lines instead of one ... ???
     if [ "$(echo "$result" | wc -l)" != "1" ] ; then
-        DIE "yad output is garbage!"
+        Printf2 "==> Warning: yad output should have been exactly one line, but is:\n'$result'\n"
+        result1="$result"
+        result="$(echo "$result" | tail -n1)"
+        Printf2 "==> Warning: using the last line:\n'$result'\n"
+    fi
+    if [ "$(echo "$result" | wc -l)" != "1" ] ; then
+        DIE "cannot parse yad output:\n'$result1'\n"
     fi
 
     result="${result:1}"                               # skip first LBL field !!
 
+    declare -A pkgstatus
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
         pkg="${kernels[$ix]}"
         pkgstatus[$pkg]="$(echo "$result" | cut -d '|' -f $((ix+1)))"   # TRUE or FALSE
@@ -507,8 +516,8 @@ Main()
     test -n "$install"   && cmd+=($pacman -S ${install[*]} ";")
 
     if [ 0 -eq 1 ] ; then
-        echo "uninstall = ${uninstall[*]}"
-        echo "install   = ${install[*]}"
+        Line2 "uninstall = ${uninstall[*]}"
+        Line2 "install   = ${install[*]}"
         return
     fi
 
