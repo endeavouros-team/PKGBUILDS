@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_next_ce
 pkgver=1.0
-pkgrel=3
+pkgrel=4
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -17,16 +17,18 @@ _caldir=$pkgname/calamares
 
 prepare() {
     mkdir -p $_caldir/modules
-    cp    calamares-packagechooser/netinstall-ce-base.yaml                 $_caldir/modules/
-    cp    calamares_config_next/calamares/modules/contextualprocess.conf   $_caldir/modules/
-    cp    calamares_config_next/calamares/modules/packagechooser.conf      $_caldir/modules/
-    cp -R calamares_config_next/calamares/images                           $_caldir/
-    cp -R calamares_config_next/calamares/ce                               $_caldir/
+    cp    calamares-packagechooser/netinstall-ce-base.yaml                         $_caldir/modules/
+    cp    calamares_config_next/calamares/modules/packagechooser.conf              $_caldir/modules/
+    cp    calamares_config_next/calamares/modules/contextualprocess.conf           $_caldir/modules/
+    cp    calamares_config_next/calamares/modules/netinstall_community-base.conf   $_caldir/modules/
+    cp    calamares_config_next/calamares/settings_community.conf                  $_caldir/
+    cp -R calamares_config_next/calamares/images                                   $_caldir/
+    cp -R calamares_config_next/calamares/ce                                       $_caldir/
 }
 
 package() {
     install -dm 755 $pkgdir/etc/calamares
     cp -r --no-preserve=ownership $_caldir $pkgdir/etc/
 
-    rm -rf ../calamares_config_next ../calamares-packagechooser    # cleanup
+    rm -rf ../calamares_config_next ../calamares-packagechooser   # cleanup
 }
