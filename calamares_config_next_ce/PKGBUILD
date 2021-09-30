@@ -1,13 +1,13 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_next_ce
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=(
-    git+https://github.com/endeavouros-team/calamares_config_next.git#branch=test
+    git+https://github.com/endeavouros-team/calamares_config_next.git#branch=master
     git+https://github.com/EndeavourOS-Community-Editions/calamares-packagechooser.git
 )
 sha512sums=('SKIP'
