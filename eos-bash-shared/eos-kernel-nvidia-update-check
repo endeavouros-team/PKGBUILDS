@@ -4,56 +4,47 @@
 # - if linux-lts is updated, nvidia-lts should be updated too
 # - if linux     is updated, nvidia     should be updated too
 #
-# This app checks the above and informs the user with messages
-# and the calling app with exit code (0=success, 1=failure).
+# This app checks the above and informs the calling app with exit code:
+#     0=success
+#     1=failure
+# On failure also error messages to stderr will be displayed.
 
 Main()
 {
-    local targets="$*"
-    local target
+    PATH=/usr/bin:$PATH
+    lsmod | grep nvidia >/dev/null || exit 0                # NVIDIA not is use
+    /usr/bin/pacman -Qq nvidia-dkms >& /dev/null && exit 0  # stop if nvidia-dkms package is already installed
+
+    local pkgs=("$@")
+    local pkg
     local linux_lts=no
     local linux=no
     local nvidia_lts=no
     local nvidia=no
-    local nvidia_pkgs
     local msgs=() msg
-    local progname=$(/usr/bin/basename "$0")
 
-    if [ -z "$targets" ] ; then
-        targets=$(/usr/bin/checkupdates  | /usr/bin/awk '{print $1}')
-    fi
+    # Find updates if they are not as parameters.
+    [ -z "$pkgs" ] && readarray -t pkgs <<< $(checkupdates  | awk '{print $1}')
 
-    # stop if no nvidia package is already installed
-    nvidia_pkgs="$(/usr/bin/pacman -Qq nvidia-dkms nvidia nvidia-lts 2>/dev/null)"
-    [ -z "$nvidia_pkgs" ] && return
-
-    # stop if nvidia-dkms is already installed
-    [ -n "$(echo "$nvidia_pkgs" | /usr/bin/grep nvidia-dkms)" ] && return
-
-    # stop if kernel will not be updated
-    for target in $targets ; do
-        case "$target" in
+    # Check if kernel(s) and nvidia driver(s) are in the updates list.
+    for pkg in "${pkgs[@]}" ; do
+        case "$pkg" in
             linux)      linux=yes ;;
             linux-lts)  linux_lts=yes ;;
-        esac
-    done
-    [ "$linux $linux_lts" = "no no" ] && return
-
-    # notify if kernel will be updated but corresponding nvidia driver not
-    for target in $targets ; do
-        case "$target" in
             nvidia)     nvidia=yes ;;
             nvidia-lts) nvidia_lts=yes ;;
         esac
     done
+
+    # Notify if kernel will be updated but corresponding nvidia driver not.
     [ "$linux_lts $nvidia_lts" = "yes no" ] && msgs+=("'linux-lts' would be upgraded but 'nvidia-lts' not.")
     [ "$linux $nvidia" = "yes no" ]         && msgs+=("'linux' would be upgraded but 'nvidia' not.")
-
     if [ -n "$msgs" ] ; then
+        local progname=$(basename "$0")
         for msg in "${msgs[@]}" ; do
             echo "$progname: error: $msg" >&2
         done
-        exit 1
+        return 1
     fi
 }
 
