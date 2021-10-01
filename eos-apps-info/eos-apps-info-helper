@@ -161,7 +161,8 @@ Main()
         esac
         if [ -z "$url" ] ; then
             # Find the section of the man page
-            section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/cut -d '.' -f2)
+            # section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/cut -d '.' -f2)
+            section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/sed 's|.*\.\([0-9]*\)\.gz|\1|')
             if [ -n "$section" ] ; then
                 url="https://man.archlinux.org/man/$name.$section"
             fi
