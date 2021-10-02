@@ -26,6 +26,5 @@ eos-update-notifier [options]
 Configuration file: `/etc/eos-update-notifier.conf`.
 
 ## See also
-```
-eos-update-notifier-configure
-```
+
+[eos-update-notifier-configure](/etc/eos-apps-info/pageinfo/eos-update-notifier-configure/eos-update-notifier-configure.html)

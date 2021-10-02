@@ -22,6 +22,5 @@ su-c_wrapper ls -la
 ```
 
 ## See also
-```
-man su
-```
+
+[su(1)](https://man.archlinux.org/man/su.1)

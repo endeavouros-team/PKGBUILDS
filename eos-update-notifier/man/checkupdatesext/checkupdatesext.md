@@ -13,6 +13,5 @@ checkupdatesext
 The same as `checkupdates`.
 
 ## See also
-```
-checkupdates(8)
-```
+
+[checkupdates](https://man.archlinux.org/man/checkupdates.8)

@@ -12,6 +12,5 @@ paccache-service-manager
 ```
 
 ## See also
-```
-paccache(8)
-```
+
+[paccache(8)](https://man.archlinux.org/man/paccache.8)

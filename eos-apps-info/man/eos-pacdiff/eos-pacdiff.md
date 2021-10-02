@@ -14,6 +14,5 @@ Usage: eos-pacdiff
 ```
 
 ## See also
-```
-man pacdiff
-```
+
+[pacdiff](https://man.archlinux.org/man/pacdiff.8)
