@@ -43,3 +43,7 @@ Version 1.16.1-1 changed the method of finding the country code of a user. Now u
 
 # ...
 ```
+
+## See also
+
+[reflector(1)](https://man.archlinux.org/man/reflector.1)
