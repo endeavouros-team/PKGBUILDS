@@ -230,6 +230,11 @@ Options()
         name="$1"
     fi
 
+    # Special adjustments
+    case "$name" in
+        eos-welcome) name=welcome ;;
+    esac
+
     [ -n "$name" ] || DIE "Error: give name for command/package/..."
 }
 
