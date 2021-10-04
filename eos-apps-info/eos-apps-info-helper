@@ -5,20 +5,30 @@
 
 echo2() { echo "$@" >&2 ; }
 
+DIE() {
+    echo2 "$progname: error: $1"
+    exit 1
+}
+
 Usage() {
     cat <<EOF >&2
-Usage: $progname [basic-options] name
+Usage: $progname [basic-options] [man-section] name
        $progname help-options
 
 Name:
     The name for which the manual page or other info is searched.
 
+Man-section:
+    The section of a man page, e.g. 1. See 'man(1)'.
+
 Basic-options:
     --find-other-info   Find other info if man page doesn't exist.
     --skip-other-info   Don't find other info if man page doesn't exist (default).
+    --wipe-cache        Delete cached man page files. Use this option when any of the
+                        cached man pages in $manstore2 is outdated.
 
 Help-options:
-    -h | --help              This help.
+    -h | --help         This help.
 
 Config file $real_progname.conf is searched from the following folders in this order:
     ~/.config/$real_progname
@@ -36,6 +46,51 @@ Web page info files can be:
 EOF
 }
 
+Man2html() {
+    # Convert a local man page to a html page.
+
+    local app="$1"
+
+    mkdir -p "$manstore"
+
+    if [ 1 -eq 1 ] ; then
+        # check if a man page has already been converted to html
+        if [ -r "$manstore/$app.html" ] ; then
+            url="$manstore/$app.html"
+            return
+        fi
+    fi
+
+    local manpage="$(MANSECT="$mansect" /usr/bin/man -w "$app" 2>/dev/null)"
+    if [ -z "$manpage" ] ; then
+        echo2 "$FUNCNAME: local man page for '$app' missing."
+        return 1
+    fi
+
+    /usr/bin/cp "$manpage" /tmp || DIE "copying man page failed."
+    manpage="$(/usr/bin/basename "$manpage" .gz)"
+    rm -f "/tmp/$manpage"
+    /usr/bin/gunzip "/tmp/$manpage.gz"
+
+    case "$app" in
+        downgrade"foobar")
+            printf "# NAME\n\n" > "/tmp/$app.md"
+            sed -i "/tmp/$manpage" -e 's|^\.SH USAGE$|.SH SYNOPSIS|'
+            ;;
+        *)
+            /usr/bin/rm -f "/tmp/$app.md"
+            ;;
+    esac
+    /usr/bin/pandoc -f man "/tmp/$manpage" -t gfm >> "/tmp/$app.md"
+    /usr/bin/sed -i "/tmp/$app.md" \
+                 -e 's|^# \([A-Z]\)\(.*\)|## \1\L\2|' \
+                 -e "s|^## Name$|# $app|"
+    /usr/bin/pandoc -f gfm "/tmp/$app.md" -o "$manstore/$app.html"
+    rm -f "/tmp/$app.md" "/tmp/$manpage"
+
+    url="$manstore/$app.html"
+}
+
 URL_from_package() {
     local pkgname="$1"
     local opt
@@ -50,12 +105,21 @@ URL_from_package() {
     done
 }
 
-URL_from_arch_man() {
+URL_from_local_man() {
     # Find the section of the Arch man page
 
-    local section=$(/usr/bin/man -w "$name" 2>/dev/null | /usr/bin/sed 's|.*\.\([0-9]*\)\.gz|\1|')
+    if [ -z "$section" ] ; then
+        local file=$(MANSECT="$mansect" /usr/bin/man -w "$name" 2>/dev/null)
+        section=$(echo "$file" | /usr/bin/sed 's|.*\.\([0-9npl]*\)\.gz$|\1|')
+    fi
     if [ -n "$section" ] ; then
         url="https://man.archlinux.org/man/$name.$section"
+        # Test if Arch man page exists in the internet. If not, then try use a local man page.
+        if ! /usr/bin/curl -Lsm 10 --fail "$url" >/dev/null ; then
+            # if this man page is not available on Arch, look for a local man page
+            # and convert it to a local html page
+            Man2html "$name"
+        fi
     fi
 }
 
@@ -107,46 +171,66 @@ GetConfigs() {
     done
 }
 
-Options() {
-    local arg
+Options()
+{
+    local opts
+    local long_opts="help,return-url,find-other-info,skip-other-info,show-system-folder,show-bonus,section:,wipe-cache"
+    local short_opts="h,s:"
 
-    for arg in "$@" ; do
-        case "$arg" in
-            -h | --help)
-                Usage
-                exit
-                ;;
+    opts="$(/usr/bin/getopt -o=$short_opts --longoptions $long_opts --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
             --return-url)
-                return_url=yes
-                ;;
+                return_url=yes;;
             --find-other-info)
-                find_other_info=yes
-                ;;
+                find_other_info=yes;;
             --skip-other-info)
-                find_other_info=no
-                ;;
+                find_other_info=no;;
             --show-system-folder)
-                echo "${folders[1]}"   # for bash completion
-                exit
-                ;;
+                echo "${folders[1]}"; exit;;    # for bash completion
             --show-bonus)
                 echo "grub linux linux-lts nvidia virtualbox"  # supported bonus apps!
                 exit
                 ;;
-            -* )
-                echo "Sorry, option '$arg' is not supported."; exit 1
+            --wipe-cache)
+                rm -rf "$manstore"
+                exit
                 ;;
-            *)
-                name="$arg"
+            -s | --section)
+                section="$2"
+                shift
                 ;;
+
+            -h | --help)
+                Usage
+                exit
+                ;;
+            
+            --) shift ; break ;;
         esac
+        shift
     done
 
-    # check mandatory params
-    if [ -z "$name" ] ; then
-        echo2 "Error: give command name"
-        exit 1
+    # handle remaining params
+
+    if [ -n "$2" ] ; then
+        section="$1"
+        name="$2"
+        case "$section" in
+            1 | 1p | n | l | 8 | 3 | 3p | 0 | 0p | 2 | 5 | 4 | 9 | 6 | 7) ;;
+            *) DIE "unsupported section '$section'" ;;
+        esac
+    else
+        name="$1"
     fi
+
+    [ -n "$name" ] || DIE "Error: give name for command/package/..."
 }
 
 
@@ -157,11 +241,20 @@ Main()
     local name=""
     local find_other_info=yes   # default: will find other web info if $name has no man page
     local return_url=no
-
+    local section=""
+        # Examples of 'man -w':
+        #   /usr/share/man/man1/ps.1.gz
+        #   /usr/share/man/mann/proc.n.gz    # this is weird, man section 5 should be before n
+        # $MANSECT default:
+        #   1 1p n l 8 3 3p 0 0p 2 5 4 9 6 7
+    local mansect="1,1p,5,n,l,8,3,3p,0,0p,2,5,4,9,6,7"      # MANSECT: 5 before n
+    
     local folders=(
         $HOME/.config/$real_progname
         /etc/$real_progname
     )
+    local manstore="$HOME/.cache/$progname"
+    local manstore2="\$HOME/.cache/$progname"
     local folder
     local url=""
     local br_default="/usr/bin/xdg-open"
@@ -189,7 +282,7 @@ Main()
         fi
     done
     [ -z "$url" ] && URL_from_bonus
-    [ -z "$url" ] && URL_from_arch_man "$name"
+    [ -z "$url" ] && URL_from_local_man "$name"
     [ -z "$url" ] && URL_from_package "$name"
 
     if [ -n "$url" ] ; then
@@ -199,7 +292,7 @@ Main()
             /usr/bin/setsid $br "$url" 2>/dev/null &
         fi
     else
-        echo2 "Sorry, no info found."
+        DIE "sorry, no info found."
     fi
 }
 
