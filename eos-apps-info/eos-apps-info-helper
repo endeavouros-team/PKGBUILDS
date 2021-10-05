@@ -241,7 +241,7 @@ Options()
 
 Main()
 {
-    local progname="$(basename "$0")"
+    local progname=eos-apps-info-helper          # "$(basename "$0")"
     local real_progname=${progname%-helper}
     local name=""
     local find_other_info=yes   # default: will find other web info if $name has no man page
