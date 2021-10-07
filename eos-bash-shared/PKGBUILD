@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.10.9
+pkgver=1.10.10
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -22,6 +22,7 @@ optdepends=(
   "neofetch: for additional DE detection"
 #  "yay:      an AUR helper supported by eos-pkginfo"
 #  "paru:     an AUR helper supported by eos-pkginfo"
+  "kde-gtk-config: to remove gtk related yad warnings"
 )
 
 backup=(
@@ -76,7 +77,7 @@ sha512sums=('975f48ff181182a0e1a9020563b6b7eba2870feef02def6a74535675d9ae93c0459
             '0193f851b4145cb761dc2e47f4bd2c00a028c016489bb2f053bba64ef88c08d02e81f9dc095ba3928de8fa0fbb1fd2b3e5289bb125fe7dcc31634b7afbf48818'
             'dfb17438b66c0e17f86d3160d49866f8bbd22a60e0f97d9a1ff33fb41bddc1cd03b2fdf0fe378f937fcd836a31f7a407fd64b9714c4e1cc494e890b5f4f7a9ca'
             '7b39c37d0541ffa773ef886a3f4db835c19a9e64cc78ff30f8253574d6f34977d11ae40d87f911da0f0139455d80dc74c8c628315e05988c57812a9111d761e2'
-            'dbe1c6e133ef46e64e8a826f20eb9777513cd738bf90ed28e18d0cb10dcfa5712ffa5b36b033c9c0b8c844ffdecc7c62fcd7076ff4138a67f3cef29531b61065'
+            '984dfddb570c76b80a52a31717d38ed6d092f2848ed5bfa855739fad26c1c6634f5070a9b7b6949b3064590f8a579c474ad54a1f89bd7a00993de029ab441d90'
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '790c15dfa97cc0558666616bdc362b62e40c55e06921a7a8fa9d784a536c9f6b27c8d34825ce518a2177075cd009cea77b7dfbaba21df2508dc9875b8c15972d'

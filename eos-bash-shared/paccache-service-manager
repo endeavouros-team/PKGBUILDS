@@ -21,17 +21,29 @@ DIE() {
 }
 
 GetCurrentValues() {
-    if [ ! -r $service ] ; then
+    local t="$timer"
+    local s="$service"
+
+    if [ ! -r $s ] ; then
         # service is only under /usr/lib/... so get current values from there
+        t="$dir2/$pt"
+        s="$dir2/paccache.service"
+
         local why="Is pacman-contrib installed?"
-        test -r $dir2/$pt || DIE "sorry, $dir2/$pt does not exist. $why"
-        test -r $dir2/paccache.service || DIE "sorry, $dir2/paccache.service does not exist. $why"
-        current_period="$(grep "^OnCalendar=" $dir2/paccache.timer | cut -d '=' -f 2)"
-        current_keepcount="$(grep "^ExecStart=" $dir2/paccache.service | awk '{print $NF}')"
-    else
-        current_period="$(grep "^OnCalendar=" $timer | cut -d '=' -f 2)"
-        current_keepcount="$(grep "^ExecStart=" $service | awk '{print $NF}')"
+        test -r $t || DIE "sorry, $t does not exist. $why"
+        test -r $s || DIE "sorry, $s does not exist. $why"
     fi
+
+    current_period="$(   grep "^OnCalendar=" $t | cut -d '=' -f 2)"
+    current_keepcount="$(grep "^ExecStart="  $s | awk '{print $NF}')"
+    current_delete_uninstalled=FALSE
+
+    # ad hoc check for the 'keepcount' value
+    case "$current_keepcount" in
+        -r)   current_keepcount=3 ;;                  # original value
+        -rk*) current_keepcount="${current_keepcount:3}" ;;   # value after using this app
+        *) DIE "sorry, variable 'keepcount' has value '$current_keepcount' from file '$service', cannot parse it." --width=800 ;;
+    esac
 }
 
 _paccache_cleaner_manager()
@@ -43,65 +55,72 @@ _paccache_cleaner_manager()
     local timer=$dir/paccache.timer
     local current_period
     local current_keepcount
-    local period keepcount
+    local current_delete_uninstalled
+    local period keepcount delete_uninstalled
     local pt="paccache.timer"
-    local cmds=":" cmd=""
+    local cmds=":" cmd_period="" cmd=()
     local xx
-    local period_vals
+    local period_vals=""
     local txt
     local image=drive-harddisk # disk-utility
+    local result=""
+    local field_nr=1
+    local indent="<tt>  </tt>"
+    local du="$(LANG=C /usr/bin/du --si -s /var/cache/pacman/pkg | /usr/bin/awk '{print $1}' | sed 's|G$||')"
+    local df="$(LANG=C /usr/bin/df --si | /usr/bin/grep -w / | /usr/bin/awk '{print $4}' | sed 's|G$||')"
 
     GetCurrentValues
 
-    # possible period values, and set the default
+    txt="<b>Modifies the service that cleans up pacman cache periodically.\n"
+    txt+="Below you'll see settings and their current values.\n\n"
+    txt+="Current status:\n"
+    txt+="${indent}Package cache usage: $du GB\n"
+    txt+="${indent}Free space on disk: $df GB</b>\n"
+    txt+="\n"
+
+    # List possible period values, and set the default
     for xx in daily weekly monthly ; do
         test -n "$period_vals" && period_vals+="!"           # separator
         test "$xx" = "$current_period" && period_vals+="^"   # default
         period_vals+="$xx"
     done
 
-    # ad hoc check for the 'keepcount' value
-    case "$current_keepcount" in
-        -r)   current_keepcount=3 ;;                  # original value
-        -rk*) current_keepcount="${current_keepcount:3}" ;;   # value after using this app
-        *) DIE "sorry, variable 'keepcount' got value '$current_keepcount' from file '$service' but didn't understand it." --width=800 ;;
-    esac
+    cmd=(
+        eos_yad --form --width=500 --image=$image
+        --title='Pacman cache cleaner service manager' 
+        --text="$txt" 
+        --field='Cleaning period':CB                                   "$period_vals" 
+        --field='Number of package versions to keep':NUM               "$current_keepcount"
+        --field='Remove uninstalled but still cached packages now':CHK "$current_delete_uninstalled"
+    )
 
-    local du="$(/usr/bin/du -hs /var/cache/pacman/pkg | /usr/bin/awk '{print $1}')"
-    local df="$(/usr/bin/df -h | /usr/bin/grep -w / | /usr/bin/awk '{print $4}')"
+    result="$("${cmd[@]}")" ; [ -n "$result" ] || return    # package kde-gtk-config should remove possible gtk related yad warnings
 
-    txt="<b>Modifies the service that cleans up pacman cache periodically.\n"
-    txt+="Below you'll see features and their current values.\n\n"
-    txt+="Package cache usage: $du.\n"
-    txt+="Free space on disk: $df.</b>\n" \
+    # New values
+    period="$(            echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+    keepcount="$(         echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+    delete_uninstalled="$(echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
 
-    local result=$(eos_yad --form --width=500 --image=$image \
-                           --title='Pacman cache cleaner service manager' \
-                           --text="$txt" \
-                           --field="":LBL "" \
-                           --field='Cleaning period':CB "$period_vals" \
-                           --field='Number of package versions to keep':NUM  "$current_keepcount"
-          )
+    # Build the final command
 
-    if [ -n "$result" ] ; then
-        period="$(   echo "$result" | cut -d '|' -f 2)"
-        keepcount="$(echo "$result" | cut -d '|' -f 3)"
-        cmd="/usr/bin/paccache -rk$keepcount"
-
-        if [ "$keepcount" != "$current_keepcount" ] || [ "$period" != "$current_period" ] ; then
-           if [ ! -r $service ] ; then
-                cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
-           fi
-           # cmds+=" ; systemctl status $pt >/dev/null && { systemctl stop $pt ; systemctl disable $pt ; }"
-           cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=$cmd|'"
-           cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
-           cmds+=" ; systemctl enable $pt"
-           cmds+=" ; systemctl start $pt"
-           cmds+=" ; systemctl daemon-reload"
-        fi
-        cmds+=" ; $cmd"                         # clean up cache now!
-        pkexec bash -c "$cmds"
+    # Clean up cache now and periodically
+    cmd_period="/usr/bin/paccache -rk$keepcount"
+    cmd="$cmd_period"
+    if [ "$delete_uninstalled" = "TRUE" ] ; then
+        cmd+=" ; /usr/bin/paccache -ruk0"          # remove uninstalled but cached packages only now
     fi
+
+    if [ "$keepcount $period $delete_uninstalled" != "$current_keepcount $current_period $current_delete_uninstalled" ] ; then
+        if [ ! -r $service ] ; then
+            cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
+        fi
+        cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=$cmd_period|'"
+        cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
+        cmds+=" ; systemctl enable $pt"
+        cmds+=" ; systemctl start $pt"
+        cmds+=" ; systemctl daemon-reload"
+    fi
+    pkexec bash -c "$cmds ; $cmd"
 }
 
 _paccache_cleaner_manager
