@@ -42,7 +42,7 @@ Main()
     if [ -n "$msgs" ] ; then
         local progname=$(basename "$0")
         for msg in "${msgs[@]}" ; do
-            echo "$progname: error: $msg" >&2
+            echo "==> $progname: error: $msg" >&2
         done
         return 1
     fi

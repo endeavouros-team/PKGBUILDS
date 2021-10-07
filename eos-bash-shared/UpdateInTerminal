@@ -28,7 +28,7 @@ Checkupdates() {
 
     case "$retval" in
         0)
-            eos-kernel-nvidia-update-check "$(echo "$updates" | awk '{print $1}')" || {
+            eos-kernel-nvidia-update-check $(echo "$updates" | awk '{print $1}') || {
                 read -p "Stop upgrade (Y/n)? " >&2
                 case "$REPLY" in
                     "" | [Yy]*) exit 1 ;;
