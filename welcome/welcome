@@ -672,6 +672,7 @@ DailyAssistant() {
       I3)           DEname=i3;;
       BSPWM)        DEname=bspwm;;
       SWAY)         DEname=sway;;
+      GNOME3)       DEname=GNOME;;
       GNOME|KDE|MATE) ;;
       *)            DEname="";;
   esac
