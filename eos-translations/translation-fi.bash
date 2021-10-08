@@ -305,3 +305,7 @@ _tr_add2 after_install_vbox2         "Käynnistääksesi VirtualBox Guest -toimi
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Ethernet-ongelma$_question Poista paketti r8168$_exclamation"
 _tr_add2 after_install_r8168_tip     "Paketin <b>r8168</b> poistaminen <i>saattaa</i> korjata langallisen yhteyden (uudelleenkäynnistys tarvitaan)"
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "lisätietoa"                                      # assume prefix "DE:", e.g.: "Xfce: info"
+_tr_add2 daily_assist_DEinfo_tip     "lisätietoa tästä työpöydästä/ikkunamanagerista"  # assume prefix "DE:", e.g.: "Xfce: more information ..."

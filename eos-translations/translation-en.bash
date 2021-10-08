@@ -305,3 +305,7 @@ _tr_add2 after_install_vbox2         "To enable VirtualBox Guest utilities, sele
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Ethernet issue$_question Remove r8168$_exclamation"
 _tr_add2 after_install_r8168_tip     "Removing package <b>r8168</b> may fix failing wired connection (reboot required)"
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "more information about this Desktop/Window Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
