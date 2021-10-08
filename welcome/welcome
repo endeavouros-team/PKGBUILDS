@@ -663,6 +663,24 @@ DailyAssistant() {
       --field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "$_WELCOME_BROWSER https://wiki.archlinux.org/title/List_of_applications"
   )
 
+  local DEname="$(eos_GetDeOrWm)"
+  case "$(eos_yad_GetDesktopName)" in
+      XFCE)         DEname=Xfce;;
+      BUDGIE)       DEname=Budgie;;
+      CINNAMON)     DEname=Cinnamon;;
+      LXQT)         DEname=LXQt;;
+      I3)           DEname=i3;;
+      BSPWM)        DEname=bspwm;;
+      SWAY)         DEname=sway;;
+      GNOME|KDE|MATE) ;;
+      *)            DEname="";;
+  esac
+  if [ -n "DEname" ] ; then
+      tabcontents+=(
+          --field=" $DEname info!!$DEname information for Arch based systems":fbtn   "$_WELCOME_BROWSER https://wiki.archlinux.org/title/$DEname"
+      )
+  fi
+
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
 
