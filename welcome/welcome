@@ -678,7 +678,7 @@ DailyAssistant() {
   esac
   if [ -n "DEname" ] ; then
       tabcontents+=(
-          --field=" $DEname info!!$DEname information for Arch based systems":fbtn   "$_WELCOME_BROWSER https://wiki.archlinux.org/title/$DEname"
+          --field=" $DEname: $(ltr daily_assist_DEinfo)!!$DEname: $(ltr daily_assist_DEinfo_tip)":fbtn   "$_WELCOME_BROWSER https://wiki.archlinux.org/title/$DEname"
       )
   fi
 
