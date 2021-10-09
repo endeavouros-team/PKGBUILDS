@@ -140,6 +140,7 @@ URL_from_bonus() {
                 fi
             fi
             ;;
+        code-oss)      url=https://code.visualstudio.com/docs;;
         grub)          url=https://www.gnu.org/software/grub/manual/grub/grub.html;;
         #libreoffice)  url=https://documentation.libreoffice.org/en/english-documentation;;
         linux)         url=https://www.kernel.org;;
@@ -164,6 +165,12 @@ GetConfigs() {
                         echo2 "Browser '$br' not found, using default $br_default."
                         br="$br_default"
                     fi
+                fi
+                if [ -n "$EOS_SEARCH_PROVIDER" ] ; then
+                    case "$EOS_SEARCH_PROVIDER" in
+                        duckduckgo | google) searcher="$EOS_SEARCH_PROVIDER" ;;
+                        *) echo2 "Search provider '$EOS_SEARCH_PROVIDER' not supported, using $searcher." ;;
+                    esac
                 fi
             }
             break
@@ -265,6 +272,7 @@ Main()
     local br_default="/usr/bin/xdg-open"
     local br="$br_default"
     local EOS_APPS_INFO_BROWSER=""
+    local searcher=duckduckgo
     local dir
 
     Options "$@"
@@ -289,6 +297,14 @@ Main()
     [ -z "$url" ] && URL_from_bonus
     [ -z "$url" ] && URL_from_local_man "$name"
     [ -z "$url" ] && URL_from_package "$name"
+    if [ "$EOS_APPS_INFO_SEARCH" = "enabled" ] ; then
+        if [ -z "$url" ] ; then
+            case "$searcher" in
+                duckduckgo)  url="https://duckduckgo.com/?q=$name" ;;
+                google)      url="https://www.google.com/search?q=$name" ;;
+            esac
+        fi
+    fi
 
     if [ -n "$url" ] ; then
         if [ "$return_url" = "yes" ] ; then
