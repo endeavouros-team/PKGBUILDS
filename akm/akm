@@ -5,7 +5,7 @@ Printf2() { printf "$@" >&2 ; }
 
 # use monospace (non-proportional) fonts!
 #FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
-FormatVersion()     { printf "%s  " "$1" ; }
+FormatVersion()     { printf "%s%s  " "$1" "$2" ; }
 FormatName()        { FormatVersion "$1" ; }
 
 RepoType() {
@@ -53,10 +53,19 @@ PkgName() {
 
 Installed() {
     local version xx
+    local running=$(pacman -Q $(cat /proc/cmdline | sed 's|.*/vmlinuz-\([^ ]*\) .*|\1|') | awk '{print $2}')
+    local ind
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
-        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+        ind=""
+        if [ "$version" = "$running" ] ; then
+            case "$xx" in
+                *-headers) ;;
+                *) ind=" <tt>$km</tt>"
+            esac
+        fi
+        cmd+=(--field="$(FormatVersion "$version" "$ind")":LBL "")            
     done
 }
 
@@ -365,6 +374,7 @@ Main()
     local KOVersionName="K.o.version"
     local xx
     local t1=""
+    local km="*"
 
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
     t1+="You can install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n"
@@ -373,7 +383,7 @@ Main()
     t1+="<tt>"
     t1+="    Choose        Checkboxes for installing/uninstalling kernel packages.\n"
     t1+="    PkgName       Kernel package name.\n"
-    t1+="    Installed     Currently installed kernel package versions.\n"
+    t1+="    Installed     Installed kernel package versions. A $km marks the currently running kernel.\n"
     t1+="    Stable        Versions available from the stable repos.\n"
     t1+="    Testing       Versions available from the testing repos.\n"
     t1+="    $KOName  Kernel category at kernel.org.\n"
