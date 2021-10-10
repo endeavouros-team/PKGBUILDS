@@ -54,7 +54,7 @@ _tr_add2 nb_tab_AddMoreApps       "Aggiungi altre App"
 _tr_add2 after_install_text       "Dopo le attività di installazione"
 
 _tr_add2 after_install_um         "Aggiorna i Mirrors"
-_tr_add2 after_install_umtip      "Aggiorna l'elenco dei mirror prima dell'aggiornamento del sistema"
+_tr_add2 after_install_umtip      "Aggiorna l'elenco dei mirrors prima dell'aggiornamento del sistema"
 
 _tr_add2 after_install_us         "Aggiorna il Sistema"
 _tr_add2 after_install_ustip      "Aggiorna software di sistema"
@@ -213,7 +213,7 @@ _tr_add2 after_install_themedef     "Tema di default per EndeavourOS di Xfce"
 _tr_add2 after_install_themedeftip  "Usa il tema di default per EndeavourOS di Xfce"
 
 # 2020-Jun-28:
-_tr_add2 after_install_pclean       "Configurazione della pulizia dei pachetti"
+_tr_add2 after_install_pclean       "Configurazione della pulizia dei pacchetti"
 _tr_add2 after_install_pcleantip    "Configura la pulizia del servizio di pulizia della cache dei pacchetti."
 
 # 2020-Jul-04:
@@ -221,10 +221,10 @@ _tr_add2 nb_tab_OwnCommands         "Comandi Personali"                   # modi
 _tr_add2 nb_tab_owncmds_text        "Comandi Personalizzati"               # modified 2020-Jul-08
 
 # 2020-Jul-08:
-_tr_add2 nb_tab_owncmdstip          "Aiuto sull'inserimento dei conmandi personali"
+_tr_add2 nb_tab_owncmdstip          "Aiuto sull'inserimento dei comandi personali"
 
 _tr_add2 add_more_apps_akm          "Un gestore del Kernel"
-_tr_add2 add_more_apps_akmtip       "Un piccolo programme di gestione del Kernel linux e informazione dei sorgenti"
+_tr_add2 add_more_apps_akmtip       "Un piccolo programma di gestione del Kernel linux e informazione dei sorgenti"
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help        "Tutorial: Comandi Personali"
@@ -280,7 +280,7 @@ _tr_add2 after_install_info           "informazione"                           #
 _tr_add2 butt_softnews                "Notizie sui programmi"
 _tr_add2 butt_softnews_tip            "Importanti notizie sui programmi di EndeavourOS"
 
-_tr_add2 install_community            "Installa le versioni della Communità"
+_tr_add2 install_community            "Installa le versioni della Comunità"
 _tr_add2 install_community_tip        "Versioni della Comunità: Sway, Bspwm (nota: richiesta la connessione internet)"
 
 # 2021-May-01
@@ -305,3 +305,7 @@ _tr_add2 after_install_vbox2         "Per abilitare le utilità di VirtualBox, s
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Problemi con la rete Lan (Ethernet)$_question Rimuovi il driver realtek r8168$_exclamation"
 _tr_add2 after_install_r8168_tip     "Rimuovendo il pacchetto driver realtek <b>r8168</b> potrebbe risolvere il problema della connessione (riavvio richiesto)"
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "informazioni"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "maggiori informazioni sul Desktop/Window Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
