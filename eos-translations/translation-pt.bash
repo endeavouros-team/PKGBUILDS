@@ -305,3 +305,7 @@ _tr_add2 after_install_vbox2         "Para ativar os utilitários VirtualBox Gue
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Ethernet issue$_question Remover r8168$_exclamation"
 _tr_add2 after_install_r8168_tip     "A remoção do pacote <b>r8168</b> pode corrigir falha de ligação por cabo (necessário reiniciar)"
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "informação"                                         # assumir o prefixo "DE:", por ex.: "Xfce: informação"
+_tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente gráfico/Gestor de janelas"  # assumir o prefixo "DE:", por ex.: "Xfce: mais informação ..."
