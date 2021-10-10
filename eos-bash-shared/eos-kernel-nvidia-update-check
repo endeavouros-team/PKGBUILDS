@@ -13,10 +13,15 @@ Main()
 {
     PATH=/usr/bin:$PATH
     lsmod | grep nvidia >/dev/null || exit 0                # NVIDIA not is use
-    /usr/bin/pacman -Qq nvidia-dkms >& /dev/null && exit 0  # stop if nvidia-dkms package is already installed
+
+    # stop if any nvidia dkms driver is installed
+    local pkg
+    for pkg in nvidia-dkms nvidia-390xx-dkms   # nvidia-340xx-dkms
+    do
+        /usr/bin/pacman -Qq $pkg >& /dev/null && exit 0
+    done
 
     local pkgs=("$@")
-    local pkg
     local linux_lts=no
     local linux=no
     local nvidia_lts=no
