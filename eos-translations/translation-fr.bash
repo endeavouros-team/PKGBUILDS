@@ -301,3 +301,7 @@ _tr_add2 after_install_vbox2         "Pour activer les outils invités de Virtua
 # 17-juin-2021
 _tr_add2 after_install_r8168         "Problème ethernet $_question Enlever r8168 $_exclamation"
 _tr_add2 after_install_r8168_tip     "Enlever le paquet <b>r8168</b> pourrait corriger des problèmes de connexion filaire (redémarrage requis)"
+
+# 08-octobre-2021
+_tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "plus d'informations sur cet environnement de bureau/gestionnaire de fen"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
