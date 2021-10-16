@@ -261,29 +261,65 @@ yad_vanilla_xfce4_theme() {
 export -f yad_vanilla_xfce4_theme
 
 yad_endeavouros_xfce4_theme() {
-    local log="$HOME/.config/EOS-xfce-theme.log"
+    local log2='$HOME/.config/EOS-xfce-theme.log'
+    local log="$(eval echo $log2)"
     local DE="$(eos_yad_GetDesktopName)"
     local new_theme_name="EndeavourOS default"
     case "$DE" in
         XFCE)
             local conf="$HOME/.config/xfce4"
+            local conf2='$HOME/.config/xfce4'
             local datetime="$(date '+%Y%m%d-%H:%M:%S')"
-            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
-            msg+="To restore the previous theme:\n     - remove folder <b>$conf</b>\n     - rename <b>$conf.$datetime</b> into <b>$conf</b>\n\n"
-            msg+="(Note: this info is stored into file $log).\n\n"
+            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf2.$datetime</b>\n\n"
+            msg+="To restore the previous theme:\n     - remove folder <b>$conf2</b>\n     - rename <b>$conf2.$datetime</b> into <b>$conf2</b>\n\n"
+            msg+="(Note: this info is stored into file $log2).\n\n"
             msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
             printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
             eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=preferences-desktop-theme \
                     --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
             case "$?" in
                 0)
+                    # Backup old xfce4 configuration.
                     mv $conf $conf.$datetime
+
                     # Fetch the EndeavourOS default Xfce theme from github.
                     local tmpdir=$(mktemp -d)
                     pushd $tmpdir >/dev/null
-                    git clone $(Github2Gitlab https://github.com/endeavouros-team/EndeavourOS-iso-next.git) 2>/dev/null
-                    mv EndeavourOS-iso-next/airootfs/etc/skel/.config/xfce4   "$(dirname "$conf")"
-                    mv EndeavourOS-iso-next/airootfs/etc/skel/.config/gtk-3.0 "$(dirname "$conf")"
+
+                    if [ 1 -eq 1 ] ; then
+                        git clone $(Github2Gitlab https://github.com/endeavouros-team/endeavouros-xfce4-theming.git) 2>/dev/null || {
+                            popd >/dev/null
+                            rm -rf $tmpdir
+                            return 1
+                        }
+                        local pkgs2=$(cat endeavouros-xfce4-theming/xfce4-packages-list)
+                        local pkg pkg2 group_members pkgs=""
+                        for pkg in $pkgs2 ; do
+                            pacman -Qq $pkg >& /dev/null && continue
+                            if pacman -Si $pkg >& /dev/null ; then
+                                pkgs+=" $pkg"
+                            else
+                                group_members="$(pacman -Sqg $pkg)"      # find group members
+                                for pkg2 in $group_members ; do
+                                    pacman -Qq $pkg2 >& /dev/null && continue
+                                    pkgs+=" $pkg2"
+                                done
+                            fi
+                        done
+                        if [ -n "$pkgs" ] ; then
+                            pkgs="${pkgs:1}"
+                            RunInTerminal "echo 'pacman -S $pkgs' ; $EOS_ROOTER 'pacman -S $pkgs'"
+                        fi
+                        dbus-launch dconf load / < endeavouros-xfce4-theming/xed.dconf
+                        mv endeavouros-xfce4-theming/.config/xfce4      "$(dirname "$conf")"
+                        mv endeavouros-xfce4-theming/.config/gtk-3.0    "$(dirname "$conf")"
+                    else
+                        # the old way
+                        git clone $(Github2Gitlab https://github.com/endeavouros-team/EndeavourOS-iso-next.git) 2>/dev/null
+                        mv EndeavourOS-iso-next/airootfs/etc/skel/.config/xfce4   "$(dirname "$conf")"
+                        mv EndeavourOS-iso-next/airootfs/etc/skel/.config/gtk-3.0 "$(dirname "$conf")"
+                    fi
+
                     popd >/dev/null
                     rm -rf $tmpdir
                     /usr/share/endeavouros/scripts/wallpaper-once -rr   # allows default wallpaper question after reboot
