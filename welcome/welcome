@@ -439,7 +439,7 @@ GeneralInfo() {
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
       --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
       --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com"
-      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/blog"
+      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/news"
       --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
       --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
       --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/endeavouros-tools/welcome"
