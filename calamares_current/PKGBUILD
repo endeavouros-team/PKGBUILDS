@@ -3,10 +3,10 @@
 # Multipurpose installer for arch based distros
 
 pkgname=calamares_current
-_eos_changes=Calamares_current
+_eos_changes=EndeavourOS-calamares
 _reponame=calamares
 pkgver=3.2.44.3
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -20,7 +20,7 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcorea
 provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
-  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=master"
+  "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
   "efi-boot-mountpoint.patch"
 )
@@ -33,7 +33,7 @@ sha256sums=(
 prepare() {
 
     mv $_reponame-$pkgver            $_reponame
-    rsync -va $_eos_changes/*        $_reponame
+    rsync -va $_eos_changes/calamares-extra-modules/*       $_reponame/
     rm -rf $_eos_changes
 
     mkdir -p $_reponame/build/$pkgname
@@ -105,4 +105,6 @@ package() {
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
 
+    rm -rf ../EndeavourOS-calamares-next    # cleanup
 }
+
