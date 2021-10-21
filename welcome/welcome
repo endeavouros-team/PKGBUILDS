@@ -400,11 +400,11 @@ INSTALL() {
 
       --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 "eos-install-mode-run-calamares '$lang' '' FALSE TRUE"   # pacman log by default
   )
-  if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
+  #if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
           --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community TRUE TRUE"  # show all logs
       )
-  fi
+  #fi
   tabcontents+=(
       --field=" $(ltr after_install_um)!$reflector_simple!$(ltr after_install_umtip)":fbtn          reflector-simple
   )
