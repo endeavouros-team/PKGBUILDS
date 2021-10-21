@@ -14,7 +14,7 @@ _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgna
 source=(
   $_url/$pkgname
 )
-sha512sums=('e05d17f089f0bf5e3590642399985a63cc76c6b49a9a6547010922910c0f1b2f71769219b9e379bccda584ee01488dd9bc7693c374c8610bd6041a897a1e6b4a')
+sha512sums=('6340959ab6f7e44cbb906ec95b8b59168f7a17c20809e8793fadbe325fd3760035df8091d4981d9c00982a26e912270bb7a3bee2a5f7f6901f3c9c7e922a5c39')
 
 package() {
   install -Dm644 $pkgname  $pkgdir/usr/share/bash-completion/completions/reflector
