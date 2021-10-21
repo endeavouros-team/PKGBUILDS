@@ -2,10 +2,10 @@
 
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-pkgname=EndeavourOS-iso-next
-pkgver=0.10
-pkgrel=3
-pkgdesc="Build EndeavourOS-iso-next"
+pkgname=EndeavourOS-ISO
+pkgver=0.11
+pkgrel=1
+pkgdesc="Build EndeavourOS ISO"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
 source=(git+https://github.com/endeavouros-team/$pkgname.git)
