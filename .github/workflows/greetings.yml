@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: PKGBUILDS
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Hei nice to see you start contributing to EndeavourOS'
+        pr-message: 'Thanks for your first Pull Request, we will rewiev and commit as fast as we can!'
