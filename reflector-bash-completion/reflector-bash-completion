@@ -17,7 +17,7 @@ _reflector_complete_countries() {
         country_names="$(cat $countrylist.$date)"
     else
         rm -f $countrylist.*
-        country_names="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed -e '1d' -e 's|^\([A-Z][a-zA-Z ]*[a-z]\).*$|\1|')"
+        country_names="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed -e '1d' -e 's|^\([A-Z][a-zA-Zé ]*[a-z]\).*$|\1|')"
         echo "$country_names" > $countrylist.$date
     fi
 

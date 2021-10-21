@@ -2,8 +2,8 @@
 
 pkgname=reflector-bash-completion
 pkgdesc="Bash completion support for 'reflector'"
-pkgver=1
-pkgrel=2
+pkgver=1.1
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(bash-completion
