@@ -31,7 +31,8 @@ Main() {
     local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
 
     case "$DE" in
-        SWAY | BSPWM) return ;;      # don't change wallpaper on community editions
+        SWAY | BSPWM | QTILE | OPENBOX)
+            return ;;      # don't change wallpaper on community editions
     esac
 
     case "$1" in
