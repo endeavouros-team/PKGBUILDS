@@ -135,71 +135,10 @@ run_hotfix_start() {
 
     if wget --timeout=30 -q -O $file $url ; then
         all_sudo_commands+="; bash $PWD/$file"
-        all_sudo_commands+="; echo '===> Hotfixes definition file fetched and executed.'"
+        all_sudo_commands+="; echo '===> Hotfixes definition file $file executed.'"
     else
         all_sudo_commands+="; echo '===> Fetching the hotfixes definition file failed!'"
     fi
-}
-
-fetch_community_files() {
-    local head=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next/raw/master/calamares)
-    local urls=(
-        $head/modules/packagechooser.conf
-        $head/modules/contextualprocess.conf
-        $head/ce/bspwm.txt
-        $head/ce/sway.txt
-        $head/images/bspwm.jpg
-        $head/images/community.jpg
-        $head/images/sway.jpg
-    )
-    curl -Lsm 20 --remote-name-all "${urls[@]}" || GUIDIE "Fetching community files failed."
-
-    all_sudo_commands+="; mkdir -p /etc/calamares/{ce,modules,images}"
-    all_sudo_commands+="; cp $PWD/*.txt  /etc/calamares/ce/"
-    all_sudo_commands+="; cp $PWD/*.conf /etc/calamares/modules/"
-    all_sudo_commands+="; cp $PWD/*.jpg  /etc/calamares/images/"
-    all_sudo_commands+="; echo '===> Community configurations and package lists were successfully updated!'"
-
-    return
-
-
-    # The following code is obsolete.
-
-    if [ "$EOS_FILESERVER_SITE" = "github" ] ; then
-        url=https://github.com/endeavouros-team/calamares_config_next
-        svn checkout $url/trunk/calamares/{ce,modules,images} || GUIDIE "svn checkout '$url' failed."
-        
-        all_sudo_commands+="; cp -R $PWD/ce      /etc/calamares/"
-        all_sudo_commands+="; cp -R $PWD/modules /etc/calamares/"
-        all_sudo_commands+="; cp -R $PWD/images  /etc/calamares/"
-    else
-        if [ 1 -eq 1 ] ; then
-            local head=https://gitlab.com/endeavouros-filemirror/calamares_config_next/raw/master/calamares
-            local urls=(
-                $head/modules/packagechooser.conf
-                $head/modules/contextualprocess.conf
-                $head/ce/bspwm.txt
-                $head/ce/sway.txt
-                $head/images/bspwm.jpg
-                $head/images/community.jpg
-                $head/images/sway.jpg
-            )
-            curl -Lsm 20 --remote-name-all "${urls[@]}" || GUIDIE "Fetching community files failed."
-
-            all_sudo_commands+="; mkdir -p /etc/calamares/{ce,modules,images}"
-            all_sudo_commands+="; cp $PWD/*.txt  /etc/calamares/ce/"
-            all_sudo_commands+="; cp $PWD/*.conf /etc/calamares/modules/"
-            all_sudo_commands+="; cp $PWD/*.jpg  /etc/calamares/images/"
-        else
-            url=$(eos-github2gitlab https://github.com/endeavouros-team/calamares_config_next.git)
-            git clone $url || GUIDIE "git clone '$url' failed."
-    
-            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/ce      /etc/calamares/"
-            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/modules /etc/calamares/"
-            all_sudo_commands+="; cp -R $PWD/calamares_config_next/calamares/images  /etc/calamares/"
-        fi
-    fi
-    all_sudo_commands+="; echo '===> Community configurations and package lists were successfully updated!'"
 }
 
 ###  Everything starts in the Main function. ###
@@ -237,13 +176,13 @@ Main() {
         "" | test) AskMode ;;
     esac
 
+    if eos-connection-checker ; then
+        run_hotfix_start              # run possible hotfixes before copying settings.conf file
+    fi
+
     # copy config files based on $mode
 
     pushd $workdir 2>/dev/null || GUIDIE "cannot go to folder $workdir"
-
-    case "$mode" in
-        community) fetch_community_files ;;
-    esac
 
     case "$mode" in
         online | offline | community)
@@ -255,10 +194,7 @@ Main() {
             ;;
     esac
 
-    if eos-connection-checker ; then
-        run_hotfix_start
-    fi
-
+    # now actually run hotfixes and copy settings.conf
     sudo bash -c "${all_sudo_commands[*]}"
 
     popd 2>/dev/null
