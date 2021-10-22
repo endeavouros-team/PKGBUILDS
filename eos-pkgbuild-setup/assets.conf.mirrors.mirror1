@@ -28,8 +28,11 @@ local PKGNAMES=(                                    # actually: dir names for pa
     arc-gtk-theme-eos
     aur/arc-x-icons-theme
     aur/bashdb
-    calamares_config_next
-    calamares_next
+    #calamares_config_next
+    #calamares_next
+    calamares_config_ce
+    calamares_config_default
+    calamares_current
     ckbcomp
     aur/downgrade
     endeavouros-skel-i3wm
@@ -42,6 +45,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-bash-shared
     eos-skel-ce-bspwm
     eos-skel-ce-sway
+    eos-skel-ce-openbox
+    eos-skel-ce-qtile
     eos-hooks
     eos-log-tool
     eos-rankmirrors
