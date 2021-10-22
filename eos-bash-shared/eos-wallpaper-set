@@ -155,8 +155,20 @@ WallpaperSetCommon() {
             AssertPicture endeavouros-wallpaper.png no
             nitrogen --set-auto "$pic"
             ;;
+        OPENBOX)
+            AssertPicture endeavouros-wallpaper.png no
+            nitrogen --set-auto "$pic"
+            ;;
+        QTILE)
+            AssertPicture endeavouros-wallpaper.png no
+            feh --bg-scale "$pic"
+            ;;
         *)
-            DIE "Sorry, desktop '$DE' is not supported."
+            echo "$progname: info: not setting wallpaper to $DE ..." >&2
+
+            #AssertPicture endeavouros-wallpaper.png no
+            #feh --bg-scale "$pic"
+            #DIE "Sorry, desktop '$DE' is not supported."
             ;;
     esac
 }

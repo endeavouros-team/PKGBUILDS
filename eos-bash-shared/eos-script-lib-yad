@@ -408,6 +408,11 @@ eos_yad__detectDE()
         # neofetch differs: KDE -> plasma (with DESKTOP_SESSION=openbox-kde and DESKTOP_SESSION=plasma)
         [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr [:upper:] [:lower:])"
     fi
+    if [ -z "$DE" ] ; then
+        if [ -x /usr/bin/qtile ] && [ -d /usr/share/doc/qtile ] ; then
+            DE="qtile"
+        fi
+    fi
 }
 
 eos_yad_GetDesktopName() {      # return DE name in uppercase letters
