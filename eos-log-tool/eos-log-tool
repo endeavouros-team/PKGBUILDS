@@ -204,6 +204,8 @@ Main()
     local grub="/boot/grub/grub.cfg"
     local pacmanconf="/etc/pacman.conf"
     local blame="systemd-analyze blame"
+    local fdisk="fdisk -l"
+    local lsblk="lsblk -fm"
     local lspci="lspci -vnn"
     local lsusb="lsusb"
     local hwinfo="hwinfo --short"
@@ -251,6 +253,8 @@ Main()
         false "$lightdm"    "Display manager log"
         false "$lightdm2"   "Display manager log, X server related"
         false "$fstab"      "Static information about the filesystem"
+        false "$lsblk"      "List information about disks, partitions, labels, uuids, ..."
+        false "$fdisk"      "Another list of disk and partition information"
     )
     IsInstalled grub && log_tool_cmd+=(false "$grub" "Grub configuration file")
     log_tool_cmd+=(
@@ -271,6 +275,7 @@ Main()
             "$journal0") Cmd pkexec $xx ;;
             "$journal1") Cmd pkexec $xx ;;
             "$journal2") Cmd pkexec $xx ;;
+            "$fdisk")    Cmd pkexec $xx ;;
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
             "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
@@ -298,6 +303,7 @@ Main()
             "$fstab")    Cmd cat /etc/fstab ;;
             "$pacmanconf") Cmd cat $pacmanconf ;;
             "$blame")    Cmd systemd-analyze blame ;;
+            "$lsblk")    Cmd $xx ;;
             "$lspci")    Cmd $xx ;;
             "$lsusb")    Cmd $xx ;;
             "$hwinfo")   Cmd $xx ;;
