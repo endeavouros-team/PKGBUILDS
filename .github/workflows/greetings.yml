@@ -4,7 +4,7 @@ on: [pull_request, issues]
 
 jobs:
   greeting:
-    runs-on: PKGBUILDS
+    runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
