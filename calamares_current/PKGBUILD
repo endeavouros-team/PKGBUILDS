@@ -44,6 +44,7 @@ prepare() {
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g" $_reponame/CMakeLists.txt
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $_reponame/src/modules/initcpio/InitcpioJob.cpp
+    sed -i "s?modules = []?modules = [\"vmd\"] $_reponame/src/modules/initcpiocfg/main.py
 
     
     # set pacman flags on the run
