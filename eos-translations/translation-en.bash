@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Software News"
 _tr_add2 butt_softnews_tip            "Important news about EndeavourOS software"
 
 _tr_add2 install_community            "Install community editions"
-_tr_add2 install_community_tip        "Community editions: Sway, Bspwm (note: online required)"
+_tr_add2 install_community_tip        "Community editions collection (online required)"    # changed 2021-Oct-23
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "How to share system logs"

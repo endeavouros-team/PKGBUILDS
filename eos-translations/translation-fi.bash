@@ -280,8 +280,8 @@ _tr_add2 after_install_info           "tietoa"                           # last 
 _tr_add2 butt_softnews                "Ohjelmistouutisia"
 _tr_add2 butt_softnews_tip            "Tärkeitä uutisia EndeavourOS:n ohjelmistosta"
 
-_tr_add2 install_community            "Asenna yhteisön kanssa tehty julkaisu"
-_tr_add2 install_community_tip        "Yhteisön kanssa tehdyt julkaisut: Sway, Bspwm (huomaa: internet-yhteys tarvitaan)"
+_tr_add2 install_community            "Asenna yhteisömme kanssa tehty julkaisu"
+_tr_add2 install_community_tip        "Valitse haluamasi yhteisöjulkaisu (huomaa: internet-yhteys tarvitaan)"
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "Kuinka saan järjestelmän lokit"
