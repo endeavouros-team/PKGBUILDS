@@ -36,7 +36,6 @@ sha256sums=(
 )
 
 prepare() {
-
     mv $_reponame-$pkgver            $_reponame
     rsync -va $_eos_changes/calamares-extra-modules/*       $_reponame/
     rm -rf $_eos_changes
@@ -66,10 +65,7 @@ prepare() {
     patch -u $_reponame/src/modules/packagechooser/PackageChooserPage.cpp -i packagechooser-coverimage.patch
 }
 
-
-
 build() {
-
     cd $_reponame/build
     # -DBoost_NO_BOOST_CMAKE=ON
     # bug https://github.com/calamares/calamares/issues/1257
@@ -96,7 +92,6 @@ build() {
     summaryq tracking usersq webview welcomeq"
     export DESTDIR="$srcdir/$_reponame/build/$pkgname"
     make -j4 install
-
 }
 
 package() {
