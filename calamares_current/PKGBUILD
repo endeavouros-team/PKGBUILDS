@@ -6,7 +6,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 pkgver=3.2.44.3
-pkgrel=3
+pkgrel=4
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -44,7 +44,7 @@ prepare() {
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g" $_reponame/CMakeLists.txt
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $_reponame/src/modules/initcpio/InitcpioJob.cpp
-    sed 's|^\([ ]*modules = \)\[\]$|\1["vmd"]|' $_reponame/src/modules/initcpiocfg/main.py
+    sed -i 's|^\([ ]*modules = \)\[\]$|\1["vmd"]|' $_reponame/src/modules/initcpiocfg/main.py
     
     # set pacman flags on the run
     # sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
