@@ -26,6 +26,7 @@ source=(
   "vmd-mkinitcpio.patch"
   "packagechooser-coverimage.patch"
 )
+
 sha256sums=(
 'SKIP'
 'SKIP'
