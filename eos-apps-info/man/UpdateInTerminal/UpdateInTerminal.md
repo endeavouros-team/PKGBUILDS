@@ -13,3 +13,7 @@ UpdateInTerminal [options]
 --noaur  Don't check AUR updates.
 --nt     Start a new terminal window for checking updates.
 ```
+
+## See also
+
+[Welcome documentation](https://discovery.endeavouros.com/endeavouros-tools/welcome/) especially about which terminal program to use.
