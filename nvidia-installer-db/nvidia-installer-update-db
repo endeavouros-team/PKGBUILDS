@@ -29,8 +29,8 @@ GetNvidiaBranch() {
 
 GetNvidiaIds() {
     local branch="$1"
-    local ids="$(wget -q --timeout=10 -O- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
-    [ -n "$ids" ] || ids="$(wget -q --timeout=10 -O- https://us.download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
+    local ids="$(curl -Lsm 10 -o- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
+    [ -n "$ids" ] || ids="$(curl -Lsm 10 -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     test -n "$ids" || DIE "$FUNCNAME: fetching ids from branch '$branch' failed."
     
     ids="$(echo "$ids" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | grep "</td>" | grep "<td>")"
@@ -46,10 +46,14 @@ NvidiaIdsCommon() {
     test -n "$branch" || DIE "$FUNCNAME: GetNvidiaBranch failed."
     if [ "$series" = "latest" ] && [ "$branch" != "$pacman_latest_branch" ] ; then
         cat <<EOF >&2
+
 Warning from $PROGNAME:
-    The driver version from the nvidia.com site is '$branch', pacman version is '$pacman_latest_branch'.
-    Thus the updated database of card ids may not be fully accurate.
-    It is recommended to run this again after having the pacman version updated.
+    The nvidia.com site lists a new driver ($branch) and an updated database of card ids.
+    The driver from pacman has a different version ($pacman_latest_branch).
+    Thus the new database will reflect the state of
+    the nvidia.com's driver, not the pacman's driver.
+    It is recommended to run $PROGNAME again after having
+    the pacman version updated to the nvidia.com version.
 EOF
         if [ "$targetdir" != "/tmp" ] ; then
             read -p "Want to proceed with the db update (Y/n)? "
@@ -232,6 +236,7 @@ CreateNvidiaDb()
     Info "Fetching NVIDIA graphics card ids from nvidia.com ..."
 
     nvidia_ids_latest="$(NvidiaIdsLatest)"
+    [ $? -eq 0 ] || return 1
     test -n "$nvidia_ids_latest" || DIE "cannot fetch latest NVIDIA ids"
 
     if [ "$legacy_available" = "yes" ] ; then
