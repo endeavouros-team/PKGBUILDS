@@ -280,7 +280,7 @@ _tr_add2 butt_softnews                "Apps Neuigkeiten"
 _tr_add2 butt_softnews_tip            "Wichtige Meldungen über EndeavourOS Apps"
 
 _tr_add2 install_community            "Installiere Community Editionen"
-_tr_add2 install_community_tip        "Community Editionen: Sway, Bspwm (Bemerkung: Benötigt eine Internet Verbindung)"
+_tr_add2 install_community_tip        "Community Editionen (Bemerkung: Benötigt eine Internet Verbindung)"  # changed 2021-Oct-23
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "Wie teile ich Systemlogs ?"
