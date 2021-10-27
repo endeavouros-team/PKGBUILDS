@@ -48,10 +48,9 @@ NvidiaIdsCommon() {
         cat <<EOF >&2
 
 Warning from $PROGNAME:
-    The nvidia.com site lists a new driver ($branch) and an updated database of card ids.
+    The nvidia.com site has database of card ids for the new driver ($branch).
+    Thus the nvidia.com database will reflect the new driver.
     The driver from pacman has a different version ($pacman_latest_branch).
-    Thus the new database will reflect the state of
-    the nvidia.com's driver, not the pacman's driver.
     It is recommended to run $PROGNAME again after having
     the pacman version updated to the nvidia.com version.
 EOF
