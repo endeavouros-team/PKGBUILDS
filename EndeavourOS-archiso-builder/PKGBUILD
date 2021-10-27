@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-ISO
 pkgver=0.11
-pkgrel=1
+pkgrel=2
 pkgdesc="Build EndeavourOS ISO"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
@@ -78,7 +78,7 @@ build() {
     pushd $tmpdir/$pkgname >/dev/null
     if [ "$FAKE_BUILD_TEST" != "yes" ] ; then
         sudo ./fix_permissions.sh
-        time sudo ./mkarchiso -o $build_rootdir .
+        time sudo ./mkarchiso -o $build_rootdir . | tee $build_rootdir/eos-iso-build.log
     else
         touch $build_rootdir/$iso
     fi
