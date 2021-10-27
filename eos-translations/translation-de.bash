@@ -300,8 +300,12 @@ _tr_add2 daily_assist_apps           "Applikationskategorien"
 _tr_add2 daily_assist_apps_tip       "Applikationen sortiert nach Kategorie"
 
 _tr_add2 after_install_vbox1         "Aktiviere VirtualBox Gast Erweiterung"
-_tr_add2 after_install_vbox2         "Um die VirtualBox Gast Erweiterungen zu aktivieren, selektiere den <b>AfterInstall</b> tab und klicke den Button "
+_tr_add2 after_install_vbox2         "Um die VirtualBox Gast Erweiterungen zu aktivieren, wähle den <b>AfterInstall</b> tab und klicke den Button "
 
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Netzwerk-Probleme$_question Entferne r8168$_exclamation"
 _tr_add2 after_install_r8168_tip     "Entfernen von Paket <b>r8168</b> könnte Probleme mit der Kabelverbindung beheben (Neustart erforderlich)"
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "Information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "Mehr Informationen über Desktop/WM"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
