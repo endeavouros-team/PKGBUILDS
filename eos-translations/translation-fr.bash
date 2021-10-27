@@ -277,7 +277,7 @@ _tr_add2 butt_softnews                "Nouvelles logicielles"
 _tr_add2 butt_softnews_tip            "Nouvelles importantes sur les logiciels d'EndeavourOS"
 
 _tr_add2 install_community            "Installer édition communautaire"
-_tr_add2 install_community_tip        "Collection  des éditions communautaire : Sway, Bspwm (note: connexion internet requise)" # changé le 23-Oct-2021
+_tr_add2 install_community_tip        "Collection des éditions communautaire (note: connexion internet requise) : " # changé le 23-Oct-2021
 
 # 1er-mai-2021
 _tr_add2 ins_syslog                   "Partager les logs système"
