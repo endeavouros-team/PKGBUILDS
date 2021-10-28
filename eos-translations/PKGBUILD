@@ -4,7 +4,7 @@
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
 pkgver=1.1.42
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(bash)
@@ -16,7 +16,6 @@ url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgnam
 
 source=(
   $url/translations.bash
-  $url/translations-reference.bash
   $url/translation-de.bash
   $url/translation-en.bash
   $url/translation-es.bash
@@ -40,7 +39,6 @@ source=(
   $url/translation-zh_CN.bash
 )
 sha512sums=('dacbbddc30d6c055c8bd530f8e0051cca917a26f0c8c35f08f00e2b241ebe6acbd7cdf7f23d22959db45329c9e24a8436204b2501a896d3991f74fe32a03e449'
-            '394ac7527470178e33c655e6804c62389140bacd3dee0b8846d46c4fd6e70401e92a16182e981ef1ff7085df4d9e3d04483c7a974a435c76ff07f4134965bed7'
             '502afc0d2ff36ad2f1740da436223d93e80d4e1d046f1bfbfb06a60ae1ccd98159ba059b7d755c1b8e69ddbc58b3bc3364bccaa39b7a98e23cd8c7e9d58b7122'
             '883bb88a27253d4d4270e207b5977f1a79322bda5aaa48c83121ce186e444562610f2187e4a9cb964f89e8d61a4f41ebaa29ea714383b318d110d3015f96a683'
             '7dcc1bdbf0ed77482c536860e1972994dfcc13dbd337314128eafb5dca2d10d024d2c5c83ac628547da1e0e0eee8833b9392e98dda1d1010effb33ee2ade8827'
@@ -70,7 +68,6 @@ package() {
   install -d $pkgdir/$folderspec
 
   install -Dm644 translations.bash             $pkgdir/$folderspec/translations.bash
-  install -Dm644 translations-reference.bash   $pkgdir/$folderspec/translations-reference.bash
 
   for xx in "${source[@]}" ; do
     case "$xx" in
