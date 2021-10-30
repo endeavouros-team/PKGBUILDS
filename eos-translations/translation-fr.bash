@@ -273,7 +273,7 @@ _tr_add2 after_install_more_wall      "Télécharger plus de fonds d'écran d'En
 _tr_add2 after_install_more_wall_tip  "Télécharger les anciens fonds d'écrans d'EndeavourOS et ceux de la communauté"
 _tr_add2 after_install_info           "information"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Nouvelles logicielles"
+_tr_add2 butt_softnews                "Nouvelles des logiciels"
 _tr_add2 butt_softnews_tip            "Nouvelles importantes sur les logiciels d'EndeavourOS"
 
 _tr_add2 install_community            "Installer édition communautaire"
