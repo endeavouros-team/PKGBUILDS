@@ -4,7 +4,7 @@
 # Initial Maintainer: joekamprad <archlinux@kamprad.net>
 
 pkgname=nvidia-installer-db
-pkgver=2.4.27
+pkgver=2.5
 pkgrel=1
 pkgdesc="Database for the script to setup nvidia drivers in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -15,6 +15,7 @@ license=('GPL2')
 source=(
     $_url/nvidia-installer-update-db
     $_url/nvidia-installer-check
+    $_url/supported-nvidia-driver-branches
     $_url/amdgpu_exp.ids
     $_url/amdgpu.ids
     $_url/ati.ids
@@ -24,6 +25,7 @@ source=(
 )
 sha256sums=('4714c4574000267c1c5a956414a4a3006b624380649713353e865efc751b4da6'
             '8b9dff914528737c92f4fb78699efcf49813931961d9b8cef3a3527761a99661'
+            '226f3793ddf4552ce92a4ee8f5eaf7aa7be17631f4f2c2e9c481bbe2a5e98219'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
             'fcbdc5e83b5b301163194f7da95e8c24c65afca41e2b1450ce8985b25bf4b270'
@@ -32,8 +34,9 @@ sha256sums=('4714c4574000267c1c5a956414a4a3006b624380649713353e865efc751b4da6'
             '2bace35def6c1ed373bfb8b5a583cd58f64152eee944873d560877dfebcfccdf')
 
 package() {
-    install -Dm755 nvidia-installer-update-db $pkgdir/usr/bin/nvidia-installer-update-db
-    install -Dm755 nvidia-installer-check     $pkgdir/usr/bin/nvidia-installer-check
+    install -Dm755 nvidia-installer-update-db       $pkgdir/usr/bin/nvidia-installer-update-db
+    install -Dm755 nvidia-installer-check           $pkgdir/usr/bin/nvidia-installer-check
+    install -Dm755 supported-nvidia-driver-branches $pkgdir/usr/bin/supported-nvidia-driver-branches
 
     local xx
     for xx in *.ids *.metainfo ; do
