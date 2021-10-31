@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Add missing kernel parameter nvidia-drm.modeset=1 to /etc/default/grub.
+
+SetKernelParameter() {
+    # return value:
+    #   0 = parameter was added
+    #   * = parameter was not added (already exists or a failure)
+
+    local pname="$1"      # parameter name in $file
+    local pvalue="$2"     # parameter value in $file
+
+    local file=/etc/default/grub
+    local varname="GRUB_CMDLINE_LINUX_DEFAULT"
+    local currline="$(grep ^"$varname"= $file | grep "$pname"=)"
+
+    if [ -n "$currline" ] ; then
+        printf "==> already set:\n%s\n" "$currline"
+        return 1    # nothing changed
+    fi
+
+    echo "==> adding kernel parameter $pname=$pvalue"
+    sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $pname=$pvalue\"|"
+}
+
+Main() {
+    SetKernelParameter "nvidia-drm.modeset" "1"
+}
+
+Main "$@"

@@ -297,6 +297,20 @@ def patch_nvidia_settings(patch=True):
                 msg = "Cannot modify {0} file : {1}"
                 log_warning(msg.format(desktop_path, err.output.decode()))
 
+def nvidia_kernel_params():
+    """ Fix Nvidia kernel parameters """
+    log_info("Patching kernel line with nvidia-drm.modeset=1")
+    cmd = ["nvidia-installer-kernel-para"]
+    if TEST:
+        log_info(" ".join(cmd))
+    else:
+        try:
+            subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as err:
+            return False
+
+    return True
+
 
 def remove_file(path):
     """ Removes file if exists """
@@ -342,6 +356,9 @@ def post_install(driver):
         # not bumblebee
         enable_service("bumblebeed.service", False)
         patch_nvidia_settings(False)
+        # add kernel parameter (disabled for now!)
+        if False and driver.startswith("nvidia"):
+            nvidia_kernel_params()
 
     if driver.startswith("nvidia"):
         create_nvidia_conf(nvidia_conf_path)
@@ -572,7 +589,13 @@ def main():
             "Your graphics card is not in our database. "
             "Forcing nvidia-dkms driver installation anyways...")
         log_warning(msg)
-        msg = ("For an older card this command may be needed before reboot: yay -S nvidia-390xx-dkms")
+        msg = (
+            "\n"
+            "  An older card needs an older driver installed before reboot.\n"
+            "  See https://www.nvidia.com/en-us/drivers/unix about supported driver versions\n"
+            "  and install the correct driver e.g. with command:\n"
+            "      yay -S nvidia-470xx-dkms\n"
+            "  (the above example was for the 470 series driver).")
         log_warning(msg)
         driver = "nvidia-dkms"
 
