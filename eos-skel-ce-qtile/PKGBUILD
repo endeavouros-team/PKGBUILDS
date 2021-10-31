@@ -3,7 +3,7 @@
 _pkgname=qtile
 pkgname=eos-skel-ce-qtile
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Pre user creation skel setup for Qtile EOS-CE"
 arch=('any')
 groups=('eos-ce')
