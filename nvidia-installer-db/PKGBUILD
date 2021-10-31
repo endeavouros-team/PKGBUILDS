@@ -15,7 +15,7 @@ license=('GPL2')
 source=(
     $_url/nvidia-installer-update-db
     $_url/nvidia-installer-check
-    $_url/supported-nvidia-driver-branches
+    $_url/nvidia-driver-supported-branches
     $_url/amdgpu_exp.ids
     $_url/amdgpu.ids
     $_url/ati.ids
@@ -36,7 +36,7 @@ sha256sums=('4714c4574000267c1c5a956414a4a3006b624380649713353e865efc751b4da6'
 package() {
     install -Dm755 nvidia-installer-update-db       $pkgdir/usr/bin/nvidia-installer-update-db
     install -Dm755 nvidia-installer-check           $pkgdir/usr/bin/nvidia-installer-check
-    install -Dm755 supported-nvidia-driver-branches $pkgdir/usr/bin/supported-nvidia-driver-branches
+    install -Dm755 nvidia-driver-supported-branches $pkgdir/usr/bin/nvidia-driver-supported-branches
 
     local xx
     for xx in *.ids *.metainfo ; do
