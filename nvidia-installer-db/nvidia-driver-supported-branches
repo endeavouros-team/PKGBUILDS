@@ -71,15 +71,11 @@ ShowDriversForId() {
     for ix in 495 470 390 340 ; do
         bname="${bnames[$ix]}"
         ids="$(GetNvidiaIds "$bname")"
-        if [ "$all" = "no" ] ; then
+        if [ -n "$(echo "$ids" | grep "$id")" ] ; then
             echo "Series $ix : supported"
-            break
+            [ "$all" = "no" ] && return
         else
-            if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-                echo "Series $ix : supported"
-            else
-                echo "Series $ix : not supported"
-            fi
+            [ "$all" = "yes" ] && echo "Series $ix: not supported"
         fi
     done
 }
@@ -100,10 +96,21 @@ Options() {
 
             -h | --help)
                 cat <<EOF >&2
-Usage: $progname [options]
+Usage: $progname [options] [parameters]
+
 Options:
   -a, --all         Show status for all available driver branches.
   -h, --help        This help.
+
+Parameters:
+  card_id           Nvidia card id (4 hex numbers, lower case letters).
+                    Example: 1b83
+                    Note: card_id is an optional parameter.
+
+Tip: the "card_id" value can be found with command:
+
+  lspci -vnn | grep -P 'VGA|3D|Display' | sed 's|.*\[10de:\([0-9a-f]*\)\].*|\1|'
+
 EOF
                 exit 0
                 ;;
@@ -112,11 +119,13 @@ EOF
         esac
         shift
     done
+    nvidia_id="$1"
 }
 
 Main() {
     local progname="$(basename "$0")"
     local all=no
+    local nvidia_id=""
 
     Options "$@"
 
@@ -130,7 +139,9 @@ Main() {
     bnames["390"]="390.xx series"
     bnames["340"]="340.xx series"
 
-    local nvidia_id="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
+    if [ -z "$nvidia_id" ] ; then
+        nvidia_id="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
+    fi
     if [ -n "$nvidia_id" ] ; then
         ShowDriversForId $nvidia_id
     fi
