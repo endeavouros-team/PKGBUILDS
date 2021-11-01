@@ -72,7 +72,7 @@ ShowDriversForId() {
         bname="${bnames[$ix]}"
         ids="$(GetNvidiaIds "$bname")"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-            echo "Series $ix : supported"
+            echo "Series $ix: supported"
             [ "$all" = "no" ] && return
         else
             [ "$all" = "yes" ] && echo "Series $ix: not supported"
