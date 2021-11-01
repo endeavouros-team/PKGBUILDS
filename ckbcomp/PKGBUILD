@@ -15,7 +15,7 @@ url=https://salsa.debian.org/installer-team/$_parentname
 license=('GPL2')
 depends=('perl')
 source=($url/-/archive/$pkgver/${_parentname}-$pkgver.tar.gz)
-sha512sums=('1736f760ce098f1b62157ca354b55c0ef65d7ee5a5bfe5113d08a92d29b0d31f9740d1d8af75690b4c2969c34dbf49d551dcfbcc471624ec031bde415144ae42')
+sha512sums=('7de37b34735139f517ecb1f10748bd69a263e59a3ef7eacfd67dc86b101ff66c4f58b29dace8351adead8c4d696203cc86402c4f93c6663f24c8efc6e9d14079')
 
 package() {
     rm -f ../${_parentname}-$pkgver.tar.gz   # cleanup
