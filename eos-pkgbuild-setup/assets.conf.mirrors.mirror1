@@ -238,7 +238,7 @@ _ckbcomp_hook() {
             printf "sorry, ckbcomp is not installed, cannot compare. " >&2
         else
             if (! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null) ; then
-                printf "new version $newver is available. " >&2
+                printf "new version $newver is available, $tool differ. " >&2
             fi
         fi
     fi
