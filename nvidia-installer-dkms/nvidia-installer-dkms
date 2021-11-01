@@ -357,7 +357,7 @@ def post_install(driver):
         enable_service("bumblebeed.service", False)
         patch_nvidia_settings(False)
         # add kernel parameter (disabled for now!)
-        if False and driver.startswith("nvidia"):
+        if driver.startswith("nvidia"):
             nvidia_kernel_params()
 
     if driver.startswith("nvidia"):
