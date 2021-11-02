@@ -1,7 +1,7 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
 
 pkgname=endeavouros-mirrorlist
-pkgver=4.1
+pkgver=4.2
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
