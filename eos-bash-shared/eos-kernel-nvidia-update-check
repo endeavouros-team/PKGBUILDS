@@ -17,9 +17,7 @@ Main()
     # stop if any nvidia dkms driver is installed
     local known_nvidia_dkms_drivers=(
         nvidia-dkms
-        nvidia-470xx-dkms
-        nvidia-390xx-dkms
-        # nvidia-340xx-dkms
+        $(yay -Ssq nvidia xx-dkms | grep -Pv '430|340' | sort -r | head -n2)  # 2 latest from AUR
     )
     local pkg
     for pkg in "${known_nvidia_dkms_drivers[@]}"
