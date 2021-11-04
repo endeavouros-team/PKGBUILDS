@@ -66,16 +66,16 @@ _paccache_cleaner_manager()
     local result=""
     local field_nr=1
     local indent="<tt>  </tt>"
-    local du="$(LANG=C /usr/bin/du --si -s /var/cache/pacman/pkg | /usr/bin/awk '{print $1}' | sed 's|G$||')"
-    local df="$(LANG=C /usr/bin/df --si | /usr/bin/grep -w / | /usr/bin/awk '{print $4}' | sed 's|G$||')"
+    local du="$(LANG=C /usr/bin/du --si -s /var/cache/pacman/pkg | /usr/bin/awk '{print $1}' | sed 's|\([KMGT]\)$| \1B|')"
+    local df="$(LANG=C /usr/bin/df --si | /usr/bin/grep -w /     | /usr/bin/awk '{print $4}' | sed 's|\([KMGT]\)$| \1B|')"
 
     GetCurrentValues
 
     txt="<b>Modifies the service that cleans up pacman cache periodically.\n"
     txt+="Below you'll see settings and their current values.\n\n"
     txt+="Current status:\n"
-    txt+="${indent}Package cache usage: $du GB\n"
-    txt+="${indent}Free space on disk: $df GB</b>\n"
+    txt+="${indent}Package cache usage: $du\n"
+    txt+="${indent}Free space on disk: $df</b>\n"
     txt+="\n"
 
     # List possible period values, and set the default
