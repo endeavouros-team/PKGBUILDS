@@ -56,6 +56,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     grub-tools
     aur/inxi
     keyserver-rank
+    aur/ly
     aur/mkinitcpio-openswap
     nvidia-hook
     nvidia-installer-db
