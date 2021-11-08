@@ -18,6 +18,7 @@ prepare() {
     cp    EndeavourOS-calamares/calamares/modules/packagechooser.conf              $_caldir/modules/
     cp    EndeavourOS-calamares/calamares/modules/contextualprocess.conf           $_caldir/modules/
     cp    EndeavourOS-calamares/calamares/modules/netinstall_community-base.conf   $_caldir/modules/
+    cp    EndeavourOS-calamares/calamares/modules/shellprocess_plist.conf          $_caldir/modules/
     cp    EndeavourOS-calamares/calamares/settings_community.conf                  $_caldir/
     cp -R EndeavourOS-calamares/calamares/images                                   $_caldir/
     cp -R EndeavourOS-calamares/calamares/ce                                       $_caldir/
