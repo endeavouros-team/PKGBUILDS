@@ -24,7 +24,7 @@ prepare() {
 
     cp $srcdir/EndeavourOS-calamares/calamares/files/netinstall.yaml  $srcdir/EndeavourOS-calamares/calamares/modules/
     rm $srcdir/EndeavourOS-calamares/calamares/settings_community.conf
-    rm $srcdir/EndeavourOS-calamares/calamares/modules/{contextualprocess.conf,packagechooser.conf,netinstall_community-base.conf,netinstall_community.conf}
+    rm $srcdir/EndeavourOS-calamares/calamares/modules/{contextualprocess.conf,packagechooser.conf,netinstall_community-base.conf,netinstall_community.conf,shellprocess_plist.conf}
     rm -R $srcdir/EndeavourOS-calamares/calamares/{ce,images}
 }
 
