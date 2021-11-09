@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_default
 pkgver=1.0
-pkgrel=9
+pkgrel=10
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
