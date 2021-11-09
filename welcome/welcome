@@ -625,7 +625,7 @@ AfterInstall() {
   if (IsR8168Card) ; then
       if [ -n "$(lsmod | grep r8169)" ] ; then
           tabcontents+=(
-              --field=" Wired net issues$_question Try r8168 driver$_exclamation!$system_software_update!Changing to r8168 driver.":fbtn "ethernet_use_8168"
+              --field=" Wired net issues$_question Try the r8168 driver package$_exclamation!$system_software_update!Changing to r8168 driver.":fbtn "ethernet_use_8168"
           )
       fi
   fi
@@ -1146,19 +1146,22 @@ export -f IsR8168Card
 
 ethernet_use_8168() {
     local cmds=""
-    cmds+="echo blacklist r8169 > /usr/lib/modprobe.d/r8168.conf"
-    cmds+="; modprobe -r r8169 2>/dev/null"
-    cmds+="; modprobe r8168"
-    cmds+="; systemctl restart NetworkManager"
-
     if (! IsInstalled r8168) ; then
         if (eos-connection-checker) ; then
-            cmds="pacman -S r8168; $cmds"
+            cmds="pacman -Syu r8168"
         else
-            w_WARN "sorry, cannot install r8168 because there's no internet connection."
-            return 1
+            local pkg="$(/usr/bin/ls -1 /opt/extra-drivers/r8168-*-x86_64.pkg.tar.zst 2>/dev/null)"  # may find it in /opt/extra-drivers !
+            if [ -n "$pkg" ] ; then
+                cmds="pacman -U $pkg"
+            else
+                w_WARN "sorry, cannot install r8168 because there's no internet connection."
+                return 1
+            fi
         fi
     fi
+    cmds+="; modprobe -r r8169 2>/dev/null"
+    cmds+="; modprobe r8168 2>/dev/null"
+    cmds+="; systemctl restart NetworkManager"
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
 export -f ethernet_use_8168
