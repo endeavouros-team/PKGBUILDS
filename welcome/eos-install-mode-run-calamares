@@ -55,6 +55,8 @@ InstallLog_Start() {
 ########## $log by $progname
 ########## Started (UTC): $(date -u "+%x %X")
 ########## Install mode: $mode
+########## ISO version: $(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
+
 EOF
     FollowFile "$log" "Install log" 20 20
 }
