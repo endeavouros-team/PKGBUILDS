@@ -398,7 +398,7 @@ INSTALL() {
       --image=$image
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 "eos-install-mode-run-calamares '$lang' '' FALSE TRUE"   # pacman log by default
+      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                 "eos-install-mode-run-calamares '$lang' '' FALSE FALSE"   # pacman log by default
   )
   #if [ "$EOS_COMMUNITY_EDITIONS" = "experimental" ] ; then
       tabcontents+=(
