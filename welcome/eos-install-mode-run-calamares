@@ -177,6 +177,9 @@ Main() {
     case "$mode" in
         "" | test) AskMode ;;
     esac
+    case "$mode" in
+        online) ShowPacmanLog=FALSE ;;  # calamares 3.2.46 shows package install progress bar
+    esac
 
     if eos-connection-checker ; then
         run_hotfix_start              # run possible hotfixes before copying settings.conf file
