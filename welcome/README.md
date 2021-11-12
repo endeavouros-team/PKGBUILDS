@@ -9,3 +9,7 @@ wallpaper-once.desktop | A launcher for wallpaper-once
 welcome | The welcome greeter app for both install phase and on the installed system
 welcome.desktop | A launcher for Welcome
 welcome-dnd | Support drag&drop for the Personal Commands
+
+## Known issues
+
+Welcome does not work well in a KDE/Wayland environment. The reason seems to be related to yad tabs. See https://github.com/frostworx/steamtinkerlaunch/issues/118.
