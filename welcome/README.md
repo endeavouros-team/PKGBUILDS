@@ -12,4 +12,5 @@ welcome-dnd | Support drag&drop for the Personal Commands
 
 ## Known issues
 
-Welcome does not work well in a KDE/Wayland environment. The reason seems to be related to yad tabs. See https://github.com/frostworx/steamtinkerlaunch/issues/118.
+Welcome does not work well in a KDE/Wayland environment. The reason seems to be related to yad tabs.<br>
+See https://github.com/v1cont/yad/issues/109 and https://github.com/frostworx/steamtinkerlaunch/issues/118.
