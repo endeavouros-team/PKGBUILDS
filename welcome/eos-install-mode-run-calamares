@@ -160,9 +160,9 @@ Main() {
     local all_sudo_commands=":"                 # all root commands will be collected to this variable!
     local workdir=""
 
-    # change bootloaderEntryName in bootloader.conf:
+    # change efiBootloaderId in bootloader.conf:
     sed -i $cfolder/modules/bootloader.conf \
-        -e "s|^bootloaderEntryName:.*|bootloaderEntryName: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|"
+        -e "s|^efiBootloaderId:.*|efiBootloaderId: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|"
 
     if [ "$I_am_only_testing" = "true" ] ; then
         Home=$HOME
