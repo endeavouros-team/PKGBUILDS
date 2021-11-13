@@ -161,8 +161,7 @@ Main() {
     local workdir=""
 
     # change efiBootloaderId in bootloader.conf:
-    sed -i $cfolder/modules/bootloader.conf \
-        -e "s|^efiBootloaderId:.*|efiBootloaderId: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|"
+    all_sudo_commands+="; sed -i $cfolder/modules/bootloader.conf -e 's|^efiBootloaderId:.*|efiBootloaderId: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|'"
 
     if [ "$I_am_only_testing" = "true" ] ; then
         Home=$HOME
