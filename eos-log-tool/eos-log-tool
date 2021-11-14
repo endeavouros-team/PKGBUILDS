@@ -120,6 +120,8 @@ RemovePersonalData() {
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
     local user
+    local ssid=$(iwgetid -r)
+    local mac=$(iwgetid -ra)
 
     # hide real user names (that are found in /etc/passwd) from logs
     for user in $(UserNames 1000 50000) ; do
@@ -143,8 +145,21 @@ RemovePersonalData() {
             -e "s|LOGNAME=$user|LOGNAME=_user_|" \
             -e "s|USERNAME=$user|USERNAME=_user_|" \
             -e "s|USER=$user|USER=_user_|" \
-            -e 's|192\.168\.[0-9]*\.[0-9]*|_ipv4_address_|' \
-            -e 's| fe80::[0-9a-f:]*\([ \.]\)|_ipv6_address_\1|'
+            -e 's| with address .*\.$| with address _ip_address_.|' \
+            -e 's| new address record for .* on \(.*\)$| new address record for _ip_address on \1|' \
+            -e "s| policy: set '.*' (\(.*\)) as default for | policy: set '_ssid_' (\1) as default for |" \
+            -e "s| connection '.*' | connection '_ssid_' |" \
+            -e "s|set MAC address to .* (|set MAC address to _mac_address (|" \
+            -e "s| associate with .* (| associate with _mac_address (|" \
+            -e "s| access point '.*' | access point '_ssid_' |" \
+            -e "s|'ssid' value '.*'$|'ssid' value '_ssid_'|" \
+            -e "s|(SSID='.*' |(SSID='_ssid_' |" \
+            -e 's| wireless network ".*"$| wireless network "_ssid_"|' \
+            -e 's|192\.168\.[0-9]*\.[0-9]*|_ip_address_|' \
+            -e 's| fe80::[0-9a-f:]*\([ \.]\)|_ip_address_\1|' \
+            -e "s|'$ssid'|'_ssid_'|" \
+            -e "s|$mac|_mac_address|"
+            
     done
 
     # hide hostname from logs
