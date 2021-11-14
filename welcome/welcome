@@ -122,7 +122,7 @@ export -f eos_yad_WARN_debug
 
 
 Welog() {
-    [ -d /home/$EOS_LIVEUSER ] && echo "$progname: " "$@" >> $INSTALL_LOG_FILE
+    [ -d /home/$EOS_LIVEUSER ] && echo "$PROGNAME: " "$@" >> $INSTALL_LOG_FILE
 }
 export -f Welog
 
@@ -1448,10 +1448,12 @@ StartHere() {
         fi
     else
         eos-kbd-set
-        if [ -r /etc/pacman.d/mirrorlist ] && [ ! -r /tmp/mirrorlist.bu ] ; then
-            cp /etc/pacman.d/mirrorlist /tmp/mirrorlist.bu  # to be checked by update-mirrorlist
-        else
-            Welog "Warning: cannot make a backup of mirrorlist!"
+        if [ ! -r /tmp/mirrorlist.bu ] ; then
+            if [ -r /etc/pacman.d/mirrorlist ] ; then
+                cp /etc/pacman.d/mirrorlist /tmp/mirrorlist.bu  # to be checked by update-mirrorlist
+            else
+                Welog "Warning: cannot make a backup of mirrorlist!"
+            fi
         fi
         #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
         #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
