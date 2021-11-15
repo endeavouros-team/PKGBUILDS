@@ -1166,6 +1166,46 @@ ethernet_use_8168() {
 }
 export -f ethernet_use_8168
 
+R8168check_at_install() {
+    local card8168="$(lspci -vnn | grep -w Ethernet | grep -w Realtek | grep -w 8168 )"
+    if [ -n "$card8168" ] ; then
+        # we have 8618 card
+        local cardid="$(echo "$card8168" | sed 's|.*\[\([^]]*\)\].*|\1|')"    # e.g. "10ec:8168"
+        case "$cardid" in
+            # 10ec:8168) ;;                # card id is known to work with kernel's r8169 module
+            *)
+                # Package r8168 is available in /opt/extra-drivers.
+                local txt=""
+                txt+="Your Ethernet card is set to use the kernel driver r8169 by default.\n"
+                txt+="In some rare cases the r8168 driver works better.\n"
+                txt+="If your Ethernet connection has problems with r8169, you can use the r8168 driver.\n"
+                local cmd=(
+                    eos_yad
+                    --form
+                    --image=dialog-question
+                    --title="Select the driver for the Realtek 8168 Ethernet card"
+                    --text="$txt"
+                    --button="r8168":1
+                    --button="r8169 (default)":3
+                )
+                "${cmd[@]}"
+                case "$?" in
+                    1)
+                        # use r8168 which is stored at /opt/extra-drivers
+                        local pkg="$(/usr/bin/ls -1 /opt/extra-drivers/r8168-*-x86_64.pkg.tar.zst 2>/dev/null)"
+                        if [ -n "$pkg" ] ; then
+                            sudo pacman -U --noconfirm $pkg
+                            sudo modprobe -r r8169 2>/dev/null
+                            sudo modprobe r8168 2>/dev/null
+                            sudo systemctl restart NetworkManager
+                        fi
+                        ;;
+                esac
+                ;;
+        esac
+    fi
+}
+
 MagicId() {
     local ENDEAVOUROS_TEAM=https://raw.githubusercontent.com/endeavouros-team
     if (! IsInstalling) ; then
@@ -1421,6 +1461,10 @@ StartHere() {
 
     IsInstalling
     test $? -eq 0 && is_installing=yes || is_installing=no
+
+    if [ "$is_installing" = "yes" ] ; then
+        R8168check_at_install
+    fi
 
     if [ "$start_delay" != "0" ] ; then
         ShowProgress "Sleeping..."
