@@ -623,9 +623,9 @@ AfterInstall() {
       --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
   if (IsR8168Card) ; then
-      if [ -n "$(lsmod | grep r8169)" ] ; then
+      if [ -n "$(lsmod | grep -Pw 'r8169|r8168')" ] ; then
           tabcontents+=(
-              --field=" Wired net issues$_question Try the r8168 driver package$_exclamation!$system_software_update!Changing to r8168 driver.":fbtn "ethernet_use_8168"
+              --field=" Wired net issues$_question Toggle between r8168 and r8169 drivers$_exclamation!$system_software_update!Toggle between r8168 and r8169 drivers.":fbtn "ethernet_toggle_r8168_r8169"
           )
       fi
   fi
@@ -1136,7 +1136,7 @@ IsR8168Card() {
         return 0
     fi
 
-    if [ -n "$(/usr/bin/lspci | /usr/bin/grep -w Ethernet | /usr/bin/grep -w 8168)" ] ; then
+    if [ -n "$(/usr/bin/lspci | /usr/bin/grep -w "Ethernet controller" | /usr/bin/grep -w 8168)" ] ; then
         return 0
     else
         return 1
@@ -1144,27 +1144,31 @@ IsR8168Card() {
 }
 export -f IsR8168Card
 
-ethernet_use_8168() {
+ethernet_toggle_r8168_r8169() {
     local cmds=""
     if (! IsInstalled r8168) ; then
         if (eos-connection-checker) ; then
-            cmds="pacman -Syu r8168"
+            cmds="pacman -Syu --noconfirm r8168"
         else
             local pkg="$(/usr/bin/ls -1 /opt/extra-drivers/r8168-*-x86_64.pkg.tar.zst 2>/dev/null)"  # may find it in /opt/extra-drivers !
             if [ -n "$pkg" ] ; then
-                cmds="pacman -U $pkg"
+                cmds="pacman -U --noconfirm $pkg"
             else
                 w_WARN "sorry, cannot install r8168 because there's no internet connection."
                 return 1
             fi
         fi
+        cmds+="; modprobe -r r8169 2>/dev/null"
+        cmds+="; modprobe r8168 2>/dev/null"
+    else
+        cmds+="; pacman -Rsn --noconfirm r8168"
+        cmds+="; modprobe -r r8168 2>/dev/null"
+        cmds+="; modprobe r8169 2>/dev/null"
     fi
-    cmds+="; modprobe -r r8169 2>/dev/null"
-    cmds+="; modprobe r8168 2>/dev/null"
     cmds+="; systemctl restart NetworkManager"
     RunInTerminal "$EOS_ROOTER '$cmds'"
 }
-export -f ethernet_use_8168
+export -f ethernet_toggle_r8168_r8169
 
 R8168check_at_install() {
     local card8168="$(lspci -vnn | grep -w Ethernet | grep -w Realtek | grep -w 8168 )"
