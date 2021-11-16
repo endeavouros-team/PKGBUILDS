@@ -625,7 +625,7 @@ AfterInstall() {
   if (IsR8168Card) ; then
       if [ -n "$(lsmod | grep -Pw 'r8169|r8168')" ] ; then
           tabcontents+=(
-              --field=" Wired net issues$_question Toggle between r8168 and r8169 drivers$_exclamation!$system_software_update!Toggle between r8168 and r8169 drivers.":fbtn "ethernet_toggle_r8168_r8169"
+              --field=" Wired net issues$_question Toggle r8168 and r8169 drivers$_exclamation!$system_software_update!Toggle between r8168 and r8169 drivers.":fbtn "ethernet_toggle_r8168_r8169"
           )
       fi
   fi
