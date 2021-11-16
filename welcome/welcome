@@ -1145,14 +1145,14 @@ IsR8168Card() {
 export -f IsR8168Card
 
 ethernet_toggle_r8168_r8169() {
-    local cmds=""
+    local cmds=":"
     if (! IsInstalled r8168) ; then
         if (eos-connection-checker) ; then
-            cmds="pacman -Syu --noconfirm r8168"
+            cmds+="; pacman -Syu --noconfirm r8168"
         else
             local pkg="$(/usr/bin/ls -1 /opt/extra-drivers/r8168-*-x86_64.pkg.tar.zst 2>/dev/null)"  # may find it in /opt/extra-drivers !
             if [ -n "$pkg" ] ; then
-                cmds="pacman -U --noconfirm $pkg"
+                cmds="; pacman -U --noconfirm $pkg"
             else
                 w_WARN "sorry, cannot install r8168 because there's no internet connection."
                 return 1
