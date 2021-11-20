@@ -87,11 +87,13 @@ AskMode() {
         --button="Online!!Vanilla theming, internet required":12
         --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
     )
+    if [ 0 -eq 1 ] ; then
     cmd+=(
         --field=' Install Log on Terminal!Show overall log about install on a terminal':CHK $ShowInstallLog
-        --field=' Pacman Log on Terminal!Show package management log on a terminal':CHK      $ShowPacmanLog
+        #--field=' Pacman Log on Terminal!Show package management log on a terminal':CHK      $ShowPacmanLog
         --field='':LBL ""
     )
+    fi
 
     local result
     result="$("${cmd[@]}")"       # ask mode from the user
@@ -104,8 +106,8 @@ AskMode() {
         13|14) mode=offline ;;
         252|*) exit $ret ;;
     esac
-    ShowInstallLog=$(echo "$result" | cut -d'|' -f1)
-    ShowPacmanLog=$( echo "$result" | cut -d'|' -f2)
+    #ShowInstallLog=$(echo "$result" | cut -d'|' -f1)
+    #ShowPacmanLog=$( echo "$result" | cut -d'|' -f2)
 }
 
 ### Starts the calamares installer process and logging. ###
@@ -151,8 +153,8 @@ Main() {
 
     local lang="$1"
     local mode="$2"                             # 'community' or '' (empty)
-    local ShowInstallLog="$3"
-    local ShowPacmanLog="$4"
+    local ShowInstallLog="TRUE"                 # TRUE --> show install log terminal window
+    local ShowPacmanLog="FALSE"                 # TRUE --> show pacman  log terminal window
     local progname="$(basename "$0")"           # for help and messages
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
@@ -179,9 +181,6 @@ Main() {
     # asks the value for $mode
     case "$mode" in
         "" | test) AskMode ;;
-    esac
-    case "$mode" in
-        online) ShowPacmanLog=FALSE ;;  # calamares 3.2.46 shows package install progress bar
     esac
 
     if eos-connection-checker ; then
