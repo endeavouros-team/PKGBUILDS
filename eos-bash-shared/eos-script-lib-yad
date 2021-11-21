@@ -404,21 +404,31 @@ eos_yad__detectDE()
     fi
 
     if [ -z "$DE" ] ; then
-        # neofetch fails: Enlightenment, openbox
-        # neofetch differs: KDE -> plasma (with DESKTOP_SESSION=openbox-kde and DESKTOP_SESSION=plasma)
-        [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr [:upper:] [:lower:])"
-    fi
-    if [ -z "$DE" ] ; then
         if [ -x /usr/bin/qtile ] && [ -d /usr/share/doc/qtile ] ; then
             DE="qtile"
         fi
     fi
+    if [ -z "$DE" ] ; then
+        if eos_IsSway ; then
+            DE=sway
+        elif eos_IsBspwm ; then
+            DE=bspwm
+        fi
+    fi
+
+    if [ -z "$DE" ] ; then
+        # neofetch fails: Enlightenment, openbox
+        # neofetch differs: KDE -> plasma (with DESKTOP_SESSION=openbox-kde and DESKTOP_SESSION=plasma)
+        [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr [:upper:] [:lower:])"
+    fi
 }
 
+# These 2 funcs return the DE/WM in upper case letters:
 eos_yad_GetDesktopName() {      # return DE name in uppercase letters
-    local de=$(eos_yad__detectDE && echo "$DE" | tr '[:lower:]' '[:upper:]')
-    echo "$de"
+    eos_yad__detectDE
+    echo "$DE" | tr '[:lower:]' '[:upper:]'
 }
+eos_GetDeOrWm() { eos_yad_GetDesktopName ; }
 
 eos_IsSway()  {
     case "$DESKTOP_SESSION" in
@@ -440,18 +450,6 @@ eos_IsBspwm() {
     esac
     [ -x /usr/bin/bspwm ] && return 0
     return 1
-}
-
-eos_GetDeOrWm() {
-    local de="$(eos_yad_GetDesktopName)"
-    if [ "$de" = "" ] ; then
-        if (eos_IsSway) ; then
-            de=SWAY
-        elif (eos_IsBspwm) ; then
-            de=BSPWM
-        fi
-    fi
-    echo "$de"
 }
 
 # DIE()  { eos_yad_DIE  "$@" ; }    # deprecated
