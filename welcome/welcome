@@ -693,22 +693,29 @@ DailyAssistant() {
       --field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "$_WELCOME_BROWSER https://wiki.archlinux.org/title/List_of_applications"
   )
 
-  local DEname="$(eos_GetDeOrWm)"
-  case "$(eos_yad_GetDesktopName)" in
-      XFCE)         DEname=Xfce;;
-      BUDGIE)       DEname=Budgie;;
-      CINNAMON)     DEname=Cinnamon;;
-      LXQT)         DEname=LXQt;;
-      I3)           DEname=i3;;
-      BSPWM)        DEname=bspwm;;
-      SWAY)         DEname=sway;;
-      GNOME3)       DEname=GNOME;;
-      GNOME|KDE|MATE) ;;
-      *)            DEname="";;
-  esac
-  if [ -n "DEname" ] ; then
+  local DE=""
+  eos_yad__detectDE          # lowercase
+
+  if [ 0 -eq 1 ] ; then
+      # Adjust DE names for the Arch web page! Note: all could be lower case...
+      case "$DE" in
+          xfce)         DE=Xfce;;
+          budgie)       DE=Budgie;;
+          cinnamon)     DE=Cinnamon;;
+          lxqt)         DE=LXQt;;
+          i3)           DE=i3;;
+          bspwm)        DE=bspwm;;
+          sway)         DE=sway;;
+          openbox)      DE=Openbox;;
+          qtile)        DE=Qtile;;
+          gnome3)       DE=GNOME;;
+          gnome|kde|mate) ;;
+          *)            DE="";;
+      esac
+  fi
+  if [ -n "$DE" ] ; then
       tabcontents+=(
-          --field=" $DEname: $(ltr daily_assist_DEinfo)!!$DEname: $(ltr daily_assist_DEinfo_tip)":fbtn   "$_WELCOME_BROWSER https://wiki.archlinux.org/title/$DEname"
+          --field=" $DE: $(ltr daily_assist_DEinfo)!!$DE: $(ltr daily_assist_DEinfo_tip)":fbtn   "$_WELCOME_BROWSER https://wiki.archlinux.org/title/$DE"
       )
   fi
 
