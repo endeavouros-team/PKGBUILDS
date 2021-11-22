@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_ce
 pkgver=1.0
-pkgrel=9
+pkgrel=10
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
