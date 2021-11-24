@@ -145,6 +145,18 @@ run_hotfix_start() {
     fi
 }
 
+RamCheck() {
+    # at least 3 GB of RAM needed
+    local min_ram_gb=3
+    local ram_gb=$(free -g | grep ^Mem | awk '{print $2}')
+
+    [ "$mode" = "test" ] && min_ram_gb=33
+
+    if [ $ram_gb -lt $min_ram_gb ] ; then
+        GUIDIE "Minimum amount of RAM needed to install is $min_ram_gb GB."
+    fi
+}
+
 ###  Everything starts in the Main function. ###
 Main() {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
@@ -161,6 +173,8 @@ Main() {
     local cfolder=/etc/calamares                # folder for calamares configuration files
     local all_sudo_commands=":"                 # all root commands will be collected to this variable!
     local workdir=""
+
+    # RamCheck
 
     # change efiBootloaderId in bootloader.conf:
     all_sudo_commands+="; sed -i $cfolder/modules/bootloader.conf -e 's|^efiBootloaderId:.*|efiBootloaderId: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|'"
