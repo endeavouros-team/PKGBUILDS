@@ -377,9 +377,17 @@ UseInitialFiles() {
 
 Initialize() {    # initialize service and timer for the current user
 
+    DevLog "in $FUNCNAME"
     local modify_service=0
     local fetch_files=0
     local timer="$configdir"/$progname.timer
+    local first_time_init_file="$HOME/.config/$progname.first_init"
+
+    if [ ! -r "$first_time_init_file" ] ; then
+        DevLog "first time initialization"
+        echo "Remove this file if you wish to re-initialize $progname service." > "$first_time_init_file"
+        fetch_files=1
+    fi
 
     case "$arg" in
         -init-force | --init-force | -conf | --conf) modify_service=1 ;;
@@ -393,6 +401,7 @@ Initialize() {    # initialize service and timer for the current user
 
     if [ "$fetch_files" = "1" ] || [ "$modify_service" = "1" ]
     then
+        DevLog "get new service files"
         systemctl --user status $progname.timer >/dev/null && {
             systemctl --user stop    $progname.timer
             systemctl --user disable $progname.timer
@@ -598,6 +607,12 @@ InitialWait() {
     }
 }
 
+DevLog() {
+    if [ "$dev_log" = "yes" ] ; then
+        echo "$(date "+%Y%m%d %H:%M:%S"); $@" >> $dev_logfile
+    fi
+}
+
 yad_infomsg() {
     local msg="$1"
     local title="$2"
@@ -608,6 +623,9 @@ yad_infomsg() {
 
 Main()
 {
+    local progname=eos-update-notifier
+    local dev_log=no
+    local dev_logfile=/tmp/$progname.dev_log
     local configdir="$HOME/.config/systemd/user"
     local initial_waittime="5s"  # was 10s
     local loop_waittime=60m
@@ -620,7 +638,6 @@ Main()
     local initialize=""
     local update_focused=0
     local pkgsonly=no
-    local progname=eos-update-notifier
     local EOS_UPDATE_NOTIFIER_CONF=/etc/$progname.conf
     #local NOTIFIER_LOG_FILE=/tmp/$progname.log
 
@@ -637,9 +654,12 @@ Main()
     rm -f /tmp/$progname.log.*
     export EOS_UPDATE_NOTIFIER_LOG=$(mktemp /tmp/$progname.log.XXXXXXXX)
 
+    DevLog "main loop starting"
+
     for arg in "$@" ; do
         case "$arg" in
             -init | --init | -init-force | --init-force)
+                DevLog "got option '$arg'"
                 initialize="$arg"
                 ;;
             -conf | --conf)
@@ -687,6 +707,9 @@ Main()
                     *) eos_yad_DIE "Unsupported mode '$mode'." ; break ;;
                 esac
                 ;;
+            --foo)
+                dev_log=yes
+                ;;
             -*)
                 eos_yad_DIE "Unsupported option '$arg'."
                 ;;
@@ -709,6 +732,7 @@ Main()
     # Now internet connection is required.
     CheckInternetConnection || return 1
 
+    DevLog "has internet connection"
     case "$initialize" in
         -init-force | --init-force | -init | --init) Initialize ; return ;;
     esac
