@@ -42,7 +42,7 @@ Main()
     case "$(eos_GetDeOrWm)" in
         SWAY | BSPWM)
             case "$XDG_SESSION_TYPE" in
-                wayland)
+                wayland--removed)
                     # wayland needs some help
                     if [ -x /usr/bin/xhost ] ; then
                         root_start=" ; xhost si:localuser:root"
