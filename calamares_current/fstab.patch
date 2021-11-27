@@ -1,0 +1,44 @@
+diff -ruN fstab/fstab.conf fstab-patched/fstab.conf
+--- fstab/fstab.conf	2021-11-16 17:30:28.000000000 +0100
++++ fstab-patched/fstab.conf	2021-11-26 20:30:05.981683000 +0100
+@@ -15,9 +15,13 @@
+ # With kernels 5.15 and newer be cautious of adding the option space_cache
+ # to the btrfs mount options.  The default in 5.15 changed to space_cache=v2.
+ # If space_cache or space_cache=v1 are specified, it may fail to remount.
++#
++# btrfs_swap options are used when a swapfile is chosen with a btrfs root
++# the options are applied to the subvolume which holds the swap partition
+ mountOptions:
+     default: defaults,noatime
+     btrfs: defaults,noatime,autodefrag,compress=zstd
++    btrfs_swap: defaults,noatime
+ 
+ # Mount options to use for the EFI System Partition. If not defined, the
+ # *mountOptions* for *vfat* are used, or if that is not set either,
+diff -ruN fstab/fstab.schema.yaml fstab-patched/fstab.schema.yaml
+--- fstab/fstab.schema.yaml	2021-11-16 17:30:28.000000000 +0100
++++ fstab-patched/fstab.schema.yaml	2021-11-26 20:30:05.981683000 +0100
+@@ -22,6 +22,7 @@
+             xfs: { type: string }
+             swap: { type: string }
+             btrfs: { type: string }
++            btrfs_swap: { type: string }
+     efiMountOptions: { type: string }
+     crypttabOptions: { type: string }
+ required: [ mountOptions ]
+diff -ruN fstab/main.py fstab-patched/main.py
+--- fstab/main.py	2021-11-16 17:30:28.000000000 +0100
++++ fstab-patched/main.py	2021-11-26 20:30:05.985017000 +0100
+@@ -236,7 +236,11 @@
+             libcalamares.utils.debug("Ignoring foreign swap {!s} {!s}".format(disk_name, partition.get("uuid", None)))
+             return None
+ 
+-        options = self.get_mount_options(filesystem, mount_point)
++        # If this is btrfs subvol a dedicated to a swapfile, use different options than a normal btrfs subvol
++        if filesystem == "btrfs" and partition["subvol"] == "/@swap":
++            options = self.get_mount_options("btrfs_swap", mount_point)
++        else:
++            options = self.get_mount_options(filesystem, mount_point)
+ 
+         if is_ssd:
+             extra = self.ssd_extra_mount_options.get(filesystem)

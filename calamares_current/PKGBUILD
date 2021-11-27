@@ -6,7 +6,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 pkgver=3.2.47
-pkgrel=3
+pkgrel=4
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -23,11 +23,13 @@ source=(
   "git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
   "https://github.com/calamares/calamares/releases/download/v$pkgver/$_reponame-$pkgver.tar.gz"
   "vmd-mkinitcpio.patch"
+  "fstab.patch"
 )
 
 sha256sums=('SKIP'
             '44c6dc6ee9c803802100f7c988a4ccb6a43b8de6e0841a0cc3c1797df9ffe3c6'
-            '20cdb6ca05d428cc71570055912fce8c0991f841621ac60ab3890fc8e62878dd')
+            '20cdb6ca05d428cc71570055912fce8c0991f841621ac60ab3890fc8e62878dd'
+            '0c4383697b4d35db89f92780ae3261c2681e87b2456853e90f4b03b6ed4da8b3')
 
 prepare() {
     mv $_reponame-$pkgver            $_reponame
@@ -52,6 +54,11 @@ prepare() {
     # apply patch to enable vmd module to be enabled for mkinitcpio generation
     # as long as mkinitcpio arch package does not get changed
     patch -u $_reponame/src/modules/initcpiocfg/main.py -i vmd-mkinitcpio.patch
+
+    # apply patch to fix BTRFS fstab entries using wrong options
+    # as long as it is not merged into calamares upstream
+    cd $_reponame/src/modules/
+    patch -p0 < $srcdir/fstab.patch
 }
 
 build() {
