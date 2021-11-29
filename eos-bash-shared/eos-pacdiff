@@ -28,19 +28,20 @@ PacdiffCmd() {
 }
 
 PowerWarning() {
-    local txt=""
+    if [ "$EOS_PACDIFF_WARNING" = "yes" ] ; then
+        local txt=""
+        txt+="NOTE: <b>eos-pacdiff</b> is a powerful tool, so use it carefully!\n\n"
+        txt+="For example, please do <i>not</i> modify files like:\n"
+        txt+="<tt>    /etc/passwd</tt>\n"
+        txt+="<tt>    /etc/group</tt>\n"
+        txt+="<tt>    /etc/shadow</tt>\n"
+        txt+="and related files unless you know <i>exactly</i> what you are doing.\n\n"
+        txt+="You can remove this warning popup by changing the value of\n"
+        txt+="variable <tt>EOS_PACDIFF_WARNING</tt> in file <tt>/etc/eos-script-lib-yad.conf</tt>.\n"
+        txt+="Note that you may need to merge the changes from /etc/eos-script-lib-yad.conf.pacnew first!\n"
 
-    txt+="NOTE: <b>eos-pacdiff</b> is a powerful tool, so use it carefully!\n\n"
-    txt+="For example, please do <i>not</i> modify files like:\n"
-    txt+="<tt>    /etc/passwd</tt>\n"
-    txt+="<tt>    /etc/group</tt>\n"
-    txt+="<tt>    /etc/shadow</tt>\n"
-    txt+="and related files unless you know <i>exactly</i> what you are doing.\n\n"
-    txt+="You can remove this warning popup by changing the value of\n"
-    txt+="variable <tt>EOS_PACDIFF_WARNING</tt> in file <tt>/etc/eos-script-lib-yad.conf</tt>.\n"
-    txt+="Note that you may need to merge the changes from /etc/eos-script-lib-yad.conf.pacnew first!\n"
-
-    eos_yad --form --image=dialog-warning --title="Warning" --text="$txt" --button=yad-quit #--width=400 --height=300
+        eos_yad --form --image=dialog-warning --title="Warning" --text="$txt" --button=yad-quit #--width=400 --height=300
+    fi
 }
 
 Main()
