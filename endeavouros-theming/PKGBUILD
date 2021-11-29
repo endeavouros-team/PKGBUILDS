@@ -7,15 +7,13 @@ arch=('any')
 replaces=('EndeavourOS-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=(
-  "${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz"
-)
-md5sums=('893347c518f786cb698b6bbf112740ed')
-sha512sums=('145f6803b79a62db67177fc962184a2e62df884e80392b5a45128dde2539f859ce903f2ef76241a6af6e088d4427486b1136ed58c7cc984d5de5f667200b231f')
+source=('git+https://github.com/endeavouros-team/endeavouros-theming.git')
+md5sums=('SKIP')
+sha512sums=('SKIP')
 install=$pkgname.install
 
 package() {
-  cd "$srcdir/${pkgname}-$pkgver"
+  cd "$srcdir/${pkgname}"
   install -d "${pkgdir}/usr/share/endeavouros"
   install -d "${pkgdir}/usr/share/pixmaps"
   install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
@@ -34,5 +32,5 @@ package() {
 
   # cleanup
   cd $srcdir
-  rm -f ../${pkgname}-${pkgver}.tar.gz
+  rm -rf ../${pkgname}
 }
