@@ -12,6 +12,11 @@ md5sums=('SKIP')
 sha512sums=('SKIP')
 install=$pkgname.install
 
+pkgver() {
+  cd $pkgname
+  git describe --long --tags | sed 's|\([0-9\.]*\)-\([0-9]*\)-\([0-9a-f]*\)|\1.r\2.\3|'
+}
+
 package() {
   cd "$srcdir/${pkgname}"
   install -d "${pkgdir}/usr/share/endeavouros"
