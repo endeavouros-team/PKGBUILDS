@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Notícias de Software"
 _tr_add2 butt_softnews_tip            "Notícias importantes sobre o software do EndeavourOS"
 
 _tr_add2 install_community            "Instalar edições da comunidade"
-_tr_add2 install_community_tip        "Edições da comunidade: Sway, Bspwm (nota: requer ligação à Internet)"
+_tr_add2 install_community_tip        "Coleção das edições da comunidade (requer ligação à Internet)"    # changed 2021-Oct-23
 
 # 2021-May-01:
 _tr_add2 ins_syslog                   "Como partilhar os registos do sistema"
