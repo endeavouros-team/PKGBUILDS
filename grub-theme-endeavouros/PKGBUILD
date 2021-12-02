@@ -2,7 +2,7 @@
 # Original Source: https://github.com/Se7endAY/grub2-theme-vimix
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=grub2-theme-endeavouros
-pkgver=20210131
+pkgver=20211129
 pkgrel=1
 pkgdesc='EndeavourOS grub2 theme'
 arch=(any)
