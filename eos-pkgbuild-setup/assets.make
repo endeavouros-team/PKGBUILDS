@@ -122,7 +122,7 @@ Build()
     local assetsdir="$2"
     local pkgbuilddir="$3"
     local pkgname
-    local pkg
+    local pkg pkgs
     local workdir=$(mktemp -d)
     local log=$workdir/buildlog-"$pkgdirname".log
     local missdeps="Missing dependencies:"
@@ -144,15 +144,19 @@ Build()
           :
           makepkg --syncdeps --clean >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
       }
-      pkg="$(ls -1 ${pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR)"
-      pkg="$(HandlePossibleEpoch "$pkgname" "$pkg")"
-      mv $pkg "$assetsdir"
-      pkg="$assetsdir/$pkg"
-
+      # pkg="$(ls -1 ${pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR)"
+      pkgs="$(ls -1 *.pkg.tar.$_COMPRESSOR)"
+      [ -n "$pkgs" ] || DIE "$pkgdirname: build failed"
+      for pkg in $pkgs ; do
+          pkg="$(HandlePossibleEpoch "$pkgname" "$pkg")"
+          mv $pkg "$assetsdir"
+          built+=("$assetsdir/$pkg")
+          built_under_this_pkgname+=("$pkg")
+      done
       Popd
     Popd
     rm -rf "$workdir"
-    echoreturn "$pkg"
+    # echoreturn "$pkg"
 }
 
 PkgBuildName()
@@ -838,6 +842,7 @@ Main2()
 
     buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
 
+    local built_under_this_pkgname
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
@@ -857,18 +862,19 @@ Main2()
                 }
             done
 
-            printf2 "==> $pkgname: "
+            # Build the package (or possibly many packages!)
+            built_under_this_pkgname=()
+
+            echo2 "==> $pkgname:"
             buildStartTime="$(TimeStamp)"
 
-            # new pkg
-            pkg="$(Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname")"
+            Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
 
-            echo2 "build time: $(TimeStamp $buildStartTime)"
+            echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
+            for yy in "${built_under_this_pkgname[@]}" ; do
+                echo2 "    ==> $yy"
+            done
 
-            case "$pkg" in
-                "") DIE "$pkgdirname: build failed" ;;
-                *)  built+=("$pkg")               ;;
-            esac
         fi
     done
 
