@@ -55,9 +55,15 @@ InstallLog_Start() {
 ########## $log by $progname
 ########## Started (UTC): $(date -u "+%x %X")
 ########## Install mode: $mode
-########## ISO version: $(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
+########## ISO version: $ISO_version
+
+## >>> Preliminary log before starting calamares:
+$(cat "$prelogfile")
+## <<< End of preliminary log.
 
 EOF
+    rm -f "$prelogfile"
+
     FollowFile "$log" "Install log" 20 20
 }
 
@@ -137,24 +143,23 @@ run_hotfix_start() {
     local file=hotfix-start.bash
     local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
 
-    if wget --timeout=30 -q -O $file $url ; then
-        all_sudo_commands+="; bash $PWD/$file"
-        all_sudo_commands+="; echo '===> Hotfixes definition file $file executed.'"
+    if wget --timeout=30 -q -O "$workdir/$file" "$url" ; then
+        bash "$workdir/$file"
+        PreLog "Hotfixes definition file $file executed."
     else
-        all_sudo_commands+="; echo '===> Fetching the hotfixes definition file failed!'"
+        PreLog "Fetching the hotfixes definition file $file failed!"
     fi
 }
 
-RamCheck() {
-    # at least 3 GB of RAM needed
-    local min_ram_gb=3
-    local ram_gb=$(free -g | grep ^Mem | awk '{print $2}')
+BootloaderId() {
+    local blid="endeavouros-$(shuf -i 1000-9999 -n1)"
+    PreLog "New bootloader id: '$blid'"
+    sudo sed -i $cfolder/modules/bootloader.conf -e 's|^efiBootloaderId:.*|efiBootloaderId: "$blid"|'
+}
 
-    [ "$mode" = "test" ] && min_ram_gb=33
-
-    if [ $ram_gb -lt $min_ram_gb ] ; then
-        GUIDIE "Minimum amount of RAM needed to install is $min_ram_gb GB."
-    fi
+PreLog() {
+    # Some logs before we can use endeavour-install.log.
+    echo "==> $1" >> "$prelogfile"
 }
 
 ###  Everything starts in the Main function. ###
@@ -173,11 +178,8 @@ Main() {
     local cfolder=/etc/calamares                # folder for calamares configuration files
     local all_sudo_commands=":"                 # all root commands will be collected to this variable!
     local workdir=""
-
-    # RamCheck
-
-    # change efiBootloaderId in bootloader.conf:
-    all_sudo_commands+="; sed -i $cfolder/modules/bootloader.conf -e 's|^efiBootloaderId:.*|efiBootloaderId: \"endeavouros-$(shuf -i 1000-9999 -n1)\"|'"
+    local prelogfile=""
+    local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
 
     if [ "$I_am_only_testing" = "true" ] ; then
         Home=$HOME
@@ -188,38 +190,33 @@ Main() {
         ShowPacmanLog=FALSE
     fi
 
-    workdir=$(mktemp -d $Home/work.XXXXX) || GUIDIE "creating work folder failed."
+    workdir="$Home/work.$progname.xyz"
+    mkdir -p "$workdir"
 
-    _init_translations $lang || { GUIDIE "language init failed" ; }
+    prelogfile="$workdir/preliminary.log"
+    rm -f "$prelogfile"
 
-    # asks the value for $mode
+    BootloaderId
+
+    _init_translations $lang || GUIDIE "language init failed"
+
     case "$mode" in
-        "" | test) AskMode ;;
+        "" | test) AskMode ;;    # ask the value for $mode
     esac
 
     if eos-connection-checker ; then
         run_hotfix_start              # run possible hotfixes before copying settings.conf file
     fi
 
-    # copy config files based on $mode
-
-    pushd $workdir 2>/dev/null || GUIDIE "cannot go to folder $workdir"
-
     case "$mode" in
         online | offline | community)
-            all_sudo_commands+="; cp $cfolder/settings_$mode.conf $cfolder/settings.conf"
-            all_sudo_commands+="; echo '===> File settings.conf updated.'"
+            sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf
+            PreLog "File settings.conf updated."
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
             ;;
     esac
-
-    # now actually run hotfixes and copy settings.conf
-    sudo bash -c "${all_sudo_commands[*]}"
-
-    popd 2>/dev/null
-    rm -rf $workdir
 
     if [ "$I_am_only_testing" = "true" ] ; then
         return

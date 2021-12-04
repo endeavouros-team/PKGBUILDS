@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.17.1
+pkgver=3.17.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -38,7 +38,7 @@ sha512sums=('f86b9ed87e52728246a41a2c892bc6b2b4bfe754f390c75d572e61a558bc124414d
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
             '9f0cd5edabf93439656046c60dc6a29f439a9d8b7afab8ec03b9470321ba98fc53b927944e2f68b5b152c150cca76913490eaab4256a5699da5960f860d81e81'
-            '12c05e164c3e64cd6f44901676d56b8178a0d1f1315a417adbd74a7373a5a52fda6b521561b693900e23e50f3200b2feb4060e9b131181afddcb1fa9522f066e')
+            'c015506a73cefdd9e07bccba76b05e9d2be877d3918ca89e24c19e9716926e3daad0bfaf3abbe2e368b19dae835750556329f450523a466e7453307fdb8b58c1')
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
