@@ -144,7 +144,7 @@ run_hotfix_start() {
     local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
 
     if wget --timeout=30 -q -O "$workdir/$file" "$url" ; then
-        bash "$workdir/$file"
+        sudo bash "$workdir/$file"
         PreLog "Hotfixes definition file $file executed."
     else
         PreLog "Fetching the hotfixes definition file $file failed!"
