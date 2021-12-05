@@ -158,6 +158,8 @@ _init_translations() {
             lang="${f1}_$f2"
         elif [ -r "$trdir/translation-$f1.bash" ] ; then
             lang="$f1"
+        else
+            lang=en
         fi
     fi
 
