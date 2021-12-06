@@ -154,7 +154,7 @@ run_hotfix_start() {
 BootloaderId() {
     local blid="endeavouros-$(shuf -i 1000-9999 -n1)"
     PreLog "New bootloader id: '$blid'"
-    sudo sed -i $cfolder/modules/bootloader.conf -e 's|^efiBootloaderId:.*|efiBootloaderId: "$blid"|'
+    sudo sed -i $cfolder/modules/bootloader.conf -e "s|^efiBootloaderId:.*|efiBootloaderId: \"$blid\"|"
 }
 
 PreLog() {
