@@ -120,8 +120,13 @@ RemovePersonalData() {
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
     local user
-    local ssid=$(iwgetid -r)
-    local mac=$(iwgetid -ra)
+    local ssid="foobarfoobarfoobar"
+    local mac="foobarfoobarfoobar"
+
+    if [ -x /usr/bin/iwgetid ] ; then
+        ssid=$(iwgetid -r)
+        mac=$(iwgetid -ra)
+    fi
 
     # hide real user names (that are found in /etc/passwd) from logs
     for user in $(UserNames 1000 50000) ; do
