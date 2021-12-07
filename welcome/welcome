@@ -1239,13 +1239,13 @@ MagicId() {
         echo "Moving existing $target to $target.$time" >&2
         mv $target $target.$time
     fi
-    if (! wget -q -O $target "$url") ; then
+    if (! Wget2Curl -q -O $target "$url") ; then
         echo "Sorry, URL '$url' not found. " >&2
         [ -r $target.$time ] && mv $target.$time $target
         return 1
     fi
     case "$id" in
-        ma) if (! wget -q "$ENDEAVOUROS_TEAM/sandbox/master/pkg/pkglist_install.sh") ; then
+        ma) if (! Wget2Curl -q -O pkglist_install.sh "$ENDEAVOUROS_TEAM/sandbox/master/pkg/pkglist_install.sh") ; then
                 echo "Warning: cannot fetch pkglist_install.sh from sandbox" >&2
                 return 1
             fi

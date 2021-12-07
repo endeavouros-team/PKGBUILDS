@@ -143,7 +143,7 @@ run_hotfix_start() {
     local file=hotfix-start.bash
     local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
 
-    if wget --timeout=30 -q -O "$workdir/$file" "$url" ; then
+    if Wget2Curl --timeout=30 -q -O "$workdir/$file" "$url" ; then
         sudo bash "$workdir/$file"
         PreLog "Hotfixes definition file $file executed."
     else
