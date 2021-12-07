@@ -94,7 +94,8 @@ CheckHeadlines()
     local news_source=https://archlinux.org
     local hlinfo=$(mktemp)
 
-    wget -q -T 10 -O $hlinfo $news_source || {
+    # wget -q -T 10 -O $hlinfo $news_source || {
+    curl --fail -Lsm 10 -o $hlinfo $news_source || {
         rm -f $hlinfo
         eos_yad_DIE "fetching Arch news headlines failed"
     }
