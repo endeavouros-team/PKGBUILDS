@@ -136,7 +136,7 @@ URL_from_bonus() {
                 if [ ! -r "$url" ] ; then
                     local url2=http://bashdb.sourceforge.net/bashdb.html
                     mkdir -p "$(dirname "$url")"
-                    wget --user-agent="" -q --timeout=10 -O "$url" $url2 || url=""
+                    Wget2Curl --user-agent="" -q --timeout=10 -O "$url" $url2 || url=""
                 fi
             fi
             ;;
@@ -248,6 +248,8 @@ Options()
 
 Main()
 {
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1   # for Wget2Curl()
+
     local progname=eos-apps-info-helper          # "$(basename "$0")"
     local real_progname=${progname%-helper}
     local name=""
