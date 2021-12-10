@@ -42,7 +42,7 @@ prepare() {
     sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $_reponame/src/modules/initcpio/InitcpioJob.cpp
         
     # set pacman flags on the run
-    sed -i "s?pacman_flags = \"-S\"?pacman_flags = \"-Sy\"?" $_reponame/src/modules/packages/main.py
+    sed -i "s?            command.append(\"-S\")?            command.append(\"-Sy\")?" $_reponame/src/modules/packages/main.py
 
 }
 
