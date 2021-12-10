@@ -6,7 +6,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 pkgver=3.2.49
-pkgrel=1
+pkgrel=2
 pkgdesc="calamares installer for arch based distros"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -55,8 +55,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DINSTALL_CONFIG=OFF \
     -DWEBVIEW_FORCE_WEBKIT=OFF \
-	-DWITH_PYTHONQT=OFF \
-	-DWITH_KF5DBus=OFF \
+    -DWITH_PYTHONQT=OFF \
+    -DWITH_KF5DBus=OFF \
     -DWITH_APPSTREAM=OFF \
     cmake .. \
     -DCMAKE_BUILD_TYPE=Debug \
@@ -69,7 +69,7 @@ build() {
     finishedq keyboardq license localeq notesqml oemid \
     openrcdmcryptcfg packagechooserq \
     plymouthcfg plasmalnf services-openrc \
-    summaryq tracking usersq webview welcomeq"
+    summaryq tracking usersq webview welcomeq zfs"
     export DESTDIR="$srcdir/$_reponame/build/$pkgname"
     make -j4 install
 }
