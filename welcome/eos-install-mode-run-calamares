@@ -51,6 +51,7 @@ CatchChrootedPacmanLog() {
 
 ### Starts logging into the install log. ###
 InstallLog_Start() {
+    local preprelogfile="$(eos-select-file-server --logfilename)"
     cat <<EOF > $log
 ########## $log by $progname
 ########## Started (UTC): $(date -u "+%x %X")
@@ -58,11 +59,20 @@ InstallLog_Start() {
 ########## ISO version: $ISO_version
 
 ## >>> Preliminary log before starting calamares:
+EOF
+    if [ -r $preprelogfile ] ; then
+        cat <<EOF >> $log
+$(cat $preprelogfile)
+
+EOF
+    fi
+    cat <<EOF >> $log
 $(cat "$prelogfile")
 ## <<< End of preliminary log.
 
 EOF
     rm -f "$prelogfile"
+    rm -f "$preprelogfile"
 
     FollowFile "$log" "Install log" 20 20
 }
@@ -147,7 +157,7 @@ run_hotfix_start() {
         sudo bash "$workdir/$file"
         PreLog "Hotfixes definition file $file executed."
     else
-        PreLog "Fetching the hotfixes definition file $file failed!"
+        PreLog "Fetching $url failed!"
     fi
 }
 

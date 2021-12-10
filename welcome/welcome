@@ -1362,10 +1362,24 @@ StartHere() {
     local columns_for_own_commands="2"
     local show_predefined_buttons_at_own_commands="yes"
 
+    export show_installer=no    # explicitly show the installer, for testing only
+    for arg in "$@" ; do
+        case "$arg" in
+            --installer) export show_installer=yes ;;
+        esac
+    done
+
+    local is_installing
+    IsInstalling
+    test $? -eq 0 && is_installing=yes || is_installing=no
+
     [ -z "$EOS_FILESERVER_SITE" ] && EOS_FILESERVER_SITE="gitlab"
+    if [ "$is_installing" = "yes" ] ; then
+        EOS_FILESERVER_SITE="$(eos-select-file-server)"
+    fi
+    export EOS_FILESERVER_SITE
 
     export WELCOME_ARGS="$*"
-    export EOS_FILESERVER_SITE
 
     # common button icons
     local user_info="$(IconGrasp user-info)"
@@ -1423,10 +1437,8 @@ StartHere() {
     fi
     export EOS_WELCOME_ACTIVE_TAB_NUMBER
 
-    export show_installer=no    # explicitly show the installer, for testing only
     export user_pkglist_url=""
     local start_delay=0
-    local is_installing
     local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
 
     #local netlog=0
@@ -1437,7 +1449,7 @@ StartHere() {
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
-            --installer) export show_installer=yes ;;
+            --installer) ;;                                             # already handled!
             #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
             --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
@@ -1467,9 +1479,6 @@ StartHere() {
         ltr2 welcome_disabled
         return
     fi
-
-    IsInstalling
-    test $? -eq 0 && is_installing=yes || is_installing=no
 
     if [ "$is_installing" = "yes" ] ; then
         R8168check_at_install
