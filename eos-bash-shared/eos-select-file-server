@@ -38,7 +38,7 @@ SelectFileServer() {
     local place="$(curl -Lsm 30 https://ipinfo.io/country 2>/dev/null)"
 
     case "$place" in
-        FI | IR)                                      # FI for testing only!
+        IR)
             # run for both liveuser and target
             fserver=github
 
