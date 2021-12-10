@@ -155,7 +155,7 @@ run_hotfix_start() {
 
     if Wget2Curl --timeout=30 -q -O "$workdir/$file" "$url" ; then
         sudo bash "$workdir/$file"
-        PreLog "Hotfixes definition file $file executed."
+        PreLog "Hotfixes definition file from $url executed."
     else
         PreLog "Fetching $url failed!"
     fi
