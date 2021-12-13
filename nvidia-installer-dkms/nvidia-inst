@@ -126,8 +126,16 @@ IsNvidiaCard() {
 
 ShowCommandsToRun() {
     printf "COMMANDS:\n"
-    local xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
-    echo "$xx" | sed 's|^|    |'
+    local xx
+    if [ -n "$cmd" ] ; then
+        xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
+        echo "$xx" | sed 's|^|    |'
+    fi
+
+    if [ -n "$cmd_nosudo" ] ; then
+        xx=$(echo "$cmd_nosudo"  | sed -e 's|; |\n|g')
+        echo "$xx" | sed 's|^|    |'
+    fi
 }
 
 Options() {
@@ -296,6 +304,7 @@ Main()
     local remove=()
 
     local cmd=""
+    local cmd_nosudo=""
 
     local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
     local currently_assumed=495
@@ -345,7 +354,14 @@ Main()
 
     if [ -n "$install" ] ; then
         Info "Installing packages: ${install[*]}"
-        cmd="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+        case "$pkginstaller" in
+            pacman)
+                cmd="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+                ;;
+            yay)
+                cmd_nosudo="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+                ;;
+        esac
     fi
     if [ -n "$remove" ] ; then
         Info "Removing packages: ${remove[*]}"
@@ -358,8 +374,11 @@ Main()
         return 0
     fi
 
-    # Here the commands are actually executed:
-    $EOS_ROOTER "$cmd"
+    # Here the commands are actually executed.
+    # If AUR packages are involved, need to give password twice!
+
+    [ -n "$cmd" ] && $EOS_ROOTER "$cmd"
+    [ -n "$cmd_nosudo" ] && $cmd_nosudo
 }
 
 Main "$@"
