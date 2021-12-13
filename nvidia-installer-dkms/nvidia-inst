@@ -101,8 +101,10 @@ CreateConfFile() {
         AddConfFileLine '    Option "NoLogo" "true"'
         AddConfFileLine 'EndSection'
     else
-        Info "Removing file $conf_file"
-        AddCmd "rm -f $conf_file"
+        if [ -r $conf_file ] ; then
+            Info "Removing file $conf_file"
+            AddCmd "rm -f $conf_file"
+        fi
     fi
 }
 
@@ -126,9 +128,9 @@ ShowCommandsToRun() {
 
 Options() {
     local opts
-    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:"
+    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore"
 
-    opts="$(/usr/bin/getopt -o=chbfnpqt --longoptions $lopts --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=chibfnpqt --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -144,6 +146,7 @@ Options() {
             -q | --quiet)     quiet=yes ;;
             -t | --test)      test=yes ;;
             -c | --conf)      create_conf=yes ;;
+            -i | --ignore)    ignore_errors=yes ;;
             --32)             bit32=yes ;;
             --series)         series="$2" ; shift ;;
             --drivers)
@@ -161,6 +164,7 @@ Options:
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
   -c, --conf              Create also file $conf_file (might be needed on some systems).
+  -i, --ignore            Ignore all errors (useful for testing only).
   --32                    Install also support for 32-bit apps.
   --drivers               Show supported NVIDIA driver series for your card.
   --series                (Advanced) Use this series for testing.
@@ -272,6 +276,7 @@ Main()
     local test=no
     local create_conf=no
     local bit32=no
+    local ignore_errors=no
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local pkginstaller=""
@@ -308,7 +313,7 @@ Main()
     if [ "$force" = "no" ] ; then
         if ! IsNvidiaCard ; then
             echo "$progname: no Nvidia card found."
-            exit 0
+            [ "$ignore_errors" = "no" ] && exit 0
         fi
     fi
 
