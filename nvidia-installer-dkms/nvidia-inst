@@ -22,8 +22,10 @@ PkgInstall() {
 PkgRemove() {
     # prepares removing given packages if they are installed
     local pkg
+    local all="$(pacman -Qsq)"
     for pkg in "$@" ; do
-        if pacman -Qq "$pkg" >& /dev/null ; then
+        #if pacman -Qq "$pkg" >& /dev/null ; then
+        if [ -n "$(echo "$all" | grep "^$pkg$")" ; then
             remove+=("$pkg")
         fi
     done
