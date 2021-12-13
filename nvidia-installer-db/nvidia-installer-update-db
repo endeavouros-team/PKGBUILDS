@@ -29,7 +29,7 @@ GetNvidiaBranch() {
 
 GetNvidiaIds() {
     local branch="$1"
-    local ids="$(curl -Lsm 10 -o- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
+    local ids="" #"$(curl -Lsm 10 -o- https://download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     [ -n "$ids" ] || ids="$(curl -Lsm 10 -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$branch/README/supportedchips.html)"
     test -n "$ids" || DIE "$FUNCNAME: fetching ids from branch '$branch' failed."
     
