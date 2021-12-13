@@ -25,7 +25,7 @@ PkgRemove() {
     local all="$(pacman -Qsq)"
     for pkg in "$@" ; do
         #if pacman -Qq "$pkg" >& /dev/null ; then
-        if [ -n "$(echo "$all" | grep "^$pkg$")" ; then
+        if [ -n "$(echo "$all" | grep "^$pkg$")" ] ; then
             remove+=("$pkg")
         fi
     done
