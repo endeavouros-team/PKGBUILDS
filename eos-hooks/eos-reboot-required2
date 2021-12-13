@@ -42,6 +42,12 @@ Main() {
                     DoNotify
                 fi
                 ;;
+            wayland | egl-wayland)
+                case "$XDG_SESSION_TYPE" in
+                    x11) ;;
+                    *) DoNotify ;;
+                esac
+                ;;
             *)
                 DoNotify
                 ;;
