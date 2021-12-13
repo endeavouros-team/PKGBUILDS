@@ -19,14 +19,54 @@ PkgInstall() {
     install+=("$@")
 }
 
+IsInstalled() {
+    local pkg="$1"
+    case "$(echo "$all_installed_packages" | grep "^$pkg$")" in
+        "") return 1 ;;  # not installed
+        *)  return 0 ;;  # is installed
+    esac
+}
+
+IsRepoPkg() {
+    local pkg="$1"
+    case "$(echo "$repopkgs" | grep "^$pkg$")" in
+        "") return 1 ;;
+        *)  return 0 ;;
+    esac
+}
+
 PkgRemove() {
     # prepares removing given packages if they are installed
     local pkg
-    local all="$(pacman -Qsq)"
+
     for pkg in "$@" ; do
-        #if pacman -Qq "$pkg" >& /dev/null ; then
-        if [ -n "$(echo "$all" | grep "^$pkg$")" ] ; then
+        if IsInstalled "$pkg" ; then
             remove+=("$pkg")
+        fi
+    done
+}
+
+KeepsAndRemoves() {
+    # remove pr_nvidia[] except install[]
+
+    local rp kp
+    local all_installed_packages="$(pacman -Qsq)"
+
+    for rp in "${pr_nvidia[@]}" ; do
+        for kp in "${install[@]}" ; do
+            [ "$rp" = "$kp" ] && break
+        done
+        [ "$rp" = "$kp" ] || PkgRemove "$rp"
+    done
+
+    # check if install contains any AUR stuff
+
+    local repopkgs="$(pacman -Ssq)"
+
+    for kp in "${install[@]}" ; do
+        if ! IsRepoPkg "$kp" ; then
+            install_has_aur_stuff=yes
+            break
         fi
     done
 }
@@ -264,19 +304,6 @@ ProperNvidiaPackages() {
     fi
 }
 
-KeepsAndRemoves() {
-    # remove pr_nvidia[] except install[]
-
-    local rp kp
-
-    for rp in "${pr_nvidia[@]}" ; do
-        for kp in "${install[@]}" ; do
-            [ "$rp" = "$kp" ] && break
-        done
-        [ "$rp" = "$kp" ] || PkgRemove "$rp"
-    done
-}
-
 Main()
 {
     local progname="$(basename "$0")"
@@ -294,6 +321,7 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local pkginstaller=""
+    local install_has_aur_stuff=no
 
     Info "Command line: $progname $*"
 
@@ -356,14 +384,24 @@ Main()
 
     if [ -n "$install" ] ; then
         Info "Installing packages: ${install[*]}"
-        case "$pkginstaller" in
-            pacman)
-                cmd="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
-                ;;
-            yay)
-                cmd_nosudo="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}"
-                ;;
-        esac
+        if [ "$pkginstaller" = pacman ] || [ "$install_has_aur_stuff" = "no" ] ; then
+            cmd="pacman -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+        else
+            cmd_nosudo="yay -Sqy --noconfirm --noprogressbar --needed ${install[*]}"
+        fi
+        if [ 0 -eq 1 ] ; then
+            case "$pkginstaller" in
+                pacman)
+                    cmd="pacman -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+                    ;;
+                yay)
+                    case "$install_has_aur_stuff" in
+                        yes) cmd_nosudo="yay -Sqy --noconfirm --noprogressbar --needed ${install[*]}" ;;
+                        no)  cmd="pacman -Sqy --noconfirm --noprogressbar --needed ${install[*]}"     ;;
+                    esac
+                    ;;
+            esac
+        fi
     fi
     if [ -n "$remove" ] ; then
         Info "Removing packages: ${remove[*]}"
