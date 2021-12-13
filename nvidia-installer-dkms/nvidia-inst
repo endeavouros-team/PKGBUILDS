@@ -1,0 +1,356 @@
+#!/bin/bash
+
+Msg() {
+    local date=$(date "+%Y-%m-%d %H:%M:%S")
+    [ "$quiet" = "no" ] && echo "$date:" "$@" >&2
+}
+MsgForce() {
+    local quiet_old="$quiet"
+    quiet=no
+    Msg "$@"
+    quiet="$quiet_old"
+}
+Info() { Msg Info: "$@" ; }
+Warn() { MsgForce Warning: "$@" ; }
+DIE()  { MsgForce Error: "$@" ; exit 1 ; }
+
+PkgInstall() {
+    # prepares installing given packages
+    install+=("$@")
+}
+
+PkgRemove() {
+    # prepares removing given packages if they are installed
+    local pkg
+    for pkg in "$@" ; do
+        if pacman -Qq "$pkg" >& /dev/null ; then
+            remove+=("$pkg")
+        fi
+    done
+}
+
+AddCmd() {
+    [ -n "$cmd" ] && cmd+="; "
+    cmd+="$1"
+}
+
+Bumblebee() {
+    local user=$(whoami)
+    local exec1="Exec=/usr/bin/nvidia-settings"
+    local exec2="Exec=optirun -b none /usr/bin/nvidia-settings -c :8"
+    local desktop=/usr/share/applications/nvidia-settings.desktop
+    local group
+
+    case "$mode" in
+        bumblebee)
+            PkgInstall bumblebee bbswitch-dkms $p_nvidia $p_nvidia32 xf86-video-intel
+
+            if [ "$user" != "root" ] ; then
+                for group in bumblebee video ; do
+                    Info "Adding user $user to group: $group"
+                    AddCmd "gpasswd -a $user $group"
+                done
+            fi
+            Info "Patching $desktop (with optirun)"
+            AddCmd "sed -i $desktop -e 's|$exec1|$exec2|'"
+            Info "Enabling bumblebeed.service"
+            AddCmd "systemctl enable bumblebeed.service"
+            ;;
+        *)
+            # remove bumblebee settings
+            if [ "$user" != "root" ] ; then
+                for group in bumblebee video ; do
+                    if [ -n "$(id $user | grep "($group)")" ] ; then
+                        Info "Removing user $user from group: $group"
+                        AddCmd "gpasswd -d $user $group"
+                    fi
+                done
+            fi
+            if [ -n "$(grep "$exec2" $desktop)" ] ; then
+                Info "Patching $desktop (no optirun)"
+                AddCmd "sed -i $desktop -e 's|$exec2|$exec1|'"
+            fi
+            if systemctl status bumblebeed.service >& /dev/null ; then
+                Info "Disabling bumblebeed.service"
+                AddCmd "systemctl disable bumblebeed.service"
+            fi
+            ;;
+    esac
+}
+
+Prime() {
+    PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
+}
+
+AddConfFileLine() {
+    local line="$1"
+    AddCmd "echo '$line' >> $conf_file"
+}
+
+CreateConfFile() {
+    if [ "$create_conf" = "yes" ] ; then
+        if [ -r $conf_file ] ; then
+            Info "File $conf_file already exists, will not overwrite."
+            return
+        fi
+        Info "Creating file $conf_file"
+        AddConfFileLine 'Section "Device"'
+        AddConfFileLine '    Identifier "Nvidia Card"'
+        AddConfFileLine '    Driver "nvidia"'
+        AddConfFileLine '    VendorName "NVIDIA Corporation"'
+        AddConfFileLine '    Option "NoLogo" "true"'
+        AddConfFileLine 'EndSection'
+    else
+        Info "Removing file $conf_file"
+        AddCmd "rm -f $conf_file"
+    fi
+}
+
+Nouveau() {
+    PkgInstall xf86-video-nouveau
+}
+
+OnlyNvidia() {
+    PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
+}
+
+IsNvidiaCard() {
+    lspci -k | grep -P 'VGA|3D|Display' | grep NVIDIA >& /dev/null
+}
+
+ShowCommandsToRun() {
+    printf "COMMANDS:\n"
+    local xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
+    echo "$xx" | sed 's|^|    |'
+}
+
+Options() {
+    local opts
+    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:"
+
+    opts="$(/usr/bin/getopt -o=chbfnpqt --longoptions $lopts --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            -b | --bumblebee) mode=bumblebee ;;
+            -n | --nouveau)   mode=nouveau ;;
+            -p | --prime)     mode=prime ;;
+            -f | --force)     force=yes ;;
+            -q | --quiet)     quiet=yes ;;
+            -t | --test)      test=yes ;;
+            -c | --conf)      create_conf=yes ;;
+            --32)             bit32=yes ;;
+            --series)         series="$2" ; shift ;;
+            --drivers)
+                nvidia-driver-supported-branches -a
+                exit 0
+                ;;
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options]
+Options:
+  -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards.
+  -f, --force             Force driver installation even if a nvidia card is not detected.
+  -n, --nouveau           Install nouveau driver (open source).
+  -p, --prime             Install also prime render offload.
+  -q, --quiet             Suppress log messages.
+  -t, --test              Test mode. Nothing in your system will be modified.
+  -c, --conf              Create also file $conf_file (might be needed on some systems).
+  --32                    Install also support for 32-bit apps.
+  --drivers               Show supported NVIDIA driver series for your card.
+  --series                (Advanced) Use this series for testing.
+  -h, --help              This help.
+EOF
+                exit 0
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+    Info "Selected mode: $mode"
+}
+
+AllRemovables() {
+    # Find all packages that this program may uninstall and add them to array pr_nvidia.
+
+    local s1=${nvidia_series_supported[1]}
+    local s2=${nvidia_series_supported[2]}
+
+    pr_nvidia=(
+        bumblebee
+        bbswitch
+        bbswitch-dkms
+        xf86-video-nouveau
+
+        # nvidia packages from repos:
+        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-installer|-cg-')
+
+        # nvidia packages from AUR:
+        $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$s1|$s2")
+    )
+    readarray -t pr_nvidia <<< $(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
+}
+
+ProperNvidiaPackages() {
+    # Set proper values for
+    # - pkginstaller (pacman or yay)
+    # - p_nvidia
+    # - p_nvidia32
+    # because older nvidia drivers may be needed.
+
+    local finder=nvidia-driver-supported-branches
+    if [ -z "$series" ] ; then
+        series="$($finder | grep ^Series | awk '{print $2}' | tr -d ':')"
+    fi
+
+    case "$mode" in
+        nouveau) ;;
+        *) case "$series" in
+               "") DIE "Sorry, $finder fails to detect a supported Nvidia driver." ;;
+               *)  Info "Nvidia series $series is supported." ;;
+           esac
+           ;;
+    esac
+
+    pkginstaller=pacman
+
+    case "$series" in
+        $latest_from_arch)
+            p_nvidia="nvidia-dkms nvidia-utils nvidia-settings"
+            p_nvidia32="lib32-nvidia-utils"
+            ;;
+        ${nvidia_series_supported[1]} | ${nvidia_series_supported[2]})
+            # 470 and 390 series, currently (23 Nov 2021) still working, from AUR
+            pkginstaller=yay
+            p_nvidia="nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings" # no hook!?
+            p_nvidia32="lib32-nvidia-${series}xx-utils"
+            ;;
+        *)
+            DIE "Sorry, Nvidia series '$series' is not supported by $progname"
+            ;;
+    esac
+
+    if [ "$bit32" = "yes" ] ; then
+        if [ -z "$(grep "^\[multilib\]" /etc/pacman.conf)" ] ; then
+            # cannot install 32-bit packages if [multilib] repo not active
+            DIE "To support 32-bit apps, enable the [multilib] repo in /etc/pacman.conf."
+        fi
+    else
+        p_nvidia32=""
+    fi
+}
+
+KeepsAndRemoves() {
+    # remove pr_nvidia[] except install[]
+
+    local rp kp
+
+    for rp in "${pr_nvidia[@]}" ; do
+        for kp in "${install[@]}" ; do
+            [ "$rp" = "$kp" ] && break
+        done
+        [ "$rp" = "$kp" ] || PkgRemove "$rp"
+    done
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local mode="nvidia"
+    local bumblebee=no
+    local force=no
+    local nouveau=no
+    local prime=no
+    local quiet=no
+    local test=no
+    local create_conf=no
+    local bit32=no
+    local series=""
+    local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
+    local pkginstaller=""
+
+    Info "Command line: $progname $*"
+
+    local pr_nvidia=()
+
+    local p_nvidia=""
+    local p_nvidia32=""
+
+    local install=()
+    local remove=()
+
+    local cmd=""
+
+    local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
+    local currently_assumed=495
+    if [ "$latest_from_arch" != "$currently_assumed" ] ; then
+        Warn "Series $currently_assumed is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
+    fi
+
+    # only these nvidia series packages are supported
+    local nvidia_series_supported=(                   # these will change in the future...
+        $latest_from_arch
+        470
+        390
+    )
+
+    AllRemovables
+
+    Options "$@"
+
+    if [ "$force" = "no" ] ; then
+        if ! IsNvidiaCard ; then
+            echo "$progname: no Nvidia card found."
+            exit 0
+        fi
+    fi
+
+    ProperNvidiaPackages
+
+    # Now all packages in various situations are known.
+
+    case "$mode" in
+        bumblebee)
+            Bumblebee
+            ;;
+        nouveau)
+            Nouveau
+            ;;
+        prime)
+            Prime
+            ;;
+        nvidia)
+            Bumblebee  # remove all bumblebee stuff
+            OnlyNvidia
+            ;;
+    esac
+    KeepsAndRemoves
+    CreateConfFile
+
+    if [ -n "$install" ] ; then
+        Info "Installing packages: ${install[*]}"
+        cmd="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+    fi
+    if [ -n "$remove" ] ; then
+        Info "Removing packages: ${remove[*]}"
+        cmd="pacman -Rs --noconfirm --noprogressbar --nodeps ${remove[*]}; $cmd"
+    fi
+
+    ShowCommandsToRun
+
+    if [ "$test" = "yes" ] ; then
+        return 0
+    fi
+
+    # Here the commands are actually executed:
+    $EOS_ROOTER "$cmd"
+}
+
+Main "$@"
