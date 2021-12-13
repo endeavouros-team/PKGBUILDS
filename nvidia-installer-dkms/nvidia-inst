@@ -359,7 +359,7 @@ Main()
                 cmd="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
                 ;;
             yay)
-                cmd_nosudo="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+                cmd_nosudo="$pkginstaller -Sqy --noconfirm --noprogressbar --needed ${install[*]}"
                 ;;
         esac
     fi
