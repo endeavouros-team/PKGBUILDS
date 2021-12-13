@@ -113,7 +113,11 @@ Nouveau() {
 }
 
 OnlyNvidia() {
-    PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
+    if [ "$series" = "$latest_from_arch" ] ; then
+        PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
+    else
+        PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
+    fi
 }
 
 IsNvidiaCard() {
