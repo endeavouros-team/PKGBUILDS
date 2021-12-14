@@ -619,7 +619,7 @@ AfterInstall() {
   if (IsR8168Card) ; then
       if [ -n "$(lsmod | grep -Pw 'r8169|r8168')" ] ; then
           tabcontents+=(
-              --field=" Wired net issues$_question Toggle r8168 and r8169 drivers$_exclamation!$system_software_update!Toggle between r8168 and r8169 drivers.":fbtn "ethernet_toggle_r8168_r8169"
+              --field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
           )
       fi
   fi
@@ -672,11 +672,11 @@ DailyAssistant() {
   tabcontents+=(
       --field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
   )
-  IsInstalled eos-apps-info && {
-      tabcontents+=(
-	  --field=" EndeavourOS apps help!endeavouros-icon!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
-      )
-  }
+  #IsInstalled eos-apps-info && {
+  #    tabcontents+=(
+  #        --field=" EndeavourOS apps help!endeavouros-icon!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
+  #    )
+  #}
 
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
@@ -819,15 +819,16 @@ AddMoreApps() {
   local gufw="$(IconGrasp gufw network-firewall firewall-config)"
   local libreoffice="$(IconGrasp libreoffice-writer)"
   local chromium="$(IconGrasp chromium web-browser)"
+  local libreoffice="libreoffice-fresh"
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
   )
-  IsInstalled libreoffice-fresh || {
+  IsInstalled "$libreoffice" || {
       ((shown_app_buttons++))
-      tabcontents+=( --field=" LibreOffice!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'yad_Install libreoffice-fresh')
+      tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'yad_Install $libreoffice')
   }
   IsInstalled chromium || {
       ((shown_app_buttons++))
@@ -844,10 +845,10 @@ AddMoreApps() {
           tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
       }
   fi
-  IsInstalled eos-apps-info || {
-      ((shown_app_buttons++))
-      tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
-  }
+  #IsInstalled eos-apps-info || {
+  #    ((shown_app_buttons++))
+  #    tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
+  #}
   case "$DE" in
     XFCE)
         while true ; do                       # Show buttons only if none of them are installed.
