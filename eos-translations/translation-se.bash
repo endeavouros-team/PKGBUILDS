@@ -39,23 +39,47 @@ _tr_add2 butt_latertip         "H&#229;ll $PRETTY_PROGNAME aktiverad"
 
 _tr_add2 butt_noshow           "Visa inte mig igen"
 _tr_add2 butt_noshowtip        "Deaktivera $PRETTY_PROGNAME"
+_tr_add2 butt_changelog        "Ändringslogg"
+_tr_add2 butt_changelogtip     "Visa Ändringslogg för Welcome"
 
 _tr_add2 butt_help             "Hj&#228;lp"
 
 
-_tr_add2 nb_tab_INSTALL        "ISTALLERA"
+_tr_add2 nb_tab_INSTALL        "INSTALLERA"
 _tr_add2 nb_tab_GeneralInfo    "Generell information"
 _tr_add2 nb_tab_AfterInstall   "Efter installationen"
 _tr_add2 nb_tab_AddMoreApps    "L&#228;gg till fler appar"
-
+_tr_add2 nb_tab_DailyAssistant "Assistent"
+_tr_add2 nb_tab_UsefulTips     "Tips"
+_tr_add2 useful_tips_text      "Användbara Tips"
+_tr_add2 nb_tab_OwnCommands    "Personliga kommandon"
+_tr_add2 nb_tab_owncmds_text   "Personliga kommandon"
+_tr_add2 nb_tab_owncmdstip     "Hjälp med att lägga till personliga kommandon"
 
 _tr_add2 after_install_text    "Efterinstallations-sysslor"
+_tr_add2 after_install_itab    "Välj initial Welcome flik"
+_tr_add2 after_install_itab_tip "Väljer fliken som Welcome visar när det startas"
 
+_tr_add2 daily_assistant_text  "Verktyg för användbara och/eller dagliga uppgifter"
+_tr_add2 daily_assist_apps     "Programkategorier"
+_tr_add2 daily_assist_apps_tip "Program sorterade efter kategori"
+_tr_add2 after_install_vbox1   "Aktivera VirtualBox Gästverktyg"
+
+
+_tr_add2 after_install_r8168   "Ethernet problem$_frågetecken Ta bort r8168$_utropstecken"
+_tr_add2 after_install_r8168_tip "Borttagning av paket <b>r8168</b> kan fixa trasig trådbunden anslutning (omstart krävs)"
 _tr_add2 after_install_um      "Uppdatera speglar"
 _tr_add2 after_install_umtip   "Uppdatera spegellista innan systemuppdatering"
 
 _tr_add2 after_install_us      "Uppdatera system"
 _tr_add2 after_install_ustip   "Uppdatera systemmjukvara"
+
+_tr_add2 updt_update_check "Uppdateringskontroll"
+_tr_add2 updt_searching    "söker"
+_tr_add2 updt_for_updates  "efter uppdateringar"
+_tr_add2 updt_failure      "misslyckades$_utropstecken"
+_tr_add2 updt_nothing_todo "det finns ingenting att göra"
+_tr_add2 updt_press_enter  "Tryck på ENTER för att stänga detta fönster"
 
 _tr_add2 after_install_dsi     "Hitta systemfel"
 _tr_add2 after_install_dsitip  "Hitta potentiella fel i systempaket eller n&#229;gon annanstans"
@@ -69,14 +93,29 @@ _tr_add2 after_install_cdmtip  "Anv&#228;nd en annan bildsk&#228;rmshanterare"
 _tr_add2 after_install_ew      "EndeavourOS skrivbordsbakgrund"
 _tr_add2 after_install_ewtip   "&#196;ndra skrivbordsbakgrund till EOS standardbakgrund"
 
+_tr_add2 after_install_themevan "Xfce Vanilj tema"
+_tr_add2 after_install_themevantip "Använd Xfce vanilj tema"
+
+_tr_add2 after_install_themedef "Xfce EndeavourOS standardtema"
+_tr_add2 after_install_themedeftip "Använd EndeavourOS Xfce standardtema"
+
 
 _tr_add2 after_install_pm      "Pakethantering"
 _tr_add2 after_install_pmtip   "Hur man hanterar paket med pacman"
 
+_tr_add2 after_install_pclean "Konfiguration för paketrensning"
+_tr_add2 after_install_pcleantip "Konfigurera tjänsten för rengöring av paketcache"
+
+_tr_add2 after_install_pacdiff_tip "Hantera pacnew, pacorig $_och pacsave filer med pacdiff $_och"
+_tr_add2 after_install_conf        "Konfigurera" 
+_tr_add2 after_install_more_wall   "Ladda ner mer EndeavourOS-bakgrundsbilder"
+_tr_add2 after_install_more_wall_tip "Ladda ner EndeavourOS äldre och gemenskaps bakgrundsbilder"
+_tr_add2 after_install_info           "Information"
+
 _tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
 _tr_add2 after_install_aytip   "Arch User Repository och yay-information"
 
-_tr_add2 after_install_hn      "H&#229;rdvara och nätv&#228;rk"
+_tr_add2 after_install_hn      "H&#229;rdvara och nätverk"
 _tr_add2 after_install_hntip   "F&#229; din h&#229;rdvara att fungera"
 
 _tr_add2 after_install_bt      "Bl&#229;tand"
@@ -110,14 +149,28 @@ _tr_add2 general_info_abtip    "Mer information om denna app"
 
 
 _tr_add2 add_more_apps_text    "Installera popul&#228;ra appar"
+_tr_add2 add_more_apps_done1_text  "Föreslagna appar redan installerade$_utropstecken"
+_tr_add2 add_more_apps_done2_text  "Eller bläddra bland alla Arch och AUR paket"
+_tr_add2 add_more_apps_done2_tip1  "För att installera, använd 'pacman' eller 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "För att installera, använd 'yay'"
 
 _tr_add2 add_more_apps_lotip   "Office-verktyg (libreoffice-fresh)"
 
 _tr_add2 add_more_apps_ch      "Chromium Web-l&#228;sare"
 _tr_add2 add_more_apps_chtip   "Web-l&#228;sare"
 
+_tr_add2 after_install_ew2     "Välj en av EndeavourOS-bakgrunderna"
+
+
 _tr_add2 add_more_apps_fw      "Brandv&#228;gg"
 _tr_add2 add_more_apps_fwtip   "Gufw brandv&#228;gg"
+
+_tr_add2 add_more_apps_akm     "En kärnhanterare"
+_tr_add2 add_more_apps_akmtip  "En liten Linux kärnhanterare och informationskälla"
+
+_tr_add2 add_more_apps_arch    "Bläddra bland alla Arch paket"
+
+_tr_add2 add_more_apps_aur     "Bläddra bland alla AUR paket"
 
 _tr_add2 add_more_apps_bt      "Bl&#229;tand (blueberry) for Xfce"
 _tr_add2 add_more_apps_bt_bm   "Bl&#229;tand (blueman) for Xfce"
@@ -133,6 +186,20 @@ _tr_add2 settings_dis_buttip     "Jag lovar"
 
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Hj&#228;lp"
 _tr_add2 help_butt_text          "Mer information om $PRETTY_PROGNAME app"
+_tr_add2 butt_owncmds_help:      "Handledning: Personliga kommandon"
+_tr_add2 butt_owncmds_dnd:       "Personliga kommandon dra${_och}släpp"
+_tr_add2 butt_owncmds_dnd_help:  "Visa ett fönster vart man kan dra fältobjekt för nya knappar"
+_tr_add2 butt_softnews           "Programvarunyheter"
+_tr_add2 butt_softnews_tip       "Viktiga nyheter om EndeavourOS programvara"
+
+_tr_add2 install_community            "Installera gemenskapsutgåvor"
+_tr_add2 install_community_tip        "Gemenskapsutgåvor: Sway, Bspwm (notera: online anslutning krävs)"
+
+_tr_add2 ins_syslog                   "Hur man delar systemloggar"
+_tr_add2 ins_syslogtip                "Förklarar hur du kan dela systemloggar när du behöver hjälp"
+
+_tr_add2 ins_logtool                  "Loggar för felsökning"
+_tr_add2 ins_logtooltip               "Välj, skapa och dela felsökningsloggar när du ber om hjälp"
 
 _tr_add2 dm_title                "V&#228;lj sk&#228;rmhanterare"
 _tr_add2 dm_col_name1            "Vald"
@@ -142,7 +209,8 @@ _tr_add2 dm_reboot_required      "Omstart kr&#228;vs f&#246;r att f&#246;r&#228;
 _tr_add2 dm_changed              "DM &#246;ndrad till: "
 _tr_add2 dm_failed               "Byte av DM misslyckades."
 _tr_add2 dm_warning_title        "Varning"
-
+_tr_add2 ins_reso                "Ändra skärmupplösning"
+_tr_add2 ins_resotip             "Ändra skärmupplösning nu"
 _tr_add2 install_installer       "Installerare"
 _tr_add2 install_already         "redan installerad"
 _tr_add2 install_ing             "Installering"
