@@ -11,6 +11,7 @@ MsgForce() {
     quiet="$quiet_old"
 }
 Info() { Msg Info: "$@" ; }
+Note() { MsgForce Note: "$@" ; }                 # like Info() but show always
 Warn() { MsgForce Warning: "$@" ; }
 DIE()  { MsgForce Error: "$@" ; exit 1 ; }
 
@@ -108,9 +109,11 @@ Bumblebee() {
                     fi
                 done
             fi
-            if [ -n "$(grep "$exec2" $desktop)" ] ; then
-                Info "Patching $desktop (no optirun)"
-                AddCmd "sed -i $desktop -e 's|$exec2|$exec1|'"
+            if [ -r $desktop ] ; then
+                if [ -n "$(grep "$exec2" $desktop)" ] ; then
+                    Info "Patching $desktop (no optirun)"
+                    AddCmd "sed -i $desktop -e 's|$exec2|$exec1|'"
+                fi
             fi
             if systemctl status bumblebeed.service >& /dev/null ; then
                 Info "Disabling bumblebeed.service"
@@ -414,11 +417,19 @@ Main()
         return 0
     fi
 
-    # Here the commands are actually executed.
-    # If AUR packages are involved, need to give password twice!
+    if [ -n "$cmd" ] || [ -n "$cmd_nosudo" ] ; then
+        Note "Running the commands may take several minutes..."
+    fi
+
+    # The commands are actually executed here.
+    # If AUR packages are involved, the sudo/root password needs to be given twice!
 
     [ -n "$cmd" ] && $EOS_ROOTER "$cmd"
     [ -n "$cmd_nosudo" ] && $cmd_nosudo
+
+    if [ -n "$cmd" ] || [ -n "$cmd_nosudo" ] ; then
+        Note "To have the changes in effect, you must reboot the computer."
+    fi
 }
 
 Main "$@"
