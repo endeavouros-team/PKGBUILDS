@@ -5,9 +5,9 @@
 pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
-pkgver=3.2.49
-pkgrel=2
-pkgdesc="calamares installer for arch based distros"
+pkgver=3.2.49.1
+pkgrel=1
+pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
@@ -25,7 +25,7 @@ source=(
 )
 
 sha256sums=('SKIP'
-            '05e8eb287baf74b7161ed50a9ce60bea098ccec3183fc77786cc5aa0d3db5fb4')
+            '86bdceb90eb81d42596b780ccd99385002e2b8d45d8fae836156d37b5122d020')
 
 prepare() {
     mv $_reponame-$pkgver            $_reponame
