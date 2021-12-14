@@ -304,7 +304,7 @@ _tr_add2 after_install_vbox2         "To enable VirtualBox Guest utilities, sele
 
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Wired net issue$_question Toggle r8168 and r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
-_tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (then reboot)"                    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (reboot may be needed)"           # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"

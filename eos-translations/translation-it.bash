@@ -303,9 +303,10 @@ _tr_add2 after_install_vbox1         "Abilità le utilità di VirtualBox"
 _tr_add2 after_install_vbox2         "Per abilitare le utilità di VirtualBox, selezionare <b>dopo l'installazione</b> la scheda e fare click sul pulsante"
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Problemi con la rete Lan (Ethernet)$_question Rimuovi il driver realtek r8168$_exclamation"
-_tr_add2 after_install_r8168_tip     "Rimuovendo il pacchetto driver realtek <b>r8168</b> potrebbe risolvere il problema della connessione (riavvio richiesto)"
+_tr_add2 after_install_r8168         "Problemmi di rete$_question Attiva/Disattiva i seguenti driver: r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Scambia i driver r8168 e r8169 (poi riavvia)"                    # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "informazioni"                                         # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "maggiori informazioni sul Desktop/Window Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
