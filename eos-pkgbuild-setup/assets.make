@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # TODO:
-#   - check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
+#   - 2.12.2021:  update of multi-package PKGBUILD? Install should work, but deletion of old packages doesn't!
+#   - older: check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
 
 echoreturn() { echo "$@" ; }     # for "return" values!
 
 echo2()      { echo   "$@" >&2 ; }    # output to stderr
 printf2()    { printf "$@" >&2 ; }    # output to stderr
+
+DebugWithLineNr() {
+    echo2 "${PROGNAME}, line ${BASH_LINENO[0]}: $1"
+}
 
 DIE() {
     echo2 "Error: $@"
@@ -289,7 +294,7 @@ Assets_clone()
         return
     fi
 
-    local xx hook
+    local xx yy hook
 
     # echo2 "It is possible that your local release assets in folder $ASSETSDIR"
     # echo2 "are not in sync with github."
@@ -357,6 +362,7 @@ Assets_clone()
     if [ -n "${ASSET_PACKAGE_EPOCH_HOOKS[*]}" ] ; then
         local oldnames oldname newname
         for xx in "${PKGNAMES[@]}" ; do
+            PkgbuildExists "$xx" 3 || continue
             hook="${ASSET_PACKAGE_EPOCH_HOOKS[$xx]}"
             if [ -n "$hook" ] ; then
                 oldnames="$(/usr/bin/ls -1 ${xx}-*)"  # files *.zst and *.zst.sig
@@ -371,6 +377,18 @@ Assets_clone()
     sleep 1
 
     Popd
+}
+
+PkgbuildExists() {
+    local pkgname="$1"                         # a name from "${PKGNAMES[@]}"
+    local special="$2"
+    local yy=$(basename "$pkgname")
+    if [ -r "$PKGBUILD_ROOTDIR/$yy/PKGBUILD" ] ; then
+        return 0
+    else
+        [ "$special" != "" ] && DebugWithLineNr "PKGBUILD for $pkgname not found."
+        return 1
+    fi
 }
 
 IsEmptyString() {
@@ -801,6 +819,7 @@ Main2()
         ShowIndented "$(JustPkgname "$xx")" 1
         pkgdirname="$(ListNameToPkgName "$xx" yes)"
         test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
+        PkgbuildExists "$pkgdirname" 1 || continue
 
         # get versions from latest PKGBUILDs
         tmp="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
@@ -843,9 +862,11 @@ Main2()
     buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
 
     local built_under_this_pkgname
+    # local remove_under_this_pkgname
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
+        PkgbuildExists "$xx" 2 || continue
         if [ $(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
 
             # old pkg
@@ -864,6 +885,7 @@ Main2()
 
             # Build the package (or possibly many packages!)
             built_under_this_pkgname=()
+            # remove_under_this_pkgname=()   # we don't know only from pkgname!
 
             echo2 "==> $pkgname:"
             buildStartTime="$(TimeStamp)"
