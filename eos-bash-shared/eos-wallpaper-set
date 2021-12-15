@@ -131,6 +131,10 @@ WallpaperSetCommon() {
             # see also:
             # https://www.kubuntuforums.net/showthread.php/66762-Right-click-wallpaper-changer?p=387392&viewfull=1#post387392
             ;;
+        LXDE)
+            AssertPicture endeavouros_lxde.png no
+            pcmanfm --set-wallpaper="$pic"
+            ;;
         LXQT)
             AssertPicture endeavouros_lxqt.png no
             pcmanfm-qt --set-wallpaper="$pic"
