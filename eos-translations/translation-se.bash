@@ -192,9 +192,9 @@ _tr_add2 nb_tab_owncmds_text   "Personliga kommandon"
 _tr_add2 nb_tab_owncmdstip     "Hjälp med att lägga till personliga kommandon"
 _tr_add2 add_more_apps_akm     "En kärnhanterare"
 _tr_add2 add_more_apps_akmtip  "En liten Linux kärnhanterare och informationskälla"
-_tr_add2 butt_owncmds_help:    "Handledning: Personliga kommandon"
-_tr_add2 butt_owncmds_dnd      "Personliga kommandon drag${_and}drop"
-_tr_add2 butt_owncmds_dnd_help:  "Visa ett fönster vart man kan dra fältobjekt för nya knappar"
+_tr_add2 butt_owncmds_help    "Handledning: Personliga kommandon"
+_tr_add2 butt_owncmds_dnd      "Personliga kommandon dra${_and}släpp"
+_tr_add2 butt_owncmds_dnd_help "Visa ett fönster vart man kan dra fältobjekt för nya knappar"
 
 _tr_add2 ins_reso                "Ändra skärmupplösning"
 _tr_add2 ins_resotip             "Ändra skärmupplösning nu"
@@ -206,8 +206,8 @@ _tr_add2 add_more_apps_done2_text  "Eller bläddra bland alla Arch och AUR paket
 _tr_add2 add_more_apps_done2_tip1  "För att installera, använd 'pacman' eller 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "För att installera, använd 'yay'"
 
-_tr_add2 after_install_ew2     "Välj en av EndeavourOS-bakgrunderna" var: "EndeavourOS bakgrunder (välj)
-_tr_add2 after_install_ewtip2     "Skrivbordsbakgrundsväljare"                          # var: "Välj från EndeavourOS standardbakgrunder"
+_tr_add2 after_install_ew2     "Välj en av EndeavourOS-bakgrunderna" # var: "EndeavourOS bakgrunder (välj)
+_tr_add2 after_install_ewtip2  "Skrivbordsbakgrundsväljare"                          # var: "Välj från EndeavourOS standardbakgrunder"
 
 _tr_add2 updt_update_check "Uppdateringskontroll"
 _tr_add2 updt_searching    "söker"
@@ -216,19 +216,19 @@ _tr_add2 updt_failure      "misslyckades$_exclamation"
 _tr_add2 updt_nothing_todo "det finns ingenting att göra"
 _tr_add2 updt_press_enter  "Tryck på ENTER för att stänga detta fönster"
 
-_tr_add2 after_install_pacdiff_tip "Hantera pacnew, pacorig $_och pacsave filer med pacdiff $_and"
+_tr_add2 after_install_pacdiff_tip "Hantera pacnew, pacorig $_and pacsave filer med pacdiff $_and"
 
 _tr_add2 after_install_conf        "Konfigurera" 
 _tr_add2 after_install_more_wall   "Ladda ner mer EndeavourOS-bakgrundsbilder"
 _tr_add2 after_install_more_wall_tip "Ladda ner EndeavourOS äldre och gemenskaps bakgrundsbilder"
-_tr_add2 after_install_info           "Information"
+_tr_add2 after_install_info "Information"
 
 
-_tr_add2 butt_softnews           "Programvarunyheter"
-_tr_add2 butt_softnews_tip       "Viktiga nyheter om EndeavourOS programvara"
+_tr_add2 butt_softnews  "Programvarunyheter"
+_tr_add2 butt_softnews_tip "Viktiga nyheter om EndeavourOS programvara"
 
 _tr_add2 install_community            "Installera gemenskapsutgåvor"
-_tr_add2 install_community_tip        "Gemenskapsutgåvor: Sway, Bspwm (notera: online anslutning krävs)"
+_tr_add2 install_community_tip        "Gemenskapsutgåvor samlingar (online anslutning krävs)"
 
 _tr_add2 ins_syslog                   "Hur man delar systemloggar"
 _tr_add2 ins_syslogtip                "Förklarar hur du kan dela systemloggar när du behöver hjälp"
@@ -247,7 +247,7 @@ _tr_add2 daily_assist_apps_tip "Program sorterade efter kategori"
 _tr_add2 after_install_vbox1   "Aktivera VirtualBox Gästverktyg"
 _tr_add2 after_install_vbox2   "För att aktivera VirtualBox Gästverktyg, Välj  <b>Efter installationen</b> fliken och klicka på knappen"
 
-_tr_add2 after_install_r8168   "Ethernet problem$_frågetecken Ta bort r8168$_utropstecken"
+_tr_add2 after_install_r8168   "Ethernet problem$_question Ta bort r8168$_exclamation"
 _tr_add2 after_install_r8168_tip "Borttagning av paket <b>r8168</b> kan fixa trasig trådbunden anslutning (omstart krävs)"
 
 _tr_add2 daily_assist_DEinfo         "Information"                                         # anta prefixet "DE:", t.e.x.: "Xfce: information"
