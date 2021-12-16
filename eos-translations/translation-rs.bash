@@ -168,7 +168,7 @@ _tr_add2 cal_choose             "Odaberi način instalacije"
 _tr_add2 cal_method             "Način"
 _tr_add2 cal_nosupport          "$PROGNAME: mod nije podržan: "
 _tr_add2 cal_nofile             "$PROGNAME: potreban file ne postoji: "
-_tr_add2 cal_istarted           "Instalacija je zapocela"
+_tr_add2 cal_istarted           "Instalacija je započela"
 _tr_add2 cal_istopped           "Instalacija je zavrsena"
 
 _tr_add2 tail_butt              "Zatvori ovaj prozor"
@@ -198,8 +198,8 @@ _tr_add2 after_install_us_fail    "ažuriranje nije uspjelo!"
 
 # 2020-May-14:
 
-_tr_add2 nb_tab_UsefulTips     "Savjeti"
-_tr_add2 useful_tips_text      "Korisni savjeti"
+_tr_add2 nb_tab_UsefulTips     "Saveti"
+_tr_add2 useful_tips_text      "Korisni saveti"
 
 # 2020-May-16:
 
@@ -223,11 +223,11 @@ _tr_add2 nb_tab_owncmds_text        "Personalizovane komande"               # mo
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Pomoć sa dodavanjem licnih komandi"
 
-_tr_add2 add_more_apps_akm          "Upravljać kernel-a"
-_tr_add2 add_more_apps_akmtip       "Upravljać linux kernel-a i izvor informacija."
+_tr_add2 add_more_apps_akm          "Upravljač kernel-a"
+_tr_add2 add_more_apps_akmtip       "Upravljač linux kernel-a i izvor informacija."
 
 # 2020-Jul-15:
-_tr_add2 butt_owncmds_help        "Uputstvo: Licne komande"
+_tr_add2 butt_owncmds_help        "Uputstvo: Lične komande"
 
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Lične komande drag${_and}drop"
@@ -269,4 +269,43 @@ _tr_add2 updt_press_enter         "Pritisnite ENTER da biste zatvorili prozor"
 #       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 2020-Dec-11:
-_tr_add2 after_install_pacdiff_tip "Upravljajte pacnew, pacorig $_and pacsave file-ovima pomocu pacdiff $_and"
+_tr_add2 after_install_pacdiff_tip "Upravljajte pacnew, pacorig $_and pacsave file-ovima pomoću pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Konfiguriši"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Preuzmi još EndeavourOS wallpaper-a"
+_tr_add2 after_install_more_wall_tip  "Preuzmi starije i community wallpaper-e"
+_tr_add2 after_install_info           "informacije"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Software-ske novosti"
+_tr_add2 butt_softnews_tip            "Bitne novosti o EndeavourOS software-u"
+
+_tr_add2 install_community            "Instaliraj community verziju"
+_tr_add2 install_community_tip        "Kolekcija community verzija  (internet konekcija potrebna)"    # changed 2021-Oct-23
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Kako podjeliti sistemske logove"
+_tr_add2 ins_syslogtip                "Objašnjava kako podjeliti logove kad Vam je potrebna pomoć"
+_tr_add2 ins_logtool                  "Logovi za rešavanje problema"
+_tr_add2 ins_logtooltip               "Odaberite, kreirajte i podjelite logove kad trazite pomoć"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Pomoćnik"
+_tr_add2 daily_assistant_text        "Korisni alati za dnevne zadatke"
+_tr_add2 after_install_itab          "Odaberi početni Welcome tab "
+_tr_add2 after_install_itab_tip      "Postavlja Welcome tab koji se prikazuje pri pokretanju"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Kategorije aplikacija"
+_tr_add2 daily_assist_apps_tip       "Aplikacije sortirane po kategorijama"
+
+_tr_add2 after_install_vbox1         "Omogući VirtualBox Guest alate"
+_tr_add2 after_install_vbox2         "Da bi omogućili VirtualBox Guest alate, odaberite <b>AfterInstall</b> tab i kliknite dugme "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Problemi sa ožičenom mrežom$_question Zamjeni r8168 i r8169 upravljački program$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Biraj između r8168 i r8169 upravljačkih programa (možda će biti potrebno ponovno pokretanje)"           # changed 2021-Dec-14 !!
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "informacije"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "više informacija o ovom Desktop/Window Manager-u"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
