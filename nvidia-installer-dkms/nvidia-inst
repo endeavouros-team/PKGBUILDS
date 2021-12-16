@@ -187,7 +187,6 @@ ShowCommandsToRun() {
 
     [ "$test" = "yes" ] && return 1   # dryrun
 
-    echo2 ""
     return 0
 }
 
