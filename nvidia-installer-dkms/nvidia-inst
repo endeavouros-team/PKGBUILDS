@@ -192,7 +192,7 @@ ShowCommandsToRun() {
 
 Options() {
     local opts
-    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore"
+    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore,legacyrepo"
 
     opts="$(/usr/bin/getopt -o=chibfnpqt --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -211,6 +211,7 @@ Options() {
             -t | --test)      test=yes ;;
             -c | --conf)      create_conf=yes ;;
             -i | --ignore)    ignore_errors=yes ;;
+            --legacyrepo)     Setup3rdPartyRepo ;;
             --32)             bit32=yes ;;
             --series)         series="$2" ; shift ;;
             --drivers)
@@ -229,6 +230,7 @@ Options:
   -t, --test              Test mode. Nothing in your system will be modified.
   -c, --conf              Create also file $conf_file (might be needed on some systems).
   -i, --ignore            Ignore all errors (useful for testing only).
+  --legacyrepo            Add a third party repository for legacy (470 and 390 series) Nvidia drivers.
   --32                    Install also support for 32-bit apps.
   --drivers               Show supported NVIDIA driver series for your card.
   --series                (Advanced) Use this series for testing.
@@ -242,6 +244,35 @@ EOF
         shift
     done
     Info "Selected mode: $mode"
+}
+
+Setup3rdPartyRepo() {
+    if [ -z "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
+        Note "Setting up repository [kernel-lts]."
+        Note "This repo provides legacy Nvidia drivers and LTS kernels."
+        Note "More info: https://wiki.archlinux.org/title/Unofficial_user_repositories#kernel-lts"
+
+        local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
+
+        cat <<EOF > "$tmpfile"
+
+[kernel-lts]
+SigLevel = Required
+Server = https://repo.m2x.dev/current/\$repo/\$arch
+EOF
+        local cmds="cat $tmpfile >> $pacmanconf"
+        local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
+        if [ -z "pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key" ] ; then
+            cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
+            cmds+="; pacman-key --lsign-key $jonathon_key"
+        fi
+        $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
+        rm -f $tmpfile
+        Info "Repository [kernel-lts] was added to $pacmanconf."
+    else
+        Info "[kernel-lts] is already set up in $pacmanconf."
+    fi
+    exit 0
 }
 
 AllRemovables() {
@@ -301,9 +332,9 @@ ProperNvidiaPackages() {
     esac
 
     if [ "$bit32" = "yes" ] ; then
-        if [ -z "$(grep "^\[multilib\]" /etc/pacman.conf)" ] ; then
+        if [ -z "$(grep "^\[multilib\]" $pacmanconf)" ] ; then
             # cannot install 32-bit packages if [multilib] repo not active
-            DIE "To support 32-bit apps, enable the [multilib] repo in /etc/pacman.conf."
+            DIE "To support 32-bit apps, enable the [multilib] repo in $pacmanconf."
         fi
     else
         p_nvidia32=""
@@ -314,6 +345,7 @@ Main()
 {
     local progname="$(basename "$0")"
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
     local bumblebee=no
     local force=no
