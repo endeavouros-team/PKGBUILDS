@@ -198,8 +198,8 @@ _tr_add2 after_install_us_fail    "ažuriranje nije uspjelo!"
 
 # 2020-May-14:
 
-_tr_add2 nb_tab_UsefulTips     "Savjeti"
-_tr_add2 useful_tips_text      "Korisni savjeti"
+_tr_add2 nb_tab_UsefulTips     "Saveti"
+_tr_add2 useful_tips_text      "Korisni saveti"
 
 # 2020-May-16:
 

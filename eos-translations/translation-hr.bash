@@ -223,8 +223,8 @@ _tr_add2 nb_tab_owncmds_text        "Personalizovane komande"               # mo
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Pomoć sa dodavanjem licnih komandi"
 
-_tr_add2 add_more_apps_akm          "Upravljać kernel-a"
-_tr_add2 add_more_apps_akmtip       "Upravljać linux kernel-a i izvor informacija."
+_tr_add2 add_more_apps_akm          "Upravljač kernel-a"
+_tr_add2 add_more_apps_akmtip       "Upravljač linux kernel-a i izvor informacija."
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help        "Uputstvo: Licne komande"
