@@ -359,7 +359,7 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
 
-    local PROGVERSION="0.0.4"
+    local PROGVERSION=0.0.5
 
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
@@ -435,13 +435,12 @@ Main()
 
     if [ -n "$aurs" ] ; then
         local txt="\n"
-        txt+="Program $progname does not support installing packages from AUR.\n"
-        txt+="Packages not found in any currently configured repository:\n"
-        txt+="    ${aurs[*]}\n"
-        txt+="Consider using a third party repository for these packages, like the\n"
-        txt+="    [kernel-lts]\n"
-        txt+="by @jonathon (more info: https://gitlab.com/m2x.dev/kernel-lts/repository).\n"
-        txt+="Sorry, bailing out."
+        txt+="   Sorry, $progname does not support installing packages from AUR.\n"
+        txt+="   Consider using option --legacyrepo first. It adds a third party repo\n"
+        txt+="   by @jonathon (see: https://gitlab.com/m2x.dev/kernel-lts/repository).\n\n"
+        txt+="   Packages missing from currently configured repositories:\n"
+        txt+="       ${aurs[*]}\n"
+        txt+="   Bailing out."
         DIE "$txt"
     fi
 
