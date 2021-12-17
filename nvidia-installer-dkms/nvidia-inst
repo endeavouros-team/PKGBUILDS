@@ -363,10 +363,10 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
 
-    local PROGVERSION=0.0.8
+    local PROGVERSION=0.0.9
 
     if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
-        DIE "package 'Sorry, nvidia-installer-db' must be installed"
+        DIE "Sorry, package 'nvidia-installer-db' must be installed"
     fi
 
     Info "Running: $progname v$PROGVERSION"
