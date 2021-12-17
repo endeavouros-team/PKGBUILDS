@@ -192,9 +192,9 @@ ShowCommandsToRun() {
 
 Options() {
     local opts
-    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore,legacyrepo"
+    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore,legacyrepo,version"
 
-    opts="$(/usr/bin/getopt -o=chibfnpqt --longoptions $lopts --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=chibfnpqtv --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -218,6 +218,7 @@ Options() {
                 nvidia-driver-supported-branches -a
                 exit 0
                 ;;
+            -v | --version)   echo "$progname $PROGVERSION" ; exit 0 ;;
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options]
@@ -230,6 +231,7 @@ Options:
   -t, --test              Test mode. Nothing in your system will be modified.
   -c, --conf              Create also file $conf_file (might be needed on some systems).
   -i, --ignore            Ignore all errors (useful for testing only).
+  -v, --version           Show version if this software.
   --legacyrepo            Add a third party repository for legacy (470 and 390 series) Nvidia drivers.
   --32                    Install also support for 32-bit apps.
   --drivers               Show supported NVIDIA driver series for your card.
@@ -262,7 +264,8 @@ Server = https://repo.m2x.dev/current/\$repo/\$arch
 EOF
         local cmds="cat $tmpfile >> $pacmanconf"
         local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
-        if [ -z "pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key" ] ; then
+        local result="$(pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key)"
+        if [ -z "$result" ] ; then
             cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
             cmds+="; pacman-key --lsign-key $jonathon_key"
         fi
@@ -359,7 +362,7 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
 
-    local PROGVERSION=0.0.5
+    local PROGVERSION=0.0.6
 
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
