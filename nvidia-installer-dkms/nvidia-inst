@@ -363,7 +363,7 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
 
-    local PROGVERSION=0.0.9
+    local PROGVERSION=0.0.10
 
     if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
         DIE "Sorry, package 'nvidia-installer-db' must be installed"
@@ -456,9 +456,8 @@ Main()
     # If AUR packages are involved, the sudo/root password needs to be given twice!
 
     if [ -n "$cmd" ] ; then
-        # cmd="printf \"\n==> Note: running the commands may take several minutes...\n\n\"; $cmd"
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
-        $EOS_ROOTER "time bash -c '$cmd'"
+        $EOS_ROOTER "$cmd"
         Note "To have the changes in effect, you must reboot the computer."
     fi
 }
