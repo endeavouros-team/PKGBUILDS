@@ -268,6 +268,7 @@ EOF
         if [ -z "$result" ] ; then
             cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
             cmds+="; pacman-key --lsign-key $jonathon_key"
+            cmds+="; pacman -Sy"
         fi
         $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
         rm -f $tmpfile
@@ -362,7 +363,7 @@ Main()
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
 
-    local PROGVERSION=0.0.6
+    local PROGVERSION=0.0.7
 
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
