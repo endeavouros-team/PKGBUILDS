@@ -22,11 +22,6 @@ Note() { MsgForce Note: "$@" ; }                 # like Info() but show always
 Warn() { MsgForce Warning: "$@" ; }
 DIE()  { MsgForce Error: "$@" ; exit 1 ; }
 
-PkgInstall() {
-    # prepares installing given packages
-    install+=("$@")
-}
-
 IsInstalled() {
     local pkg="$1"
     case "$(echo "$all_installed_packages" | grep "^$pkg$")" in
@@ -41,6 +36,11 @@ IsRepoPkg() {
         "") return 1 ;;
         *)  return 0 ;;
     esac
+}
+
+PkgInstall() {
+    # prepares installing given packages
+    install+=("$@")
 }
 
 PkgRemove() {
@@ -58,13 +58,29 @@ KeepsAndRemoves() {
     # remove pr_nvidia[] except install[]
 
     local rp kp
-    local all_installed_packages="$(pacman -Qsq)"
 
-    for rp in "${pr_nvidia[@]}" ; do
-        for kp in "${install[@]}" ; do
-            [ "$rp" = "$kp" ] && break
+    if [ -z "$install" ] ; then
+        PkgRemove "${pr_nvidia[@]}"
+    else
+        for rp in "${pr_nvidia[@]}" ; do
+            if IsInstalled "$rp" ; then
+                for kp in "${install[@]}" ; do
+                    [ "$rp" = "$kp" ] && break
+                done
+                if [ "$rp" != "$kp" ] ; then
+                    PkgRemove "$rp"
+                fi
+            fi
         done
-        [ "$rp" = "$kp" ] || PkgRemove "$rp"
+    fi
+
+    # remove already installed packages from $install
+    local tmp=("${install[@]}")
+    install=()
+    for kp in "${tmp[@]}" ; do
+        if ! IsInstalled "$kp" ; then
+            install+=("$kp")
+        fi
     done
 
     # check if install contains any AUR stuff
@@ -96,14 +112,23 @@ Bumblebee() {
 
             if [ "$user" != "root" ] ; then
                 for group in bumblebee video ; do
-                    Info "Adding user $user to group: $group"
-                    AddCmd "gpasswd -a $user $group"
+		    if [ -z "$(id $user | grep "($group)")" ] ; then
+			Info "Adding user $user to group: $group"
+			AddCmd "gpasswd -a $user $group"
+		    fi
                 done
             fi
-            Info "Patching $desktop (with optirun)"
-            AddCmd "sed -i $desktop -e 's|$exec1|$exec2|'"
-            Info "Enabling bumblebeed.service"
-            AddCmd "systemctl enable bumblebeed.service"
+            if [ -n "$(grep "$exec1" $desktop)" ] ; then
+                Info "Patching $desktop (with optirun)"
+                AddCmd "sed -i $desktop -e 's|$exec1|$exec2|'"
+            fi
+            systemctl status bumblebeed.service >& /dev/null
+            case "$?" in
+                4)
+                    Info "Enabling bumblebeed.service"
+                    AddCmd "systemctl enable bumblebeed.service"
+                    ;;
+            esac
             ;;
         *)
             # remove bumblebee settings
@@ -115,16 +140,14 @@ Bumblebee() {
                     fi
                 done
             fi
-            if [ -r $desktop ] ; then
-                if [ -n "$(grep "$exec2" $desktop)" ] ; then
-                    Info "Patching $desktop (no optirun)"
-                    AddCmd "sed -i $desktop -e 's|$exec2|$exec1|'"
-                fi
-            fi
-            if systemctl status bumblebeed.service >& /dev/null ; then
-                Info "Disabling bumblebeed.service"
-                AddCmd "systemctl disable bumblebeed.service"
-            fi
+            systemctl status bumblebeed.service >& /dev/null
+            case "$?" in
+                4) ;;
+                *)
+                    Info "Disabling bumblebeed.service"
+                    AddCmd "systemctl disable bumblebeed.service"
+                    ;;
+            esac
             ;;
     esac
 }
@@ -245,7 +268,6 @@ EOF
         esac
         shift
     done
-    Info "Selected mode: $mode"
 }
 
 Setup3rdPartyRepo() {
@@ -362,15 +384,13 @@ Main()
     local ignore_errors=no
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
+    local all_installed_packages="$(pacman -Qsq)"
 
-    local PROGVERSION=0.0.10
+    local PROGVERSION=0.0.11
 
     if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
         DIE "Sorry, package 'nvidia-installer-db' must be installed"
     fi
-
-    Info "Running: $progname v$PROGVERSION"
-    Info "Command line: $progname $*"
 
     local pr_nvidia=()
 
@@ -400,6 +420,10 @@ Main()
 
     Options "$@"
 
+    Info "Running: $progname v$PROGVERSION"
+    Info "Command line: $progname $*"
+    Info "Selected mode: $mode"
+
     if [ "$force" = "no" ] ; then
         if ! IsNvidiaCard ; then
             echo "$progname: no Nvidia card found."
@@ -411,20 +435,12 @@ Main()
 
     # Now all packages in various situations are known.
 
+    Bumblebee  # add or remove bumblebee stuff !!
     case "$mode" in
-        bumblebee)
-            Bumblebee
-            ;;
-        nouveau)
-            Nouveau
-            ;;
-        prime)
-            Prime
-            ;;
-        nvidia)
-            Bumblebee  # remove all bumblebee stuff
-            OnlyNvidia
-            ;;
+        bumblebee) ;;
+        nouveau)   Nouveau ;;
+        prime)     Prime   ;;
+        nvidia)    OnlyNvidia ;;
     esac
 
     KeepsAndRemoves
@@ -457,8 +473,7 @@ Main()
 
     if [ -n "$cmd" ] ; then
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
-        $EOS_ROOTER "$cmd"
-        Note "To have the changes in effect, you must reboot the computer."
+        $EOS_ROOTER "$cmd" && Note "To have the changes in effect, you must reboot the computer."
     fi
 }
 
