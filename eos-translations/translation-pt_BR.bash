@@ -282,3 +282,30 @@ _tr_add2 butt_softnews_tip            "Importantes novidades sobre o EndeavourOS
 
 _tr_add2 install_community            "Instale edições da comunidade"
 _tr_add2 install_community_tip        "Edições da comunidade: Sway, Bspwm (nota: requer online)"
+
+# 2021-May-01:
+_tr_add2 ins_syslog                   "Como compartilhar os registos do sistema"
+_tr_add2 ins_syslogtip                "Explica como compartilhar os registros do sistema quando precisar de ajuda"
+_tr_add2 ins_logtool                  "Registros para resolução de problemas"
+_tr_add2 ins_logtooltip               "Selecionar, criar e compartilhar registros para resolução de problemas ao pedir ajuda"
+
+# 2021-May-20:
+_tr_add2 nb_tab_DailyAssistant       "Assistente"
+_tr_add2 daily_assistant_text        "Ferramentas para tarefas úteis e/ou diárias"
+_tr_add2 after_install_itab          "Selecionar a aba inicial de Welcome"
+_tr_add2 after_install_itab_tip      "Define a aba que o Welcome mostra ao iniciar"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Categorias de programas"
+_tr_add2 daily_assist_apps_tip       "Programas ordenedos por categoria"
+
+_tr_add2 after_install_vbox1         "Ativar utilidades VirtualBox Guest"
+_tr_add2 after_install_vbox2         "Para ativar as utilidades VirtualBox Guest, selecione a aba <b>ApósInstalação</b> e clique no botão"
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Problemas de rede$_question Mude entre os drivers r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Troque entre os drivers r8168 e r8169 (Reinicialização pode ser necessária)"           # changed 2021-Dec-14 !!
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "Informação"                                         # assumir o prefixo "DE:", por ex.: "Xfce: informação"
+_tr_add2 daily_assist_DEinfo_tip     "Mais informação sobre este Ambiente de Desktop/Gerenciador de janelas"  # assumir o prefixo "DE:", por ex.: "Xfce: mais informação ..."
