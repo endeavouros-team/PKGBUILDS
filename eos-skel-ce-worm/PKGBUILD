@@ -1,0 +1,22 @@
+# Maintainer: codic12 <https://github.com/codic12>
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+_pkgname=worm
+pkgname=eos-skel-ce-worm
+pkgver=1.0
+pkgrel=1
+pkgdesc="pre user creation skel setup for worm EOS-CE"
+arch=('any')
+groups=('eos-ce')
+url="https://github.com/EndeavourOS-Community-Editions/${pkgname}"
+license=('GPL')
+depends=('git')
+source=("${_pkgname}::git+https://github.com/EndeavourOS-Community-Editions/${_pkgname}.git")
+sha256sums=('SKIP')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/" "${pkgdir}${PREFIX}/"
+}
