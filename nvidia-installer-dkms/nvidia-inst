@@ -158,7 +158,8 @@ Prime() {
 
 AddConfFileLine() {
     local line="$1"
-    AddCmd "echo '$line' >> $conf_file"
+    local tmp="$(printf "echo %-40s >> $conf_file\n" "'$line'")"
+    AddCmd "$tmp"
 }
 
 CreateConfFile() {
@@ -386,7 +387,7 @@ Main()
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local all_installed_packages="$(pacman -Qsq)"
 
-    local PROGVERSION=0.0.11
+    local PROGVERSION=0.0.12
 
     if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
         DIE "Sorry, package 'nvidia-installer-db' must be installed"
