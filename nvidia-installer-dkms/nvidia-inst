@@ -255,7 +255,7 @@ Options:
   -t, --test              Test mode. Nothing in your system will be modified.
   -c, --conf              Create also file $conf_file (might be needed on some systems).
   -i, --ignore            Ignore all errors (useful for testing only).
-  -v, --version           Show version if this software.
+  -v, --version           Show version of this software.
   --legacyrepo            Add a third party repository for legacy (470 and 390 series) Nvidia drivers.
   --32                    Install also support for 32-bit apps.
   --drivers               Show supported NVIDIA driver series for your card.
@@ -387,7 +387,7 @@ Main()
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local all_installed_packages="$(pacman -Qsq)"
 
-    local PROGVERSION=0.0.12
+    local PROGVERSION=0.0.13
 
     if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
         DIE "Sorry, package 'nvidia-installer-db' must be installed"
