@@ -154,6 +154,42 @@ Bumblebee() {
 
 Prime() {
     PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
+    KernelParametersToGrub
+}
+
+Nouveau() {
+    PkgInstall xf86-video-nouveau
+}
+
+OnlyNvidia() {
+    if [ "$series" = "$latest_from_arch" ] ; then
+        PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
+    else
+        PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
+    fi
+    KernelParametersToGrub
+}
+
+KernelParametersToGrub() {
+    local file=/boot/grub/grub.cfg
+    local param="nvidia-drm.modeset=1"
+
+    if [ -f $file ] ; then
+        case "$mode" in
+            nvidia | prime)
+                Info "Patching kernel line with $param"
+                AddCmd "nvidia-installer-kernel-para"
+                AddCmd "grub-mkconfig -o $file"
+                ;;
+            *)
+                if [ -n "$(grep "$param" $file)" ] ; then
+                    Info "Removing kernel parameter $param"
+                    AddCmd "nvidia-installer-kernel-para remove"
+                    AddCmd "grub-mkconfig -o $file"
+                fi
+                ;;
+        esac
+    fi
 }
 
 AddConfFileLine() {
@@ -180,18 +216,6 @@ CreateConfFile() {
             Info "Removing file $conf_file"
             AddCmd "rm -f $conf_file"
         fi
-    fi
-}
-
-Nouveau() {
-    PkgInstall xf86-video-nouveau
-}
-
-OnlyNvidia() {
-    if [ "$series" = "$latest_from_arch" ] ; then
-        PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
-    else
-        PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
     fi
 }
 
@@ -276,6 +300,7 @@ Setup3rdPartyRepo() {
         Note "Setting up repository [kernel-lts]."
         Note "This repo provides legacy Nvidia drivers and LTS kernels."
         Note "More info: https://wiki.archlinux.org/title/Unofficial_user_repositories#kernel-lts"
+        Note "==> Will also update all packages (pacman -Syu) <== !!"
 
         local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
 
@@ -291,7 +316,7 @@ EOF
         if [ -z "$result" ] ; then
             cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
             cmds+="; pacman-key --lsign-key $jonathon_key"
-            cmds+="; pacman -Sy"
+            cmds+="; pacman -Syu"
         fi
         $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
         rm -f $tmpfile
@@ -368,6 +393,25 @@ ProperNvidiaPackages() {
     fi
 }
 
+SanityChecks() {
+    if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
+        DIE "This program must be started as a non-root user."
+    fi
+
+    if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
+        DIE "Sorry, package 'nvidia-installer-db' must be installed"
+    fi
+
+    if [ ! -x /usr/bin/nvidia-installer-kernel-para ] ; then
+        DIE "Sorry, package 'nvidia-installer-dkms' version 3.3.12-1 or newer must be installed"
+    fi
+
+    local dversion=$(pacman -Q nvidia-installer-dkms | awk '{print $2}')
+    if [ $(vercmp $dversion 3.3.12-1) -lt 0 ] ; then
+        DIE "Sorry, package 'nvidia-installer-dkms' version must be 3.3.12-1 or newer"
+    fi
+}
+
 Main()
 {
     local progname="$(basename "$0")"
@@ -387,11 +431,9 @@ Main()
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local all_installed_packages="$(pacman -Qsq)"
 
-    local PROGVERSION=0.0.13
+    local PROGVERSION=0.0.14
 
-    if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
-        DIE "Sorry, package 'nvidia-installer-db' must be installed"
-    fi
+    SanityChecks
 
     local pr_nvidia=()
 
@@ -449,7 +491,7 @@ Main()
 
     if [ -n "$install" ] ; then
         Info "Installing packages: ${install[*]}"
-        cmd="pacman -Sqy --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+        cmd="pacman -Syuq --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
     fi
     if [ -n "$remove" ] ; then
         Info "Removing packages: ${remove[*]}"
