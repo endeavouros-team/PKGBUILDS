@@ -9,22 +9,45 @@ SetKernelParameter() {
 
     local pname="$1"      # parameter name in $file
     local pvalue="$2"     # parameter value in $file
+    local mode="$3"       # add (default) or remove
+
+    [ -n "$mode" ] || mode=add
 
     local file=/etc/default/grub
     local varname="GRUB_CMDLINE_LINUX_DEFAULT"
     local currline="$(grep ^"$varname"= $file | grep "$pname"=)"
 
     if [ -n "$currline" ] ; then
-        printf "==> already set:\n%s\n" "$currline"
-        return 1    # nothing changed
+        case "$mode" in
+            remove)
+                echo "==> removing kernel parameter $pname=$pvalue"
+                # first sed change below fails if $pname=$pvalue is first
+                sed -i $file \
+                    -e "s|^\($varname=\".*\) $pname=$pvalue\(.*\)$|\1\2|" \
+                    -e "s|^\($varname=\".*\)$pname=$pvalue \(.*\)$|\1\2|"
+                ;;
+            add)
+                printf "==> already set:\n%s\n" "$currline"
+                return 1    # nothing changed
+                ;;
+        esac
+    else
+        case "$mode" in
+            add)
+                echo "==> adding kernel parameter $pname=$pvalue"
+                sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $pname=$pvalue\"|"
+                ;;
+            remove)
+                currline="$(grep ^"$varname"= $file)"
+                printf "==> already removed:\n%s\n" "$currline"
+                return 1    # nothing changed
+                ;;
+        esac
     fi
-
-    echo "==> adding kernel parameter $pname=$pvalue"
-    sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $pname=$pvalue\"|"
 }
 
 Main() {
-    SetKernelParameter "nvidia-drm.modeset" "1"
+    SetKernelParameter "nvidia-drm.modeset" "1" "$@"
 }
 
 Main "$@"
