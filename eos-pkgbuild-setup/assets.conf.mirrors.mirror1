@@ -43,9 +43,10 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-apps-info
     eos-bash-shared
     eos-skel-ce-bspwm
-    eos-skel-ce-sway
     eos-skel-ce-openbox
     eos-skel-ce-qtile
+    eos-skel-ce-sway
+    eos-skel-ce-worm
     eos-hooks
     eos-log-tool
     eos-qogir-icons
