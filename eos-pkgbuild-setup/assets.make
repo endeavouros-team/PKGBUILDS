@@ -734,6 +734,7 @@ $PROGNAME [ options ]
 Options:
     -n  | -nl | --dryrun-local  Show what would be done, but do nothing. Use local assets.
     -nn | -nr | --dryrun        Show what would be done, but do nothing.
+    -ad | --allow-downgrade     New package may have smaller version number.
     --repoup                    (Advanced) Force update of repository database files.
     --aurdiff                   Show PKGBUILD diff for AUR packages.
 EOF
@@ -760,6 +761,7 @@ Main2()
     local filelist_txt
     local use_filelist               # yes or no
     local ask_timeout=60
+    local allow_downgrade=no
     local AUR_DIFFS=()
     local AUR_DIFF_PKGS=()
     local mirror_check_wait=180
@@ -781,14 +783,19 @@ Main2()
                     cmd=dryrun ; use_local_assets=1 ;;
                 --dryrun | -nr | -nn)
                     cmd=dryrun ;;
-                --mirrorcheck=*)
-                    mirror_check_wait="${xx#*=}";;
                 --repoup)
                     repoup=1 ;;                  # sync repo even when no packages are built
                 --aurdiff)
                     aurdiff=1 ;;
+                --allow-downgrade | -ad)
+                    allow_downgrade=yes ;;
+
+                # currently not used!
+                --mirrorcheck=*)
+                    mirror_check_wait="${xx#*=}";;
                 --versuffix=*)
-                    pkgver_suffix="${xx#*=}" ;;  # currently not used!
+                    pkgver_suffix="${xx#*=}" ;;
+
                 *) Usage 0  ;;
             esac
         done
@@ -830,6 +837,7 @@ Main2()
     local buildsavedir          # tmp storage for built packages
     local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
     local notexist='<non-existing>'
+    local cmpresult
 
     echo2 "Finding package info ..."
 
@@ -856,11 +864,22 @@ Main2()
                 ;;
         esac
         oldv["$pkgdirname"]="$tmpcurr"
-        if [ $(Vercmp "$tmp" "$tmpcurr") -gt 0 ] ; then
+
+        cmpresult=$(Vercmp "$tmp" "$tmpcurr")
+
+        if [ $cmpresult -eq 0 ] ; then
+            echo2 "OK ($tmpcurr)"
+            continue
+        fi
+        if [ $cmpresult -lt 0 ] &&  [ "$allow_downgrade" = "no" ] ; then
+            echo2 "OK ($tmpcurr)"
+            continue
+        fi
+        if [ $cmpresult -gt 0 ] ; then
             echo2 "update pending from $tmpcurr to $tmp"
             WantAurDiffs "$xx" "$pkgdirname"
         else
-            echo2 "OK ($tmpcurr)"
+            echo2 "downgrade pending from $tmpcurr to $tmp"
         fi
     done
     if [ -n "$AUR_DIFFS" ] ; then
@@ -886,38 +905,44 @@ Main2()
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
         PkgbuildExists "$xx" 2 || continue
-        if [ $(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
 
-            # Build the package (or possibly many packages!)
-            built_under_this_pkgname=()
-            # remove_under_this_pkgname=()   # we don't know only from pkgname!
+        cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
 
-            echo2 "==> $pkgdirname:"
-            buildStartTime="$(TimeStamp)"
-
-            Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
-
-            echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
-            for yy in "${built_under_this_pkgname[@]}" ; do
-                echo2 "    ==> $yy"
-            done
-
-            # determine old pkgs
-            for zz in zst xz ; do
-                for yy in "${built_under_this_pkgname[@]}" ; do
-                    pkgname="$(PkgnameFromPkg "$yy")"
-                    pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
-                    test -n "$pkg" && {
-                        removable+=("$pkg")
-                        removable+=("$pkg".sig)
-
-                        yy="$(basename "$pkg")"
-                        removableassets+=("$yy")
-                        #removableassets+=("$yy".sig)
-                    }
-                done
-            done
+        # See if we have to build.
+        [ "$cmpresult" -eq 0 ] && continue
+        if [ "$cmpresult" -lt 0 ] && [ "$allow_downgrade" = "no" ] ; then
+            continue
         fi
+
+        # Build the package (or possibly many packages!)
+        built_under_this_pkgname=()
+        # remove_under_this_pkgname=()   # we don't know only from pkgname!
+
+        echo2 "==> $pkgdirname:"
+        buildStartTime="$(TimeStamp)"
+
+        Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
+
+        echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
+        for yy in "${built_under_this_pkgname[@]}" ; do
+            echo2 "    ==> $yy"
+        done
+
+        # determine old pkgs
+        for zz in zst xz ; do
+            for yy in "${built_under_this_pkgname[@]}" ; do
+                pkgname="$(PkgnameFromPkg "$yy")"
+                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
+                test -n "$pkg" && {
+                    removable+=("$pkg")
+                    removable+=("$pkg".sig)
+
+                    yy="$(basename "$pkg")"
+                    removableassets+=("$yy")
+                    #removableassets+=("$yy".sig)
+                }
+            done
+        done
     done
 
     case "$SIGNER" in
