@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # TODO:
-#   - 2.12.2021:  update of multi-package PKGBUILD? Install should work, but deletion of old packages doesn't!
+#   - 2.12.2021:  update of multi-package PKGBUILD? Install should work, but deletion of old packages (thus updating) doesn't!
 #   - older: check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
+#   - better epoch handling
 
 echoreturn() { echo "$@" ; }     # for "return" values!
 
@@ -535,8 +536,7 @@ RunPreHooks()
     fi
 }
 
-RunPostHooks()
-{
+GitUpdate_repo() {
     local newrepodir
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
         case "$REPONAME" in
@@ -549,15 +549,19 @@ RunPostHooks()
         esac
         if [ -e "$newrepodir/.GitUpdate" ] ; then
             if [ -x /usr/bin/GitUpdate ] ; then
-                cd "$newrepodir"
+                FinalStopBeforeSyncing "$REPONAME repo"
+                pushd "$newrepodir" >/dev/null
                 /usr/bin/GitUpdate
+                popd >/dev/null
             else
                 WARN "$FUNCNAME: no GitUpdate app found."
             fi
         fi
     fi
-#    return
-    
+}
+
+RunPostHooks()
+{
     if [ -n "$ASSET_POST_HOOKS" ] ; then
         ShowIndented "Running asset post hooks"
         local xx
@@ -705,6 +709,16 @@ Vercmp() {
     else
         vercmp "$1" "$2"
     fi
+}
+
+PkgnameFilter() {
+    sed 's|-[^-]*-[^-]*-[^-]*$||'
+}
+
+PkgnameFromPkg() {
+    local pkg="$1"
+    pkg="$(basename "$pkg")"
+    echo "$pkg" | PkgnameFilter
 }
 
 Usage() {
@@ -869,20 +883,6 @@ Main2()
         PkgbuildExists "$xx" 2 || continue
         if [ $(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}") -gt 0 ] ; then
 
-            # old pkg
-            pkgname="$(PkgBuildName "$pkgdirname")"
-            for zz in zst xz ; do
-                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
-                test -n "$pkg" && {
-                    removable+=("$pkg")
-                    removable+=("$pkg".sig)
-
-                    yy="$(basename "$pkg")"
-                    removableassets+=("$yy")
-                    #removableassets+=("$yy".sig)
-                }
-            done
-
             # Build the package (or possibly many packages!)
             built_under_this_pkgname=()
             # remove_under_this_pkgname=()   # we don't know only from pkgname!
@@ -897,6 +897,21 @@ Main2()
                 echo2 "    ==> $yy"
             done
 
+            # determine old pkgs
+            for zz in zst xz ; do
+                for yy in "${built_under_this_pkgname[@]}" ; do
+                    pkgname="$(PkgnameFromPkg "$yy")"
+                    pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
+                    test -n "$pkg" && {
+                        removable+=("$pkg")
+                        removable+=("$pkg".sig)
+
+                        yy="$(basename "$pkg")"
+                        removableassets+=("$yy")
+                        #removableassets+=("$yy".sig)
+                    }
+                done
+            done
         fi
     done
 
@@ -949,7 +964,8 @@ Main2()
                 for xx in "${built[@]}" ; do
                     case "$xx" in
                         *.pkg.tar.$_COMPRESSOR)
-                            pkgname="$(basename "$xx" | sed 's|\-[0-9].*$||')"
+                            #pkgname="$(basename "$xx" | sed 's|\-[0-9].*$||')"
+                            pkgname="$(PkgnameFromPkg "$xx")"
                             repo_removes+=("$pkgname")
                             ;;
                     esac
@@ -986,7 +1002,8 @@ Main2()
                 
                 if [ -n "$repo_removes" ] ; then
                     # check if repo db contains any of the packages to be removed
-                    yy="$(tar --list --exclude */desc -f "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR | sed 's|-[0-9].*$||')"
+                    # yy="$(tar --list --exclude */desc -f "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR | sed 's|-[0-9].*$||')"
+                    yy="$(tar --list -f "$ASSETSDIR/$REPONAME".db.tar.$REPO_COMPRESSOR | grep "/desc$" | sed 's|-[^-]*-[^-]*$||')"
                     zz=()
                     for xx in "${repo_removes[@]}" ; do
                         if [ -n "$(echo "$yy" | grep "^$xx$")" ] ; then
@@ -1018,6 +1035,12 @@ Main2()
                 cp -a "$ASSETSDIR/$REPONAME".$xx.tar.$REPO_COMPRESSOR.sig "$ASSETSDIR/$REPONAME".$xx.sig
             fi
         done
+
+        # Now all is ready for syncing with github.
+
+        GitUpdate_repo
+
+        FinalStopBeforeSyncing "$REPONAME release assets"
 
         case "$REPONAME" in
             endeavouros)
@@ -1126,14 +1149,17 @@ ManualCheckOfAssets() {
     echo2 ""
 }
 
-ManageGithubReleaseAssets() {
-    echo2 "Final stop before syncing with github!"
+FinalStopBeforeSyncing() {
+    local what="$1"
+    printf2 "\n%s\n" "Final stop before syncing '$what' with github!"
     read2 -p "Continue (Y/n)? "
     case "$REPLY" in
         [yY]*|"") ;;
         *) Exit 0 ;;
     esac
+}
 
+ManageGithubReleaseAssets() {
     local last_tag=$((${#RELEASE_TAGS[@]} - 1))
     local assets
 
