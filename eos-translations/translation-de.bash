@@ -303,7 +303,7 @@ _tr_add2 after_install_vbox1         "VirtualBox-Gasterweiterungen aktivieren"
 _tr_add2 after_install_vbox2         "Um die VirtualBox-Gasterweiterungen zu aktivieren, wähle das Tab <b>AfterInstall</b> und klicke auf die Schaltfläche "
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Problem mit dem kabelgebundenen Netzwerk$_question Wechsel zwischen den Treibern r8168 und r8169$_exclamation"
+_tr_add2 after_install_r8168         "Kabelnetzwerk-Probleme$_question Tausche Treiber r8168 und r8169$_exclamation"
 _tr_add2 after_install_r8168_tip     "Wechsle zwischen den Treibern r8168 und r8169 (Neustart erforderlich)"
 
 # 2021-Oct-08
