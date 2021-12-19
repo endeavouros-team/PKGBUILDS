@@ -887,7 +887,7 @@ Main2()
             built_under_this_pkgname=()
             # remove_under_this_pkgname=()   # we don't know only from pkgname!
 
-            echo2 "==> $pkgname:"
+            echo2 "==> $pkgdirname:"
             buildStartTime="$(TimeStamp)"
 
             Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
