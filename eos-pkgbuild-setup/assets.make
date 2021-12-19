@@ -132,6 +132,11 @@ Build()
     local workdir=$(mktemp -d)
     local log=$workdir/buildlog-"$pkgdirname".log
     local missdeps="Missing dependencies:"
+    local opts=""
+
+    if [ -n "${PKG_MAKEPKG_OPTIONS[$pkgdirname]}" ] ; then   # from assets.conf
+        opts="${PKG_MAKEPKG_OPTIONS[$pkgdirname]}"
+    fi
 
     Pushd "$workdir"
       cp -r "$pkgbuilddir" .
@@ -140,7 +145,7 @@ Build()
 
       # now build, assume we have PKGBUILD
       # special handling for missing dependencies
-      LANG=C makepkg --clean 2>/dev/null >"$log" || {
+      LANG=C makepkg --clean $opts 2>/dev/null >"$log" || {
           if [ -z "$(grep "$missdeps" "$log")" ] ; then
               Popd -c2
               DIE "makepkg for '$pkgname' failed"
