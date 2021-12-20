@@ -127,11 +127,13 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) für Xfce4"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME erneut zu starten, führe diesen Befehl im Terminal aus: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Um $PRETTY_PROGNAME erneut zu starten, führe diesen Befehl im Terminal aus:\n\n$PROGNAME --enable"
 _tr_add2 settings_dis_text       "$PRETTY_PROGNAME reaktivieren:"
 _tr_add2 settings_dis_title      "Wie kann ich $PRETTY_PROGNAME wieder aktivieren?"
 _tr_add2 settings_dis_butt       "Merke ich mir$_exclamation"
 _tr_add2 settings_dis_buttip     "Versprochen"
+_tr_add2 settings_ena_butt       "Lieber doch nicht$_exclamation"
+_tr_add2 settings_ena_buttip     "Sicher ist sicher"
 
 _tr_add2 help_butt_title         "$PRETTY_PROGNAME Hilfe"
 _tr_add2 help_butt_text          "Mehr Informationen über das Programm $PRETTY_PROGNAME"

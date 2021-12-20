@@ -1101,12 +1101,18 @@ EOF
 
     case "$value" in
         disable)
-            echo "$(ltr settings_dis_contents)" | \
-                eos_yad --text-info --image=dialog-information --text="$(ltr settings_dis_text)" \
-                        --title="$(ltr settings_dis_title)" \
-                        --geometry=500x200 --wrap \
-                        --fontname="Monospace Regular 12" \
-                        --button=" $(ltr settings_dis_butt)!face-angel!$(ltr settings_dis_buttip)":0 >& /dev/null
+            confirm_dialog=$(eos_yad --image=dialog-information \
+                    --text="$(ltr settings_dis_contents)" --wrap \
+                    --title="$(ltr settings_dis_title)" \
+                    --geometry=500x50 --wrap \
+                    --button=" $(ltr settings_dis_butt)!face-angel!$(ltr settings_dis_buttip)":0 >& /dev/null \
+                    --button=" $(ltr settings_ena_butt)!face-surprise!$(ltr settings_ena_buttip)":1 >& /dev/null)
+            confirm_return=$?
+                    if [ $confirm_return -eq 0 ]; then
+                        exit 0
+                    else
+                        sed -i "$WELCOME_CONFIG" -e 's|^Greeter=.*$|Greeter='"enable"'|' && exit 0
+                    fi
             ;;
         check)
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
