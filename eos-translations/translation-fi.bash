@@ -127,7 +127,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) Xfce:lle"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Saat $PRETTY_PROGNAME:n taas käyttöön kun ajat komennon: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Saat $PRETTY_PROGNAME:n taas käyttöön kun ajat komennon:\n<tt>   $PROGNAME --enable</tt>\n"
 _tr_add2 settings_dis_text       "Ota uudestaan käyttöön $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Kuinka otat uudestaan käyttöön $PRETTY_PROGNAME:n"
 _tr_add2 settings_dis_butt       "Selvä"
