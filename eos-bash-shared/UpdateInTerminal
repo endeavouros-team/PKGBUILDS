@@ -47,6 +47,7 @@ Options() {
             --noaur) checkAur=no ;;
             --lang=*) lang="${pp#*=}" ;;
             --nt) new_terminal=yes ;;
+            --sync) allow_sync=yes ;;
             --help | -h) Usage ; return 1 ;;
             -*) DIE "unsupported option '$pp'" ;;
             *)  DIE "unsupported parameter '$pp'" ;;
@@ -64,6 +65,7 @@ Options:
     --noup     Don't check $upname updates.
     --noaur    Don't check AUR updates.
     --nt       Check updates in a new terminal window.
+    --sync     Run program 'sync' afterwards if updates were detected.
 EOF
 }
 
@@ -76,6 +78,8 @@ Main() {
     local aur_helper="$EOS_AUR_HELPER"
     local new_terminal=no
     local new_terminal_options=""  # skips only --nt
+    local updates_found=no
+    local allow_sync=no
 
     [ -n "$aur_helper" ] || aur_helper=yay
 
@@ -93,7 +97,7 @@ Main() {
         echo2 ":: $(ltr updt_searching) $upname $(ltr updt_for_updates)..."
         Checkupdates
         case "$?" in
-            0) $EOS_ROOTER 'pacman -Syu' ;;
+            0) $EOS_ROOTER 'pacman -Syu' ; updates_found=yes ;;
             1) DIE "$(echo Checkupdates: $(ltr updt_failure) | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
             2) echo2 " $(ltr updt_nothing_todo)" ;;
         esac
@@ -104,11 +108,19 @@ Main() {
         echo2 "AUR $(ltr updt_update_check):"
         which $aur_helper >& /dev/null && {
             $aur_helper -Sua
+            updates_found=yes
         } || {
             echo2 ":: Warning: no AUR helper found."
             echo2 ":: Please check configuration file /etc/eos-script-lib-yad.conf,"
             echo2 ":: and check that the configured AUR helper is installed."
         }
+    fi
+
+    if [ "$updates_found" = "yes" ] ; then
+        if [ "$allow_sync" = "yes" ] || [ "$SyncAfterUpdate" = "yes" ] ; then  # SyncAfterUpdate is an environment variable
+            echo2 "==> Running 'sync' after update."
+            sync
+        fi
     fi
 }
 
