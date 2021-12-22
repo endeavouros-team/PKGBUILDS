@@ -117,7 +117,7 @@ _tr_add2 add_more_apps_bt_bm   "Blåtand (blueman) för Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "För att köra $PRETTY_PROGNAME igen, starta terminalen och kör: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "För att köra $PRETTY_PROGNAME igen, starta en terminal terminal och kör:\n<tt>   $PROGNAME --enable</tt>\n"
 _tr_add2 settings_dis_text       "Återaktivera $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Hur man återaktiverar $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Jag kommer ihåg"
