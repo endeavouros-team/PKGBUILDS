@@ -13,6 +13,6 @@ source=('git+https://github.com/endeavouros-team/endeavouros-lxdm-theme')
 sha512sums=('SKIP')
 
 package() {
-    install -dm 755 $pkgdir/usr/share/lxde/themes/endeavouros
+    install -dm 755 $pkgdir/usr/share/lxdm/themes/endeavouros
     cp -r --no-preserve=ownership endeavouros-lxdm-theme/endeavouros $pkgdir/usr/share/lxdm/themes/
 }
