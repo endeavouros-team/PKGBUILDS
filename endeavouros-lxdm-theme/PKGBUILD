@@ -1,7 +1,7 @@
 # Original Source: https://sourceforge.net/projects/lxdm/
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=endeavouros-lxdm-theme
-pkgver=1.0
+pkgver=2.0
 pkgrel=1
 pkgdesc='EndeavourOS lxdm-gtk3 theme'
 arch=(any)
