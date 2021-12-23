@@ -2,7 +2,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=endeavouros-lxde-theme
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS lxde-gtk3 theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'
@@ -14,5 +14,5 @@ sha512sums=('SKIP')
 
 package() {
     install -dm 755 $pkgdir/usr/share/lxde/themes/endeavouros
-    cp -r --no-preserve=ownership endeavouros $pkgdir/usr/share/lxde/themes/
+    cp -r --no-preserve=ownership endeavouros-lxde-theme/endeavouros $pkgdir/usr/share/lxde/themes/
 }
