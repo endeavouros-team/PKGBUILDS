@@ -4,7 +4,7 @@
 _pkgname=worm
 pkgname=eos-skel-ce-worm
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc="pre user creation skel setup for worm EOS-CE"
 arch=('any')
 groups=('eos-ce')
@@ -18,5 +18,6 @@ package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
     mkdir -p "${pkgdir}${PREFIX}/.config/"
+    chmod +x .config/worm/rc
     cp -R ".config/" "${pkgdir}${PREFIX}/"
 }
