@@ -270,3 +270,42 @@ _tr_add2 updt_press_enter         "Press ENTER to close this window"
 
 # 2020-Dec-11:
 _tr_add2 after_install_pacdiff_tip "Управление файлами pacnew, pacorig $_and pacsave (необходимы pacdiff или meld, например) с помощью pacdiff $_and"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Настройка"                             # a starting verb on a sentence "Настройка eos-update-notifier"
+_tr_add2 after_install_more_wall      "Скачать больше обоев EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Скачать обои EndeavourOS для рабочего стола, оригинальные и от сообщества"
+_tr_add2 after_install_info           "information"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Новости софта"
+_tr_add2 butt_softnews_tip            "Важные новости о программном обеспечении EndeavourOS"
+
+_tr_add2 install_community            "Установить версии ОС от сообщества"
+_tr_add2 install_community_tip        "Коллекция версий ОС от сообщества Endeavour (только онлайн установка)"    # changed
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Как поделиться системными логами?"
+_tr_add2 ins_syslogtip                "Объясняет, как вы можете обмениваться системными логами для получения помощи (на английском)"
+_tr_add2 ins_logtool                  "Логи"
+_tr_add2 ins_logtooltip               "Выбор, создание и публикация логов для устранения неполадок при обращении за помощью (на английском)"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Ассистент"
+_tr_add2 daily_assistant_text        "Инструменты выполнения полезных и/или повседневных задач"
+_tr_add2 after_install_itab          "Стартовая вкладка Welcome"
+_tr_add2 after_install_itab_tip      "Выбор вкладки, отображаемой при старте Welcome"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Приложения по категориям"
+_tr_add2 daily_assist_apps_tip       "Приложения, отсортированные по категориям"
+
+_tr_add2 after_install_vbox1         "Включить VirtualBox Guest utilities"
+_tr_add2 after_install_vbox2         "Для включения VirtualBox Guest utilities, выберите вкладку <b>После установки</b> и нажмите кнопку"
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Wired net issue$_question Toggle r8168 and r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (reboot may be needed)"           # changed 2021-Dec-14 !!
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "информация"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "дополнительная информация о Вашем DE / WM"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
