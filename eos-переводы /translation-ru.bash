@@ -113,13 +113,13 @@ _tr_add2 general_info_abtip        "Информация о приложении
 
 _tr_add2 add_more_apps_text        "Установка популярных программ"
 
-_tr_add2 add_more_apps_lotip       "Office tools (libreoffice-fresh)"
+_tr_add2 add_more_apps_lotip       "Офисный пакет"
 
 _tr_add2 add_more_apps_ch          "Chromium"
-_tr_add2 add_more_apps_chtip       "Chromium Web Browser"
+_tr_add2 add_more_apps_chtip       "Веб-браузер с открытым исходным кодом"
 
 _tr_add2 add_more_apps_fw          "Firewall"
-_tr_add2 add_more_apps_fwtip       "Gufw firewall"
+_tr_add2 add_more_apps_fwtip       "Gufw, простой брандмауэр"
 
 _tr_add2 add_more_apps_bt          "Bluetooth (blueberry) для Xfce"
 _tr_add2 add_more_apps_bt_bm       "Bluetooth (blueman) для Xfce"
