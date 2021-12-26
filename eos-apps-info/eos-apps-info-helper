@@ -91,18 +91,32 @@ Man2html() {
     url="$manstore/$app.html"
 }
 
+URL_from_own_list() {
+    local pkgname="$1"
+    if [ -n "OwnInfoApps" ] ; then
+        [ -n "$pkgname" ] && url="${OwnInfoApps[$pkgname]}"
+        case "$url" in
+            URL) URL_from_package "$pkgname" ;;
+        esac
+    fi
+}
+
 URL_from_package() {
     local pkgname="$1"
     local opt
     local prog
-    for prog in /usr/bin/yay ; do
-        for opt in "-Qi" "-Si" ; do
-	    url="$(LANG=C $prog $opt "$pkgname" 2>/dev/null | grep -w ^URL | head -n1 | awk '{print $NF}')"
-	    if [ -n "$url" ] ; then
-	        return
-	    fi
-        done
+    for prog in /usr/bin/yay /usr/bin/pacman ; do
+        if [ -x $prog ] ; then
+            for opt in "-Qi" "-Si" ; do
+	        url="$(LANG=C $prog $opt "$pkgname" 2>/dev/null | grep -w ^URL | head -n1 | awk '{print $NF}')"
+	        if [ -n "$url" ] ; then
+	            return
+	        fi
+            done
+            return
+        fi
     done
+    DIE "cannot find yay or pacman!!"
 }
 
 URL_from_local_man() {
@@ -277,25 +291,32 @@ Main()
     local searcher=duckduckgo
     local dir
 
+    declare -A OwnInfoApps
+
     Options "$@"
 
     GetConfigs
 
     # find the URL
-    for folder in "${folders[@]}" ; do
-        dir="$folder/pageinfo"
-        if [ -r "$dir/$name/$name.html" ] ; then
-            url="$dir/$name/$name.html"
-            break
-        elif [ -r "$dir/$name.url" ] ; then
-            url=$(/usr/bin/cat "$dir/$name.url")
-            echo2 "==> '$url'"
-            break
-        elif [ -x "$dir/$name.helpcmd" ] ; then
-            url="$("$dir/$name.helpcmd")"
-            [ -z "$url" ] && return
-        fi
-    done
+
+    [ -z "$url" ] && URL_from_own_list "$name"
+
+    if [ -z "$url" ] ; then
+        for folder in "${folders[@]}" ; do
+            dir="$folder/pageinfo"
+            if [ -r "$dir/$name/$name.html" ] ; then
+                url="$dir/$name/$name.html"
+                break
+            elif [ -r "$dir/$name.url" ] ; then
+                url=$(/usr/bin/cat "$dir/$name.url")
+                echo2 "==> '$url'"
+                break
+            elif [ -x "$dir/$name.helpcmd" ] ; then
+                url="$("$dir/$name.helpcmd")"
+                [ -z "$url" ] && return
+            fi
+        done
+    fi
     [ -z "$url" ] && URL_from_bonus
     [ -z "$url" ] && URL_from_local_man "$name"
     [ -z "$url" ] && URL_from_package "$name"
