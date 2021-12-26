@@ -904,7 +904,8 @@ Main2()
     echo2 "Check if building is needed..."
     for xx in "${PKGNAMES[@]}" ; do
         pkgdirname="$(ListNameToPkgName "$xx" no)"
-        PkgbuildExists "$xx" 2 || continue
+        #PkgbuildExists "$xx" 2 || continue
+        PkgbuildExists "$xx" || continue
 
         cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
 
@@ -1261,6 +1262,11 @@ ManageGithubReleaseAssets() {
         fi
 
         AssetCmdLast add-release-assets "$tag" "${assets[@]}"
+
+        if [ "$tag" = "${RELEASE_TAGS[$last_tag]}" ] ; then
+            sleep 1
+            break
+        fi
 
         ManualCheckOfAssets addition
     done
