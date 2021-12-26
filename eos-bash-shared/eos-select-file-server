@@ -3,7 +3,7 @@
 # This program is only meant to be called by Welcome at install.
 
 WarnExit() {
-    Msg2 "need elevated privileges." warning
+    Msg2 "$1" warning
     exit 0
 }
 
