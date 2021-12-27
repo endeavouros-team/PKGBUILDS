@@ -414,6 +414,7 @@ AskCountriesAndOptions() {
     else
         command+=(--field="Max number of freshest mirrors":num $default_number)    # --latest
     fi
+    command+=(--field="Download timeout in seconds":num 5)                         # --download-timeout
 
     local free_params=""
     if [ -r "$free_params_file" ] ; then
@@ -490,6 +491,7 @@ BuildReflectorCommand() {
     else
         reflector_cmd+=(--latest "${reflector_info[$((ix++))]}")
     fi
+    reflector_cmd+=(--download-timeout "${reflector_info[$((ix++))]}")
 
     # add optional free parameters to the command and save free params to file
     printf "" > "$free_params_file"
