@@ -12,7 +12,7 @@ GetGpuIds() {
     local infobase="$(lspci -vnn | grep -P 'VGA|Display|3D')"
     local info
     local vcode
-    local v id
+    local v # id
     local result=""
 
     for v in nvidia intel amd ; do
@@ -68,7 +68,7 @@ If no parameter is given, check if the currently installed Nvidia card is suppor
 
 Program return codes:
     0 = nvidia-dkms is supported
-    2 = only nvidia-390x-dkms is supported (obsolete)
+    2 = only legacy driver (e.g. nvidia-${series_prev1}xx-dkms) is supported
     1 = no Nvidia card detected or not supported
 EOF
 }
@@ -78,60 +78,69 @@ Main()
     local progname=nvidia-installer-check
     local vendorinfo=""        # e.g. nvidia:1234:2345|intel:4321:5432|amd:9876:6789
     local db_dir=/tmp          # /var/lib/pci
-    local nvidia_id_file=$db_dir/nvidia.ids
-    local nvidia_id_file_390=$db_dir/nvidia-390xx.ids
     local nvidia_info
-    local id ids=""
+    local id=""
+    local ids=""
     local ret_ids
+    local series=""
+    local data=""
     local driver_found=""
     local resultcode=1
     local TESTING=no           # set to "no" on release !!!
+
+    # currently supported driver series:
+    local series_now=495
+    local series_prev1=470
+    local series_prev2=390
 
     GetGpuIds "$@"
     nvidia_info=$(echo "$vendorinfo" | cut -d '|' -f 1 | grep nvidia)
 
     if [ -n "$nvidia_info" ] ; then
-        nvidia-installer-update-db --tmpdb # >& /dev/null      # --tmpdb: files go to /tmp
-        ret_ids="$(echo "$nvidia_info" | sed -e 's|^nvidia:||' -e 's|:| |')"
-        for id in $ret_ids ; do
-            if [ -n "$(grep -w "$id" $nvidia_id_file)" ] ; then
+        if [ -n "$id" ] ; then
+            data="$(nvidia-driver-supported-branches $id)"
+            #id=$(echo "$data" | grep "card id" | awk '{print $NF}')
+            series="$(echo "$data" | grep "^Series " | awk '{print $2}' | cut -d ':' -f1)"
+        else
+            data="$(nvidia-driver-supported-branches)"
+            id=$(echo "$data" | grep "card id" | awk '{print $NF}')
+            series="$(echo "$data" | grep "^Series " | awk '{print $2}' | cut -d ':' -f1)"
+        fi
+
+        case "$series" in
+            $series_now)
                 cat <<EOF >&2
-Your graphics card (id: $id) is supported by the nvidia-dkms driver.
-To install a driver for this card, you can use nvidia-installer-dkms.
+Your graphics card is (id: $id) supported by the nvidia-dkms driver.
+To install a driver for this card, you can use e.g. nvidia-installer-dkms.
 
 EOF
                 driver_found+=" nvidia-dkms"
-            elif [ -n "$(grep -w "$id" $nvidia_id_file_390)" ] ; then
+                resultcode=0
+                ;;
+            $series_prev1 | $series_prev2)
                 cat <<EOF >&2
-Your graphics card (id: $id) is supported by the nvidia-390xx-dkms driver.
+Your graphics card (id: $id) is supported by the nvidia-${series}xx-dkms driver.
 To install a driver for this card:
   * Use the --force option with nvidia-installer-dkms.
-  * Then, BEFORE rebooting, install nvidia-390xx-dkms from the AUR.
+  * Then, BEFORE rebooting,
+      - uninstall nvidia-dkms, nvidia-utils, and related other Nvidia driver packages
+      - install $series series packages
     For example:
-      yay -S nvidia-390xx-dkms
+      yay -Rsn nvidia-dkms nvidia-utils nvidia-settings
+      yay -S nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings
 
 EOF
-                driver_found+=" nvidia-390xx-dkms"
-            else
-                if [ -z "$ids" ] ; then
-                    ids=($id)
-                else
-                    ids+=($id)
-                fi
-            fi
-        done
-        case "$driver_found" in
-            *nvidia-dkms*)        resultcode=0 ;;
-            " nvidia-390xx-dkms") resultcode=2 ;;
+                driver_found+=" nvidia-${series}xx-dkms"
+                resultcode=2
+                ;;
             *)
-                if [ ${#ids[@]} -eq 1 ] ; then
-                    echo2 "Sorry, your Nvidia card (id: ${ids[*]}) is not supported by nvidia-dkms nor nvidia-390xx-dkms."
-                else
-                    echo2 "Sorry, your Nvidia cards (ids: ${ids[*]}) are not supported by nvidia-dkms nor nvidia-390xx-dkms."
-                fi
+                series=""   # means: no supported driver found
+                cat <<EOF >&2
+Sorry, no supported Nvidia driver found for your graphics card (id $id).
+EOF
+                resultcode=1
                 ;;
         esac
-        rm -f $nvidia_id_file $nvidia_id_file_390
     else
         case "$vendorinfo" in
             nvidia:*) echo2 "Card '$vendorinfo' not found." ;;
@@ -139,7 +148,7 @@ EOF
         esac
     fi
 
-    return $resultcode         # 0=OK, 1=FAIL, 2=OK (but only 390xx)
+    return $resultcode         # 0=OK, 1=FAIL, 2=OK (but only older series driver)
 }
 
 Main "$@"
