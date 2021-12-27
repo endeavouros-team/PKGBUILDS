@@ -392,7 +392,7 @@ PkgbuildExists() {
     if [ -r "$PKGBUILD_ROOTDIR/$yy/PKGBUILD" ] ; then
         return 0
     else
-        [ "$special" != "" ] && DebugWithLineNr "PKGBUILD for $pkgname not found."
+        [ "$special" != "" ] && DebugWithLineNr "no PKGBUILD!"
         return 1
     fi
 }
