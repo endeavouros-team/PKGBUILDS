@@ -558,6 +558,7 @@ GitUpdate_repo() {
                 pushd "$newrepodir" >/dev/null
                 /usr/bin/GitUpdate
                 popd >/dev/null
+                ManualCheckOfAssets addition repo
             else
                 WARN "$FUNCNAME: no GitUpdate app found."
             fi
@@ -1163,6 +1164,7 @@ AssetCmdLast() {
 
 ManualCheckOfAssets() {
     local op="$1"
+    local what="$2"
     sleep 1
     while true ; do
         if [ 0 -eq 1 ] ; then
@@ -1171,7 +1173,11 @@ ManualCheckOfAssets() {
         else
             : #printf2 "\n%s "  "Is $op OK (y/n)?"
         fi
-        read2 -t 10 -p "$tag: Is $op OK (Y/n)? "
+        case "$what" in
+            assets) what="$tag" ;;
+            repo)   ;;
+        esac
+        read2 -t 10 -p "$what: Is $op OK (Y/n)? "
         case "$REPLY" in
             [yY]* | "") break ;;
             *) ;;
@@ -1223,7 +1229,7 @@ ManageGithubReleaseAssets() {
             rm -f $filelist_txt
         fi
 
-        ManualCheckOfAssets deletion
+        ManualCheckOfAssets deletion assets
 
         # Now manage new assets.
 
@@ -1268,7 +1274,7 @@ ManageGithubReleaseAssets() {
             break
         fi
 
-        ManualCheckOfAssets addition
+        ManualCheckOfAssets addition assets
     done
 }
 
