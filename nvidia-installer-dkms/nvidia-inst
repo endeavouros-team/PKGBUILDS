@@ -282,7 +282,7 @@ Options:
   -c, --conf              Create also file $conf_file (might be needed on some systems).
   -i, --ignore            Ignore all errors (useful for testing only).
   -v, --version           Show version of this software.
-  --legacyrepo            Add a third party repository for legacy (470 and 390 series) Nvidia drivers.
+  --legacyrepo            Add a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
   --32                    Install also support for 32-bit apps.
   --drivers               Show supported NVIDIA driver series for your card.
   --series                (Advanced) Use this series for testing.
@@ -332,9 +332,6 @@ EOF
 AllRemovables() {
     # Find all packages that this program may uninstall and add them to array pr_nvidia.
 
-    local s1=${nvidia_series_supported[1]}
-    local s2=${nvidia_series_supported[2]}
-
     pr_nvidia=(
         bumblebee
         bbswitch
@@ -345,7 +342,7 @@ AllRemovables() {
         $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-installer|-cg-')
 
         # nvidia packages from AUR:
-        $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$s1|$s2")
+        $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$series_prev1|$series_prev2")
     )
     readarray -t pr_nvidia <<< $(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
 }
@@ -361,27 +358,20 @@ ProperNvidiaPackages() {
         series="$($finder | grep ^Series | awk '{print $2}' | tr -d ':')"
     fi
 
-    case "$mode" in
-        nouveau) ;;
-        *) case "$series" in
-               "") DIE "Sorry, $finder fails to detect a supported Nvidia driver." ;;
-               *)  Info "Nvidia series $series is supported." ;;
-           esac
-           ;;
-    esac
-
     case "$series" in
         $latest_from_arch)
             p_nvidia="nvidia-dkms nvidia-utils nvidia-settings"
             p_nvidia32="lib32-nvidia-utils"
             ;;
-        ${nvidia_series_supported[1]} | ${nvidia_series_supported[2]})
-            # 470 and 390 series, currently (23 Nov 2021) still working, from AUR
+        $series_prev1 | $series_prev2)
             p_nvidia="nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings" # no hook!?
             p_nvidia32="lib32-nvidia-${series}xx-utils"
             ;;
         *)
-            DIE "Sorry, Nvidia series '$series' is not supported by $progname"
+            case "$mode" in
+                nouveau) ;;
+                *) DIE "Sorry, Nvidia series '$series' is not supported by $progname" ;;
+            esac
             ;;
     esac
 
@@ -416,6 +406,11 @@ SanityChecks() {
 
 Main()
 {
+    # Support only these Nvidia series (must update these values too!):
+    local series_now=495
+    local series_prev1=470
+    local series_prev2=390
+
     local progname="$(basename "$0")"
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     local pacmanconf=/etc/pacman.conf
@@ -433,7 +428,7 @@ Main()
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local all_installed_packages="$(pacman -Qsq)"
 
-    local PROGVERSION=0.0.15
+    local PROGVERSION=0.0.16
 
     SanityChecks
 
@@ -449,17 +444,9 @@ Main()
     local cmd=""
 
     local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
-    local currently_assumed=495
-    if [ "$latest_from_arch" != "$currently_assumed" ] ; then
-        Warn "Series $currently_assumed is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
+    if [ "$latest_from_arch" != "$series_now" ] ; then
+        Warn "Series $series_now is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
     fi
-
-    # only these nvidia series packages are supported
-    local nvidia_series_supported=(                   # these will change in the future...
-        $latest_from_arch
-        470
-        390
-    )
 
     AllRemovables
 
