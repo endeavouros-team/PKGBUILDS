@@ -31,8 +31,8 @@ Os_release() {
     [ -n "$doc" ] || doc=https://discovery.endeavouros.com
 
     sed -i $file \
-        -e "s|^NAME=.*$|NAME='EndeavourOS'|" \
-        -e "s|^PRETTY_NAME=.*$|PRETTY_NAME='EndeavourOS'|" \
+        -e 's|^NAME=.*$|NAME=EndeavourOS|' \
+        -e 's|^PRETTY_NAME=.*$|PRETTY_NAME=EndeavourOS|' \
         -e "s|^HOME_URL=.*$|HOME_URL='$home'|" \
         -e "s|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL='$doc'|" \
         -e "s|^SUPPORT_URL=.*$|SUPPORT_URL='$support'|" \
