@@ -322,19 +322,6 @@ def remove_file(path):
             log_info("{} not found. That's ok.".format(path))
 
 
-def create_nvidia_conf(path):
-    """ Creates specific Xorg nvidia setup """
-    log_info("Creating {} file...".format(path))
-    if not TEST:
-        with open(path, 'w') as nvidia:
-            nvidia.write('Section "Device"\n')
-            nvidia.write('    Identifier "Nvidia Card"\n')
-            nvidia.write('    Driver "nvidia"\n')
-            nvidia.write('    VendorName "NVIDIA Corporation"\n')
-            nvidia.write('    Option "NoLogo" "true"\n')
-            nvidia.write('EndSection\n')
-
-
 def post_install(driver):
     """ Run post installation actions here """
 
@@ -360,9 +347,7 @@ def post_install(driver):
         if driver.startswith("nvidia"):
             nvidia_kernel_params()
 
-    if driver.startswith("nvidia"):
-        create_nvidia_conf(nvidia_conf_path)
-    else:
+    if not driver.startswith("nvidia"):
         # bumblebee and nouveau
         remove_file(nvidia_conf_path)
 
