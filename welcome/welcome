@@ -826,7 +826,7 @@ AddMoreApps() {
   )
   IsInstalled "$libreoffice" || {
       ((shown_app_buttons++))
-      tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn 'yad_Install $libreoffice')
+      tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
   }
   IsInstalled chromium || {
       ((shown_app_buttons++))
