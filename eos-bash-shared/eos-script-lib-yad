@@ -31,7 +31,7 @@ export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 
 eos_yad() {
     GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@" | grep -v "^WINDOW DECORATIONS RELOADED$"
-    return ${PIPESTATUS[0]}
+    return "${PIPESTATUS[0]}"
 }
 #export -f eos_yad
 
@@ -42,7 +42,7 @@ source $translations_dir/translations.bash || {
 }
 
 eos_GetArch() {
-    local arch="$(/usr/bin/uname -m)"
+    local arch; arch="$(/usr/bin/uname -m)"
     case "$arch" in
         armv7* | aarch64) arch=armv7h ;;
     esac
@@ -72,7 +72,7 @@ eos_select_browser() {
             return
         fi
     done
-    eos_yad_WARN "$FUNCNAME: cannot find a browser"
+    eos_yad_WARN "${FUNCNAME[0]}: cannot find a browser"
 }
 
 eos_yad_terminal() {
@@ -188,10 +188,12 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
     local termopts=""
     local waitopt=""
     local opts
+    local retval
 
     # Handle options for variables cmd ... waitopt.
-    opts="$(getopt -o=p:t:w:E --longoptions prompt:,term:,wait:,no-enter-wait --name "$FUNCNAME" -- "$@")"
-    [ $? -eq 0 ] || return 1
+    opts="$(getopt -o=p:t:w:E --longoptions prompt:,term:,wait:,no-enter-wait --name "${FUNCNAME[0]}" -- "$@")"
+    retval=$?
+    [ $retval -eq 0 ] || return 1
     eval set -- "$opts"
     while true ; do
         case "$1" in
@@ -209,46 +211,46 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
         shift
     done
     cmd="$*"
-    [ -n "$cmd" ] || { echo "$FUNCNAME: warning: required command is missing." >&2; return 1; }
+    [ -n "$cmd" ] || { echo "${FUNCNAME[0]}: warning: required command is missing." >&2; return 1; }
 
     # Get the available/configured terminal.
-    local term="$(eos_yad_terminal)"
+    local term; term="$(eos_yad_terminal)"
     test -n "$term" || return 1
 
     mkdir -p "$HOME/.cache"
-    local tmpfile=$(mktemp "$HOME/.cache/$FUNCNAME.XXXXX")
+    local tmpfile; tmpfile=$(mktemp "$HOME/.cache/${FUNCNAME[0]}.XXXXX")
 
-    echo "#!/bin/bash"                                   >> $tmpfile
-    test -n "$prompt" && echo "echo $prompt"             >> $tmpfile
-    echo "$cmd"                                          >> $tmpfile
-    echo "echo"                                          >> $tmpfile
+    echo "#!/bin/bash"                                   >> "$tmpfile"
+    test -n "$prompt" && echo "echo $prompt"             >> "$tmpfile"
+    echo "$cmd"                                          >> "$tmpfile"
+    echo "echo"                                          >> "$tmpfile"
     case "$term" in
         /usr/bin/deepin-terminal | deepin-terminal) ;;
         *)
             _init_translations
             if [ "$waitopt" != "--no-enter-wait" ] ; then
-                echo "read -p '$(ltr updt_press_enter): '"    >> $tmpfile
+                echo "read -p '$(ltr updt_press_enter): '"    >> "$tmpfile"
             fi
             ;;
     esac
-    echo "rm -f $tmpfile"                                >> $tmpfile                    # this may cause issues in very special cases!
+    echo "rm -f $tmpfile"                                >> "$tmpfile"                    # this may cause issues in very special cases!
 
-    chmod +x $tmpfile
+    chmod +x "$tmpfile"
 
     # Try make sure terminal $term does not return to the caller immediately
     # but waits until the commands from $tmpfile are executed.
     case "$term" in
         /usr/bin/gnome-terminal | gnome-terminal)
-            $term $termopts --wait -- $tmpfile ;;
+            $term $termopts --wait -- "$tmpfile" ;;
         /usr/bin/xfce4-terminal | xfce4-terminal)
-            $term --disable-server $termopts -e $tmpfile ;;
+            $term --disable-server $termopts -e "$tmpfile" ;;
         *)
-            $term $termopts -e $tmpfile ;;
+            $term $termopts -e "$tmpfile" ;;
     esac
 
     # The following DOES NOT WORK with plain gnome-terminal:
     #echo "Deleting '$tmpfile'."
-    #rm -f $tmpfile
+    #rm -f "$tmpfile"
 }
 
 eos_yad_RunCmdTermBash() {
@@ -347,20 +349,20 @@ eos_yad__detectDE()
       esac
     fi
 
-    if [ x"$DE" = x"" ]; then
+    if [ "$DE" = "" ]; then
       # classic fallbacks
       if [ x"$KDE_FULL_SESSION" != x"" ]; then DE=kde;
       elif [ x"$GNOME_DESKTOP_SESSION_ID" != x"" ]; then DE=gnome;
       elif [ x"$MATE_DESKTOP_SESSION_ID" != x"" ]; then DE=mate;
-      elif `dbus-send --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.GetNameOwner string:org.gnome.SessionManager > /dev/null 2>&1` ; then DE=gnome;
+      elif dbus-send --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.GetNameOwner string:org.gnome.SessionManager &>/dev/null ; then DE=gnome;
       elif xprop -root _DT_SAVE_MODE 2> /dev/null | grep ' = \"xfce4\"$' >/dev/null 2>&1; then DE=xfce;
       elif xprop -root 2> /dev/null | grep -i '^xfce_desktop_window' >/dev/null 2>&1; then DE=xfce
-      elif echo $DESKTOP | grep -q '^Enlightenment'; then DE=enlightenment;
+      elif echo "$DESKTOP" | grep -q '^Enlightenment'; then DE=enlightenment;
       elif [ x"$LXQT_SESSION_CONFIG" != x"" ]; then DE=lxqt;
       fi
     fi
 
-    if [ x"$DE" = x"" ]; then
+    if [ "$DE" = "" ]; then
       # fallback to checking $DESKTOP_SESSION
       case "$DESKTOP_SESSION" in
          gnome)
@@ -381,7 +383,7 @@ eos_yad__detectDE()
       esac
     fi
 
-    if [ x"$DE" = x"" ]; then
+    if [ "$DE" = "" ]; then
       # fallback to uname output for other platforms
       case "$(uname 2>/dev/null)" in 
         CYGWIN*)
@@ -393,12 +395,11 @@ eos_yad__detectDE()
       esac
     fi
 
-    if [ x"$DE" = x"gnome" ]; then
+    if [ "$DE" = "gnome" ]; then
         # gnome-default-applications-properties is only available in GNOME 2.x
         # but not in GNOME 3.x
-        if [ 0 -eq 1 ] ; then
-            which gnome-default-applications-properties > /dev/null 2>&1  || DE="gnome3"        # This is no more needed (?)
-        fi
+        :
+        # which gnome-default-applications-properties > /dev/null 2>&1  || DE="gnome3"        # This is no more needed (?)
     fi
 
     if [ -f "$XDG_RUNTIME_DIR/flatpak-info" ]; then
@@ -421,7 +422,7 @@ eos_yad__detectDE()
     if [ -z "$DE" ] ; then
         # neofetch fails: Enlightenment, openbox
         # neofetch differs: KDE -> plasma (with DESKTOP_SESSION=openbox-kde and DESKTOP_SESSION=plasma)
-        [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr [:upper:] [:lower:])"
+        [ -x /usr/bin/neofetch ] && DE="$(neofetch --enable de --de_version off | awk '{print $NF}' | tr '[:upper:]' '[:lower:]')"
     fi
 }
 
@@ -465,7 +466,7 @@ eos_IsBspwm() {
 #            return
 #        fi
 #    done
-#    DIE "$FUNCNAME: cannot find a browser"
+#    DIE "${FUNCNAME[0]}: cannot find a browser"
 #}
 
 eos_yad_nothing_todo() {
@@ -480,7 +481,7 @@ eos_yad_nothing_todo() {
 
     local cmd=(
         eos_yad --form --text="$text" --title="$title" --no-focus
-                --height=100 --width=300 --timeout=$timeout --timeout-indicator=left
+                --height=100 --width=300 --timeout="$timeout" --timeout-indicator=left
                 --button=yad-close:0
     )
     "${cmd[@]}"
@@ -518,9 +519,9 @@ ProgressBar() {         # This function was converted from the work of @Kresimir
     [ "${#msg}" -gt "$msglen" ] && msg="${msg::$msglen}"    # msg must be truncated
     [ "${msg: -1}" = ":" ] || msg+=":"                      # make sure a colon is after msg
 
-    printf "\r%-*s %3d%% [" "$msglen" "$msg" $percent >&2
-    for ((c = 0; c < $barlen; c++)) ; do
-        if (( $c <= $percent * $barlen / 100 )); then
+    printf "\r%-*s %3d%% [" "$msglen" "$msg" "$percent" >&2
+    for ((c = 0; c < barlen; c++)) ; do
+        if (( c <= percent * barlen / 100 )); then
             echo -ne "#" >&2
         else
             echo -ne " " >&2
@@ -564,9 +565,11 @@ eos_FormMonoText() {
 Wget2Curl() {
     # Convert a wget call to a curl call.
     local opts
+    local _progname="$progname"                                # $progname may come from the user app
+    [ -n "$_progname" ] || _progname="$(eos_GetProgName)"
 
-    opts="$(/usr/bin/getopt -o=qO: --longoptions timeout:,user-agent: --name "$progname" -- "$@")" || {
-        PreLog "$FUNCNAME: option handling failed!"
+    opts="$(/usr/bin/getopt -o=qO: --longoptions timeout:,user-agent: --name "$_progname" -- "$@")" || {
+        PreLog "${FUNCNAME[0]}: option handling failed!"
         return 1
     }
 
@@ -579,26 +582,26 @@ Wget2Curl() {
         case "$1" in
             -q)           cmd+=(--silent)  ;;
             -O)           cmd+=(--output "$2"); shift ;;
-            --user-agent) cmd+=($1 "$2"); shift ;;
-            --timeout)    cmd+=(--max-time $2); shift ;;
+            --user-agent) cmd+=(--user-agent "$2"); shift ;;
+            --timeout)    cmd+=(--max-time "$2"); shift ;;
 
             --) shift ; break ;;
         esac
         shift
     done
 
-    [ "$foobar_test" = "yes" ] && echo "${cmd[*]} $*"
+    # [ "$foobar_test" = "yes" ] && echo "${cmd[*]} $*"
 
     "${cmd[@]}" "$@"
 
     retval=$?
-    if [ "$foobar_test" = "yes" ] ; then
-        case "$retval" in
-            23) echo "==> Write error. Curl could not write data to a local filesystem or similar." ;;
-            0) ;;
-            *) echo "==> curl returned $retval." ;;
-        esac
-    fi
+    #if [ "$foobar_test" = "yes" ] ; then
+    #    case "$retval" in
+    #        23) echo "==> Write error. Curl could not write data to a local filesystem or similar." ;;
+    #        0) ;;
+    #        *) echo "==> curl returned $retval." ;;
+    #    esac
+    #fi
     return $retval
 }
 
