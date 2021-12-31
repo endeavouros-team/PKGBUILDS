@@ -2,6 +2,7 @@
 
 # Fetch the latest Arch mirrorlist.
 # Use the file as target if given, otherwise save it to /tmp.
+# Then display the full file path to stdout.
 
 Main()
 {
@@ -15,6 +16,7 @@ Main()
     curl -Lsm 10 -o "$full_list" $ARCH_SITE/mirrorlist/all || {
         return 1
     }
+    echo "$full_list"
 }
 
 Main "$@"
