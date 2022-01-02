@@ -134,8 +134,10 @@ Build()
     local missdeps="Missing dependencies:"
     local opts=""
 
-    if [ -n "${PKG_MAKEPKG_OPTIONS[$pkgdirname]}" ] ; then   # from assets.conf
-        opts="${PKG_MAKEPKG_OPTIONS[$pkgdirname]}"
+    if [ -n "${PKG_MAKEPKG_OPTIONS}" ] ; then
+        if [ -n "${PKG_MAKEPKG_OPTIONS[$pkgdirname]}" ] ; then   # from assets.conf
+            opts="${PKG_MAKEPKG_OPTIONS[$pkgdirname]}"
+        fi
     fi
 
     Pushd "$workdir"
@@ -291,6 +293,12 @@ ListNameToPkgName()
 }
 
 HubRelease() {
+    if which logstuff >& /dev/null ; then
+        if ! logstuff state ; then
+            echo2 "==> logstuff on"
+            logstuff on
+        fi
+    fi
     hub release "$@"
 }
 
@@ -315,9 +323,11 @@ Assets_clone()
                 read2
 
                 case "$REPLY" in
-                    [yY]*|"") ;;
+                    [yY]*|"")
+                        echo2 "==> Using remote assets."
+                        ;;
                     *)
-                        echo2 "Using local assets."
+                        echo2 "==> Using local assets."
                         echo2 ""
                         return
                         ;;
