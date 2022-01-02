@@ -67,6 +67,13 @@ Cmd() {
             SUDO_CMDS+=" ; echo '$(Footer)' >> $FILE_OF_LOGS"
             return
             ;;
+        cmd_and_lines)
+            # params: cmd_and_lines "cmd" "lines"
+            Header "$2" >> $FILE_OF_LOGS
+            echo "$3"   >> $FILE_OF_LOGS
+            Footer      >> $FILE_OF_LOGS
+            return
+            ;;
     esac
 
     Header "$@" >> "$FILE_OF_LOGS"
@@ -191,6 +198,27 @@ RemovePersonalData() {
 
 IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
 
+ForeignInfo() {
+    # input & output: line
+    local pkg ver desc
+    local data ix l2
+
+    readarray -t data <<< $(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
+
+    for ((ix=0; ix<${#data[@]}; ix=ix+3 )) ; do
+        pkg="$( echo "${data[ix]}"   | sed 's|[^:]*: ||')"
+        ver="$( echo "${data[ix+1]}" | sed 's|[^:]*: ||')"
+        desc="$(echo "${data[ix+2]}" | sed 's|[^:]*: ||')"
+        
+        l2="$(printf "%-40s %-15s %s" "$pkg" "$ver" "$desc")"
+        if [ -n "$line" ] ; then
+            line="$(echo "$line" ; echo "$l2")"
+        else
+            line="$(echo "$l2")"
+        fi
+    done
+}
+
 Main()
 {
     case "$1" in
@@ -232,6 +260,7 @@ Main()
     local rdbut="<b>Remove personal data from logs</b>"
     local slbut="<b>Send logs to internet</b>"
     local inxi="inxi -Fxxc0z"
+    local foreigns="pacman -Qm"
 
     local cmds
     local sendToInternet=no
@@ -279,6 +308,7 @@ Main()
     IsInstalled grub && log_tool_cmd+=(false "$grub" "Grub configuration file")
     log_tool_cmd+=(
         true  "$pacmanconf" "Pacman package manager configuration file"
+        true  "$foreigns"   "List foreign packages"
         true  "$rdbut"      "$rdtip"
         false "$slbut"      "$sltip"
     )
@@ -328,6 +358,11 @@ Main()
             "$lsusb")    Cmd $xx ;;
             "$hwinfo")   Cmd $xx ;;
             "$inxi")     Cmd $xx ;;
+            "$foreigns")
+                local line=""
+                ForeignInfo
+                Cmd cmd_and_lines "$xx" "$line"    # does special handling
+                ;;
         esac
     done
     if [ "$SUDO_CMDS" != ":" ] ; then
