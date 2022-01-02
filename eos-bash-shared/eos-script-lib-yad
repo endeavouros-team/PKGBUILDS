@@ -23,6 +23,8 @@
 # export -f eos_yad_nothing_todo
 #
 # The two last functions above do not use yad.
+#
+# shellcheck disable=SC1090      # Don't show warnings on sourceing via a variable
 
 source /etc/eos-script-lib-yad.conf      # for EOS_ROOTER and other configs
 
@@ -565,6 +567,7 @@ eos_FormMonoText() {
 Wget2Curl() {
     # Convert a wget call to a curl call.
     local opts
+    # shellcheck disable=SC2154       # don't complain about undefined $progname
     local _progname="$progname"                                # $progname may come from the user app
     [ -n "$_progname" ] || _progname="$(eos_GetProgName)"
 
