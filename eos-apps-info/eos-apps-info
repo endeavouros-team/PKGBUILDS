@@ -34,7 +34,7 @@ Main()
     local txt=""
     txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
     txt+="Click an app button and an information window opens.\n\n"
-    txt+="<b>Note</b>: a special selection of <i>bonus</i> infos is appended!\n\n"
+    txt+="<b>Note</b>: a special selection of <i>bonus</i> info is appended!\n\n"
     if [ 0 -eq 1 ] ; then
         txt+="Note: you may have to run command\n<tt>  sudo pacman -Fy</tt>\nfirst to detect EndeavourOS commands.\n\n"
     else
@@ -57,7 +57,7 @@ Main()
     local packages=$(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
     local apps=()
     local pkg app app2
-    local blabel="Bonus infos"
+    local blabel="Bonus info"
 
     readarray -t app <<< $(/usr/bin/pacman -Fl $packages 2>/dev/null | /usr/bin/grep "usr/bin/" | /usr/bin/grep -v "usr/bin/$" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's|usr/bin/||' | /usr/bin/sort)
     [ -n "$app" ] || return 1
