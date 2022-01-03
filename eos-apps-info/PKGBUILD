@@ -2,7 +2,7 @@
 
 pkgname=eos-apps-info
 pkgdesc="Documentation about apps in the EndeavourOS repository."
-pkgver=1.2
+pkgver=1.2.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -32,7 +32,7 @@ source=(
   $_url/${pkgname}-pages.tar.gz
 )
 
-sha512sums=('0d388eb5232a3c8d8c6dfe75d6788f432630455eca6cc302a4c3dc40c664e80b95f96f125b6539fd9c829997fcf0e86b2c1d9192878ef3a84748e1051bec15df'
+sha512sums=('4921d523d23ee7db849443b1155b1fbf248b8b1c46d030a0dfde32dc7f28a3e1628cbdc5f4a902a186cf32bd2d365eb8e77562f5d6a0a4b5907334b503ad25f9'
             '34d527b87538cf591bfaa26da735559447deb23e4a17dafe17ded33bebefd0f80b4b9adce88f5b9a5fadb11541f461175d179f385b3a5cc47093d3e4d0215c60'
             '59fd2cad19572e4d4f73577ff74f37c21cd983a8e9ff35434624878cf04177be2a9964f2440aa1357abb1c45d408529fec0d2f1fa8bfc81b206b7c89f76de8f9'
             '8a0692ff5e714a0690c7a90d04a928b2edf2e01515f8707b345d0da36ee95cab7f4f9badf3dca6cbd280438a08519957c5852be92e7936da9f0affef3d895b17'

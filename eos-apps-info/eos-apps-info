@@ -8,18 +8,19 @@ CheckDatabaseUpdate() {
     local txt=""
     local cmd
 
-    if [ -z "$(/usr/bin/pacman -Fl eos-bash-shared 2>/dev/null)" ] ; then
+    if ! /usr/bin/pacman -Fl eos-bash-shared >&/dev/null ; then
         # need to run pacman -Fy
         txt+="\nPacman database needs updating using command:\n"
         txt+="<tt>  pacman -Fy</tt>\n"
         cmd=(
             eos_yad --form --title="Database update needed" --text="$txt" --image=dialog-information
-            --button=yad-quit:11 --button="Update database now!system-run!":13
+            --button=yad-quit:$exit_quit
+            --button="Update database now!system-run!":$exit_updatedb
         )
         "${cmd[@]}"
         case "$?" in
-            13) UpdateDatabase ;;
-            11 | *) exit ;;
+            $exit_updatedb)   UpdateDatabase ;;
+            $exit_quit | *)   exit ;;
         esac
     fi
 }
@@ -27,6 +28,11 @@ CheckDatabaseUpdate() {
 Main()
 {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
+    # yad command exit codes (don't use even numbers)
+    local exit_quit=11
+    local exit_updatedb=13
+
     CheckDatabaseUpdate
 
     local update_label="Update database"
@@ -34,39 +40,31 @@ Main()
     local txt=""
     txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
     txt+="Click an app button and an information window opens.\n\n"
-    txt+="<b>Note</b>: a special selection of <i>bonus</i> infos is appended!\n\n"
-    if [ 0 -eq 1 ] ; then
-        txt+="Note: you may have to run command\n<tt>  sudo pacman -Fy</tt>\nfirst to detect EndeavourOS commands.\n\n"
-    else
-        txt+="Note: you may need to click the <b>$update_label</b> button below to update your package database.\n\n"
-    fi
-    if [ 0 -eq 1 ] ; then
-        txt+="<i>The information window(s) can contain different formats:\n"
-        txt+="  - web browser\n"
-        txt+="  - a pager on a terminal\n"
-        txt+="  - small yad window\n"
-        txt+="due to various ways the information is available.</i>\n"
-    fi
+    txt+="Note: you may need to click the <b>$update_label</b> button below to update your package database.\n\n"
+    txt+="A special selection of <i>bonus items</i> is appended!\n\n"
 
     local cmd=(
         eos_yad --form --title="EndeavourOS apps info" --text="$txt" --columns=4 --align-buttons --image=dialog-information
         # --no-buttons
-        --button="$update_label!!Updates package database and restarts this app":11
+        --button="$update_label!!Updates package database and restarts this app":$exit_updatedb
         --buttons-layout=center
     )
     local packages=$(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
     local apps=()
     local pkg app app2
-    local blabel="Bonus infos"
+    local blabel="Bonus items"
 
     readarray -t app <<< $(/usr/bin/pacman -Fl $packages 2>/dev/null | /usr/bin/grep "usr/bin/" | /usr/bin/grep -v "usr/bin/$" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's|usr/bin/||' | /usr/bin/sort)
     [ -n "$app" ] || return 1
     apps+=("${app[@]}")
 
-    apps+=("$blabel")                              # label text for bonus apps
+    apps+=("$blabel")                              # separation label for the bonus apps
     apps+=($(eos-apps-info-helper --show-bonus))   # the bonus apps!
 
     for app in "${apps[@]}" ; do
+
+        # Hide or rename some apps.
+
         case "$app" in
             # not needed here or deprecated:
             ckbcomp | eos-waiting-indicator | eos-FindAppIcon | eos-kbd-set | eos-hooks-runner | eos-reboot-required* | eos-arch-news \
@@ -86,19 +84,21 @@ Main()
             eos-pkginfo-aur)  app2=eos-pkginfo ;;
             eos-welcome)      app2=welcome ;;
             su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character !!
-            *)
-                app2="$app" ;;
+            *)                app2="$app" ;;
         esac
+
+        # Add app buttons to the command.
+
         case "$app" in
-            "$blabel") cmd+=(--field="<b><i>$app:</i></b>":LBL "") ;;
-            *) cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'") ;;
+            "$blabel") cmd+=(--field="<b><i>$app:</i></b>":LBL "") ;;                        # add this to visually separate bonus apps
+            *)         cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'") ;;
         esac
     done
 
     while true ; do
         "${cmd[@]}"
         case "$?" in
-            11) UpdateDatabase ;;
+            $exit_updatedb) UpdateDatabase ;;
             *) break ;;
         esac
     done
