@@ -10,8 +10,10 @@ _prepare_arc-gtk-theme-eos() {
     ################## Fetch and source the upstream PKGBUILD:
     curl -Lsm 10 -o PKGBUILD.orig \
          https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD || exit 1
-    if [ -n "$(grep -w "^prepare" PKGBUILD.orig)" ] ; then
-        echo "Error: upstream $_pkgname_orig PKGBUILD has function 'prepare'!!" >&2
+
+    if [ -z "$(grep "[ \t]*patch -p1 " PKGBUILD.orig)" ] ; then
+        # we need a patch line for 'sed' to work below
+        echo "Error: upstream $_pkgname_orig PKGBUILD no more has a patch line!!" >&2
         exit 1
     fi
 
@@ -19,25 +21,30 @@ _prepare_arc-gtk-theme-eos() {
     # - change pkgname to arc-gtk-theme-eos (only)
     # - change package_$pkgname() accordingly
     # - add conflicts
+    # - make text color darker (needs an existing patch line in prepare() !!)
+    # - change the 'url' value
 
     sed -i PKGBUILD.orig \
         -e "s|^pkgname=.*|pkgname=(arc-gtk-theme-eos)|" \
         -e 's|^package_arc-gtk-theme(|package_arc-gtk-theme-eos(|' \
-        -e '/^package_arc-gtk-theme/a \ \n    conflicts=(arc-gtk-theme)'
+        -e '/^package_arc-gtk-theme/a \ \n    conflicts=(arc-gtk-theme)' \
+        -e '/^[ \t]*patch -p1 /a \ \n    _darker_text_color'
 
     ################## now use the modified definitions of PKGBUILD:
     source PKGBUILD.orig
     rm -f PKGBUILD.orig
 
-    ################## more PKGBUILD additions:
-    # - change the url to help with the manual page
-    # - add prepare()
+    ################# still some stuff to change or add:
 
     url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-    prepare() {
+
+    _darker_text_color() {
+        # old prepare() !!
         # change the text color code darker
-        cd ${_pkgname}-${pkgver}
-        find common -type f -exec sed -i "s/5c616c/111521/gI" {} \;
+        #cd ${_pkgname}-${pkgver}
+        find common -type f -exec sed -i "s/5c616c/111521/g" {} \;
+        #find common -type f -exec sed -i "s/5c616c/111521/gI" {} \;
+        # Note: case insensitive flag 'I' not really needed...
     }
 }
 _prepare_arc-gtk-theme-eos
