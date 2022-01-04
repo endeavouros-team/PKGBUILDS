@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo2() { echo "$@" >&2 ; }
+msg()   { echo2 "==>" "$@" ; }
+
+Main() {
+    if eos-rankmirrors --timeout 30 >/dev/null ; then
+        msg "The EndeavourOS mirrorlist was modified by ranking."
+        msg "The old mirrorlist was backed up with the current date in the file name."
+        msg "Because of ranking, please run command"
+        msg "   sudo pacman -Syu"
+        msg "to activate the changes."
+    fi
+}
+
+Main "$@"

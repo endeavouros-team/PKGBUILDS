@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-rankmirrors
-pkgver=2.0.5
+pkgver=2.1
 pkgrel=1
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
@@ -13,10 +13,20 @@ license=(GPL3)
 depends=(eos-bash-shared)
 options=(!strip !emptydirs)
 
-source=($url/$pkgname)
-sha512sums=('bcf450c5822d5b64140419423771d41cfba5e4c8cf3b0c1492026bc4823381e456cf6a19c6858b1c6c8378de786aca56e702c2c8d5c59f4e9595ff82108cce06')
+source=(
+  $url/$pkgname
+  $url/eos-rankmirrors-from-hook
+  $url/eos-rankmirrors.hook
+)
+sha512sums=('bcf450c5822d5b64140419423771d41cfba5e4c8cf3b0c1492026bc4823381e456cf6a19c6858b1c6c8378de786aca56e702c2c8d5c59f4e9595ff82108cce06'
+            '39b60d9c69db8726c526d5d36fa1b09bf38e1643c3abb9d73926326aa752174e2e8c719ac81b13d9d27da9441c1a906e08223eb94ca63edb05b58929b4f61df2'
+            '2d55a398ef739a9d0ef8b619d89f0b2c947e6292db6aaa09076ec394838a71017f1376caf21681933d2eb188e78e8ed4dd39ebc6c7e2047414f0a0d6dd707755')
 
 package() {
- install -d $pkgdir/usr/bin
- install -Dm755 $pkgname $pkgdir/usr/bin/$pkgname
+  local hooks=$pkgdir/usr/share/libalpm/hooks
+
+  install -Dm644 eos-rankmirrors.hook      $hooks/eos-rankmirrors.hook
+
+  install -Dm755 $pkgname                  $pkgdir/usr/bin/$pkgname
+  install -Dm755 eos-rankmirrors-from-hook $pkgdir/usr/bin/eos-rankmirrors-from-hook
 }
