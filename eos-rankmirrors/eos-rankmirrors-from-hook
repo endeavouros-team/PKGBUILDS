@@ -4,12 +4,19 @@ echo2() { echo "$@" >&2 ; }
 msg()   { echo2 "==>" "$@" ; }
 
 Main() {
-    if eos-rankmirrors --timeout 30 >/dev/null ; then
-        msg "The EndeavourOS mirrorlist was modified by ranking."
-        msg "The old mirrorlist was backed up with the current date in the file name."
-        msg "Because of ranking, please run command"
-        msg "   sudo pacman -Syu"
-        msg "to activate the changes."
+    local conf=/etc/eos-rankmirrors.conf
+
+    source $conf || return
+    if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] ; then
+        if eos-rankmirrors --timeout 30 >/dev/null ; then
+            msg "The EndeavourOS mirrorlist was modified by ranking."
+            msg "The old mirrorlist was backed up with the current date in the file name."
+            msg "Because of ranking, please run command"
+            msg "   sudo pacman -Syu"
+            msg "to activate the changes."
+        fi
+    else
+        msg "Configured in $conf not to do mirror ranking."
     fi
 }
 
