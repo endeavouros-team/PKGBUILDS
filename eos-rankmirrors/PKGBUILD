@@ -2,7 +2,7 @@
 
 pkgname=eos-rankmirrors
 pkgver=2.1
-pkgrel=2
+pkgrel=3
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
 
@@ -20,9 +20,9 @@ source=(
   $url/eos-rankmirrors.conf
 )
 sha512sums=('bcf450c5822d5b64140419423771d41cfba5e4c8cf3b0c1492026bc4823381e456cf6a19c6858b1c6c8378de786aca56e702c2c8d5c59f4e9595ff82108cce06'
-            'ffcbe94769f637823bababeecdc799a1037f5d287dc955ddb741071629635e3ba99408c4257c16ec8d18b2879b55c344272bef8844ed436d69dc05a253ec7dfb'
+            '425da376a4ff075375cfb6c4bed2edfa7a8f8b9681a76dc4aa22d1fe35362148dec915e015e02a7b3d9d568711d0f3fb8a253831e3ae479ded988e75de20632b'
             '2d55a398ef739a9d0ef8b619d89f0b2c947e6292db6aaa09076ec394838a71017f1376caf21681933d2eb188e78e8ed4dd39ebc6c7e2047414f0a0d6dd707755'
-            '9fdd954eac96b542cbe2e5a212661f853e855a88ea105d23003130c468b15ce5b691395df7cabe640903c92a7bed9fe72d77a91d963a04d1c88fcff3f6abee16')
+            '718b2edd4337bcf96e1d210056cb8e4f16ff996db5d9ed7df84b1672612894a3b4d44bd999bd143c1ce35d8641050cba4de383adee7978bd19db00cc1994db56')
 
 package() {
   local hooks=$pkgdir/usr/share/libalpm/hooks

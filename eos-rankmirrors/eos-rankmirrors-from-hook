@@ -5,10 +5,13 @@ msg()   { echo2 "==>" "$@" ; }
 
 Main() {
     local conf=/etc/eos-rankmirrors.conf
-
     source $conf || return
+
+    local timeout="$EOS_AUTORANK_TIMEOUT"
+    [ -n "$timeout" ] || timeout=30
+
     if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] ; then
-        if eos-rankmirrors --timeout 30 >/dev/null ; then
+        if eos-rankmirrors --timeout $timeout >/dev/null ; then
             msg "The EndeavourOS mirrorlist was modified by ranking."
             msg "The old mirrorlist was backed up with the current date in the file name."
             msg "Because of ranking, please run command"
