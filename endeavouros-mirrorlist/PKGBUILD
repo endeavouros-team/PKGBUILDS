@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-mirrorlist
 pkgver=4.4
-pkgrel=1
+pkgrel=2
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
