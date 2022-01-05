@@ -34,3 +34,5 @@ Server = http://mirror.jingk.ai/endeavouros/repo/$repo/$arch
 ## France
 Server = https://endeavour.remi.lu/repo/$repo/$arch
 
+## South Korea
+Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
