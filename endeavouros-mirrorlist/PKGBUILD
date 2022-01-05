@@ -10,7 +10,7 @@ _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgna
 
 license=('GPL3')
 options=(!strip !emptydirs)
-#backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
+backup=("etc/pacman.d/$pkgname")  # to keep possibly ranked mirrorlist
 
 conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
