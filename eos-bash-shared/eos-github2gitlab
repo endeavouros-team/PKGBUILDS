@@ -1,7 +1,13 @@
 #!/bin/bash
 
 Github2Gitlab() {
-    local url="$1"
+    local url
+    local keep_master=no
+
+    case "$1" in
+        --keep-master) url="$2" ; keep_master=yes ;;
+        *) url="$1" ;;
+    esac
 
     source /etc/eos-script-lib-yad.conf
 
@@ -14,7 +20,11 @@ Github2Gitlab() {
             if [ -n "$(echo "$url" | grep "/raw\.githubusercontent\.com/")" ] ; then
                 sed+=(-e 's|/raw\.githubusercontent\.com/|/gitlab.com/|')
                 sed+=(-e 's|/main/|/-/raw/main/|' )
-                sed+=(-e 's|/master/|/-/raw/main/|')
+                if [ "$keep_master" = "yes" ] ; then
+                    sed+=(-e 's|/master/|/-/raw/master/|')
+                else
+                    sed+=(-e 's|/master/|/-/raw/main/|')
+                fi
                 sed+=(-e 's|/install-scripts-next/|/install-scripts-next/-/raw/|')
             else
                 sed+=(-e 's|/github\.com/|/gitlab.com/|')
