@@ -116,7 +116,6 @@ FetchLatestMirrorlist() {
     # Grab endeavouros-mirrorlist from the package cache, or fetch it from github/gitlab.
 
     local pkg=$(ls -1 /var/cache/pacman/pkg/endeavouros-mirrorlist-*.zst 2>/dev/null | tail -n1)
-    pkg=""
     if [ -n "$pkg" ] ; then
         echo2 "Extracting $pkg ..."
         tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
@@ -182,20 +181,27 @@ WriteSystemMirrorlist() {
     local new="$2"
     local bak="$eos.$(date +%Y.%m.%d-%H.%M.%S)"
     local eosranked="$eos$ranked_suffix"
+    local cmd=""
+    local conf=/etc/eos-rankmirrors.conf
 
-    if [ "$save_as_pacnew" = "yes" ] ; then
+    source $conf || {
+        echo2 "Config file $conf does not exist!"
+        return 1
+    }
+
+    if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$force_rank" = "yes" ] ; then
+        printf2 "\nMoving old EndeavourOS mirrorlist to %s.\n" "$bak"
+        printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
+        $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+    else
         printf2 "\nWriting new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
         $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
-    else
-        printf2 "\nMoving old EndeavourOS mirrorlist to %s.\n" "$bak"
-        printf2 "Writing new EndeavourOS mirrorlist to %s.\n" "$eos"
-        $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
     fi
 }
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,save-as-pacnew"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,force-rank"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -228,9 +234,6 @@ Options:
   -n
              Don't save the generated mirrorlist.
 
-  --save-as-pacnew
-             Save the ranked mirrorlist as $mlfolder/$pkgname$ranked_suffix
-
   --verbose
              Show more detailed output.
 
@@ -253,8 +256,8 @@ EOF
             --no-save | -n)
                 save=no
                 ;;
-            --save-as-pacnew)
-                save_as_pacnew=yes
+            --force-rank)
+                force_rank=yes
                 ;;
             --)
                 shift ; break ;;
@@ -276,8 +279,8 @@ Main()
     local timeout_default=20                  # in seconds
     local sort_default=age                    # age or rate
     local use_rankmirrors=no
+    local force_rank=no
     local save=yes
-    local save_as_pacnew=no
     local ranked_suffix=".pacnew"             # was: ".ranked"  !!!
 
     # option-related variables
@@ -287,9 +290,6 @@ Main()
 
     Options "$@"
 
-    if [ "$save_as_pacnew $save" = "yes no" ] ; then
-        DIE "Option --no-save is not allowed with option --save-as-pacnew."
-    fi
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
     fi

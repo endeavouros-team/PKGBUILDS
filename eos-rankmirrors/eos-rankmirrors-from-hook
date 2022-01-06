@@ -11,15 +11,9 @@ Main() {
     [ -n "$timeout" ] || timeout=30
 
     if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] ; then
-        if eos-rankmirrors --timeout $timeout --save-as-pacnew >/dev/null ; then
-            local mlfile=/etc/pacman.d/endeavouros-mirrorlist
-            msg "A ranked new EndeavourOS mirror list was saved into $mlfile.pacnew."
-            msg "To use it,"
-            msg "   1. copy it to $mlfile (or use 'eos-pacdiff')"
-            msg "   2. run: 'sudo pacman -Syu'"
-        fi
+        eos-rankmirrors --timeout $timeout >/dev/null
     else
-        msg "Configured in $conf not to do mirror ranking."
+        msg "Configured in $conf not to rank mirrors."
     fi
 }
 

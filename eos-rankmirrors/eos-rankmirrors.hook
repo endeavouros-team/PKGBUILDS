@@ -5,6 +5,6 @@ Type = Package
 Target = endeavouros-mirrorlist
 
 [Action]
-Description = Rank EndeavourOS mirrors after installing or upgrading the related mirrorlist package
+Description = Hook to rank EndeavourOS mirrors after installing or upgrading the related mirrorlist package
 When = PostTransaction
 Exec = /usr/bin/eos-rankmirrors-from-hook
