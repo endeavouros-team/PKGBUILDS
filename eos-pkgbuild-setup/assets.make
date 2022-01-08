@@ -1082,7 +1082,8 @@ Main2()
 
         GitUpdate_repo
 
-        FinalStopBeforeSyncing "$REPONAME release assets"
+        sleep 3
+        echo2 "Syncing $REPONAME release assets with github:"
 
         case "$REPONAME" in
             endeavouros)
