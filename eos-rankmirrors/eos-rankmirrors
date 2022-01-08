@@ -4,9 +4,6 @@
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
 
-source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
-export -f eos_GetArch
-
 echo2()   { echo "$1" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
@@ -36,17 +33,6 @@ ShowArray() {
     for item in "$@" ; do
         echo $item
     done
-}
-
-RankPerTime() {
-    # latest_ml : in     # servers not commented!
-    # result    : out
-
-    readarray -t result <<< $(/usr/bin/rankmirrors -t --max-time 5 --repo endeavouros $latest_ml | /usr/bin/tail -n +4)
-    # - $result will contain an array of lines like:
-    #      mirror : time
-    # - "time" can be "unreachable", and that line will be in the end of array
-    # - $result is sorted based on time, fastest first
 }
 
 RankPerAge() {
@@ -148,11 +134,7 @@ SimpleRank() {
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
     echo2 "Ranking EndeavourOS mirrors, please wait ..."
-    if [ "$use_rankmirrors" = "yes" ] ; then
-        RankPerTime
-    else
-        RankPerAge
-    fi
+    RankPerAge
 
     # show the original list (mirrors commented out)
     /usr/bin/cat $latest_ml.orig | /usr/bin/sed 's|^Server = |#Server = |'
@@ -182,14 +164,8 @@ WriteSystemMirrorlist() {
     local bak="$eos.$(date +%Y.%m.%d-%H.%M.%S)"
     local eosranked="$eos$ranked_suffix"
     local cmd=""
-    local conf=/etc/eos-rankmirrors.conf
 
-    source $conf || {
-        echo2 "Config file $conf does not exist!"
-        return 1
-    }
-
-    if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$force_rank" = "yes" ] ; then
+    if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$hook_rank" = "no" ] ; then
         printf2 "\nMoving old EndeavourOS mirrorlist to %s.\n" "$bak"
         printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
         $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
@@ -201,7 +177,7 @@ WriteSystemMirrorlist() {
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,force-rank"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -256,8 +232,9 @@ EOF
             --no-save | -n)
                 save=no
                 ;;
-            --force-rank)
-                force_rank=yes
+            --hook-rank)
+                hook_rank=yes
+                
                 ;;
             --)
                 shift ; break ;;
@@ -276,31 +253,34 @@ Main()
     local latest_ml=""
     local delete_at_end=()
     local arg
-    local timeout_default=20                  # in seconds
     local sort_default=age                    # age or rate
-    local use_rankmirrors=no
-    local force_rank=no
     local save=yes
+    local hook_rank=no
     local ranked_suffix=".pacnew"             # was: ".ranked"  !!!
-
-    # option-related variables
-    local verbose=no
-    local timeout=$timeout_default
-    local sort=$sort_default
-
-    Options "$@"
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
     fi
-    if [ "$use_rankmirrors" = "yes" ] && [ ! -x /usr/bin/rankmirrors ] ; then
-        DIE "ranking failed because package 'pacman-contrib' is not installed."
-    fi
+
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    export -f eos_GetArch
+
+    local conf=/etc/eos-rankmirrors.conf
+    source $conf || DIE "Config file $conf does not exist!"
+
+    # option-related variables
+    local verbose=no
+    local sort=$sort_default
+    local timeout_default="$EOS_AUTORANK_TIMEOUT"                  # in seconds
+    [ -n "$timeout_default" ] || timeout_default=30
+    local timeout=$timeout_default
+
+    Options "$@"
 
     new=$(/usr/bin/mktemp) ; delete_at_end+=("$new")
 
     SimpleRank > $new
-    cat $new
+    [ "$hook_rank" = "no" ] && cat $new
 
     if [ -z "$(grep "^Server = " $new)" ] ; then
         DIE "ranking failed, no mirrors found!"
