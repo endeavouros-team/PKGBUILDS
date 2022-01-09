@@ -1,0 +1,26 @@
+# Maintainer: S4NDM4N <sadaruwan12@gmail.com>
+
+_pkgname=awesome
+pkgname=eos-skel-ce-awesome
+pkgver=1.0
+pkgrel=2
+pkgdesc="pre user creation skel setup for Awesome EOS-CE"
+arch=('any')
+groups=('eos-ce')
+url="https://github.com/EndeavourOS-Community-Editions/${_pkgname}"
+license=('GPL')
+conflicts=('eos-ce-sway')
+depends=('git')
+source=("${_pkgname}::git+https://github.com/EndeavourOS-Community-Editions/${_pkgname}.git")
+sha256sums=('SKIP')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/" "${pkgdir}${PREFIX}/"
+    install -Dm644 ".gtkrc-2.0" "${pkgdir}${PREFIX}/.gtkrc-2.0"
+    install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
+    install -Dm644 ".Xresources" "${pkgdir}${PREFIX}/.Xresources"
+    install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+}
