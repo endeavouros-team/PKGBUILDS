@@ -5,7 +5,7 @@
 _pkgname=sway
 pkgname=eos-skel-ce-sway
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc="pre user creation skel setup for SWAY EOS-CE"
 arch=('any')
 groups=('eos-ce')
