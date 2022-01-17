@@ -153,9 +153,30 @@ SimpleRank() {
         break
     done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
 
-    # this is the actual ranked result
-    printf "\n# EndeavourOS mirrorlist:\n"
+    # This is the actual ranked result.
+
+    echo ""
+    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "# EndeavourOS mirrorlist:"
+    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+    # User may have a static list (mirrors separated by '|' characters) as the best EndeavourOS mirrors for the location.
+    #
+    # Example definition in your ~/.bashrc file:
+    #    export ALWAYS_FIRST_EOS_MIRRORS='https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch|https://mirror.moson.org/endeavouros/repo/$repo/$arch'
+    #
+    if [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
+        echo "# user added mirrors >>>"
+        local mirror
+        for mirror in $(echo "$ALWAYS_FIRST_EOS_MIRRORS" | tr '|' ' ') ; do
+            echo "User added: $mirror" >&2
+            echo "Server = $mirror"
+        done
+        echo "# user added mirrors <<<"
+    fi
+
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
+    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 }
 
 WriteSystemMirrorlist() {
