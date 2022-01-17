@@ -24,7 +24,7 @@ source=(
     $_url/nvidia.ids.metainfo
 )
 sha256sums=('b1ccfa6f0231583b65cd2de3e73f4e8d496ee185efd13145aedcbc0274bcc26b'
-            'bbac3707b9f529b867371314f5812fa6fcf773875dcb0ac9e7dc53add879bc65'
+            '4f15adefea7765ffad9e6eb1ed103ec1e63b23edfb263485b0fe533e72f87c35'
             '8a3adb883de76e57f9aa4a2fb3c331f8722d695e92502e20304e685203dca713'
             '06c5de5806519981298e7317b15cc7261be3c2e1897d983a6a26557a819f1afb'
             '695eae8f757aafc540efddeff5f7c1ef058152ab109829bd78cba91398fe5a64'
