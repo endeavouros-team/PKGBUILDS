@@ -3,60 +3,6 @@
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
-GetGpuIds() {
-    declare -A vcodes
-    vcodes[nvidia]=10de
-    vcodes[intel]=8086
-    vcodes[amd]=1002
-
-    local infobase="$(lspci -vnn | grep -P 'VGA|Display|3D')"
-    local info
-    local vcode
-    local v # id
-    local result=""
-
-    for v in nvidia intel amd ; do
-        vcode="${vcodes[$v]}"
-        info="$(echo "$infobase" | grep "\[$vcode:[0-9a-f][0-9a-f]*\]")"
-        test -n "$info" || continue
-        card_id="$(echo "$info" | sed -e "s|^.*\[$vcode:||" -e "s|\].*$||")"
-        test -n "$result" && result+="|"
-        result+="$v"
-        for id in $card_id ; do
-            result+=":$id"
-        done
-    done
-    vendorinfo="$result"
-
-    case "$1" in
-        "")
-            ;;
-        internal-test)
-            vendorinfo="nvidia:1dba|$result"
-            vendorinfo="nvidia:06c4|$result"
-            #vendorinfo="nvidia:aaaa|$result"
-            #vendorinfo="nvidia:aaaa:bbbb|$result"
-            vendorinfo="nvidia:06c4:1dba|$result"
-            ;;
-        [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])            # id = 4 hex numbers
-            id="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
-            vendorinfo="nvidia:$id"
-            ;;
-        *:[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])          # id = 4 hex numbers
-            id="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
-            vendorinfo="$id"
-            ;;
-        *)
-            case "$1" in
-                -h | --help) ;;
-                *) printf2 "Warning: unsupported parameter '$1' is ignored.\n\n" ;;
-            esac
-            Usage2
-            exit 1
-            ;;
-    esac
-}
-
 Usage2() {
     cat <<EOF >&2
 Usage: $progname [<nvidia-id> | internal-test]
@@ -73,82 +19,100 @@ Program return codes:
 EOF
 }
 
-Main()
-{
-    local progname=nvidia-installer-check
-    local vendorinfo=""        # e.g. nvidia:1234:2345|intel:4321:5432|amd:9876:6789
-    local db_dir=/tmp          # /var/lib/pci
-    local nvidia_info
-    local id=""
-    local ids=""
-    local ret_ids
-    local series=""
-    local data=""
-    local driver_found=""
-    local resultcode=1
-    local TESTING=no           # set to "no" on release !!!
+NvidiaSupportedSeries() {
+    local id="$1"
+    [ -z "$id" ] && return 1
+    local series="$(nvidia-driver-supported-branches "$id" | grep "^Series " | awk '{print $2}' | tr -d ':')"
 
-    # currently supported driver series:
-    local series_now=495
-    local series_prev1=470
-    local series_prev2=390
-
-    GetGpuIds "$@"
-    nvidia_info=$(echo "$vendorinfo" | cut -d '|' -f 1 | grep nvidia)
-
-    if [ -n "$nvidia_info" ] ; then
-        if [ -n "$id" ] ; then
-            data="$(nvidia-driver-supported-branches $id)"
-            #id=$(echo "$data" | grep "card id" | awk '{print $NF}')
-            series="$(echo "$data" | grep "^Series " | awk '{print $2}' | cut -d ':' -f1)"
-        else
-            data="$(nvidia-driver-supported-branches)"
-            id=$(echo "$data" | grep "card id" | awk '{print $NF}')
-            series="$(echo "$data" | grep "^Series " | awk '{print $2}' | cut -d ':' -f1)"
-        fi
-
-        case "$series" in
-            $series_now)
-                cat <<EOF >&2
-Your graphics card is (id: $id) supported by the nvidia-dkms driver.
-To install a driver for this card, you can use e.g. nvidia-installer-dkms.
+    case "$series" in
+        $series_now)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Is supported by the nvidia-dkms driver.
+  - To install a driver for this card, you can use e.g. nvidia-installer-dkms.
 
 EOF
-                driver_found+=" nvidia-dkms"
-                resultcode=0
-                ;;
-            $series_prev1 | $series_prev2)
-                cat <<EOF >&2
-Your graphics card (id: $id) is supported by the nvidia-${series}xx-dkms driver.
-To install a driver for this card:
-  * Use the --force option with nvidia-installer-dkms.
-  * Then, BEFORE rebooting,
+            return 0
+            ;;
+        $series_prev1 | $series_prev2 | 340)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Is supported by the nvidia-${series}xx-dkms driver.
+  - To install a driver for this card:
+    - Use the --force option with nvidia-installer-dkms.
+    - Then, BEFORE rebooting,
       - uninstall nvidia-dkms, nvidia-utils, and related other Nvidia driver packages
       - install $series series packages
-    For example:
+    Example:
       yay -Rsn nvidia-dkms nvidia-utils nvidia-settings
       yay -S nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings
 
 EOF
-                driver_found+=" nvidia-${series}xx-dkms"
-                resultcode=2
-                ;;
-            *)
-                series=""   # means: no supported driver found
-                cat <<EOF >&2
-Sorry, no supported Nvidia driver found for your graphics card (id $id).
+            if [ "$series" = "340" ] ; then
+                printf2 "  Warning: series 340 driver might not work properly on current systems.\n\n"
+            fi
+            return 2
+            ;;
+        *)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Not supported by any of the Nvidia driver series: $series_now $series_prev1 $series_prev2.
 EOF
-                resultcode=1
-                ;;
-        esac
+            return 1
+            ;;
+    esac
+}
+
+Main()
+{
+    local id="$1"              # optional
+    local ids
+    local progname=nvidia-installer-check
+    local series
+    local retval retval0=11 retval1=11 retval2=11
+
+    local nvidia=10de          # nvidia vendor code
+    local series_now=495       # currently supported driver series
+    local series_prev1=470     # previously supported driver series
+    local series_prev2=390     # previously supported driver series
+
+    if [ -n "$id" ] ; then
+        ids="$id"
     else
-        case "$vendorinfo" in
-            nvidia:*) echo2 "Card '$vendorinfo' not found." ;;
-            *)        echo2 "Sorry, card '$vendorinfo' not checked by this program." ;;
-        esac
+        ids="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[$nvidia:[0-9a-f][0-9a-f]*\]" | sed -e "s|^.*\[$nvidia:||" -e "s|\].*$||")"
     fi
 
-    return $resultcode         # 0=OK, 1=FAIL, 2=OK (but only older series driver)
+    # internal-testing:
+    #   ids=1dba
+    #   ids=06c4
+    #   ids="1dba 06c4 aaaa"  # multiple nvidia cards detected
+    #   ids=aaaa         # non-existing
+    #   ids=""           # no nvidia card detected
+
+    # We *may* have multiple nvidia cards of various supports.
+    # Return value will be according to the newest.
+    local count=0
+    for id in $ids ; do
+        ((count++))
+    done
+    if [ $count -gt 1 ] ; then
+        printf2 "\nMultiple Nvidia card ids detected!\n\n"
+    fi
+    for id in $ids ; do
+        NvidiaSupportedSeries "$id"
+        retval=$?
+        case "$retval" in
+            0) retval0=0 ;;
+            1) retval1=1 ;;
+            2) retval2=2 ;;
+        esac
+    done
+    [ $retval0 -eq 0 ] && return 0
+    [ $retval2 -eq 2 ] && return 2
+    [ $retval1 -eq 1 ] && return 1
+
+    echo2 "Sorry, no nvidia card found."
+    return 1
 }
 
 Main "$@"
