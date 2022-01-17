@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-mirrorlist
 pkgver=4.4
-pkgrel=2
+pkgrel=3
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -16,7 +16,7 @@ conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
 source=($_url/$pkgname)
-sha512sums=('b5e55bd376e624fbb907c6ef22374e82b599e8fdc224734210706cc79f082f6f8a7640294cb3753b3af9ea92b88c5bf1a4c193e707cfeee3a151c693ec80d2d9')
+sha512sums=('e677e8d624ff6976d847bf8e1847fe8b2d588acbe29b5bb776ce73f0de0e37ff738931876ab71c219128505e07357f8feaa98e4ae40eceecd2db2d65bb91cd30')
 
 package() {
  #install -d "$pkgdir/etc/pacman.d"

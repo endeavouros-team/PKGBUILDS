@@ -8,7 +8,7 @@
 ###     SigLevel = PackageRequired
 ###     Include = /etc/pacman.d/endeavouros-mirrorlist
 ######################################################
-### Tip: Use the 'eos-rankimirrors' program to rank
+### Tip: Use the 'eos-rankmirrors' program to rank
 ###      these mirrors or re-order them manually.
 ######################################################
 
