@@ -32,10 +32,8 @@ export EOS_WICON=/usr/share/endeavouros/EndeavourOS-icon.png
 export EOS_YAD_STARTER_CMD="/usr/bin/yad --window-icon=$EOS_WICON"
 
 eos_yad() {
-    GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@" | grep -v "^WINDOW DECORATIONS RELOADED$"
-    return "${PIPESTATUS[0]}"
+    GDK_BACKEND=x11 $EOS_YAD_STARTER_CMD "$@"
 }
-#export -f eos_yad
 
 translations_dir=/usr/share/endeavouros/scripts  # needed in translations.bash
 source $translations_dir/translations.bash || {
@@ -179,10 +177,7 @@ eos_yad_check_internet_connection() {
     }
 }
 
-eos_yad_GetArgVal() {
-    echo "${1#*=}"
-    #e cho "$1" | cut -d '=' -f 2
-}
+eos_yad_GetArgVal() { echo "${1#*=}" ; }
 
 eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certain options
     local cmd=""
