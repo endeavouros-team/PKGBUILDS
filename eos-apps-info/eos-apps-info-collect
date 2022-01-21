@@ -13,17 +13,23 @@ MakePicSmaller() {
 Md2html() {
     local app="$1"
     local dir="$2"
-    local pkgbuilds=../..
-    [ -n "$dir" ] && dir="/$dir"
+    local pkgbuildsdir
+
+    if [ "${dir::1}" = "/" ] ; then
+        pkgbuildsdir=""
+    else
+        pkgbuildsdir=../..
+        [ -n "$dir" ] && dir="/$dir"
+    fi
     mkdir -p $app
 
-    /usr/bin/ls $pkgbuilds$dir/$app/*.png >& /dev/null && {
-        /usr/bin/cp $pkgbuilds$dir/$app/*.png $app
+    /usr/bin/ls $pkgbuildsdir$dir/$app/*.png >& /dev/null && {
+        /usr/bin/cp $pkgbuildsdir$dir/$app/*.png $app
         for xx in $app/*.png ; do
             MakePicSmaller "$xx"
         done
     }
-    /usr/bin/pandoc -f gfm $pkgbuilds$dir/$app/*.md -o $app/$app.html
+    /usr/bin/pandoc -f gfm $pkgbuildsdir$dir/$app/*.md -o $app/$app.html
 
     echo "$app" >&2
 }
@@ -76,7 +82,40 @@ Man2html() {
 }
 
 Help2html() {
-    :  # TODO!
+    local app      # e.g. rate-mirrors and others
+    local descr
+    local help
+    local fmt='```'
+    local usage usage_def="$(printf "\n## Usage\n\n")"
+    local tmpdir=$(mktemp -d)
+    local tmpfile
+
+    for app in "$@" ; do
+        case "$app" in
+            rate-mirrors)
+                usage=""
+                help="$($app -h | grep -v "Usually default options should work")"  # fix!
+                ;;
+            *)
+                usage="$usage_def"
+                help="$($app -h)"
+                ;;
+        esac
+        mkdir -p $tmpdir/$app
+        tmpfile=$tmpdir/$app/foobar123.md
+        descr="$(LANG=C yay -Si $app | grep Description | sed 's|^Description[ ]*: ||')"
+        cat <<EOF > $tmpfile
+# $app
+
+$descr
+$usage
+$fmt
+$help
+$fmt
+EOF
+        Md2html "$app" "$tmpdir"
+    done
+    rm -rf $tmpdir
 }
 
 
@@ -93,6 +132,11 @@ Main()
 
     mkdir -p $infos_folder || DIE "creating folder '$infos_folder' failed"
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
+
+    # help option to html
+    for app in rate-mirrors ; do
+        Help2html $app
+    done
 
     # direct pages
     for app in akm eos-log-tool eos-rankmirrors pahis reflector-simple
@@ -114,11 +158,11 @@ Main()
                    eos-wallpaper-set \
                    grub-colour-chooser \
                    paccache-service-manager \
-                   rate-mirrors \
                    su-c_wrapper \
                    RunInTerminal \
                    UpdateInTerminal
     do
+        # was also: rate-mirrors
         Md2html $app $appname/man
     done
 
@@ -135,7 +179,6 @@ Main()
 
     Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
     Md2html welcome                welcome/man
-
 
     # man page to html
     for app in downgrade inxi polybar yad yay ; do
