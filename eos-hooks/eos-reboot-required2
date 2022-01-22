@@ -36,6 +36,16 @@ Main() {
                     DoNotify
                 fi
                 ;;
+            amd-ucode)
+                if [ "$(device-info --cpu)" = "AuthenticAMD" ] ; then
+                    DoNotify
+                fi
+                ;;
+            intel-ucode)
+                if [ "$(device-info --cpu)" = "GenuineIntel" ] ; then
+                    DoNotify
+                fi
+                ;;
             btrfs-progs)
                 # Notify only if btrfs is in use
                 if [ -n "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] ; then
