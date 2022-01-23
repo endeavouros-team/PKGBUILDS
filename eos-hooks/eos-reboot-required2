@@ -6,7 +6,13 @@
 
 IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
-        running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')
+        if [ -r /proc/version ] ; then
+            # this works with grub and refind
+            running_kernel=$(cat /proc/version | sed 's|.*(\([^@]*\)@archlinux).*|\1|')
+        else
+            # this works with grub but not with refind
+            running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')
+        fi
     fi
     test "$1" = "$running_kernel"
 }
