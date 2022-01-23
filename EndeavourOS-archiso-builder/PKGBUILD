@@ -4,7 +4,7 @@
 
 pkgname=EndeavourOS-ISO
 pkgver=0.11
-pkgrel=4
+pkgrel=5
 pkgdesc="Build EndeavourOS ISO"
 arch=(any)
 makedepends=(archiso mkinitcpio-archiso git squashfs-tools)
@@ -62,8 +62,8 @@ build() {
     sudo pacman -Syyu || return 1
 
     # get extra drivers!
-    sudo pacman -Sw --noconfirm --cachedir airootfs/opt/extra-drivers r8168
-    sudo chown -R liveuser:users airootfs/opt
+    #sudo pacman -Sw --noconfirm --cachedir airootfs/opt/extra-drivers r8168
+    #sudo chown -R liveuser:users airootfs/opt
 
     local tmpdir
     local tmpsize=$(LANG=C /usr/bin/df | grep -w /tmp | awk '{print $4}')
