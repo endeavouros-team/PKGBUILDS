@@ -123,14 +123,20 @@ SimpleRank() {
     local pkgname=endeavouros-mirrorlist
     local result
 
-    latest_ml=$(/usr/bin/mktemp) ; delete_at_end+=("$latest_ml")
+    latest_ml=$(mktemp /tmp/tmp.dF3784XXXXX) ; delete_at_end+=("$latest_ml")
 
     FetchLatestMirrorlist
+
+    if [ -n "$ignored_mirrors" ] ; then
+        cat $latest_ml | grep -Pv "$ignored_mirrors" > $latest_ml.tmp
+        rm -f $latest_ml
+        mv $latest_ml.tmp $latest_ml
+    fi
 
     rm -f $latest_ml.orig
     mv $latest_ml $latest_ml.orig
     delete_at_end+=("$latest_ml.orig")
-    /usr/bin/cat $latest_ml.orig | grep "^Server[ ]*=" | /usr/bin/sort | /usr/bin/uniq > $latest_ml
+    cat $latest_ml.orig | grep "^Server[ ]*=" | sort | uniq > $latest_ml
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
     echo2 "Ranking EndeavourOS mirrors, please wait ..."
@@ -198,7 +204,7 @@ WriteSystemMirrorlist() {
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -231,6 +237,14 @@ Options:
   -n
              Don't save the generated mirrorlist.
 
+  --ignore "<wordlist>"
+             Mirrors to be ignored from the result.
+             This is useful for e.g. leaving out non-functional mirrors.
+             The <wordlist> is a list of words separated by a pipe '|' character.
+             Each word should be a unique part of the mirror address.
+             Note that the list should be enclosed in quotes if it includes
+             more than one word.
+
   --verbose
              Show more detailed output.
 
@@ -246,6 +260,8 @@ EOF
 
             --sort)
                 sort="$2" ; shift ;;
+            --ignore)
+                ignored_mirrors="$2" ; shift ;;
             --timeout | -t)
                 timeout="$2" ; shift ;;
             --verbose)
@@ -278,6 +294,7 @@ Main()
     local save=yes
     local hook_rank=no
     local ranked_suffix=".pacnew"             # was: ".ranked"  !!!
+    local ignored_mirrors=""
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
