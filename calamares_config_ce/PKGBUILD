@@ -1,12 +1,12 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_ce
 pkgver=1.0
-pkgrel=13
+pkgrel=14
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=(git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main)
+source=(git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=Atlantis_neo)
 
 sha512sums=('SKIP')
 
