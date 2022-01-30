@@ -166,16 +166,17 @@ SimpleRank() {
     echo "# EndeavourOS mirrorlist:"
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-    # User may have a static list (mirrors separated by '|' characters) as the best EndeavourOS mirrors for the location.
-    #
-    # Example definition in your ~/.bashrc file:
-    #    export ALWAYS_FIRST_EOS_MIRRORS='https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch|https://mirror.moson.org/endeavouros/repo/$repo/$arch'
-    #
-    if [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
-        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"
-    fi
+    # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
+
     if [ -n "$preferred_mirrors" ] ; then
         UserAddedMirrors "$preferred_mirrors"
+    fi
+
+    # Example configuration:
+    #    ALWAYS_FIRST_EOS_MIRRORS='https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch|https://mirror.moson.org/endeavouros/repo/$repo/$arch'
+
+    if [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
+        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"
     fi
 
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
