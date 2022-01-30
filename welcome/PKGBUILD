@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.17.10
+pkgver=3.17.11
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -32,13 +32,13 @@ source=(
   $_url/welcome-dnd
   $_url/eos-install-mode-run-calamares
 )
-sha512sums=('eedcf033cc499b665970721f038c5ca725b2a3bf49f0cac3c97c5342a9a40b4e2508bfdcda92f866952b05507ce74695d3d6eae958e882e8d38bb8f42cdebfef'
-            '82a1b2354f8121dc1d932035ff3ea02ad244ba5a7d11cfce2a233d31bdc04590614fae511c5e33a06553ad436cac1585201e5eb52de31c773c2346a50d43b52d'
+sha512sums=('5f14a1b52ede696ad786c0ddcf41cccea3a3a7317a6157c4e0543f5be527978727001b6dca4a943da7c28380f789b78a528f11952d9d072e1a85e1102d3a07a0'
+            'fc360cf63894772bbc75f41d5b5f312ac4e70afb43bc081b63e3d8db6b8c9a1f0e08fa5a3fdff840f8064c883dda1d3f16328bfc8aa5b4a18e8adf83b93174a0'
             '66977e3853538a25a7f1530ab34e91749ec4890ad03ac7d80e49fe1e0bdfca114ee0cff795d1a5fb4569c7c395d78b07aadc161a70e12c6546086a18f9e47db7'
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
             '9f0cd5edabf93439656046c60dc6a29f439a9d8b7afab8ec03b9470321ba98fc53b927944e2f68b5b152c150cca76913490eaab4256a5699da5960f860d81e81'
-            '2cb6920b87c317538a84e5c0a10dd19d0959efa2bb7bca177318fc9f9c1823e66f8a341b3e39d118d4f0c3fb2725f1387ac326f8ae73ac258cb36375115298ae')
+            'ebda472f841f1b376a30c978e7a22efdbccb491e58f62a08e195724d51127d8f381c5f6d4ac15f65bfd61a47590f904efa05f756f53062e88f1583c806ef68bc')
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
@@ -53,12 +53,12 @@ package() {
 
   install -d $pkgdir/etc/xdg/autostart
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop
-  install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop      # no --enable
+  install -Dm644 $pkgname.desktop         $pkgdir/etc/xdg/autostart/$pkgname.desktop      # no --once
 
   install -d $pkgdir/usr/share/applications
   cp -a $pkgname.desktop $pkgname.desktop-enable
   sed -i $pkgname.desktop-enable \
       -e 's|^\(Exec=.* --startdelay.*\)$|#\1|' \
-      -e 's|^#\(Exec=.* --enable.*\)$|\1|'
-  install -Dm644 $pkgname.desktop-enable         $pkgdir/usr/share/applications/$pkgname.desktop      # has --enable
+      -e 's|^#\(Exec=.* --once.*\)$|\1|'
+  install -Dm644 $pkgname.desktop-enable         $pkgdir/usr/share/applications/$pkgname.desktop      # has --once
 }

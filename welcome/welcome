@@ -1356,6 +1356,7 @@ StartHere() {
     local pb_percent=0
     local show_progress_bar=no   # was: yes
     local testing=no
+    local allow_run_if_disabled=no            # yes = allow run even if disabled
 
     local welcome_own_commands=()
     local activate_own_commands_tab="no"
@@ -1448,6 +1449,7 @@ StartHere() {
             --help|-h) WelcomeHelp ; return ;;
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
+            --once) allow_run_if_disabled=yes ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) ;;                                             # already handled!
             #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
@@ -1475,7 +1477,7 @@ StartHere() {
 
     CreateNotebookCommands
 
-    if [ "$(WelcomeSettings check)" != "enable" ] ; then
+    if [ "$(WelcomeSettings check)" != "enable" ] && [ "$allow_run_if_disabled" = "no" ]; then
         ltr2 welcome_disabled
         return
     fi
@@ -1594,7 +1596,9 @@ StartHere() {
 
     case "$result" in
         5) WelcomeSettings disable ;;
-        0|252) sleep 0.5 ; WelcomeSettings enable ;;
+        0) sleep 0.5 ; WelcomeSettings enable ;;
+        252) ;;
+        # 0|252) sleep 0.5 ; WelcomeSettings enable ;;
         *)
             case "$result" in
                 143) comment="   # likely caused by restarting the Welcome app" ;;

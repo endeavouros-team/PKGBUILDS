@@ -8,7 +8,7 @@ Comment[sk]=Spúšťač privítania v systéme EndeavourOS
 # for autostart:
 Exec=sh /usr/share/endeavouros/scripts/welcome --startdelay=3
 # for desktop launcher:
-#Exec=sh /usr/share/endeavouros/scripts/welcome --enable
+#Exec=sh /usr/share/endeavouros/scripts/welcome --once
 Icon=endeavouros-icon
 # StartupNotify=false
 # Terminal=False
