@@ -263,7 +263,7 @@ Options:
              a pipe '|' character.
              Note that the list must be enclosed in single quotes.
              Example:
-                 eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/$repo/$arch'
+                 eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
 
   --verbose
              Show more detailed output.
