@@ -195,7 +195,7 @@ Main() {
 
     [ -n "$calamares_version" ] || GUIDIE "error: calamares is not installed!"
 
-    if [ 0 -eq 1 ] ; then
+    if [ 1 -eq 1 ] ; then
         if [ $(vercmp "$calamares_version" 3.2.49.1-3) -gt 0 ] ; then
             ShowInstallLog=FALSE
             ShowPacmanLog=FALSE
