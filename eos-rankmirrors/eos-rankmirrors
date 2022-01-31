@@ -35,12 +35,26 @@ ShowArray() {
     done
 }
 
+SortMirrors() {
+    local latest_ml="$1"
+    local sortopts="$2"
+    local marr mirror m m2
+
+    readarray -t marr <<< $(grep "^Server = " $latest_ml)
+    for mirror in "${marr[@]}" ; do
+        m=$(echo "$mirror" | awk '{print $3}')                    # mirror value (with variables)
+        verbose "$m"
+        m2=$(echo "$m" | sed 's|/$repo/$arch$||')                 # mirror url (without variables)
+        GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
+    done | LC_ALL=C sort -g $sortopts
+}
+
 RankPerAge() {
     # latest_ml : in     # servers not commented!
     # result    : out
     local repo=endeavouros
     local arch=$(eos_GetArch)
-    local mirror m m2 nr_time
+    local mirror m m2
     local marr
     local sortopts=""
     local sort_rate="-k3,3 -k2r,2"
@@ -57,16 +71,7 @@ RankPerAge() {
             ;;
     esac
 
-    readarray -t marr <<< $(grep "^Server = " $latest_ml)
-
-    readarray -t result <<< $(
-        for mirror in "${marr[@]}" ; do
-            m=$(echo "$mirror" | /usr/bin/awk '{print $3}')           # mirror value (with variables)
-            verbose "$m"
-            m2=$(echo "$m" | /usr/bin/sed 's|/$repo/$arch$||')        # mirror url (without variables)
-            GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
-        done | LC_ALL=C /usr/bin/sort -g $sortopts
-    )
+    readarray -t result <<< $(SortMirrors "$latest_ml" "$sortopts")
 }
 
 GetUpdateNumberAndTime() {
@@ -76,12 +81,34 @@ GetUpdateNumberAndTime() {
     local result=0
     local time
     local nr
+    local low_limit=999999    # use a very high number!
+
+    [ -n "$reference_level" ] && low_limit=$((reference_level - 2))
 
     time=$(curl -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
     result=$?
     case "$result" in
         0)
             nr="$(cat "$tmpfile" | head -n1)"
+
+            local just_testing=no                  # no=production, yes=TESTING
+
+            if [ "$just_testing" = "yes" ] ; then
+                if [ "$mirror" = 'https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch' ] ; then
+                    nr=5555
+                fi
+            fi
+
+            if [ -n "$reference_level" ] ; then
+                if [ $nr -lt $low_limit ] ; then     # ad hoc test for the update level value in the state file
+                    echo2 "====> Fail: update level $nr too low (should be close to $reference_level): $mirror"
+                    return
+                fi
+                if [ $nr -gt $reference_level ] ; then             # ad hoc test for the update level value in the state file
+                    echo2 "====> Fail: update level $nr too high (cannot be more than $reference_level): $mirror"
+                    return
+                fi
+            fi
             result="$nr $time"
             ;;
         *)
@@ -94,8 +121,14 @@ GetUpdateNumberAndTime() {
     if [ -n "$result" ] ; then
         echo "$mirror $result"      # "mirror nr time"
     else
-        echo2 "====> Fail: $mirror"
+        echo2 "====> Fail: no response: $mirror"
     fi
+}
+
+GetReferenceUpdateLevel() {
+    local refroot="https://mirror.alpix.eu/endeavouros/repo"
+    local result=$(GetUpdateNumberAndTime "$refroot/state" "$refroot"/'$repo/$arch')
+    reference_level=$(echo "$result" | awk '{print $2}')
 }
 
 FetchLatestMirrorlist() {
@@ -319,6 +352,7 @@ Main()
     local ranked_suffix=".pacnew"             # was: ".ranked"  !!!
     local ignored_mirrors=""
     local preferred_mirrors=""
+    local reference_level=""
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local mirrorlist found, please install package '$pkgname'."
@@ -336,6 +370,8 @@ Main()
     local timeout_default="$EOS_AUTORANK_TIMEOUT"                  # in seconds
     [ -n "$timeout_default" ] || timeout_default=30
     local timeout=$timeout_default
+
+    GetReferenceUpdateLevel
 
     Options "$@"
 
