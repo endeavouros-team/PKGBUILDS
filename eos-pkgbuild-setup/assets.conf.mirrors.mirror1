@@ -35,7 +35,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/downgrade
     endeavouros-skel-i3wm
     endeavouros-skel-xfce4
-    endeavouros-lxde-skel
+    # endeavouros-lxde-skel
     endeavouros-keyring
     endeavouros-mirrorlist
     endeavouros-theming
