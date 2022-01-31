@@ -1,13 +1,13 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 pkgname=calamares_config_default
 pkgver=1.0
-pkgrel=30
+pkgrel=31
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=(
-    git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main
+    git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=Atlantis_neo
 )
 
 sha512sums=('SKIP')
