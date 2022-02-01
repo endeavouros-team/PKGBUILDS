@@ -303,7 +303,7 @@ _tr_add2 after_install_vbox1         "Abilità le utilità di VirtualBox"
 _tr_add2 after_install_vbox2         "Per abilitare le utilità di VirtualBox, selezionare <b>dopo l'installazione</b> la scheda e fare click sul pulsante"
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Problemmi di rete$_question Attiva/Disattiva i seguenti driver: r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168         "Problemi di rete$_question Attiva/Disattiva i seguenti driver: r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
 _tr_add2 after_install_r8168_tip     "Scambia i driver r8168 e r8169 (poi riavvia)"                    # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
