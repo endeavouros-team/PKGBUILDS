@@ -334,7 +334,7 @@ _yay_hook_check_latest_old() {
 }
 
 _nvidia-installer-db_hook() {
-    nvidia-site-check-and-update-db
+    # nvidia-site-check-and-update-db
     return
 
     # check if Nvidia has changed its driver archive (db) site
