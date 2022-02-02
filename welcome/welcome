@@ -1351,19 +1351,29 @@ CheckUserPkglist() {
     local userlistfile="/home/$EOS_LIVEUSER/user_pkglist.txt"
 
     if [ -r "$userlistfile" ] ; then
-        # Remove comments (sed) and empty lines (grep):
-        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$")
+        # Remove comments (sed), empty lines (grep), and trim lines from spaces (sed):
+        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$" | sed -e 's|^[ \t]*||' -e 's|[ \t]*$||')
         local up
         local failed=()
+        local has_spaces=no
 
-        for up in $user_pkgs ; do
-            if ! pacman -Si $up >& /dev/null ; then
-                failed+=($up)
+        # allow only one pkgname per line
+        readarray -t user_pkgs <<< $(echo "$user_pkgs")
+
+        for up in "${user_pkgs[@]}" ; do
+            if ! pacman -Si "$up" >& /dev/null ; then
+                failed+=("$up")
+                if [ "$up" != "$(echo "$up" | sed 's|[ \t]||g')" ] ; then
+                    has_spaces=yes
+                fi
             fi
         done
         if [ -n "$failed" ] ; then
-            eos_yad --form --title="Error" --text="The following package names listed in $userlistfile do not exist:\n${failed[*]}" \
-                    --image=dialog-error --button=yad-quit:1
+            local txt="The following package names listed in $userlistfile do not exist:\n$(printf "%s\n" "${failed[@]}")\n"
+            if [ "$has_spaces" = "yes" ] ; then
+                txt+="Note that only one package name per line is allowed.\n"
+            fi
+            eos_yad --form --title="Error" --text="$txt" --image=dialog-error --button=yad-quit:1
             exit 1
         fi
     fi
