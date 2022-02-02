@@ -1347,6 +1347,27 @@ export -f Usage
 #                  to install. Package names are listed as one package name per line.
 #                  Empty lines and comments (lines starting with character #) are allowed.
 
+CheckUserPkglist() {
+    local userlistfile="/home/$EOS_LIVEUSER/user_pkglist.txt"
+
+    if [ -r "$userlistfile" ] ; then
+        # Remove comments (sed) and empty lines (grep):
+        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$")
+        local up
+        local failed=()
+
+        for up in $user_pkgs ; do
+            if ! pacman -Si $up >& /dev/null ; then
+                failed+=($up)
+            fi
+        done
+        if [ -n "$failed" ] ; then
+            eos_yad --form --title="Error" --text="The following package names listed in $userlistfile do not exist:\n${failed[*]}" \
+                    --image=dialog-error --button=yad-quit:1
+            exit 1
+        fi
+    fi
+}
 
 StartHere() {
     local arg lang
@@ -1417,6 +1438,10 @@ StartHere() {
     AfterTranslations
 
     KillExtraYad > /tmp/yad-zombies.log
+
+    if [ "$is_installing" = "yes" ] ; then
+        CheckUserPkglist
+    fi
 
     ShowProgress Processing...
 
