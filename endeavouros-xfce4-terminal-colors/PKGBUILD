@@ -2,7 +2,7 @@
 # Artwork by: FLVAL --> https://github.com/FLVAL
 pkgname=endeavouros-xfce4-terminal-colors
 pkgver=2
-pkgrel=1
+pkgrel=2
 pkgdesc="EndeavourOS colorscheme for xfce4-terminal"
 arch=('any')
 depends=('xfce4-terminal')
