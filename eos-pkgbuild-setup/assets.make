@@ -282,8 +282,13 @@ ListNameToPkgName()
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
     if [ -n "$hook" ] ; then
         if [ "$fetch" = "yes" ] ; then
-            HookIndicator "$hook_yes"
             $hook
+            case $? in
+                0) HookIndicator "$hook_yes" ;;          # OK
+                11) HookIndicator "$hook_pkgver" ;;      # pkgver was updated by hook
+                1) HookIndicator "?" ;;                  # failed
+                *) HookIndicator "??" ;;                 # unknown error
+            esac
         fi
     else
         HookIndicator "$hook_no"

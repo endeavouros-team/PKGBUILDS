@@ -186,6 +186,8 @@ _paper-icon-theme-git_hook() {
         -e 's|^pkgver()|_pkgver_not_used()|' \
         -e "/^provides=(/a \conflicts=(paper-icon-theme)" \
         -e "/ ninja -C /a \    # cleanup\n$cleanup"
+
+    return 11  # pkgver was changed
 }
 
 
@@ -223,7 +225,9 @@ _ckbcomp_hook() {
     fi
 
     if [ "$newver" != "$Pkgver" ] ; then
-        printf "new version $newver is available. " >&2
+        # printf "new version $newver is available. " >&2
+        popd >/dev/null
+        return 11  # pkgver was changed
     else
         if [ ! -x /usr/bin/$tool ] ; then
             # Cannot compare with non-existing /usr/bin/ckbcomp !!!
@@ -278,7 +282,8 @@ _ckbcomp_hook_old() {
                 ;;
         esac
         updpkgsums "$Pkgbuild" 2>/dev/null
-        echo -n "#" >&2
+        # echo -n "#" >&2
+        return 11  # pkgver was changed
     fi
 }
 
@@ -372,8 +377,9 @@ _inxi_hook_check_latest() {
 
     if [ "$prefer_dev_version" = "yes" ] ; then
         sed -i $Pkgbuild -e 's|^pkgver='"$localversion"'$|pkgver='"$dev_version"'|'
-        echo -n "#" >&2
+        # echo -n "#" >&2
         _Updpkgsums "$Pkgbuild"
+        return 11  # pkgver was changed
     else
         _common_show_version
     fi
@@ -409,7 +415,7 @@ _kalu_hook_fix_files() {
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
 }
 _yad_hook_add_gspell() {
-    # add gspell to 'depends', and modify 'pkgver'
+    # add gspell to 'depends', and modify 'pkgrel'
     sed -i "$PKGBUILD_ROOTDIR"/yad/PKGBUILD \
         -e 's|^depends=(\([^\)]*\))$|depends=(\1 gspell)|' \
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
