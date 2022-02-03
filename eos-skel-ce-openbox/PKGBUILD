@@ -3,7 +3,7 @@
 _pkgname=openbox
 pkgname=eos-skel-ce-openbox
 pkgver=1.0
-pkgrel=11
+pkgrel=12
 pkgdesc="Pre user creation skel setup for Openbox EOS-CE"
 arch=('any')
 groups=('eos-ce')
