@@ -1,8 +1,8 @@
 # Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
 
 pkgname=endeavouros-mirrorlist
-pkgver=4.4
-pkgrel=4
+pkgver=4.4.1
+pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -16,7 +16,7 @@ conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
 source=($_url/$pkgname)
-sha512sums=('e5a71d2a6ec621a2bc130920530cc84fd5e5670693946b173e086686f8e2cffc8ab9e8beb508e5b6c864c6ee777b4d7e5e72b5ce5660ebbb489f9bb666615b73')
+sha512sums=('4c9cf642c60ea295b3beedbb83783a0ceee3b5ad8317d5decd870e98fe10d144c901ea73d33dd838398b7f8f248c37b7007cddbb20ce42771601b94e20651688')
 
 package() {
  #install -d "$pkgdir/etc/pacman.d"
