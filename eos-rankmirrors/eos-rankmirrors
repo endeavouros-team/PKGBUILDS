@@ -134,15 +134,21 @@ GetReferenceUpdateLevel() {
 FetchLatestMirrorlist() {
     # Grab endeavouros-mirrorlist from the package cache, or fetch it from github/gitlab.
 
-    local pkg=$(ls -1 /var/cache/pacman/pkg/endeavouros-mirrorlist-*.zst 2>/dev/null | tail -n1)
+    local pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
     if [ -n "$pkg" ] ; then
-        echo2 "Extracting $pkg ..."
-        tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
-    else
-        local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
-        echo2 "Fetching $url ..."
-        curl -Lsm $timeout -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
+        # the package exists in the cache
+        local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
+        local installedv=$(pacman -Q $pkgname | awk '{print $2}')
+        if [ "$cachev" = "$installedv" ] ; then
+            echo2 "Extracting $pkg ..."
+            tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
+            return
+        fi
     fi
+    # package not in cache or installed package version is not the same as in cache
+    local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
+    echo2 "Fetching $url ..."
+    curl -Lsm $timeout -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
 }
 
 SimpleRank() {
