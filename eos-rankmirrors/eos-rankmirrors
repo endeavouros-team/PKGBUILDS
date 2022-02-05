@@ -146,9 +146,15 @@ FetchLatestMirrorlist() {
         fi
     fi
     # package not in cache or installed package version is not the same as in cache
+    local code=0
     local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
     echo2 "Fetching $url ..."
-    curl -Lsm $timeout -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
+    # curl -Lsm $timeout -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
+    curl --fail -Lsm $timeout -o $latest_ml $url || code=$?
+    case "$code" in
+        0) ;;
+        *) DIE "cannot fetch EndeavourOS mirrorlist info (curl error code $code)." ;;
+    esac
 }
 
 SimpleRank() {
