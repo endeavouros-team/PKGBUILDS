@@ -4,7 +4,7 @@
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
 pkgver=1.0
-pkgrel=8
+pkgrel=9
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
@@ -21,6 +21,6 @@ package() {
     mkdir -p "${pkgdir}${PREFIX}/.config/"
     cp -R ".config/" "${pkgdir}${PREFIX}/"
     install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
-    install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh"
+    install -Dm755 "set_once_xfce4.sh" "${pkgdir}${PREFIX}/set_once_xfce4.sh"
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
 }
