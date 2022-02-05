@@ -4,7 +4,7 @@
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
 pkgver=1.0
-pkgrel=7
+pkgrel=8
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
