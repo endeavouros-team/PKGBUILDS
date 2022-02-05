@@ -79,17 +79,19 @@ GetUpdateNumberAndTime() {
     local mirror="$2"
     local tmpfile="$HOME/.eos-rank-state.123456"
     local result=0
+    local retcode=0
     local time
     local nr
     local low_limit=999999    # use a very high number!
 
     [ -n "$reference_level" ] && low_limit=$((reference_level - 2))
 
-    time=$(curl -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
-    result=$?
-    case "$result" in
+    time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
+    retcode=$?
+    case "$retcode" in
         0)
             nr="$(cat "$tmpfile" | head -n1)"
+            rm -f "$tmpfile"
 
             local just_testing=no                  # no=production, yes=TESTING
 
@@ -110,24 +112,20 @@ GetUpdateNumberAndTime() {
                 fi
             fi
             result="$nr $time"
+            echo "$mirror $result"      # "mirror nr time"
             ;;
         *)
-            result=""
+            echo2 "====> Fail: no response: $mirror, error code $retcode"
+            rm -f "$tmpfile"
+            return $retcode
             ;;
     esac
-
-    rm -f "$tmpfile"
-    
-    if [ -n "$result" ] ; then
-        echo "$mirror $result"      # "mirror nr time"
-    else
-        echo2 "====> Fail: no response: $mirror"
-    fi
 }
 
 GetReferenceUpdateLevel() {
     local refroot="https://mirror.alpix.eu/endeavouros/repo"
     local result=$(GetUpdateNumberAndTime "$refroot/state" "$refroot"/'$repo/$arch')
+    [ -n "$result" ] || exit 0
     reference_level=$(echo "$result" | awk '{print $2}')
 }
 
@@ -149,11 +147,12 @@ FetchLatestMirrorlist() {
     local code=0
     local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
     echo2 "Fetching $url ..."
-    # curl -Lsm $timeout -o $latest_ml $url || DIE "cannot fetch EndeavourOS mirrorlist info!"
     curl --fail -Lsm $timeout -o $latest_ml $url || code=$?
     case "$code" in
         0) ;;
-        *) DIE "cannot fetch EndeavourOS mirrorlist info (curl error code $code)." ;;
+        *) echo2 "cannot fetch EndeavourOS mirrorlist info (curl error code $code)."
+           exit 0
+           ;;
     esac
 }
 
