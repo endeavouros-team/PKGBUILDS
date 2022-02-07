@@ -7,7 +7,7 @@
 pkgbase=lxdm
 pkgname=eos-lxdm-gtk3
 pkgver=0.5.3
-pkgrel=7
+pkgrel=1
 pkgdesc='Lightweight X11 Display Manager'
 arch=('x86_64')
 url="https://lxde.org/"
@@ -15,6 +15,7 @@ license=('GPL')
 depends=('gtk2' 'gtk3' 'xorg-server')
 makedepends=('intltool' 'iso-codes')
 optdepends=('iso-codes: show language names in language chooser')
+conflicts=('lxdm-gtk3' 'lxdm' 'lxdm-git' 'lxdm-consolekit')
 backup=('etc/lxdm/lxdm.conf' 'etc/pam.d/lxdm' 'etc/lxdm/Xsession'
         'etc/lxdm/PreLogin' 'etc/lxdm/LoginReady' 'etc/lxdm/PostLogin'
         'etc/lxdm/PostLogout' 'etc/lxdm/PreReboot' 'etc/lxdm/PreShutdown')
