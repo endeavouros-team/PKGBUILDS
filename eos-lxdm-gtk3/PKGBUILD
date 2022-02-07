@@ -8,7 +8,7 @@ pkgbase=lxdm
 pkgname=eos-lxdm-gtk3
 _eos_theming=endeavouros-lxdm-theme
 pkgver=0.5.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Lightweight X11 Display Manager'
 arch=('x86_64')
 url="https://lxde.org/"
@@ -26,14 +26,11 @@ source=(https://downloads.sourceforge.net/lxde/$pkgbase-$pkgver.tar.xz
         lxdm.pam
         Xsession)
 sha256sums=('4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f'
+            'SKIP'
             '328f766c4d2ee899fc37a26f6e8666d40ebeaa3bd4c7d5a474ebb5415351a440'
             'e8c4c5fd3b801a390d201166fd1fb9730e78a5c62928768103b870b6bd980ea0'
-            'a02f547e1c36f1c7dd2a1f942b620fe76445d561f7835e7fef434aa4c12c6967'
-            'e3061f39ffeb8423f58412d7a76dbec7ffab45d5ef605e8f422c2644cecbeea1'
-            '91dc9c9d80583e82757553b3ed76fe98929d3b2f1a65bb2a53143877db8d8dd8')
-
-
-
+            'a02f547e1c36f1c7dd2a1f942b620fe76445d561f7835e7fef434aa4c12c6967')
+            
 prepare(){
   cd $pkgbase-$pkgver
 
