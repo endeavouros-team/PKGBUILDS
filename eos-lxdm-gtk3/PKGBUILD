@@ -30,7 +30,10 @@ sha256sums=('4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f'
             '328f766c4d2ee899fc37a26f6e8666d40ebeaa3bd4c7d5a474ebb5415351a440'
             'e8c4c5fd3b801a390d201166fd1fb9730e78a5c62928768103b870b6bd980ea0'
             'a02f547e1c36f1c7dd2a1f942b620fe76445d561f7835e7fef434aa4c12c6967')
-            
+
+
+
+
 prepare(){
   cd $pkgbase-$pkgver
 
@@ -60,9 +63,9 @@ package() {
   make DESTDIR="$pkgdir" install
   # replace lxdm.conf and theme
   rm $pkgdir/etc/lxdm/lxdm.conf
-  cp $srcdir/lxdm.conf $pkgdir/etc/lxdm/lxdm.conf
+  cp $srcdir/$_eos_theming/lxdm.conf $pkgdir/etc/lxdm/lxdm.conf
   rm -R $pkgdir/usr/share/lxdm/themes/Industrial
-  rsync -va $srcdir/endeavouros       $pkgdir/usr/share/lxdm/themes/
+  rsync -va $srcdir/$_eos_theming/endeavouros       $pkgdir/usr/share/lxdm/themes/
   chmod 644 "$pkgdir/etc/lxdm/lxdm.conf"
 
   # Setup system user and group
