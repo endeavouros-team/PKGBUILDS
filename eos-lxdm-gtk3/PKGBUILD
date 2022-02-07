@@ -6,6 +6,7 @@
 
 pkgbase=lxdm
 pkgname=eos-lxdm-gtk3
+_eos_theming=endeavouros-lxdm-theme
 pkgver=0.5.3
 pkgrel=1
 pkgdesc='Lightweight X11 Display Manager'
@@ -20,11 +21,10 @@ backup=('etc/lxdm/lxdm.conf' 'etc/pam.d/lxdm' 'etc/lxdm/Xsession'
         'etc/lxdm/PreLogin' 'etc/lxdm/LoginReady' 'etc/lxdm/PostLogin'
         'etc/lxdm/PostLogout' 'etc/lxdm/PreReboot' 'etc/lxdm/PreShutdown')
 source=(https://downloads.sourceforge.net/lxde/$pkgbase-$pkgver.tar.xz
+        git+https://github.com/endeavouros-team/$_eos_theming.git#branch=main
         set-path.patch
         lxdm.pam
-        Xsession
-        lxdm.conf
-        endeavouros.tar.gz)
+        Xsession)
 sha256sums=('4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f'
             '328f766c4d2ee899fc37a26f6e8666d40ebeaa3bd4c7d5a474ebb5415351a440'
             'e8c4c5fd3b801a390d201166fd1fb9730e78a5c62928768103b870b6bd980ea0'
