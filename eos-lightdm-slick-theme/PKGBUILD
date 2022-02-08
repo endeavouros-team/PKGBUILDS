@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=eos-lightdm-slick-theme
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS theme for lightdm-slick-greeter'
 arch=('any')
 url='https://www.endeavouros.com'
@@ -14,7 +14,7 @@ install=eos-lightdm-slick-theme.install
 
 package() {
   cd "$srcdir/"
-  install -d "${pkgdir}/etc/lighdm/"
+  mkdir -p "${pkgdir}/etc/lightdm/
   cp slick-greeter.conf ${pkgdir}/etc/lightdm/
 
   # cleanup
