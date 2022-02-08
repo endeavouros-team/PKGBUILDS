@@ -2,8 +2,8 @@
 # patched for EndeavourOS: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-qogir-icons
-pkgver=1
-pkgrel=2
+pkgver=2
+pkgrel=1
 pkgdesc='A colorful design icon theme for linux desktops'
 arch=('any')
 url='https://github.com/vinceliuice/Qogir-icon-theme'
