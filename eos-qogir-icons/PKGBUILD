@@ -2,7 +2,7 @@
 # patched for EndeavourOS: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-qogir-icons
-pkgver=2
+pkgver=3
 pkgrel=1
 pkgdesc='A colorful design icon theme for linux desktops'
 arch=('any')
@@ -18,11 +18,9 @@ source=(
 'git+https://github.com/vinceliuice/Qogir-icon-theme'
 'install.patch'
 'start-here-symbolic.svg'
-'distributor-logo-endeavouros.svg'
 )
 
 sha256sums=(
-'SKIP'
 'SKIP'
 'SKIP'
 'SKIP'
@@ -31,7 +29,6 @@ sha256sums=(
 prepare() {
     patch -u ${srcdir}/Qogir-icon-theme/install.sh -i install.patch
     cp start-here-symbolic.svg ${srcdir}/Qogir-icon-theme/src/symbolic/status/start-here-symbolic.svg
-    cp distributor-logo-endeavouros.svg ${srcdir}/Qogir-icon-theme/src/scalable/apps/distributor-logo-endeavouros.svg
 }
 
 package() {
