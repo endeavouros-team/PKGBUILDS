@@ -4,10 +4,10 @@ post_install() {
     sed -i 's?#allow-user-switching=true?allow-user-switching=true?' /etc/lightdm/lightdm.conf
 }
 
-post_upgrade() {
+#post_upgrade() {
 
-}
+#}
 
-post_remove() {
+#post_remove() {
 
-}
+#}
