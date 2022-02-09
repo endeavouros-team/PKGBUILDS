@@ -1,36 +1,8 @@
-# This is a default template for a post-install scriptlet.
-# Uncomment only required functions and remove any functions
-# you don't need (and this header).
-
-## arg 1:  the new package version
-#pre_install() {
-	# do something here
-#}
-
-## arg 1:  the new package version
-#post_install() {
-	# do something here
-#}
-
-## arg 1:  the new package version
-## arg 2:  the old package version
-#pre_upgrade() {
-	# do something here
-#}
-
-## arg 1:  the new package version
-## arg 2:  the old package version
-#post_upgrade() {
-	# do something here
-#}
-
-## arg 1:  the old package version
 pre_remove() {
 	echo "This will remove the lightdm and greeter configuration for EndeavourOS"
 	echo "You need to configure the Arch-Way after the removal"
 }
 
-## arg 1:  the old package version
 post_remove() {
 	echo "keep in mind to setup /etc/lightdm/lightdm.conf for the greeter you want to use"
 	echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
