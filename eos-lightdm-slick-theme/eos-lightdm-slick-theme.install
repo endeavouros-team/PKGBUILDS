@@ -25,13 +25,14 @@
 #}
 
 ## arg 1:  the old package version
-#pre_remove() {
-	# do something here
-#}
+pre_remove() {
+	echo "This will remove the lightdm and greeter configuration for EndeavourOS"
+	echo "You need to configure the Arch-Way after the removal"
+}
 
 ## arg 1:  the old package version
 post_remove() {
-echo "keep in mind to setup /etc/lightdm/lightdm.conf for the greeter you want to use"
-echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
-echo "if not LightDM will fail to start!"
+	echo "keep in mind to setup /etc/lightdm/lightdm.conf for the greeter you want to use"
+	echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
+	echo "if not LightDM will fail to start!"
 }
