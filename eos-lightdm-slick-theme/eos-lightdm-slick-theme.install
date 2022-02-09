@@ -1,6 +1,6 @@
 pre_remove() {
-	echo "This will remove the lightdm and greeter configuration for EndeavourOS"
-	echo "You need to configure the Arch-Way after the removal"
+	echo "removing the lightdm and greeter configurations for EndeavourOS"
+	echo "You need to reconfigure the Arch-Way after the removal of this package"
 }
 
 post_remove() {
