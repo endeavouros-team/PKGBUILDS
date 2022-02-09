@@ -7,10 +7,9 @@ arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
 depends=('lightdm' 'lightdm-slick-greeter')
-source=('slick-greeter.conf' 'eos-lightdm-slick-theme.install')
+source=('slick-greeter.conf' '10-eos-slick.conf')
 md5sums=('SKIP' 'SKIP')
 sha512sums=('SKIP' 'SKIP')
-install=eos-lightdm-slick-theme.install
 
 package() {
   cd "$srcdir/"
