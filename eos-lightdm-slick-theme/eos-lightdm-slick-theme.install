@@ -4,6 +4,7 @@ pre_remove() {
 }
 
 post_remove() {
+	echo "drop-in /etc/lightdm/lightdm.conf.d/ removed!"
 	echo "keep in mind to setup /etc/lightdm/lightdm.conf for the greeter you want to use"
 	echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
 	echo "if not LightDM will fail to start!"
