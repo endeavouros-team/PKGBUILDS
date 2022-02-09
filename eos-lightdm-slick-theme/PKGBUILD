@@ -16,8 +16,6 @@ package() {
   cd "$srcdir/"
   mkdir -p "${pkgdir}/etc/lightdm/"
   cp slick-greeter.conf "${pkgdir}/etc/lightdm/"
-
-  # cleanup
-  cd $srcdir
-  rm -rf ../${pkgname}
+  mkdir -p "${pkgdir}/etc/lightdm/lightdm.conf.d"
+  cp 10-eos-slick.conf  "${pkgdir}/etc/lightdm/lightdm.conf.d"
 }
