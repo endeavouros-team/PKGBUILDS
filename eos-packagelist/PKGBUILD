@@ -1,0 +1,14 @@
+pkgname=eos-packagelist
+pkgver=1.0
+pkgrel=1
+pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
+arch=('x86_64')
+license=('GPL3')
+depends=('python-pyaml')
+optdepends=('sudo')
+source=(eos-packagelist)
+sha256sums=('e844a41661998599a3e60a262afb7a111f933131909488845ab4cb45e6de22d2')
+
+package() {
+    install -Dm0755 "$srcdir/eos-packagelist" "$pkgdir/usr/bin/eos-packagelist"
+}

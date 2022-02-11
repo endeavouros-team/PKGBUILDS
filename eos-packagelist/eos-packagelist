@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+
+import argparse
+import os.path
+import subprocess
+import sys
+import urllib.request
+import yaml
+
+
+def get_packages(group):
+    """
+    Recursively parses the group data and returns the packages
+
+    :param group: A group in the format of the netinstall.yaml from Calamares
+    :return: A list of the package names
+    """
+    packages = []
+    if "packages" in group:
+        packages += group["packages"]
+    if "subgroups" in group:
+        for subgroup in group["subgroups"]:
+            packages += get_packages(subgroup)
+    return packages
+
+
+def get_groups(data):
+    """
+    Iterates over the list of groups and gathers the group name and packages for each
+
+    :param data: A list of groups in the format of the netinstall.yaml from Calamares
+    :return: A list of tuples containing the name of the group and the list of packages
+    """
+    group_list = []
+    for group in data:
+        if group["name"]:
+            group_list.append((group["name"], get_packages(group)))
+    return group_list
+
+
+def get_packagechooser_groups(data):
+    """
+    Reads the packagechooser data and gathers the group name and packages for each
+
+    :param data: A dict in the format of packagechooser.conf from Calamares
+    :return: A list of tuples containing the name of the group and the list of packages
+    """
+    group_list = []
+    if "items" in data:
+        for item in data["items"]:
+            if "netinstall" in item:
+                group_list.append((item["netinstall"]["name"], get_packages(item["netinstall"])))
+    return group_list
+
+
+def install(package_list):
+    """
+    Uses pacman to install the listed packages
+    
+    :param package_list: A list of strings containing package names
+    :return:
+    """
+    if os.path.exists("/usr/bin/sudo"):
+        command = ["sudo", "pacman", "--needed", "-Syu"] + package_list
+    else:
+        command = ["su", "-c", "pacman --needed -Syu " + " ".join(package_list)]
+
+    try:
+        subprocess.call(command)
+    except subprocess.CalledProcessError as cpe:
+        print("Pacman failed with error " + format(cpe))
+
+
+if __name__ == '__main__':
+    # Set up the available command line arguments
+    parser = argparse.ArgumentParser(description='The EndeavourOS package list handler gets package information from '
+                                                 'the current installer files and allows you to optionally install '
+                                                 'them')
+    parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you which to see packages for')
+    parser.add_argument('--list', action="store_true", help='Lists the available options')
+    parser.add_argument('--install', action="store_true",
+                        help='Install the packages on the list using pacman instead of just listing them')
+    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+
+    # Get the data from the internet and parse it
+    netinstall_packages = []
+    try:
+        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/files" \
+              "/netinstall.yaml"
+        with urllib.request.urlopen(url) as netinstall_file:
+            netinstall_data = yaml.safe_load(netinstall_file)
+            netinstall_packages += get_groups(netinstall_data)
+
+        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
+              "/packagechooser_ce.conf"
+        with urllib.request.urlopen(url) as netinstall_file:
+            netinstall_data = yaml.safe_load(netinstall_file)
+            netinstall_packages += get_packagechooser_groups(netinstall_data)
+    except yaml.YAMLError or KeyError as ex:
+        print("Malformed netinstall.yaml detected with error: " + format(ex))
+
+    # Act on the parsed data
+    if args.list:
+        for group_name in netinstall_packages:
+            print(group_name[0])
+        exit(0)
+    else:
+        if args.profile:
+            for group_name, packages_list in netinstall_packages:
+                if group_name == args.profile:
+                    if args.install:
+                        install(packages_list)
+                        exit(0)
+                    else:
+                        print("\n".join(packages_list))
+                        exit(0)
+
+    print("No profile found matching: " + args.profile)
+    exit(1)
