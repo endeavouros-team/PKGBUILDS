@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import locale
 import os.path
 import subprocess
 import sys
@@ -71,11 +72,21 @@ def install(package_list):
         print("Pacman failed with error " + format(cpe))
 
 
+def replace_locale(packages):
+    locale_name = locale.getlocale()[0].lower().replace("_", "-")
+    new_packages = []
+    for package in packages:
+        new_packages.append(package.replace("$LOCALE", locale_name))
+    return new_packages
+
+
 if __name__ == '__main__':
     # Set up the available command line arguments
     parser = argparse.ArgumentParser(description='The EndeavourOS package list handler gets package information from '
                                                  'the current installer files and allows you to optionally install '
-                                                 'them')
+                                                 'them',
+                                     epilog="example: eos-packagelist \"Awesome Edition\""
+                                     )
     parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you which to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
     parser.add_argument('--install', action="store_true",
@@ -109,10 +120,10 @@ if __name__ == '__main__':
             for group_name, packages_list in netinstall_packages:
                 if group_name == args.profile:
                     if args.install:
-                        install(packages_list)
+                        install(replace_locale(packages_list))
                         exit(0)
                     else:
-                        print("\n".join(packages_list))
+                        print("\n".join(replace_locale(packages_list)))
                         exit(0)
 
     print("No profile found matching: " + args.profile)

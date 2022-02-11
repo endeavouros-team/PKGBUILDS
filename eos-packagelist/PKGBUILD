@@ -7,7 +7,7 @@ license=('GPL3')
 depends=('python-pyaml')
 optdepends=('sudo')
 source=(eos-packagelist)
-sha256sums=('e844a41661998599a3e60a262afb7a111f933131909488845ab4cb45e6de22d2')
+sha256sums=('2871b9131c4610158c6742368db5904fc588bfc21622da6d95fd6994912422be')
 
 package() {
     install -Dm0755 "$srcdir/eos-packagelist" "$pkgdir/usr/bin/eos-packagelist"
