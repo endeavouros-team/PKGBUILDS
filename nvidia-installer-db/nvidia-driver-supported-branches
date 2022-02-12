@@ -17,7 +17,7 @@ GetNvidiaIds()
     [ -n "$searchstr" ]  || DIE "give search string"
     [ -n "$machinedef" ] || machinedef="Linux x86_64\/AMD64"
 
-    local data=$(curl -Lsm 10 -o- https://www.nvidia.com/en-us/drivers/unix)
+    local data=$(curl -Lsm 10 -o- "$starting_url")
     [ -n "$data" ] || DIE "fetching data from NVIDIA failed"
 
     local sed=(
@@ -31,7 +31,9 @@ GetNvidiaIds()
 
     # get the version and url
     data=$(echo "$data" | grep -A1 "$searchstr" | tail -n1)
-    [ -n "$data" ] || DIE "no branch data"
+    [ -n "$data" ] || {
+        DIE "no branch data"
+    }
 
     local version=$(echo "$data" | sed 's|.*>\([0-9.]*\)</a>.*$|\1|')
     local url=$(echo "$data" | sed 's|.*\(https://[^"]*\)".*|\1|')
@@ -40,6 +42,8 @@ GetNvidiaIds()
     local ids="" #$(curl -Lsm 10 -o- https://download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
     [ -n "$ids" ] || ids="$(curl -Lsm 10 -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
     [ -n "$ids" ] || DIE "fetcing supported ids for $version failed"
+
+    local true_series="${version%%.*}"
 
     ids="$(echo "$ids" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | grep '<tr id=')"
 
@@ -57,7 +61,7 @@ GetNvidiaIds()
     fi
 
     ids=$(echo "$ids" | sort | uniq | tr '[:upper:]' '[:lower:]')
-    echo "$ids"
+    echo "$true_series|$ids"
 }
 
 ShowDriversForId() {
@@ -65,17 +69,20 @@ ShowDriversForId() {
     local ix
     local ids
     local bname
+    local true_series=""   # found from the Nvidia website
 
     echo "NVIDIA card id: $id"
 
-    for ix in 495 470 390 340 ; do
+    for ix in $latest_prod $latest_new $latest_legacy ; do
         bname="${bnames[$ix]}"
         ids="$(GetNvidiaIds "$bname")"
+        true_series="$(echo "$ids" | head -n1 | cut -d'|' -f1)"
+        ids="$(echo "$ids" | cut -d'|' -f2)"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-            echo "Series $ix: supported"
+            echo "Series $true_series: supported"
             [ "$all" = "no" ] && return
         else
-            [ "$all" = "yes" ] && echo "Series $ix: not supported"
+            [ "$all" = "yes" ] && echo "Series $true_series: not supported"
         fi
     done
 }
@@ -126,24 +133,25 @@ Main() {
     local progname="$(basename "$0")"
     local all=no
     local nvidia_id=""
+    local latest_prod=1
+    local latest_new=2
+    local latest_legacy=3
+    local starting_url="https://www.nvidia.com/en-us/drivers/unix"
 
     Options "$@"
 
     local bname ix
     declare -A bnames
-    bnames["495"]="Latest New Feature Branch Version"              # 495.44
-    bnames["470"]="Latest Production Branch Version"               # 470.82.00
-    bnames["390"]="Latest Legacy Gpu version (390.xx series)"
-    bnames["340"]="Latest Legacy Gpu version (340.xx series)"
-
-    bnames["390"]="390.xx series"
-    bnames["340"]="340.xx series"
+    bnames["$latest_prod"]="Latest Production Branch Version"            # 510.47.03
+    bnames["$latest_new"]="Latest New Feature Branch Version"            # 495.46
+    bnames["$latest_legacy"]="390.xx series"
 
     if [ -z "$nvidia_id" ] ; then
         nvidia_id="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
     fi
     if [ -n "$nvidia_id" ] ; then
         ShowDriversForId $nvidia_id
+        printf "\nMore info: %s\n\n" "$starting_url"
     fi
 }
 
