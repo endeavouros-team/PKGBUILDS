@@ -87,7 +87,7 @@ if __name__ == '__main__':
                                                  'them',
                                      epilog="example: eos-packagelist \"Awesome Edition\""
                                      )
-    parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you which to see packages for')
+    parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you want to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
     parser.add_argument('--install', action="store_true",
                         help='Install the packages on the list using pacman instead of just listing them')
