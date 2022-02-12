@@ -1,5 +1,5 @@
 pkgname=eos-packagelist
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
 arch=('x86_64')

@@ -72,11 +72,11 @@ def install(package_list):
         print("Pacman failed with error " + format(cpe))
 
 
-def replace_locale(packages):
-    locale_name = locale.getlocale()[0].lower().replace("_", "-")
+def remove_variable_packages(packages):
     new_packages = []
     for package in packages:
-        new_packages.append(package.replace("$LOCALE", locale_name))
+        if "$" not in package:
+            new_packages.append(package)
     return new_packages
 
 
@@ -120,10 +120,10 @@ if __name__ == '__main__':
             for group_name, packages_list in netinstall_packages:
                 if group_name == args.profile:
                     if args.install:
-                        install(replace_locale(packages_list))
+                        install(remove_variable_packages(packages_list))
                         exit(0)
                     else:
-                        print("\n".join(replace_locale(packages_list)))
+                        print("\n".join(remove_variable_packages(packages_list)))
                         exit(0)
 
     print("No profile found matching: " + args.profile)
