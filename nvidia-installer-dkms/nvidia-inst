@@ -339,11 +339,19 @@ AllRemovables() {
         xf86-video-nouveau
 
         # nvidia packages from repos:
-        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-installer|-cg-')
-
-        # nvidia packages from AUR:
-        $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$series_prev1|$series_prev2")
+        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-installer|-cg-|beta')
     )
+
+    # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
+    # Currently we support the [kernel-lts] repo which contains some older Nvidia drivers.
+
+    if [ 0 -eq 1 ] ; then
+        # nvidia packages from AUR:
+        pr_nvidia+=(
+            $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$series_prev1|$series_prev2")
+        )
+    fi
+
     readarray -t pr_nvidia <<< $(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
 }
 
@@ -406,8 +414,12 @@ SanityChecks() {
 
 Main()
 {
-    # Support only these Nvidia series (must update these values too!):
-    local series_now=495
+    # Support only these Nvidia series (must update these values too!).
+    # Include:
+    # - the latest from Arch
+    # - two latest from the kernel-lts repo
+
+    local series_now=510
     local series_prev1=470
     local series_prev2=390
 
