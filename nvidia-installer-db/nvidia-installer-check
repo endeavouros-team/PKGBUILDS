@@ -63,6 +63,10 @@ EOF
     esac
 }
 
+NvidiaDkmsSeries() {
+    LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}' | cut -d'.' -f1
+}
+
 Main()
 {
     local id="$1"              # optional
@@ -71,10 +75,10 @@ Main()
     local series
     local retval retval0=11 retval1=11 retval2=11
 
-    local nvidia=10de          # nvidia vendor code
-    local series_now=495       # currently supported driver series
-    local series_prev1=470     # previously supported driver series
-    local series_prev2=390     # previously supported driver series
+    local nvidia=10de                           # nvidia vendor code
+    local series_now=$(NvidiaDkmsSeries)        # currently supported driver series
+    local series_prev1=470                      # previously supported driver series
+    local series_prev2=390                      # previously supported driver series
 
     if [ -n "$id" ] ; then
         ids="$id"

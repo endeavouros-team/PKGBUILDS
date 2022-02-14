@@ -17,8 +17,8 @@ GetNvidiaIds()
     [ -n "$searchstr" ]  || DIE "give search string"
     [ -n "$machinedef" ] || machinedef="Linux x86_64\/AMD64"
 
-    local data=$(curl -Lsm 10 -o- "$starting_url")
-    [ -n "$data" ] || DIE "fetching data from NVIDIA failed"
+    local data=""
+    local retval=0
 
     local sed=(
         sed
@@ -26,17 +26,44 @@ GetNvidiaIds()
         -e 's|<br> |<br> \n|g'
     )
 
-    # get the right branch
-    data=$(echo "$data" | "${sed[@]}" | sed -n "/$machinedef/,/^$/p" | tail -n +2)
+    local version=""
 
-    # get the version and url
-    data=$(echo "$data" | grep -A1 "$searchstr" | tail -n1)
-    [ -n "$data" ] || {
-        DIE "no branch data"
-    }
+    case "$searchstr" in
+        "Latest Production Branch Version")
+            data=$(curl --fail -Lsm 10 -o- "$starting_url")
+            retval=$?
+            if [ $retval -ne 0 ] || [ -z "$data" ] ; then
+                DIE "fetching data from NVIDIA failed, error code $retval"
+            fi
+            # get the right branch
+            data=$(echo "$data" | "${sed[@]}" | sed -n "/$machinedef/,/^$/p" | tail -n +2)
+            # get the version
+            data=$(echo "$data" | grep -A1 "$searchstr" | tail -n1)
+            version=$(echo "$data" | sed 's|.*>\([0-9.]*\)</a>.*$|\1|')
+            ;;
+        470)
+            data=$(curl --fail -Lsm 10 -o- "https://www.nvidia.com/Download/driverResults.aspx/186016/en-us")
+            retval=$?
+            version=$(echo "$data" | grep "(AMD64/EM64T)" | head -n1 | sed 's/.* Driver | \([^ ]*\) | Linux .*/\1/')
+            if [ $retval -ne 0 ] || [ -z "$version" ] ; then
+                DIE "no $searchstr series data found, error code $retval"
+            fi
+            ;;
+        390)
+            data=$(curl --fail -Lsm 10 -o- "https://www.nvidia.com/Download/driverResults.aspx/184603/en-us")
+            retval=$?
+            version=$(echo "$data" | grep "(AMD64/EM64T)" | head -n1 | sed 's/.* Driver | \([^ ]*\) | Linux .*/\1/')
+            if [ $retval -ne 0 ] || [ -z "$version" ] ; then
+                DIE "no $searchstr series data found, error code $retval"
+            fi
+            ;;
+        *)
+            DIE "no branch data"
+            ;;
+    esac
 
-    local version=$(echo "$data" | sed 's|.*>\([0-9.]*\)</a>.*$|\1|')
-    local url=$(echo "$data" | sed 's|.*\(https://[^"]*\)".*|\1|')
+    #local version=$(echo "$data" | sed 's|.*>\([0-9.]*\)</a>.*$|\1|')
+    #local url=$(echo "$data" | sed 's|.*\(https://[^"]*\)".*|\1|')
 
     # supported chips
     local ids="" #$(curl -Lsm 10 -o- https://download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
@@ -73,7 +100,7 @@ ShowDriversForId() {
 
     echo "NVIDIA card id: $id"
 
-    for ix in $latest_prod $latest_new $latest_legacy ; do
+    for ix in 0 1 2 ; do
         bname="${bnames[$ix]}"
         ids="$(GetNvidiaIds "$bname")"
         true_series="$(echo "$ids" | head -n1 | cut -d'|' -f1)"
@@ -133,18 +160,19 @@ Main() {
     local progname="$(basename "$0")"
     local all=no
     local nvidia_id=""
-    local latest_prod=1
-    local latest_new=2
-    local latest_legacy=3
     local starting_url="https://www.nvidia.com/en-us/drivers/unix"
 
     Options "$@"
 
     local bname ix
-    declare -A bnames
-    bnames["$latest_prod"]="Latest Production Branch Version"            # 510.47.03
-    bnames["$latest_new"]="Latest New Feature Branch Version"            # 495.46
-    bnames["$latest_legacy"]="390.xx series"
+    local bnames=(
+        # search based on branch name
+        "Latest Production Branch Version"
+
+        # search based on hard-coded url
+        470
+        390
+    )
 
     if [ -z "$nvidia_id" ] ; then
         nvidia_id="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
