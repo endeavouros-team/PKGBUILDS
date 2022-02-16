@@ -2,8 +2,10 @@
 
 import argparse
 import os.path
+import platform
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 import yaml
 
@@ -92,16 +94,16 @@ if __name__ == '__main__':
                                                  'them',
                                      epilog="example: eos-packagelist \"Awesome Edition\""
                                      )
-    parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you want to see packages for')
+    parser.add_argument('profile', type=str, nargs='+', help='The name of the profile you want to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
-    parser.add_argument('--arm', action="store_true", help='Only include packages available on ARM')
+    parser.add_argument('--arch', type=str, help='Only include packages available on ARM')
     parser.add_argument('--install', action="store_true",
                         help='Install the packages on the list using pacman instead of just listing them')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
     # Get the data from the internet and parse it
     blacklist = []
-    if args.arm:
+    if (args.arch and args.arch != "x86_64") or (not args.arch and platform.machine() != "x86_64"):
         try:
             url = "https://raw.githubusercontent.com/endeavouros-arm/install-script/master/blacklist"
             with urllib.request.urlopen(url) as blacklist_file:
@@ -132,15 +134,19 @@ if __name__ == '__main__':
             print(group_name[0])
         exit(0)
     else:
-        if args.profile:
+        output_list = []
+        for profile in args.profile:
             for group_name, packages_list in netinstall_packages:
-                if group_name == args.profile:
-                    if args.install:
-                        install(remove_variable_packages(packages_list))
-                        exit(0)
-                    else:
-                        print("\n".join(remove_variable_packages(packages_list)))
-                        exit(0)
+                if group_name == profile:
+                    output_list.extend(packages_list)
 
-    print("No profile found matching: " + args.profile)
-    exit(1)
+        if output_list:
+            if args.install:
+                install(remove_variable_packages(output_list))
+                exit(0)
+            else:
+                print("\n".join(remove_variable_packages(output_list)))
+                exit(0)
+        else:
+            print("No profile found matching: " + " ".join(args.profile))
+            exit(1)
