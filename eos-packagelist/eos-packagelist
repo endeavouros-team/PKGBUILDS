@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import locale
 import os.path
 import subprocess
 import sys
@@ -9,48 +8,54 @@ import urllib.request
 import yaml
 
 
-def get_packages(group):
+def get_packages(group, exclude_list):
     """
     Recursively parses the group data and returns the packages
 
     :param group: A group in the format of the netinstall.yaml from Calamares
+    :param exclude_list: A list of packages to exclude
+
     :return: A list of the package names
     """
     packages = []
     if "packages" in group:
-        packages += group["packages"]
+        for package in group["packages"]:
+            if package not in exclude_list:
+                packages.append(package)
     if "subgroups" in group:
         for subgroup in group["subgroups"]:
-            packages += get_packages(subgroup)
+            packages += get_packages(subgroup, exclude_list)
     return packages
 
 
-def get_groups(data):
+def get_groups(data, exclude_list):
     """
     Iterates over the list of groups and gathers the group name and packages for each
 
     :param data: A list of groups in the format of the netinstall.yaml from Calamares
+    :param exclude_list: A list of packages to exclude
     :return: A list of tuples containing the name of the group and the list of packages
     """
     group_list = []
     for group in data:
         if group["name"]:
-            group_list.append((group["name"], get_packages(group)))
+            group_list.append((group["name"], get_packages(group, exclude_list)))
     return group_list
 
 
-def get_packagechooser_groups(data):
+def get_packagechooser_groups(data, exclude_list):
     """
     Reads the packagechooser data and gathers the group name and packages for each
 
     :param data: A dict in the format of packagechooser.conf from Calamares
+    :param exclude_list: A list of packages to exclude
     :return: A list of tuples containing the name of the group and the list of packages
     """
     group_list = []
     if "items" in data:
         for item in data["items"]:
             if "netinstall" in item:
-                group_list.append((item["netinstall"]["name"], get_packages(item["netinstall"])))
+                group_list.append((item["netinstall"]["name"], get_packages(item["netinstall"], exclude_list)))
     return group_list
 
 
@@ -89,24 +94,35 @@ if __name__ == '__main__':
                                      )
     parser.add_argument('profile', type=str, nargs='?', help='The name of the profile you want to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
+    parser.add_argument('--arm', action="store_true", help='Only include packages available on ARM')
     parser.add_argument('--install', action="store_true",
                         help='Install the packages on the list using pacman instead of just listing them')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
     # Get the data from the internet and parse it
+    blacklist = []
+    if args.arm:
+        try:
+            url = "https://raw.githubusercontent.com/endeavouros-arm/install-script/master/blacklist"
+            with urllib.request.urlopen(url) as blacklist_file:
+                blacklist.extend(blacklist_file.read().decode('utf-8').split())
+        except urllib.error.HTTPError or TypeError:
+            print("A properly formatted blacklist file for arm not found", file=sys.stderr)
+            pass
+
     netinstall_packages = []
     try:
         url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/files" \
               "/netinstall.yaml"
         with urllib.request.urlopen(url) as netinstall_file:
             netinstall_data = yaml.safe_load(netinstall_file)
-            netinstall_packages += get_groups(netinstall_data)
+            netinstall_packages += get_groups(netinstall_data, blacklist)
 
         url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
               "/packagechooser_ce.conf"
         with urllib.request.urlopen(url) as netinstall_file:
             netinstall_data = yaml.safe_load(netinstall_file)
-            netinstall_packages += get_packagechooser_groups(netinstall_data)
+            netinstall_packages += get_packagechooser_groups(netinstall_data, blacklist)
     except yaml.YAMLError or KeyError as ex:
         print("Malformed netinstall.yaml detected with error: " + format(ex))
 
