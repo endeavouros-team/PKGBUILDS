@@ -811,60 +811,63 @@ AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
 
-  local shown_app_buttons=0
-  local DE="$(eos_yad_GetDesktopName)"
-
-  local gufw="$(IconGrasp gufw network-firewall firewall-config)"
-  local libreoffice="$(IconGrasp libreoffice-writer)"
-  local chromium="$(IconGrasp chromium web-browser)"
-  local libreoffice="libreoffice-fresh"
-
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
       --image=$system_software_install
   )
-  IsInstalled "$libreoffice" || {
-      ((shown_app_buttons++))
-      tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
-  }
-  IsInstalled chromium || {
-      ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
-  }
-  IsInstalled gufw || {
-      ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
-  }
+  local shown_app_buttons=0
+  local use_eos_quickstart=no
 
-  if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      IsInstalled akm || {
+  if [ "$use_eos_quickstart" = "no" ] ; then
+      local DE="$(eos_yad_GetDesktopName)"
+      local gufw="$(IconGrasp gufw network-firewall firewall-config)"
+      local libreoffice="$(IconGrasp libreoffice-writer)"
+      local chromium="$(IconGrasp chromium web-browser)"
+      local libreoffice="libreoffice-fresh"
+
+      IsInstalled "$libreoffice" || {
           ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
+          tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
       }
-  fi
-  #IsInstalled eos-apps-info || {
-  #    ((shown_app_buttons++))
-  #    tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
-  #}
-  case "$DE" in
-    XFCE)
-        while true ; do                       # Show buttons only if none of them are installed.
-            IsInstalled blueberry && break
-            IsInstalled blueman && break
-            ((shown_app_buttons+=2))
-            local bluetooth="$(IconGrasp bluetooth)"
-            tabcontents+=(
-                --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
-                --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
-            )
-            break
-        done
-        ;;
-  esac
+      IsInstalled chromium || {
+          ((shown_app_buttons++))
+          tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
+      }
+      IsInstalled gufw || {
+          ((shown_app_buttons++))
+          tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
+      }
 
-  if (! IsEosYadInstalled) ; then
-      tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
+      if [ "$(eos_GetArch)" != "armv7h" ] ; then
+          IsInstalled akm || {
+              ((shown_app_buttons++))
+              tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
+          }
+      fi
+      #IsInstalled eos-apps-info || {
+      #    ((shown_app_buttons++))
+      #    tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
+      #}
+      case "$DE" in
+          XFCE)
+              while true ; do                       # Show buttons only if none of them are installed.
+                  IsInstalled blueberry && break
+                  IsInstalled blueman && break
+                  ((shown_app_buttons+=2))
+                  local bluetooth="$(IconGrasp bluetooth)"
+                  tabcontents+=(
+                      --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
+                      --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
+                  )
+                  break
+              done
+              ;;
+      esac
+
+      if (! IsEosYadInstalled) ; then
+          tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
+      fi
   fi
 
   # General app browsing buttons:
@@ -874,7 +877,12 @@ AddMoreApps() {
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "$_WELCOME_BROWSER https://www.archlinux.org/packages")
   fi
   tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "$_WELCOME_BROWSER https://aur.archlinux.org/packages")
-  
+
+  if [ "$use_eos_quickstart" = "yes" ] ; then
+      ((shown_app_buttons++))
+      tabcontents+=(--field=" $(ltr add_more_apps_qs)!$EOS_WICON!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
+  fi
+
   # Now we know if we have any apps in the install list.
 
   if [ $shown_app_buttons -eq 0 ] ; then
