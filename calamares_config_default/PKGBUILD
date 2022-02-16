@@ -1,13 +1,14 @@
-# Maintainer: joekamprad <joekamprad@endeavouros.com>
+# Maintainer: EndeavourOS <info@endeavouros.com>
+
 pkgname=calamares_config_default
-pkgver=1.0
-pkgrel=31
+pkgver=2.0
+pkgrel=1
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=(
-    git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=Atlantis_neo
+    git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main
 )
 
 sha512sums=('SKIP')
@@ -24,8 +25,8 @@ prepare() {
 
     cp $srcdir/EndeavourOS-calamares/calamares/files/netinstall.yaml  $srcdir/EndeavourOS-calamares/calamares/modules/
     rm $srcdir/EndeavourOS-calamares/calamares/settings_community.conf
-    rm $srcdir/EndeavourOS-calamares/calamares/modules/{contextualprocess.conf,packagechooser.conf,netinstall_community-base.conf,shellprocess_plist.conf}
-    rm -R $srcdir/EndeavourOS-calamares/calamares/{ce,images}
+    rm $srcdir/EndeavourOS-calamares/calamares/modules/{packagechooser_ce.conf,netinstall_community_base.conf}
+    rm -R $srcdir/EndeavourOS-calamares/calamares/images-ce
 }
 
 package() {
