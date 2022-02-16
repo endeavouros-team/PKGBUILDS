@@ -3,8 +3,8 @@
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-default-testing
-pkgver=1.0
-pkgrel=2
+pkgver=2.0
+pkgrel=1
 pkgdesc="pre user creation skel setup for GTK and xfce4-terminal under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
