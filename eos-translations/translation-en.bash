@@ -310,3 +310,7 @@ _tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (re
 _tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "more information about this Desktop/Window Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Choose popular apps to install"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Choose popular apps and install them"
+

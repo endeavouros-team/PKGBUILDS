@@ -310,3 +310,7 @@ _tr_add2 after_install_r8168_tip     "Vaihda langallisen netin ajuri (uudelleenk
 _tr_add2 daily_assist_DEinfo         "lisätietoa"                                      # assume prefix "DE:", e.g.: "Xfce: info"
 _tr_add2 daily_assist_DEinfo_tip     "lisätietoa tästä työpöydästä/ikkunamanagerista"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Valitse ja asenna suosittuja sovelluksia"        # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Valitse ja asenna joukosta suosittuja sovelluksia"
+
