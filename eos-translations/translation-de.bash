@@ -309,3 +309,7 @@ _tr_add2 after_install_r8168_tip     "Wechsle zwischen den Treibern r8168 und r8
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "Information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "mehr Informationen über diesen Desktop/Fenster-Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Wähle beliebte Anwendungen zur Installation aus"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Wähle beliebte Anwendungen und installiere diese"
