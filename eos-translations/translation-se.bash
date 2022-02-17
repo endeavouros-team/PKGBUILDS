@@ -103,6 +103,8 @@ _tr_add2 general_info_ab       "Om $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip    "Mer information om detta program"
 
 _tr_add2 add_more_apps_text    "Installera populära program"
+_tr_add2 add_more_apps_qs      "Välj populära program att installera"                      # kör eos-quickstart
+_tr_add2 add_more_apps_qstip   "Välj populära program och installera dem"
 
 _tr_add2 add_more_apps_lotip   "Office-verktyg (libreoffice-fresh)"
 
