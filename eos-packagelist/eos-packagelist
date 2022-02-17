@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import os.path
+import os
 import platform
 import subprocess
 import sys
@@ -68,10 +68,14 @@ def install(package_list):
     :param package_list: A list of strings containing package names
     :return:
     """
-    if os.path.exists("/usr/bin/sudo"):
-        command = ["sudo", "pacman", "--needed", "-Syu"] + package_list
-    else:
-        command = ["su", "-c", "pacman --needed -Syu " + " ".join(package_list)]
+    command = ["pacman", "--needed", "-Syu"] + package_list
+
+    # If the process isn't running as root try sudo first, otherwise use su -c
+    if os.getuid() != 0:
+        if os.path.exists("/usr/bin/sudo"):
+            command.insert(0, "sudo")
+        else:
+            command = ["su", "-c", "pacman --needed -Syu " + " ".join(package_list)]
 
     try:
         subprocess.call(command)
