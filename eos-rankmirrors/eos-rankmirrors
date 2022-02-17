@@ -115,7 +115,8 @@ GetUpdateNumberAndTime() {
             echo "$mirror $result"      # "mirror nr time"
             ;;
         *)
-            echo2 "====> Fail: no response: $mirror, error code $retcode"
+            printf2 "====> Fail: no response: mirror $mirror, url $url,\n"
+            printf2 "====> Error code $retcode: '$(curl-exit-code-to-string $retcode)'\n"
             rm -f "$tmpfile"
             return $retcode
             ;;
