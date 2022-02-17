@@ -64,7 +64,7 @@ def get_packagechooser_groups(data, exclude_list):
 def install(package_list):
     """
     Uses pacman to install the listed packages
-    
+
     :param package_list: A list of strings containing package names
     :return:
     """
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                                                  'them',
                                      epilog="example: eos-packagelist \"Awesome Edition\""
                                      )
-    parser.add_argument('profile', type=str, nargs='+', help='The name of the profile you want to see packages for')
+    parser.add_argument('profile', type=str, nargs='*', help='The name of the profile you want to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
     parser.add_argument('--arch', type=str, help='Only include packages available on ARM')
     parser.add_argument('--install', action="store_true",
