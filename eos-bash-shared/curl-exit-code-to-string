@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Convert curl return code to human friendly text.
+# See 'man curl' for more info.
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Generate() {
+    local tmp=$(mktemp)
+    cat <<EOF > $tmp
+#!/bin/bash
+_generated_func_() {
+    local curlRetCode="\$1"
+    local msg
+    case "\$curlRetCode" in
+$(man curl | sed -n '/^EXIT CODES$/,/^AUTHORS \/ CONTRIBUTORS$/'p | grep "^ [ ]*[0-9][0-9]* [ ]*" | sed 's| [ ]*\([0-9][0-9]*\) [ ]*\(.*\)$|        \1) msg="\2" ;;|')
+        0) msg="OK" ;;
+        *) msg="[CURL doc error]: unsupported error code '\$curlRetCode'. See 'man curl'." ;;
+    esac
+    echo "\$msg"
+    #echo "\$curlRetCode: \$msg"
+}
+_generated_func_ "\$1"
+EOF
+    echo "==> Creating $converter" >&2
+    chmod +x $tmp
+    rm -f "$converter"
+    mv $tmp "$converter" || DIE "Creating '$converter' failed."
+}
+
+usage_f() {
+    local msg="$1"
+
+    cat <<EOF
+Convert the curl exit code to a descriptive string.
+
+Usage: $progname { curl-exit-code | option }
+Options:
+  -c, --create    Generate up to date curl string list.
+  -r, --remove    Remove the current curl string list.
+  -h, --help      This help.
+
+Example:
+  $progname 6
+EOF
+
+    case "$msg" in
+        "")     exit 0 ;;     # exit normally
+        "stay") ;;            # do not exit
+        *)                    # exit with a message
+            printf "\nError: %s\n" "$msg" >&2
+            exit 1
+            ;;
+    esac
+}
+
+CurlReturnCodeToString() {
+    local progname=curl-exit-code-to-string
+
+    [ -n "$1" ] || usage_f "parameter missing"
+
+    local curlRetCode=""
+    local cdir="$HOME/.config/$progname"
+    local converter="$cdir/curl-code-to-string-converter"
+    local timenow_sec=$(date +%s)
+    local timefile_sec=0
+    local generate_interval_seconds=$((3600*24*7))   # weekly automatic generation of the curl error code list
+
+
+    mkdir -p "$cdir"
+
+    [ -r "$converter" ] && timefile_sec=$(stat -c %Y "$converter")
+
+    while [ -n "$1" ] ; do
+        case "$1" in
+            --create | -c)  Generate ; return ;;
+            --remove | -r)  echo "==> Removing $converter" >&2 ; rm -f "$converter" ; return ;;
+            --help | -h)    usage_f ;;
+            -*)             DIE "unsupported option '$1'" ;;
+            *)              curlRetCode="$1" ;;
+        esac
+        shift
+    done
+
+    # ((timenow_sec += generate_interval_seconds))  # testing generation!
+
+    [ $timenow_sec -gt $((timefile_sec + generate_interval_seconds)) ] && Generate
+    [ -x "$converter" ] || DIE "curl code to text converter '$converter' not found or not executable."
+
+    "$converter" "$curlRetCode"
+}
+
+CurlReturnCodeToString "$@"

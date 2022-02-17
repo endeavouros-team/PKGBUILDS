@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.10.30
+pkgver=1.10.31
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -64,6 +64,7 @@ source=(
   $_url/eos-kernel-nvidia-update-check
   $_url/eos-github2gitlab
   $_url/eos-select-file-server
+  $_url/curl-exit-code-to-string
   $_url/eos-shifttime                # Thanks, @freebird54!
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
@@ -94,6 +95,7 @@ sha512sums=('d746848c06b6b953d45512d8acb4677828624aa524e4eb2f98c6cb60601b05a6dcb
             'cbb3bfe07e2dfc81e2f577e4a5810c4c0c917aec42a03a078959f788f970c9dd503d834f1ec7a10862b65abf5b340cecc899c34ba794364fb50cbbcc2987dd53'
             'a1ebc7d308aeffa2e9eab1cdf4a69d7a3844cd1f17038f73dba683655429da0542e2db12a36f11c6f702a3789ff13f49250eafacd94d51ca6809dc950e8bbdfa'
             '31acd2dfab68bb64c531be097429c3180e6a8223406d2ce1b5046585d4fc07fdc25a51dadf0565c199a106bde709ae677682cfef33631ca2f250b8e7aec8ced4'
+            '071beced77e0803a8a20c1d75c71fd22d04db4c7165cc821e174eb2897ba684a5445b2a63bae5e6e6095bd625eb2502a77abd2fce717458950a0a48395c4868e'
             'ba055d67ba50959cf9c63e456ee3ddd470a8ee2f9a1042bbc5f650e4f00ca2c56738b5170189455b5b510a505308c612a284a3c1077219ffbeaf4370ba5451ff'
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
@@ -103,6 +105,7 @@ package() {
   install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
   install -Dm644 eos-sendlog.conf               $pkgdir/etc/eos-sendlog.conf
 
+  install -Dm755 curl-exit-code-to-string       $pkgdir/usr/bin/curl-exit-code-to-string
   install -Dm755 eos-FindAppIcon                $pkgdir/usr/bin/eos-FindAppIcon
   install -Dm755 eos-sendlog                    $pkgdir/usr/bin/eos-sendlog
   install -Dm755 eos-kbd-set                    $pkgdir/usr/bin/eos-kbd-set
