@@ -1373,6 +1373,7 @@ CheckUserPkglist() {
         readarray -t user_pkgs <<< $(echo "$user_pkgs")
 
         for up in "${user_pkgs[@]}" ; do
+            [ -n "$up" ] || continue
             if ! pacman -Si "$up" >& /dev/null ; then
                 if [ "$up" != "$(echo "$up" | sed 's|[ \t]||g')" ] ; then
                     has_spaces=yes
