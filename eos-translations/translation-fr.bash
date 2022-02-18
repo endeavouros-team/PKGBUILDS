@@ -303,5 +303,10 @@ _tr_add2 after_install_r8168         "Réseau filaire issue$_question  Basculer 
 _tr_add2 after_install_r8168_tip     "Basculer entre les pilotes r8168 et r8169 (puis redémarrer)"
 
 # 08-octobre-2021
-_tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "plus d'informations sur cet environnement de bureau/gestionnaire de fen"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "Information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "Plus d'informations sur cet environnement de bureau/gestionnaire de fen"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 16-fevrier-2022
+_tr_add2 add_more_apps_qs            "Choisir applications populaires à installer"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Choisissez des applications populaires et installez-les"
+
