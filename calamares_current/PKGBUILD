@@ -51,8 +51,8 @@ prepare() {
     # calamares now has kernel = all option in initcpio.conf that does the same.
     #sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $_reponame/src/modules/initcpio/InitcpioJob.cpp
 
-    # set pacman flags on the run
-    sed -i "s?            command.append(\"-S\")?            command.append(\"-Sy\")?" $_reponame/src/modules/packages/main.py
+    # set pacman flags on the run (we do that now in configs: packages_online.conf)
+    #sed -i "s?            command.append(\"-S\")?            command.append(\"-Sy\")?" $_reponame/src/modules/packages/main.py
 
     # remove hardcoded quiet from grubcfg
     sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" $_reponame/src/modules/grubcfg/main.py
