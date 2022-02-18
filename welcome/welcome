@@ -819,6 +819,8 @@ AddMoreApps() {
   local shown_app_buttons=0
   local use_eos_quickstart=no
 
+  [ -x /usr/bin/eos-quickstart ] && use_eos_quickstart=yes
+
   if [ "$use_eos_quickstart" = "no" ] ; then
       local DE="$(eos_yad_GetDesktopName)"
       local gufw="$(IconGrasp gufw network-firewall firewall-config)"
