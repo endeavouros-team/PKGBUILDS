@@ -29,13 +29,13 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/arc-x-icons-theme
     aur/bashdb
 
-    calamares_config_ce
-    calamares_config_default
-    calamares_current
+    #calamares_config_ce
+    #calamares_config_default
+    #calamares_current
 
-    #endeavouros-skel-default-testing
-    #endeavouros-skel-i3wm-testing
-    #endeavouros-skel-xfce4-testing
+    endeavouros-skel-default-testing
+    endeavouros-skel-i3wm-testing
+    endeavouros-skel-xfce4-testing
 
     ckbcomp
     aur/downgrade
@@ -49,14 +49,14 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-apps-info
     eos-bash-shared
     eos-hooks
-    # eos-lightdm-slick-theme
+    eos-lightdm-slick-theme
     eos-log-tool
-    # eos-lxdm-gtk3
+    eos-lxdm-gtk3
     eos-packagelist
     eos-qogir-icons
-    # eos-quickstart
+    eos-quickstart
     eos-rankmirrors
-    # eos-sddm-theme
+    eos-sddm-theme
     eos-skel-ce-awesome
     eos-skel-ce-bspwm
     eos-skel-ce-openbox
@@ -86,6 +86,11 @@ local PKGNAMES=(                                    # actually: dir names for pa
     yad-eos
     aur/yay
 )
+
+declare -A PKG_MAKEPKG_OPTIONS
+PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm-testing]="--nodeps"
+PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4-testing]="--nodeps"
+
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
 # There may be several hook functions.

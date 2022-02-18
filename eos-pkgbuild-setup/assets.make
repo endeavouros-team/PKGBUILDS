@@ -134,7 +134,7 @@ Build()
     local missdeps="Missing dependencies:"
     local opts=""
 
-    if [ -n "${PKG_MAKEPKG_OPTIONS}" ] ; then
+    if [ "${#PKG_MAKEPKG_OPTIONS[@]}" -gt 0 ] ; then
         if [ -n "${PKG_MAKEPKG_OPTIONS[$pkgdirname]}" ] ; then   # from assets.conf
             opts="${PKG_MAKEPKG_OPTIONS[$pkgdirname]}"
         fi
