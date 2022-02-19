@@ -1,0 +1,47 @@
+# bash completion for eos-packagelist        -*- shell-script -*-
+
+_eos-packagelist_complete() {
+    local IFS=$'\n'         # handles spaces in names!
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o filenames    # handles spaces in names!
+    compopt -o nosort
+}
+
+_eos-packagelist_() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    # eos-packagelist options
+    local options=(
+        --help -h --list --arch --install
+    )
+
+    # architectures supported by eos-packagelist
+    local architectures=(
+        x86_64 aarch64 armv7h
+    )
+
+    # Handle options that need sub-options.
+
+    case "$prev" in
+        --arch)
+            _eos-packagelist_complete "$(printf "%s\n" "${architectures[@]}")"
+            ;;
+        *)
+            # Handle all top-level parameters.
+            case "$cur" in
+                -*)
+                    # Any option.
+                    _eos-packagelist_complete "$(printf "%s\n" "${options[@]}")"
+                    ;;
+                *)
+                    # Non-option parameters.
+                    _eos-packagelist_complete "$(printf "%s\n" "${options[@]}"; eos-packagelist --list | sort)"
+                    ;;
+            esac
+            ;;
+    esac
+} &&
+complete -F _eos-packagelist_ eos-packagelist
