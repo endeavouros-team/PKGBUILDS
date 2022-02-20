@@ -5,8 +5,3 @@ pre_install() {
 }
 
 
-post_install() {
-	cp /etc/sddm.conf.d/10-endeavouros.conf /etc/sddm.conf.d/kde_settings.conf
-}
-
-
