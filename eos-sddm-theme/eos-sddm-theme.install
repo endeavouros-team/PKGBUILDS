@@ -4,4 +4,6 @@ pre_install() {
 	echo "this will disable current used DM and enable sddm up from next boot!"
 }
 
-
+post_install() {
+	cp /etc/sddm.conf.d/10-endeavouros.conf /etc/sddm.conf.d/kde_settings.conf
+}
