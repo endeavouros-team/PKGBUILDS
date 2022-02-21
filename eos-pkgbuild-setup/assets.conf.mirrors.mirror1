@@ -76,9 +76,9 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer-dkms
     pahis
     paper-icon-theme
-    aur/paru-bin
+    aur/paru
     aur/polybar
-    aur/rate-mirrors-bin
+    aur/rate-mirrors
     reflector-bash-completion
     reflector-simple
     aur/worm
@@ -154,6 +154,22 @@ _fetch_that_file() {
 }
 
 __generic_get_pkgname() { local funcname="$1" ; echo "$funcname" | cut -d '_' -f 2 ; }
+
+
+# 2022-Feb-19: added temporary hooks for *-bin ==> non-bin, remove e.g. 2 months after both packages have updated ??
+
+_rate-mirrors_hook() {
+    local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
+    sed -i $PKGBUILD \
+        -e "/^depends=/a \ \nreplaces=(rate-mirrors-bin)"
+}
+_paru_hook() {
+    local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
+    sed -i $PKGBUILD \
+        -e "/^depends=/a \ \nreplaces=(paru-bin)"
+}
+
+
 
 _bashdb_hook() {
     local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
@@ -483,13 +499,18 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
 
 declare -A ASSET_PACKAGE_HOOKS
 ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook
-#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
-#ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
 ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
+
+# Temporary hooks for replacing *-bin versions to non-bin versions.
+ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
+ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
+
+#ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
+#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
+#ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
 #ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
-ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
-ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
+#ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
 #ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 #ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 #ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
