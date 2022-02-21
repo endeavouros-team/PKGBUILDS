@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable."
+_tr_add2 welcome_disabled      "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable (temporarily: --once)."  # changed 2022-Feb-21
 
 _tr_add2 butt_later            "See you later"
 _tr_add2 butt_latertip         "Keep $PRETTY_PROGNAME enabled"

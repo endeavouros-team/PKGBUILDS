@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled     "$PRETTY_PROGNAME: käyttö on estetty. Ota se käyttöön valitsimella --enable."
+_tr_add2 welcome_disabled     "$PRETTY_PROGNAME: käyttö on estetty. Ota se käyttöön valitsimella --enable (tilapäisesti: --once)."  # changed 2022-Feb-21
 
 _tr_add2 butt_later           "Nähdään myöhemmin"
 _tr_add2 butt_latertip        "Pidä $PRETTY_PROGNAME käytössä"
