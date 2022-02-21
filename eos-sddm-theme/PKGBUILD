@@ -2,12 +2,12 @@
 
 pkgname=eos-sddm-theme
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS Theme for SDDM'
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL')
-depends=('sddm')
+depends=('sddm' 'qt5-quickcontrols2')
 makedepends=('git')
 install=eos-sddm-theme.install
 source=(
