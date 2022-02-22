@@ -348,6 +348,11 @@ EOF
     done
 }
 
+PackageThatOwnsApp() {
+    local app="$1"
+    LANG=C pacman -Qo "$app" | awk '{print $5}'
+}
+
 Main()
 {
     local progname="$(basename "$0")"
@@ -382,6 +387,13 @@ Main()
     local timeout_default="$EOS_AUTORANK_TIMEOUT"                  # in seconds
     [ -n "$timeout_default" ] || timeout_default=30
     local timeout=$timeout_default
+
+    if [ -x /usr/bin/eos-connection-checker ] ; then
+        eos-connection-checker || DIE "internet connection not available!"
+    else
+        echo2 "WARNING: eos-connection-checker is not available, cannot verify internet connection."
+        echo2 "         Package '$(PackageThatOwnsApp eos-connection-checker)' is not installed?"
+    fi
 
     GetReferenceUpdateLevel
 
