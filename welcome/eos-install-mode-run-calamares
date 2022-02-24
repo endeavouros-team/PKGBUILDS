@@ -195,14 +195,16 @@ Main() {
 
     [ -n "$calamares_version" ] || GUIDIE "error: calamares is not installed!"
 
-    if [ 1 -eq 1 ] ; then
-        if [ $(vercmp "$calamares_version" 3.2.49.1-3) -gt 0 ] ; then
-            ShowInstallLog=FALSE
-            ShowPacmanLog=FALSE
-        fi
+    if [ $(vercmp "$calamares_version" 3.2.49.1-3) -gt 0 ] ; then
+        # assume calamares is showing progress on installing packages
+        ShowInstallLog=FALSE
+        ShowPacmanLog=FALSE
     fi
 
-    if [ "$I_am_only_testing" = "true" ] ; then
+    ShowInstallLog=TRUE    # 2022-Feb-24: REMOVE THIS LINE when calamares progress display is fixed.
+
+    if [ 0 -eq 1 ] ; then
+        # Testing settings only, not for production!
         Home=$HOME
         #EOS_FILESERVER_SITE=github
         mode=community
