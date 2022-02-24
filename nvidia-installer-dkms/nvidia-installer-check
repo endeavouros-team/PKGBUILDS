@@ -1,0 +1,122 @@
+#!/bin/bash
+
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+
+Usage2() {
+    cat <<EOF >&2
+Usage: $progname [<nvidia-id> | internal-test]
+where
+    <nvidia-id>     Check if an Nvidia card with given id (4 hex numbers) is supported.
+    internal-test   Internal ad hoc test (useful for devs only).
+
+If no parameter is given, check if the currently installed Nvidia card is supported.
+
+Program return codes:
+    0 = nvidia-dkms is supported
+    2 = only legacy driver (e.g. nvidia-${series_prev1}xx-dkms) is supported
+    1 = no Nvidia card detected or not supported
+EOF
+}
+
+NvidiaSupportedSeries() {
+    local id="$1"
+    [ -z "$id" ] && return 1
+    local series="$(nvidia-driver-supported-branches "$id" | grep "^Series " | awk '{print $2}' | tr -d ':')"
+
+    case "$series" in
+        $series_now)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Is supported by the nvidia-dkms driver.
+  - To install a driver for this card, you can use e.g. nvidia-installer-dkms.
+
+EOF
+            return 0
+            ;;
+        $series_prev1 | $series_prev2 | 340)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Is supported by the nvidia-${series}xx-dkms driver.
+  - To install a driver for this card:
+    - Use the --force option with nvidia-installer-dkms.
+    - Then, BEFORE rebooting,
+      - uninstall nvidia-dkms, nvidia-utils, and related other Nvidia driver packages
+      - install $series series packages
+    Example:
+      yay -Rsn nvidia-dkms nvidia-utils nvidia-settings
+      yay -S nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings
+
+EOF
+            if [ "$series" = "340" ] ; then
+                printf2 "  Warning: series 340 driver might not work properly on current systems.\n\n"
+            fi
+            return 2
+            ;;
+        *)
+            cat <<EOF >&2
+Graphics card (id: $id):
+  - Not supported by any of the Nvidia driver series: $series_now $series_prev1 $series_prev2.
+EOF
+            return 1
+            ;;
+    esac
+}
+
+NvidiaDkmsSeries() {
+    LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}' | cut -d'.' -f1
+}
+
+Main()
+{
+    local id="$1"              # optional
+    local ids
+    local progname=nvidia-installer-check
+    local series
+    local retval retval0=11 retval1=11 retval2=11
+
+    local nvidia=10de                           # nvidia vendor code
+    local series_now=$(NvidiaDkmsSeries)        # currently supported driver series
+    local series_prev1=470                      # previously supported driver series
+    local series_prev2=390                      # previously supported driver series
+
+    if [ -n "$id" ] ; then
+        ids="$id"
+    else
+        ids="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[$nvidia:[0-9a-f][0-9a-f]*\]" | sed -e "s|^.*\[$nvidia:||" -e "s|\].*$||")"
+    fi
+
+    # internal-testing:
+    #   ids=1dba
+    #   ids=06c4
+    #   ids="1dba 06c4 aaaa"  # multiple nvidia cards detected
+    #   ids=aaaa         # non-existing
+    #   ids=""           # no nvidia card detected
+
+    # We *may* have multiple nvidia cards of various supports.
+    # Return value will be according to the newest.
+    local count=0
+    for id in $ids ; do
+        ((count++))
+    done
+    if [ $count -gt 1 ] ; then
+        printf2 "\nMultiple Nvidia card ids detected!\n\n"
+    fi
+    for id in $ids ; do
+        NvidiaSupportedSeries "$id"
+        retval=$?
+        case "$retval" in
+            0) retval0=0 ;;
+            1) retval1=1 ;;
+            2) retval2=2 ;;
+        esac
+    done
+    [ $retval0 -eq 0 ] && return 0
+    [ $retval2 -eq 2 ] && return 2
+    [ $retval1 -eq 1 ] && return 1
+
+    echo2 "Sorry, no nvidia card found."
+    return 1
+}
+
+Main "$@"
