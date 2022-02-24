@@ -854,6 +854,7 @@ Main2()
     local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
     local notexist='<non-existing>'
     local cmpresult
+    local total_items_to_build=0
 
     echo2 "Finding package info ..."
 
@@ -891,11 +892,10 @@ Main2()
             echo2 "OK ($tmpcurr)"
             continue
         fi
+        ((total_items_to_build++))
+        echo2 "$tmpcurr ==> $tmp"
         if [ $cmpresult -gt 0 ] ; then
-            echo2 "update pending from $tmpcurr to $tmp"
             WantAurDiffs "$xx" "$pkgdirname"
-        else
-            echo2 "downgrade pending from $tmpcurr to $tmp"
         fi
     done
     if [ -n "$AUR_DIFFS" ] ; then
@@ -903,7 +903,13 @@ Main2()
     fi
     Popd
 
-    ExplainHookMarks
+    printf2 "\nItems to build: %s\n" "$total_items_to_build"
+
+    if [ 0 -eq 1 ] ; then
+        ExplainHookMarks
+    else
+        printf2 "\n"
+    fi
 
     case "$cmd" in
         dryrun)
