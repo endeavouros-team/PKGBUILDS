@@ -63,7 +63,7 @@ YadNonFocused() {
 
 ShowTray() {
     # Tray notification may have issues on EOS...
-    eos_yad --notification --image="system-software-update" \
+    eos_yad --notification --image="$_UpdateNotifyIcon" \
             --text="$progname: $update_count $source updates are available at $date"
 }
 ShowNotify() {
@@ -84,7 +84,7 @@ ShowNotify() {
 	packages)
 	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
-    /usr/bin/notify-send --icon=system-software-update --urgency=normal $expiretime \
+    /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
                          --app-name="EndeavourOS Update Notifier" \
                          "Updates available at $date" \
 			 "$msg"
@@ -94,6 +94,13 @@ ShowNonFocused() {
     local date="$(/usr/bin/date '+%x %X')"
     local source="$1"
     local pkgs="\n<tt>$updates</tt>"        # for notify and notify+tray
+    local _UpdateNotifyIcon
+
+    if [ -n "UpdateNotifyIcon" ] ; then
+        _UpdateNotifyIcon="$UpdateNotifyIcon"
+    else
+        _UpdateNotifyIcon=system-software-update
+    fi
 
     if [ "$pkgsonly" = "yes" ] ; then       # cmd line options override config file options
         ShowHowAboutUpdates=window
