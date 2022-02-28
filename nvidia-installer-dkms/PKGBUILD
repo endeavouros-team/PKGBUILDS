@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-installer-dkms
-pkgver=3.3.15
+pkgver=3.3.16
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -26,12 +26,13 @@ optdepends=(
 
 source=(
   $_url/$pkgname
-  # $_url/nvidia-inst
+  $_url/nvidia-inst
   $_url/nvidia-installer-kernel-para
   $_url/nvidia-driver-supported-branches
   $_url/nvidia-installer-check
 )
 sha512sums=('24ab4b1c3932ad92dd87a9f3d25fb640839338c2f0f786acf2cbaacf1c0fec8ab969f3f4274ad6792b446def42580a0176cd8eea74598ba2f1f99fd599e191aa'
+            'fe20a60efd259ebba345795c0821d834787070e0331683cfda9c56053f628e407b1bb1109fbb55cf7f0ff97713b3f8f1431ec1d8fedc7f2eeeea5b53e8a14b75'
             '98ceb7fb204bb9fef77af8e306c8e97c1f324372d2d2019295c52b0eb4357314e8af2ea7caa487b68d9907014ea70ab6edafa098cd9155fc71f11def3c8aa8b9'
             '98264da1d2442aa790cecf975649a0b56bc7548c5ef1808b318eaa085882e2dc884866b73875da3d6ca28abc9d02121419f966b72ad7dd30309107b437f812bf'
             '548ff0da65baa07dfb9831318a78cfb93cda48510e5f81f74a9abe241813e74ebb8a3711f853b9c4335a855d7531de00f8f511830aaf39d7f85a251b61a606e9')
@@ -41,7 +42,7 @@ package() {
       -e 's|^VERSION = .*$|VERSION = "'$pkgver'"|'
 
   install -Dm755 $pkgname                         $pkgdir/usr/bin/$pkgname
-  # install -Dm755 nvidia-inst                     $pkgdir/usr/bin/nvidia-inst
+  install -Dm755 nvidia-inst                     $pkgdir/usr/bin/nvidia-inst
   install -Dm755 nvidia-installer-kernel-para     $pkgdir/usr/bin/nvidia-installer-kernel-para
   install -Dm755 nvidia-installer-check           $pkgdir/usr/bin/nvidia-installer-check
   install -Dm755 nvidia-driver-supported-branches $pkgdir/usr/bin/nvidia-driver-supported-branches

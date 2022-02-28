@@ -271,6 +271,13 @@ Options() {
             -v | --version)   echo "$progname $PROGVERSION" ; exit 0 ;;
             -h | --help)
                 cat <<EOF >&2
+
+NOTE: this app is still beta quality!
+      Please report any issues to:
+      https://forum.endeavouros.com/c/arch-based-related-questions/bug-reports
+
+$progname - help installing Nvidia graphics drivers
+
 Usage: $progname [options]
 Options:
   -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards.
