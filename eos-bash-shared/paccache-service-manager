@@ -46,6 +46,17 @@ GetCurrentValues() {
     esac
 }
 
+Usage() {
+    cat <<EOF
+Usage: $progname [options]
+
+Options:
+    -v, --verbose      Increase verbosity, can be specified up to 3 times.
+    -h, --help         This help.
+EOF
+    [ -n "$1" ] && exit "$1"
+}
+
 _paccache_cleaner_manager()
 {
     local progname=paccache-service-manager
@@ -68,6 +79,12 @@ _paccache_cleaner_manager()
     local indent="<tt>  </tt>"
     local du="$(LANG=C /usr/bin/du --si -s /var/cache/pacman/pkg | /usr/bin/awk '{print $1}' | sed 's|\([KMGT]\)$| \1B|')"
     local df="$(LANG=C /usr/bin/df --si | /usr/bin/grep -w /     | /usr/bin/awk '{print $4}' | sed 's|\([KMGT]\)$| \1B|')"
+    local options=""
+
+    case "$1" in
+        -v | --verbose) options+=" -v" ;;
+        -h | --help)    Usage 0 ;;
+    esac
 
     GetCurrentValues
 
@@ -104,17 +121,17 @@ _paccache_cleaner_manager()
     # Build the final command
 
     # Clean up cache now and periodically
-    cmd_period="/usr/bin/paccache -rk$keepcount"
+    cmd_period="paccache $options -rk$keepcount"
     cmd="$cmd_period"
     if [ "$delete_uninstalled" = "TRUE" ] ; then
-        cmd+=" ; /usr/bin/paccache -ruk0"          # remove uninstalled but cached packages only now
+        cmd+=" ; paccache $options -ruk0"          # remove uninstalled but cached packages only now
     fi
 
     if [ "$keepcount $period $delete_uninstalled" != "$current_keepcount $current_period $current_delete_uninstalled" ] ; then
         if [ ! -r $service ] ; then
             cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
         fi
-        cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=$cmd_period|'"
+        cmds+=" ; sed -i $service -e 's|^ExecStart=paccache .*$|ExecStart=$cmd_period|'"
         cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
         cmds+=" ; systemctl enable $pt"
         cmds+=" ; systemctl start $pt"
@@ -123,4 +140,4 @@ _paccache_cleaner_manager()
     pkexec bash -c "$cmds ; $cmd"
 }
 
-_paccache_cleaner_manager
+_paccache_cleaner_manager "$@"
