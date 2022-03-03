@@ -903,6 +903,9 @@ Main2()
     fi
     Popd
 
+    if [ $total_items_to_build -eq 0 ] ; then
+        total_items_to_build=NONE
+    fi
     printf2 "\nItems to build: %s\n" "$total_items_to_build"
 
     if [ 0 -eq 1 ] ; then

@@ -223,16 +223,35 @@ _paper-icon-theme-git_hook() {
     return 11  # pkgver was changed
 }
 
+_ckbcomp_hook_new() {
+    printf "@" >&2
+
+    local data=$(curl -Lsm 10 -o- https://packages.debian.org/source/sid/console-setup)
+    local Pkgver=$(echo "$data" | grep metadata | head -n1 | sed -e 's|.*/console-setup_||' -e 's|_.*||')
+    local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
+    local new_url=https://deb.debian.org/debian/pool/main/c/console-setup/console-setup_$Pkgver.tar.xz
+    sed -i "$PKGBUILD" \
+        -e "/^source=.*/a \source=($new_url)"
+}
 
 _ckbcomp_hook() {
     local tool=ckbcomp
 
     # new version info
-    local info=$(curl --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
-    [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] && {
+    local info retval
+    info=$(curl --fail --silent --location --max-time 10 https://salsa.debian.org/installer-team/console-setup/-/tags)
+    retval=$?
+    if [ $retval -ne 0 ] ; then
+        _ckbcomp_hook_new
+        return
+
+        #printf "fetching info failed, curl code $retval. " >&2
+        #return 1
+    fi
+    if [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] ; then
         printf "fetching info failed. " >&2
         return 1
-    }
+    fi
     local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
 
     # NOTE: 1.196 - 1.202: 'ckbcomp' hasn't changed!
