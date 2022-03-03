@@ -631,6 +631,12 @@ yad_infomsg() {
 Main()
 {
     local progname=eos-update-notifier
+
+    if [ -x /usr/bin/calamares ] && [ "$LOGNAME" = "liveuser" ] ; then
+        echo "==> Stopping $progname while installing."
+        return 0
+    fi
+
     local dev_log=no
     local dev_logfile=/tmp/$progname.dev_log
     local configdir="$HOME/.config/systemd/user"
