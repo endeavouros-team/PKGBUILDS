@@ -134,7 +134,7 @@ Main()
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
 
     # help option to html
-    for app in rate-mirrors ; do
+    for app in eos-packagelist rate-mirrors ; do
         Help2html $app
     done
 
