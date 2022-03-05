@@ -103,6 +103,5 @@ package() {
 
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
-
-    rm -rf ../EndeavourOS-calamares    # cleanup
+    
 }
