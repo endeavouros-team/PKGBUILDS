@@ -2,20 +2,55 @@
 
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-# Latest arc-gtk-theme release with a color patch.
+# Latest arc-gtk-theme release with a color patch to foreground text.
 
 _prepare_arc-gtk-theme-eos() {
+
+    # VERSION: 1.1             # change this number when this file is modified!
+
     local _pkgname_orig=arc-gtk-theme
+    local _empty_prepare=no
+    local _url_orig=https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD
 
     ################## Fetch and source the upstream PKGBUILD:
-    curl -Lsm 10 -o PKGBUILD.orig \
-         https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD || exit 1
+    curl -Lsm 10 -o PKGBUILD.orig $_url_orig || exit 1
 
-    if [ -z "$(grep "[ \t]*patch -p1 " PKGBUILD.orig)" ] ; then
+    if [ 1 -eq 1 ] ; then     # TODO !!
+        _empty_prepare=yes
+    else
         # we need a patch line for 'sed' to work below
-        echo "Error: upstream $_pkgname_orig PKGBUILD no more has a patch line!!" >&2
+        echo "Error: upstream $_pkgname_orig PKGBUILD needs to be changed!!" >&2
         exit 1
     fi
+
+    _replace_prepare_eos() {
+        # replace the "empty" prepare()
+        cat <<EOF > PKGBUILD.orig.empty-prepare
+prepare() {
+    cd \${_pkgname}-\${pkgver}
+}
+EOF
+        grep -w -A2 ^prepare PKGBUILD.orig > PKGBUILD.orig.prepare
+
+        if diff PKGBUILD.orig.prepare PKGBUILD.orig.empty-prepare ; then
+            # prepare() is "empty" (=does essentially nothing), so replace it
+            sed -n  '0,/^prepare/'p PKGBUILD.orig | head -n -1 > PKGBUILD.orig.a
+            sed -n  '/^build/,//'p PKGBUILD.orig               > PKGBUILD.orig.c
+            cat <<EOF                                          > PKGBUILD.orig.b
+prepare() {
+    cd \${_pkgname}-\${pkgver}
+    _darker_text_color
+}
+
+EOF
+            cat PKGBUILD.orig.{a,b,c} > PKGBUILD.orig
+        fi
+
+        rm -f PKGBUILD.orig.{a,b,c} PKGBUILD.orig.empty-prepare PKGBUILD.orig.prepare
+
+        # old sed code:
+        #    -e '/^[ \t]*patch -p1 /a \ \n    _darker_text_color'
+    }
 
     ################## Modifications to the original PKGBUILD:
     # - change pkgname to arc-gtk-theme-eos (only)
@@ -24,15 +59,18 @@ _prepare_arc-gtk-theme-eos() {
     # - make text color darker (needs an existing patch line in prepare() !!)
     # - change the 'url' value
 
+    if [ "$_empty_prepare" = "yes" ] ; then
+        _replace_prepare_eos
+    fi
     sed -i PKGBUILD.orig \
         -e "s|^pkgname=.*|pkgname=(arc-gtk-theme-eos)|" \
         -e 's|^package_arc-gtk-theme(|package_arc-gtk-theme-eos(|' \
-        -e '/^package_arc-gtk-theme/a \ \n    conflicts=(arc-gtk-theme)' \
-        -e '/^[ \t]*patch -p1 /a \ \n    _darker_text_color'
+        -e '/^package_arc-gtk-theme/a \ \n    conflicts=(arc-gtk-theme)'
 
     ################## now use the modified definitions of PKGBUILD:
     source PKGBUILD.orig
     rm -f PKGBUILD.orig
+    rm -f ${pkgname}-*.sig ${pkgname}-*.xz
 
     ################# still some stuff to change or add:
 
@@ -49,3 +87,5 @@ _prepare_arc-gtk-theme-eos() {
 }
 _prepare_arc-gtk-theme-eos
 unset -f _prepare_arc-gtk-theme-eos
+sha512sums=('33a0e73e9951fcfe74f80af5e1449df23a5564d11a26b930cbc17b0f74887aedf2634579da1e0484e22465422f62559c801dbcd35221fbb7b7fc783671103aa4'
+            'SKIP')
