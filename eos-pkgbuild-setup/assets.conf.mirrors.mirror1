@@ -29,9 +29,9 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/arc-x-icons-theme
     aur/bashdb
 
-    #calamares_config_ce
-    #calamares_config_default
-    #calamares_current
+    calamares_config_ce
+    calamares_config_default
+    calamares_current
 
     endeavouros-skel-default-testing
     endeavouros-skel-i3wm-testing

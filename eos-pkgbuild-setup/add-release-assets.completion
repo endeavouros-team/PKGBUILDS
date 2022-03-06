@@ -28,4 +28,4 @@ _add_release_assets() {
     esac
 }
 
-complete -F _add_release_assets  add-release-assets delete-release-assets release-asset-names
+complete -F _add_release_assets  add-release-assets delete-release-assets download-release-assets release-asset-names
