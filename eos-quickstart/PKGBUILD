@@ -1,6 +1,6 @@
 pkgname=eos-quickstart
 pkgver=1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="An application for getting a quick start with installing packages"
 arch=('any')
 license=('GPL3')
