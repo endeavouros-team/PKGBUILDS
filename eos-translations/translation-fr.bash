@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### MAINTENANT, LES CHAÎNES DE CARACTÈRES À TRADUIRE ######################
 # func   <placeholder>           "string"
 
-_tr_add2 welcome_disabled        "$PRETTY_PROGNAME l'application est désactivée. Pour la démarrer, utilisez l'option --enable."
+_tr_add2 welcome_disabled        "$PRETTY_PROGNAME l'application est désactivée. Pour la démarrer, utilisez l'option --enable. (Temporairement : --once)"
 
 _tr_add2 butt_later              "À plus tard"
 _tr_add2 butt_latertip           "Conserver $PRETTY_PROGNAME activé"
