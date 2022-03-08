@@ -204,13 +204,13 @@ CheckUserPkglist() {
         done
 
         if [ -n "$failed" ] ; then
-            txt="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${failed[@]}")\n\n"
+            txt+="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${failed[@]}")\n\n"
         fi
         if [ -n "$aur" ] ; then
             txt+="AUR packages listed in <b>$userlistfile</b> are not supported:\n$(printf "<tt>%s</tt>\n" "${aur[@]}")\n\n"
         fi
         if [ "$has_spaces" = "yes" ] ; then
-            txt+="Note that only one package name per line is allowed.\n"
+            txt+="Note that only one package name per line is allowed and a package name cannot include white space characters.\n"
         fi
         if [ -n "$txt" ] ; then
             GUIDIE "$txt"
