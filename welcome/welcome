@@ -1358,7 +1358,12 @@ export -f Usage
 #                  to install. Package names are listed as one package name per line.
 #                  Empty lines and comments (lines starting with character #) are allowed.
 
-CheckUserPkglist() {
+
+if [ 0 -eq 1 ] ; then
+
+# NOTE: CheckUserPkglist() moved to eos-install-mode-run-calamares
+
+CheckUserPkglist_old() {
     local userlistfile="/home/$EOS_LIVEUSER/user_pkglist.txt"
 
     if [ -r "$userlistfile" ] ; then
@@ -1403,6 +1408,7 @@ CheckUserPkglist() {
         fi
     fi
 }
+fi
 
 StartHere() {
     local arg lang
@@ -1474,9 +1480,9 @@ StartHere() {
 
     KillExtraYad > /tmp/yad-zombies.log
 
-    if [ "$is_installing" = "yes" ] ; then
-        CheckUserPkglist
-    fi
+    # if [ "$is_installing" = "yes" ] ; then
+    #     CheckUserPkglist
+    # fi
 
     ShowProgress Processing...
 

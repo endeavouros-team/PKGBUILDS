@@ -11,8 +11,8 @@ GUIDIE() {
 
     # show the error in a yad window
     local cmd=(
-        eos_yad --form --title="Error detected"
-        --text="<tt>$progname</tt>:\n$1\n"
+        eos_yad --form --title="Error detected" --text="<tt>$progname</tt>:\n$1\n"
+        --image=dialog-error
         --button=yad-quit:1
     )
     "${cmd[@]}"
@@ -173,6 +173,52 @@ PreLog() {
     echo "==> $1" >> "$prelogfile"
 }
 
+CheckUserPkglist() {
+    local userlistfile="$Home/user_pkglist.txt"
+
+    if [ -r "$userlistfile" ] ; then
+        # Remove comments (sed), empty lines (grep), and trim lines from spaces (sed):
+        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$" | sed -e 's|^[ \t]*||' -e 's|[ \t]*$||')
+        local up up2
+        local failed=()
+        local aur=()
+        local has_spaces=no
+        local txt=""
+
+        # allow only one pkgname per line
+        readarray -t user_pkgs <<< $(echo "$user_pkgs")
+
+        for up in "${user_pkgs[@]}" ; do
+            [ -n "$up" ] || continue
+            if ! pacman -Si "$up" >& /dev/null ; then
+                if [ "$up" != "$(echo "$up" | sed 's|[ \t]||g')" ] ; then
+                    has_spaces=yes
+                fi
+                up2="\t'$up'"
+                if yay -Sia "$up" >& /dev/null ; then
+                    aur+=("$up2")
+                else
+                    failed+=("$up2")
+                fi
+            fi
+        done
+
+        if [ -n "$failed" ] ; then
+            txt="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${failed[@]}")\n\n"
+        fi
+        if [ -n "$aur" ] ; then
+            txt+="AUR packages listed in <b>$userlistfile</b> are not supported:\n$(printf "<tt>%s</tt>\n" "${aur[@]}")\n\n"
+        fi
+        if [ "$has_spaces" = "yes" ] ; then
+            txt+="Note that only one package name per line is allowed.\n"
+        fi
+        if [ -n "$txt" ] ; then
+            GUIDIE "$txt"
+        fi
+    fi
+}
+
+
 ###  Everything starts in the Main function. ###
 Main() {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
@@ -212,6 +258,8 @@ Main() {
         ShowInstallLog=FALSE
         ShowPacmanLog=FALSE
     fi
+
+    CheckUserPkglist
 
     workdir="$Home/work.$progname.xyz"
     mkdir -p "$workdir"
