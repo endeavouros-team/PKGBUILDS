@@ -2,12 +2,12 @@
 
 pkgname=calamares_config_ce
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=(git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main)
+source=("git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main")
 
 sha512sums=('SKIP')
 
