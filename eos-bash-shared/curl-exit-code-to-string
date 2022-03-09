@@ -10,25 +10,31 @@ DIE() {
 
 Generate() {
     local tmp=$(mktemp)
-    cat <<EOF > $tmp
+    local data=""
+
+    # Get exit codes and strings from the curl man page.
+    data="$(man curl | sed -n '/^EXIT CODES$/,/^AUTHORS \/ CONTRIBUTORS$/'p | grep "^ [ ]*[0-9][0-9]* [ ]*")"
+    data="$(echo "$data" | sed "s|\"|'|g")"
+    data="$(echo "$data" | sed 's|^\([ ]*[0-9]*\)[ ]*\(.*\)|\1) echo "\2" ;;|')"
+
+    echo "==> Creating $converter" >&2
+    cat <<EOF > "$converter"
 #!/bin/bash
 _generated_func_() {
     local curlRetCode="\$1"
     local msg
     case "\$curlRetCode" in
-$(man curl | sed -n '/^EXIT CODES$/,/^AUTHORS \/ CONTRIBUTORS$/'p | grep "^ [ ]*[0-9][0-9]* [ ]*" | sed 's| [ ]*\([0-9][0-9]*\) [ ]*\(.*\)$|        \1) msg="\2" ;;|')
-        0) msg="OK" ;;
-        *) msg="[CURL doc error]: unsupported error code '\$curlRetCode'. See 'man curl'." ;;
+$(echo "$data")
+       0) echo "OK" ;;
+       *) echo "[Error] The manual page of 'curl' does not recognize error code '\$curlRetCode'."
+          return 1
+          ;;
     esac
-    echo "\$msg"
-    #echo "\$curlRetCode: \$msg"
 }
 _generated_func_ "\$1"
 EOF
-    echo "==> Creating $converter" >&2
-    chmod +x $tmp
-    rm -f "$converter"
-    mv $tmp "$converter" || DIE "Creating '$converter' failed."
+    [ -r "$converter" ] || DIE "Creating '$converter' failed."
+    chmod +x "$converter"
 }
 
 usage_f() {
