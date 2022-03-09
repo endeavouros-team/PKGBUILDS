@@ -11,9 +11,10 @@ DIE() {
 Generate() {
     local tmp=$(mktemp)
     local data=""
+    local width=300   # currently code 9 line needs over 200 characters ...
 
     # Get exit codes and strings from the curl man page.
-    data="$(man curl | sed -n '/^EXIT CODES$/,/^AUTHORS \/ CONTRIBUTORS$/'p | grep "^ [ ]*[0-9][0-9]* [ ]*")"
+    data="$(MANWIDTH=$width man curl | sed -n '/^EXIT CODES$/,/^AUTHORS \/ CONTRIBUTORS$/'p | grep "^ [ ]*[0-9][0-9]* [ ]*")"
     data="$(echo "$data" | sed "s|\"|'|g")"
     data="$(echo "$data" | sed 's|^\([ ]*[0-9]*\)[ ]*\(.*\)|\1) echo "\2" ;;|')"
 
@@ -84,6 +85,7 @@ CurlReturnCodeToString() {
         case "$1" in
             --create | -c)  Generate ; return ;;
             --remove | -r)  echo "==> Removing $converter" >&2 ; rm -f "$converter" ; return ;;
+            --converter)    echo "$converter" ; return 0 ;;
             --help | -h)    usage_f ;;
             -*)             DIE "unsupported option '$1'" ;;
             *)              curlRetCode="$1" ;;
