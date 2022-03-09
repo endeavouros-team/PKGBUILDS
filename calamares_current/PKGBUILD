@@ -37,7 +37,7 @@ prepare() {
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
     rm -r "$_reponame/src/modules/"{fstab,mount,packages}
     # move extra modules from external repo inside calamares sources
-    rsync -va "$_eos_changes/calamares-extra-modules/*"       "$_reponame/"
+    rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
     rm -rf "$_eos_changes"
 
     mkdir -p "$_reponame/build/$pkgname"
