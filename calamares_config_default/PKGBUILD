@@ -2,7 +2,7 @@
 
 pkgname=calamares_config_default
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
