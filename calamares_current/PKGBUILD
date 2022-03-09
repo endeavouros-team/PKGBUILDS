@@ -33,33 +33,27 @@ sha256sums=('SKIP'
 
 
 prepare() {
-    mv $_reponame-$pkgver            $_reponame
+    mv "$_reponame-$pkgver2            "$_reponame"
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
-    rm -r $_reponame/src/modules/{fstab,mount}
+    rm -r "$_reponame/src/modules/{fstab,mount}"
     # move extra modules from external repo inside calamares sources
-    rsync -va $_eos_changes/calamares-extra-modules/*       $_reponame/
-    rm -rf $_eos_changes
+    rsync -va "$_eos_changes/calamares-extra-modules/*"       "$_reponame/"
+    rm -rf "$_eos_changes"
 
-    mkdir -p $_reponame/build/$pkgname
+    mkdir -p "$_reponame/build/$pkgname"
 
     # remove default branding // keep package small
-    rm -r $_reponame/src/branding/default
+    rm -r "$_reponame/src/branding/default"
 
     # change some files on the go - distro-specific
-    sed -i "s?configuration files\" OFF?configuration files\" ON?g" $_reponame/CMakeLists.txt
-
-    # calamares now has kernel = all option in initcpio.conf that does the same.
-    #sed -i 's/\"mkinitcpio\", \"-p\", m_kernel/\"mkinitcpio\", \"-P\"/' $_reponame/src/modules/initcpio/InitcpioJob.cpp
-
-    # set pacman flags on the run (we do that now in configs: packages_online.conf)
-    #sed -i "s?            command.append(\"-S\")?            command.append(\"-Sy\")?" $_reponame/src/modules/packages/main.py
+    sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame/CMakeLists.txt"
 
     # remove hardcoded quiet from grubcfg
-    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" $_reponame/src/modules/grubcfg/main.py
+    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame/src/modules/grubcfg/main.py"
 }
 
 build() {
-    cd $_reponame/build
+    cd "$_reponame/build"
     cmake .. \
     -DCMAKE_BUILD_TYPE=Debug  \
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
@@ -81,25 +75,13 @@ build() {
     finishedq keyboardq license localeq notesqml oemid \
     openrcdmcryptcfg packagechooserq \
     plymouthcfg plasmalnf services-openrc \
-    summaryq tracking usersq webview welcomeq zfs"
+    summaryq tracking usersq webview welcomeq"
     export DESTDIR="$srcdir/$_reponame/build/$pkgname"
     make -j4 install
 }
 
 package() {
     local destdir="/usr"
-
-    # Build proccess can't understand our personal files, so we explicitly copy them here to be packed along calamares files
-    # both modules now are rewritten and do not need to copy and chmod anymore:
-    # https://github.com/endeavouros-team/EndeavourOS-calamares/tree/main/calamares-extra-modules/src/modules
-
-    # pacstrap as bash script implementation
-    # cp -r $_reponame/src/modules/pacstrap/base_install.sh $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
-    # chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/pacstrap/base_install.sh
-
-    # user_pkglist implementation module
-    #cp -r $_reponame/src/modules/user_pkglist/pkglist_install.sh $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
-    #chmod +x $_reponame/build/$pkgname/usr/lib/calamares/modules/user_pkglist/pkglist_install.sh
 
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
