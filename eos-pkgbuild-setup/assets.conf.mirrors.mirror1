@@ -85,6 +85,9 @@ local PKGNAMES=(                                    # actually: dir names for pa
     welcome
     yad-eos
     aur/yay
+
+    aur/zfs-dkms
+    aur/zfs-utils
 )
 
 declare -A PKG_MAKEPKG_OPTIONS

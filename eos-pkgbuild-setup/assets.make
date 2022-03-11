@@ -323,6 +323,10 @@ Assets_clone()
     case "$REPONAME" in
         endeavouros_calamares) ;;  # many maintainers, so make sure we have the same assets!
         *)
+            if [ "$repoup" = "1" ] ; then
+                echo2 "==> Using local assets."
+                return
+            fi
             if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
                 printf2 "\n%s " "Fetch assets from github (Y/n)?"
                 read2
@@ -545,6 +549,9 @@ RunPreHooksEOS()
 
 RunPreHooks()
 {
+    if [ "$repoup" = "1" ] ; then
+        return
+    fi
     RunPreHooksEOS
     if [ -n "$ASSET_HOOKS" ] ; then
         ShowIndented "Running asset hooks"
@@ -583,6 +590,9 @@ GitUpdate_repo() {
 
 RunPostHooks()
 {
+    if [ "$repoup" = "1" ] ; then
+        return
+    fi
     if [ -n "$ASSET_POST_HOOKS" ] ; then
         ShowIndented "Running asset post hooks"
         local xx
@@ -856,62 +866,65 @@ Main2()
     local cmpresult
     local total_items_to_build=0
 
-    echo2 "Finding package info ..."
+    if [ "$repoup" = "0" ] ; then
 
-    Pushd "$PKGBUILD_ROOTDIR"
-    for xx in "${PKGNAMES[@]}" ; do
-        ShowIndented "$(JustPkgname "$xx")" 1
-        pkgdirname="$(ListNameToPkgName "$xx" yes)"
-        test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
-        PkgbuildExists "$pkgdirname" 1 || continue
+        echo2 "Finding package info ..."
 
-        # get versions from latest PKGBUILDs
-        tmp="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
-        test -n "$tmp" || DIE "PkgBuildVersion for '$xx' failed"
-        newv["$pkgdirname"]="$tmp"
+        Pushd "$PKGBUILD_ROOTDIR"
+        for xx in "${PKGNAMES[@]}" ; do
+            ShowIndented "$(JustPkgname "$xx")" 1
+            pkgdirname="$(ListNameToPkgName "$xx" yes)"
+            test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
+            PkgbuildExists "$pkgdirname" 1 || continue
 
-        # get current versions from local asset files
-        pkgname="$(PkgBuildName "$pkgdirname")"
-        tmpcurr="$(LocalVersion "$ASSETSDIR/$pkgname")"
-        case "$tmpcurr" in
-            "") DIE "LocalVersion for '$xx' failed" ;;
-            "-")
-                # package (and version) not found
-                tmpcurr="$notexist"
-                ;;
-        esac
-        oldv["$pkgdirname"]="$tmpcurr"
+            # get versions from latest PKGBUILDs
+            tmp="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
+            test -n "$tmp" || DIE "PkgBuildVersion for '$xx' failed"
+            newv["$pkgdirname"]="$tmp"
 
-        cmpresult=$(Vercmp "$tmp" "$tmpcurr")
+            # get current versions from local asset files
+            pkgname="$(PkgBuildName "$pkgdirname")"
+            tmpcurr="$(LocalVersion "$ASSETSDIR/$pkgname")"
+            case "$tmpcurr" in
+                "") DIE "LocalVersion for '$xx' failed" ;;
+                "-")
+                    # package (and version) not found
+                    tmpcurr="$notexist"
+                    ;;
+            esac
+            oldv["$pkgdirname"]="$tmpcurr"
 
-        if [ $cmpresult -eq 0 ] ; then
-            echo2 "OK ($tmpcurr)"
-            continue
+            cmpresult=$(Vercmp "$tmp" "$tmpcurr")
+
+            if [ $cmpresult -eq 0 ] ; then
+                echo2 "OK ($tmpcurr)"
+                continue
+            fi
+            if [ $cmpresult -lt 0 ] &&  [ "$allow_downgrade" = "no" ] ; then
+                echo2 "OK ($tmpcurr)"
+                continue
+            fi
+            ((total_items_to_build++))
+            echo2 "$tmpcurr ==> $tmp"
+            if [ $cmpresult -gt 0 ] ; then
+                WantAurDiffs "$xx" "$pkgdirname"
+            fi
+        done
+        if [ -n "$AUR_DIFFS" ] ; then
+            ShowAurDiffs
         fi
-        if [ $cmpresult -lt 0 ] &&  [ "$allow_downgrade" = "no" ] ; then
-            echo2 "OK ($tmpcurr)"
-            continue
-        fi
-        ((total_items_to_build++))
-        echo2 "$tmpcurr ==> $tmp"
-        if [ $cmpresult -gt 0 ] ; then
-            WantAurDiffs "$xx" "$pkgdirname"
-        fi
-    done
-    if [ -n "$AUR_DIFFS" ] ; then
-        ShowAurDiffs
-    fi
-    Popd
+        Popd
 
-    if [ $total_items_to_build -eq 0 ] ; then
-        total_items_to_build=NONE
-    fi
-    printf2 "\nItems to build: %s\n" "$total_items_to_build"
+        if [ $total_items_to_build -eq 0 ] ; then
+            total_items_to_build=NONE
+        fi
+        printf2 "\nItems to build: %s\n" "$total_items_to_build"
 
-    if [ 0 -eq 1 ] ; then
-        ExplainHookMarks
-    else
-        printf2 "\n"
+        if [ 0 -eq 1 ] ; then
+            ExplainHookMarks
+        else
+            printf2 "\n"
+        fi
     fi
 
     case "$cmd" in
@@ -920,56 +933,58 @@ Main2()
             ;;
     esac
 
-    # build if newer versions exist. When building, collect removables and builds.
+    if [ "$repoup" = "0" ] ; then
+        # build if newer versions exist. When building, collect removables and builds.
 
-    buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
+        buildsavedir="$(mktemp -d "$HOME/.tmpdir.XXXXX")"
 
-    local built_under_this_pkgname
-    # local remove_under_this_pkgname
-    echo2 "Check if building is needed..."
-    for xx in "${PKGNAMES[@]}" ; do
-        pkgdirname="$(ListNameToPkgName "$xx" no)"
-        #PkgbuildExists "$xx" 2 || continue
-        PkgbuildExists "$xx" || continue
+        local built_under_this_pkgname
+        # local remove_under_this_pkgname
+        echo2 "Check if building is needed..."
+        for xx in "${PKGNAMES[@]}" ; do
+            pkgdirname="$(ListNameToPkgName "$xx" no)"
+            #PkgbuildExists "$xx" 2 || continue
+            PkgbuildExists "$xx" || continue
 
-        cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
+            cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
 
-        # See if we have to build.
-        [ "$cmpresult" -eq 0 ] && continue
-        if [ "$cmpresult" -lt 0 ] && [ "$allow_downgrade" = "no" ] ; then
-            continue
-        fi
+            # See if we have to build.
+            [ "$cmpresult" -eq 0 ] && continue
+            if [ "$cmpresult" -lt 0 ] && [ "$allow_downgrade" = "no" ] ; then
+                continue
+            fi
 
-        # Build the package (or possibly many packages!)
-        built_under_this_pkgname=()
-        # remove_under_this_pkgname=()   # we don't know only from pkgname!
+            # Build the package (or possibly many packages!)
+            built_under_this_pkgname=()
+            # remove_under_this_pkgname=()   # we don't know only from pkgname!
 
-        echo2 "==> $pkgdirname:"
-        buildStartTime="$(TimeStamp)"
+            echo2 "==> $pkgdirname:"
+            buildStartTime="$(TimeStamp)"
 
-        Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
+            Build "$pkgdirname" "$buildsavedir" "$PKGBUILD_ROOTDIR/$pkgdirname"
 
-        echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
-        for yy in "${built_under_this_pkgname[@]}" ; do
-            echo2 "    ==> $yy"
-        done
-
-        # determine old pkgs
-        for zz in zst xz ; do
+            echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
             for yy in "${built_under_this_pkgname[@]}" ; do
-                pkgname="$(PkgnameFromPkg "$yy")"
-                pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
-                test -n "$pkg" && {
-                    removable+=("$pkg")
-                    removable+=("$pkg".sig)
+                echo2 "    ==> $yy"
+            done
 
-                    yy="$(basename "$pkg")"
-                    removableassets+=("$yy")
-                    #removableassets+=("$yy".sig)
-                }
+            # determine old pkgs
+            for zz in zst xz ; do
+                for yy in "${built_under_this_pkgname[@]}" ; do
+                    pkgname="$(PkgnameFromPkg "$yy")"
+                    pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
+                    test -n "$pkg" && {
+                        removable+=("$pkg")
+                        removable+=("$pkg".sig)
+
+                        yy="$(basename "$pkg")"
+                        removableassets+=("$yy")
+                        #removableassets+=("$yy".sig)
+                    }
+                done
             done
         done
-    done
+    fi
 
     case "$SIGNER" in
         EndeavourOS) reposig=0 ;;
@@ -987,7 +1002,7 @@ Main2()
         fi
 
         # Move built and signed to assets dir...
-        if [ -n "$built" ] ; then
+        if [ -n "$built" ] && [ "$repoup" = "0" ] ; then
             echo2 "Signing and putting it all together..."
 
             if [ -n "$built" ] ; then
