@@ -1547,10 +1547,9 @@ StartHere() {
             --once) allow_run_if_disabled=yes ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) ;;                                             # already handled!
-            --ni) ;;
             #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --no-progress) ;; # already handled!
+            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --ni=* | --no-progress) ;; # already handled!
             --testing) testing=yes ;;
             #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
