@@ -9,77 +9,93 @@ Options() {
     local arg
     for arg in "$@" ; do
         case "$arg" in
+            -c | --clear)
+                read -p "Are you sure you want to clear the contents of $logfile? " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]
+                    then
+                    truncate -s 0 $logfile
+                fi
+                exit 0
+                ;;
+            -g | --go)
+                xdg-open $EOS_SENDLOG_URI > /dev/null 2>&1
+                exit 0
+                ;;  
             -h | --help)
                 cat <<EOF
 Directs standard input into a service at address
     $EOS_SENDLOG_URI
 and saves returned URLs into file
-    $db2
-See file $configfile about how to configure the service address.
+    $db
+To change default service address edit file 
+    $configfile
 
 Usage: $progname [options]
 options:
-    -n | --nosave   Don't save returned URL.
-    -h | --help     This help.
-    --man           Show manual at $EOS_SENDLOG_URI.
+    -c | --clear    Clear the contents of $logfile.
+    -g | --go       Go to service homepage at $EOS_SENDLOG_URI.
+    -h | --help     Display this help.
+    -n | --nosave   Don't save returned URL in $logfile.
+    -s | --show     Show the contents of $logfile.
 EOF
-                exit 0
-                ;;
-            --man)
-                xdg-open "$EOS_SENDLOG_URI"
                 exit 0
                 ;;
             -n | --nosave)
                 save=no
                 ;;
-            -*) DIE "unsupported option '$arg'" ;;
-            *) DIE "unsupported parameter '$arg'" ;;
+            -s | --show)
+               cat $logfile
+               exit 0
+               ;;  
+            -*) DIE "invalid option '$arg' use -h/--help to show valid options" ;;
+            *) DIE "invalid parameter '$arg'" ;;
         esac
     done
 }
 
 SendToNet() {
-    url=$(curl -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+    url=$(curl --no-progress-meter -F "$EOS_SENDLOG_FORM" "$EOS_SENDLOG_URI")
 }
 
 Init() {
-    local ix
+    local service
 
     [ -r $configfile ] && source $configfile
 
-    for ((ix=0; ix < ${#supported_uris[@]}; ix++)) ; do
-        if [ "$EOS_SENDLOG_URI" = "${supported_uris[$ix]}" ] ; then
-            EOS_SENDLOG_FORM="${supported_forms[$ix]}"
+    for ((service=0; service < ${#supported_uris[@]}; service++)) ; do
+        if [ "$EOS_SENDLOG_URI" = "${supported_uris[$service]}" ] ; then
+            EOS_SENDLOG_FORM="${supported_forms[$service]}"
             return
         fi
     done
     # use default:
-    EOS_SENDLOG_URI="${supported_uris[$default_ix]}"
-    EOS_SENDLOG_FORM="${supported_forms[$default_ix]}"
+    EOS_SENDLOG_URI="${supported_uris[$default_service]}"
+    EOS_SENDLOG_FORM="${supported_forms[$default_service]}"
 }
 
 Main() {
     local progname="$(basename "$0")"
-    local configfile=/etc/eos-sendlog.conf
+    local configfile=/etc/$progname.conf
+    local logfile=$HOME/.config/$progname.txt
 
     # from config file (if values are set, they must be correct!):
     local EOS_SENDLOG_URI=""
     local EOS_SENDLOG_FORM=""
 
     local supported_uris=(
+        "https://0x0.st/"
         "http://ix.io"
-        "https://clbin.com"
     )
     local supported_forms=(
-        "f:1"
-        "clbin"
+        "file=@-"
+        "f:1=<-"
     )
-    local default_ix=1      # was 0
+    local default_service=0
 
     Init
     local save=yes
-    local db=$HOME/.config/$progname.txt
-    local db2='$HOME'/.config/$progname.txt
+    local db=$logfile
     local url
 
     Options "$@"
@@ -87,9 +103,9 @@ Main() {
     SendToNet
 
     if [ "$save" = "yes" ] ; then
-        local tmpfile=$(mktemp $HOME/.config/eos-sendlog.XXXXX)
+        local tmpfile=$(mktemp $logfile.XXXXX)
         [ -r $db ] && mv $db $tmpfile
-        printf "%s: %s\n" "$(date +%Y%m%d-%H%M)" "$url" > $db
+        printf "%s: %s\n" "$(date +'%Y-%m-%d-%T')" "$url" > $db
         cat $tmpfile >> $db
         rm -f $tmpfile
     fi
