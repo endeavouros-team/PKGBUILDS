@@ -1,33 +1,36 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=calamares_config_default
-pkgver=2.0
-pkgrel=2
+pkgver=22.03.1.1
+pkgrel=1
+_repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=("git+https://github.com/endeavouros-team/EndeavourOS-calamares.git#branch=main")
+source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('SKIP')
+sha512sums=('cafbe7b9d2e3692aa2c43b21634fb938d933d2191ab9c810bcae25ce3cd5457743eb66aef7fca0650ea74f6c840f69ec4dd8672e8ca91e53ef8a61c84a973b1f')
 
 _date=$(date +%Y.%m.%d)
 
 prepare() {
+    mv "$_repo_name-$pkgver"            "$_repo_name"
+
     # set date for calamares_branding
-    sed -i "$srcdir/EndeavourOS-calamares/calamares/branding/endeavouros/branding.desc" \
+    sed -i "$srcdir/${_repo_name}/calamares/branding/endeavouros/branding.desc" \
     -e "s|^\(    version:[ ]*\).*$|\1$_date|" \
     -e "s|^\(    shortVersion:[ ]*\).*$|\1$_date|"
 
-    chmod +x "$srcdir/EndeavourOS-calamares/calamares/scripts/"{cleaner_script.sh,chrooted_cleaner_script.sh,update-mirrorlist,pacstrap_calamares}
+    chmod +x "$srcdir/${_repo_name}/calamares/scripts/"{cleaner_script.sh,chrooted_cleaner_script.sh,update-mirrorlist,pacstrap_calamares}
 
-    cp "$srcdir/EndeavourOS-calamares/calamares/files/netinstall.yaml"  "$srcdir/EndeavourOS-calamares/calamares/modules/"
-    rm "$srcdir/EndeavourOS-calamares/calamares/settings_community.conf"
-    rm "$srcdir/EndeavourOS-calamares/calamares/modules/"{packagechooser_ce.conf,netinstall_community_base.conf}
-    rm -R "$srcdir/EndeavourOS-calamares/calamares/images-ce"
+    cp "$srcdir/${_repo_name}/calamares/files/netinstall.yaml"  "$srcdir/${_repo_name}/calamares/modules/"
+    rm "$srcdir/${_repo_name}/calamares/settings_community.conf"
+    rm "$srcdir/${_repo_name}/calamares/modules/"{packagechooser_ce.conf,netinstall_community_base.conf}
+    rm -R "$srcdir/${_repo_name}/calamares/images-ce"
 }
 
 package() {
     install -dm 755 "$pkgdir/etc/calamares"
-    cp -r --no-preserve=ownership "$srcdir/EndeavourOS-calamares/calamares" "$pkgdir/etc/"
+    cp -r --no-preserve=ownership "$srcdir/${_repo_name}/calamares" "$pkgdir/etc/"
 }
