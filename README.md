@@ -11,16 +11,16 @@ Created backup branch:
 
 --- 
 
-13-03-2022 creting new release tags scheme to be used for some packages like calamares and calamares config packages:
+13-03-2022 creating new **release tags scheme** to be used for some packages like calamares and calamares config packages and others with branding or purposes that are changed for ISO release in any other matter:
 
 Naming convention for the tags. 
 This would only be for packages that can change as part of the release of a new ISO.
 
-example version: 22.03.1.1
+example version: **22.03.1.1**
 
-22 - The year of Apollo release
-03 - The month of Apollo release
-1 - 1 for the main release, 2 for neo, 3 for nova
-1 - The current iteration of the package
+**22** - The year of Apollo release
+**03** - The month of Apollo release
+**1** - 1 for the main release, 2 for neo, 3 for nova
+**1** - The current iteration of the package
 
 ---
