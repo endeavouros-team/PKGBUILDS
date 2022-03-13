@@ -247,7 +247,7 @@ Main() {
         ShowPacmanLog=FALSE
     fi
 
-    ShowInstallLog=TRUE    # 2022-Feb-24: REMOVE THIS LINE when calamares progress display is fixed.
+    #ShowInstallLog=TRUE    # 2022-Feb-24: REMOVE THIS LINE when calamares progress display is fixed.
 
     if [ 0 -eq 1 ] ; then
         # Testing settings only, not for production!
