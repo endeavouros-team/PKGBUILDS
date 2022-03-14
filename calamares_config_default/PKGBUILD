@@ -2,7 +2,7 @@
 
 pkgname=calamares_config_default
 pkgver=22.03.1.2
-pkgrel=1
+pkgrel=2
 _repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('cafbe7b9d2e3692aa2c43b21634fb938d933d2191ab9c810bcae25ce3cd5457743eb66aef7fca0650ea74f6c840f69ec4dd8672e8ca91e53ef8a61c84a973b1f')
+sha512sums=('3d5cab013c9ab18ada9d7dc768d029d98df42adbcd3148472cd0d4912534499075d936c7b0a13ed590bc369565834574184b628ffe7e17d933556f447eee03de')
 
 _date=$(date +%Y.%m.%d)
 
