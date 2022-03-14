@@ -29,7 +29,7 @@ source=(
   "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
 )
 
-sha256sums=('636a53713c48b73b1bb9ca87c24a4f3e71c663dd238aec5a5550db0a33628150'
+sha256sums=('b86123f5dd123ef40bbd9d00534846c22e81234e36b7920afd6415de57229d40'
             '2d692042cbcfed79aea410d20276f07b05914fe65a00bc83170df0ee2cfae97d')
 
 
