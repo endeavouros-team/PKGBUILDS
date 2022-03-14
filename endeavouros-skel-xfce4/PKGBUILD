@@ -12,7 +12,7 @@ url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
 depends=('endeavouros-skel-default')
-source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=master")
 sha256sums=('SKIP')
 
 package() {
