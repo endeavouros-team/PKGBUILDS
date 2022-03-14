@@ -1,0 +1,28 @@
+# Maintainer: EndeavourOS <info@endeavoueos.com>
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+_pkgname=endeavouros-xfce4-theming
+pkgname=endeavouros-skel-default
+pkgver=1.0
+pkgrel=2
+pkgdesc="pre user creation skel setup for GTK and xfce4-terminal under EndeavourOS"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+makedepends=('git')
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
+sha256sums=('SKIP')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    mkdir -p "${pkgdir}${PREFIX}/.config/xfce4/"
+    cp -R ".config/xfce4/terminal" "${pkgdir}${PREFIX}/.config/xfce4/"
+    cp -R ".config/gtk-3.0" "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/gtk-4.0" "${pkgdir}${PREFIX}/.config/"
+    install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
+    install -Dm755 ".Xresources" "${pkgdir}${PREFIX}/.Xresources"
+    install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+}
