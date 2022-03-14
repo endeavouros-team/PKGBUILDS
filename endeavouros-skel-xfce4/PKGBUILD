@@ -11,7 +11,7 @@ groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
-depends=('endeavouros-skel-default-testing')
+depends=('endeavouros-skel-default')
 source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
 sha256sums=('SKIP')
 
