@@ -71,7 +71,8 @@ Main()
                 | eos-grub-fix-initrd-generation | keyserver-rank* | nvidia-installer-update-db | polybar-msg | eos-kill-yad-zombies \
                 | welcome-dnd | yad-settings | yad-tools | eos-latest-arch-mirrorlist | eos-apps-info-helper | eos-install-mode-run-calamares \
                 | eos-run-cmd-with-su | *.sh | *calamares* | update-mirrorlist | nvidia-installer-kernel-para | eos-select-file-server | wormc \
-                | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | eos-quickstart)
+                | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | eos-quickstart | arc* | dbufstat \
+                | *.zfs | raidz* | z*)
                 continue ;;
             lxdm-binary | lxdm-config | lxdm)
                 # why these show up ???
