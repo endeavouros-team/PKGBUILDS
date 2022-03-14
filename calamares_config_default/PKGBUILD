@@ -2,7 +2,7 @@
 
 pkgname=calamares_config_default
 pkgver=22.03.1.3
-pkgrel=2
+pkgrel=1
 _repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
