@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('3d5cab013c9ab18ada9d7dc768d029d98df42adbcd3148472cd0d4912534499075d936c7b0a13ed590bc369565834574184b628ffe7e17d933556f447eee03de')
+sha512sums=('503522fa3de02e398c22c5ca864f8ecf03ed2a66c2e13ef6033f0147f2dac607040849f1347c7a7bbe53e36a31be22b8adf1b7f20541da6b7ee51c5445a1692c')
 
 _date=$(date +%Y.%m.%d)
 
