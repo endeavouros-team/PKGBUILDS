@@ -1,0 +1,27 @@
+# Maintainer: EndeavourOS <info@endeavoueos.com>
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+_pkgname=endeavouros-i3wm-setup
+pkgname=endeavouros-skel-i3wm
+pkgver=3.0
+pkgrel=4
+pkgdesc="pre user creation skel setup for i3-wm under EndeavourOS"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+makedepends=('git')
+depends=('endeavouros-skel-default-testing')
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=apollo")
+sha256sums=('SKIP')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    mkdir -p "${pkgdir}${PREFIX}/.config/"
+    cp -R ".config/dunst" "${pkgdir}${PREFIX}/.config/dunst"
+    cp -R ".config/i3" "${pkgdir}${PREFIX}/.config/i3"
+    cp -R ".config/nitrogen" "${pkgdir}${PREFIX}/.config/nitrogen"
+    cp -R ".config/rofi" "${pkgdir}${PREFIX}/.config/rofi"
+    install -Dm755 "set_once_i3.sh" "${pkgdir}${PREFIX}/set_once_i3.sh"
+}
