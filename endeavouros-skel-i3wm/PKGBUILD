@@ -4,7 +4,7 @@
 _pkgname=endeavouros-i3wm-setup
 pkgname=endeavouros-skel-i3wm
 pkgver=3.0
-pkgrel=8
+pkgrel=9
 pkgdesc="pre user creation skel setup for i3-wm under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
@@ -24,6 +24,6 @@ package() {
     chmod -R +x "${pkgdir}${PREFIX}/.config/i3/scripts"
     cp -R ".config/nitrogen" "${pkgdir}${PREFIX}/.config/nitrogen"
     cp -R ".config/rofi" "${pkgdir}${PREFIX}/.config/rofi"
-    cp ".config/picom.conf "${pkgdir}${PREFIX}/.config/"
+    cp ".config/picom.conf" "${pkgdir}${PREFIX}/.config/"
     install -Dm755 "set_once_i3.sh" "${pkgdir}${PREFIX}/set_once_i3.sh"
 }
