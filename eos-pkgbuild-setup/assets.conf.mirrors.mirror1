@@ -33,15 +33,12 @@ local PKGNAMES=(                                    # actually: dir names for pa
     calamares_config_default
     calamares_current
 
-    endeavouros-skel-default-testing
-    endeavouros-skel-i3wm-testing
-    endeavouros-skel-xfce4-testing
-
     ckbcomp
     aur/downgrade
     endeavouros-keyring
     endeavouros-mirrorlist
     # endeavouros-lxde-skel
+    endeavouros-skel-default
     endeavouros-skel-i3wm
     endeavouros-skel-xfce4
     endeavouros-theming
@@ -53,6 +50,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-log-tool
     eos-lxdm-gtk3
     eos-packagelist
+    eos-plasma-sddm-config
     eos-qogir-icons
     eos-quickstart
     eos-rankmirrors
@@ -91,9 +89,10 @@ local PKGNAMES=(                                    # actually: dir names for pa
 )
 
 declare -A PKG_MAKEPKG_OPTIONS
-PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm-testing]="--nodeps"
-PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4-testing]="--nodeps"
 
+PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
+PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
+PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
 # There may be several hook functions.
