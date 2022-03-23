@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME A aplicação está desativada. Para, ainda assim, a iniciar, use a opção --enable."
+_tr_add2 welcome_disabled      "A aplicação $PRETTY_PROGNAME está desativada. Para, ainda assim, a iniciar, use a opção --enable (temporariamente: --once)."  # changed 2022-Feb-21
 
 _tr_add2 butt_later            "Até breve"
 _tr_add2 butt_latertip         "Manter $PRETTY_PROGNAME ativo"
@@ -46,37 +46,37 @@ _tr_add2 butt_help             "Ajuda"
 
 
 _tr_add2 nb_tab_INSTALL        "INSTALAR"
-_tr_add2 nb_tab_GeneralInfo    "Informação Geral"
+_tr_add2 nb_tab_GeneralInfo    "Informação geral"
 _tr_add2 nb_tab_AfterInstall   "Pós-instalação"
-_tr_add2 nb_tab_AddMoreApps    "Adicionar Aplicações"
+_tr_add2 nb_tab_AddMoreApps    "Adicionar aplicações"
 
 
 _tr_add2 after_install_text    "Tarefas pós-instalação"
 
-_tr_add2 after_install_um      "Atualizar Servidores"
+_tr_add2 after_install_um      "Atualizar servidores"
 _tr_add2 after_install_umtip   "Atualiza a lista de servidores antes da atualização do sistema"
 
-_tr_add2 after_install_us      "Atualizar Sistema"
-_tr_add2 after_install_ustip   "Atualiza o Software do Sistema"
+_tr_add2 after_install_us      "Atualizar sistema"
+_tr_add2 after_install_ustip   "Atualiza o software do sistema"
 
 _tr_add2 after_install_dsi     "Detetar problemas no sistema"
 _tr_add2 after_install_dsitip  "Deteta potenciais problemas nos pacotes do sistema ou noutro local"
 
-_tr_add2 after_install_etl     "EndeavourOS mais recente$_question"
-_tr_add2 after_install_etltip  "Mostra o que fazer para atualizar o sistema EndeavourOS para o nível mais recente"
+_tr_add2 after_install_etl     "EndeavourOS para o mais recente$_question"
+_tr_add2 after_install_etltip  "Mostra o que fazer para que o sistema atinja o nível mais recente do EndeavourOS"
 
-_tr_add2 after_install_cdm     "Mudar o Gestor de Visualização"
-_tr_add2 after_install_cdmtip  "Usa um gestor de visualização diferente"
+_tr_add2 after_install_cdm     "Mudar o gestor de sessão"
+_tr_add2 after_install_cdmtip  "Usa um gestor de sessão diferente"
 
-_tr_add2 after_install_ew      "Fundo de ecrã EndeavourOS"
-_tr_add2 after_install_ewtip   "Muda o fundo de ecrã para o predefinido do EOS"
+_tr_add2 after_install_ew      "Fundo de ecrã EndeavourOS"                       # was: "EndeavourOS wallpaper"
+_tr_add2 after_install_ewtip   "Muda o fundo de ecrã para o predefinido do EOS"  # was: "Change desktop wallpaper to EOS default"
 
 
 _tr_add2 after_install_pm      "Gestão de pacotes"
 _tr_add2 after_install_pmtip   "Como gerir os pacotes com o pacman"
 
 _tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
-_tr_add2 after_install_aytip   "Informação sobre o Repositório do Utilizador Arch (AUR) e o yay"
+_tr_add2 after_install_aytip   "Informação sobre o repositório do utilizador Arch (AUR) e o yay"
 
 _tr_add2 after_install_hn      "Hardware e Rede"
 _tr_add2 after_install_hntip   "Ponha o equipamento a funcionar"
@@ -85,13 +85,13 @@ _tr_add2 after_install_bt      "Bluetooth"
 _tr_add2 after_install_bttip   "Recomendações sobre Bluetooth"
 
 _tr_add2 after_install_nv      "Utilizadores NVIDIA$_exclamation"
-_tr_add2 after_install_nvtip   "Use o instalador de NVIDIA"
+_tr_add2 after_install_nvtip   "Use o instalador da NVIDIA"
 
 _tr_add2 after_install_ft      "Dicas do fórum"
-_tr_add2 after_install_fttip   "Ajude-nos a ajudá-lo/a!"
+_tr_add2 after_install_fttip   "Ajude-nos a ajudá-lo(a)!"
 
 
-_tr_add2 general_info_text     "Encontre o seu caminho para o website do EndeavourOS$_exclamation"
+_tr_add2 general_info_text     "Encontre o seu caminho no website do EndeavourOS$_exclamation"
 
 _tr_add2 general_info_ws       "Sítio Web"
 
@@ -107,13 +107,13 @@ _tr_add2 general_info_fotip    "Faça perguntas, comente e converse no nosso ami
 _tr_add2 general_info_do       "Doações"
 _tr_add2 general_info_dotip    "Ajude-nos a manter o EndeavourOS a funcionar"
 
-_tr_add2 general_info_ab       "Sobre o $PRETTY_PROGNAME"
+_tr_add2 general_info_ab       "Acerca do $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip    "Mais informação acerca desta aplicação"
 
 
 _tr_add2 add_more_apps_text    "Instale aplicações populares"
 
-_tr_add2 add_more_apps_lotip   "Ferramenta de produtividade (libreoffice-fresh)"
+_tr_add2 add_more_apps_lotip   "Ferramentas de produtividade (libreoffice-fresh)"
 
 _tr_add2 add_more_apps_ch      "Navegador Web Chromium"
 _tr_add2 add_more_apps_chtip   "Navegador Web"
@@ -127,38 +127,38 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) para Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME outra vez, abra um terminal e execute: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME novamente, abra um terminal e execute:\n<tt>   $PROGNAME --enable</tt>\n"  # slightly changed 2021-Dec-21
 _tr_add2 settings_dis_text       "Reativar o $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Como voltar a ativar o $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Lembro-me"
 _tr_add2 settings_dis_buttip     "Prometo"
 
-_tr_add2 help_butt_title         "$PRETTY_PROGNAME Ajuda"
+_tr_add2 help_butt_title         "Ajuda do $PRETTY_PROGNAME"
 _tr_add2 help_butt_text          "Mais informação sobre a aplicação $PRETTY_PROGNAME"
 
-_tr_add2 dm_title                "Selecionar o Gestor de Visualização"
+_tr_add2 dm_title                "Selecionar o gestor de sessão"
 _tr_add2 dm_col_name1            "Selecionado"
-_tr_add2 dm_col_name2            "Nome do Gestor de Visualização"
+_tr_add2 dm_col_name2            "Nome do gestor de sessão"
 
 _tr_add2 dm_reboot_required      "É necessário reiniciar para que as alterações tenham efeito."
-_tr_add2 dm_changed              "Gestor de Visualização alterado para: "
-_tr_add2 dm_failed               "Falha ao alterar o Gestor de Visualização."
+_tr_add2 dm_changed              "Gestor de sessão alterado para: "
+_tr_add2 dm_failed               "Falha ao alterar o gestor de sessão."
 _tr_add2 dm_warning_title        "Aviso"
 
 _tr_add2 install_installer       "Instalador"
-_tr_add2 install_already         "Já instalado"
+_tr_add2 install_already         "já instalado"
 _tr_add2 install_ing             "A instalar"
 _tr_add2 install_done            "Terminado."
 
 _tr_add2 sysup_no                "Não existem atualizações."
-_tr_add2 sysup_check             "A procurar atualizações de software..."
+_tr_add2 sysup_check             "A procurar por atualizações de software..."
 
 _tr_add2 issues_title            "Detcção de problemas no pacote"
 _tr_add2 issues_grub             "IMPORTANTE: é necessário voltar a criar manualmente o menu de arranque."
 _tr_add2 issues_run              "Comandos de execução:"
 _tr_add2 issues_no               "Não foram detetados problemas importantes no sistema."
 
-_tr_add2 cal_noavail            "Não disponível: "        # programa de instalação
+_tr_add2 cal_noavail            "Não disponível: "        # installer program
 _tr_add2 cal_warn               "Aviso"
 _tr_add2 cal_info1              "Esta é uma versão desenvolvida pela comunidade.\n\n"                                   # specials needed!
 _tr_add2 cal_info2              "<b>Offline</b> Este método dá-lhe um ambiente gráfico Xfce com tema do EndeavourOS.\nNão é necessária ligação à Internet.\n\n"
@@ -168,7 +168,7 @@ _tr_add2 cal_choose             "Escolha o método de instalação"
 _tr_add2 cal_method             "Método"
 _tr_add2 cal_nosupport          "$PROGNAME: modo não suportado: "
 _tr_add2 cal_nofile             "$PROGNAME: o ficheiro requerido não existe: "
-_tr_add2 cal_istarted           "A instalação começou"
+_tr_add2 cal_istarted           "A instalação iniciou"
 _tr_add2 cal_istopped           "A instalação terminou"
 
 _tr_add2 tail_butt              "Fechar esta janela"
@@ -210,32 +210,32 @@ _tr_add2 after_install_themevan      "Tema original Xfce"
 _tr_add2 after_install_themevantip   "Usar o tema original Xfce"
 
 _tr_add2 after_install_themedef     "Tema do EndeavourOS para o Xfce"
-_tr_add2 after_install_themedeftip  "Usar o tema do EndeavourOS para o Xfce"
+_tr_add2 after_install_themedeftip  "Usa o tema do EndeavourOS para o Xfce"
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Configuração de limpeza de pacotes"
-_tr_add2 after_install_pcleantip    "Configurar o serviço de limpeza da cache de pacotes"
+_tr_add2 after_install_pcleantip    "Configura o serviço de limpeza da cache de pacotes"
 
 # 2020-Jul-04:
-_tr_add2 nb_tab_OwnCommands         "Comandos Pessoais"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_OwnCommands         "Comandos pessoais"                   # modified 2020-Jul-08
 _tr_add2 nb_tab_owncmds_text        "Comandos personalizados"             # modified 2020-Jul-08
 
 # 2020-Jul-08:
-_tr_add2 nb_tab_owncmdstip          "Ajuda para adicionar comandos pessoais"
+_tr_add2 nb_tab_owncmdstip          "Ajuda a adicionar comandos pessoais"
 
-_tr_add2 add_more_apps_akm          "Um Gestor de Kernel"
-_tr_add2 add_more_apps_akmtip       "Um pequeno gestor de kernel linux e fonte de informação"
+_tr_add2 add_more_apps_akm          "Um gestor de Kernel"
+_tr_add2 add_more_apps_akmtip       "Um pequeno gestor do kernel linux e fonte de informação"
 
 # 2020-Jul-15:
-_tr_add2 butt_owncmds_help        "Tutorial: Comandos Pessoais"
+_tr_add2 butt_owncmds_help        "Tutorial: Comandos pessoais"
 
 # 2020-Aug-05:
-_tr_add2 butt_owncmds_dnd         "Comandos pessoais arrastar${_and}largar"
+_tr_add2 butt_owncmds_dnd         "Comandos pessoais drag${_and}drop"
 _tr_add2 butt_owncmds_dnd_help    "Mostra uma janela onde pode arrastar itens de área para novos botões"
 
 # 2020-Sep-03:
 _tr_add2 ins_reso                 "Alterar a resolução do ecrã"
-_tr_add2 ins_resotip              "Altere agora a resolução do ecrã"
+_tr_add2 ins_resotip              "Altera a resolução do ecrã agora"
 
 # 2020-Sep-08:
 _tr_add2 add_more_apps_arch          "Navegar por todos os pacotes Arch"
@@ -262,7 +262,7 @@ _tr_add2 updt_searching           "A procurar"
 _tr_add2 updt_for_updates         "por atualizações"
 _tr_add2 updt_failure             "falha$_exclamation"
 _tr_add2 updt_nothing_todo        "não há nada para fazer"
-_tr_add2 updt_press_enter         "Pressione ENTER para fechar esta janela"
+_tr_add2 updt_press_enter         "Prima ENTER para fechar esta janela"
 
 # 2020-Oct-24:
 #    IMPORTANT NOTE:
@@ -272,7 +272,7 @@ _tr_add2 updt_press_enter         "Pressione ENTER para fechar esta janela"
 _tr_add2 after_install_pacdiff_tip "Gerir ficheiros pacnew, pacorig $_and pacsave com pacdiff $_and"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Configurar"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_conf           "Configurar"                           # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Transferir mais papéis de parede do EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Transferir papéis de parede da comunidade e de versões antigas do EndeavourOS"
 _tr_add2 after_install_info           "informação"                           # last word on a sentence, means just any information
@@ -283,13 +283,13 @@ _tr_add2 butt_softnews_tip            "Notícias importantes sobre o software do
 _tr_add2 install_community            "Instalar edições da comunidade"
 _tr_add2 install_community_tip        "Coleção das edições da comunidade (requer ligação à Internet)"    # changed 2021-Oct-23
 
-# 2021-May-01:
+# 2021-May-01
 _tr_add2 ins_syslog                   "Como partilhar os registos do sistema"
 _tr_add2 ins_syslogtip                "Explica como pode partilhar os registos do sistema quando necessita de ajuda"
 _tr_add2 ins_logtool                  "Registos para resolução de problemas"
 _tr_add2 ins_logtooltip               "Selecionar, criar e partilhar registos de resolução de problemas ao pedir ajuda"
 
-# 2021-May-20:
+# 2021-May-20
 _tr_add2 nb_tab_DailyAssistant       "Assistente"
 _tr_add2 daily_assistant_text        "Ferramentas para tarefas úteis e/ou diárias"
 _tr_add2 after_install_itab          "Selecionar o separador inicial de Bem-vindo"
@@ -300,13 +300,17 @@ _tr_add2 daily_assist_apps           "Categorias de aplicações"
 _tr_add2 daily_assist_apps_tip       "Aplicações ordenadas por categoria"
 
 _tr_add2 after_install_vbox1         "Ativar utilitários VirtualBox Guest"
-_tr_add2 after_install_vbox2         "Para ativar os utilitários VirtualBox Guest, selecione o separador <b>ApósInstalação</b> e clique no botão "
+_tr_add2 after_install_vbox2         "Para ativar os utilitários VirtualBox Guest, selecione o separador <b>Pós-instalação</b> e clique no botão "
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Ethernet issue$_question Remover r8168$_exclamation"
-_tr_add2 after_install_r8168_tip     "A remoção do pacote <b>r8168</b> pode corrigir falha de ligação por cabo (necessário reiniciar)"
+_tr_add2 after_install_r8168         "Problemas com a rede por cabo$_question Alternar controlador r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Alterna entre controladores r8168 e r8169 (necessário reiniciar)"                        # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "informação"                                         # assumir o prefixo "DE:", por ex.: "Xfce: informação"
-_tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente gráfico/Gestor de janelas"  # assumir o prefixo "DE:", por ex.: "Xfce: mais informação ..."
+_tr_add2 daily_assist_DEinfo         "informação"                                                     # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente gráfico/Gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Escolha aplicações populares e instale-as"
 
