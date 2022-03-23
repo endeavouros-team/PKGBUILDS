@@ -66,7 +66,7 @@ eos_select_browser() {
     fi
 
     local browser
-    for browser in xdg-open exo-open firefox chromium vivaldi-stable opera ; do
+    for browser in firefox xdg-open exo-open chromium vivaldi-stable opera ; do
         if (/usr/bin/which "$browser" >& /dev/null) ; then
             echo "$browser"
             return
