@@ -384,6 +384,21 @@ ShowChangeResoButton() {
 }
 export -f ShowChangeResoButton
 
+Installer_html_get() { 
+  local local="$1"
+  local remote="$2"
+
+  if [ ! -r "$local" ] ; then
+      if eos-connection-checker ; then
+          mkdir -p "$(dirname "$local")"
+          wget -O "$local" "$remote" 2>/dev/null || return
+      else
+          return
+      fi
+  fi
+  echo "$local"
+}
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -391,7 +406,10 @@ INSTALL() {
   local image=$system_software_install
   local gparted="$(IconGrasp gparted)"
   local reflector_simple="$(IconGrasp software-update-available)"
+  local bluetooth=$(IconGrasp bluetooth)
   local user_info=info
+  local btdoc="$(Installer_html_get "$HOME/Documents/bluetooth.html" "https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03")"
+
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
@@ -408,6 +426,13 @@ INSTALL() {
   local icon=face-worried #dialog-question
   tabcontents+=(
       --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                  'gparted'
+  )
+  if [ -n "$btdoc" ] ; then
+      tabcontents+=(
+          --field=" $(ltr ins_blue_notes)!$bluetooth!$(ltr ins_blue_notes_tip)":fbtn    "$_WELCOME_BROWSER '$btdoc'"
+      )
+  fi
+  tabcontents+=(
       --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
       --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
     # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
