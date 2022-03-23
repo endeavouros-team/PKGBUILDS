@@ -254,3 +254,6 @@ _tr_add2 after_install_r8168_tip "Borttagning av paket <b>r8168</b> kan fixa tra
 
 _tr_add2 daily_assist_DEinfo         "Information"                                         # anta prefixet "DE:", t.e.x.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "Mer information om denna Skrivbords/Fönsterhanterare"  # anta prefixet "DE:", t.e.x.: "Xfce: information"
+
+_tr_add2 ins_blue_notes              "Blåtands anteckningar"
+_tr_add2 ins_blue_notes_tip          "Anteckningar om hur man ställer in blåtand"
