@@ -230,10 +230,18 @@ SimpleRank() {
 
 UserAddedMirrors() {
     local mirrors="$1"    # a list of strings separated by '|' (pipe) chars
-    local mirror
+    local mirror m
 
     echo "# user added mirrors >>>"
-    for mirror in $(echo "$mirrors" | tr '|' ' ') ; do
+    for m in $(echo "$mirrors" | tr '|' ' ') ; do
+        case "$m" in
+            https://* | http://* | rsync://*)
+                mirror="$m"
+                ;;
+            *)
+                mirror="$(grep "$m" "$latest_ml.orig" | awk '{print $NF}')"
+                ;;
+        esac
         echo "User added: $mirror" >&2
         echo "Server = $mirror"
     done
