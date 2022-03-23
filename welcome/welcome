@@ -409,6 +409,7 @@ INSTALL() {
   local bluetooth=$(IconGrasp bluetooth)
   local user_info=info
   local btdoc="$(Installer_html_get "$HOME/Documents/bluetooth.html" "https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03")"
+  local INSTALLER_BROWSER=firefox
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp
@@ -429,14 +430,14 @@ INSTALL() {
   )
   if [ -n "$btdoc" ] ; then
       tabcontents+=(
-          --field=" $(ltr ins_blue_notes)!$bluetooth!$(ltr ins_blue_notes_tip)":fbtn    "$_WELCOME_BROWSER '$btdoc'"
+          --field=" $(ltr ins_blue_notes)!$bluetooth!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
       )
   fi
   tabcontents+=(
-      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$_WELCOME_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/installation"
-    # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/system-rescue"
-      --field=" $(ltr ins_syslog)!$user_info!$(ltr ins_syslogtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
+    # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_syslog)!$user_info!$(ltr ins_syslogtip)":fbtn        "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
 #      --field=" $(ltr ins_logtool)!$icon!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
   )
 
