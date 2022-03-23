@@ -314,3 +314,7 @@ _tr_add2 daily_assist_DEinfo_tip     "more information about this Desktop/Window
 _tr_add2 add_more_apps_qs            "Choose popular apps to install"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Choose popular apps and install them"
 
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Bluetooth notes"
+_tr_add2 ins_blue_notes_tip          "Notes about setting up bluetooth"
+

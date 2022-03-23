@@ -314,3 +314,7 @@ _tr_add2 daily_assist_DEinfo_tip     "lisätietoa tästä työpöydästä/ikkuna
 _tr_add2 add_more_apps_qs            "Valitse ja asenna suosittuja sovelluksia"        # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Valitse ja asenna joukosta suosittuja sovelluksia"
 
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Bluetooth-tietoja"
+_tr_add2 ins_blue_notes_tip          "Tietoja bluetooth:n ottamisesta käyttöön"
+
