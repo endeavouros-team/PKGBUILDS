@@ -39,7 +39,7 @@ GetNvidiaIds()
             data=$(echo "$data" | "${sed[@]}" | sed -n "/$machinedef/,/^$/p" | tail -n +2)
             # get the version
             data=$(echo "$data" | grep -A1 "$searchstr" | tail -n1)
-            version=$(echo "$data" | sed 's|.*>\([0-9.]*\)</a>.*$|\1|')
+            version=$(echo "$data" | sed 's|.*>[ ]*\([0-9][0-9.]*\)[ ]*</a>.*$|\1|')
             ;;
         470)
             data=$(curl --fail -Lsm 10 -o- "https://www.nvidia.com/Download/driverResults.aspx/186016/en-us")
