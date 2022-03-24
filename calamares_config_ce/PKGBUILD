@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=calamares_config_ce
-pkgver=22.03.1.12
+pkgver=22.03.1.15
 pkgrel=1
 _repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('05717adfc91382e2f6e967ef3ac9ebfad9343cc4d57c7d5c2b96ffe3cba3a0fc5f0efdce0290afa1a1cf8711fb975c36425a63bde29ade0e7da70330e797f699')
+sha512sums=('b62e393e8b164dc8c6c52c95528dd88117d5e85ce6fee36a924efd4183cb648049b78c6e03480700dcb8a5ff277370379141d04d89e35a16190ac0249aa2d9a0')
 
 
 _caldir="$pkgname/calamares"
@@ -19,7 +19,7 @@ prepare() {
     mkdir -p "$_caldir/modules"
     mv "$_repo_name-$pkgver"            "$_repo_name"
 
-    cp "${_repo_name}/calamares/files/netinstall-ce-base.yaml"              "$_caldir/modules/"
+    cp "${_repo_name}/calamares/modules/netinstall-ce-base.yaml"            "$_caldir/modules/"
     cp "${_repo_name}/calamares/modules/packagechooser_ce.conf"             "$_caldir/modules/"
     cp "${_repo_name}/calamares/modules/netinstall_community_base.conf"     "$_caldir/modules/"
     cp "${_repo_name}/calamares/settings_community.conf"                    "$_caldir/"
