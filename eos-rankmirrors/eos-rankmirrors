@@ -82,9 +82,13 @@ GetUpdateNumberAndTime() {
     local retcode=0
     local time
     local nr
-    local low_limit=999999    # use a very high number!
+    local low_limit=999999           # still acceptable value (use a very high initial number!)
+    local too_low_limit=999999       # fails when below this
 
-    [ -n "$reference_level" ] && low_limit=$((reference_level - 2))
+    if [ -n "$reference_level" ] ; then
+        low_limit=$((reference_level - 2))
+        too_low_limit=$((reference_level - 10))
+    fi
 
     time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
     retcode=$?
@@ -102,13 +106,17 @@ GetUpdateNumberAndTime() {
             fi
 
             if [ -n "$reference_level" ] ; then
-                if [ $nr -lt $low_limit ] ; then     # ad hoc test for the update level value in the state file
-                    echo2 "====> Fail: update level $nr too low (should be close to $reference_level): $mirror"
-                    return
-                fi
-                if [ $nr -gt $reference_level ] ; then             # ad hoc test for the update level value in the state file
+                # ad hoc tests for the update level value in the state file
+                if [ $nr -gt $reference_level ] ; then
                     echo2 "====> Fail: update level $nr too high (cannot be more than $reference_level): $mirror"
                     return
+                elif [ $nr -lt $too_low_limit ] ; then
+                    echo2 "====> Fail: $mirror:"
+                    echo2 "      Update level is $nr/$reference_level, problem with the mirror?"
+                    return
+                elif [ $nr -lt $low_limit ] ; then
+                    echo2 "====> Warning: $mirror:"
+                    echo2 "      Update level is $nr/$reference_level, some packages may be outdated."
                 fi
             fi
             result="$nr $time"
