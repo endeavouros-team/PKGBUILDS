@@ -1109,7 +1109,7 @@ Main2()
 
         # Now all is ready for syncing with github.
 
-        GitUpdate_repo
+        GitUpdate_repo "${built[@]}"
 
         sleep 3
         echo2 "Syncing $REPONAME release assets with github:"

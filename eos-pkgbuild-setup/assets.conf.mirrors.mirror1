@@ -94,6 +94,12 @@ PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 
+PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
+PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
+PKG_MAKEPKG_OPTIONS[polybar]="--rmdeps"
+PKG_MAKEPKG_OPTIONS[worm]="--rmdeps"
+PKG_MAKEPKG_OPTIONS[yay]="--rmdeps"
+
 # Hook functions are run in the beginning after RationalityTests in assets.make.
 # There may be several hook functions.
 local ASSET_HOOKS=(
