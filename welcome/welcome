@@ -1249,27 +1249,37 @@ R8168check_at_install() {
 
 MagicId_new() {
     # special support for user_commands.bash
+
     if (! IsInstalling) ; then
-        echo "Sorry, option --ni is only an install time feature." >&2
+        echo "Option '--ni' is only an install time feature." >&2
         return 1
     fi
 
-    local id="$1"
+    local id="$1"     # URL or special id
+    local url=""
 
-    local EOS_LIVEUSER=$LOGNAME  # TESTING !!!
-
-    if [ -n "$id" ] ; then
-        local url=https://raw.githubusercontent.com/endeavouros-team/sandbox/master/pkg/list  # currently not in gitlab!
-        local data=$(curl -Lsm 10 -o- $url)
-        [ -n "$data" ] || { echo "Fetching data failed." >&2 ; return 1 ; }
-        url=$(echo "$data" | grep "^$id"= | cut -d'=' -f2)
-        [ -n "$url" ] || { echo "URL not found." >&2 ; return 1 ; }
-        if ! curl --fail -Lsm 10 -o/home/$EOS_LIVEUSER/user_commands.bash "$url" ; then
-            echo "Sorry, cannot find URL $url" >&2
+    case "$id" in
+        "")
+            echo "Option --ni: URL or special id is missing'." >&2
             return 1
-        fi
-    else
-        echo "Sorry, id is missing." >&2
+            ;;
+        https://* | http://*)
+            url="$id"
+            ;;
+        *)
+            # use special id
+            url=https://raw.githubusercontent.com/endeavouros-team/sandbox/master/pkg/list  # currently not in gitlab!
+            local data=$(curl -Lsm 10 -o- $url)
+            [ -n "$data" ] || { echo "Option --ni: failed to fetch data." >&2 ; return 1 ; }
+            url=$(echo "$data" | grep "^$id"= | cut -d'=' -f2)
+            [ -n "$url" ] || { echo "Option --ni: URL not found." >&2 ; return 1 ; }
+            ;;
+    esac
+
+    # local EOS_LIVEUSER=$LOGNAME  # TESTING !!!
+
+    if ! curl --fail -Lsm 10 -o/home/$EOS_LIVEUSER/user_commands.bash "$url" ; then
+        echo "Sorry, cannot find URL $url" >&2
         return 1
     fi
     return 0
