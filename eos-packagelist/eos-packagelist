@@ -118,7 +118,7 @@ if __name__ == '__main__':
 
     netinstall_packages = []
     try:
-        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/files" \
+        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
               "/netinstall.yaml"
         with urllib.request.urlopen(url) as netinstall_file:
             netinstall_data = yaml.safe_load(netinstall_file)

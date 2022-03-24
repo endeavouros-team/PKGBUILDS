@@ -1,5 +1,5 @@
 pkgname=eos-packagelist
-pkgver=1.5.1
+pkgver=1.5.2
 pkgrel=1
 pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
 arch=('any')
@@ -10,7 +10,7 @@ source=(
     eos-packagelist
     eos-packagelist.bash-completion
 )
-sha256sums=('9db22c02daf60dae2e870107361a40df51f9f07280e369ba08d49cc7579d0ef8'
+sha256sums=('702a2884aa24c26b0b9cd9afa1d23541a066beaf25ef21b8b26b5f8c222e7bd5'
             '4b13f6ef7af87431157d2a80f856cba2c2d6d1a835cceddc96f2339f528849e7')
 
 package() {
