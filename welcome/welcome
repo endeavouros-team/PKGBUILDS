@@ -384,21 +384,6 @@ ShowChangeResoButton() {
 }
 export -f ShowChangeResoButton
 
-Installer_html_get() { 
-  local local="$1"
-  local remote="$2"
-
-  if [ ! -r "$local" ] ; then
-      if eos-connection-checker ; then
-          mkdir -p "$(dirname "$local")"
-          wget -O "$local" "$remote" 2>/dev/null || return
-      else
-          return
-      fi
-  fi
-  echo "$local"
-}
-
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
@@ -408,7 +393,7 @@ INSTALL() {
   local reflector_simple="$(IconGrasp software-update-available)"
   local bluetooth=$(IconGrasp bluetooth)
   local user_info=info
-  local btdoc="$(Installer_html_get "$HOME/Documents/bluetooth.html" "https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03")"
+  local btdoc="https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03"
   local INSTALLER_BROWSER=firefox
 
   local tabcontents=(
@@ -428,7 +413,7 @@ INSTALL() {
   tabcontents+=(
       --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                  'gparted'
   )
-  if [ -n "$btdoc" ] ; then
+  if eos-connection-checker ; then
       tabcontents+=(
           --field=" $(ltr ins_blue_notes)!$bluetooth!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
       )
