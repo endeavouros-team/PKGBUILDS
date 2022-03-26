@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=calamares_config_ce
-pkgver=22.03.1.16
+pkgver=22.03.1.17
 pkgrel=1
 _repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('bce1f94fe317e57eb4a1c1294ccc3bf4acb86c3fbbdf352e351d4d0066b9bf3cf4889be4e694885ae5e14d7f5595cb1c3896a5bb1e73bba7e3357d473de6ed68')
+sha512sums=('50c915742d745f8d9fe4744c6ccfbf37601835109b43bf79b8cec6030328c01046d48f910b7d97be74c4d6b20b5bcb87bd1ea91eca6ad18608ac594885245a94')
 
 
 _caldir="$pkgname/calamares"
