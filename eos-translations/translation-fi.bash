@@ -318,3 +318,7 @@ _tr_add2 add_more_apps_qstip         "Valitse ja asenna joukosta suosittuja sove
 _tr_add2 ins_blue_notes              "Bluetooth-tietoja"
 _tr_add2 ins_blue_notes_tip          "Tietoja bluetooth:n ottamisesta käyttöön"
 
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Tietoa palomuurista"
+_tr_add2 after_install_fwtip         "Katsaus oletuksena asennettuun palomuuriin"
+

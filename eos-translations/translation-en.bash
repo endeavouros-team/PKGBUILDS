@@ -318,3 +318,7 @@ _tr_add2 add_more_apps_qstip         "Choose popular apps and install them"
 _tr_add2 ins_blue_notes              "Bluetooth notes"
 _tr_add2 ins_blue_notes_tip          "Notes about setting up bluetooth"
 
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Firewall information"
+_tr_add2 after_install_fwtip         "Information about the default firewall"
+
