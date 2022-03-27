@@ -782,14 +782,19 @@ UsefulTips() {
   local tabnum="$2"
   local _and='&#38;'           # '&'
 
-
   local tabcontents+=(
       eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$user_info
       --text="<b>$(ltr useful_tips_text)</b>"
+
       --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=pacman'"
       --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
+  )
+  if [ -x /usr/bin/firewalld ] ; then
+      tabcontents+=(--field=" $(ltr after_install_fw)!$user_info!$(ltr after_install_fwtip)":fbtn "$_WELCOME_BROWSER   'https://discovery.endeavouros.com/news/firewalld/2022/03'")
+  fi
+  tabcontents+=(
       --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
       --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/bluetooth'"
   )
