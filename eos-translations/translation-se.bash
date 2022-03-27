@@ -257,3 +257,6 @@ _tr_add2 daily_assist_DEinfo_tip     "Mer information om denna Skrivbords/Fönst
 
 _tr_add2 ins_blue_notes              "Blåtands anteckningar"
 _tr_add2 ins_blue_notes_tip          "Anteckningar om hur man ställer in blåtand"
+
+_tr_add2 after_install_fw            "Brandväggsinformation"
+_tr_add2 after_install_fwtip         "Information om standardbrandväggen"
