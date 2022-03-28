@@ -313,3 +313,11 @@ _tr_add2 daily_assist_DEinfo_tip     "mehr Informationen über diesen Desktop/Fe
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Wähle beliebte Anwendungen zur Installation aus"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Wähle beliebte Anwendungen und installiere diese"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Hilfe für Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Anleitung zur Bluetooth Nutzung"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Firewall Information"
+_tr_add2 after_install_fwtip         "Information über die installierte Firewall"
