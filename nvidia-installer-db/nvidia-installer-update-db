@@ -20,7 +20,7 @@ LATEST_LEGACY="Latest Legacy GPU version"
 GetNvidiaBranch() {
     local string="$1"
     local series="$2"
-    local result="$(curl -Lsm 10 -o- https://www.nvidia.com/en-us/drivers/unix | sed 's|</a>|</a>\n|g' | grep "$string" | head -n1 | sed 's|.*>\([0-9.]*\)<.*|\1|')"
+    local result="$(curl -Lsm 10 -o- https://www.nvidia.com/en-us/drivers/unix | sed 's|</a>|</a>\n|g' | grep "$string" | head -n1 | sed 's|.*>\([0-9.]*\)[ ]*<.*|\1|')"
 
     test -n "$result" || DIE "$FUNCNAME: fetching branch '$string' failed."
     Debug "$series branch: $result"
