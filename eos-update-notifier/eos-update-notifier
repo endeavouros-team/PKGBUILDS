@@ -660,7 +660,7 @@ Main()
 
     [ -n "$oncalendar" ]   || oncalendar=daily
     [ -n "$onstartupsec" ] || onstartupsec=30sec
-    [ -n "$persistent" ]   || persistent=true
+    [ -n "$persistent" ]   || persistent=false
 
     mkdir -p "$configdir"
 
