@@ -1,10 +1,10 @@
 [Unit]
-Description=Run EOS update notifier periodically
+Description=EOS update notifier runs periodically (weekly) and soon after a reboot
 
 [Timer]
-OnStartupSec=30 seconds
-OnCalendar=daily
-Persistent=true
+OnStartupSec=300 seconds
+OnCalendar=weekly
+# Persistent=true
  
 [Install]
 WantedBy=timers.target
