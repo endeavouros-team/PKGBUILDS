@@ -65,7 +65,11 @@ Installed() {
                 *) ind=" <tt>$km</tt>"
             esac
         fi
-        cmd+=(--field="$(FormatVersion "$version" "$ind")":LBL "")            
+        if IsLatestKO "$version" ; then
+            cmd+=(--field="$(FormatVersion "<b>$version</b>" "$ind")":LBL "")
+        else
+            cmd+=(--field="$(FormatVersion "$version" "$ind")":LBL "")
+        fi
     done
 }
 
@@ -112,10 +116,12 @@ Testing() {
 
 KernelOrgVersion() {
     local type="$1"
+    local count="$2"
+    [ -n "$count" ] || count=1
     local result="$(echo "$kernelorg" | grep -A2 $type: | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
     case "$type" in
         mainline) ;;
-        longterm) result="$(echo "$result" | head -n 1)" ;;
+        longterm) result="$(echo "$result" | head -n $count)" ;;
         *) result="$(echo "$result" | grep -v "[0-9][0-9\.]*-rc")" ;;
     esac
     echo "$result"
@@ -156,6 +162,23 @@ KOVersion() {
         esac
     done
     PaddingLines
+}
+
+IsLatestKO() {
+    local installed_version="$1"
+    local type versions version
+
+    installed_version="$(echo "$installed_version" | sed -e 's|-.*||' -e 's|\.[a-z].*||')"   # skip Arch suffixes
+
+    for type in stable longterm ; do
+        readarray -t versions <<< "$(KernelOrgVersion "$type" 100)"
+        for version in "${versions[@]}" ; do
+            if [ "$installed_version" = "$version" ] ; then
+                return 0
+            fi
+        done
+    done
+    return 1
 }
 
 PaddingLines() {
@@ -384,6 +407,7 @@ Main()
     t1+="    Choose        Checkboxes for installing/uninstalling kernel packages.\n"
     t1+="    PkgName       Kernel package name.\n"
     t1+="    Installed     Installed kernel package versions. A $km marks the currently running kernel.\n"
+    t1+="                  A bolded string means the latest K.o. version.\n"
     t1+="    Stable        Versions available from the stable repos.\n"
     t1+="    Testing       Versions available from the testing repos.\n"
     t1+="    $KOName  Kernel category at kernel.org.\n"
