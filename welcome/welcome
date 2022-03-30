@@ -404,6 +404,7 @@ INSTALL() {
 
       --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                  "eos-install-mode-run-calamares '$lang' ''"
       --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
+      --field=" $(ltr ins_custom)!$system_software_install!$(ltr ins_custom_tip)":fbtn               "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
       --field=" $(ltr after_install_um)!$reflector_simple!$(ltr after_install_umtip)":fbtn           reflector-simple
   )
 
