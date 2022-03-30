@@ -322,3 +322,7 @@ _tr_add2 ins_blue_notes_tip          "Notes about setting up bluetooth"
 _tr_add2 after_install_fw            "Firewall information"
 _tr_add2 after_install_fwtip         "Information about the default firewall"
 
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Customizing the install process"
+_tr_add2 ins_custom_tip              "How to customize the install process"
+
