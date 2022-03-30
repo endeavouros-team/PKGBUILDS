@@ -1,0 +1,34 @@
+# Original Maintainer: Gustau Castells <karasu@antergos.com>
+# Maintainer: @manuel
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+pkgname=nvidia-installer-common
+pkgver=1.0
+pkgrel=1
+pkgdesc="Common scripts for nvidia-installer-dkms and nvidia-inst"
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
+arch=('any')
+license=('GPL2')
+depends=(
+  dkms
+)
+
+optdepends=(
+  'linux-headers: for nvidia-installer-dkms with kernel linux'
+  'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts'
+  'linux-hardened-headers: for nvidia-installer-dkms with kernel linux-hardened'
+  'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
+)
+
+source=(
+  $_url/nvidia-installer-kernel-para
+  $_url/nvidia-driver-supported-branches
+)
+sha512sums=('98ceb7fb204bb9fef77af8e306c8e97c1f324372d2d2019295c52b0eb4357314e8af2ea7caa487b68d9907014ea70ab6edafa098cd9155fc71f11def3c8aa8b9'
+            '1612e5281c5f677f8637f7d2a13c14a4bec0fa42e2ad8f080c7f64ba0d1ef2c90e90e8f11024cc71ba4483da0e5cbb2c12684c25993d119ac0cf759853039edb')
+
+package() {
+  install -Dm755 nvidia-installer-kernel-para     $pkgdir/usr/bin/nvidia-installer-kernel-para
+  install -Dm755 nvidia-driver-supported-branches $pkgdir/usr/bin/nvidia-driver-supported-branches
+}

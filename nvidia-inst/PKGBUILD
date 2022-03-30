@@ -1,0 +1,32 @@
+# Original Maintainer: Gustau Castells <karasu@antergos.com>
+# Maintainer: manuel at endeavouros.com
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+pkgname=nvidia-inst
+pkgver=1.0
+pkgrel=1
+pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
+arch=('any')
+license=('GPL2')
+depends=(
+  nvidia-installer-common
+  dkms
+)
+
+optdepends=(
+  'linux-headers: for nvidia-installer-dkms with kernel linux'
+  'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts'
+  'linux-hardened-headers: for nvidia-installer-dkms with kernel linux-hardened'
+  'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
+)
+
+source=(
+  $_url/$pkgname
+)
+sha512sums=('3ec6f095076a825af875b16e7e6e1b21d7cfcd63e939592bc92f699d22ef2bc59b3e2e2fbe1b04f5eb808c7e164bd922f7c436aca029452bf95a00d7f2f19306')
+
+package() {
+  install -Dm755 $pkgname                         $pkgdir/usr/bin/$pkgname
+}
