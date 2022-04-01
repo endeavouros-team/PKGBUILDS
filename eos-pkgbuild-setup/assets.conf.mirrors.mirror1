@@ -70,6 +70,8 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/ly
     aur/mkinitcpio-openswap
     nvidia-hook
+    nvidia-inst
+    nvidia-installer-common
     nvidia-installer-db
     nvidia-installer-dkms
     pahis

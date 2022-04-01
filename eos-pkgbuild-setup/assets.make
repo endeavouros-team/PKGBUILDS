@@ -1368,6 +1368,8 @@ Main() {
     test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
     test -n "$PROGNAME" || PROGNAME="assets.make"
     test -r $ASSETS_CONF || DIE "file './$ASSETS_CONF' does not exist in $PWD."
+    [ -L $ASSETS_CONF ] || DIE "$PWD/$ASSETS_CONF must be a symlink to the real $ASSETS_CONF!"
+    [ -L .git ] || DIE "$PWD/.git must be a symlink to the real .git!"
 
     local reponame="$(AssetsConfLocalVal REPONAME)"
     local signer="$(  AssetsConfLocalVal SIGNER)"
