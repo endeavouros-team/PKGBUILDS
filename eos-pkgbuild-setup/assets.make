@@ -1365,11 +1365,11 @@ Main() {
     local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
     local PROGNAME="$(basename "$0")"
 
-    test "$PROGNAME" = "bashdb" && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
-    test -n "$PROGNAME" || PROGNAME="assets.make"
-    test -r $ASSETS_CONF || DIE "file './$ASSETS_CONF' does not exist in $PWD."
-    [ -L $ASSETS_CONF ] || DIE "$PWD/$ASSETS_CONF must be a symlink to the real $ASSETS_CONF!"
+    [ "$PROGNAME" = "bashdb" ] && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
+    [ -n "$PROGNAME" ] || PROGNAME="assets.make"
     [ -L .git ] || DIE "$PWD/.git must be a symlink to the real .git!"
+    [ -r $ASSETS_CONF ] || DIE "file './$ASSETS_CONF' does not exist in $PWD."
+    # [ -L $ASSETS_CONF ] || DIE "$PWD/$ASSETS_CONF must be a symlink to the real $ASSETS_CONF!"
 
     local reponame="$(AssetsConfLocalVal REPONAME)"
     local signer="$(  AssetsConfLocalVal SIGNER)"
