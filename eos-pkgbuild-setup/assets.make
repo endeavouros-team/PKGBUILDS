@@ -905,7 +905,7 @@ Main2()
                 continue
             fi
             ((total_items_to_build++))
-            echo2 "$tmpcurr ==> $tmp"
+            echo2 "CHANGED $tmpcurr ==> $tmp"
             if [ $cmpresult -gt 0 ] ; then
                 WantAurDiffs "$xx" "$pkgdirname"
             fi
