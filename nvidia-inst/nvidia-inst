@@ -346,7 +346,7 @@ AllRemovables() {
         xf86-video-nouveau
 
         # nvidia packages from repos:
-        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-installer|-cg-|beta')
+        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-cg-|beta')
     )
 
     # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
