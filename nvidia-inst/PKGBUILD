@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-inst
-pkgver=1.0.1
+pkgver=1.0.2
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -16,17 +16,20 @@ depends=(
 )
 
 optdepends=(
-  'linux-headers: for nvidia-installer-dkms with kernel linux'
-  'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts'
-  'linux-hardened-headers: for nvidia-installer-dkms with kernel linux-hardened'
-  'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
+  "linux-headers: for $pkgname with kernel linux"
+  "linux-lts-headers: for $pkgname with kernel linux-lts"
+  "linux-hardened-headers: for $pkgname with kernel linux-hardened"
+  "linux-zen-headers: for $pkgname with kernel linux-zen"
 )
 
 source=(
   $_url/$pkgname
+  $_url/$pkgname.bash-completion
 )
-sha512sums=('184b4663bbf44fa2fe514968e3532a5c873ade5d081709e97d9945cbc21eb99d22a0496438833f2b1b7d0b329a9b62e465b1518701b262ecaf2335207ff93f80')
+sha512sums=('c302d8785107631c4fa1eed02da82a4abc65d29ee6688ee5b2e607d51260bf3d5a00e57412368072fb92fac6ff68e5a5175a46db06bcb79e210678c16cb579f6'
+            'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6')
 
 package() {
   install -Dm755 $pkgname                         $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.bash-completion         $pkgdir/usr/share/bash-completion/completions/$pkgname
 }

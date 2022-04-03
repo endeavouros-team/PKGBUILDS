@@ -1,0 +1,46 @@
+# bash completion for nvidia-inst        -*- shell-script -*-
+
+_nvidia-inst_complete() {
+    local IFS=$'\n'         # handles spaces in names!
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o filenames    # handles spaces in names!
+    compopt -o nosort
+}
+
+_make_as_lines() {
+    printf "%s\n" "$@"
+}
+
+_nvidia_list_opts()   { _make_as_lines $(nvidia-inst --listopts) ; }
+_nvidia_list_series() { _make_as_lines $(nvidia-inst --listseries) ; }
+
+_nvidia-inst_() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    # Handle options that need sub-options.
+
+    case "$prev" in
+        --series)
+            _nvidia-inst_complete "$(_nvidia_list_series)"
+            ;;
+        *)
+            # Handle all top-level parameters.
+            _nvidia-inst_complete "$(_nvidia_list_opts)"
+
+            #case "$cur" in
+            #    -*)
+            #        # Any option.
+            #        _nvidia-inst_complete "$(_nvidia_list_opts)"
+            #        ;;
+            #    *)
+            #        # Non-option parameters.
+            #        _nvidia-inst_complete "$(_nvidia_list_opts)"
+            #        ;;
+            #esac
+            ;;
+    esac
+} &&
+complete -F _nvidia-inst_ nvidia-inst

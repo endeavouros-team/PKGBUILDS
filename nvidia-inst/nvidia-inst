@@ -240,11 +240,39 @@ ShowCommandsToRun() {
     return 0
 }
 
+SeparateShortOpts() {
+    local opts="$1"
+    if [ -n "$opts" ] ; then
+        opts=$(echo "$opts" | sed -e 's|:|=|g' -e 's|\([a-zA-Z]\)| -\1|g')
+        opts="${opts:1}"
+    fi
+    echo "$opts"
+}
+
+SeparateLongOpts() {
+    local opts="$1"
+    if [ -n "$opts" ] ; then
+        opts=$(echo "$opts" | sed -e 's|:||g' -e 's|,| --|g')
+        opts="--$opts"
+    fi
+    echo "$opts"
+}
+
+ListOptions() {
+    local sopts="$1"
+    local lopts="$2"
+
+    sopts=$(SeparateShortOpts "$sopts")
+    lopts=$(SeparateLongOpts "$lopts")
+    echo "$lopts $sopts"
+}
+
 Options() {
     local opts
-    local lopts="help,bumblebee,force,test,quiet,nouveau,prime,conf,32,drivers,series:,ignore,legacyrepo,version"
+    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries,nouveau,prime,quiet,series:,test,version"
+    local sopts="bfhnpqtv"
 
-    opts="$(/usr/bin/getopt -o=chibfnpqtv --longoptions $lopts --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -259,16 +287,22 @@ Options() {
             -f | --force)     force=yes ;;
             -q | --quiet)     quiet=yes ;;
             -t | --test)      test=yes ;;
-            -c | --conf)      create_conf=yes ;;
-            -i | --ignore)    ignore_errors=yes ;;
+            --conf)           create_conf=yes ;;
+            --ignore)         ignore_errors=yes ;;
             --legacyrepo)     Setup3rdPartyRepo ;;
             --32)             bit32=yes ;;
             --series)         series="$2" ; shift ;;
+            --listopts)       ListOptions "$sopts" "$lopts" ; exit 0 ;;
+            --listseries)     echo "$series_now $series_prev1 $series_prev2" ; exit 0 ;;
             --drivers)
                 nvidia-driver-supported-branches -a
                 exit 0
                 ;;
-            -v | --version)   echo "$progname $PROGVERSION" ; exit 0 ;;
+            -v | --version)
+                [ -n "$PROGVERSION" ] || PROGVERSION=$(pacman -Q "$progname" | awk '{print $2}')
+                echo "$progname $PROGVERSION"
+                exit 0
+                ;;
             -h | --help)
                 cat <<EOF >&2
 
@@ -280,20 +314,22 @@ $progname - help installing Nvidia graphics drivers
 
 Usage: $progname [options]
 Options:
+  -h, --help              This help.
   -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards.
   -f, --force             Force driver installation even if a nvidia card is not detected.
   -n, --nouveau           Install nouveau driver (open source).
   -p, --prime             Install also prime render offload.
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
-  -c, --conf              Create also file $conf_file (might be needed on some systems).
-  -i, --ignore            Ignore all errors (useful for testing only).
   -v, --version           Show version of this software.
-  --legacyrepo            Add a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
   --32                    Install also support for 32-bit apps.
+  --conf                  Create also file $conf_file (might be needed on some systems).
   --drivers               Show supported NVIDIA driver series for your card.
-  --series                (Advanced) Use this series for testing.
-  -h, --help              This help.
+  --ignore                Ignore all errors (useful for testing only).
+  --legacyrepo            Add a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
+  --listopts              List options supported by $progname.
+  --listseries            List Nvidia driver versions supported by $progname.
+  --series                (Advanced) Use the given Nvidia driver version (for testing).
 EOF
                 exit 0
                 ;;
@@ -432,7 +468,6 @@ Main()
 
     local progname=nvidia-inst
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
     local bumblebee=no
@@ -446,22 +481,20 @@ Main()
     local ignore_errors=no
     local series=""
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
-    local all_installed_packages="$(pacman -Qsq)"
-
-    local PROGVERSION=$(pacman -Q "$progname" | awk '{print $2}')
-
-    SanityChecks
-
+    local PROGVERSION=""
     local pr_nvidia=()
-
     local p_nvidia=""
     local p_nvidia32=""
-
     local install=()
     local remove=()
     local aurs=()        # collect needed AUR packages in this array
-
     local cmd=""
+
+    Options "$@"
+
+    SanityChecks
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local all_installed_packages="$(pacman -Qsq)"
 
     local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
     if [ "$latest_from_arch" != "$series_now" ] ; then
@@ -470,8 +503,7 @@ Main()
 
     AllRemovables
 
-    Options "$@"
-
+    [ -n "$PROGVERSION" ] || PROGVERSION=$(pacman -Q "$progname" | awk '{print $2}')
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
     Info "Selected mode: $mode"
