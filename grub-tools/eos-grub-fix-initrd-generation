@@ -24,6 +24,23 @@ _die() {
     exit 1
 }
 
+_check_bashisms() {
+    # checkbashisms wrongly reports quoting problems in file /usr/lib/linux-boot-probes/mounted/40grub2,
+    # hence remove stderr output here.
+
+    local file="$1"
+    local errfile=/tmp/check_bashisms.tmp
+
+    if ! checkbashisms $file 2> "$errfile" ; then
+        if [ -z "$(grep "Unterminated quoted string found" "$errfile")" ] ; then
+            printf "\n===> Error detected:\n" >&2
+            cat "$errfile" >&2
+        fi
+        _die "$file: 'checkbashisms' found bashisms."
+    fi
+    rm -f "$errfile"
+}
+
 _check_file_existence() {
     local file="$1"
     local pkg="$2"
@@ -67,9 +84,12 @@ _show_result() {
 _grub_mod1() {
     local file=/etc/grub.d/30_os-prober  # from package 'grub'
     _backup $file grub
+
     sed -i $file \
         -e "s|\(echo \${LINUX} \| cut -d ':' -f 5\)\`|\1 \| tr '^' ' '\`|" \
         -e 's|LINITRD="${LINITRD#/boot}"$|LINITRD=$(echo "$LINITRD" \| sed -e "s\|/boot/\|/\|g")|'  # remove /boot
+
+    _check_bashisms $file
     _show_result $file
 }
 
@@ -80,6 +100,7 @@ _grub_mod2() {
         -e "s|s, with Linux |s, on |" \
         -e 's|"Loading Linux |"Loading kernel |' \
         -e 's|^  OS="${GRUB_DISTRIBUTOR} Linux"$|  OS="${GRUB_DISTRIBUTOR}"|'
+    _check_bashisms $file
     _show_result $file
 }
 
@@ -150,6 +171,7 @@ _os_prober_mod() {
 
         sed -i $file -e "$c1" -e "$c2"
 
+        _check_bashisms $file
         _show_result $file
     fi
 }
