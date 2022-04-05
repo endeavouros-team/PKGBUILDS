@@ -3,10 +3,10 @@
 pkgname=grub-tools
 pkgdesc="Fixes, additions and enhancements to grub and os-prober."
 pkgver=1.6.9
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
-depends=(grub lsb-release)
+depends=(grub lsb-release checkbashisms)
 optdepends=(os-prober)
 
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
