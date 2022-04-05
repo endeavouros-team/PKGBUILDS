@@ -30,8 +30,11 @@ _check_bashisms() {
 
     local file="$1"
     local errfile=/tmp/check_bashisms.tmp
+    local retcode=0
 
-    if ! checkbashisms $file 2> "$errfile" ; then
+    LANG=C checkbashisms $file 2> "$errfile" || retcode=$?
+
+    if [ $retcode -ne 0 ] ; then
         if [ -z "$(grep "Unterminated quoted string found" "$errfile")" ] ; then
             printf "\n===> Error detected:\n" >&2
             cat "$errfile" >&2
