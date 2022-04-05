@@ -793,7 +793,7 @@ UsefulTips() {
       --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
   )
   if [ -x /usr/bin/firewalld ] ; then
-      tabcontents+=(--field=" $(ltr after_install_fw)!$user_info!$(ltr after_install_fwtip)":fbtn "$_WELCOME_BROWSER   'https://discovery.endeavouros.com/news/firewalld/2022/03'")
+      tabcontents+=(--field=" $(ltr after_install_fw)!$user_info!$(ltr after_install_fwtip)":fbtn "$_WELCOME_BROWSER   'https://discovery.endeavouros.com/applications/firewalld/2022/03'")
   fi
   tabcontents+=(
       --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
