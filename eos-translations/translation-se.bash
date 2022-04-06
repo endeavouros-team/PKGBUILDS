@@ -260,3 +260,6 @@ _tr_add2 ins_blue_notes_tip          "Anteckningar om hur man ställer in blåta
 
 _tr_add2 after_install_fw            "Brandväggsinformation"
 _tr_add2 after_install_fwtip         "Information om standardbrandväggen"
+
+_tr_add2 ins_custom                  "Anpassa installationsprocessen"
+_tr_add2 ins_custom_tip              "Hur man anpssar installationsprocessen"
