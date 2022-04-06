@@ -90,6 +90,11 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/zfs-utils
 )
 
+# Add packages in PKGNAMES here if they shouldn't be built for now.
+local PKGNAMES_WAIT=(
+    arc-gtk-theme-eos
+)
+
 declare -A PKG_MAKEPKG_OPTIONS
 
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"

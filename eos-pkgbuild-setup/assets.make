@@ -770,6 +770,18 @@ EOF
     test -n "$1" && exit "$1"
 }
 
+IsInWaitList() {
+    local pkg="$1"
+    if [ -n "$PKGNAMES_WAIT" ] ; then
+        for xx in "${PKGNAMES_WAIT[@]}" ; do
+            if [ "$xx" = "$pkg" ] ; then
+                return 0
+            fi
+        done
+    fi
+    return 1
+}
+
 Main2()
 {
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
@@ -904,6 +916,11 @@ Main2()
                 echo2 "OK ($tmpcurr)"
                 continue
             fi
+            if IsInWaitList "$xx" ; then
+                echo2 "WAIT $tmpcurr ==> $tmp"
+                continue
+            fi
+            
             ((total_items_to_build++))
             echo2 "CHANGED $tmpcurr ==> $tmp"
             if [ $cmpresult -gt 0 ] ; then
@@ -951,6 +968,10 @@ Main2()
             # See if we have to build.
             [ "$cmpresult" -eq 0 ] && continue
             if [ "$cmpresult" -lt 0 ] && [ "$allow_downgrade" = "no" ] ; then
+                continue
+            fi
+            if IsInWaitList "$xx" ; then
+                echo2 "==> $xx is in the wait list, skipping build."
                 continue
             fi
 
