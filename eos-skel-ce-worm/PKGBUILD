@@ -19,7 +19,8 @@ package() {
     cd "$_pkgname"
     mkdir -p "${pkgdir}${PREFIX}/.config/"
     chmod +x .config/worm/rc
-    chmod +x .config/sxhkd/sxhkdrc
+    chmod +x .config/sxhkd/sxhkdrc          
     install -Dm644 ".Xresources" "${pkgdir}${PREFIX}/.Xresources"
+    install -Dm644 ".dmrc" "${pkgdir}${PREFIX}/.dmrc"
     cp -R ".config/" "${pkgdir}${PREFIX}/"
 }
