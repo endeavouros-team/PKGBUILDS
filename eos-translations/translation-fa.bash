@@ -284,3 +284,16 @@ _tr_add2 after_install_r8168_tip     ‌‌‌‌‌‌‌"جابجایی بین
 
 _tr_add2 daily_assist_DEinfo         "اخبار و اطلاعات"
 _tr_add2 daily_assist_DEinfo_tip     "اطلاعات بیشتر درباره این دسکتاپ/مدیر پنجره"
+
+# 2022 Update
+_tr_add2 add_more_apps_qs            "انتخاب برنامه‌های متداول برای نصب"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "برنامه‌های متداول را انتخاب و نصب کنید"
+
+_tr_add2 ins_blue_notes              "نکاتی درباره بلوتوث"
+_tr_add2 ins_blue_notes_tip          "نکاتی درباره راه‌اندازی بلوتوث"
+
+_tr_add2 after_install_fw            "اطلاعات فایروال"
+_tr_add2 after_install_fwtip         "اطلاعات درباره فایروال پیشفرض"
+
+_tr_add2 ins_custom                  "سفارشی ساختن پروسه نصب"
+_tr_add2 ins_custom_tip              "طریقه سفارشی سازی فرایند نصب"
