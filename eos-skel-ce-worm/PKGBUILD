@@ -4,7 +4,7 @@
 _pkgname=worm
 pkgname=eos-skel-ce-worm
 pkgver=1.0
-pkgrel=6
+pkgrel=7
 pkgdesc="pre user creation skel setup for worm EOS-CE"
 arch=('any')
 groups=('eos-ce')
@@ -21,5 +21,6 @@ package() {
     chmod +x .config/worm/rc
     chmod +x .config/sxhkd/sxhkdrc
     install -Dm644 ".Xresources" "${pkgdir}${PREFIX}/.Xresources"
+    install -Dm644 ".dmrc" "${pkgdir}${PREFIX}/.dmrc"
     cp -R ".config/" "${pkgdir}${PREFIX}/"
 }
