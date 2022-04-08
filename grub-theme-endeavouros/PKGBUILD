@@ -2,14 +2,13 @@
 # Original Source: https://github.com/Se7endAY/grub2-theme-vimix
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=grub2-theme-endeavouros
-pkgver=20211129
+pkgver=20220408
 pkgrel=1
 pkgdesc='EndeavourOS grub2 theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'
 license=('GPL3')
 depends=('grub')
-optdepends=('grub-customizer: GUI tool to configure grub')
 replaces=('vimix-grub' 'grub-theme-vimix' 'grub-themes-vimix')
 makedepends=('git')
 source=('git+https://github.com/endeavouros-team/grub2-theme-endeavouros')
