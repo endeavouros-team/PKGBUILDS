@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.10.37
+pkgver=1.10.38
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -19,10 +19,11 @@ depends=(
   xdg-utils             # for eos-pkginfo
 )
 optdepends=(
-  "neofetch: for additional DE detection"
-#  "yay:      an AUR helper supported by eos-pkginfo"
-#  "paru:     an AUR helper supported by eos-pkginfo"
-  "kde-gtk-config: to remove gtk related yad warnings"
+    "wgetpaste-eos: needed when wgetpaste is selected in eos-sendlog.conf"
+    "neofetch: for additional DE detection"
+    #  "yay:      an AUR helper supported by eos-pkginfo"
+    #  "paru:     an AUR helper supported by eos-pkginfo"
+    "kde-gtk-config: to remove gtk related yad warnings"
 )
 
 backup=(
@@ -86,8 +87,8 @@ sha512sums=('eea16d1b8efa39fa1ee72c336fd8a6254ac918c142087510eb94e8e84d374540211
             '5a8a897623c31124f314c6b807a70f6404aa3974e64a6cd78dae697496ad9423018dbe9415457990f40675b1f7cf29c0cdcca6136e2aa25aa10637649f8347bd'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
-            '6f697fdc8092d0e834232bb81e166930328c6eb8ec6adadf08fa59ea041c88e379158288fc8f5b0edfeaeb869bc67402ad08e1e2f99235b014bf32badb55d604'
-            '9bfc50c61ea4fe81cf4fb65226894b7468743e24ba03cf8593d84ec089e6e4e53dd736495a4823022c3624a0653068ef7361a5ac6dddf8dca09a0a6e8ada1240'
+            '5ddf86c682c028f8f36f1617832306561c4b1fcc6855d44d2fec17ba21283c3be973c8e12bda137c13c664c3e00d804d661a8cc9525169e1cc16d00f174185d6'
+            '4ff541fee2c0b9b1bb21ae307988458cfc2bae183a9c7b49b2f8c90c5e5099b9caaeb57b44db2525ee322d9ec2285742fef9feaa791dd1dc45b6897de26138f6'
             '5e7daaf9f13785958ab944a0a3254f658cd485462a0921da850c73e87db548567c6c2b3068893b905ff318910e534459f3440faebca06b49c5da5b4efd42a308'
             '77eba34090f4327caa01e584153bf7f319c7957f959917ffc26032aa06a2f6fde20a556324a099945f28bfa19cf37e68d9bc8fa67614fdc7563c27412e87d953'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'

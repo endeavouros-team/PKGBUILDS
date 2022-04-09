@@ -39,13 +39,22 @@ EOF
 }
 
 SendToNet() {
-    url=$(curl -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+    case "$EOS_SENDLOG_URI" in
+        wgetpaste)
+            [ -x /usr/bin/wgetpaste ] || DIE "wgetpaste is not installed!"
+            url=$(wgetpaste $WGETPASTE_OPTIONS 2>/dev/null)
+            ;;
+        *)
+            url=$(curl -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+            ;;
+    esac
 }
 
 Init() {
     local ix
 
     [ -r $configfile ] && source $configfile
+    [ -z "$WGETPASTE_OPTIONS" ] && WGETPASTE_OPTIONS="--nick nobody"
 
     for ((ix=0; ix < ${#supported_uris[@]}; ix++)) ; do
         if [ "$EOS_SENDLOG_URI" = "${supported_uris[$ix]}" ] ; then
@@ -65,14 +74,17 @@ Main() {
     # from config file (if values are set, they must be correct!):
     local EOS_SENDLOG_URI=""
     local EOS_SENDLOG_FORM=""
+    local WGETPASTE_OPTIONS=""
 
     local supported_uris=(
         "http://ix.io"
         "https://clbin.com"
+        "wgetpaste"           # use another program!
     )
     local supported_forms=(
         "f:1"
         "clbin"
+        ""
     )
     local default_ix=1      # was 0
 
