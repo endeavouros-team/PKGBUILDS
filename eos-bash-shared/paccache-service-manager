@@ -40,8 +40,11 @@ GetCurrentValues() {
 
     # ad hoc check for the 'keepcount' value
     case "$current_keepcount" in
-        -r)   current_keepcount=3 ;;                  # original value
-        -rk*) current_keepcount="${current_keepcount:3}" ;;   # value after using this app
+        -r) current_keepcount=3 ;;                        # original value
+        -rk*)
+            current_keepcount="${current_keepcount:3}"    # value after using this app
+            [ -z "$current_keepcount" ] && DIE "file '$s': paccache option 'k' requires an argument."
+            ;;
         *) DIE "sorry, variable 'keepcount' has value '$current_keepcount' from file '$service', cannot parse it." --width=800 ;;
     esac
 }
@@ -131,7 +134,9 @@ _paccache_cleaner_manager()
         if [ ! -r $service ] ; then
             cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
         fi
+        # allow ExecStart line with both /usr/bin/paccache or just paccache
         cmds+=" ; sed -i $service -e 's|^ExecStart=paccache .*$|ExecStart=$cmd_period|'"
+        cmds+=" ; sed -i $service -e 's|^ExecStart=/usr/bin/paccache .*$|ExecStart=$cmd_period|'"
         cmds+=" ; sed -i $timer -e 's|^OnCalendar=.*$|OnCalendar=$period|'"
         cmds+=" ; systemctl enable $pt"
         cmds+=" ; systemctl start $pt"
