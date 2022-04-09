@@ -4,7 +4,7 @@
 _pkgname=worm
 pkgname=eos-skel-ce-worm
 pkgver=1.0
-pkgrel=8
+pkgrel=9
 pkgdesc="pre user creation skel setup for worm EOS-CE"
 arch=('any')
 groups=('eos-ce')
