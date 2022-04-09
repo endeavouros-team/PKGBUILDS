@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+# Latest 'wgetpaste' release with a change to use https instead of http on '0x0' and 'dpaste'.
+
+_orig_pkgname=wgetpaste
+
+
+_wgetpaste-eos_prepare() {
+
+    curl -Lsm 10 -o $_orig_pkgname.changelog \
+         https://github.com/archlinux/svntogit-community/raw/packages/$_orig_pkgname/trunk/$_orig_pkgname.changelog || exit 1
+    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$_orig_pkgname/trunk/PKGBUILD || exit 1
+    if [ -n "$(grep "^prepare(" PKGBUILD.orig)" ] ; then
+        echo "$FUNCNAME: error: upstream '$_orig_pkgname' PKGBUILD already has function 'prepare'!!" >&2
+        exit 1
+    fi
+
+    sed -i PKGBUILD.orig \
+        -e "s|\$pkgname|${_orig_pkgname}|g" \
+        -e "s|\${pkgname}|${_orig_pkgname}|g" \
+        -e "/\/licenses\//a \  \n# cleanup\n  cd '../..'\n  rm -f ${_orig_pkgname}-*.tar.xz* ${_orig_pkgname}.example"
+    source PKGBUILD.orig
+    rm -f PKGBUILD.orig
+
+    pkgname=${_orig_pkgname}-eos
+
+    # Show our web page:
+    url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+
+    # Take care of conflicting packages:
+    conflicts=($_orig_pkgname)
+    provides=($_orig_pkgname)
+
+    prepare() {
+        cd "${_orig_pkgname}-$pkgver"
+        # Add the http-to-https modifications:
+        sed -i ${_orig_pkgname} -e 's|http:\(//0x0\.st\)|https:\1|' -e 's|http:\(//dpaste\.com\)|https:\1|'
+    }
+}
+
+_wgetpaste-eos_prepare
+unset -f _wgetpaste-eos_prepare
