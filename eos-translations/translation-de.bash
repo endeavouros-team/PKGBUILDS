@@ -321,3 +321,7 @@ _tr_add2 ins_blue_notes_tip          "Anleitung zur Bluetooth Nutzung"
 # 2022-Mar-27
 _tr_add2 after_install_fw            "Firewall Information"
 _tr_add2 after_install_fwtip         "Information über die installierte Firewall"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Anpassen des Installationsprozesses"
+_tr_add2 ins_custom_tip              "Möglichkeiten die Installation erweitert anzupassen"
