@@ -127,11 +127,11 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) para Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME novamente, abra um terminal e execute:\n<tt>   $PROGNAME --enable</tt>\n"  # slightly changed 2021-Dec-21
+_tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME novamente, abra um terminal e execute:\n<tt>   $PROGNAME --enable</tt>\nor\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
 _tr_add2 settings_dis_text       "Reativar o $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Como voltar a ativar o $PRETTY_PROGNAME"
-_tr_add2 settings_dis_butt       "Lembro-me"
-_tr_add2 settings_dis_buttip     "Prometo"
+_tr_add2 settings_dis_butt       "Eu lembro-me"
+_tr_add2 settings_dis_buttip     "Eu prometo"
 
 _tr_add2 help_butt_title         "Ajuda do $PRETTY_PROGNAME"
 _tr_add2 help_butt_text          "Mais informação sobre a aplicação $PRETTY_PROGNAME"
@@ -313,4 +313,16 @@ _tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente grá
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Escolha aplicações populares e instale-as"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Notas do Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Notas sobre a configuração do bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Informação da Firewall"
+_tr_add2 after_install_fwtip         "Informação sobre a firewall predefinida"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Personalização do processo de instalação"
+_tr_add2 ins_custom_tip              "Como personalizar o processo de instalação"
 
