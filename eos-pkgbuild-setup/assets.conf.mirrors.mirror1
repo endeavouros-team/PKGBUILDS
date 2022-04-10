@@ -83,6 +83,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     reflector-simple
     aur/worm
     welcome
+    wgetpaste-eos
     yad-eos
     aur/yay
 
@@ -92,7 +93,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
 local PKGNAMES_WAIT=(
-    arc-gtk-theme-eos
+    #arc-gtk-theme-eos
 )
 
 declare -A PKG_MAKEPKG_OPTIONS
