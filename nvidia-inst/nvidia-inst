@@ -349,13 +349,14 @@ Setup3rdPartyRepo() {
 
         local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
 
-        cat <<EOF > "$tmpfile"
+        cat $pacmanconf > "$tmpfile" 
+        cat <<EOF >> "$tmpfile"
 
 [kernel-lts]
 SigLevel = Required
 Server = https://repo.m2x.dev/current/\$repo/\$arch
 EOF
-        local cmds="cat $tmpfile >> $pacmanconf"
+        local cmds="cp '$tmpfile' $pacmanconf"
         local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
         local result="$(pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key)"
         if [ -z "$result" ] ; then
@@ -363,9 +364,11 @@ EOF
             cmds+="; pacman-key --lsign-key $jonathon_key"
             cmds+="; pacman -Syu"
         fi
+
         $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
-        rm -f $tmpfile
+
         Info "Repository [kernel-lts] was added to $pacmanconf."
+        rm -f "$tmpfile"
     else
         Info "[kernel-lts] is already set up in $pacmanconf."
     fi
@@ -490,10 +493,11 @@ Main()
     local aurs=()        # collect needed AUR packages in this array
     local cmd=""
 
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
     Options "$@"
 
     SanityChecks
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     local all_installed_packages="$(pacman -Qsq)"
 
     local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
