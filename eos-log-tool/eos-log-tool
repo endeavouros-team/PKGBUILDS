@@ -277,7 +277,7 @@ Main()
     local xx
     local helptext=""
 
-    helptext+="Selecting any of the boxes below (except the last two) will add\n"
+    helptext+="Selecting any of the boxes below (except the first two) will add\n"
     helptext+="that particular log to a common log file <b>$FILE_OF_LOGS2</b>.\n"
     helptext+="Once you have selected the desired boxes, including $slbut,\n"
     helptext+="click the OK button and you will receive a URL that tells "
@@ -288,10 +288,16 @@ Main()
     helptext+="Note4: A list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
 
     local log_tool_cmd=(
-        eos_yad --list --checklist --text="$helptext" --height=620
+        eos_yad --list --checklist --text="$helptext" --height=620 --grid-lines=both
         --image=dialog-question --title="EndeavourOS log tools"
         --no-click --multiple
         --column=Select --column="Item!Command / File / Action" --column="Description"
+    )
+
+    log_tool_cmd+=(
+        false "$slbut"      "$sltip"
+        true  "$rdbut"      "$rdtip"
+
         true  "$journal0"   "Journal from the most recent boot"
         false "$journal1"   "Journal from the second most recent boot"
         false "$journal2"   "Journal from the third most recent boot"
@@ -309,8 +315,14 @@ Main()
         false "$install"    "$install"
         false "$xsession"   "X session errors"
         false "$Xorg"       "Xorg log"
-        false "$lightdm"    "Display manager log"
-        false "$lightdm2"   "Display manager log, X server related"
+    )
+    if IsInstalled lightdm ; then
+        log_tool_cmd+=(
+            false "$lightdm"    "Display manager log"
+            false "$lightdm2"   "Display manager log, X server related"
+        )
+    fi
+    log_tool_cmd+=(
         false "$fstab"      "Static information about the filesystem"
         false "$lsblk"      "List information about disks, partitions, labels, uuids, ..."
         false "$fdisk"      "Another list of disk and partition information"
@@ -319,8 +331,6 @@ Main()
     log_tool_cmd+=(
         true  "$pacmanconf" "Pacman package manager configuration file"
         true  "$foreigns"   "List foreign packages"
-        true  "$rdbut"      "$rdtip"
-        false "$slbut"      "$sltip"
     )
 
     local result=$("${log_tool_cmd[@]}")
