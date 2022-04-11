@@ -187,7 +187,7 @@ RemovePersonalData() {
 
     # User may create an additional filter for removing
     # any remaining personal data from the logs.
-    local filter="$DIR_OF_CONFIG"/eos-log-tool-filter.bash
+    local filter="$DIR_OF_CONFIG"/${progname}-filter.bash
     if [ -r "$filter" ] ; then
         # $filter refers to user's own bash script
         # $FILE_OF_LOGS is the file containing all gathered logs
@@ -221,17 +221,25 @@ ForeignInfo() {
 
 Main()
 {
+    local progname=eos-log-tool
+
     case "$1" in
         --changelog)
-            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/eos-log-tool)
+            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)
             return
             ;;
     esac
-    local FILE_OF_LOGS=$HOME/eos-log-tool.logs
-    local FILE_OF_LOGS2='$HOME/eos-log-tool.logs'
-    local DIR_OF_CONFIG="$HOME/.config/eos-log-tool"
-    local DIR_OF_CONFIG2='$HOME/.config/eos-log-tool'
+    local FILE_OF_LOGS=$HOME/$progname.logs
+    local FILE_OF_LOGS2="\$HOME/$progname.logs"
+    local DIR_OF_CONFIG="$HOME/.config/$progname"
+    local DIR_OF_CONFIG2="\$HOME/.config/$progname"
     local SUDO_CMDS=":"
+
+    local EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
+
+    if [ -r /etc/$progname.conf ] ; then
+        source /etc/$progname.conf    # may change option values, e.g. for EOS_LOG_TOOL_JOURNAL_OPTS
+    fi
 
     mkdir -p "$DIR_OF_CONFIG"
 
@@ -243,6 +251,7 @@ Main()
     local journal0="journalctl -b -0"
     local journal1="journalctl -b -1"
     local journal2="journalctl -b -2"
+    local journalany="journalctl $EOS_LOG_TOOL_JOURNAL_OPTS"
     local xsession="~/.xsession-errors"
     local Xorg="/var/log/Xorg.0.log"
     local lightdm="/var/log/lightdm/lightdm.log"
@@ -286,6 +295,7 @@ Main()
         true  "$journal0"   "Journal from the most recent boot"
         false "$journal1"   "Journal from the second most recent boot"
         false "$journal2"   "Journal from the third most recent boot"
+        false "$journalany" "Journal by a user defined value in file <tt>/etc/$progname.conf</tt>"
         false "$blame"      "Time that running units took to initialize"
         false "$lspci"      "Information related to PCI devices"
         false "$lsusb"      "Information related to USB devices"
@@ -325,6 +335,7 @@ Main()
             "$journal0") Cmd pkexec $xx ;;
             "$journal1") Cmd pkexec $xx ;;
             "$journal2") Cmd pkexec $xx ;;
+            "$journalany") Cmd pkexec $xx ;;
             "$fdisk")    Cmd pkexec $xx ;;
             "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
             "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;

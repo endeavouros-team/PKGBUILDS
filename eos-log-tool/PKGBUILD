@@ -3,8 +3,8 @@
 pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=1.4.13
-pkgrel=1.1
+pkgver=1.4.14
+pkgrel=1
 
 arch=('any')
 license=('GPL')
@@ -14,17 +14,20 @@ optdepends=(
     'xclip: for automatic copying the returned URL to clipboard'
     'inxi: for inxi logs'
 )
+backup=(etc/$pkgname.conf)
 
 source=(
     $pkgname
     $pkgname.desktop
-#    changelog.txt
+    $pkgname.conf
 )
-sha512sums=('9c0d42e8039de5fa10a27d8249315795ec03ef4b5bc1e22602bf21146dcf076c0199800a24e7a304815ca52098939b8eab705de00d9d89e46e99313662df0adb'
-            '177f28300b7721ae165afc651279d619dd2924496e2f727ea2c63c131070a0d727de71619a0cf8d359486f0f91f319e58946a066c8411500976f60ff30e7d3c3')
+sha512sums=('78dddc665e9628678ea8810da33a7566dc9246a34f2418f90d5aeab71369cee0564b4acdce31975c7ab8c4c984b70ff023bbb564b00f3604156ba494a66fdfe9'
+            '177f28300b7721ae165afc651279d619dd2924496e2f727ea2c63c131070a0d727de71619a0cf8d359486f0f91f319e58946a066c8411500976f60ff30e7d3c3'
+            'ff89ed7aba63a28acfb0da06ba82d7d7db99c89c679b2b4939d3cdb0d0f8dd6ee9ac565b1fdd7124ab3fff51caf9071b3b5d8eb553984bf6f0bd516f2f25233e')
 
 package() {
   install -Dm755 $pkgname                 $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.conf            $pkgdir/etc/$pkgname.conf
 
   install -d $pkgdir/usr/share/applications
   install -Dm755 $pkgname.desktop         $pkgdir/usr/share/applications/$pkgname.desktop
