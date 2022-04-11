@@ -63,7 +63,7 @@ _tr_add2 after_install_dsi         "Поиск ошибок"
 _tr_add2 after_install_dsitip      "Обнаружение любых потенциальных проблем в системе и программах"
 
 _tr_add2 after_install_etl         "Обновить EndeavourOS$_question"
-_tr_add2 after_install_etltip      "Переход на следующий уровень EndeavourOS"
+_tr_add2 after_install_etltip      "Переход на новейший уровень EndeavourOS"
 
 _tr_add2 after_install_cdm         "Изменить Display Manager"
 _tr_add2 after_install_cdmtip      "Установка другого Display Manager"
@@ -87,7 +87,7 @@ _tr_add2 after_install_bttip       "Советы по использованию
 _tr_add2 after_install_nv          "Пользователям NVIDIA"
 _tr_add2 after_install_nvtip       "Работа с NVIDIA installer"
 
-_tr_add2 after_install_ft          "Советы по форуму"
+_tr_add2 after_install_ft          "Форум с советами"
 _tr_add2 after_install_fttip       "Обратитесь к нам за помощью$_exclamation"
 
 
@@ -118,14 +118,14 @@ _tr_add2 add_more_apps_lotip       "Офисный пакет"
 _tr_add2 add_more_apps_ch          "Chromium"
 _tr_add2 add_more_apps_chtip       "Веб-браузер с открытым исходным кодом"
 
-_tr_add2 add_more_apps_fw          "Firewall"
+_tr_add2 add_more_apps_fw          "Брандмауэер"
 _tr_add2 add_more_apps_fwtip       "Gufw, простой брандмауэр"
 
 _tr_add2 add_more_apps_bt          "Bluetooth (blueberry) для Xfce"
 _tr_add2 add_more_apps_bt_bm       "Bluetooth (blueman) для Xfce"
 
 
-###################### НОВЫЕ ВЕЩИ ПОСЛЕ ЭТОЙ ЛИНИИ ######################
+###################### ПРОЧЕЕ НОВОЕ ПОСЛЕ ЭТОЙ ЛИНИИ ######################
 
 _tr_add2 settings_dis_contents     "Для запуска $PRETTY_PROGNAME повторно, откройте терминал и выполните команду: $PROGNAME --enable"
 _tr_add2 settings_dis_text         "Перезапуск $PRETTY_PROGNAME:"
@@ -148,7 +148,7 @@ _tr_add2 dm_warning_title          "Внимание"
 _tr_add2 install_installer         "Установщик"
 _tr_add2 install_already           "Уже установлено"
 _tr_add2 install_ing               "Установка"
-_tr_add2 install_done              "Финиш"
+_tr_add2 install_done              "Завершено"
 
 _tr_add2 sysup_no                  "Обновлений нет"
 _tr_add2 sysup_check               "Проверка обновлений программ..."
@@ -156,11 +156,11 @@ _tr_add2 sysup_check               "Проверка обновлений про
 _tr_add2 issues_title              "Обнаружена ошибка пакета"
 _tr_add2 issues_grub               "ВАЖНОЕ ЗАМЕЧАНИЕ: необходимо вручную воссоздать загрузочное меню"
 _tr_add2 issues_run                "Выполнение команды:"
-_tr_add2 issues_no                 "Системных ошибок не обнаружено"
+_tr_add2 issues_no                 "Системные ошибки не обнаружены"
 
 _tr_add2 cal_noavail               "Не доступно: "			# программа установки
 _tr_add2 cal_warn                  "Внимание"
-_tr_add2 cal_info1                 "Это релиз по развитию сообщества.\n\n"                                   				# необходимые специальности!
+_tr_add2 cal_info1                 "Это релиз разработки сообщества.\n\n"                                   				# для специалистов!
 _tr_add2 cal_info2                 "<b>Оффлайн</b> вариант предоставляет рабочий стол Xfce с темой EndeavourOS.\nПодключение к интернет не требуется.\n\n"
 _tr_add2 cal_info3                 "<b>Онлайн</b> вариант позволяет выбрать DE с оформлением по умолчанию.\nТребуется подключение к интернет.\n\n"
 _tr_add2 cal_info4                 "Внимание: Этот релиз находится в процессе разработки. Пожалуйста, сообщите нам в случае ошибки.\n"
@@ -178,9 +178,9 @@ _tr_add2 tail_buttip               "Закрыть только это окно"
 _tr_add2 ins_text                  "Установка EndeavourOS на компьютер"
 _tr_add2 ins_start                 "Запуск установки"
 _tr_add2 ins_starttip              "Запуcк установки EndeavourOS вместе с отладочным терминалом"
-_tr_add2 ins_up                    "Обновить Welcome $_exclamation"
+_tr_add2 ins_up                    "Обновить Welcome$_exclamation"
 _tr_add2 ins_uptip                 "Обновить Welcome и перезапустить его"
-_tr_add2 ins_keys                  "Pacman - gpg keys"
+_tr_add2 ins_keys                  "Pacman - gpg ключи"
 _tr_add2 ins_keystip               "Обновить список ключей шифрования репозиториев"
 _tr_add2 ins_pm                    "Управление разделами диска"
 _tr_add2 ins_pmtip                 "Создание и управление разделами на вашем диске с помощью Gparted"
@@ -189,7 +189,7 @@ _tr_add2 ins_reltip                "Расширенная информация 
 _tr_add2 ins_tips                  "Полезные советы"
 _tr_add2 ins_tipstip               "Полезная информация для помощи при установке"
 _tr_add2 ins_trouble               "Устранение неполадок"
-_tr_add2 ins_troubletip            "Рекомендации по восстановлению системы"
+_tr_add2 ins_troubletip            "Восстановление системы"
 
 _tr_add2 after_install_us_from     "Обновление из"			# AUR или вышерасположенный
 _tr_add2 after_install_us_el       "Требуется повышение привилегий."
@@ -206,11 +206,11 @@ _tr_add2 useful_tips_text      "Полезные советы"
 _tr_add2 butt_changelog        "Изменения в Welcome"
 _tr_add2 butt_changelogtip     "История изменений Welcome"
 
-_tr_add2 after_install_themevan      "Xfce оригинальная тема"
-_tr_add2 after_install_themevantip   "Использовать тему Xfce"
+_tr_add2 after_install_themevan      "Оригинальная тема Xfce"
+_tr_add2 after_install_themevantip   "Использовать оригинальную тему Xfce"
 
-_tr_add2 after_install_themedef     "Xfce тема в стиле EndeavourOS"
-_tr_add2 after_install_themedeftip  "использовать стиль EndeavourOS в теме Xfce"
+_tr_add2 after_install_themedef     "Тема Xfce в стиле EndeavourOS"
+_tr_add2 after_install_themedeftip  "Использовать стиль EndeavourOS в теме Xfce по умолчанию"
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Настройка очистки пакетов"
@@ -235,7 +235,7 @@ _tr_add2 butt_owncmds_dnd_help    "Отображение окна для соз
 
 # 2020-Sep-03:
 _tr_add2 ins_reso                 "Разрешение дисплея"
-_tr_add2 ins_resotip              "Изменить разрешение дисплея"
+_tr_add2 ins_resotip              "Изменение разрешение дисплея"
 
 # 2020-Sep-08:
 _tr_add2 add_more_apps_arch          "Просмотр всех Arch пакетов"
@@ -246,8 +246,8 @@ _tr_add2 add_more_apps_done2_tip1    "Для установки, использ�
 _tr_add2 add_more_apps_done2_tip2    "Для установки, используйте 'yay'"
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2        "Выбор обоев"   # was: "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2     "Выбор обоев EndeavourOS"                          # was: "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ew2        "Выбор обоев EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Выбор обоев"               # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
@@ -257,27 +257,27 @@ _tr_add2 after_install_ewtip2     "Выбор обоев EndeavourOS"           
 #       - line 250: changed text of 'after_install_ewtip2'
 
 # 2020-Oct-23:
-_tr_add2 updt_update_check        "update check"
-_tr_add2 updt_searching           "Searching"
-_tr_add2 updt_for_updates         "for updates"
-_tr_add2 updt_failure             "failure$_exclamation"
-_tr_add2 updt_nothing_todo        "there is nothing to do"
-_tr_add2 updt_press_enter         "Press ENTER to close this window"
+_tr_add2 updt_update_check        "проверить обновление"
+_tr_add2 updt_searching           "Поиск"
+_tr_add2 updt_for_updates         "для обновления"
+_tr_add2 updt_failure             "сбой$_exclamation"
+_tr_add2 updt_nothing_todo        "нечего обновлять"
+_tr_add2 updt_press_enter         "Нажмите ENTER, чтобы закрыть это окно"
 
 # 2020-Oct-24:
 #    IMPORTANT NOTE:
 #       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 2020-Dec-11:
-_tr_add2 after_install_pacdiff_tip "Управление файлами pacnew, pacorig $_and pacsave (необходимы pacdiff или meld, например) с помощью pacdiff $_and"
+_tr_add2 after_install_pacdiff_tip "Управление файлами pacnew, pacorig $_and pacsave (необходимы pacdiff или meld) с помощью pacdiff $_and"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Настройка"                             # a starting verb on a sentence "Настройка eos-update-notifier"
+_tr_add2 after_install_conf           "Настройка"                            # a starting verb on a sentence "Настройка eos-update-notifier"
 _tr_add2 after_install_more_wall      "Скачать больше обоев EndeavourOS"
-_tr_add2 after_install_more_wall_tip  "Скачать обои EndeavourOS для рабочего стола, оригинальные и от сообщества"
-_tr_add2 after_install_info           "information"                           # last word on a sentence, means just any information
+_tr_add2 after_install_more_wall_tip  "Скачать предыдущие обои EndeavourOS и обои от сообщества"
+_tr_add2 after_install_info           "информация"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Новости софта"
+_tr_add2 butt_softnews                "Новости о программном обеспечении"
 _tr_add2 butt_softnews_tip            "Важные новости о программном обеспечении EndeavourOS"
 
 _tr_add2 install_community            "Установить версии ОС от сообщества"
@@ -286,14 +286,14 @@ _tr_add2 install_community_tip        "Коллекция версий ОС от
 # 2021-May-01
 _tr_add2 ins_syslog                   "Как поделиться системными логами?"
 _tr_add2 ins_syslogtip                "Объясняет, как вы можете обмениваться системными логами для получения помощи (на английском)"
-_tr_add2 ins_logtool                  "Логи"
+_tr_add2 ins_logtool                  "Логи для устранения неполадок"
 _tr_add2 ins_logtooltip               "Выбор, создание и публикация логов для устранения неполадок при обращении за помощью (на английском)"
 
 # 2021-May-20
 _tr_add2 nb_tab_DailyAssistant       "Ассистент"
 _tr_add2 daily_assistant_text        "Инструменты выполнения полезных и/или повседневных задач"
-_tr_add2 after_install_itab          "Стартовая вкладка Welcome"
-_tr_add2 after_install_itab_tip      "Выбор вкладки, отображаемой при старте Welcome"
+_tr_add2 after_install_itab          "Начальная вкладка Welcome"
+_tr_add2 after_install_itab_tip      "Выбор вкладки Welcome, отображаемой при запуске"
 
 # 2021-Jun-08
 _tr_add2 daily_assist_apps           "Приложения по категориям"
@@ -303,9 +303,9 @@ _tr_add2 after_install_vbox1         "Включить VirtualBox Guest utilitie
 _tr_add2 after_install_vbox2         "Для включения VirtualBox Guest utilities, выберите вкладку <b>После установки</b> и нажмите кнопку"
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Wired net issue$_question Toggle r8168 and r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
-_tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (reboot may be needed)"           # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168         "Проблема$_question с проводным подключением/переключением драйвера r8168 и r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Переключение между драйверами r8168 и r8169 (может потребоваться перезагрузка)"                   # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "информация"                                         # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "дополнительная информация о Вашем DE / WM"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "информация"                                        # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "дополнительная информация о Вашем DE/WM"           # assume prefix "DE:", e.g.: "Xfce: more information ..."
