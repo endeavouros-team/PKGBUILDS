@@ -75,6 +75,27 @@ eos_select_browser() {
     eos_yad_WARN "${FUNCNAME[0]}: cannot find a browser"
 }
 
+eos_notification() {
+    local icon="$1"
+    local urgency="$2"        # low, normal, critical
+    local expiretime="$3"
+    local appname="$4"
+    local summary="$5"
+    local body="$6"
+    [ -n "$urgency" ] || urgency=normal
+
+    local cmd=(
+        notify-send
+        --icon="$icon"
+        --urgency="$urgency"
+        --expire-time="$expiretime"
+        --app-name="appname"
+        "$summary"
+	"$body"
+    )
+    "${cmd[@]}"
+}
+
 eos_yad_terminal() {
     local conf=/etc/eos-script-lib-yad.conf
     if [ -r $conf ] ; then
@@ -153,7 +174,7 @@ eos_yad_check_internet_connection() {
     test -z "$onewait"    && onewait=1s
 
     if [ -n "$caller" ] ; then
-        title+=" at $caller"
+        title+=" from $caller"
     fi
 
     for ((ix=0; ix<waitrounds; ix++)) ; do
@@ -164,11 +185,15 @@ eos_yad_check_internet_connection() {
     $checker >/dev/null || {
         case "$verbose" in
             [yY]*|1|true|TRUE|True|on|enable*|verbose)
-                echo "No internet connection!" | \
-                    eos_yad --text-info --title="$title" \
-                            --height=100 --width=300 --justify=center --wrap \
-                            --button=yad-quit:1 \
-                            --button=" Continue anyway!go-next!Don't stop me now":0
+                if [ 0 -eq 1 ] ; then
+                    echo "No internet connection!" | \
+                        eos_yad --text-info --title="$title" \
+                                --height=100 --width=300 --justify=center --wrap \
+                                --button=yad-quit:1 \
+                                --button=" Continue anyway!go-next!Don't stop me now":0
+                else
+                    eos_notification "dialog-warning" normal 60000 "$caller" "$title" "No internet connection!"
+                fi
                 ;;
             *)
                 return 1
