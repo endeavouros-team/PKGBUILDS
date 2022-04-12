@@ -76,7 +76,6 @@ ShowNotify() {
         *s) expiretime=$((1000*${expiretime:: -1})) ;;
         0)  ;;
     esac
-    expiretime="--expire-time=$expiretime"
 
     case "$ShowWhatAboutUpdates" in
 	number)
@@ -84,10 +83,17 @@ ShowNotify() {
 	packages)
 	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
-    /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
-                         --app-name="EndeavourOS Update Notifier" \
+    if [ 0 -eq 1 ] ; then
+        expiretime="--expire-time=$expiretime"
+        /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
+                             --app-name="EndeavourOS Update Notifier" \
+                             "Updates available at $date" \
+			     "$msg"
+    else
+        eos_notification "$_UpdateNotifyIcon" "normal" "$expiretime" "EndeavourOS Update Notifier" \
                          "Updates available at $date" \
 			 "$msg"
+    fi
 }
 
 ShowNonFocused() {
@@ -448,8 +454,13 @@ CheckInternetConnection() {
 
     eos_yad_check_internet_connection no_fail_dialog $wait_rounds $one_wait || {
         if [ "$verbosity" = "high" ] ; then
-            echo "Internet connection is not available!" | \
-                eos_yad_problem "Warning from eos-update-notifier" --width=400 --height=200 &
+            if [ 0 -eq 1 ] ; then
+                echo "Internet connection is not available!" | \
+                    eos_yad_problem "Warning from eos-update-notifier" --width=400 --height=200 &
+            else
+                eos_notification "dialog-warning" "normal" "60000" "eos-update-notifier" \
+                                 "Warning from eos-update-notifier" "Internet connection is not available!"
+            fi
         fi
         debug "Warning: eos-update-notifier: internet connection is not available!"
         return 1
