@@ -54,6 +54,7 @@ Usage() {
 Usage: $progname [options]
 
 Options:
+    --defaults         Enable manager with default values (run $period, keep latest $keepcount).
     -v, --verbose      Increase verbosity, can be specified up to 3 times.
     -h, --help         This help.
 EOF
@@ -70,9 +71,9 @@ _paccache_cleaner_manager()
     local current_period
     local current_keepcount
     local current_delete_uninstalled
-    local period keepcount delete_uninstalled
     local pt="paccache.timer"
-    local cmds=":" cmd_period="" cmd=()
+    local cmd_yad
+    local cmds=":" cmd_period cmd_ruk=""
     local xx
     local period_vals=""
     local txt
@@ -83,54 +84,65 @@ _paccache_cleaner_manager()
     local du="$(LANG=C /usr/bin/du --si -s /var/cache/pacman/pkg | /usr/bin/awk '{print $1}' | sed 's|\([KMGT]\)$| \1B|')"
     local df="$(LANG=C /usr/bin/df --si | /usr/bin/grep -w /     | /usr/bin/awk '{print $4}' | sed 's|\([KMGT]\)$| \1B|')"
     local options=""
+    local defaults=no
+    local period=weekly keepcount=2 delete_uninstalled=FALSE
+    local first_time=no
+
+    if [ ! -r $service ] ; then
+        first_time=yes
+    fi
 
     case "$1" in
         -v | --verbose) options+=" -v" ;;
         -h | --help)    Usage 0 ;;
+        --defaults)     defaults=yes ;;
     esac
 
     GetCurrentValues
 
-    txt="<b>Modifies the service that cleans up pacman cache periodically.\n"
-    txt+="Below you'll see settings and their current values.\n\n"
-    txt+="Current status:\n"
-    txt+="${indent}Package cache usage: $du\n"
-    txt+="${indent}Free space on disk: $df</b>\n"
-    txt+="\n"
+    if [ "$defaults" = "no" ] ; then
+        txt="<b>Modifies the service that cleans up pacman cache periodically.\n"
+        txt+="Below you'll see settings and their current values.\n\n"
+        txt+="Current status:\n"
+        txt+="${indent}Package cache usage: $du\n"
+        txt+="${indent}Free space on disk: $df</b>\n"
+        txt+="\n"
 
-    # List possible period values, and set the default
-    for xx in daily weekly monthly ; do
-        test -n "$period_vals" && period_vals+="!"           # separator
-        test "$xx" = "$current_period" && period_vals+="^"   # default
-        period_vals+="$xx"
-    done
+        # List possible period values, and set the default
+        for xx in daily weekly monthly ; do
+            test -n "$period_vals" && period_vals+="!"           # separator
+            test "$xx" = "$current_period" && period_vals+="^"   # default
+            period_vals+="$xx"
+        done
 
-    cmd=(
-        eos_yad --form --width=500 --image=$image
-        --title='Pacman cache cleaner service manager' 
-        --text="$txt" 
-        --field='Cleaning period':CB                                   "$period_vals" 
-        --field='Number of package versions to keep':NUM               "$current_keepcount"
-        --field='Remove uninstalled but still cached packages now':CHK "$current_delete_uninstalled"
-    )
+        cmd_yad=(
+            eos_yad --form --width=500 --image=$image
+            --title='Pacman cache cleaner service manager' 
+            --text="$txt" 
+            --field='Cleaning period':CB                                   "$period_vals" 
+            --field='Number of package versions to keep':NUM               "$current_keepcount"
+            --field='Remove uninstalled but still cached packages now':CHK "$current_delete_uninstalled"
+        )
 
-    result="$("${cmd[@]}")" ; [ -n "$result" ] || return    # package kde-gtk-config should remove possible gtk related yad warnings
+        result="$("${cmd_yad[@]}")" ; [ -n "$result" ] || return    # package kde-gtk-config should remove possible gtk related yad warnings
 
-    # New values
-    period="$(            echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
-    keepcount="$(         echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
-    delete_uninstalled="$(echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+        # New values
+        period="$(            echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+        keepcount="$(         echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+        delete_uninstalled="$(echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+    fi
 
     # Build the final command
 
     # Clean up cache now and periodically
-    cmd_period="paccache $options -rk$keepcount"
-    cmd="$cmd_period"
+
     if [ "$delete_uninstalled" = "TRUE" ] ; then
-        cmd+=" ; paccache $options -ruk0"          # remove uninstalled but cached packages only now
+        cmd_ruk="paccache $options -ruk0"
     fi
 
-    if [ "$keepcount $period $delete_uninstalled" != "$current_keepcount $current_period $current_delete_uninstalled" ] ; then
+    if [ "$keepcount $period $delete_uninstalled" != "$current_keepcount $current_period $current_delete_uninstalled" ] || [ "$first_time" = "yes" ] ; then
+        cmd_period="paccache $options -rk$keepcount"
+
         if [ ! -r $service ] ; then
             cmds+=" ; cp $dir2/$pt $timer ; cp $dir2/paccache.service $service"
         fi
@@ -142,7 +154,15 @@ _paccache_cleaner_manager()
         cmds+=" ; systemctl start $pt"
         cmds+=" ; systemctl daemon-reload"
     fi
-    pkexec bash -c "$cmds ; $cmd"
+    if [ -n "$cmd_ruk" ] ; then
+        cmds+=" ; $cmd_ruk"
+    fi
+
+    if [ "$cmds" != ":" ] ; then
+        pkexec bash -c "$cmds"
+    else
+        echo "No change to settings." >&2
+    fi
 }
 
 _paccache_cleaner_manager "$@"
