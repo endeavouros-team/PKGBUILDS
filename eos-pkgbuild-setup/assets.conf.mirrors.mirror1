@@ -96,6 +96,12 @@ local PKGNAMES_WAIT=(
     #arc-gtk-theme-eos
 )
 
+# HAS_GIT_VER array incldues packages whose pkgver can be anything, i.e. newer package can have lower pkgver.
+# Sometimes e.g. -git packages have that property.
+# declare -A HAS_GIT_PKGVER            # allow any pkgver value if "yes"
+# HAS_GIT_PKGVER[???-git]=yes
+
+
 declare -A PKG_MAKEPKG_OPTIONS
 
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"

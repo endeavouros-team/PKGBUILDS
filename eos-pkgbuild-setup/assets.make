@@ -782,6 +782,13 @@ IsInWaitList() {
     return 1
 }
 
+DowngradeProbibited() {
+    local cmpresult="$1"
+    local allow_downgrade="$2"
+
+    [ $cmpresult -lt 0 ] && [ "$allow_downgrade" = "no" ] && [ "${HAS_GIT_PKGVER[$pkgdirname]}" != "yes" ]
+}
+
 Main2()
 {
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
@@ -912,7 +919,7 @@ Main2()
                 echo2 "OK ($tmpcurr)"
                 continue
             fi
-            if [ $cmpresult -lt 0 ] &&  [ "$allow_downgrade" = "no" ] ; then
+            if DowngradeProbibited "$cmpresult" "$allow_downgrade" ; then
                 echo2 "OK ($tmpcurr)"
                 continue
             fi
@@ -967,7 +974,8 @@ Main2()
 
             # See if we have to build.
             [ "$cmpresult" -eq 0 ] && continue
-            if [ "$cmpresult" -lt 0 ] && [ "$allow_downgrade" = "no" ] ; then
+
+            if DowngradeProbibited "$cmpresult" "$allow_downgrade" ; then
                 continue
             fi
             if IsInWaitList "$xx" ; then
