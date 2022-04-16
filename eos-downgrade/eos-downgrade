@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Downgrade EndeavourOS packages.
+#
+# Usage: eos-downgrade names-of-packages
+#
+# Package sources:
+# - local package cache
+# - latest available EndeavourOS packages at github
+# - archived older EndeavourOS packages at github (currently many previous releases are missing)
+#
+# Caveats:
+# - alpha status ==> warning for potential bugs!
+# - requires github.com currently
+# - only x86_64 architecture
+
+
+Usage() {
+    local exit_code="$1"
+
+    cat <<EOF >&2
+Downgrade EndeavourOS packages.
+
+Usage: $progname names-of-packages
+
+EOF
+    [ -n "$exit_code" ] && exit $exit_code
+}
+
+AddRemoteCurrent() {
+    local url="https://github.com/endeavouros-team/repo/tree/master/endeavouros/$arch"
+    local remote_currents=$(curl -Lsm 10 -o- "$url" | grep '\.pkg\.tar\.' | grep -Pv '\.sig|tease-commit-message' | sed -e 's|.* title="\([^"]*\)".*|\1|' -e 's|^|latest:  |')
+
+    if [ -n "$remote_currents" ] ; then
+        printf "%s\n" "$remote_currents"
+    fi
+}
+
+AddRemoteArchive() {
+    # Get archived remote pkgname without folders.
+
+    local remote_filenames="$(curl -Lsm 10 -o- "$archive_url" | grep /packages/ | grep pkg\.tar\.[zstx]*\" | sed -e 's|.*/packages/\([^"]*\)".*|\1|' -e 's|^|archive: |')"
+
+    if [ -n "$remote_filenames" ] ; then
+        printf "%s\n" "$remote_filenames"
+    fi
+}
+
+AddLocals() {
+    local local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
+    local eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
+    local locals=()
+    local tmp
+
+    for xx in $eos_pkgs ; do
+        readarray -t tmp <<< $(echo "$local_filenames" | grep "$xx")
+        if [ -n "$tmp" ] ; then
+            locals+=("${tmp[@]}")
+        fi
+    done
+
+    if [ -n "$locals" ] ; then
+        printf "cache:   %s\n" "${locals[@]}"
+    fi
+}
+
+Main()
+{
+    local progname=eos-downgrade
+
+    case "$1" in
+        "") Usage 0 ;;
+    esac
+
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
+    local arch=x86_64
+    local data
+
+    local archive_url=https://github.com/endeavouros-team/archive/releases
+    local archive_dl_url=https://github.com/endeavouros-team/archive/releases/download/packages
+    local latest_dl_url=https://github.com/endeavouros-team/repo/raw/master/endeavouros/$arch
+
+    printf "Fetching info about packages, please wait ... " >&2
+    data=$( { AddLocals ; AddRemoteCurrent ; AddRemoteArchive ; } | sort -V )
+    echo "done." >&2
+
+    local pkgname
+    local filenames=() filespec
+    local URLs=()
+
+    for pkgname in "$@" ; do
+        filespec="$(echo "$data" | grep "$pkgname" | fzf --tac)"
+        case "$?" in
+            0) ;;
+            *) echo "Nothing for $pkgname." >&2
+               continue
+               ;;
+        esac
+        case "$filespec" in
+            "cache:"*)   filespec="/var/cache/pacman/pkg/$(   echo "$filespec" | awk '{print $2}')" ;;
+            "latest:"*)  filespec="$latest_dl_url/$(          echo "$filespec" | awk '{print $2}')" ;;
+            "archive:"*) filespec="$archive_dl_url/$(         echo "$filespec" | awk '{print $2}')" ;;
+            *)
+                echo "Sorry, nothing found for $pkgname." >&2
+                continue
+                ;;
+        esac
+        URLs+=("$filespec")
+    done
+    if [ -n "$URLs" ] ; then
+        echo sudo pacman -U "${URLs[@]}"
+        sudo pacman -U "${URLs[@]}"
+    fi
+}
+
+Main "$@"
