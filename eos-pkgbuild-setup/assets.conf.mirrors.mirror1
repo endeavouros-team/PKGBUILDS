@@ -37,7 +37,6 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/downgrade
     endeavouros-keyring
     endeavouros-mirrorlist
-    # endeavouros-lxde-skel
     endeavouros-skel-default
     endeavouros-skel-i3wm
     endeavouros-skel-xfce4
@@ -45,6 +44,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-xfce4-terminal-colors
     eos-apps-info
     eos-bash-shared
+    eos-downgrade
     eos-hooks
     eos-lightdm-slick-theme
     eos-log-tool
@@ -81,12 +81,11 @@ local PKGNAMES=(                                    # actually: dir names for pa
     aur/rate-mirrors
     reflector-bash-completion
     reflector-simple
-    aur/worm
     welcome
     wgetpaste-eos
+    aur/worm
     yad-eos
     aur/yay
-
     aur/zfs-dkms
     aur/zfs-utils
 )
