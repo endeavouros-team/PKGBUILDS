@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Downgrade EndeavourOS packages.
+# Downgrade EndeavourOS (and Arch) packages.
 #
 # Usage: eos-downgrade names-of-packages
 #
@@ -11,7 +11,7 @@
 #
 # Caveats:
 # - alpha status ==> warning for potential bugs!
-# - requires github.com currently
+# - requires github.com currently for EOS packages
 # - only x86_64 architecture
 
 
@@ -19,9 +19,14 @@ Usage() {
     local exit_code="$1"
 
     cat <<EOF >&2
-Downgrade EndeavourOS packages.
+Downgrade EndeavourOS and Arch packages.
 
-Usage: $progname names-of-packages
+Note: The EndeavourOS files will be fetched from github.com.
+      This may cause issues in some locations.
+
+Usage: $progname [options] <package-name(s)>
+Options:
+    -h, --help     This help.
 
 EOF
     [ -n "$exit_code" ] && exit $exit_code
@@ -29,7 +34,9 @@ EOF
 
 AddRemoteCurrent() {
     local url="https://github.com/endeavouros-team/repo/tree/master/endeavouros/$arch"
-    local remote_currents=$(curl -Lsm 10 -o- "$url" | grep '\.pkg\.tar\.' | grep -Pv '\.sig|tease-commit-message' | sed -e 's|.* title="\([^"]*\)".*|\1|' -e 's|^|latest:  |')
+    local remote_currents
+
+    remote_currents=$(curl -Lsm 10 -o- "$url" | grep '\.pkg\.tar\.' | grep ' Link--primary" title=' | grep -Pv '\.sig"'| sed -e 's|.* title="\([^"]*\)".*|\1|' -e 's|^|latest:  |')
 
     if [ -n "$remote_currents" ] ; then
         printf "%s\n" "$remote_currents"
@@ -39,7 +46,8 @@ AddRemoteCurrent() {
 AddRemoteArchive() {
     # Get archived remote pkgname without folders.
 
-    local remote_filenames="$(curl -Lsm 10 -o- "$archive_url" | grep /packages/ | grep pkg\.tar\.[zstx]*\" | sed -e 's|.*/packages/\([^"]*\)".*|\1|' -e 's|^|archive: |')"
+    local remote_filenames
+    remote_filenames="$(curl -Lsm 10 -o- "$archive_url" | grep /packages/ | grep 'pkg\.tar\.[xz][xzst]*"' | sed -e 's|.*/packages/\([^"]*\)".*|\1|' -e 's|^|archive: |')"
 
     if [ -n "$remote_filenames" ] ; then
         printf "%s\n" "$remote_filenames"
@@ -47,33 +55,52 @@ AddRemoteArchive() {
 }
 
 AddLocals() {
-    local local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
-    local eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
+    local local_filenames
+    local eos_pkgs
     local locals=()
     local tmp
 
+    local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
+    eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
+
     for xx in $eos_pkgs ; do
-        readarray -t tmp <<< $(echo "$local_filenames" | grep "$xx")
-        if [ -n "$tmp" ] ; then
+        readarray -t tmp <<< "$(echo "$local_filenames" | grep "$xx")"
+        if [ ${#tmp[@]} -gt 0 ] ; then
             locals+=("${tmp[@]}")
         fi
     done
 
-    if [ -n "$locals" ] ; then
+    if [ ${#locals[@]} -gt 0 ] ; then
         printf "cache:   %s\n" "${locals[@]}"
     fi
 }
 
-Main()
-{
-    local progname=eos-downgrade
+Options() {
+    local opts
 
-    case "$1" in
-        "") Usage 0 ;;
-    esac
+    opts="$(/usr/bin/getopt -o=h --longoptions help --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    eval set -- "$opts"
 
+    while true ; do
+        case "$1" in
+            -h | --help)  Usage 0 ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+    [ -n "$1" ] || Usage 1
+    pkgnames=("$@")
+}
+
+Main_eos() {
+    if [ -z "$1" ] ; then
+        return
+    fi
     local arch=x86_64
     local data
 
@@ -83,11 +110,11 @@ Main()
 
     printf "Fetching info about packages, please wait ... " >&2
     data=$( { AddLocals ; AddRemoteCurrent ; AddRemoteArchive ; } | sort -V )
-    echo "done." >&2
+    printf "done.\n\n" >&2
 
     local pkgname
-    local filenames=() filespec
-    local URLs=()
+    local filespec
+    local URLs=() pkgs=()
 
     for pkgname in "$@" ; do
         filespec="$(echo "$data" | grep "$pkgname" | fzf --tac)"
@@ -107,10 +134,90 @@ Main()
                 ;;
         esac
         URLs+=("$filespec")
+        pkgs+=("$pkgname")
     done
-    if [ -n "$URLs" ] ; then
-        echo sudo pacman -U "${URLs[@]}"
-        sudo pacman -U "${URLs[@]}"
+
+    if [ ${#URLs[@]} -gt 0 ] ; then
+        commands_eos+=("pacman -U ${URLs[*]}")
+        AddIgnoreAsk "${pkgs[@]}"
+    fi
+}
+
+Main_arch() {
+    if [ -n "$1" ] ; then
+        commands_arch+=("/usr/bin/downgrade $*")
+    fi
+}
+
+Separate_packages() {
+    local eos_pkgs
+    local arg eos
+
+    eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
+
+    for arg in "$@" ; do
+        for eos in $eos_pkgs ; do
+            [ "$arg" = "$eos" ] && break
+        done
+        [ "$arg" = "$eos" ] && pkgnames_eos+=("$arg") || pkgnames_arch+=("$arg")
+    done
+
+    if [ ${#pkgnames_arch[@]} -gt 0 ] ; then
+        if [ ! -x /usr/bin/downgrade ] ; then
+            echo "Install 'downgrade' to downgrade Arch packages: ${pkgnames_arch[*]}" >&2
+            return 1
+        fi
+    fi
+}
+
+AddIgnore() {
+    local pkg="$1"
+    local sedline="/packages listed in IgnorePkg/a \IgnorePkg = $pkg"
+
+    commands_eos+=("sed -i $file -e \"$sedline\"")
+}
+
+AddIgnoreAsk() {
+    local pkg reply
+    local file=/etc/pacman.conf
+
+    for pkg in "$@" ; do
+        if [ -z "$(grep -w "$pkg" "$file" | grep "^IgnorePkg[ ]*=")" ] ; then   # should check commenting as well...
+            read -p "add $pkg to IgnorePkg? [y/N] " reply >&2
+            case "$reply" in
+                [Yy]*) AddIgnore "$pkg" ;;
+            esac
+        fi
+    done
+}
+
+Main() {
+    local progname=eos-downgrade
+    local pkgnames=()
+    local pkgnames_eos=() pkgnames_arch=()
+    local commands_eos=() commands_arch=()
+
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
+    Options "$@"
+
+    Separate_packages "${pkgnames[@]}" || return 1
+
+    Main_eos  "${pkgnames_eos[@]}"
+    Main_arch "${pkgnames_arch[@]}"
+
+    if [ ${#commands_eos[@]} -gt 0 ] ; then
+        echo "==> EndeavourOS downgrades:"
+        printf "   %s\n" "${commands_eos[@]}"
+        commands_eos=$(printf "%s; " "${commands_eos[@]}")
+        $EOS_ROOTER "$commands_eos"
+    fi
+
+    if [ ${#commands_arch[@]} -gt 0 ] ; then
+        echo "==> Arch downgrades:"
+        printf "   %s\n" "${commands_arch[@]}"
+        commands_arch=$(printf "%s; " "${commands_arch[@]}")
+        $EOS_ROOTER "$commands_arch"
     fi
 }
 
