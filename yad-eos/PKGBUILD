@@ -5,54 +5,23 @@
 # Latest yad release with a patch.
 
 _yad-eos_prepare() {
-    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/yad/trunk/PKGBUILD || exit 1
-    if [ -n "$(grep -w "^prepare" PKGBUILD.orig)" ] ; then
-        echo "$FUNCNAME: error: upstream 'yad' PKGBUILD already has function 'prepare'!!" >&2
-        exit 1
-    fi
-    sed -i PKGBUILD.orig -e 's|${pkgname}|yad|'   # we will change $pkgname later
+    local _pkgname_orig=yad
+
+    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD || exit 1
+
+    sed -i PKGBUILD.orig -e 's|${pkgname}|'$_pkgname_orig'|'   # keep the original pkgname in PKGBUILD for building a package
     source PKGBUILD.orig
     rm -f PKGBUILD.orig
 
-    pkgname=yad-eos
-
-    # Add missing and remove unnecessary dependencies
-    local xx
-    depends+=(gspell gtksourceview3)
-    depends=($(for xx in "${depends[@]}" ; do [ "$xx" != "gtkspell3" ] && echo "$xx" ; done))
+    # now change to the new pkgname
+    pkgname=${_pkgname_orig}-eos
 
     # Take care of conflicting packages:
-    conflicts=(yad yad-git)
-    provides=(yad)
+    conflicts=($_pkgname_orig ${_pkgname_orig}-git)
+    provides=($_pkgname_orig)
 
     # Add architectures
-    arch+=(aarch64 armv7h)
-
-    # Show our web page:
-    url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-
-    # Add the patch:
-    prepare() {
-        # The source code patch.
-
-        local file=yad-$pkgver/src/main.c
-        local add_before_this_line="parse_geometry ();"         # line number 567 in yad version 9.0!
-        local pp="gtk_widget_set_size_request (dlg, nw, -1);"   # check with this string if this patch already exists
-        local patch=""
-        local color_red="$(printf "\e[1;35m")"
-        local color_reset="$(printf "\e[0m")"
-
-        if [ "$(grep "$pp" $file)" = "" ] ; then
-            echo "${color_red}====>${color_reset} $pkgname: patching $file" >&2
-
-            patch+="     gint mw, nw;\n\n"
-            patch+="      gtk_widget_get_preferred_width (dlg, &mw, &nw);\n"
-            patch+="      $pp\n"
-
-            sed -i $file -e "/$add_before_this_line/i \ $patch"
-        fi
-        rm -f ../yad-$pkgver.tar.xz
-    }
+    # arch+=(aarch64 armv7h)
 }
 
 _yad-eos_prepare
