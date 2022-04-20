@@ -26,15 +26,15 @@ export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD fil
 local PKGNAMES=(                                    # actually: dir names for packages
     akm
     arc-gtk-theme-eos
-    aur/arc-x-icons-theme
-    aur/bashdb
+    arc-x-icons-theme/aur
+    bashdb/aur                                      # aur/pkgname and pkgname/aur are equal
 
     calamares_config_ce
     calamares_config_default
     calamares_current
 
     ckbcomp
-    aur/downgrade
+    downgrade/aur
     endeavouros-keyring
     endeavouros-mirrorlist
     endeavouros-skel-default
@@ -65,10 +65,10 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-update-notifier
     grub-theme-endeavouros
     grub-tools
-    aur/inxi
+    inxi/aur
     keyserver-rank
-    aur/ly
-    aur/mkinitcpio-openswap
+    ly/aur
+    mkinitcpio-openswap/aur
     nvidia-hook
     nvidia-inst
     nvidia-installer-common
@@ -76,18 +76,18 @@ local PKGNAMES=(                                    # actually: dir names for pa
     nvidia-installer-dkms
     pahis
     paper-icon-theme
-    aur/paru
-    aur/polybar
-    aur/rate-mirrors
+    paru/aur
+    polybar/aur
+    rate-mirrors/aur
     reflector-bash-completion
     reflector-simple
     welcome
     wgetpaste-eos
-    aur/worm
+    worm/aur
     yad-eos
-    aur/yay
-    aur/zfs-dkms
-    aur/zfs-utils
+    yay/aur
+    zfs-dkms/aur
+    zfs-utils/aur
 )
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
