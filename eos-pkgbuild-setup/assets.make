@@ -230,6 +230,7 @@ JustPkgname()
     case "$fakepath" in
         ./*)      echoreturn "${fakepath:2}" ;;
         aur/*)    echoreturn "${fakepath:4}" ;;
+        */aur)    echoreturn "${fakepath:: -4}" ;;
         *)        echoreturn "${fakepath}"   ;;
     esac
 }
@@ -260,6 +261,7 @@ ListNameToPkgName()
     #    pkgname          local package
     #    ./pkgname        local package (emphasis)
     #    aur/pkgname      AUR package
+    #    pkgname/aur      AUR package  (another way)
 
     local xx="$1"
     local fetch="$2"
@@ -268,7 +270,7 @@ ListNameToPkgName()
 
     pkgname=$(JustPkgname "$xx")
 
-    if [ "${xx::4}" = "aur/" ] ; then
+    if [ "${xx::4}" = "aur/" ] || [ "${xx: -4}" = "/aur" ] ; then
         case "$fetch" in
             yes)
                 rm -rf "$pkgname"
@@ -611,7 +613,7 @@ WantAurDiffs() {
 #   local browser=/usr/bin/xdg-open   # firefox by default
 
     case "$xx" in
-        aur/*)
+        aur/* | */aur)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
                 read2 -p "AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
@@ -625,7 +627,7 @@ WantAurDiffs() {
             fi
             if [ "$aurdiff" = "1" ] ; then
                 case "$xx" in
-                    aur/*)
+                    aur/* | */aur)
                         AUR_DIFFS+=("$diff_url")
                         AUR_DIFF_PKGS+=("$pkgdirname")
                         #$browser "$diff_url" >& /dev/null
