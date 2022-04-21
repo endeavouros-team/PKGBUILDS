@@ -3,9 +3,18 @@
 # Checks that an internet connection exists.
 # Return value is 0 on success, or another number on failure.
 #
+# Program 'curl-exit-code-to-string' can convert the error code to a human readable message (see below).
+#
 # Example usage:
 #    eos-connection-checker && echo connection is ON
 #    eos-connection-checker || echo connection is OFF
+#    eos-connection-checker || curl-exit-code-to-string $?
+
+GetFastestMirror() {
+    # This assumes eos-rankmirrors has been executed on the current list.
+    # If not, then this does essentially nothing.
+    grep -A10 "^# mirror [ ]*update-level" /etc/pacman.d/endeavouros-mirrorlist | grep "^# https://" | sort -k4 | head -n1 | awk '{print $2}' | sed 's|\([^$]*\)/\$.*|\1|'
+}
 
 Main() {
     # These addresses will be used for checking the availability of internet access.
@@ -14,11 +23,12 @@ Main() {
     #
     local URLs=(
         # This should work globally.
-        https://geoip.kde.org/v1/calamares
+        #https://geoip.kde.org/v1/calamares   # this doesn't seem to work anymore?
 
-        # EndeavourOS mirrors.
-        # Tip: move the mirror that works the best as the first in file /etc/pacman.d/endeavouros-mirrorlist.
-        $(/usr/bin/grep ^Server /etc/pacman.d/endeavouros-mirrorlist | /usr/bin/sed 's|^Server[ ]*=[ ]*\([^$]*\)/\$.*|\1|')
+        # EndeavourOS mirrors (fastest first).
+
+        $(GetFastestMirror)
+        $(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | sed 's|^Server[ ]*=[ ]*\([^$]*\)/\$.*|\1|')
     )
     local URL
     local retval
