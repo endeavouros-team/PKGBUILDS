@@ -175,14 +175,14 @@ Build()
 PkgBuildName()
 {
     local pkgdirname="$1"
-    source "$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
+    source "$PKGBUILD_ROOTDIR"/"$(JustPkgname "$pkgdirname")"/PKGBUILD
     echoreturn "$pkgname"
 }
 
 PkgBuildVersion()
 {
     local pkgdirname="$1"
-    local srcfile="$PKGBUILD_ROOTDIR"/"$(basename "$pkgdirname")"/PKGBUILD
+    local srcfile="$PKGBUILD_ROOTDIR"/"$(JustPkgname "$pkgdirname")"/PKGBUILD
 
     if [ ! -r "$srcfile" ] ; then
         DIE "'$srcfile' does not exist."
@@ -201,7 +201,7 @@ LocalVersion()
     local pkgs
     local xx
     
-    Pkgname="$(basename "$Pkgname")"
+    Pkgname="$(JustPkgname "$Pkgname")"
 
     for xx in zst xz ; do         # order is important because of change to zstd!
         pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$xx 2>/dev/null)"    # $_COMPRESSOR
@@ -228,11 +228,12 @@ JustPkgname()
 {
     local fakepath="$1"
     case "$fakepath" in
-        ./*)      echoreturn "${fakepath:2}" ;;
-        aur/*)    echoreturn "${fakepath:4}" ;;
-        */aur)    echoreturn "${fakepath:: -4}" ;;
-        *)        echoreturn "${fakepath}"   ;;
+        ./*)      fakepath="${fakepath:2}" ;;
+        aur/*)    fakepath="${fakepath:4}" ;;
+        */aur)    fakepath="${fakepath:: -4}" ;;
+        *)        fakepath="${fakepath}"   ;;
     esac
+    echoreturn "$(basename "$fakepath")"
 }
 
 HookIndicator() {
@@ -409,7 +410,8 @@ Assets_clone()
 PkgbuildExists() {
     local pkgname="$1"                         # a name from "${PKGNAMES[@]}"
     local special="$2"
-    local yy=$(basename "$pkgname")
+    local yy=$(JustPkgname "$pkgname")
+
     if [ -r "$PKGBUILD_ROOTDIR/$yy/PKGBUILD" ] ; then
         return 0
     else
