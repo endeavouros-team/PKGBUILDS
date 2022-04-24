@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=eos-lightdm-slick-theme
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS theme for lightdm-slick-greeter'
 arch=('any')
 url='https://www.endeavouros.com'
