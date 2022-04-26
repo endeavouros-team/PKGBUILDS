@@ -310,6 +310,13 @@ HubRelease() {
     hub release "$@"
 }
 
+HubReleaseShow() {
+    # also convert characters:
+    #    %2B ==> +
+    #    %3A ==> :
+    HubRelease show "$@" | sed -e 's|%2B|+|g'     # -e 's|%3A|:|g'
+}
+
 Assets_clone()
 {
     if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
@@ -355,7 +362,7 @@ Assets_clone()
         local remotes remote
         local waittime=30
         for tag in "${RELEASE_TAGS[@]}" ; do
-            remotes="$(HubRelease show -f %as%n $tag | sed 's|^.*/||')"
+            remotes="$(HubReleaseShow -f %as%n $tag | sed 's|^.*/||')"
             for remote in $remotes ; do
                 if [ ! -r $remote ] ; then
                     break
@@ -1241,7 +1248,7 @@ ManualCheckOfAssets() {
     sleep 1
     while true ; do
         if [ 0 -eq 1 ] ; then
-            HubRelease show -f %as%n $tag | sed 's|^.*/||' >&2
+            HubReleaseShow -f %as%n $tag | sed 's|^.*/||' >&2
             printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
         else
             : #printf2 "\n%s "  "Is $op OK (y/n)?"
