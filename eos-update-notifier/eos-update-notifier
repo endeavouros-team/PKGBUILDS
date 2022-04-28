@@ -79,19 +79,19 @@ ShowNotify() {
 
     case "$ShowWhatAboutUpdates" in
 	number)
-	    msg="$(printf "$progname: $update_count $source updates available at $date.\n")" ;;
+	    msg="$(printf "$update_count $source updates available at $date\n")" ;;
 	packages)
-	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$pkgs\n")" ;;
+	    msg="$(printf "$update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
     if [ 0 -eq 1 ] ; then
         expiretime="--expire-time=$expiretime"
         /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
                              --app-name="EndeavourOS Update Notifier" \
-                             "Updates available at $date" \
+                             "Updates available ($progname)" \
 			     "$msg"
     else
         eos_notification "$_UpdateNotifyIcon" "normal" "$expiretime" "EndeavourOS Update Notifier" \
-                         "Updates available at $date" \
+                         "Updates available ($progname)" \
 			 "$msg"
     fi
 }
@@ -205,7 +205,7 @@ Update_common() {
 
         if [ $update_focused -eq 0 ] ; then
             SystemLockActive b || return
-            ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
+            ShowNonFocused upstream || return 1    # returns 252 if window closed from X
             if [ "extra_check" = "yes" ] ; then
                 if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                     # Re-check for updates if more than $secs seconds elapsed from the first check.
