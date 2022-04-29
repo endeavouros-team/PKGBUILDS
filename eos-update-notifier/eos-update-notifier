@@ -205,7 +205,7 @@ Update_common() {
 
         if [ $update_focused -eq 0 ] ; then
             SystemLockActive b || return
-            ShowNonFocused Upstream || return 1    # returns 252 if window closed from X
+            ShowNonFocused upstream || return 1    # returns 252 if window closed from X
             if [ "extra_check" = "yes" ] ; then
                 if [ $(( $(/usr/bin/date +%s) - previous_check_time )) -gt $secs ] ; then
                     # Re-check for updates if more than $secs seconds elapsed from the first check.
@@ -217,7 +217,11 @@ Update_common() {
         if [ -n "$updates" ] ; then              # some other process may have updated!
             ((hasupdates++))
             source=upstream
-            cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER '/usr/bin/pacman -Syu'"
+            if [ "$EOS_UPDATE_ARCH_KEYRING_FIRST" = "yes" ] ; then
+                cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER '/usr/bin/pacman -Sy --needed --noconfirm archlinux-keyring && /usr/bin/pacman -Su'"
+            else
+                cmd="echo -n 'Updating, elevated privileges required. ' ; $EOS_ROOTER '/usr/bin/pacman -Syu'"
+            fi
             eos_un_log "$source updates available: $updates"
             eos_yad_RunCmdTermBash "echo $progname: updates from $source: ; echo \"$updates\" ; $cmd && printf '\n$source update done!\n' || printf '\n$source update failed.\n'"
         fi
