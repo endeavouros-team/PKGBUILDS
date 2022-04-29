@@ -2,8 +2,8 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.17.31
-pkgrel=2
+pkgver=3.18
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -13,8 +13,6 @@ depends=(
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
   'reflector-simple: for the Update Mirrors button'
-  'yad: upstream yad provider'
-  'yad-eos: alternative yad provider (includes fixes)'
   'kdiff3: alternative app for pacdiff to use'
   'meld: alternative app for pacdiff to use'
   'diffuse: alternative app for pacdiff to use'
@@ -33,7 +31,7 @@ source=(
   $_url/welcome-dnd
   $_url/eos-install-mode-run-calamares
 )
-sha512sums=('3bae40331ce6c10e97d8fcf776098f55994c600a9a855e95d55160b8f42332d159e46955378b0333974aa40c589f07c0b84dec6d75012bb57a19ddc220d74a84'
+sha512sums=('919bf29b3577907b824ad138340a7940c1c264cfb1bfb4843076d25eddcbe954653b7b78f4f20a73c31c21230989c9dd67cf47709b9b248fa2e49dc6c53c831b'
             'fc360cf63894772bbc75f41d5b5f312ac4e70afb43bc081b63e3d8db6b8c9a1f0e08fa5a3fdff840f8064c883dda1d3f16328bfc8aa5b4a18e8adf83b93174a0'
             '66977e3853538a25a7f1530ab34e91749ec4890ad03ac7d80e49fe1e0bdfca114ee0cff795d1a5fb4569c7c395d78b07aadc161a70e12c6546086a18f9e47db7'
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'

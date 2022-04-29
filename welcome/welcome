@@ -50,6 +50,87 @@ export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
 export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
 
+GetIcons() {
+    # Icons for various use cases like
+    #   --field=...
+    #   --image=...
+
+    export WELCOME_ICON_CHANGE_RESOLUTION=preferences-desktop-display
+    export WELCOME_ICON_CHANGE_DISPLAY_MANAGER=preferences-desktop-display
+    export WELCOME_ICON_INSTALL_TAB=$(IconGrasp system-software-install)
+    export WELCOME_ICON_INSTALL_OFFICIAL=$WELCOME_ICON_INSTALL_TAB
+    export WELCOME_ICON_INSTALL_COMMUNITY=$WELCOME_ICON_INSTALL_TAB
+    export WELCOME_ICON_INSTALL_INFO=$WELCOME_ICON_INSTALL_TAB
+    export WELCOME_ICON_MIRROR_UPDATE=software-update-available  # $(IconGrasp software-update-available)     # or applications-internet ?
+    export WELCOME_ICON_PARTITION_MANAGER=$(IconGrasp gparted)
+    export WELCOME_ICON_BLUETOOTH=$(IconGrasp bluetooth)
+    export WELCOME_ICON_BLUETOOTH_INFO=$WELCOME_ICON_BLUETOOTH
+    export WELCOME_ICON_LATEST_RELEASE=user-info                            # or info ?
+    export WELCOME_ICON_INSTALLATION_TIPS=user-info
+    export WELCOME_ICON_SYSTEM_RESCUE=user-info
+    export WELCOME_ICON_SYSTEM_LOGS_HOWTO=user-info
+    export WELCOME_ICON_SYSTEM_LOGS=face-worried
+    export WELCOME_ICON_WEBSITE=user-info                    # or info ?
+    export WELCOME_ICON_WIKI=user-info
+    export WELCOME_ICON_NEWS=user-info
+    export WELCOME_ICON_FORUM=user-info
+    export WELCOME_ICON_DONATE=user-info
+    export WELCOME_ICON_ABOUT_WELCOME=user-info
+    export WELCOME_ICON_SYSTEM_UPDATE=system-software-update
+    export WELCOME_ICON_PACCACHE_SRV=applications-system
+    export WELCOME_ICON_UPDATE_NOTIFIER_CONF=preferences-system
+    export WELCOME_ICON_WALLPAPER_SET_DEFAULT=preferences-desktop-wallpaper
+    export WELCOME_ICON_WALLPAPER_SET=preferences-desktop-wallpaper
+    export WELCOME_ICON_WALLPAPER_DOWNLOAD=preferences-desktop-wallpaper
+    export WELCOME_ICON_TOGGLE_r8169_DRIVER="$(IconGrasp system-software-update)"
+    export WELCOME_ICON_XFCE_THEME_VANILLA=preferences-desktop-theme
+    export WELCOME_ICON_XFCE_THEME_EOS=preferences-desktop-theme
+    export WELCOME_ICON_INITIAL_TAB=preferences-system
+    export WELCOME_ICON_EOS_GENERIC=endeavouros-icon
+    export WELCOME_ICON_TIPS=user-info
+    export WELCOME_ICON_ARM=system-run
+    export WELCOME_ICON_RUNINTERMINAL=preferences-system
+    export WELCOME_ICON_QUESTION=dialog-question
+    export WELCOME_ICON_INFO=dialog-information
+    export WELCOME_ICON_PREFERENCES=system-preferences
+    export WELCOME_ICON_OWN_COMMANDS=applications-other
+    export WELCOME_ICON_HELP=help-about
+}
+
+IconGrasp() {
+    local app desktop icon
+
+    for app in "$@" ; do
+        icon=$(yad-tools -i "$(eos-FindAppIcon "$app")")
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            #echo $(yad-tools -i "$icon")
+            return
+        fi
+    done
+
+    for app in "$@" ; do
+        icon=$(yad-tools -i "$app")
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+
+    return 1
+
+    # old stuff
+    for app in "$@" ; do
+        desktop=$(/usr/bin/find /usr/share/applications -name \*$app\*\.desktop | /usr/bin/head -n1)
+        icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
+        if [ -n "$icon" ] ; then
+            echo "$icon"
+            return
+        fi
+    done
+    return 1
+}
+
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
     # yad running in other processes...
@@ -248,7 +329,7 @@ yad_vanilla_xfce4_theme() {
             msg+="(Note: this info is stored into file $log).\n\n"
             msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
             printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
-            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=preferences-desktop-theme \
+            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=$WELCOME_ICON_XFCE_THEME_VANILLA \
                     --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
             case "$?" in
                 0) mv $conf $conf.$datetime ; reboot ;;
@@ -275,7 +356,7 @@ yad_endeavouros_xfce4_theme() {
             msg+="(Note: this info is stored into file $log2).\n\n"
             msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
             printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
-            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=preferences-desktop-theme \
+            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=$WELCOME_ICON_XFCE_THEME_EOS \
                     --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
             case "$?" in
                 0)
@@ -378,8 +459,7 @@ ShowChangeResoButton() {
     fi
 
     if [ "$show_reso_butt" = "yes" ] ; then
-        local icon=preferences-desktop-display
-        tabcontents+=(--field=" $(ltr ins_reso)!$icon!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
+        tabcontents+=(--field=" $(ltr ins_reso)!$WELCOME_ICON_CHANGE_RESOLUTION!$(ltr ins_resotip)":fbtn   ChangeDisplayResolution)
     fi
 }
 export -f ShowChangeResoButton
@@ -388,67 +468,56 @@ INSTALL() {
   local handle="$1"
   local tabnum="$2"
   local _exclamation='&#33;'   # '!'
-  local image=$system_software_install
-  local gparted="$(IconGrasp gparted)"
-  local reflector_simple="$(IconGrasp software-update-available)"
-  local bluetooth=$(IconGrasp bluetooth)
-  local user_info=info
   local btdoc="https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03"
   local INSTALLER_BROWSER=firefox
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
-      --image=$image
+      --image=$WELCOME_ICON_INSTALL_TAB
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
-      --field=" $(ltr ins_start)!$system_software_install!$(ltr ins_starttip)":fbtn                  "eos-install-mode-run-calamares '$lang' ''"
-      --field=" $(ltr install_community)!$system_software_install!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" $(ltr ins_custom)!$system_software_install!$(ltr ins_custom_tip)":fbtn               "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
-      --field=" $(ltr after_install_um)!$reflector_simple!$(ltr after_install_umtip)":fbtn           reflector-simple
+      --field=" $(ltr ins_start)!$WELCOME_ICON_INSTALL_OFFICIAL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
+      --field=" $(ltr install_community)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
+      --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALL_INFO!$(ltr ins_custom_tip)":fbtn                    "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
+      --field=" $(ltr after_install_um)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn        reflector-simple
   )
 
   ShowChangeResoButton
 
-  local icon=face-worried #dialog-question
   tabcontents+=(
-      --field=" $(ltr ins_pm)!$gparted!$(ltr ins_pmtip)":fbtn                  'gparted'
+      --field=" $(ltr ins_pm)!$WELCOME_ICON_PARTITION_MANAGER!$(ltr ins_pmtip)":fbtn                  'gparted'
   )
   if eos-connection-checker ; then
       tabcontents+=(
-          --field=" $(ltr ins_blue_notes)!$bluetooth!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
+          --field=" $(ltr ins_blue_notes)!$WELCOME_ICON_BLUETOOTH_INFO!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
       )
   fi
   tabcontents+=(
-      --field=" $(ltr ins_rel)!$user_info!$(ltr ins_reltip)":fbtn              "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$user_info!$(ltr ins_tipstip)":fbtn            "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
-    # --field=" $(ltr ins_trouble)!$user_info!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
-      --field=" $(ltr ins_syslog)!$user_info!$(ltr ins_syslogtip)":fbtn        "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-#      --field=" $(ltr ins_logtool)!$icon!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
+      --field=" $(ltr ins_rel)!$WELCOME_ICON_LATEST_RELEASE!$(ltr ins_reltip)":fbtn              "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
+      --field=" $(ltr ins_tips)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_tipstip)":fbtn            "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
+    # --field=" $(ltr ins_trouble)!$WELCOME_ICON_SYSTEM_RESCUE!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      --field=" $(ltr ins_syslog)!$WELCOME_ICON_SYSTEM_LOGS_HOWTO!$(ltr ins_syslogtip)":fbtn        "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+#      --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
-
-  # could use 'gparted' as the icon for gparted...
 }
 
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
-  IsInstalling && {
-      local user_info=info
-  }
   local tabcontents=(
       eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=dialog-question
+      --image=$WELCOME_ICON_QUESTION
       --text="<b>$(ltr general_info_text)</b>" --text-align=left
-      --field=" $(ltr general_info_ws)!$user_info!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
-      --field=" $(ltr general_info_wi)!$user_info!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com"
-      --field=" $(ltr general_info_ne)!$user_info!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/news"
-      --field=" $(ltr general_info_fo)!$user_info!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
-      --field=" $(ltr general_info_do)!$user_info!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
-      --field=" $(ltr general_info_ab)!$user_info!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/endeavouros-tools/welcome"
+      --field=" $(ltr general_info_ws)!$WELCOME_ICON_WEBSITE!https://endeavouros.com":fbtn          "$_WELCOME_BROWSER https://endeavouros.com"
+      --field=" $(ltr general_info_wi)!$WELCOME_ICON_WIKI!$(ltr general_info_witip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com"
+      --field=" $(ltr general_info_ne)!$WELCOME_ICON_NEWS!$(ltr general_info_netip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/news"
+      --field=" $(ltr general_info_fo)!$WELCOME_ICON_FORUM!$(ltr general_info_fotip)":fbtn        "$_WELCOME_BROWSER https://forum.endeavouros.com"
+      --field=" $(ltr general_info_do)!$WELCOME_ICON_DONATE!$(ltr general_info_dotip)":fbtn        "$_WELCOME_BROWSER https://endeavouros.com/donate"
+      --field=" $(ltr general_info_ab)!$WELCOME_ICON_ABOUT_WELCOME!$(ltr general_info_abtip)":fbtn        "$_WELCOME_BROWSER https://discovery.endeavouros.com/endeavouros-tools/welcome"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
@@ -494,31 +563,6 @@ RunIfInstalled() {
 }
 export -f RunIfInstalled
 
-IconGrasp() {
-    local app desktop icon
-
-    for app in "$@" ; do
-        icon=$(eos-FindAppIcon "$app")
-        if [ -n "$icon" ] ; then
-            echo "$icon"
-            return
-        fi
-    done
-
-    return 1
-
-    # old stuff
-    for app in "$@" ; do
-        desktop=$(/usr/bin/find /usr/share/applications -name \*$app\*\.desktop | /usr/bin/head -n1)
-        icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
-        if [ -n "$icon" ] ; then
-            echo "$icon"
-            return
-        fi
-    done
-    return 1
-}
-
 if [ 0 -eq 1 ] ; then
 NothingToDo_other() {
     local text="$1"
@@ -532,24 +576,6 @@ NothingToDo_other() {
 }
 export -f NothingToDo_other
 fi
-
-PacdiffFieldAdd() {
-  local differs=("${EOS_WELCOME_PACDIFFERS[@]}")  # see /etc/eos-script-lib-yad.conf
-  local differ Icon=preferences-system
-
-#  [ "$XDG_SESSION_TYPE" = "wayland" ] && differs=(diffuse "${differs[@]}")
-  for differ in "${differs[@]}" ; do
-      if [ -x /usr/bin/$differ ] ; then
-          case "$differ" in
-              meld|code|vim)          Icon=$(IconGrasp "$differ") ;;
-              kdiff3|kompare|diffuse) Icon=$differ ;;
-          esac
-          tabcontents+=(--field=" Pacdiff $_and $differ!$Icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
-          break
-      fi
-  done
-}
-export -f PacdiffFieldAdd
 
 UpdateWithAurHelper() {
     local helper="$1"
@@ -600,52 +626,68 @@ AfterInstall() {
   local tabcontents=(
       eos_yad --align-buttons
       --use-interp  # don't need explicit 'bash -c' construct when calling functions
-      --plug="$handle" --tabnum="$tabnum" --form --image=dialog-information
+      --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="<b>$(ltr after_install_text)</b>" --columns=2
   )
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       tabcontents+=(
-          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
+          --field=" $(ltr after_install_um)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
       )
   fi
   tabcontents+=(
-      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
-      --field=" $(ltr after_install_pclean)!applications-system!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
+      --field=" $(ltr after_install_us)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_pclean)!$WELCOME_ICON_PACCACHE_SRV!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
   if [ -x /usr/bin/eos-update-notifier-configure ] ; then
-      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!preferences-system!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
+      tabcontents+=(--field=" $(ltr after_install_conf) eos-update-notifier!$WELCOME_ICON_UPDATE_NOTIFIER_CONF!$(ltr after_install_conf) eos-update-notifier":fbtn "eos-update-notifier-configure")
   fi
 
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      tabcontents+=(--field=" $(ltr after_install_cdm)!preferences-desktop-display!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
+      tabcontents+=(--field=" $(ltr after_install_cdm)!$WELCOME_ICON_CHANGE_DISPLAY_MANAGER!$(ltr after_install_cdmtip)":fbtn 'yad_ChangeDisplayManager')
   fi
 
   ShowChangeResoButton
 
   tabcontents+=(
-      --field=" $(ltr after_install_ew)!preferences-desktop-wallpaper!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
-      --field=" $(ltr after_install_ew2)!preferences-desktop-wallpaper!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
-      --field=" $(ltr after_install_more_wall)!preferences-desktop-wallpaper!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
+      --field=" $(ltr after_install_ew)!$WELCOME_ICON_WALLPAPER_SET_DEFAULT!$(ltr after_install_ewtip)":fbtn    'eos-wallpaper-set DEFAULT'
+      --field=" $(ltr after_install_ew2)!$WELCOME_ICON_WALLPAPER_SET!$(ltr after_install_ewtip2)":fbtn  'eos-wallpaper-set'
+      --field=" $(ltr after_install_more_wall)!$WELCOME_ICON_WALLPAPER_DOWNLOAD!$(ltr after_install_more_wall_tip)":fbtn  'RunInTerminal eos-download-wallpapers'
   )
   if IsR8168Card ; then
       tabcontents+=(
-          --field=" $(ltr after_install_r8168)!$system_software_update!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
+          --field=" $(ltr after_install_r8168)!$WELCOME_ICON_TOGGLE_r8169_DRIVER!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
       )
   fi
-  tabcontents+=(--field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  tabcontents+=(--field=" $(ltr ins_logtool)!WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   case "$(eos_yad_GetDesktopName)" in
       XFCE)
           tabcontents+=(
-              --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
-              --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
+              --field=" $(ltr after_install_themevan)!$WELCOME_ICON_XFCE_THEME_VANILLA!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
+              --field=" $(ltr after_install_themedef)!$WELCOME_ICON_XFCE_THEME_EOS!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
           )
           ;;
   esac
   VboxGuestEnable
-  tabcontents+=(--field=" $(ltr after_install_itab)!preferences-system!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
+  tabcontents+=(--field=" $(ltr after_install_itab)!$WELCOME_ICON_INITIAL_TAB!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
+}
+
+
+PacdiffIcon() {
+    # see /etc/eos-script-lib-yad.conf for differs
+
+    for differ in "${EOS_WELCOME_PACDIFFERS[@]}" ; do
+        if [ -x /usr/bin/$differ ] ; then
+            case "$differ" in
+                kompare)      differ_icon=$differ ;;
+                meld)         differ_icon=org.gnome.meld ;;
+                *)            differ_icon=$(IconGrasp "$differ") ;;                    #kdiff3|diffuse|code|vim)
+            esac
+            break
+        fi
+    done
 }
 
 DailyAssistant() {
@@ -655,36 +697,41 @@ DailyAssistant() {
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
 
+  local differ=""                         # PacdiffIcon may change
+  local differ_icon=preferences-system    # PacdiffIcon may change
+
+  PacdiffIcon
+
   local tabcontents=(
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
-      --plug="$handle" --tabnum="$tabnum" --form --image=dialog-information
+      --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="<b>$(ltr daily_assistant_text)</b>" --columns=2
-      --field=" $(ltr after_install_us)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_us)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
   if [ "$EOS_WELCOME_USE_AUR_HELPERS_TESTING" = "yes" ] ; then
       if [ -x /usr/bin/yay ] ; then
           tabcontents+=(
-              --field=" $(ltr after_install_us) (yay)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper yay"
+              --field=" $(ltr after_install_us) (yay)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper yay"
           )
       fi
       if [ -x /usr/bin/paru ] ; then
           tabcontents+=(
-              --field=" $(ltr after_install_us) (paru)!$system_software_update!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper paru"
+              --field=" $(ltr after_install_us) (paru)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper paru"
           )
       fi
   fi
   if [ "$(eos_GetArch)" != "armv7h" ] ; then
       tabcontents+=(
-          --field=" $(ltr after_install_um)!applications-internet!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
+          --field=" $(ltr after_install_um)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn "RunIfInstalled -a=reflector-simple"
       )
   fi
-  PacdiffFieldAdd
+  tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
-      --field=" $(ltr ins_logtool)!face-worried!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr ins_logtool)!WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
   )
   #IsInstalled eos-apps-info && {
   #    tabcontents+=(
-  #        --field=" EndeavourOS apps help!endeavouros-icon!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
+  #        --field=" EndeavourOS apps help!$WELCOME_ICON_EOS_GENERIC!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
   #    )
   #}
 
@@ -753,7 +800,7 @@ WelcomeInitialTab() {
     txt+="After selecting the initial tab, Welcome will be restarted.\n"
     local cmd=(
         eos_yad --form --align-buttons --use-interp --title="Welcome initial tab"
-        --text="$txt" --image=system-preferences
+        --text="$txt" --image=$WELCOME_ICON_PREFERENCES
         --field="Initial tab number\t\t":num "$EOS_WELCOME_ACTIVE_TAB_NUMBER!1..$count!1"
     )
     local result="$("${cmd[@]}" | cut -d '|' -f1)"
@@ -786,25 +833,25 @@ UsefulTips() {
   local tabcontents+=(
       eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
-      --image=$user_info
+      --image=$WELCOME_ICON_TIPS
       --text="<b>$(ltr useful_tips_text)</b>"
 
-      --field=" $(ltr after_install_pm)!$user_info!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=pacman'"
-      --field=" $(ltr after_install_ay)!$user_info!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
+      --field=" $(ltr after_install_pm)!$WELCOME_ICON_TIPS!$(ltr after_install_pmtip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=pacman'"
+      --field=" $(ltr after_install_ay)!$WELCOME_ICON_TIPS!$(ltr after_install_aytip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/category/aur'"
   )
   if [ -x /usr/bin/firewalld ] ; then
-      tabcontents+=(--field=" $(ltr after_install_fw)!$user_info!$(ltr after_install_fwtip)":fbtn "$_WELCOME_BROWSER   'https://discovery.endeavouros.com/applications/firewalld/2022/03'")
+      tabcontents+=(--field=" $(ltr after_install_fw)!$WELCOME_ICON_TIPS!$(ltr after_install_fwtip)":fbtn "$_WELCOME_BROWSER   'https://discovery.endeavouros.com/applications/firewalld/2022/03'")
   fi
   tabcontents+=(
-      --field=" $(ltr after_install_hn)!$user_info!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
-      --field=" $(ltr after_install_bt)!$user_info!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
+      --field=" $(ltr after_install_hn)!$WELCOME_ICON_TIPS!$(ltr after_install_hntip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/?s=Hardware'"
+      --field=" $(ltr after_install_bt)!$WELCOME_ICON_TIPS!$(ltr after_install_bttip)":fbtn     "$_WELCOME_BROWSER 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
   )
   test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_nv)!$user_info!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/nvidia")
+      tabcontents+=(--field=" $(ltr after_install_nv)!$WELCOME_ICON_TIPS!$(ltr after_install_nvtip)":fbtn "$_WELCOME_BROWSER https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
-      --field=" $(ltr after_install_ft)!$user_info!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-      --field=" EndeavourOS $_and ARM!system-run!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "$_WELCOME_BROWSER https://arm.endeavouros.com"
-      --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn      "$_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
+      --field=" $(ltr after_install_ft)!$WELCOME_ICON_TIPS!$(ltr after_install_fttip)":fbtn     "$_WELCOME_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+      --field=" EndeavourOS $_and ARM!$WELCOME_ICON_ARM!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "$_WELCOME_BROWSER https://arm.endeavouros.com"
+      --field=" $(ltr butt_owncmds_help)!$WELCOME_ICON_TIPS!$(ltr nb_tab_owncmdstip)":fbtn      "$_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
       --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn   "welcome-dnd"
   )
 
@@ -831,37 +878,42 @@ AddMoreApps() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --text-align=left --columns=2
-      --image=$system_software_install
+      --image=$WELCOME_ICON_INSTALL_INFO
   )
   local shown_app_buttons=0
   local use_eos_quickstart=no
+
+  local WELCOME_ICON_LIBREOFFICE=libreoffice-fresh
+  local WELCOME_ICON_CHROMIUM=chromium
+  local WELCOME_ICON_AKM=system-software-install
+  local WELCOME_ICON_BLUETOOTH=$(IconGrasp bluetooth)
 
   [ -x /usr/bin/eos-quickstart ] && use_eos_quickstart=yes
 
   if [ "$use_eos_quickstart" = "no" ] ; then
       local DE="$(eos_yad_GetDesktopName)"
-      local gufw="$(IconGrasp gufw network-firewall firewall-config)"
-      local libreoffice="$(IconGrasp libreoffice-writer)"
+      # local gufw="$(IconGrasp gufw network-firewall firewall-config)"
+      # local libreoffice="$(IconGrasp libreoffice-writer)"
       local chromium="$(IconGrasp chromium web-browser)"
       local libreoffice="libreoffice-fresh"
 
       IsInstalled "$libreoffice" || {
           ((shown_app_buttons++))
-          tabcontents+=( --field=" LibreOffice fresh!$libreoffice!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
+          tabcontents+=( --field=" LibreOffice fresh!$WELCOME_ICON_LIBREOFFICE!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
       }
       IsInstalled chromium || {
           ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_ch)!$chromium!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
+          tabcontents+=(--field=" $(ltr add_more_apps_ch)!$WELCOME_ICON_CHROMIUM!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
       }
-      IsInstalled gufw || {
-          ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
-      }
+      #IsInstalled gufw || {
+      #    ((shown_app_buttons++))
+      #    tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
+      #}
 
       if [ "$(eos_GetArch)" != "armv7h" ] ; then
           IsInstalled akm || {
               ((shown_app_buttons++))
-              tabcontents+=(--field=" $(ltr add_more_apps_akm)!$system_software_install!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
+              tabcontents+=(--field=" $(ltr add_more_apps_akm)!$WELCOME_ICON_AKM!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
           }
       fi
       #IsInstalled eos-apps-info || {
@@ -876,8 +928,8 @@ AddMoreApps() {
                   ((shown_app_buttons+=2))
                   local bluetooth="$(IconGrasp bluetooth)"
                   tabcontents+=(
-                      --field=" $(ltr add_more_apps_bt)!$bluetooth!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
-                      --field=" $(ltr add_more_apps_bt_bm)!$bluetooth!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
+                      --field=" $(ltr add_more_apps_bt)!$WELCOME_ICON_BLUETOOTH!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
+                      --field=" $(ltr add_more_apps_bt_bm)!$WELCOME_ICON_BLUETOOTH!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
                   )
                   break
               done
@@ -987,12 +1039,12 @@ OwnCommands() {
   local tabcontents=(
       eos_yad --align-buttons
       --plug="$handle" --tabnum="$tabnum" --form --columns=$cols
-      --image=applications-other
+      --image=$WELCOME_ICON_OWN_COMMANDS
       --text="<b>$(ltr nb_tab_owncmds_text)</b>"
   )
   if [ "$show_buttons" = "yes" ] ; then
       tabcontents+=(
-          --field=" $(ltr butt_owncmds_help)!$user_info!$(ltr nb_tab_owncmdstip)":fbtn
+          --field=" $(ltr butt_owncmds_help)!$WELCOME_ICON_TIPS!$(ltr nb_tab_owncmdstip)":fbtn
                   "$_WELCOME_BROWSER $(Github2Gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/welcome/Adding-own-commands.md)"
           --field=" $(ltr butt_owncmds_dnd)!$EOS_WICON!$(ltr butt_owncmds_dnd_help)":fbtn  "welcome-dnd"
       )
@@ -1048,7 +1100,7 @@ WelcomeHelp() {
                     --fontname="Mono 10" \
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
-                    --image=help-about --button=yad-ok:0
+                    --image=$WELCOME_ICON_HELP --button=yad-ok:0
 }
 export -f WelcomeHelp
 
@@ -1128,7 +1180,7 @@ EOF
 
     case "$value" in
         disable)
-            eos_yad --form --image=dialog-information --text="$(ltr settings_dis_contents)" \
+            eos_yad --form --image=$WELCOME_ICON_INFO --text="$(ltr settings_dis_contents)" \
                     --title="$(ltr settings_dis_title)" \
                     --button=" $(ltr settings_dis_butt)!face-angel!$(ltr settings_dis_buttip)":11
             ;;
@@ -1214,7 +1266,7 @@ R8168check_at_install() {
                 local cmd=(
                     eos_yad
                     --form
-                    --image=dialog-question
+                    --image=$WELCOME_ICON_QUESTION
                     --title="Select the driver for the Realtek 8168 Ethernet card"
                     --text="$txt"
                     --button="r8168":1
@@ -1346,9 +1398,9 @@ VboxGuestEnable() {
                 local msg1="$(ltr after_install_vbox2)"
                 local cmd="systemctl enable --now vboxservice.service"
                 local msgvb="$msg1\n<b>$label</b>"
-                local icon=user-info
-                eos_yad --form --title="Info" --text="$msgvb" --image=$icon --button=yad-quit:0 &
-                tabcontents+=(--field=" $label!preferences-system!$cmd":fbtn "RunInTerminal $cmd")
+                local icon=$WELCOME_ICON_TIPS
+                eos_yad --form --title="Info" --text="$msgvb" --image=$WELCOME_ICON_TIPS --button=yad-quit:0 &
+                tabcontents+=(--field=" $label!$WELCOME_ICON_RUNINTERMINAL!$cmd":fbtn "RunInTerminal $cmd")
             fi
             ;;
     esac
@@ -1466,6 +1518,8 @@ CheckUserPkglist_old() {
 fi
 
 StartHere() {
+    GetIcons
+
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
@@ -1498,11 +1552,6 @@ StartHere() {
     export EOS_FILESERVER_SITE
 
     export WELCOME_ARGS="$*"
-
-    # common button icons
-    local user_info="$(IconGrasp user-info)"
-    local system_software_update="$(IconGrasp system-software-update)"
-    local system_software_install="$(IconGrasp system-software-install)"
 
     for arg in "$@" ; do
         case "$arg" in
