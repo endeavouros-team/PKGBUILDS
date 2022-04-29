@@ -22,7 +22,7 @@ FindDesktopIcon() {
     local dir=/usr/share/applications
 
     if [ -r $dir/"$app".desktop ] ; then
-        path="$(/usr/bin/grep "^Icon=" $dir/"$app".desktop | /usr/bin/head -n 1 | /usr/bin/cut -d '=' -f 2)"
+        path="$(grep "^Icon=" $dir/"$app".desktop | head -n 1 | cut -d '=' -f 2)"
         if [ -n "$path" ] ; then
             echo "$path"
             return 0
@@ -32,16 +32,26 @@ FindDesktopIcon() {
 }
 
 FindAppIcon() {
+    source /etc/eos-script-lib-yad.conf || return 1
+
     local progname="$(/usr/bin/basename "$0")"
     local app="$1"
     local sz
-    local path
+    local path paths
+    local set
+    local icon_sets=()
+
+    for set in "${EOS_ICON_SETS_PREFERENCE[@]}" ; do
+        icon_sets+=("${set##*/}")
+    done
 
     FindDesktopIcon "$app" && return
 
-    for sz in 48 32 24 64
-    do
-        path="$(/usr/bin/find /usr/share/icons -name "$app".\* | /usr/bin/grep -P "/$sz/|/${sz}x${sz}/" | /usr/bin/head -n 1)"
+    for set in "${icon_sets[@]}" ; do
+        paths="$(find "/usr/share/icons/$set" -name "$app".\*)"
+        path="$(echo "$paths" | grep "/scalable/" | head -n1)"
+        [ -z "$path" ] && path="$(echo "$paths" | sort -r | head -n1)"
+        [ -z "$path" ] && path=$(yad-tools -i "$app")
         if [ -n "$path" ] ; then
             echo "$path"
             return
