@@ -121,6 +121,8 @@ export WELCOME_ICON_INFO=dialog-information
 export WELCOME_ICON_PREFERENCES=system-preferences
 export WELCOME_ICON_OWN_COMMANDS=applications-other
 export WELCOME_ICON_HELP=help-about
+export WELCOME_ICON_ERROR=dialog-error
+export WELCOME_ICON_WARNING=dialog-warning
 
 eos_GetArch() {
     local arch; arch="$(/usr/bin/uname -m)"
@@ -273,7 +275,7 @@ eos_yad_check_internet_connection() {
                                 --button=yad-quit:1 \
                                 --button=" Continue anyway!go-next!Don't stop me now":0
                 else
-                    eos_notification "dialog-warning" normal 60000 "$caller" "$title" "No internet connection!"
+                    eos_notification "$WELCOME_ICON_WARNING" normal 60000 "$caller" "$title" "No internet connection!"
                 fi
                 ;;
             *)
@@ -368,7 +370,7 @@ eos_yad_RunCmdTermBash() {
 eos_yad_problem() {
     local title="$1"
     shift
-    eos_yad --text-info --title="$title" --wrap --image=error \
+    eos_yad --text-info --title="$title" --wrap --image=$WELCOME_ICON_ERROR \
             --width=700 --height=500 --button=yad-quit:0 "$@"
     # removed --tail
 }
@@ -395,7 +397,7 @@ eos_yad_WARN() {
     local msg="$1"
     local title="Warning"
     shift
-    echo "$msg" | eos_yad_problem "$title" --image=dialog-warning "$@"
+    echo "$msg" | eos_yad_problem "$title" --image=$WELCOME_ICON_WARNING "$@"
 }
 
 # Function detectDE is copied from: https://cgit.freedesktop.org/xdg/xdg-utils/tree/scripts/xdg-utils-common.in
