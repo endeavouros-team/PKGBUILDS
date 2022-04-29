@@ -50,87 +50,6 @@ export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
 export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
 
-GetIcons() {
-    # Icons for various use cases like
-    #   --field=...
-    #   --image=...
-
-    export WELCOME_ICON_CHANGE_RESOLUTION=preferences-desktop-display
-    export WELCOME_ICON_CHANGE_DISPLAY_MANAGER=preferences-desktop-display
-    export WELCOME_ICON_INSTALL_TAB=$(IconGrasp system-software-install)
-    export WELCOME_ICON_INSTALL_OFFICIAL=$WELCOME_ICON_INSTALL_TAB
-    export WELCOME_ICON_INSTALL_COMMUNITY=$WELCOME_ICON_INSTALL_TAB
-    export WELCOME_ICON_INSTALL_INFO=$WELCOME_ICON_INSTALL_TAB
-    export WELCOME_ICON_MIRROR_UPDATE=software-update-available  # $(IconGrasp software-update-available)     # or applications-internet ?
-    export WELCOME_ICON_PARTITION_MANAGER=$(IconGrasp gparted)
-    export WELCOME_ICON_BLUETOOTH=$(IconGrasp bluetooth)
-    export WELCOME_ICON_BLUETOOTH_INFO=$WELCOME_ICON_BLUETOOTH
-    export WELCOME_ICON_LATEST_RELEASE=user-info                            # or info ?
-    export WELCOME_ICON_INSTALLATION_TIPS=user-info
-    export WELCOME_ICON_SYSTEM_RESCUE=user-info
-    export WELCOME_ICON_SYSTEM_LOGS_HOWTO=user-info
-    export WELCOME_ICON_SYSTEM_LOGS=face-worried
-    export WELCOME_ICON_WEBSITE=user-info                    # or info ?
-    export WELCOME_ICON_WIKI=user-info
-    export WELCOME_ICON_NEWS=user-info
-    export WELCOME_ICON_FORUM=user-info
-    export WELCOME_ICON_DONATE=user-info
-    export WELCOME_ICON_ABOUT_WELCOME=user-info
-    export WELCOME_ICON_SYSTEM_UPDATE=system-software-update
-    export WELCOME_ICON_PACCACHE_SRV=applications-system
-    export WELCOME_ICON_UPDATE_NOTIFIER_CONF=preferences-system
-    export WELCOME_ICON_WALLPAPER_SET_DEFAULT=preferences-desktop-wallpaper
-    export WELCOME_ICON_WALLPAPER_SET=preferences-desktop-wallpaper
-    export WELCOME_ICON_WALLPAPER_DOWNLOAD=preferences-desktop-wallpaper
-    export WELCOME_ICON_TOGGLE_r8169_DRIVER="$(IconGrasp system-software-update)"
-    export WELCOME_ICON_XFCE_THEME_VANILLA=preferences-desktop-theme
-    export WELCOME_ICON_XFCE_THEME_EOS=preferences-desktop-theme
-    export WELCOME_ICON_INITIAL_TAB=preferences-system
-    export WELCOME_ICON_EOS_GENERIC=endeavouros-icon
-    export WELCOME_ICON_TIPS=user-info
-    export WELCOME_ICON_ARM=system-run
-    export WELCOME_ICON_RUNINTERMINAL=preferences-system
-    export WELCOME_ICON_QUESTION=dialog-question
-    export WELCOME_ICON_INFO=dialog-information
-    export WELCOME_ICON_PREFERENCES=system-preferences
-    export WELCOME_ICON_OWN_COMMANDS=applications-other
-    export WELCOME_ICON_HELP=help-about
-}
-
-IconGrasp() {
-    local app desktop icon
-
-    for app in "$@" ; do
-        icon=$(yad-tools -i "$(eos-FindAppIcon "$app")")
-        if [ -n "$icon" ] ; then
-            echo "$icon"
-            #echo $(yad-tools -i "$icon")
-            return
-        fi
-    done
-
-    for app in "$@" ; do
-        icon=$(yad-tools -i "$app")
-        if [ -n "$icon" ] ; then
-            echo "$icon"
-            return
-        fi
-    done
-
-    return 1
-
-    # old stuff
-    for app in "$@" ; do
-        desktop=$(/usr/bin/find /usr/share/applications -name \*$app\*\.desktop | /usr/bin/head -n1)
-        icon=$(/usr/bin/grep ^Icon= "$desktop" 2>/dev/null | /usr/bin/cut -d '=' -f2 | /usr/bin/head -n1)
-        if [ -n "$icon" ] ; then
-            echo "$icon"
-            return
-        fi
-    done
-    return 1
-}
-
 AfterTranslations() {
     # Here we have definitions that require special treatment because of
     # yad running in other processes...
@@ -683,7 +602,7 @@ PacdiffIcon() {
             case "$differ" in
                 kompare)      differ_icon=$differ ;;
                 meld)         differ_icon=org.gnome.meld ;;
-                *)            differ_icon=$(IconGrasp "$differ") ;;                    #kdiff3|diffuse|code|vim)
+                *)            differ_icon=$(eos_IconGrasp "$differ") ;;                    #kdiff3|diffuse|code|vim)
             esac
             break
         fi
@@ -886,15 +805,15 @@ AddMoreApps() {
   local WELCOME_ICON_LIBREOFFICE=libreoffice-fresh
   local WELCOME_ICON_CHROMIUM=chromium
   local WELCOME_ICON_AKM=system-software-install
-  local WELCOME_ICON_BLUETOOTH=$(IconGrasp bluetooth)
+  local WELCOME_ICON_BLUETOOTH=$(eos_IconGrasp bluetooth)
 
   [ -x /usr/bin/eos-quickstart ] && use_eos_quickstart=yes
 
   if [ "$use_eos_quickstart" = "no" ] ; then
       local DE="$(eos_yad_GetDesktopName)"
-      # local gufw="$(IconGrasp gufw network-firewall firewall-config)"
-      # local libreoffice="$(IconGrasp libreoffice-writer)"
-      local chromium="$(IconGrasp chromium web-browser)"
+      # local gufw="$(eos_IconGrasp gufw network-firewall firewall-config)"
+      # local libreoffice="$(eos_IconGrasp libreoffice-writer)"
+      local chromium="$(eos_IconGrasp chromium web-browser)"
       local libreoffice="libreoffice-fresh"
 
       IsInstalled "$libreoffice" || {
@@ -926,7 +845,7 @@ AddMoreApps() {
                   IsInstalled blueberry && break
                   IsInstalled blueman && break
                   ((shown_app_buttons+=2))
-                  local bluetooth="$(IconGrasp bluetooth)"
+                  local bluetooth="$(eos_IconGrasp bluetooth)"
                   tabcontents+=(
                       --field=" $(ltr add_more_apps_bt)!$WELCOME_ICON_BLUETOOTH!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
                       --field=" $(ltr add_more_apps_bt_bm)!$WELCOME_ICON_BLUETOOTH!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
@@ -1518,8 +1437,6 @@ CheckUserPkglist_old() {
 fi
 
 StartHere() {
-    GetIcons
-
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
     local tr_engine=bing
