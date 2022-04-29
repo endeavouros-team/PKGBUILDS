@@ -578,7 +578,7 @@ AfterInstall() {
           --field=" $(ltr after_install_r8168)!$WELCOME_ICON_TOGGLE_r8169_DRIVER!$(ltr after_install_r8168_tip)":fbtn "ethernet_toggle_r8168_r8169"
       )
   fi
-  tabcontents+=(--field=" $(ltr ins_logtool)!WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
+  tabcontents+=(--field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   case "$(eos_yad_GetDesktopName)" in
       XFCE)
           tabcontents+=(
@@ -646,7 +646,7 @@ DailyAssistant() {
   fi
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
-      --field=" $(ltr ins_logtool)!WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
   )
   #IsInstalled eos-apps-info && {
   #    tabcontents+=(
@@ -1101,7 +1101,7 @@ EOF
         disable)
             eos_yad --form --image=$WELCOME_ICON_INFO --text="$(ltr settings_dis_contents)" \
                     --title="$(ltr settings_dis_title)" \
-                    --button=" $(ltr settings_dis_butt)!face-angel!$(ltr settings_dis_buttip)":11
+                    --button=" $(ltr settings_dis_butt)!$WELCOME_ICON_HONEST!$(ltr settings_dis_buttip)":11
             ;;
         check)
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
@@ -1653,21 +1653,21 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
-    notebook+=(--button=" $(ltr butt_softnews)!applications-development!$(ltr butt_softnews_tip)":"ImportantNews")
-    notebook+=(--button=" $(ltr butt_changelog)!applications-development!$(ltr butt_changelogtip)":"WelcomeChangelog")
+    notebook+=(--button=" $(ltr butt_softnews)!$WELCOME_ICON_APPDEV!$(ltr butt_softnews_tip)":"ImportantNews")
+    notebook+=(--button=" $(ltr butt_changelog)!$WELCOME_ICON_CHANGELOG!$(ltr butt_changelogtip)":"WelcomeChangelog")
     case "$EOS_WELCOME_HAS_SEE_YOU_LATER_BUTTON" in
         yes)
-            notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
+            notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
             if [ "$is_installing" = "no" ] ; then
-                notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+                notebook+=(--button=" $(ltr butt_noshow)!$WELCOME_ICON_LEAVE!$(ltr butt_noshow)":5)
             fi
             notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
             ;;
         no|*)
             if [ "$is_installing" = "no" ] ; then
-                notebook+=(--button=" $(ltr butt_noshow)!face-crying!$(ltr butt_noshow)":5)
+                notebook+=(--button=" $(ltr butt_noshow)!$WELCOME_ICON_LEAVE!$(ltr butt_noshow)":5)
             fi
-            notebook+=(--button=" $(ltr butt_help)!help-contents!":"WelcomeHelp")
+            notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
             ;;
     esac
 
