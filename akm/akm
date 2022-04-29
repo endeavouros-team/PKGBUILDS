@@ -215,7 +215,7 @@ AkmConfig() {
 }
 
 DIE() {
-    eos_yad --form --width=400 --title="AKM failure" --image=error --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="AKM failure" --image=$WELCOME_ICON_ERROR --text="$1" --button=yad-quit
     exit 1
 }
 
@@ -433,7 +433,7 @@ Main()
         --use-interp
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
-        --image=system-software-update
+        --image=$WELCOME_ICON_SYSTEM_UPDATE
         --button=" Changelog!applications-development!Show latest changes of this program":"Changelog"
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" Help!help-contents!Helps to use $progname":"Manual"
@@ -449,7 +449,7 @@ Main()
     local progress_cmd=(
         eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
         --width=400 --no-buttons
-        --image=user-info
+        --image=$WELCOME_ICON_INFO
         --title="AKM progress"
         --text="Fetching information, please wait..."
     )
