@@ -127,7 +127,7 @@ WallpaperSetCommon() {
             ;;
         KDE)
             AssertPicture endeavouros_plasma.png no
-            python3 /usr/share/endeavouros/scripts/ksetwallpaper.py "$pic"
+            python3 /usr/share/endeavouros/scripts/ksetwallpaper.py --file "$pic"
             # see also:
             # https://www.kubuntuforums.net/showthread.php/66762-Right-click-wallpaper-changer?p=387392&viewfull=1#post387392
             ;;

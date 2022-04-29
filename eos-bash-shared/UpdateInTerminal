@@ -48,6 +48,7 @@ Options() {
             --lang=*) lang="${pp#*=}" ;;
             --nt) new_terminal=yes ;;
             --sync) allow_sync=yes ;;
+            --keyring) keyring_first=yes ;;
             --help | -h) Usage ; return 1 ;;
             -*) DIE "unsupported option '$pp'" ;;
             *)  DIE "unsupported parameter '$pp'" ;;
@@ -66,12 +67,14 @@ Options:
     --noaur    Don't check AUR updates.
     --nt       Check updates in a new terminal window.
     --sync     Run program 'sync' afterwards if updates were detected.
+    --keyring  Update archlinux-keyring first. This may help on some PGP signature issues.
 EOF
 }
 
 Main() {
     local checkArchEos=yes
     local checkAur=yes
+    local keyring_first="$EOS_UPDATE_ARCH_KEYRING_FIRST"
     local lang=""
     local progname="$(basename "$0")"
     local upname="Arch & EndeavourOS"
@@ -81,7 +84,9 @@ Main() {
     local updates_found=no
     local allow_sync=no
 
-    [ -n "$aur_helper" ] || aur_helper=yay
+    # make sure we have reasonable values
+    [ -n "$keyring_first" ] || keyring_first=no
+    [ -n "$aur_helper" ]    || aur_helper=yay
 
     Options "$@" || return
 
@@ -97,7 +102,14 @@ Main() {
         echo2 ":: $(ltr updt_searching) $upname $(ltr updt_for_updates)..."
         Checkupdates
         case "$?" in
-            0) $EOS_ROOTER 'pacman -Syu' ; updates_found=yes ;;
+            0)
+                if [ "$keyring_first" = "yes" ] ; then
+                    $EOS_ROOTER "pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Su"
+                else
+                    $EOS_ROOTER "pacman -Syu"
+                fi
+                updates_found=yes
+                ;;
             1) DIE "$(echo Checkupdates: $(ltr updt_failure) | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
             2) echo2 " $(ltr updt_nothing_todo)" ;;
         esac
@@ -106,14 +118,14 @@ Main() {
 
     if [ "$checkAur" = "yes" ] ; then
         echo2 "AUR $(ltr updt_update_check):"
-        which $aur_helper >& /dev/null && {
+        if which $aur_helper >& /dev/null ; then
             $aur_helper -Sua
             updates_found=yes
-        } || {
+        else
             echo2 ":: Warning: no AUR helper found."
             echo2 ":: Please check configuration file /etc/eos-script-lib-yad.conf,"
             echo2 ":: and check that the configured AUR helper is installed."
-        }
+        fi
     fi
 
     if [ "$updates_found" = "yes" ] ; then
