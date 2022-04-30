@@ -79,19 +79,19 @@ ShowNotify() {
 
     case "$ShowWhatAboutUpdates" in
 	number)
-	    msg="$(printf "$progname: $update_count $source updates available at $date.\n")" ;;
+	    msg="$(printf "$update_count $source updates available at $date\n")" ;;
 	packages)
-	    msg="$(printf "$progname: $update_count $source updates available at $date:\n$pkgs\n")" ;;
+	    msg="$(printf "$update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
     if [ 0 -eq 1 ] ; then
         expiretime="--expire-time=$expiretime"
         /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
                              --app-name="EndeavourOS Update Notifier" \
-                             "Updates available at $date" \
+                             "Updates available ($progname)" \
 			     "$msg"
     else
         eos_notification "$_UpdateNotifyIcon" "normal" "$expiretime" "EndeavourOS Update Notifier" \
-                         "Updates available at $date" \
+                         "Updates available ($progname)" \
 			 "$msg"
     fi
 }
