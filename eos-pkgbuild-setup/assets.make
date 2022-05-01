@@ -24,6 +24,34 @@ DIE() {
 }
 WARN()       { echo2 -n "Warning: " ; echo2 "$@" ; }
 
+FileSizePrint() {
+    # Print size of file in bytes, numbers are is groups of three.
+    # Examples:
+    #       43854 ==> 43 854
+    #    52341928 ==> 52 341 928
+    # Note: user must align right if needed.
+
+    local file="$1"
+    local nr nr2="" nrtail
+    local left remove=3
+
+    nr=$(stat -c %s "$file")
+    left=${#nr}
+    while [ $left -gt 0 ] ; do
+        if [ $remove -gt $left ] ; then
+            remove=$left
+        fi
+        ((left -= remove))
+        nrtail="${nr: -remove}"
+        nr="${nr:: -remove}"
+        nr2="$nrtail $nr2"
+    done
+    [ "${nr2::1}" = " " ]  && nr2="${nr2:1}"         # skip leading space
+    [ "${nr2: -1}" = " " ] && nr2="${nr2:: -1}"      # skip trailing space
+
+    echo "$nr2"
+}
+
 read2() {
     # Special handling for option -t (and -p).
     # The read value goes to the REPLY variable only.
@@ -1005,7 +1033,8 @@ Main2()
 
             echo2 "    ==> Build time: $(TimeStamp $buildStartTime)"
             for yy in "${built_under_this_pkgname[@]}" ; do
-                echo2 "    ==> $yy"
+                printf2 "    ==> %15s %s\n" "$(FileSizePrint "$buildsavedir/$yy")" "$yy"
+                #echo2  "    ==> $yy"
             done
 
             # determine old pkgs
