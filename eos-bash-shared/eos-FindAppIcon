@@ -51,7 +51,7 @@ FindAppIcon() {
         paths="$(find "/usr/share/icons/$set" -name "$app".\*)"
         path="$(echo "$paths" | grep "/scalable/" | head -n1)"
         [ -z "$path" ] && path="$(echo "$paths" | sort -r | head -n1)"
-        [ -z "$path" ] && path=$(yad-tools -i "$app")
+        [ -z "$path" ] && path=$(yad-tools -i "$app" 2>/dev/null)
         if [ -n "$path" ] ; then
             echo "$path"
             return
