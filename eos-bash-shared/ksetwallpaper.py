@@ -5,6 +5,7 @@ import argparse
 import glob
 import random
 import os
+import subprocess
 from pathlib import Path
 HOME = str(Path.home())
 SCREEN_LOCK_CONFIG = HOME+"/.config/kscreenlockerrc"
@@ -32,17 +33,23 @@ def set_lockscreen_wallpaper(filepath,plugin='org.kde.image'):
             is_wallpaper_section=False
             for num,line in enumerate(new_data,1):
                 if "[Greeter][Wallpaper]["+plugin+"][General]" in line:
-                    #print(">>> Found wall section")
                     is_wallpaper_section = True
                 if "Image=" in line and is_wallpaper_section:
-                    #print(f">>> Found image line >>> {line}")
                     new_data[num-1] = "Image="+filepath+"\n"
+                    break
 
         with open(SCREEN_LOCK_CONFIG, "w") as kscreenlockerrc:
             kscreenlockerrc.writelines(new_data)
 
+def is_locked():
+    is_locked=subprocess.check_output("qdbus org.kde.screensaver /ScreenSaver org.freedesktop.ScreenSaver.GetActive",shell=True,universal_newlines=True).strip()
+    if is_locked == "true":
+        is_locked = True
+    else:
+        is_locked = False
+    return is_locked
+
 def get_walls_from_folder(directory):
-    # return  [f for f in listdir(folder) if isfile(join(folder, f))]
     return glob.glob(directory+'/*')
 
 
@@ -62,11 +69,12 @@ def wallpaper_slideshow(wallapapers, plugin, timer, lock_screen):
         print(
             f"Looping through {wallpaper_count} wallpapers every  {timer_show}")
         while True:
-            random_int = random.randint(0, wallpaper_count-1)
-            wallpaper_now = wallapapers[random_int]
-            setwallpaper(wallpaper_now, plugin)
-            if lock_screen == True:
-                set_lockscreen_wallpaper(wallpaper_now, plugin)
+            if is_locked() != True:
+                random_int = random.randint(0, wallpaper_count-1)
+                wallpaper_now = wallapapers[random_int]
+                setwallpaper(wallpaper_now, plugin)
+                if lock_screen == True:
+                    set_lockscreen_wallpaper(wallpaper_now, plugin)
             time.sleep(timer)
     else:
         raise ValueError('Invalid --timer value')
@@ -84,7 +92,6 @@ if __name__ == '__main__':
     parser.add_argument('--lock-screen', '-l', action="store_true",
                         help="Set lock screen wallpaper")
     args = parser.parse_args()
-    # setwallpaper(args.file, args.plugin)
 
     if args.file != None:
         setwallpaper(filepath=args.file, plugin=args.plugin)
