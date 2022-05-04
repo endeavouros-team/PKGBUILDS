@@ -6,7 +6,7 @@ depends=(yad)
 pkgdesc="A fork of zenity - display graphical dialogs from shell scripts or command line"
 url="https://github.com/v1cont/yad"
 license=('GPL3')
-arch=(x86_64 aarch64 armv7h)
+arch=(any)
 
 # pkgver and pkgrel should "never" change, they are used only to update yad-eos 12.0-1
 pkgver=12.0
