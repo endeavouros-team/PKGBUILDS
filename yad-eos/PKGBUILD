@@ -1,28 +1,13 @@
-#!/bin/bash
-
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-# Latest yad release with a patch.
+pkgname=yad-eos
+depends=(yad)
 
-_yad-eos_prepare() {
-    local _pkgname_orig=yad
+pkgdesc="A fork of zenity - display graphical dialogs from shell scripts or command line"
+url="https://github.com/v1cont/yad"
+license=('GPL3')
+arch=('x86_64')
 
-    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD || exit 1
-
-    sed -i PKGBUILD.orig -e 's|${pkgname}|'$_pkgname_orig'|'   # keep the original pkgname in PKGBUILD for building a package
-    source PKGBUILD.orig
-    rm -f PKGBUILD.orig
-
-    # now change to the new pkgname
-    pkgname=${_pkgname_orig}-eos
-
-    # Take care of conflicting packages:
-    conflicts=($_pkgname_orig ${_pkgname_orig}-git)
-    provides=($_pkgname_orig)
-
-    # Add architectures
-    # arch+=(aarch64 armv7h)
-}
-
-_yad-eos_prepare
-unset -f _yad-eos_prepare
+# pkgver and pkgrel should "never" change, they are used only to update yad-eos 12.0-1
+pkgver=12.0
+pkgrel=1.1
