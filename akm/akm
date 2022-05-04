@@ -356,7 +356,7 @@ Main()
     local connect_header_with_kernel=no    # default, change with option --connect-header
     local akm_kernels_headers_user=()
     local akm_window_width=900
-    local scroll=no
+    local scroll=yes
     local nrofkernelitems                  # 8 with only upstream kernels
 
     CommonStuff
