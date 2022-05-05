@@ -20,17 +20,21 @@ export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
 
 Checkupdates() {
-    local updates
+    # Variables:
+    #    in:  updates
+    #    out: updates
+
     local retval
 
     updates=$(checkupdates)
     retval=$?
 
     echo "$updates"
+    updates="$(echo "$updates" | awk '{print $1}')"
 
     case "$retval" in
         0)
-            eos-kernel-nvidia-update-check $(echo "$updates" | awk '{print $1}') || {
+            eos-kernel-nvidia-update-check $updates || {
                 read -p "Stop upgrade (Y/n)? " >&2
                 case "$REPLY" in
                     "" | [Yy]*) exit 1 ;;
@@ -85,6 +89,9 @@ Main() {
     local new_terminal_options=""  # skips only --nt
     local updates_found=no
     local allow_sync=no
+    local updates
+    local args=() arg
+    local krpkg=""
 
     # make sure we have reasonable values
     [ -n "$keyring_first" ] || keyring_first=no
@@ -105,12 +112,25 @@ Main() {
         Checkupdates
         case "$?" in
             0)
-                if [ "$keyring_first" = "yes" ] ; then
-                    $EOS_ROOTER "pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Su"
-                else
-                    $EOS_ROOTER "pacman -Syu"
-                fi
                 updates_found=yes
+
+                # check if 'archlinux-keyring' is among updates
+                for arg in $updates ; do
+                    case "$arg" in
+                        archlinux-keyring)
+                            krpkg="$arg"             # yes it is among updates
+                            ;;
+                        *)
+                            args+=("$arg")
+                            ;;
+                    esac
+                done
+                
+                if [ -n "$krpkg" ] && [ "$keyring_first" = "yes" ] ; then
+                    $EOS_ROOTER "pacman -Sy --needed --noconfirm $krpkg && pacman -S ${args[*]}"
+                else
+                    $EOS_ROOTER "pacman -Sy $krpkg ${args[*]}"
+                fi
                 ;;
             1) DIE "$(echo Checkupdates: $(ltr updt_failure) | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
             2) echo2 " $(ltr updt_nothing_todo)" ;;
