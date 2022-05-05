@@ -7,10 +7,12 @@ WARN()    { echo2 "====> $progname: warning: $1" ; }
 
 translations_dir=/usr/share/endeavouros/scripts  # needed in translations.bash
 
-source $translations_dir/eos-script-lib-yad || {
+source $translations_dir/eos-script-lib-yad --limit-icons || {
+    progname="$(basename "$0")"
     DIE "$translations_dir/eos-script-lib-yad not found!"
 }
 source $translations_dir/translations.bash || {
+    progname="$(basename "$0")"
     DIE "$translations_dir/translations.bash not found!"
 }
 

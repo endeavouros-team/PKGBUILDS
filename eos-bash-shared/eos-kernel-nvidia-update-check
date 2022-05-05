@@ -12,28 +12,23 @@
 Main()
 {
     PATH=/usr/bin:$PATH
-    lsmod | grep nvidia >/dev/null || exit 0                # NVIDIA not is use
 
-    # stop if any nvidia dkms driver is installed
-    local known_nvidia_dkms_drivers=(
-        nvidia-dkms
-        $(yay -Ssq nvidia xx-dkms | grep -Pv '430|340' | sort -r | head -n2)  # 2 latest from AUR
-    )
-    local pkg
-    for pkg in "${known_nvidia_dkms_drivers[@]}"
-    do
-        /usr/bin/pacman -Qq $pkg >& /dev/null && exit 0
-    done
+    lsmod | grep nvidia >/dev/null || exit 0                             # NVIDIA not is use
+    [ -n "$(pacman -Qsq nvidia dkms | grep nvidia.*dkms)" ] && exit 0    # stop if any nvidia dkms driver is installed
 
-    local pkgs=("$@")
     local linux_lts=no
     local linux=no
     local nvidia_lts=no
     local nvidia=no
     local msgs=() msg
+    local pkgs pkg
 
     # Find updates if they are not as parameters.
-    [ -z "$pkgs" ] && readarray -t pkgs <<< $(checkupdates  | awk '{print $1}')
+    if [ -z "$1" ] ; then
+        readarray -t pkgs <<< $(checkupdates | awk '{print $1}')
+    else
+        pkgs=("$@")
+    fi
 
     # Check if kernel(s) and nvidia driver(s) are in the updates list.
     for pkg in "${pkgs[@]}" ; do
