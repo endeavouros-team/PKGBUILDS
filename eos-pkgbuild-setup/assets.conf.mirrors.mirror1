@@ -501,7 +501,8 @@ _diff_file_and_data() {
     local retval
 
     echo "$data" > $datafile
-    diff "$file" "$datafile"
+    #diff "$file" "$datafile"
+    meld "$file" "$datafile"
 }
 
 _eos-bash-shared_hook_check_ksetwallpaper_py() {
@@ -521,10 +522,11 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
     fi
     if [ "$(cat "$current")" != "$new" ] ; then
         local newfile=$(mktemp)
-        diffs="$(_diff_file_and_data "$current" "$new" "$newfile")"
-        echo "" >&2
-        echo "$diffs" >&2
-        echo "" >&2
+        _diff_file_and_data "$current" "$new" "$newfile"
+        # diffs="$(_diff_file_and_data "$current" "$new" "$newfile")"
+        # echo "" >&2
+        # echo "$diffs" >&2
+        # echo "" >&2
         read -p "eos-bash-shared: file '$file' differs from current, update (Y/n)? " answer >&2
         case "$answer" in
             "" | [yY]*)
