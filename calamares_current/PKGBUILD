@@ -10,7 +10,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 _calamares_ver=3.2.57
-pkgver=22.04.2.6
+pkgver=22.04.2.7
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -29,16 +29,16 @@ source=(
   "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
 )
 
-sha256sums=('cd4fcfe19399ec169f47699d9c999efd8d31a40b78b9dbfd2ec2221e66b8386a'
+sha256sums=('03dbd078dbdc2e904b0afb335d60a83c40a4f8a25639de7218ba3624fb25a01e'
             'ef7f564ec2cd8baaf94a44982ce1db88c1192696617f21538d0b8472a63b4c2b')
 
 prepare() {
     mv "$_reponame-$_calamares_ver"            "$_reponame"
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
     rm -r "$_reponame/src/modules/"{fstab,mount,packages}
-    
+
     mv "${_eos_changes}-${pkgver}" "${_eos_changes}"
-    
+
     # move extra modules from external repo inside calamares sources
     rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
     rm -rf "$_eos_changes"
@@ -88,5 +88,5 @@ package() {
 
     # Commom install -D doesn't work
     cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
-    
+
 }
