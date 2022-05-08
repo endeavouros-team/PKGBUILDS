@@ -4,10 +4,9 @@
 _pkgname=worm
 pkgname=eos-skel-ce-worm
 pkgver=1.0
-pkgrel=9
+pkgrel=10
 pkgdesc="pre user creation skel setup for worm EOS-CE"
 arch=('any')
-groups=('eos-ce')
 url="https://github.com/EndeavourOS-Community-Editions/${pkgname}"
 license=('GPL')
 depends=('git')
