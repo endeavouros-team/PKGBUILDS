@@ -4,7 +4,7 @@
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
 pkgver=2.0
-pkgrel=9
+pkgrel=10
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=('any')
 groups=('EndeavourOS')
@@ -19,6 +19,7 @@ package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
     mkdir -p "${pkgdir}${PREFIX}/.config/"
+    mkdir -p "${pkgdir}${PREFIX}/.config/autostart"
     mkdir -p "${pkgdir}${PREFIX}/.config/xfce4/"
     cp -R ".config/Thunar" "${pkgdir}${PREFIX}/.config/Thunar"
     cp -R ".config/xfce4/panel" "${pkgdir}${PREFIX}/.config/xfce4/panel"
