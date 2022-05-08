@@ -1,13 +1,43 @@
+#!/bin/bash
+
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
-pkgname=yad-eos
-depends=(yad)
+# Latest yad release with a patch.
 
-pkgdesc="A fork of zenity - display graphical dialogs from shell scripts or command line"
-url="https://github.com/v1cont/yad"
-license=('GPL3')
-arch=(any)
+_yad-eos_prepare() {
+    local orig_name=yad
 
-# pkgver and pkgrel should "never" change, they are used only to update yad-eos 12.0-1
-pkgver=12.0
-pkgrel=1.1
+    curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$orig_name/trunk/PKGBUILD || exit 1
+
+    # keep the original pkgname in PKGBUILD for building a package
+    sed -i PKGBUILD.orig -e 's|${pkgname}|'$orig_name'|'
+
+    # patch the dialog height issue, see https://sourceforge.net/p/yad-dialog/tickets/322/#6f2d
+    sed -i PKGBUILD.orig -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n'
+
+    source PKGBUILD.orig
+    rm -f PKGBUILD.orig
+
+    # now change to the new pkgname
+    pkgname=${orig_name}-eos
+
+    # Use our web page
+    url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+
+    # update pkgrel because of this patch
+    pkgrel="$pkgrel".2
+
+    source+=($url/yad-github-issue-107.patch)
+sha256sums=('65dbfa72a229f6cbd131470caf4f70fec98fe935a1436acb58c841fa2a8bddde'
+            '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
+
+    # Take care of conflicting packages:
+    conflicts=($orig_name ${orig_name}-git)
+    provides=($orig_name)
+
+    # Use any architectures
+    arch=(any)
+}
+
+_yad-eos_prepare
+unset -f _yad-eos_prepare

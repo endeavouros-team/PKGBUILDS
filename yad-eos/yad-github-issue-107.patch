@@ -1,0 +1,147 @@
+diff -Nru yad-8.0/src/main.c yad-8.0-OK/src/main.c
+--- yad-8.0/src/main.c	2021-01-19 20:59:42.000000000 +0300
++++ yad-8.0-OK/src/main.c	2021-03-17 23:59:39.015842842 +0300
+@@ -178,66 +178,6 @@
+ 
+   layout = image = mw = exp = NULL;
+ 
+-  /* create image */
+-  if (options.data.dialog_image)
+-    {
+-      GdkPixbuf *pb = NULL;
+-
+-      pb = get_pixbuf (options.data.dialog_image, YAD_BIG_ICON, FALSE);
+-      image = gtk_image_new_from_pixbuf (pb);
+-      if (pb)
+-        g_object_unref (pb);
+-
+-      gtk_widget_set_name (image, "yad-dialog-image");
+-      gtk_widget_set_halign (image, GTK_ALIGN_CENTER);
+-      gtk_widget_set_valign (image, GTK_ALIGN_START);
+-    }
+-
+-  /* create text label */
+-  if (options.data.dialog_text)
+-    {
+-      /* for dnd's tooltip we don't need text label */
+-      if (options.mode != YAD_MODE_DND || !options.dnd_data.tooltip)
+-        {
+-          gchar *buf = g_strcompress (options.data.dialog_text);
+-
+-          text = gtk_label_new (NULL);
+-          gtk_widget_set_name (text, "yad-dialog-label");
+-          gtk_label_set_line_wrap (GTK_LABEL (text), TRUE);
+-          gtk_label_set_selectable (GTK_LABEL (text), options.data.selectable_labels);
+-          gtk_widget_set_state_flags (text, GTK_STATE_FLAG_NORMAL, FALSE);
+-          gtk_widget_set_can_focus (text, FALSE);
+-
+-          if (options.data.text_width > 0)
+-            gtk_label_set_width_chars (GTK_LABEL (text), options.data.text_width);
+-
+-          /* set label align and justification */
+-          switch (options.data.text_align)
+-            {
+-            case GTK_JUSTIFY_LEFT:
+-            case GTK_JUSTIFY_FILL:
+-              gtk_label_set_xalign (GTK_LABEL (text), 0.0);
+-              break;
+-            case GTK_JUSTIFY_RIGHT:
+-              gtk_label_set_xalign (GTK_LABEL (text), 1.0);
+-              break;
+-            case GTK_JUSTIFY_CENTER:
+-              gtk_label_set_xalign (GTK_LABEL (text), 0.5);
+-              break;
+-            }
+-          gtk_label_set_justify (GTK_LABEL (text), options.data.text_align);
+-
+-          if (!options.data.no_markup)
+-            {
+-              gtk_label_set_markup (GTK_LABEL (text), buf);
+-              g_signal_connect (G_OBJECT (text), "activate-link", G_CALLBACK (link_cb), NULL);
+-            }
+-          else
+-            gtk_label_set_text (GTK_LABEL (text), buf);
+-          g_free (buf);
+-        }
+-    }
+-
+   /* create main widget */
+   switch (options.mode)
+     {
+@@ -310,10 +250,72 @@
+   layout = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
+   box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
+ 
+-  if (image)
+-    gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 2);
+-  if (text)
+-    gtk_box_pack_start (GTK_BOX (box), text, TRUE, TRUE, 2);
++  /* create image */
++  if (options.data.dialog_image)
++    {
++      GdkPixbuf *pb = NULL;
++
++      pb = get_pixbuf (options.data.dialog_image, YAD_BIG_ICON, FALSE);
++      image = gtk_image_new_from_pixbuf (pb);
++      if (pb)
++        g_object_unref (pb);
++
++      gtk_widget_set_name (image, "yad-dialog-image");
++      gtk_widget_set_halign (image, GTK_ALIGN_CENTER);
++      gtk_widget_set_valign (image, GTK_ALIGN_START);
++
++      if (image)
++        gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 2);
++    }
++
++  /* create text label */
++  if (options.data.dialog_text)
++    {
++      /* for dnd's tooltip we don't need text label */
++      if (options.mode != YAD_MODE_DND || !options.dnd_data.tooltip)
++        {
++          gchar *buf = g_strcompress (options.data.dialog_text);
++
++          text = gtk_label_new (NULL);
++          gtk_widget_set_name (text, "yad-dialog-label");
++          if (imw)
++            gtk_label_set_line_wrap (GTK_LABEL (text), TRUE);
++          gtk_label_set_selectable (GTK_LABEL (text), options.data.selectable_labels);
++          gtk_widget_set_state_flags (text, GTK_STATE_FLAG_NORMAL, FALSE);
++          gtk_widget_set_can_focus (text, FALSE);
++
++          if (options.data.text_width > 0)
++            gtk_label_set_width_chars (GTK_LABEL (text), options.data.text_width);
++
++          /* set label align and justification */
++          switch (options.data.text_align)
++            {
++            case GTK_JUSTIFY_LEFT:
++            case GTK_JUSTIFY_FILL:
++              gtk_label_set_xalign (GTK_LABEL (text), 0.0);
++              break;
++            case GTK_JUSTIFY_RIGHT:
++              gtk_label_set_xalign (GTK_LABEL (text), 1.0);
++              break;
++            case GTK_JUSTIFY_CENTER:
++              gtk_label_set_xalign (GTK_LABEL (text), 0.5);
++              break;
++            }
++          gtk_label_set_justify (GTK_LABEL (text), options.data.text_align);
++
++          if (!options.data.no_markup)
++            {
++              gtk_label_set_markup (GTK_LABEL (text), buf);
++              g_signal_connect (G_OBJECT (text), "activate-link", G_CALLBACK (link_cb), NULL);
++            }
++          else
++            gtk_label_set_text (GTK_LABEL (text), buf);
++          g_free (buf);
++
++          if (text)
++            gtk_box_pack_start (GTK_BOX (box), text, TRUE, TRUE, 2);
++        }
++    }
+ 
+   gtk_box_pack_start (GTK_BOX (layout), box, FALSE, FALSE, 0);
+   if (imw)
