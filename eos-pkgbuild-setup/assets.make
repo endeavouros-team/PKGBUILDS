@@ -11,7 +11,7 @@ echo2()      { echo   "$@" >&2 ; }    # output to stderr
 printf2()    { printf "$@" >&2 ; }    # output to stderr
 
 DebugWithLineNr() {
-    echo2 "${PROGNAME}, line ${BASH_LINENO[0]}: $1"
+    echo2 "${PROGNAME}, line ${BASH_LINENO[1]}: $1"
 }
 
 DIE() {
@@ -450,7 +450,7 @@ PkgbuildExists() {
     if [ -r "$PKGBUILD_ROOTDIR/$yy/PKGBUILD" ] ; then
         return 0
     else
-        [ "$special" != "" ] && DebugWithLineNr "no PKGBUILD!"
+        [ "$special" != "" ] && DebugWithLineNr "$yy ($special): no PKGBUILD!"
         return 1
     fi
 }
@@ -1007,7 +1007,7 @@ Main2()
         for xx in "${PKGNAMES[@]}" ; do
             pkgdirname="$(ListNameToPkgName "$xx" no)"
             #PkgbuildExists "$xx" 2 || continue
-            PkgbuildExists "$xx" || continue
+            PkgbuildExists "$xx" 2a || continue
 
             cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
 
