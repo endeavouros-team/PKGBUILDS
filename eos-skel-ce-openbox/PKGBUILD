@@ -3,10 +3,9 @@
 _pkgname=openbox
 pkgname=eos-skel-ce-openbox
 pkgver=1.0
-pkgrel=13
+pkgrel=14
 pkgdesc="Pre user creation skel setup for Openbox EOS-CE"
 arch=('any')
-groups=('eos-ce')
 url="https://github.com/EndeavourOS-Community-Editions/${_pkgname}"
 license=('GPL')
 depends=('git')
