@@ -80,7 +80,7 @@ EOF
 
 ### Starts calamares and runs it in the background. ###
 Calamares_Start() {
-    pkexec calamares -D6 -style kvantum >> $log &
+    pkexec calamares -style kvantum -D8 >> $log &
 }
 
 ### Dialog that asks for the online or offline edition. ###
