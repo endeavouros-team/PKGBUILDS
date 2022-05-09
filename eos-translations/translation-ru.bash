@@ -309,3 +309,19 @@ _tr_add2 after_install_r8168_tip     "Переключение между дра
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "информация"                                        # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "дополнительная информация о Вашем DE/WM"           # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Выбор популярных приложений для установки"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Выберите приложения и установите их"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Примечания по Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Примечания по настройке bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Информация о Firewall"
+_tr_add2 after_install_fwtip         "Информация о Firewall установленном по умолчанию"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Настройка установки"
+_tr_add2 ins_custom_tip              "Как настроить процесс установки"
