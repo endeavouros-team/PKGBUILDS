@@ -186,8 +186,11 @@ _rate-mirrors_hook() {
 }
 _paru_hook() {
     local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
-    sed -i $PKGBUILD \
-        -e "/^depends=/a \ \nreplaces=(paru-bin)"
+    # sed -i $PKGBUILD -e "/^depends=/a \ \nreplaces=(paru-bin)"
+    local Pkgver=$(grep ^pkgver= "$PKGBUILD" | cut -d'=' -f2)
+    if [ "$Pkgver" = "1.10.0" ] ; then
+        sed -i "$PKGBUILD" -e 's|^\(pkgrel=[0-9.]*\)|\1.1|'
+    fi
 }
 
 
