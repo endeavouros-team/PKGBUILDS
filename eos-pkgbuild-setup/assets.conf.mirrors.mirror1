@@ -78,7 +78,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     pahis
     paper-icon-theme
     paru/aur
-    polybar/aur
+    # polybar/aur
     rate-mirrors/aur
     reflector-bash-completion
     reflector-simple
@@ -110,7 +110,7 @@ PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 
 PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
-PKG_MAKEPKG_OPTIONS[polybar]="--rmdeps"
+#PKG_MAKEPKG_OPTIONS[polybar]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[worm]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[yay]="--rmdeps"
 
