@@ -75,7 +75,9 @@ EOF
     rm -f "$prelogfile"
     rm -f "$preprelogfile"
 
-    FollowFile "$log" "Install log" 20 20
+    if [ "$ShowInstallLog" = "TRUE" ] ; then
+        FollowFile "$log" "Install log" 20 20
+    fi
 }
 
 ### Starts calamares and runs it in the background. ###
@@ -129,9 +131,7 @@ AskMode() {
 
 ### Starts the calamares installer process and logging. ###
 InstallWithLogs() {
-    if [ "$ShowInstallLog" = "TRUE" ] ; then
-        InstallLog_Start
-    fi
+    InstallLog_Start
     Calamares_Start
 
     if [ "$ShowPacmanLog" = "FALSE" ] ; then
@@ -155,7 +155,7 @@ run_hotfix_start() {
     local url=$(eos-github2gitlab https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/main/$file)
 
     if Wget2Curl --timeout=30 -q -O "$workdir/$file" "$url" ; then
-        sudo bash "$workdir/$file"
+        sudo bash "$workdir/$file" >> "$prelogfile"
         PreLog "Hotfixes definition file from $url executed."
     else
         PreLog "Fetching $url failed!"
