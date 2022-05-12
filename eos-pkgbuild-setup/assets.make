@@ -1187,7 +1187,7 @@ Main2()
             endeavouros)
                 case "$use_release_assets" in
                      yes) ManageGithubReleaseAssets ;;
-                     *)   ManageGithubNormalFiles ;;
+                     *)   ;; # ManageGithubNormalFiles ;;
                 esac
                 ;;
             *)
@@ -1388,6 +1388,8 @@ ManageGithubReleaseAssets() {
 }
 
 ManageGithubNormalFiles() {
+    return    # no more needed !!?
+
     case "$REPONAME" in
         endeavouros) ;;
         endeavouros-testing-dev) return ;;   # TODO: remove 'return' when the repo exists!
