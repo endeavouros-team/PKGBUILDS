@@ -15,6 +15,7 @@ local SIGNER="EndeavourOS"
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
 local GITDIR="$ASSETSDIR/../../repo-testing"        # not $REPONAME ...
+local USE_RELEASE_ASSETS=no
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
