@@ -10,7 +10,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 _calamares_ver=3.2.57
-pkgver=22.04.2.9
+pkgver=22.04.2.10
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -29,7 +29,7 @@ source=(
   "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
 )
 
-sha256sums=('2ef46630b01ec715c641b493b4eb4d7fa0f0e379f2b363b6123af2b6dfdd681f'
+sha256sums=('848432d4cd89711202856775ef5ff31f031f88adbd74b37dc7d2388261790d29'
             'ef7f564ec2cd8baaf94a44982ce1db88c1192696617f21538d0b8472a63b4c2b')
 
 prepare() {
