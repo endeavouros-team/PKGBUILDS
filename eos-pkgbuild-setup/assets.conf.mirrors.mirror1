@@ -16,8 +16,8 @@ local SIGNER="EndeavourOS"
 
 # general options
 local USE_GENERATED_FILELIST="no"                   # may generate 'repofiles.txt' into the repo
-local USE_RELEASE_ASSETS="no"                       # either 'release assets' or "ordinary" github files
-# local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
+# local USE_RELEASE_ASSETS="no"                       # either 'release assets' or "ordinary" github files
+local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
 
 # local folders
 local ASSETSDIR="$PWD"

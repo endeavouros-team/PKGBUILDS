@@ -1183,20 +1183,24 @@ Main2()
         sleep 3
         echo2 "Syncing $REPONAME release assets with github:"
 
-        case "$REPONAME" in
-            endeavouros)
-                case "$use_release_assets" in
-                     yes) ManageGithubReleaseAssets ;;
-                     *)   ;; # ManageGithubNormalFiles ;;
-                esac
-                ;;
-            *)
-                case "$SIGNER" in
-                    EndeavourOS) ManageGithubReleaseAssets ;;
-                    *) ManageGithubReleaseAssets ;;
-                esac
-                ;;
-        esac
+        if [ 0 -eq 1 ] ; then
+            case "$REPONAME" in
+                endeavouros)
+                    case "$use_release_assets" in
+                        yes) ManageGithubReleaseAssets ;;
+                        *)   ;; # ManageGithubNormalFiles ;;
+                    esac
+                    ;;
+                *)
+                    case "$SIGNER" in
+                        EndeavourOS) ManageGithubReleaseAssets ;;
+                        *) ManageGithubReleaseAssets ;;
+                    esac
+                    ;;
+            esac
+        else
+            ManageGithubReleaseAssets
+        fi
     else
         echo2 "Nothing to do."
     fi
@@ -1306,6 +1310,10 @@ FinalStopBeforeSyncing() {
 }
 
 ManageGithubReleaseAssets() {
+    case "$use_release_assets" in
+        no) return ;;
+    esac
+
     local last_tag=$((${#RELEASE_TAGS[@]} - 1))
     local assets
 
