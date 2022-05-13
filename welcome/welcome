@@ -1459,11 +1459,15 @@ StartHere() {
     done
 
     local is_installing
-    IsInstalling
-    test $? -eq 0 && is_installing=yes || is_installing=no
+    IsInstalling && is_installing=yes || is_installing=no
 
     [ -z "$EOS_FILESERVER_SITE" ] && EOS_FILESERVER_SITE="gitlab"
     if [ "$is_installing" = "yes" ] ; then
+        local timezone="$(show-location-info timezone)"
+        if [ -n "$timezone" ] ; then
+            timedatectl set-timezone
+            sleep 0.1
+        fi
         EOS_FILESERVER_SITE="$(eos-select-file-server)"
     fi
     export EOS_FILESERVER_SITE
