@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Show (a short piece of) information related to current location.
+# Use a keyword to specify what info to show.
+
+DIE() {
+    local progname="$(basename "$0")"
+    echo "==> $progname: error: $1"
+    exit 0
+}
+
+Main() {
+    local item="$1"
+    case "$item" in
+        ALL);;
+        city);;
+        country);;
+        hostname);;
+        ip);;
+        loc);;
+        org);;
+        postal);;
+        region);;
+        timezone);;
+        *) DIE "give item name: ALL ip hostname city region country loc org postal timezone" ;;
+    esac
+
+    # fetch the location info
+    local data=$(LANG=C curl -Lsm 10 https://ipinfo.io/)
+
+    # show the wanted location info
+    case "$item" in
+        ALL) echo "$data" ;;
+        *)   echo "$data" | grep -w "$item" | sed 's|.*"\([^"]*\)",|\1|' ;;
+    esac
+}
+
+Main "$@"
