@@ -1465,7 +1465,7 @@ StartHere() {
     if [ "$is_installing" = "yes" ] ; then
         local timezone="$(show-location-info timezone)"
         if [ -n "$timezone" ] ; then
-            timedatectl set-timezone
+            timedatectl set-timezone "$timezone"
             sleep 0.1
         fi
         EOS_FILESERVER_SITE="$(eos-select-file-server)"
