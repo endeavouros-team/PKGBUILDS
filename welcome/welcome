@@ -1465,6 +1465,8 @@ StartHere() {
     if [ "$is_installing" = "yes" ] ; then
         local timezone="$(show-location-info timezone)"
         if [ -n "$timezone" ] ; then
+            local preprelogfile="$(eos-select-file-server --logfilename)"
+            echo "==> $PROGNAME: info: setting timezone to '$timezone'" >> "$preprelogfile"
             timedatectl set-timezone "$timezone"
             sleep 0.1
         fi
