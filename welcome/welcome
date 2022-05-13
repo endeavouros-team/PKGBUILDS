@@ -1463,6 +1463,9 @@ StartHere() {
 
     [ -z "$EOS_FILESERVER_SITE" ] && EOS_FILESERVER_SITE="gitlab"
     if [ "$is_installing" = "yes" ] ; then
+
+        EOS_FILESERVER_SITE="$(eos-select-file-server)"        # do this first at install !!!
+
         local timezone="$(show-location-info timezone)"
         if [ -n "$timezone" ] ; then
             local preprelogfile="$(eos-select-file-server --logfilename)"
@@ -1470,7 +1473,6 @@ StartHere() {
             timedatectl set-timezone "$timezone"
             sleep 0.1
         fi
-        EOS_FILESERVER_SITE="$(eos-select-file-server)"
     fi
     export EOS_FILESERVER_SITE
 
