@@ -1119,9 +1119,13 @@ Main2()
                     if [ "$REPONAME" = "endeavouros" ] ; then
                         local archiving=success
 
-                        mkdir -p "$pkg_archive"                                                || archiving=fail1
-                        [ "$archiving" = "success" ] && chmod -R u+w "$pkg_archive"            || archiving=fail2
-                        [ "$archiving" = "success" ] && mv -f "${removable[@]}" "$pkg_archive" || archiving=fail3
+                        mkdir -p "$pkg_archive"                    || archiving=fail1
+                        if [ "$archiving" = "success" ] ; then
+                            chmod -R u+w "$pkg_archive"            || archiving=fail2
+                        fi
+                        if [ "$archiving" = "success" ] ; then
+                            mv -f "${removable[@]}" "$pkg_archive" || archiving=fail3
+                        fi
 
                         if [ "$archiving" = "success" ] ; then
                             Pushd "$pkg_archive"
