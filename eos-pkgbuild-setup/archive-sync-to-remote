@@ -1,0 +1,229 @@
+#!/bin/bash
+
+printf2() { printf "$@" >&2 ; }
+echo2()   { echo   "$@" >&2 ; }
+read2()   { read   "$@" >&2 ; }
+
+FolderTests() {
+    local filename_head="$1"
+
+    if [ "$(basename "$PWD")" != "PKG_ARCHIVE" ] ; then
+        echo2 "You seem to be in the wrong folder, should be PKG_ARCHIVE."
+        return 4
+    fi
+    if [ -z "$(ls -1 ${filename_head}-*.zst 2>/dev/null)" ] ; then
+        echo2 "You seem to be in the wrong folder, package ${filename_head}-*.zst was not found."
+        return 4
+    fi
+}
+
+Tag() {
+    local available_tags
+    local known_tag
+
+    echo "Making sure we can reach the tags."
+    logstuff on
+
+    readarray -t available_tags <<< $(hub release)
+    
+    for known_tag in "${available_tags[@]}" ; do
+        [ "$tag" = "$known_tag" ] && break
+    done
+
+    case "$tag" in
+        "$known_tag")
+            case "$tag" in
+                packages)
+                    FolderTests welcome || return $?
+                    echo2 "Using tag: $tag"
+                    return 0
+                    ;;
+                repo-testing)
+                    FolderTests eos-pkgbuild-setup || return $?
+                    echo2 "Using tag: $tag"
+                    return 0
+                    ;;
+            esac
+            read2 -p "OK to use tag '$tag'? [Y/n] "
+            case "$REPLY" in
+                "" | [yY]*) ;;
+                *) return 1 ;;
+            esac
+            ;;
+        "")
+            echo2 "Please give a tag. Available tags:" 
+            printf2 "    %s\n" "${available_tags[@]}"
+            return 2
+            ;;
+        *)
+            echo2 "Unknown tag '$tag'. Available tags:"
+            printf2 "    %s\n" "${available_tags[@]}"
+            return 3
+            ;;
+    esac
+}
+
+Options() {
+    local progname="$(/usr/bin/basename "$0")"
+    local opts
+
+    opts="$(/usr/bin/getopt -o=hd --longoptions help,dryrun --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            -d | --dryrun)
+                dryrun=yes
+                ;;
+
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options] params
+Options:
+  -d, --dryrun       Simulate run, don't change anything permanently.
+Params:
+  tag                Release assets tag at github.
+EOF
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+
+    tag="$1"
+}
+
+TrimLocals() {
+    # remove local oldies first
+    if [ "$dryrun" = "no" ] ; then
+        archive-remove-old-locally --keep=$keep || return $?
+    else
+        archive-remove-old-locally --simulate --keep=$keep || return $?
+    fi
+}
+
+LocalsToRemote() {
+    # add local files to remote that are only on local
+    local add=()
+    local ll rr
+
+    for ll in $locals ; do
+        case "$ll" in
+            *.pkg.tar.*) ;;
+            *) continue ;;
+        esac
+        for rr in $remotes ; do
+            [ "$rr" = "$ll" ] && break
+        done
+        [ "$rr" != "$ll" ] && add+=("$ll")
+    done
+    if [ ${#add[@]} -gt 0 ] ; then
+        echo2 "adding ${#add[@]} assets with tag '$tag'"
+        if [ "$dryrun" = "no" ] ; then
+            add-release-assets "$tag" "${add[@]}" || return $?
+        else
+            printf2 "    %s\n" "${add[@]}"
+        fi
+    else
+        echo2 "No local files to add to remote."
+    fi
+}
+
+RemotesToLocal() {
+    # add remote files to local that are only in remote
+    local add=()
+    local ll rr
+
+    for rr in $remotes ; do
+        case "$rr" in
+            *.pkg.tar.*) ;;
+            *) continue ;;
+        esac
+        for ll in $locals ; do
+            [ "$rr" = "$ll" ] && break
+        done
+        [ "$rr" != "$ll" ] && add+=("$rr")
+    done
+    if [ ${#add[@]} -gt 0 ] ; then
+        echo2 "adding ${#add[@]} assets to local"
+        if [ "$dryrun" = "no" ] ; then
+            chmod u+w .
+            for rr in "${add[@]}" ; do
+                download-release-assets "$tag" "$rr" || return $?
+            done
+            chmod u-w .
+        else
+            printf2 "    %s\n" "${add[@]}"
+        fi
+    else
+        echo2 "No remote files to add to local."
+    fi
+}
+
+TrimRemotes() {
+    # remove remote files that are only in remote
+    local remove=()
+    local ll rr
+
+    for rr in $remotes ; do
+        for ll in $locals ; do
+            [ "$rr" = "$ll" ] && break
+        done
+        [ "$rr" != "$ll" ] && remove+=("$rr")
+    done
+
+    if [ ${#remove[@]} -gt 0 ] ; then
+        echo2 "deleting ${#remove[@]} remote assets with tag '$tag'"
+        if [ "$dryrun" = "no" ] ; then
+            delete-release-assets --quietly "$tag" "${remove[@]}" || return $?
+        else
+            printf2 "    %s\n" "${remove[@]}"
+        fi
+    else
+        echo2 "No remote assets to remove."   # Note: dryrun can show deleting local files, but remote doesn't know that yet...
+    fi
+}
+
+Main() {
+    local tag=""
+    local dryrun=no
+    local keep=5
+    local locals=""
+    local remotes=""
+
+    Options "$@"
+
+    Tag || return $?
+
+    locals=$(/usr/bin/ls -1)
+    [ $? -eq 0 ] || return 1
+
+    remotes=$(release-asset-names "$tag")
+    [ $? -eq 0 ] || return 1
+
+    RemotesToLocal || return $?
+    TrimLocals || return 1
+
+    locals=$(/usr/bin/ls -1)
+    [ $? -eq 0 ] || return 1
+
+    # now local should be OK
+
+    LocalsToRemote || return $?
+
+    remotes=$(release-asset-names "$tag")
+    [ $? -eq 0 ] || return 1
+
+    # now remote should have all older packages (maybe more than $keep)
+
+    TrimRemotes || return $?
+
+    # now remote should be OK
+}
+
+Main "$@"

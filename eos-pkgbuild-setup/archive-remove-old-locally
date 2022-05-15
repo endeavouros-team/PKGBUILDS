@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Remove old archived EOS packages locally.
+# Run this in the archive folder.
+
+DIE() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+Remove() {
+    local xx
+    for xx in "$@" ; do
+        printf "Removing %s\n" "$xx"
+        [ "$simulate" = "no" ] && rm -f "$xx"
+    done
+}
+
+Options() {
+    local progname="$(/usr/bin/basename "$0")"
+    local opts
+
+    opts="$(/usr/bin/getopt -o=hk:s --longoptions help,keep:,simulate --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            -k | --keep)
+                remaining="$2"
+                shift
+                ;;
+            -s | --simulate)
+                simulate=yes
+                ;;
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options] 
+Options:
+  -s, --simulate         Show what would be done (but change nothing).
+  -k, --keep             Give max number of versions to keep of each package (default: $remaining_default).
+  -h, --help             This help.
+EOF
+                exit 0
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+}
+
+Main()
+{
+    local progname="$(basename "$0")"
+    local pkgnames
+    local xx rempkg remsig
+    local remaining_default=5
+    local simulate=no
+    local remaining=$remaining_default
+
+    Options "$@" || return 1
+
+    echo "Removing all but $remaining latest of each local asset file..." >&2
+
+    # find names of packages
+    readarray -t pkgnames <<< $(command ls -1 *.pkg.tar.{zst,xz} 2>/dev/null | sed 's|\-[0-9].*$||' | uniq)
+
+    chmod u+w .
+    # remove all versions but latest $remaining of each package
+    for xx in "${pkgnames[@]}" ; do
+        readarray -t remsig <<< $(command ls -1v "$xx"-*.pkg.tar.{zst,xz}.sig 2>/dev/null | head -n -$remaining)
+        readarray -t rempkg <<< $(command ls -1v "$xx"-*.pkg.tar.{zst,xz}     2>/dev/null | head -n -$remaining)
+        [ -n "$rempkg" ] && Remove "${rempkg[@]}"
+        [ -n "$remsig" ] && Remove "${remsig[@]}"
+    done
+    chmod u-w .
+}
+
+Main "$@"

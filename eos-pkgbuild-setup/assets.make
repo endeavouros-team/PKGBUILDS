@@ -1112,32 +1112,39 @@ Main2()
                 done
 
                 if [ -n "$removable" ] ; then
-                    # rm -f  "${removable[@]}"
-                    test -e "$pkg_archive" || mkdir -p "$pkg_archive"
-                    chmod -R u+w "$pkg_archive"
-                    mv -f "${removable[@]}" "$pkg_archive" || WARN "problem moving old packages to $pkg_archive"
+                    # Here we have some old packages after upgrading them.
+                    # Save them automatically into an archive at github.
+                    # Then downgrading of EOS packages can be supported with app 'eos-downgrade'.
 
-                    case "REPONAME" in
-                        endeavouros)
+                    if [ "$REPONAME" = "endeavouros" ] ; then
+                        local archiving=success
+
+                        mkdir -p "$pkg_archive"                                                || archiving=fail1
+                        [ "$archiving" = "success" ] && chmod -R u+w "$pkg_archive"            || archiving=fail2
+                        [ "$archiving" = "success" ] && mv -f "${removable[@]}" "$pkg_archive" || archiving=fail3
+
+                        if [ "$archiving" = "success" ] ; then
                             Pushd "$pkg_archive"
                             if [ ! -d .git ] ; then
-                                if [ -d ../../../archive/.git ] ; then
-                                    ln -s ../../../archive/.git
+                                if [ -d "$ASSETSDIR"/../../archive/.git ] ; then
+                                    ln -s "$ASSETSDIR"/../../archive/.git
                                 fi
                             fi
                             if [ -d .git ] ; then
-                                for xx in "${removable[@]}" ; do
-                                    add-release-assets packages "$(basename "$xx")"
-                                    sleep 1
-                                done
+                                archive-sync-to-remote packages
+                                # for xx in "${removable[@]}" ; do
+                                #     add-release-assets packages "$(basename "$xx")"
+                                #     sleep 1
+                                # done
                             else
-                                WARN "pkg archive .git folder not found"
+                                WARN "the .git folder of the pkg archive was not found"
                             fi
                             Popd
-                            ;;
-                    esac
-
-                    chmod -R -w "$pkg_archive"               # do not (accidentally) delete archived packages...
+                        else
+                            WARN "($archiving) problem moving old packages to $pkg_archive"
+                        fi
+                        chmod -R -w "$pkg_archive"               # do not (accidentally) delete archived packages...
+                    fi
                 fi
                 
                 if [ -n "$repo_removes" ] ; then
