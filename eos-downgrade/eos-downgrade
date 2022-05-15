@@ -64,14 +64,14 @@ AddLocals() {
     eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
 
     for xx in $eos_pkgs ; do
-        readarray -t tmp <<< "$(echo "$local_filenames" | grep "$xx")"
+        readarray -t tmp <<< "$(echo "$local_filenames" | grep "^${xx}-")"
         if [ ${#tmp[@]} -gt 0 ] ; then
             locals+=("${tmp[@]}")
         fi
     done
 
     if [ ${#locals[@]} -gt 0 ] ; then
-        printf "cache:   %s\n" "${locals[@]}"
+        printf "cache:   %s\n" "${locals[@]}" | grep -Pv "^cache:[ ]*$"
     fi
 }
 
