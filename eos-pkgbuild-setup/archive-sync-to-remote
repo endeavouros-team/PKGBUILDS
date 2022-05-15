@@ -204,7 +204,7 @@ Main() {
     [ $? -eq 0 ] || return 1
 
     remotes=$(release-asset-names "$tag")
-    [ $? -eq 0 ] || return 1
+    # [ $? -eq 0 ] || return 1                 # may be empty!!
 
     RemotesToLocal || return $?
     TrimLocals || return 1
