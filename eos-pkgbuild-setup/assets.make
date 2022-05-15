@@ -1116,7 +1116,21 @@ Main2()
                     # Save them automatically into an archive at github.
                     # Then downgrading of EOS packages can be supported with app 'eos-downgrade'.
 
-                    if [ "$REPONAME" = "endeavouros" ] ; then
+                    local archive_git=""
+                    local archive_tag=""
+
+                    case "$REPONAME" in
+                        endeavouros)
+                            archive_git="$ASSETSDIR"/../../archive/.git
+                            archive_tag=packages
+                            ;;
+                        endeavouros-testing-dev)
+                            archive_git="$ASSETSDIR"/../../archive/.git
+                            archive_tag=repo-testing
+                            ;;
+                    esac
+
+                    if [ -n "$archive_tag" ] ; then
                         local archiving=success
 
                         mkdir -p "$pkg_archive"                    || archiving=fail1
@@ -1130,12 +1144,12 @@ Main2()
                         if [ "$archiving" = "success" ] ; then
                             Pushd "$pkg_archive"
                             if [ ! -d .git ] ; then
-                                if [ -d "$ASSETSDIR"/../../archive/.git ] ; then
-                                    ln -s "$ASSETSDIR"/../../archive/.git
+                                if [ -d "$archive_git" ] ; then
+                                    ln -s "$archive_git"
                                 fi
                             fi
                             if [ -d .git ] ; then
-                                archive-sync-to-remote packages
+                                archive-sync-to-remote "$archive_tag"
                                 # for xx in "${removable[@]}" ; do
                                 #     add-release-assets packages "$(basename "$xx")"
                                 #     sleep 1
