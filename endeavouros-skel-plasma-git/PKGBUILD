@@ -22,8 +22,6 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
-    mkdir -p "${pkgdir}${PREFIX}/.config/"
-    mkdir -p "${pkgdir}${PREFIX}/.local/"
-    mkdir -p "${pkgdir}${PREFIX}/.config/autostart"
-    install -Dm755 "filename.executable" "${pkgdir}${PREFIX}/filename.executable"
+    mkdir -p "${pkgdir}${PREFIX}/.local/share/"
+    cp -a "main.xml" "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml"
 }
