@@ -22,6 +22,6 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
-    mkdir -p "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config"
-    cp -a "plasma/main.xml" "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml"
+    mkdir -p "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids"
+    cp -ra "plasma/org.kde.plasma.taskmanager" "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids/"
 }
