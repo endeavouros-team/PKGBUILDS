@@ -1,11 +1,14 @@
-post_install() {
-	pacman-key --init
-	pacman-key --add /usr/share/pacman/keyrings/endeavouros.gpg 
-	pacman-key --lsign-key 497AF50C92AD2384C56E1ACA003DB8B0CB23504F
-	pacman-key --populate
+post_upgrade() {
+	if usr/bin/pacman-key -l >/dev/null 2>&1; then
+		usr/bin/pacman-key --populate endeavouros
+	else
+		echo " >>> Run \`pacman-key --init\` to set up your pacman keyring."
+		echo " >>> Then run \`pacman-key --populate endeavouros\` to install the EndeavourOS keyring."
+	fi
 }
 
-post_upgrade() {
-        post_install
+post_install() {
+	if [ -x usr/bin/pacman-key ]; then
+		post_upgrade
+	fi
 }
-# -*- mode: bash;-*-

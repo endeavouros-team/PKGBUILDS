@@ -1,28 +1,24 @@
-# Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
-
 pkgname=endeavouros-keyring
-pkgver=1
-pkgrel=5
-pkgdesc="EndeavourOS keyring"
+pkgver=20220521
+pkgrel=1
+pkgdesc='EndeavourOS keyring'
 arch=('any')
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-license=('GPL3')
-
-install=$pkgname.install
-[ -r $install ] || curl -o $install -s --max-time 30 $url/$install
-
-source=(
-  $url/endeavouros.gpg
-  $url/$install
-)
-
-sha512sums=('53a4fa6595d86df7ccf024df0a79c1969b47758c4170685935484f7594a61a100b7024b8ad8b118254cf71453c2e3097a7da2fde52095aa3759fec16eab9ae80'
-            'd0fcd2fdabd610c2c656ae71d61780a3d69ec0cb2f30952af7658d8a9a50fe366d15b1ccfcd2d74675dfbcade143f593b91437ed3a9071f9eb3d0b94eb61ac54')
+url='https://endeavouros.com/'
+license=('GPL')
+install="${pkgname}.install"
+source=('https://raw.githubusercontent.com/endeavouros-team/keyring/main/Makefile'
+        'https://raw.githubusercontent.com/endeavouros-team/keyring/main/endeavouros.gpg'
+        'https://raw.githubusercontent.com/endeavouros-team/keyring/main/endeavouros-revoked'
+        'https://raw.githubusercontent.com/endeavouros-team/keyring/main/endeavouros-trusted')
+validpgpkeys=('8F43FC374CD4CEEA19CEE323E3D8752ACDF595A1'  # joekamprad
+              '497af50c92ad2384c56e1aca003db8b0cb23504f'  # legacy eos key
+              '286E73D3CB90A2368DE1B0B12B37DD3DB00531E8') # dalto
+sha512sums=('7d046b44ee059384cf95aced62c354bf5401aaeea286df113ef74c1b0c186210e9b4fdf55e54b6f2fc28991c28fec9f6aee018505668e44bdc19286761d24609'
+            '9ffb490692149a4854d3577151f028ff32b6c6d81a57d786690fc49248735218708b4b2616a856878135317d59256d9010ae79a6658218df5d4037cad47e7417'
+            'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'
+            'aeb16840fbf117c1d9c16bf9b4cfe1ed60b072773eef77bbaac86cfdb2bd6ac800ea3f4823dd0db8efe646027df3201e4f5294873106208cbcfb8eddbc09ce87')
 
 package() {
-    local destdir=usr/share/pacman/keyrings
-
-    install -d $pkgdir/$destdir
-    install -Dm644 endeavouros.gpg $pkgdir/$destdir/endeavouros.gpg
+	cd "${srcdir}"
+	make PREFIX=/usr DESTDIR=${pkgdir} install
 }
