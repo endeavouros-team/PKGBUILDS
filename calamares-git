@@ -1,0 +1,97 @@
+# Original Maintainer: Portergos Linux <portergoslinux@gmail.com>
+# Maintainer : EndeavourOS <info@endeavouros.com>
+# Calamares installer configured for EndeavourOS
+#
+# Configurations are in extra packages:
+# calamares_config_default - default settings
+# calamares_config_ce - Community Edition settings
+
+pkgname=calamares-git
+_eos_changes=EndeavourOS-calamares
+_reponame=calamares
+_calamares_ver=3.2.58.1
+pkgver=15.b58ba41
+pkgrel=1
+pkgdesc="Calamares installer for EndeavourOS - Development version"
+arch=('any')
+url="https://github.com/endeavouros-team"
+license=('GPL3')
+optdepends=('calamares_config_default' 'calamares_config_ce')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
+conflicts=('calamares-git')
+depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
+'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
+'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'mkinitcpio-openswap')
+provides=("${pkgname}")
+options=(!strip !emptydirs)
+source=(
+  "${__eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
+  "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
+)
+
+sha256sums=('SKIP'
+            '6cabd62b1899456dba87dee8ead7700f743ae3c7374240837b77305856b4798a')
+            
+pkgver() {
+  cd "$_pkgname"
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    mv "$_reponame-$_calamares_ver"            "$_reponame"
+    # remove upstream modules packagechooser and netinstall for replacing with testing ones
+    rm -r "$_reponame/src/modules/"{fstab,mount,packages}
+
+    mv "${_eos_changes}-${pkgver}" "${_eos_changes}"
+
+    # move extra modules from external repo inside calamares sources
+    rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
+    rm -rf "$_eos_changes"
+
+    mkdir -p "$_reponame/build/$pkgname"
+
+    # remove default branding // keep package small
+    rm -r "$_reponame/src/branding/default"
+
+    # change some files on the go - distro-specific
+    sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame/CMakeLists.txt"
+
+    # remove hardcoded quiet from grubcfg
+    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame/src/modules/grubcfg/main.py"
+}
+
+build() {
+    cd "$_reponame/build"
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=Debug  \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DBoost_NO_BOOST_CMAKE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_CONFIG=OFF \
+    -DWEBVIEW_FORCE_WEBKIT=OFF \
+    -DWITH_PYTHONQT=OFF \
+    -DWITH_KF5DBus=OFF \
+    -DWITH_APPSTREAM=OFF \
+    cmake .. \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DBoost_NO_BOOST_CMAKE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_CONFIG=OFF \
+    -DSKIP_MODULES="dracut dracutlukscfg \
+    dummycpp dummyprocess dummypython dummypythonqt \
+    finishedq keyboardq license localeq notesqml oemid \
+    openrcdmcryptcfg packagechooserq \
+    plymouthcfg plasmalnf services-openrc \
+    summaryq tracking usersq webview welcomeq"
+    export DESTDIR="$srcdir/$_reponame/build/$pkgname"
+    make -j4 install
+}
+
+package() {
+    local destdir="/usr"
+
+    # Commom install -D doesn't work
+    cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
+
+}
