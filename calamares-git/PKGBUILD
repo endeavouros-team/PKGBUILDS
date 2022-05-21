@@ -25,7 +25,7 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcorea
 provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
-  "${__eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
+  "${_eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
   "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
 )
 
