@@ -16,12 +16,12 @@ pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL3')
-optdepends=('mkinitcpio-openswap' 'calamares_config_default' 'calamares_config_ce' 'ckbcomp')
+optdepends=('calamares_config_default' 'calamares_config_ce')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
 conflicts=('calamares-git')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
-'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality')
+'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'mkinitcpio-openswap')
 provides=("${pkgname}")
 options=(!strip !emptydirs)
 source=(
