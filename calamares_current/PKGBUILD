@@ -22,7 +22,7 @@ conflicts=('calamares-git')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'mkinitcpio-openswap')
-provides=("${pkgname}")
+provides=("calamares")
 options=(!strip !emptydirs)
 source=(
   "https://github.com/endeavouros-team/$_eos_changes/archive/refs/tags/${pkgver}.tar.gz"
