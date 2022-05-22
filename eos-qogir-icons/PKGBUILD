@@ -25,13 +25,13 @@ sha256sums=('afcd0955ead6f9ef73a801cb6fd5917d8ccdd655381b583312e418198d468e10'
             '1bdbae5b47dd14fd937cb59b1119501f21b48f7bdb6f34bbd3fa6617c0a4716b')
 
 prepare() {
-    patch -u ${srcdir}/Qogir-icon-theme/install.sh -i install.patch
-    cp start-here-symbolic.svg ${srcdir}/Qogir-icon-theme/src/symbolic/status/start-here-symbolic.svg
-    cp logout-purple.svg ${srcdir}/Qogir-icon-theme/src/scalable/apps/system-log-out.svg
+    patch -u Qogir-icon-theme-$_srcver/install.sh -i install.patch
+    cp start-here-symbolic.svg Qogir-icon-theme-$_srcver/src/symbolic/status/start-here-symbolic.svg
+    cp logout-purple.svg       Qogir-icon-theme-$_srcver/src/scalable/apps/system-log-out.svg
 }
 
 package() {
-  cd Qogir-icon-theme
+  cd Qogir-icon-theme-$_srcver
   mkdir -p "${pkgdir}/usr/share/icons"
   ./install.sh -d "${pkgdir}/usr/share/icons"
 }
