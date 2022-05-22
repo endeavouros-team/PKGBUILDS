@@ -6,9 +6,9 @@
 
 pkgbase=lxdm
 pkgname=eos-lxdm-gtk3
-_eos_theming=endeavouros-lxdm-theme
 pkgver=0.5.3
 pkgrel=4
+_srcver=1.5
 pkgdesc='Lightweight X11 Display Manager for EndeavourOS'
 arch=(x86_64 aarch64 armv7h)
 url="https://lxde.org/"
@@ -20,19 +20,16 @@ conflicts=('lxdm-gtk3' 'lxdm' 'lxdm-git' 'lxdm-consolekit')
 backup=('etc/lxdm/lxdm.conf' 'etc/pam.d/lxdm' 'etc/lxdm/Xsession'
         'etc/lxdm/PreLogin' 'etc/lxdm/LoginReady' 'etc/lxdm/PostLogin'
         'etc/lxdm/PostLogout' 'etc/lxdm/PreReboot' 'etc/lxdm/PreShutdown')
-source=(https://downloads.sourceforge.net/lxde/$pkgbase-$pkgver.tar.xz
-        git+https://github.com/endeavouros-team/$_eos_theming.git#branch=main
-        set-path.patch
-        lxdm.pam
-        Xsession)
+source=("https://downloads.sourceforge.net/lxde/$pkgbase-$pkgver.tar.xz"
+        "https://github.com/endeavouros-team/endeavouros-lxdm-theme/archive/refs/tags/${_srcver}.tar.gz"
+        "set-path.patch"
+        "lxdm.pam"
+        "Xsession")
 sha256sums=('4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f'
-            'SKIP'
+            '8821d32b7306f6cdca71e6f56582a93add11441f22cfde545f387fe026527b43'
             '328f766c4d2ee899fc37a26f6e8666d40ebeaa3bd4c7d5a474ebb5415351a440'
             'e8c4c5fd3b801a390d201166fd1fb9730e78a5c62928768103b870b6bd980ea0'
             'a02f547e1c36f1c7dd2a1f942b620fe76445d561f7835e7fef434aa4c12c6967')
-
-
-
 
 prepare(){
   cd $pkgbase-$pkgver

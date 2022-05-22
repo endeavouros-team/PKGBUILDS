@@ -3,7 +3,8 @@
 
 pkgname=eos-qogir-icons
 pkgver=4
-pkgrel=1
+_srcver=2022-01-12
+pkgrel=2
 pkgdesc='A colorful design icon theme for linux desktops'
 arch=('any')
 url='https://github.com/vinceliuice/Qogir-icon-theme'
@@ -14,19 +15,14 @@ optdepends=()
 provides=('qogir-icon-theme')
 conflicts=('qogir-icon-theme' 'qogir-icon-theme-git')
 options=('!strip')
-source=(
-'git+https://github.com/vinceliuice/Qogir-icon-theme'
-'install.patch'
-'start-here-symbolic.svg'
-'logout-purple.svg'
-)
-
-sha256sums=(
-'SKIP'
-'SKIP'
-'SKIP'
-'SKIP'
-)
+source=("https://github.com/vinceliuice/Qogir-icon-theme/archive/refs/tags/${_srcver}.tar.gz"
+	"install.patch"
+	"start-here-symbolic.svg"
+	"logout-purple.svg")
+sha256sums=('afcd0955ead6f9ef73a801cb6fd5917d8ccdd655381b583312e418198d468e10'
+            '75b15f5a4d9228ceb7e6009181785924e0372b78d9bbd42171fb4c17f0ee6a36'
+            '863cd90e8971b7c594a37a2025c12fd0cc8627a184829c755b584f6d65c7db92'
+            '1bdbae5b47dd14fd937cb59b1119501f21b48f7bdb6f34bbd3fa6617c0a4716b')
 
 prepare() {
     patch -u ${srcdir}/Qogir-icon-theme/install.sh -i install.patch
