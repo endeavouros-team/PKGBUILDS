@@ -55,7 +55,7 @@ InstallLog_Start() {
     local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
     local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
 
-    [ -n "$calamares_version"] || calamares_version="$(pacman -Q calamares_current 2>/dev/null | awk '{print $NF}')"  # this line is probably not needed
+    [ -n "$calamares_version"] || calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"  # this line is probably not needed
 
     cat <<EOF > $log
 ########## $log by $progname
