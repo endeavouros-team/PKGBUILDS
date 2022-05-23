@@ -1,6 +1,6 @@
 pkgname=endeavouros-keyring
 pkgver=20220523
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS keyring'
 arch=('any')
 url='https://endeavouros.com/'
@@ -14,7 +14,8 @@ validpgpkeys=('8F43FC374CD4CEEA19CEE323E3D8752ACDF595A1'  # joekamprad
               '497af50c92ad2384c56e1aca003db8b0cb23504f'  # legacy eos key
               'E0D16589967E1FE68EF8693E7EED78C58A63A62E'  # bryanpwo
               '286E73D3CB90A2368DE1B0B12B37DD3DB00531E8'  # dalto
-              '0F20FADC599D1C46EB556455AED8858E4B9813F1') # manuel
+              '0F20FADC599D1C46EB556455AED8858E4B9813F1'  # manuel
+	      'C918B8CB65A96DFA48F1F2E6BC4423F58F260BAF') # Pudge 
 sha512sums=('7d046b44ee059384cf95aced62c354bf5401aaeea286df113ef74c1b0c186210e9b4fdf55e54b6f2fc28991c28fec9f6aee018505668e44bdc19286761d24609'
             '2ef09af78dc02e8cd5f291eb7635530a71763ff2931df32eaea299427da429c99024e207dc69ea7d01196e3f5aeaceb5da08088ea651b823facfc7d4dd080c84'
             'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'
