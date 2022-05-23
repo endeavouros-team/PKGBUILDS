@@ -1,6 +1,6 @@
 pkgname=endeavouros-keyring
 pkgver=20220523
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS keyring'
 arch=('any')
 url='https://endeavouros.com/'
@@ -16,7 +16,7 @@ validpgpkeys=('8F43FC374CD4CEEA19CEE323E3D8752ACDF595A1'  # joekamprad
               '286E73D3CB90A2368DE1B0B12B37DD3DB00531E8'  # dalto
               '0F20FADC599D1C46EB556455AED8858E4B9813F1') # manuel
 sha512sums=('7d046b44ee059384cf95aced62c354bf5401aaeea286df113ef74c1b0c186210e9b4fdf55e54b6f2fc28991c28fec9f6aee018505668e44bdc19286761d24609'
-            '950221ebcfcf2d06f54f04dca639898aa4a0cd423beefcda63a43653dd11137a095cc8e25941edfff8fd11237cea9e96db417647206cec0406084c3e4d4a2056'
+            '2ef09af78dc02e8cd5f291eb7635530a71763ff2931df32eaea299427da429c99024e207dc69ea7d01196e3f5aeaceb5da08088ea651b823facfc7d4dd080c84'
             'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'
             'aa8b6cefb4eb0124ad771b599d64c1f4978cf43e2d1568354ba6672d2044c1baf6ef0b558639529d5f9154ac59401c7e5a448d10d56172457c2183a0fdb85138')
 
