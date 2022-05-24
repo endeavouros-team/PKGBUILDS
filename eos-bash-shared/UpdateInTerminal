@@ -73,7 +73,7 @@ Options:
     --noaur    Don't check AUR updates.
     --nt       Check updates in a new terminal window.
     --sync     Run program 'sync' afterwards if updates were detected.
-    --keyring  Update archlinux-keyring first. This may help on some PGP signature issues.
+    --keyring  Update keyring packages first. This may help on some PGP signature issues.
 EOF
 }
 
@@ -91,7 +91,7 @@ Main() {
     local allow_sync=no
     local updates
     local args=() arg
-    local krpkg=""
+    local krpkg=()
 
     # make sure we have reasonable values
     [ -n "$keyring_first" ] || keyring_first=no
@@ -117,8 +117,8 @@ Main() {
                 # check if 'archlinux-keyring' is among updates
                 for arg in $updates ; do
                     case "$arg" in
-                        archlinux-keyring)
-                            krpkg="$arg"             # yes it is among updates
+                        archlinux-keyring | endeavouros-keyring)
+                            krpkg+=("$arg")             # yes it is among updates
                             ;;
                         *)
                             args+=("$arg")
@@ -126,10 +126,10 @@ Main() {
                     esac
                 done
                 
-                if [ -n "$krpkg" ] && [ "$keyring_first" = "yes" ] ; then
-                    $EOS_ROOTER "pacman -Sy --needed --noconfirm $krpkg && pacman -S ${args[*]}"
+                if [ -n "${krpkg[0]}" ] && [ "$keyring_first" = "yes" ] ; then
+                    $EOS_ROOTER "pacman -Sy --needed --noconfirm ${krpkg[*]} && pacman -S ${args[*]}"
                 else
-                    $EOS_ROOTER "pacman -Sy $krpkg ${args[*]}"
+                    $EOS_ROOTER "pacman -Sy ${krpkg[*]} ${args[*]}"
                 fi
                 ;;
             1) DIE "$(echo Checkupdates: $(ltr updt_failure) | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
