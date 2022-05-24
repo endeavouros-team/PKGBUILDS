@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-plasma-git
-pkgver=11.0f00716
+pkgver=53.f9dbab5
 pkgrel=1
 pkgdesc="pre user creation skel setup to fix plasma install"
 arch=('any')
@@ -22,6 +22,7 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
-    mkdir -p "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids"
-    cp -ra "plasma/org.kde.plasma.taskmanager" "${pkgdir}${PREFIX}/.local/share/plasma/plasmoids/"
+    mkdir -p "${pkgdir}${PREFIX}/.config/autostart"
+    install -Dm755  "plasma/set_once_plasma.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
+    install -Dm755  "plasma/set_once_plasma.sh" "${pkgdir}${PREFIX}/"
 }
