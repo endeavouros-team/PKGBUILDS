@@ -37,3 +37,5 @@ Server = https://endeavour.remi.lu/repo/$repo/$arch
 ## South Korea
 Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 
+## Vietnam
+Server = https://mirrors.42tm.tech/endeavouros/repo/$repo/$arch
