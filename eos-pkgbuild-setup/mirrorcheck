@@ -37,6 +37,7 @@ NameCheck() {
     local xx yy
     for xx in "$@" ; do
         for yy in $remotefilelist ; do
+            yy="${yy/\%2B/+}"                      # convert character code '%2B' to '+'
             test "$xx" = "$yy" && break
         done
         if [ "$xx" != "$yy" ] ; then
