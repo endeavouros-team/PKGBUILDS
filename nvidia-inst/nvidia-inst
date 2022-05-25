@@ -458,6 +458,12 @@ SanityChecks() {
     #fi
 }
 
+GetSeriesFromPacman() {
+    local pacman_version=$(pacman -Q nvidia-dkms | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
+    local pacman_version_series=${pacman_version%%.*}
+    echo "$pacman_version_series"
+}
+
 Main()
 {
     # Support only these Nvidia series (must update these values too!).
@@ -465,7 +471,7 @@ Main()
     # - the latest from Arch
     # - two latest from the kernel-lts repo
 
-    local series_now=510
+    local series_now=$(GetSeriesFromPacman)
     local series_prev1=470
     local series_prev2=390
 
