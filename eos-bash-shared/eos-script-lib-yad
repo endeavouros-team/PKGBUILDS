@@ -86,8 +86,8 @@ fi
 
 export WELCOME_ICON_CHANGE_RESOLUTION=preferences-desktop-display
 export WELCOME_ICON_CHANGE_DISPLAY_MANAGER=preferences-desktop-display
-export WELCOME_ICON_INSTALL_OFFICIAL=$WELCOME_ICON_INSTALL_TAB
-export WELCOME_ICON_INSTALL_COMMUNITY=$WELCOME_ICON_INSTALL_TAB
+export WELCOME_ICON_INSTALL_OFFICIAL=calamares                              # $WELCOME_ICON_INSTALL_TAB
+export WELCOME_ICON_INSTALL_COMMUNITY=calamares                             # $WELCOME_ICON_INSTALL_TAB
 export WELCOME_ICON_INSTALL_INFO=$WELCOME_ICON_INSTALL_TAB
 export WELCOME_ICON_MIRROR_UPDATE=software-update-available  # $(eos_IconGrasp software-update-available)     # or applications-internet ?
 export WELCOME_ICON_BLUETOOTH_INFO=$WELCOME_ICON_BLUETOOTH
