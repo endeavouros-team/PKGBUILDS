@@ -393,12 +393,12 @@ INSTALL() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
-      --image=$WELCOME_ICON_INSTALL_TAB
+      --image=$WELCOME_ICON_INSTALL_OFFICIAL                       # $WELCOME_ICON_INSTALL_TAB
       --text="<b>$(ltr ins_text)</b>" --text-align=left
 
       --field=" $(ltr ins_start)!$WELCOME_ICON_INSTALL_OFFICIAL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
       --field=" $(ltr install_community)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALL_INFO!$(ltr ins_custom_tip)":fbtn                    "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
+      --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_custom_tip)":fbtn               "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
       --field=" $(ltr after_install_um)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn        reflector-simple
   )
 
