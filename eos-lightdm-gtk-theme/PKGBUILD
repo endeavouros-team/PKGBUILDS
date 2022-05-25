@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+_eos-lightdm-gtk-theme_prepare() {
+
+    # Clone package https://github.com/endeavouros-arm/PKGBUILDS/eos-lightdm-gtk-theme and allow building it as-is.
+    
+    local PKGNAME=eos-lightdm-gtk-theme
+
+    local files_to_remove=(
+        10-eos-gtk.conf
+        eos-lightdm-gtk-theme.install
+        lightdm-gtk-greeter.conf
+        PKGBUILD.orig
+        ${PKGNAME}-*-any.pkg.tar.zst
+    )
+    rm -f "${files_to_remove[@]}"        # remove possible old files
+
+    git clone https://github.com/endeavouros-arm/PKGBUILDS.git >& /dev/null || return 1
+
+    mv PKGBUILDS/$PKGNAME/PKGBUILD ./PKGBUILD.orig || return 1
+    mv PKGBUILDS/$PKGNAME/* . || return 1
+    rm -rf PKGBUILDS || return 1
+
+    source PKGBUILD.orig
+
+    rm -f PKGBUILD.orig
+}
+
+_eos-lightdm-gtk-theme_prepare
+unset -f _eos-lightdm-gtk-theme_prepare
+sha512sums=('7aefc4861155a48fe367c22129ad674ff264f9f4f5bcad5dcb6571b8be22741136c13e39aed1e18ffc14b38d6481e3a00024aada9febffec53e2dda8615e739b'
+            '03e82b0f586a28105d025b98eb33d8d958d0a2084b9965d019942aa02e94b476fbfef7be75eb8a5cf88e15acc194ac8b32c243c121a09bfa7778fe4f2881ebeb'
+            '334063f1ea763468873e0ca00fb45037dc6f8b46dc9c6caf0136fdbe747d04fae09ec9c9b1270fd6f5caac0bf0cae98b8c4b676010ae07513e53c1915280f4fa')
