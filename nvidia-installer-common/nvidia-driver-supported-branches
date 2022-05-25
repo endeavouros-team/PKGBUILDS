@@ -114,7 +114,7 @@ EOF
 }
 
 GetSeriesFromPacman() {
-    local pacman_version=$(pacman -Q nvidia-dkms | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
+    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
     local pacman_version_series=${pacman_version%%.*}
     echo "$pacman_version_series"
 }

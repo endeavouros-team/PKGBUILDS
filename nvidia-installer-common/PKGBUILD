@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-installer-common
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="Common scripts for nvidia-installer-dkms and nvidia-inst"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -26,7 +26,7 @@ source=(
   $_url/nvidia-driver-supported-branches
 )
 sha512sums=('98ceb7fb204bb9fef77af8e306c8e97c1f324372d2d2019295c52b0eb4357314e8af2ea7caa487b68d9907014ea70ab6edafa098cd9155fc71f11def3c8aa8b9'
-            'ae65c8a3cca649141cb7338ce080bcbc9a842cc92c65b064a0e2335fa9ab469f826d609728e87151956f2524b61fe5d924b9719f7df12a44ff41d6d8af8e1b35')
+            '55c5a0371b8189a547c9d0241aa641feb7f23f87c76da17c63784ff5f0ebefa51b0497ebcb48725d337620cfce22b59c02258b58dbc926b57f266b85e631794d')
 
 package() {
   install -Dm755 nvidia-installer-kernel-para     $pkgdir/usr/bin/nvidia-installer-kernel-para
