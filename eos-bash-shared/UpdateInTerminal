@@ -65,6 +65,40 @@ Options() {
     done
 }
 
+ChecksForKeyrings() {
+
+    # Separate keyring package updates from other updates.
+    # Also make sure that package endeavouros-keyring is installed.
+
+    local arg
+    local eos_keyring=no
+
+    for arg in $updates ; do
+        case "$arg" in
+            archlinux-keyring)
+                krpkg+=("$arg")
+                ;;
+            endeavouros-keyring)
+                krpkg+=("$arg")
+                eos_keyring=yes
+                ;;
+            *)
+                args+=("$arg")
+                ;;
+        esac
+    done
+
+    # This is for old installs that might not have package endeavouros-keyring installed:
+
+    if [ "$eos_keyring" = "no" ] ; then
+        if ! pacman -Qq endeavouros-keyring >& /dev/null ; then
+            echo "==> Installing endeavouros-keyring." >&2
+            krpkg+=(endeavouros-keyring)
+        fi
+    fi
+}
+
+
 Usage() {
     cat <<EOF
 Usage: $progname [options]
@@ -90,7 +124,7 @@ Main() {
     local updates_found=no
     local allow_sync=no
     local updates
-    local args=() arg
+    local args=()
     local krpkg=()
 
     # make sure we have reasonable values
@@ -113,19 +147,7 @@ Main() {
         case "$?" in
             0)
                 updates_found=yes
-
-                # check if 'archlinux-keyring' is among updates
-                for arg in $updates ; do
-                    case "$arg" in
-                        archlinux-keyring | endeavouros-keyring)
-                            krpkg+=("$arg")             # yes it is among updates
-                            ;;
-                        *)
-                            args+=("$arg")
-                            ;;
-                    esac
-                done
-                
+                ChecksForKeyrings
                 if [ -n "${krpkg[0]}" ] && [ "$keyring_first" = "yes" ] ; then
                     $EOS_ROOTER "pacman -Sy --needed --noconfirm ${krpkg[*]} && pacman -S ${args[*]}"
                 else
@@ -141,8 +163,18 @@ Main() {
     if [ "$checkAur" = "yes" ] ; then
         echo2 "AUR $(ltr updt_update_check):"
         if which $aur_helper >& /dev/null ; then
-            $aur_helper -Sua
-            updates_found=yes
+            case "$aur_helper" in
+                paru | */paru)
+                    $aur_helper -Sua
+                    if [ $? -ne 0 ] ; then
+                        updates_found=yes
+                    fi
+                    ;;
+                yay | */yay)
+                    $aur_helper -Sua
+                    updates_found=yes
+                    ;;
+            esac
         else
             echo2 ":: Warning: no AUR helper found."
             echo2 ":: Please check configuration file /etc/eos-script-lib-yad.conf,"
