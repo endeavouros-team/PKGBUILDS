@@ -80,7 +80,7 @@ build() {
     plymouthcfg plasmalnf services-openrc \
     summaryq tracking usersq webview welcomeq"
     export DESTDIR="$srcdir/$_reponame/build/$pkgname"
-    make -j4 install
+    make install
 }
 
 package() {
