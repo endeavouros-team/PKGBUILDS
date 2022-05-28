@@ -24,8 +24,11 @@ package() {
     cp -R ".config/xfce4/terminal" "${pkgdir}${PREFIX}/.config/xfce4/"
     cp -R ".config/gtk-3.0" "${pkgdir}${PREFIX}/.config/"
     cp -R ".config/gtk-4.0" "${pkgdir}${PREFIX}/.config/"
-    install -Dm755 ".config/autostart/firewall-applet.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
     install -Dm644 ".nanorc" "${pkgdir}${PREFIX}/.nanorc"
     install -Dm755 ".Xresources" "${pkgdir}${PREFIX}/.Xresources"
+    install -Dm755 ".config/autostart/firewall-applet.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
+    install -Dm755 ".config/autostart/set_once.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
+    install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh" 
 }
+    
