@@ -18,7 +18,6 @@ package() {
     PREFIX=/etc/skel
     cd "$_pkgname-$pkgver.$pkgrel"
     mkdir -p "${pkgdir}${PREFIX}/.config/"
-    mkdir -p "${pkgdir}${PREFIX}/.config/autostart"
     mkdir -p "${pkgdir}${PREFIX}/.config/xfce4/"
     cp -R ".config/Thunar" "${pkgdir}${PREFIX}/.config/Thunar"
     cp -R ".config/xfce4/panel" "${pkgdir}${PREFIX}/.config/xfce4/panel"
