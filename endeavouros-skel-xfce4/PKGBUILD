@@ -23,6 +23,4 @@ package() {
     cp -R ".config/Thunar" "${pkgdir}${PREFIX}/.config/Thunar"
     cp -R ".config/xfce4/panel" "${pkgdir}${PREFIX}/.config/xfce4/panel"
     cp -R ".config/xfce4/xfconf" "${pkgdir}${PREFIX}/.config/xfce4/xfconf"
-    install -Dm755 ".config/autostart/set_once_xfce4.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
-    install -Dm755 "set_once_xfce4.sh" "${pkgdir}${PREFIX}/set_once_xfce4.sh"
 }
