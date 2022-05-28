@@ -24,7 +24,6 @@ package() {
     chmod -R +x "${pkgdir}${PREFIX}/.config/i3/scripts"
     cp -R ".config/nitrogen" "${pkgdir}${PREFIX}/.config/nitrogen"
     cp -R ".config/rofi" "${pkgdir}${PREFIX}/.config/rofi"
-    cp ".config/example.picom.conf" "${pkgdir}${PREFIX}/.config/"
-    cp ".profile" "${pkgdir}${PREFIX}/.profile"
-    install -Dm755 "set_once_i3.sh" "${pkgdir}${PREFIX}/set_once_i3.sh"
+    install -Dm644 ".config/example.picom.conf" "${pkgdir}${PREFIX}/.config/"
+    install -Dm755 ".profile" "${pkgdir}${PREFIX}/.profile"
 }
