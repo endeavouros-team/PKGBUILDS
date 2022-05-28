@@ -3,7 +3,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=grub2-theme-endeavouros
 pkgver=20220512
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS grub2 theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'
@@ -11,10 +11,10 @@ license=('GPL3')
 depends=('grub')
 replaces=('vimix-grub' 'grub-theme-vimix' 'grub-themes-vimix')
 makedepends=('git')
-source=('git+https://github.com/endeavouros-team/grub2-theme-endeavouros')
-sha512sums=('SKIP')
+source=("https://github.com/endeavouros-team/grub2-theme-endeavouros/archive/refs/tags/${pkgver}.${pkgrel}.tar.gz")
+sha512sums=('63e2de53a9fbf718852fe1251831d13cd71e08eca5b109e466d6ef70178b75a646135510a2af436808f054351b106fdc16194b35c9b99242eac8f1a4aa8c98b1')
 
 package() {
-    install -dm 755 $pkgdir/boot/grub/themes/EndeavourOS
-    cp -r --no-preserve=ownership grub2-theme-endeavouros/EndeavourOS $pkgdir/boot/grub/themes/
+    install -dm 755 "$pkgdir/boot/grub/themes/EndeavourOS"
+    cp -r --no-preserve=ownership "grub2-theme-endeavouros-$pkgver.$pkgrel/EndeavourOS" "$pkgdir/boot/grub/themes/"
 }
