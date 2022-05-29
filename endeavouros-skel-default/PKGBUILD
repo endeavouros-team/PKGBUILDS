@@ -3,8 +3,8 @@
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-default
-pkgver=1
-pkgrel=6
+pkgver=1.6
+pkgrel=1
 _srcver=2.13
 pkgdesc="pre user creation skel setup for GTK and xfce4-terminal under EndeavourOS"
 arch=('any')
@@ -31,4 +31,3 @@ package() {
     install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
     install -Dm755 "set_once.sh" "${pkgdir}${PREFIX}/set_once.sh" 
 }
-    
