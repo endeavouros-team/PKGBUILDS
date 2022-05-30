@@ -1,0 +1,28 @@
+# Maintainer: EndeavourOS <info@endeavouros.com>
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+_pkgname=endeavouros-DE-fixes
+pkgname=endeavouros-skel-lxde-git
+pkgver=95.e511b6b
+pkgrel=1
+pkgdesc="pre user creation skel setup to fix lxde install"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+makedepends=('git')
+source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    install -Dm755  "lxde/autostart" "${pkgdir}${PREFIX}/.config/lxsession/LXDE/autostart"
+    install -Dm755  "lxde/set_once_lxde.sh" "${pkgdir}${PREFIX}/"
+    install -Dm755  "lxde/lxde.patch" "${pkgdir}${PREFIX}/"
+}
