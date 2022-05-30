@@ -36,9 +36,9 @@ PacdiffCmd() {
 
         prompt="echo '$msg'"
         if DoesSudo ; then
-            cmd="sudo DIFFPROG='/usr/bin/$differ' /usr/bin/pacdiff 2>/dev/null"
+            cmd="/usr/bin/sudo DIFFPROG='/usr/bin/$differ' /usr/bin/pacdiff 2>/dev/null"
         else
-            cmd="DIFFPROG='/usr/bin/$differ' su-c_wrapper -p /usr/bin/pacdiff 2>/dev/null"
+            cmd="DIFFPROG='/usr/bin/$differ' /usr/bin/su-c_wrapper -p /usr/bin/pacdiff 2>/dev/null"
         fi
 
         if [ $start_new_terminal = yes ] ; then
