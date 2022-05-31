@@ -6,12 +6,12 @@
 # calamares_config_default - default settings
 # calamares_config_ce - Community Edition settings
 
-pkgname=calamares-git
+pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
-_calamares_ver=3.2.58.1
-pkgver=15.b58ba41
-pkgrel=2
+_calamares_ver=3.2.59
+pkgver=506.8f022eb
+pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
 url="https://github.com/endeavouros-team"
@@ -30,10 +30,10 @@ source=(
 )
 
 sha256sums=('SKIP'
-            '6cabd62b1899456dba87dee8ead7700f743ae3c7374240837b77305856b4798a')
+            '55adef250613e80a868f2aa3d1e57bdae5b769387d91decf0fe2b64e3605574f')
             
 pkgver() {
-  cd "$_pkgname"
+  cd "$_eos_changes"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
@@ -44,7 +44,7 @@ prepare() {
 
     # move extra modules from external repo inside calamares sources
     rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
-    rm -rf "$_eos_changes"
+    #rm -rf "$_eos_changes"
 
     mkdir -p "$_reponame/build/$pkgname"
 
