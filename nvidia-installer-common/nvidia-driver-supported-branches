@@ -44,13 +44,14 @@ ShowDriversForId() {
     local true_series=""   # found from the Nvidia website
 
     echo "NVIDIA card id: $id"
+    echo "The nvidia-dkms version: $pacman_version"
 
     for ver in "${nvidia_versions[@]}" ; do
         ids="$(GetNvidiaIds "$ver")"
         true_series="$(echo "$ids" | head -n1 | cut -d'|' -f1)"
         ids="$(echo "$ids" | cut -d'|' -f2)"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-            echo "Series $true_series: supported"
+            echo "Series $true_series: supported (Nvidia: $ver)"
             [ "$all" = "no" ] && return
         else
             [ "$all" = "yes" ] && echo "Series $true_series: not supported"
@@ -113,23 +114,20 @@ EOF
     nvidia_id="$1"
 }
 
-GetSeriesFromPacman() {
-    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
-    local pacman_version_series=${pacman_version%%.*}
-    echo "$pacman_version_series"
-}
-
 Main() {
     local progname="$(basename "$0")"
     local all=no
     local nvidia_id=""
     local starting_url="https://www.nvidia.com/en-us/drivers/unix"
     local nvidia_versions=()
+    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}')
+    local pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
+    local pacman_version_series=${pacman_pkgver%%.*}
 
     Options "$@"
 
     local series_ids=(
-        $(GetSeriesFromPacman)        # latest provided by Arch
+        $pacman_version_series        # latest provided by Arch
         470                           # legacy series ids
         390                           # ditto
     )
