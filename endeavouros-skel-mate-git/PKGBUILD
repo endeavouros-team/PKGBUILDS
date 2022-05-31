@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-mate-git
-pkgver=51.a9e5fff
+pkgver=117.7cd7c70
 pkgrel=1
 pkgdesc="pre user creation skel setup to fix mate install"
 arch=('any')
