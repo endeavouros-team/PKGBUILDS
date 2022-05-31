@@ -23,5 +23,5 @@ package() {
     PREFIX=/usr/share/glib-2.0/schemas/
     cd "$_pkgname"
     mkdir -p "${pkgdir}${PREFIX}"
-    cp -a "budgie/20_endeavouros-budgie.gschema.override" "${pkgdir}${PREFIX}/"
+    cp -a "budgie/99_endeavouros-budgie.gschema.override" "${pkgdir}${PREFIX}/"
 }
