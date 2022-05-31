@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-lxde-git
-pkgver=124.d701002
+pkgver=125.366021c
 pkgrel=1
 pkgdesc="pre user creation skel setup to fix lxde install"
 arch=('any')

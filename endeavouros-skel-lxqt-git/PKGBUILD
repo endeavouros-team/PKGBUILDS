@@ -3,8 +3,8 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-lxqt-git
-pkgver=104.a2b4b6f
-pkgrel=2
+pkgver=125.366021c
+pkgrel=1
 pkgdesc="pre user creation skel setup to fix lxqt install"
 arch=('any')
 groups=('EndeavourOS')
@@ -22,6 +22,6 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
-    install -Dm755  "lxqt/set_once_lxqt.desktop" "${pkgdir}${PREFIX}/.config/autostart/"
+    install -Dm755  "lxqt/set_once_lxqt.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_lxqt.desktop"
     install -Dm755  "lxqt/set_once_lxqt.sh" "${pkgdir}${PREFIX}/"
 }
