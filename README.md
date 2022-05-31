@@ -18,11 +18,11 @@ This would only be for packages that can change as part of the release of a new 
 
 example version: **22.03.1.1**
 
-**22** - The year of Apollo release
+**22** - The year of Release
 
-**03** - The month of Apollo release
+**03** - The month of Release
 
-**1** - 1 for the main release, 2 for neo, 3 for nova
+**1** - 1 for the main release, 2 for neo, 3 for nova (bug fix relases)
 
 **1** - The current iteration of the package
 
