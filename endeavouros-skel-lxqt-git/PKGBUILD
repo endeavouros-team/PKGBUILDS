@@ -4,7 +4,7 @@
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-lxqt-git
 pkgver=125.366021c
-pkgrel=1
+pkgrel=2
 pkgdesc="pre user creation skel setup to fix lxqt install"
 arch=('any')
 groups=('EndeavourOS')
