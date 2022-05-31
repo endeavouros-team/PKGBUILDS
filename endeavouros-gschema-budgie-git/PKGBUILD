@@ -4,7 +4,7 @@
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-gschema-budgie-git
 pkgver=124.d701002
-pkgrel=1
+pkgrel=2
 pkgdesc="pre user creation gschema.override setup to fix budgie install"
 arch=('any')
 groups=('EndeavourOS')
@@ -22,6 +22,5 @@ pkgver() {
 package() {
     PREFIX=/usr/share/glib-2.0/schemas/
     cd "$_pkgname"
-    mkdir -p "${pkgdir}${PREFIX}"
-    cp -a "budgie/99_endeavouros-budgie.gschema.override" "${pkgdir}${PREFIX}/"
+    install -Dm755 "budgie/99_endeavouros-budgie.gschema.override" "${pkgdir}${PREFIX}/99_endeavouros-budgie.gschema.override"
 }
