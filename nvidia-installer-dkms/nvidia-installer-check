@@ -2,6 +2,12 @@
 
 echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
+DIE() {
+    local msg="$1"
+    echo2 "==> $msg"
+    Usage2
+    exit 1
+}
 
 Usage2() {
     cat <<EOF >&2
@@ -70,6 +76,10 @@ NvidiaDkmsSeries() {
 Main()
 {
     local id="$1"              # optional
+    case "$id" in
+        [0-9a-f][0-9a-f][0-9a-f][0-9a-f] | "") ;;
+        *) DIE "parameter must be a card id (4 characters, each character is 0-9 or a-f)" ;;
+    esac
     local ids
     local progname=nvidia-installer-check
     local series

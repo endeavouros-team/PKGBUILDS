@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-installer-dkms
-pkgver=3.4
+pkgver=3.5
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -30,7 +30,7 @@ source=(
   $_url/nvidia-installer-check
 )
 sha512sums=('24ab4b1c3932ad92dd87a9f3d25fb640839338c2f0f786acf2cbaacf1c0fec8ab969f3f4274ad6792b446def42580a0176cd8eea74598ba2f1f99fd599e191aa'
-            '548ff0da65baa07dfb9831318a78cfb93cda48510e5f81f74a9abe241813e74ebb8a3711f853b9c4335a855d7531de00f8f511830aaf39d7f85a251b61a606e9')
+            'eafc245d1acd6fe0110553ca293e7a82a63b2fceedb4d89dae735a18fbdbe48355986b78f1ac3ee31004a6c154a6d31a18361c5a9a931bae78656ed131051a16')
 
 package() {
   sed -i $pkgname \
