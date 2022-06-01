@@ -12,7 +12,7 @@ license=("GPL")
 makedepends=("git")
 depends=("endeavouros-skel-default")
 source=("https://github.com/endeavouros-team/endeavouros-xfce4-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('d61ee16c98ede8b5a3cbd1f5c6b09d840a7d1abc9c61cfe9d166aaa21a851b4d')
+sha256sums=('b1018a586359c0b7005b33b1bc995dbe8fbd8eb7d7c3d5c17b27f5cdefebbf23')
 
 package() {
     PREFIX=/etc/skel
