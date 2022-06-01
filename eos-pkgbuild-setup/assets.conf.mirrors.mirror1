@@ -31,7 +31,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     akm
     arc-gtk-theme-eos
     arc-x-icons-theme/aur
-    bashdb/aur                                      # aur/pkgname and pkgname/aur are equal
+    bashdb/aur                                      # aur/pkgname and pkgname/aur mean the same
     budgie-control-center/aur
 
     calamares_config_ce
@@ -44,6 +44,14 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-mirrorlist
     endeavouros-skel-default
     endeavouros-skel-i3wm
+
+    endeavouros-gschema-budgie-git
+    endeavouros-gschema-gnome-git
+    endeavouros-skel-lxde-git
+    endeavouros-skel-lxqt-git
+    endeavouros-skel-mate-git
+    endeavouros-skel-plasma-git
+
     endeavouros-skel-xfce4
     endeavouros-theming
     endeavouros-xfce4-terminal-colors
