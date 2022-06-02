@@ -1,0 +1,20 @@
+# Maintainer: joekamprad <joekamprad@endeavouros.com>
+
+pkgname=power-profiles-switcher
+pkgver=1.0
+pkgrel=1
+pkgdesc="a simple switcher for power-profiles (power-profiles-daemon)"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${pkgname}"
+license=('GPL')
+makedepends=('git')
+depends=('power-profiles-daemon' 'yad')
+source=("https://github.com/endeavouros-team/power-profiles-switcher/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('3a7b7d69a5f0e6cb8c87d0b0fd003daa3cfa77ae07ce2e5badac0915b203d79f')
+
+package() {
+     cd "$pkgname-$pkgver"
+    install -Dm644 "power-profiles-switcher.desktop" "${pkgdir}/usr/share/applications/power-profiles-switcher.desktop"
+    install -Dm755 "ppd-switcher" "${pkgdir}/usr/bin/ppd-switcher"
+}
