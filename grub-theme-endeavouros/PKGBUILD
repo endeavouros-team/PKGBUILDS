@@ -3,12 +3,13 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 pkgname=grub2-theme-endeavouros
 pkgver=20220512
-pkgrel=2
+pkgrel=3
 pkgdesc='EndeavourOS grub2 theme'
 arch=(any)
 url='https://github.com/endeavouros-team/'
 license=('GPL3')
 depends=('grub')
+makedepends=('git')
 replaces=('vimix-grub' 'grub-theme-vimix' 'grub-themes-vimix')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/grub2-theme-endeavouros/archive/refs/tags/${pkgver}.${pkgrel}.tar.gz")
