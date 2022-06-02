@@ -3,8 +3,8 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-gschema-budgie-git
-pkgver=125.366021c
-pkgrel=2
+pkgver=144.c786578
+pkgrel=1
 pkgdesc="pre user creation gschema.override setup to fix budgie install"
 arch=('any')
 groups=('EndeavourOS')
