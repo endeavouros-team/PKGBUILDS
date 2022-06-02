@@ -4,11 +4,12 @@
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-mate-git
 pkgver=125.366021c
-pkgrel=2
+pkgrel=3
 pkgdesc="pre user creation skel setup to fix mate install"
 arch=('any')
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
+makedepends=('git')
 source=("${_pkgname}::git+https://github.com/endeavouros-team/${_pkgname}.git#branch=main")
 sha256sums=('SKIP')
 
