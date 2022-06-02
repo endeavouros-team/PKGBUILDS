@@ -9,7 +9,7 @@ groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${pkgname}"
 license=('GPL')
 makedepends=('git')
-depends=('power-profiles-daemon' 'yad')
+depends=('power-profiles-daemon' 'yad' 'awesome-terminal-fonts')
 source=("https://github.com/endeavouros-team/power-profiles-switcher/archive/refs/tags/${pkgver}.tar.gz")
 sha256sums=('3a7b7d69a5f0e6cb8c87d0b0fd003daa3cfa77ae07ce2e5badac0915b203d79f')
 
