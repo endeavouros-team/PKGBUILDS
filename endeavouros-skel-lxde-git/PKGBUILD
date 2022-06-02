@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-lxde-git
-pkgver=139.d6de048
+pkgver=146.0e1bf65
 pkgrel=1
 pkgdesc="pre user creation skel setup to fix lxde install"
 arch=('any')
@@ -22,5 +22,6 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
+    install -Dm755  "lxde/org.freedesktop.Notifications.service" "${pkgdir}${PREFIX}/.local/share/dbus-1/services/org.freedesktop.Notifications.service"
     install -Dm755  "lxde/panel" "${pkgdir}${PREFIX}/.config/lxpanel/LXDE/panels/panel"
 }
