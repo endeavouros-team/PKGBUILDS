@@ -22,6 +22,6 @@ pkgver() {
 package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
-    install -Dm755  "plasma/set_once_plasma.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_plasma.desktop"
+    install -Dm644  "plasma/set_once_plasma.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_plasma.desktop"
     install -Dm755  "plasma/set_once_plasma.sh" "${pkgdir}${PREFIX}/set_once_plasma.sh"
 }
