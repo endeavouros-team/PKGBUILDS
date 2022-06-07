@@ -22,7 +22,7 @@ package() {
     PREFIX=/etc/skel
     cd "$_pkgname"
     install -Dm755 "mate/set_once_mate.sh" "${pkgdir}${PREFIX}/set_once_mate.sh"
-    install -Dm755 "mate/set_once_mate.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_mate.desktop"
+    install -Dm644 "mate/set_once_mate.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_mate.desktop"
     install -Dm755 "mate/99_endeavouros-mate.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-mate.gschema.override"
     install -Dm755 "mate/endeavouros.layout" "${pkgdir}/usr/share/mate-panel/layouts/endeavouros.layout"
 }
