@@ -3,7 +3,7 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-skel-plasma-git
-pkgver=153.1470872
+pkgver=158.8856369
 pkgrel=1
 pkgdesc="pre user creation skel setup to fix plasma install"
 arch=('any')
