@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha512sums=('82bcfdde7e0abea50175e71a97a6f38ceece2f495132b31dd3215d76326bb4d5bfada4be7582adbdb29c58ac09fda14d8e0bb27a3576990a8acb2eabd0d0ebc7')
+sha512sums=('956867278d92565f9e8aec1ecba2987d8f55cca6ff11cd092be53ae727fd67f00f51688bca7d5b7fe71f4149251c16861725e9f0bc42ed6fd18cc2d364fefbce')
 
 
 _caldir="$pkgname/calamares"
