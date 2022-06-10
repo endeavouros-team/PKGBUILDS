@@ -1,0 +1,21 @@
+# Maintainer: EndeavourOS <info@endeavouros.com>
+# Contributor: joekamprad <joekamprad@endeavouros.com>
+
+_pkgname=endeavouros-DE-fixes
+pkgname=endeavouros-gschema-gnome-git
+pkgver=1.0
+pkgrel=1
+pkgdesc="pre user creation gschema.override setup to fix Gnome install"
+arch=('any')
+groups=('EndeavourOS')
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=('GPL')
+makedepends=('git')
+source=("https://github.com/endeavouros-team/$_pkgname/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('96d63cab0bd707514caebef0b6e4048200be63debc759cd13ba815487147717a')
+
+package() {
+    PREFIX=/usr/share/glib-2.0/schemas
+    cd "$_pkgname-$pkgver"
+    install -Dm755 "gnome/99_endeavouros-gnome.gschema.override" "${pkgdir}${PREFIX}/99_endeavouros-gnome.gschema.override"
+}
