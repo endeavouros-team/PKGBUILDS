@@ -1,0 +1,58 @@
+#!/bin/bash
+
+PROBLEM() {
+    local msg="$1"
+    local problem=(
+        eos_yad --form --image=$WELCOME_ICON_ERROR
+        --title="ARM installer problem"
+        --text="$msg"
+        --button=yad-quit:1
+    )
+    "${problem[@]}"
+}
+
+ARM_installer_in_terminal() {
+    local errcode
+    git clone https://github.com/pudges-place/exper-images.git /tmp/arm-install 2>/dev/null
+    errcode=$?
+    if [ $errcode -ne 0 ] ; then
+        PROBLEM "Fetching the ARM installer failed (git error code $errcode)."
+        return
+    fi
+    cd /tmp/arm-install
+    chmod +x image-install-calamares.sh                                 # sudo not needed here?
+    xfce4-terminal --maximize -e "sudo ./image-install-calamares.sh"
+
+}
+export -f ARM_installer_in_terminal
+
+Main() {
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+
+    local browser="firefox"
+    [ -x /usr/bin/firefox ] || browser="xdg-open"
+    local info_url="https://arm.endeavouros.com/installation"
+    local icon=calamares
+    local title="EndeavourOS ARM image installer"                       # TODO
+    local text="Starting to install the EndeavourOS ARM image\n"        # TODO
+    text+="to your external storage device.\n"
+    text+="Please follow the instructions in the terminal window.\n"
+
+    local cmd=(
+        eos_yad
+        --form --align-buttons --use-interp --image=$icon
+        --title="$title"
+        --text="$text"
+        --button="Start ARM Installer!$icon!Install EndeavourOS ARM image":5
+        --button="More Info!user-info!More details on the wiki page":3
+        --button=yad-cancel:1
+    )
+    "${cmd[@]}"
+    case "$?" in
+        5) ARM_installer_in_terminal ;;
+        3) "$browser" "$info_url" ;;
+    esac
+    return 0
+}
+
+Main "$@"

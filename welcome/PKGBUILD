@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=3.25
+pkgver=3.26
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -30,14 +30,16 @@ source=(
   $_url/eos-kill-yad-zombies
   $_url/welcome-dnd
   $_url/eos-install-mode-run-calamares
+  $_url/arm-eos-welcome-installer
 )
-sha512sums=('d1cc8f863667707535c29a7de646b9558d151dde17c60644fbd89256639ea3377e028ca4f8068ca6dd3599d751618fdbb695cd5b515c10b5907097a57686d1ef'
+sha512sums=('49abf8b8f53279a37b242ef818102440967b114ffb6b5857f498236e3ab011820a84c04552d0f4d02b5e37e221ec033bc2735eca7e9c927d53e3a436e5ae4ce1'
             'fc360cf63894772bbc75f41d5b5f312ac4e70afb43bc081b63e3d8db6b8c9a1f0e08fa5a3fdff840f8064c883dda1d3f16328bfc8aa5b4a18e8adf83b93174a0'
             '66977e3853538a25a7f1530ab34e91749ec4890ad03ac7d80e49fe1e0bdfca114ee0cff795d1a5fb4569c7c395d78b07aadc161a70e12c6546086a18f9e47db7'
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
             '9f0cd5edabf93439656046c60dc6a29f439a9d8b7afab8ec03b9470321ba98fc53b927944e2f68b5b152c150cca76913490eaab4256a5699da5960f860d81e81'
-            '48d19c1dae7041f0ed0f6a58825f4dcd077f910c00e83cb9c3cdb09db1b9c977d69ab9d1fb823c04af662e139afb51da5672dc2d782ee021d4ca65f8f4cd0fe3')
+            '48d19c1dae7041f0ed0f6a58825f4dcd077f910c00e83cb9c3cdb09db1b9c977d69ab9d1fb823c04af662e139afb51da5672dc2d782ee021d4ca65f8f4cd0fe3'
+            '190ff84fc95c033172c94112f0586286a358e75bc3c12d3c06d52c9e32cffc89ec12202c297591b9681a4aae2bf6b22491ec6cc08890455a3879bc8ce8a95cd3')
 package() {
   install -d $pkgdir/usr/share/endeavouros/scripts
   install -Dm755 $pkgname                 $pkgdir/usr/share/endeavouros/scripts/$pkgname
@@ -49,6 +51,7 @@ package() {
   install -Dm755 eos-kill-yad-zombies           $pkgdir/usr/bin/eos-kill-yad-zombies
   install -Dm755 welcome-dnd                    $pkgdir/usr/bin/welcome-dnd
   install -Dm755 eos-install-mode-run-calamares $pkgdir/usr/bin/eos-install-mode-run-calamares
+  install -Dm755 arm-eos-welcome-installer      $pkgdir/usr/bin/arm-eos-welcome-installer
 
   install -d $pkgdir/etc/xdg/autostart
   install -Dm644 wallpaper-once.desktop   $pkgdir/etc/xdg/autostart/wallpaper-once.desktop
