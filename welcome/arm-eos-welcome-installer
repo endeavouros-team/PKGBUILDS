@@ -12,6 +12,10 @@ PROBLEM() {
 }
 
 ARM_installer_in_terminal() {
+    if [ "$Manuels_internal_testing" != "no" ] ; then
+        PROBLEM "$FUNCNAME called for testing only."
+        return
+    fi
     local errcode
     git clone https://github.com/pudges-place/exper-images.git /tmp/arm-install 2>/dev/null
     errcode=$?
@@ -26,17 +30,28 @@ ARM_installer_in_terminal() {
 }
 export -f ARM_installer_in_terminal
 
+InfoPage() {
+    local browser="firefox"
+    [ -x /usr/bin/$browser ] || browser="xdg-open"
+    $browser https://arm.endeavouros.com/installation
+}
+export -f InfoPage
+
 Main() {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
-    local browser="firefox"
-    [ -x /usr/bin/firefox ] || browser="xdg-open"
     local info_url="https://arm.endeavouros.com/installation"
     local icon=calamares
-    local title="EndeavourOS ARM image installer"                       # TODO
-    local text="Starting to install the EndeavourOS ARM image\n"        # TODO
+    local title="EndeavourOS ARM image installer"
+    local text=""
+    text+="Starting to install the EndeavourOS ARM image\n"
     text+="to your external storage device.\n"
     text+="Please follow the instructions in the terminal window.\n"
+    text+="\n"
+    text+="Before starting the ARM Installer, ensure you have a storage device\n"
+    text+="plugged into a USB port to receive the image.\n"
+    text+="Note that the download size of the image is about 1.5 GB.\n"
+    text+="Click <b>More Info</b> for further details.\n"
 
     local cmd=(
         eos_yad
@@ -44,13 +59,12 @@ Main() {
         --title="$title"
         --text="$text"
         --button="Start ARM Installer!$icon!Install EndeavourOS ARM image":5
-        --button="More Info!user-info!More details on the wiki page":3
+        --button='More Info!user-info!More details on the wiki page':"InfoPage"
         --button=yad-cancel:1
     )
     "${cmd[@]}"
     case "$?" in
         5) ARM_installer_in_terminal ;;
-        3) "$browser" "$info_url" ;;
     esac
     return 0
 }
