@@ -23,7 +23,7 @@ package() {
     PREFIX=/usr/share/glib-2.0/schemas
     cd "$_pkgname"
     install -Dm755 "gnome/99_endeavouros-gnome.gschema.override" "${pkgdir}${PREFIX}/99_endeavouros-gnome.gschema.override"
-    install -Dm644 "gnome/endeavouros.xml" "${pkgdir}${PREFIX}/usr/share/gnome-background-properties/endeavouros.xml"
-    install -Dm644 "gnome/endeavouros-l.png" "${pkgdir}${PREFIX}/usr/share/backgrounds/gnome/endeavouros-l.png"
-    install -Dm644 "gnome/endeavouros-d.png" "${pkgdir}${PREFIX}/usr/share/backgrounds/gnome/endeavouros-d.png"
+    install -Dm644 "gnome/endeavouros.xml" "${pkgdir}/usr/share/gnome-background-properties/endeavouros.xml"
+    install -Dm644 "gnome/endeavouros-l.png" "${pkgdir}/usr/share/backgrounds/gnome/endeavouros-l.png"
+    install -Dm644 "gnome/endeavouros-d.png" "${pkgdir}/usr/share/backgrounds/gnome/endeavouros-d.png"
 }
