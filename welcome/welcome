@@ -398,7 +398,7 @@ INSTALL() {
 
       --field=" $(ltr ins_start)!$WELCOME_ICON_INSTALL_OFFICIAL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
       --field=" $(ltr install_community)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
-      --field=" EndeavourOS ARM Image Installer!calamares!Start installing EndeavourOS ARM edition":fbtn    "eos-welcome-installer-arm"
+      --field=" EndeavourOS ARM Image Installer!calamares!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
       --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_custom_tip)":fbtn               "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
       --field=" $(ltr after_install_um)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn        reflector-simple
   )
