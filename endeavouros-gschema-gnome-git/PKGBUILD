@@ -3,8 +3,8 @@
 
 _pkgname=endeavouros-DE-fixes
 pkgname=endeavouros-gschema-gnome-git
-pkgver=125.366021c
-pkgrel=2
+pkgver=161.1ce93d3
+pkgrel=1
 pkgdesc="pre user creation gschema.override setup to fix Gnome install"
 arch=('any')
 groups=('EndeavourOS')
