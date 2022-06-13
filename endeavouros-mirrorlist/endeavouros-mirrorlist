@@ -12,28 +12,34 @@
 ###      these mirrors or re-order them manually.
 ######################################################
 
-## Germany
-Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
-Server = https://de.freedif.org/EndeavourOS/repo/$repo/$arch
-Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
-
-## Sweden
-Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
-Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch
-
 ## Canada
 Server = https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch
 
 ## China
 Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 
-## Singapore
-Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
-Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
+## Germany
+Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
+Server = https://de.freedif.org/EndeavourOS/repo/$repo/$arch
+Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
 
 ## France
 Server = https://endeavour.remi.lu/repo/$repo/$arch
 
+## Singapore
+Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
+Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
+
 ## South Korea
 Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
+
+## Sweden
+Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
+Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch
+
+## Taiwan
+Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
+
+## Vietnam
+Server = https://mirrors.42tm.tech/endeavouros/repo/$repo/$arch
 
