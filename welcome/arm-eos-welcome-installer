@@ -12,7 +12,7 @@ PROBLEM() {
 }
 
 ARM_installer_in_terminal() {
-    if [ "$Manuels_internal_testing" != "no" ] ; then
+    if [ "$Manuels_internal_testing" = "yes" ] ; then
         PROBLEM "$FUNCNAME called for testing only."
         return
     fi
