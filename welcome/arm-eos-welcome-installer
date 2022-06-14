@@ -12,21 +12,40 @@ PROBLEM() {
 }
 
 ARM_installer_in_terminal() {
-    if [ "$Manuels_internal_testing" = "yes" ] ; then
-        PROBLEM "$FUNCNAME called for testing only."
-        return
-    fi
+    local urls=(
+        https://github.com/endeavouros-arm/images.git
+        # https://github.com/pudges-place/exper-images.git
+    )
+    local url ix count=${#urls[@]}
     local errcode
-    git clone https://github.com/pudges-place/exper-images.git /tmp/arm-install 2>/dev/null
-    errcode=$?
-    if [ $errcode -ne 0 ] ; then
-        PROBLEM "Fetching the ARM installer failed (git error code $errcode)."
-        return
-    fi
-    cd /tmp/arm-install
-    chmod +x image-install-calamares.sh                                 # sudo not needed here?
-    xfce4-terminal --maximize -e "sudo ./image-install-calamares.sh"
+    local msg
+    local targetdir=/tmp/arm-install
 
+    rm -rf $targetdir
+
+    for ((ix=0; ix < $count; ix++)) ; do
+        url="${urls[$ix]}"
+        git clone $url $targetdir 2>/dev/null
+        errcode=$?
+        if [ $errcode -eq 0 ] ; then
+            if [ "$Manuels_internal_testing" = "yes" ] ; then
+                PROBLEM "$FUNCNAME called for testing only."
+                return
+            fi
+            cd $targetdir
+            chmod +x image-install-calamares.sh                                 # sudo not needed here?
+            xfce4-terminal --maximize -e "sudo ./image-install-calamares.sh"
+            return
+        else
+            msg="ARM installer fetch failed (git code $errcode) from\n<tt>$url</tt>\n\n"
+            if [ $ix -lt $((count - 1)) ] ; then
+                PROBLEM "${msg}Next URL to try:\n<tt>${urls[$((ix+1))]}</tt>\n"
+            else
+                PROBLEM "${msg}Bailing out.\n"
+                return
+            fi
+        fi
+    done
 }
 export -f ARM_installer_in_terminal
 
