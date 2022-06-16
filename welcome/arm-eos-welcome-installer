@@ -60,7 +60,7 @@ Main() {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
     local info_url="https://arm.endeavouros.com/installation"
-    local icon=calamares
+    local icon=$WELCOME_ICON_INSTALL_OFFICIAL
     local title="EndeavourOS ARM image installer"
     local text=""
     text+="Starting to install the EndeavourOS ARM image\n"
