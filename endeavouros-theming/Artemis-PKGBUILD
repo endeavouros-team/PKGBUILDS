@@ -1,0 +1,37 @@
+# Maintainer: EndeavourOS <info@endeavouros.com>
+pkgname=endeavouros-theming
+pkgver=9.0
+pkgrel=1
+pkgdesc='Default EndeavourOS background images and icons for all different DE'
+arch=('any')
+replaces=('EndeavourOS-theming')
+url='https://www.endeavouros.com'
+license=('GPL3')
+makedepends=('git')
+source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
+md5sums=('07e2c38413daee3e06cbbc9a40482f1a')
+sha512sums=('b82c4c929cb13c980aa8dfb433fc290ed2af97cf4aaf13ae75e94f14cb110dfedd40b73c88b6c53ce3d1f41f3c8c07e94822bb049c31c9110db87441140b23ab')
+install=$pkgname.install
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  install -d "${pkgdir}/usr/share/endeavouros"
+  install -d "${pkgdir}/usr/share/pixmaps"
+  install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
+
+  install -Dm644 *.png *.svg           "${pkgdir}/usr/share/endeavouros"
+  install -Dm644 endeavouros.{svg,png} "${pkgdir}/usr/share/pixmaps"
+  install -Dm644 endeavouros-icon.png  "${pkgdir}/usr/share/pixmaps"
+  
+  cd backgrounds
+  install -Dm644 *.png                 "${pkgdir}/usr/share/endeavouros/backgrounds"
+
+  # make symlinks for KDE:
+  cd "${pkgdir}/usr/share/pixmaps"
+  ln -s endeavouros.png endeavouros-logo.png
+  ln -s endeavouros.svg endeavouros-logo.svg
+
+  # cleanup
+  cd $srcdir
+  rm -rf ../${pkgname}
+}
