@@ -105,7 +105,7 @@ AskMode() {
 
     local cmd=(
         eos_yad --form --title="$(ltr cal_choose)"
-        --image=system-os-installer
+        --image=$WELCOME_ICON_INSTALL_OFFICIAL # system-os-installer
         --text="$txt"
         --buttons-layout=spread
         --button="Online!!Vanilla theming, internet required":12
