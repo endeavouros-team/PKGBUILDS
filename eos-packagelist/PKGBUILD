@@ -2,7 +2,7 @@
 # Contributor : Sravan Pannala <sradjoker@endeavouros.com>
 
 pkgname=eos-packagelist
-pkgver=2.0.0
+pkgver=2.0
 pkgrel=1
 pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
 arch=('any')
