@@ -107,6 +107,7 @@ if __name__ == '__main__':
 
     # Get the data from the internet and parse it
     blacklist = []
+    netinstall_packages = []
     if (args.arch and args.arch != "x86_64") or (not args.arch and platform.machine() != "x86_64"):
         try:
             url = "https://raw.githubusercontent.com/endeavouros-arm/install-script/master/blacklist"
@@ -115,22 +116,35 @@ if __name__ == '__main__':
         except urllib.error.HTTPError or TypeError:
             print("A properly formatted blacklist file for arm not found", file=sys.stderr)
             pass
+        try:
+            url = "https://raw.githubusercontent.com/endeavouros-arm/calamares-image/main/configs/calamares/modules" \
+                  "/netinstall.yaml"
+            with urllib.request.urlopen(url) as netinstall_file:
+                netinstall_data = yaml.safe_load(netinstall_file)
+                netinstall_packages += get_groups(netinstall_data, blacklist)
 
-    netinstall_packages = []
-    try:
-        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
-              "/netinstall.yaml"
-        with urllib.request.urlopen(url) as netinstall_file:
-            netinstall_data = yaml.safe_load(netinstall_file)
-            netinstall_packages += get_groups(netinstall_data, blacklist)
+            url = "https://raw.githubusercontent.com/endeavouros-arm/calamares-image/main/configs/calamares/modules" \
+                  "/packagechooser_ce.conf"
+            with urllib.request.urlopen(url) as netinstall_file:
+                netinstall_data = yaml.safe_load(netinstall_file)
+                netinstall_packages += get_packagechooser_groups(netinstall_data, blacklist)
+        except yaml.YAMLError or KeyError as ex:
+            print("Malformed netinstall.yaml detected with error: " + format(ex))
+    else:
+        try:
+            url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
+                  "/netinstall.yaml"
+            with urllib.request.urlopen(url) as netinstall_file:
+                netinstall_data = yaml.safe_load(netinstall_file)
+                netinstall_packages += get_groups(netinstall_data, blacklist)
 
-        url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
-              "/packagechooser_ce.conf"
-        with urllib.request.urlopen(url) as netinstall_file:
-            netinstall_data = yaml.safe_load(netinstall_file)
-            netinstall_packages += get_packagechooser_groups(netinstall_data, blacklist)
-    except yaml.YAMLError or KeyError as ex:
-        print("Malformed netinstall.yaml detected with error: " + format(ex))
+            url = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
+                  "/packagechooser_ce.conf"
+            with urllib.request.urlopen(url) as netinstall_file:
+                netinstall_data = yaml.safe_load(netinstall_file)
+                netinstall_packages += get_packagechooser_groups(netinstall_data, blacklist)
+        except yaml.YAMLError or KeyError as ex:
+            print("Malformed netinstall.yaml detected with error: " + format(ex))
 
     # Act on the parsed data
     if args.list:
