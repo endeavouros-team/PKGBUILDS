@@ -1,7 +1,8 @@
-# Maintainer : EndeavourOS <info@endeavouros.com>
+# Maintainer : Evan James <dalto@endeavouros.com>
+# Contributor : Sravan Pannala <sradjoker@endeavouros.com>
 
 pkgname=eos-packagelist
-pkgver=1.6.0
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
 arch=('any')
@@ -12,7 +13,7 @@ source=(
     eos-packagelist
     eos-packagelist.bash-completion
 )
-sha256sums=('315167ce9d80d6ad0754bbe0becb9d081dbf326877afa74bbfe60f4540162026'
+sha256sums=('4f2b8e1fd666be2484300082341462fc298b1f87bc14dd53f5397b191a29797c'
             '4b13f6ef7af87431157d2a80f856cba2c2d6d1a835cceddc96f2339f528849e7')
 
 package() {
