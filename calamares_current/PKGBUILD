@@ -9,8 +9,8 @@
 pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
-_calamares_ver=3.2.59
-pkgver=22.06.1.4
+_calamares_ver=3.2.60
+pkgver=22.06.1.6
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -27,10 +27,12 @@ options=(!strip !emptydirs)
 source=(
   "https://github.com/endeavouros-team/$_eos_changes/archive/refs/tags/${pkgver}.tar.gz"
   "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
+  "calamares.desktop.patch"
 )
 
-sha256sums=('5b87452ab2dc93e50088971ba03ef38153c15c7f05aa611c50b070c6c6a51102'
-            '55adef250613e80a868f2aa3d1e57bdae5b769387d91decf0fe2b64e3605574f')
+sha256sums=('b22c31eb4b639742d8d3134fbd35e7a02669816d1150a2414f32aab1ffcd46b0'
+            '9ec6c49f4e2316cd3058d402c2ab65efff02e3f09a0028d50f0359e5154e6c8c'
+            '66f7b90ab3bc32103d2c3485ee32a4978b57aea466473cfbd06fcb93058d0df8')
 
 prepare() {
     mv "$_reponame-$_calamares_ver"            "$_reponame"
@@ -50,6 +52,7 @@ prepare() {
 
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame/CMakeLists.txt"
+    patch "$_reponame/calamares.desktop" < calamares.desktop.patch
 
     # remove hardcoded quiet from grubcfg
     sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame/src/modules/grubcfg/main.py"
