@@ -1,17 +1,17 @@
-# Переводы для Welcome заявка
+# Перевод приложения Welcome.
 #
-# Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
-# - in the Welcome app
-# - globally
+# Примечание: переменные (ниже, например, $PRETTY_PROGNAME) могут использоваться, если они уже определены:
+# - в приложении Welcome
+# - глобально
 #
 #
-# Any string should be defined like:
+# Любая строка должна быть определена так:
 #
 #    _tr_add <language> <placeholder> "string"
-#          or
+#          или
 #    _tr_add2 <placeholder> "string"
 #
-# where
+# где
 #
 #    _tr_add         A bash function that adds a "string" to the strings database.
 #    _tr_add2        Same as _tr_add but knows the language from the _tr_lang variable (below).
@@ -21,7 +21,7 @@
 
 # Russian:
 
-### First some useful definitions:
+### Сначала немного полезных определений:
 
 _tr_lang=ru            # required helper variable for _tr_add2
 
@@ -31,7 +31,7 @@ _and='&#38;'           # '&'
 _question='&#63;'      # '?'
 
 
-###################### ТЕПЕРЬ ФАКТИЧЕСКИЕ СТРОКИ, КОТОРЫЕ ДОЛЖНЫ БЫТЬ ПЕРЕВЕДЕНЫ ######################
+###################### Теперь фактические строки, которые должны быть переведены ######################
 # func   <placeholder>             "string"
 
 _tr_add2 welcome_disabled          "$PRETTY_PROGNAME отключено. Для повторного запуска используйте команду eos-welcome --enable"
@@ -63,13 +63,13 @@ _tr_add2 after_install_dsi         "Поиск ошибок"
 _tr_add2 after_install_dsitip      "Обнаружение любых потенциальных проблем в системе и программах"
 
 _tr_add2 after_install_etl         "Обновить EndeavourOS$_question"
-_tr_add2 after_install_etltip      "Переход на новейший уровень EndeavourOS"
+_tr_add2 after_install_etltip      "Показывает действия для перехода на новейший уровень EndeavourOS"
 
 _tr_add2 after_install_cdm         "Изменить Display Manager"
 _tr_add2 after_install_cdmtip      "Установка другого Display Manager"
 
 _tr_add2 after_install_ew          "Обои EndeavourOS"
-_tr_add2 after_install_ewtip       "Установить обои EndeavourOS по умолчанию"
+_tr_add2 after_install_ewtip       "Установка обой EndeavourOS по умолчанию"
 
 
 _tr_add2 after_install_pm          "Управление пакетами"
@@ -79,7 +79,7 @@ _tr_add2 after_install_ay          "AUR и yay"
 _tr_add2 after_install_aytip       "Информация об Arch User Repository (AUR) и yay"
 
 _tr_add2 after_install_hn          "Оборудование и сеть"
-_tr_add2 after_install_hntip       "Заставь работать своё оборудование"
+_tr_add2 after_install_hntip       "Заставьте работать ваше оборудование"
 
 _tr_add2 after_install_bt          "Bluetooth"
 _tr_add2 after_install_bttip       "Советы по использованию Bluetooth"
@@ -91,7 +91,7 @@ _tr_add2 after_install_ft          "Форум с советами"
 _tr_add2 after_install_fttip       "Обратитесь к нам за помощью$_exclamation"
 
 
-_tr_add2 general_info_text         "Найди себя в EndeavourOS"
+_tr_add2 general_info_text         "Найдите свой путь на сайте EndeavourOS"
 
 _tr_add2 general_info_ws           "Сайт"
 
@@ -118,8 +118,8 @@ _tr_add2 add_more_apps_lotip       "Офисный пакет"
 _tr_add2 add_more_apps_ch          "Chromium"
 _tr_add2 add_more_apps_chtip       "Веб-браузер с открытым исходным кодом"
 
-_tr_add2 add_more_apps_fw          "Брандмауэер"
-_tr_add2 add_more_apps_fwtip       "Gufw, простой брандмауэр"
+_tr_add2 add_more_apps_fw          "Брандмауэр"
+_tr_add2 add_more_apps_fwtip       "Брандмауэр Gufw"
 
 _tr_add2 add_more_apps_bt          "Bluetooth (blueberry) для Xfce"
 _tr_add2 add_more_apps_bt_bm       "Bluetooth (blueman) для Xfce"
@@ -154,14 +154,14 @@ _tr_add2 sysup_no                  "Обновлений нет"
 _tr_add2 sysup_check               "Проверка обновлений программ..."
 
 _tr_add2 issues_title              "Обнаружена ошибка пакета"
-_tr_add2 issues_grub               "ВАЖНОЕ ЗАМЕЧАНИЕ: необходимо вручную воссоздать загрузочное меню"
+_tr_add2 issues_grub               "ВАЖНО: необходимо вручную воссоздать загрузочное меню"
 _tr_add2 issues_run                "Выполнение команды:"
 _tr_add2 issues_no                 "Системные ошибки не обнаружены"
 
 _tr_add2 cal_noavail               "Не доступно: "			# программа установки
 _tr_add2 cal_warn                  "Внимание"
-_tr_add2 cal_info1                 "Это релиз разработки сообщества.\n\n"                                   				# для специалистов!
-_tr_add2 cal_info2                 "<b>Оффлайн</b> вариант предоставляет рабочий стол Xfce с темой EndeavourOS.\nПодключение к интернет не требуется.\n\n"
+_tr_add2 cal_info1                 "Это выпуск разработки сообщества.\n\n"                                   				# для специалистов!
+_tr_add2 cal_info2                 "<b>Офлайн</b> вариант предоставляет рабочий стол Xfce с темой EndeavourOS.\nПодключение к интернет не требуется.\n\n"
 _tr_add2 cal_info3                 "<b>Онлайн</b> вариант позволяет выбрать DE с оформлением по умолчанию.\nТребуется подключение к интернет.\n\n"
 _tr_add2 cal_info4                 "Внимание: Этот релиз находится в процессе разработки. Пожалуйста, сообщите нам в случае ошибки.\n"
 _tr_add2 cal_choose                "Выбор способа установки"
@@ -184,14 +184,14 @@ _tr_add2 ins_keys                  "Pacman - gpg ключи"
 _tr_add2 ins_keystip               "Обновить список ключей шифрования репозиториев"
 _tr_add2 ins_pm                    "Управление разделами диска"
 _tr_add2 ins_pmtip                 "Создание и управление разделами на вашем диске с помощью Gparted"
-_tr_add2 ins_rel                   "Информация о релизе"
-_tr_add2 ins_reltip                "Расширенная информация о последнем релизе"
+_tr_add2 ins_rel                   "Информация о выпуске"
+_tr_add2 ins_reltip                "Расширенная информация о последнем выпуске"
 _tr_add2 ins_tips                  "Полезные советы"
 _tr_add2 ins_tipstip               "Полезная информация для помощи при установке"
 _tr_add2 ins_trouble               "Устранение неполадок"
 _tr_add2 ins_troubletip            "Восстановление системы"
 
-_tr_add2 after_install_us_from     "Обновление из"			# AUR или вышерасположенный
+_tr_add2 after_install_us_from     "Обновление из"			        # AUR или вышерасположенный
 _tr_add2 after_install_us_el       "Требуется повышение привилегий."
 _tr_add2 after_install_us_done     "обновление выполнено."
 _tr_add2 after_install_us_fail     "ошибка обновления$_exclamation"
@@ -204,7 +204,7 @@ _tr_add2 useful_tips_text      "Полезные советы"
 # 2020-May-16:
 
 _tr_add2 butt_changelog        "Изменения в Welcome"
-_tr_add2 butt_changelogtip     "История изменений Welcome"
+_tr_add2 butt_changelogtip     "Список изменений в Welcome"
 
 _tr_add2 after_install_themevan      "Оригинальная тема Xfce"
 _tr_add2 after_install_themevantip   "Использовать оригинальную тему Xfce"
@@ -319,8 +319,8 @@ _tr_add2 ins_blue_notes              "Примечания по Bluetooth"
 _tr_add2 ins_blue_notes_tip          "Примечания по настройке bluetooth"
 
 # 2022-Mar-27
-_tr_add2 after_install_fw            "Информация о Firewall"
-_tr_add2 after_install_fwtip         "Информация о Firewall установленном по умолчанию"
+_tr_add2 after_install_fw            "Информация о брандмауэре"
+_tr_add2 after_install_fwtip         "Информация о брандмауэре, установленном по умолчанию"
 
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Настройка установки"
