@@ -241,7 +241,7 @@ _tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant
 _tr_add2 add_more_apps_arch          "Parcourir paquets Arch"
 _tr_add2 add_more_apps_aur           "Parcourir tous les paquets AUR"
 _tr_add2 add_more_apps_done1_text    "Suggestions d'applications déjà installées$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nVous pouvez aussi parcourir tous les paquets d'Arch et d'AUR packages (et les installer dans un terminal).\n"
+_tr_add2 add_more_apps_done2_text    "ou parcourir tous les paquets d'Arch et d'AUR"
 _tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
 
@@ -263,6 +263,10 @@ _tr_add2 updt_for_updates         "pour les mises à jour"
 _tr_add2 updt_failure             "échec$_exclamation"
 _tr_add2 updt_nothing_todo        "il n'y a rien à faire"
 _tr_add2 updt_press_enter         "Presser ENTRÉE pour fermer cette fenêtre"
+
+# 24-octobre-2020:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 11-décembre-2020:
 _tr_add2 after_install_pacdiff_tip "Gère les fichier pacnew, pacorig $_and pacsave avec pacdiff $_and"
@@ -310,3 +314,14 @@ _tr_add2 daily_assist_DEinfo_tip     "Plus d'informations sur cet environnement 
 _tr_add2 add_more_apps_qs            "Choisir applications populaires à installer"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Choisissez des applications populaires et installez-les"
 
+# 21-mars-2022
+_tr_add2 ins_blue_notes              "Notes sur le Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Notes sur la configuration du Bluetooth"
+
+# 27-mars-2022
+_tr_add2 after_install_fw            "Infos sur le pare-feu"
+_tr_add2 after_install_fwtip         "Infos sur le pare-feu par défaut"
+
+# 30-mars-2022
+_tr_add2 ins_custom                  "Personnaliser le processus d'installation"
+_tr_add2 ins_custom_tip              "Comment personnaliser le processus d'installation"
