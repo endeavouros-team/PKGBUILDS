@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=power-profiles-switcher
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="a simple switcher for power-profiles (power-profiles-daemon)"
 arch=('any')
@@ -11,7 +11,7 @@ license=('GPL')
 makedepends=('git')
 depends=('power-profiles-daemon' 'yad' 'awesome-terminal-fonts')
 source=("https://github.com/endeavouros-team/power-profiles-switcher/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('885758a6ec6a6f76592d77b2815cddccd98e11b6ee0a456d3487019c92c5e581')
+sha256sums=('89fa1e53b78b3985f0321b1510961c1829c0008361b51fe2fa9671232c42008b')
 
 package() {
      cd "$pkgname-$pkgver"
