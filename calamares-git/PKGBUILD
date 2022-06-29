@@ -10,7 +10,7 @@ pkgname=calamares_current
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 _calamares_ver=3.2.59
-pkgver=506.8f022eb
+pkgver=525.322befc
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
@@ -26,11 +26,11 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=(
   "${_eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
-  "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
+  "${_reponame}::git+https://github.com/$_reponame/$_reponame.git#branch=$_reponame"
 )
 
 sha256sums=('SKIP'
-            '55adef250613e80a868f2aa3d1e57bdae5b769387d91decf0fe2b64e3605574f')
+            'SKIP')
             
 pkgver() {
   cd "$_eos_changes"
@@ -38,7 +38,7 @@ pkgver() {
 }
 
 prepare() {
-    mv "$_reponame-$_calamares_ver"            "$_reponame"
+    # mv "$_reponame-$_calamares_ver"            "$_reponame"
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
     rm -r "$_reponame/src/modules/"{fstab,mount,packages}
 
