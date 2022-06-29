@@ -6,10 +6,10 @@
 # calamares_config_default - default settings
 # calamares_config_ce - Community Edition settings
 
-pkgname=calamares_current
+pkgname=calamares-git
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
-_calamares_ver=3.2.59
+_calamares_ver=3.3-alpha
 pkgver=525.322befc
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
