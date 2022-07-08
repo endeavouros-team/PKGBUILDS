@@ -2,7 +2,7 @@
 
 Main() {
     if (eos-connection-checker) ; then
-        local country=$(curl -s https://ipinfo.io/country | tr '[:upper:]' '[:lower:]')
+        local country=$(show-location-info country | tr '[:upper:]' '[:lower:]')
         case "$country" in
             de|fi|se)
                 echo "Setting keyboard layout to: $country" > /tmp/eos-kbd-set.log

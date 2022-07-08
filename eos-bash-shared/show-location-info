@@ -26,7 +26,7 @@ Main() {
     esac
 
     # fetch the location info
-    local data=$(LANG=C curl -Lsm 10 https://ipinfo.io/)
+    local data=$(LANG=C curl -Lsm 30 https://ipinfo.io/)
 
     # show the wanted location info
     case "$item" in

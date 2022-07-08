@@ -35,7 +35,7 @@ SelectFileServer() {
     fi
 
     local fserver=gitlab
-    local place="$(curl -Lsm 30 https://ipinfo.io/country 2>/dev/null)"
+    local place="$(show-location-info country 2>/dev/null)"
 
     case "$place" in
         IR)
