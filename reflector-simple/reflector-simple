@@ -50,8 +50,7 @@ CCCheck() {   # check validity of country code
 }
 
 Method0() {
-    # use https://ipinfo.io/country
-    local code="$(curl -Lsm 10 https://ipinfo.io/country)"
+    local code="$(show-location-info country)"
     CCCheck "$code"
 }
 Method1() {
