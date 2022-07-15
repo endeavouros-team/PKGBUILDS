@@ -648,6 +648,7 @@ DailyAssistant() {
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
       --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
+      --field=" $(ltr daily_assist_anews)!$WELCOME_ICON_NEWS!$(ltr daily_assist_anewstip)":fbtn "$_WELCOME_BROWSER https://archlinux.org/news"
   )
   #IsInstalled eos-apps-info && {
   #    tabcontents+=(
