@@ -322,8 +322,11 @@ _tr_add2 ins_blue_notes_tip          "Tietoja bluetooth:n ottamisesta käyttöö
 _tr_add2 after_install_fw            "Tietoa palomuurista"
 _tr_add2 after_install_fwtip         "Katsaus oletuksena asennettuun palomuuriin"
 
-
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Asennuksen mukauttamisesta"
 _tr_add2 ins_custom_tip              "Miten asennusta ja asennustulosta voi muokata"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Viimeisimmät Arch-uutiset"
+_tr_add2 daily_assist_anewstip       "Viimeisimmät Arch-uutiset selaimessa"
 
