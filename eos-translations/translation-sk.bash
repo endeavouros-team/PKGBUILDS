@@ -301,3 +301,32 @@ _tr_add2 daily_assist_apps_tip       "Aplikácie zoradené podľa kategórií"
 
 _tr_add2 after_install_vbox1         "Povoliť nástroje pre návštevu cez VirtualBox"
 _tr_add2 after_install_vbox2         "Pre povolenie nástrojov návštevy cez VirtualBox, VirtualBox Guest, vyberte prosím záložku <b>Po inštalácii</b> a kliknite na tlačítko "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "Poblém s káblovým pripojením$_question Prepnúť ovládače r8168 a r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Vybrať medzi ovládačmi r8168 a r8169 drivers (môže byť potrebný reštart)"           # changed 2021-Dec-14 !!
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "informácie"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "viac informácii o tomto desktopovom prostredí/správcovi okien"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Vyberte si populárne aplikácie k inštalácii"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Vyberte si populárne aplikácie a nainštalujte ich"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Poznámky k Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Poznámky ohľadom nastavenia bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Informácie k firewallu"
+_tr_add2 after_install_fwtip         "Informácie ohľadom východzieho firewallu"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Prispôsobovanie priebehu inštalácie"
+_tr_add2 ins_custom_tip              "Ako si prispôsobiť priebeh inštalácie"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Posledné Arch novinky"
+_tr_add2 daily_assist_anewstip       "Ukáže posledné Arch novinky v prehliadači"
+
