@@ -249,7 +249,7 @@ eos_yad_check_internet_connection() {
     case "$EOS_CONNECTION_CHECKER" in
         curl)
             # checker="curl --silent --connect-timeout 8 https://8.8.8.8"
-            checker=/usr/bin/eos-connection-checker
+            checker=eos-connection-checker
             ;;
     esac
 
