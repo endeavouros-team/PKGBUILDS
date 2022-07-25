@@ -404,12 +404,7 @@ Main()
     [ -n "$timeout_default" ] || timeout_default=30
     local timeout=$timeout_default
 
-    if [ -x /usr/bin/eos-connection-checker ] ; then
-        eos-connection-checker || DIE "internet connection not available!"
-    else
-        echo2 "WARNING: eos-connection-checker is not available, cannot verify internet connection."
-        echo2 "         Package '$(PackageThatOwnsApp eos-connection-checker)' is not installed?"
-    fi
+    eos-connection-checker || DIE "internet connection not available!"
 
     GetReferenceUpdateLevel
 
