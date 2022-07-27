@@ -263,3 +263,6 @@ _tr_add2 after_install_fwtip         "Information om standardbrandväggen"
 
 _tr_add2 ins_custom                  "Anpassa installationsprocessen"
 _tr_add2 ins_custom_tip              "Hur man anpssar installationsprocessen"
+
+_tr_add2 daily_assist_anews          "Senaste Arch nyheter"
+_tr_add2 daily_assist_anewstip       "Visa senaste Arch nyheter i en webbläsare"
