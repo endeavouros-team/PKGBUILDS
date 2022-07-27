@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Теперь фактические строки, которые должны быть переведены ######################
 # func   <placeholder>             "string"
 
-_tr_add2 welcome_disabled          "$PRETTY_PROGNAME отключено. Для повторного запуска используйте команду eos-welcome --enable"
+_tr_add2 welcome_disabled          "Приложение $PRETTY_PROGNAME отключено. Для запуска используйте команду --enable (временно: --once)."
 
 _tr_add2 butt_later                "Закрыть это окно"
 _tr_add2 butt_latertip             "Запускать $PRETTY_PROGNAME при старте системы"
@@ -127,13 +127,13 @@ _tr_add2 add_more_apps_bt_bm       "Bluetooth (blueman) для Xfce"
 
 ###################### ПРОЧЕЕ НОВОЕ ПОСЛЕ ЭТОЙ ЛИНИИ ######################
 
-_tr_add2 settings_dis_contents     "Для запуска $PRETTY_PROGNAME повторно, откройте терминал и выполните команду: $PROGNAME --enable"
+_tr_add2 settings_dis_contents     "Для запуска $PRETTY_PROGNAME повторно, откройте терминал и выполните:\n<tt>$PROGNAME --enable</tt>\nили\n<tt>$PROGNAME --once</tt>\n"
 _tr_add2 settings_dis_text         "Перезапуск $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title        "Как возобновить $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt         "Я помню"
 _tr_add2 settings_dis_buttip       "Я обещаю"
 
-_tr_add2 help_butt_title           "$PRETTY_PROGNAME Help"
+_tr_add2 help_butt_title           "Помощь $PRETTY_PROGNAME"
 _tr_add2 help_butt_text            "Информация о приложении $PRETTY_PROGNAME"
 
 _tr_add2 dm_title                  "Выбор Display Manager"
@@ -158,7 +158,7 @@ _tr_add2 issues_grub               "ВАЖНО: необходимо вручн�
 _tr_add2 issues_run                "Выполнение команды:"
 _tr_add2 issues_no                 "Системные ошибки не обнаружены"
 
-_tr_add2 cal_noavail               "Не доступно: "			# программа установки
+_tr_add2 cal_noavail               "Недоступно: "			# программа установки
 _tr_add2 cal_warn                  "Внимание"
 _tr_add2 cal_info1                 "Это выпуск разработки сообщества.\n\n"                                   				# для специалистов!
 _tr_add2 cal_info2                 "<b>Офлайн</b> вариант предоставляет рабочий стол Xfce с темой EndeavourOS.\nПодключение к интернет не требуется.\n\n"
@@ -204,10 +204,10 @@ _tr_add2 useful_tips_text      "Полезные советы"
 # 2020-May-16:
 
 _tr_add2 butt_changelog        "Изменения в Welcome"
-_tr_add2 butt_changelogtip     "Список изменений в Welcome"
+_tr_add2 butt_changelogtip     "Показать список изменений в Welcome"
 
-_tr_add2 after_install_themevan      "Оригинальная тема Xfce"
-_tr_add2 after_install_themevantip   "Использовать оригинальную тему Xfce"
+_tr_add2 after_install_themevan      "Ванильная тема Xfce"
+_tr_add2 after_install_themevantip   "Использовать ванильную тему Xfce"
 
 _tr_add2 after_install_themedef     "Тема Xfce в стиле EndeavourOS"
 _tr_add2 after_install_themedeftip  "Использовать стиль EndeavourOS в теме Xfce по умолчанию"
@@ -223,8 +223,8 @@ _tr_add2 nb_tab_owncmds_text        "Добавление пользовател
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Справка по добавлению пользовательских команд"
 
-_tr_add2 add_more_apps_akm          "Выбор ядра Linux"
-_tr_add2 add_more_apps_akmtip       "Установка простого менеджера ядер Linux"
+_tr_add2 add_more_apps_akm          "Менеджер ядра Linux"
+_tr_add2 add_more_apps_akmtip       "Установка простого менеджера ядра Linux"
 
 # 2020-Jul-15:
 _tr_add2 butt_owncmds_help        "Справка: пользовательские команды"
@@ -238,16 +238,16 @@ _tr_add2 ins_reso                 "Разрешение дисплея"
 _tr_add2 ins_resotip              "Изменение разрешение дисплея"
 
 # 2020-Sep-08:
-_tr_add2 add_more_apps_arch          "Просмотр всех Arch пакетов"
-_tr_add2 add_more_apps_aur           "Просмотр всех AUR пакетов"
+_tr_add2 add_more_apps_arch          "Просмотр всех пакетов Arch"
+_tr_add2 add_more_apps_aur           "Просмотр всех пакетов AUR"
 _tr_add2 add_more_apps_done1_text    "Рекомендуемые приложения уже установлены$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nТакже можно просмотреть все пакеты Arch и AUR, и установить их используя терминал.\n"
-_tr_add2 add_more_apps_done2_tip1    "Для установки, используйте 'pacman' или 'yay'"
-_tr_add2 add_more_apps_done2_tip2    "Для установки, используйте 'yay'"
+_tr_add2 add_more_apps_done2_text    "Также можно просмотреть все пакеты Arch и AUR"
+_tr_add2 add_more_apps_done2_tip1    "Для установки используйте 'pacman' или 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Для установки используйте 'yay'"
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2        "Выбор обоев EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2     "Выбор обоев"               # was: "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ew2        "Выбор обоев EndeavourOS"      # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Средство выбора обоев"        # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
@@ -272,7 +272,7 @@ _tr_add2 updt_press_enter         "Нажмите ENTER, чтобы закрыт
 _tr_add2 after_install_pacdiff_tip "Управление файлами pacnew, pacorig $_and pacsave (необходимы pacdiff или meld) с помощью pacdiff $_and"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Настройка"                            # a starting verb on a sentence "Настройка eos-update-notifier"
+_tr_add2 after_install_conf           "Настроить"                            # a starting verb on a sentence "Настройка eos-update-notifier"
 _tr_add2 after_install_more_wall      "Скачать больше обоев EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Скачать предыдущие обои EndeavourOS и обои от сообщества"
 _tr_add2 after_install_info           "информация"                           # last word on a sentence, means just any information
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Новости о программном 
 _tr_add2 butt_softnews_tip            "Важные новости о программном обеспечении EndeavourOS"
 
 _tr_add2 install_community            "Установить версии ОС от сообщества"
-_tr_add2 install_community_tip        "Коллекция версий ОС от сообщества Endeavour (только онлайн установка)"    # changed
+_tr_add2 install_community_tip        "Коллекция версий ОС от сообщества (только онлайн установка)"    # changed
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "Как поделиться системными логами?"
@@ -299,20 +299,20 @@ _tr_add2 after_install_itab_tip      "Выбор вкладки Welcome, ото�
 _tr_add2 daily_assist_apps           "Приложения по категориям"
 _tr_add2 daily_assist_apps_tip       "Приложения, отсортированные по категориям"
 
-_tr_add2 after_install_vbox1         "Включить VirtualBox Guest utilities"
-_tr_add2 after_install_vbox2         "Для включения VirtualBox Guest utilities, выберите вкладку <b>После установки</b> и нажмите кнопку"
+_tr_add2 after_install_vbox1         "Включить утилиты VirtualBox Guest"
+_tr_add2 after_install_vbox2         "Для включения утилит VirtualBox Guest, выберите вкладку <b>После установки</b> и нажмите кнопку "
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Проблема$_question с проводным подключением/переключением драйвера r8168 и r8169$_exclamation"    # changed 2021-Dec-14 !!
-_tr_add2 after_install_r8168_tip     "Переключение между драйверами r8168 и r8169 (может потребоваться перезагрузка)"                   # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168         "Проблема с проводным подключением$_question Переключите драйвера r8168 и r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Переключение между драйверами r8168 и r8169 (может потребоваться перезагрузка)"                 # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "информация"                                        # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "дополнительная информация о Вашем DE/WM"           # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "информация"                                                               # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "дополнительная информация об этом менеджере рабочего стола/окон"          # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Выбор популярных приложений для установки"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "Выберите приложения и установите их"
+_tr_add2 add_more_apps_qstip         "Выберите популярные приложения и установите их"
 
 # 2022-Mar-21
 _tr_add2 ins_blue_notes              "Примечания по Bluetooth"
@@ -325,3 +325,7 @@ _tr_add2 after_install_fwtip         "Информация о брандмауэ
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Настройка установки"
 _tr_add2 ins_custom_tip              "Как настроить процесс установки"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Новости Arch"
+_tr_add2 daily_assist_anewstip       "Покажет последние новости Arch в браузере"
