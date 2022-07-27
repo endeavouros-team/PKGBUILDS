@@ -325,3 +325,7 @@ _tr_add2 after_install_fwtip         "Infos sur le pare-feu par défaut"
 # 30-mars-2022
 _tr_add2 ins_custom                  "Personnaliser le processus d'installation"
 _tr_add2 ins_custom_tip              "Comment personnaliser le processus d'installation"
+
+# 15-juillet-2022
+_tr_add2 daily_assist_anews          "Dernières nouvelles Arch"
+_tr_add2 daily_assist_anewstip       "Montre les dernières nouvelles d'Arch dans un navigateur"
