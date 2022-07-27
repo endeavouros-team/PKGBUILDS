@@ -324,4 +324,9 @@ _tr_add2 after_install_fwtip         "Information über die installierte Firewal
 
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Anpassen des Installationsprozesses"
-_tr_add2 ins_custom_tip              "Möglichkeiten die Installation erweitert anzupassen"
+_tr_add2 ins_custom_tip              "Möglichkeiten die Installation anzupassen"
+
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Archlinux Neugkeiten"
+_tr_add2 daily_assist_anewstip       "Zeigt Neugkeiten über Archlinux im Browser an"
