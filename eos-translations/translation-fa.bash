@@ -200,8 +200,8 @@ _tr_add2 nb_tab_UsefulTips     "نکات"
 _tr_add2 useful_tips_text      "نکات کارآمد"
 
 
-_tr_add2 butt_changelog        "لاگ تغییرات"
-_tr_add2 butt_changelogtip     "لاگ تغییرات Welcome را نشان بده"
+_tr_add2 butt_changelog        "گزارش تغییرات"
+_tr_add2 butt_changelogtip     "نمایش گزارش تغییرات Welcome"
 
 _tr_add2 after_install_themevan      "Xfce تم ساده"
 _tr_add2 after_install_themevantip   "استفاده کن Xfce از تم ساده"
@@ -261,11 +261,11 @@ _tr_add2 install_community            "نصب نسخه های انجمن"
 _tr_add2 install_community_tip        "مجموعه نسخه‌های انجمن (نیازمند اینترنت)"
 
 
-_tr_add2 ins_syslog                   "چگونگی اشتراک گذاری لاگ‌های سیستمی"
-_tr_add2 ins_syslogtip                "توضیح می‌دهد چگونه می‌توانید لاگ‌های سیستم را وقتی به کمک نیازمندید به اشتراک بگذارید"
+_tr_add2 ins_syslog                   "چگونگی اشتراک گذاری گزارش‌های سیستمی"
+_tr_add2 ins_syslogtip                "توضیح می‌دهد چگونه می‌توانید گزارش‌های سیستم را وقتی به کمک نیازمندید به اشتراک بگذارید"
 
-_tr_add2 ins_logtool                  "لاگ‌ها برای عیب‌یابی"
-_tr_add2 ins_logtooltip               "هنگام نیاز به کمک، لاگ‌های عیب‌یابی را ایجاد، انتخاب و به اشتراک بگذارید"
+_tr_add2 ins_logtool                  "گزارش‌ها برای عیب‌یابی"
+_tr_add2 ins_logtooltip               "هنگام نیاز به کمک، گزارش‌های عیب‌یابی را ایجاد، انتخاب و به اشتراک بگذارید"
 
 
 _tr_add2 nb_tab_DailyAssistant       "دستیار"
