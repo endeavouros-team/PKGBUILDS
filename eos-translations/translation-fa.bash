@@ -40,8 +40,8 @@ _tr_add2 welcome_disabled      ".برنامه غیر فعال است. به هر 
 _tr_add2 butt_later            "بعدا می‌بینمت"
 _tr_add2 butt_latertip         "برنامه را فعال نگه دار"
 
-_tr_add2 butt_noshow           "دیگه منو نشون نده"
-_tr_add2 butt_noshowtip        "را غیر فعال کن $PRETTY_PROGNAME"
+_tr_add2 butt_noshow           "مخفی کردن برنامه"
+_tr_add2 butt_noshowtip        "غیرفعال کردن $PRETTY_PROGNAME"
 
 _tr_add2 butt_help             "کمک"
 
@@ -235,7 +235,7 @@ _tr_add2 add_more_apps_done2_tip1    "برای نصب، از 'yay'یا 'pacman' 
 _tr_add2 add_more_apps_done2_tip2    "برای نصب، از 'yay' استفاده کنید"
 
 
-_tr_add2 after_install_ew2        "یکی از والپیپرهای اندیور رو انتخاب کن"
+_tr_add2 after_install_ew2        "انتخاب یکی از والپیپرهای اندیور"
 _tr_add2 after_install_ewtip2     "انتخابگر والپیپر"
 
 
@@ -287,7 +287,7 @@ _tr_add2 daily_assist_DEinfo_tip     "اطلاعات بیشتر درباره ا�
 
 # 2022 Update
 _tr_add2 add_more_apps_qs            "انتخاب برنامه‌های متداول برای نصب"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "برنامه‌های متداول را انتخاب و نصب کنید"
+_tr_add2 add_more_apps_qstip         "نصب و انتخاب برنامه‌های متداول"
 
 _tr_add2 ins_blue_notes              "نکاتی درباره بلوتوث"
 _tr_add2 ins_blue_notes_tip          "نکاتی درباره راه‌اندازی بلوتوث"
@@ -297,3 +297,6 @@ _tr_add2 after_install_fwtip         "اطلاعات درباره فایروال
 
 _tr_add2 ins_custom                  "سفارشی ساختن پروسه نصب"
 _tr_add2 ins_custom_tip              "طریقه سفارشی سازی فرایند نصب"
+
+_tr_add2 daily_assist_anews          "جدیدترین اخبار آرچ"
+_tr_add2 daily_assist_anewstip       "جدیدترین اخبار آرچ را در یک مرورگر نمایش می‌دهد"
