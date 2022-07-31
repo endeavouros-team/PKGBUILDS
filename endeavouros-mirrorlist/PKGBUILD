@@ -26,7 +26,8 @@ prepare() {
     local offline="endeavouros-mirrorlist$suffix"
     local mirrorlist=endeavouros-mirrorlist
 
-    cat $mirrorlist | sed -n '/^## Germany/,/^$/p'   > $offline
+    printf "# EndeavourOS mirrorlist for offline install only.\n\n" > $offline
+    cat $mirrorlist | sed -n '/^## Germany/,/^$/p'  >> $offline
     cat $mirrorlist | sed -n '/^## [A-Z].*/,$p'     >> $offline
 }
 
