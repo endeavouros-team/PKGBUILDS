@@ -5,6 +5,9 @@ DIE() {
     exit 1
 }
 
+pushd() { builtin pushd "$@" >/dev/null || DIE "'pushd $*' failed" ; }
+popd()  { builtin popd  "$@" >/dev/null ; }
+
 MakePicSmaller() {
     local picfile="$1"
     /usr/bin/convert "$picfile" -depth 3 "$picfile"
@@ -98,7 +101,7 @@ Help2html() {
                 ;;
             *)
                 usage="$usage_def"
-                help="$($app -h)"
+                help="$($app -h 2>&1)"
                 ;;
         esac
         mkdir -p $tmpdir/$app
@@ -134,7 +137,7 @@ Main()
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
 
     # help option to html
-    for app in eos-packagelist rate-mirrors ; do
+    for app in eos-packagelist nvidia-inst rate-mirrors ; do
         Help2html $app
     done
 
@@ -146,23 +149,11 @@ Main()
 
     # indirect via man folder
     # note: added 'rate-mirrors' here!
-    for app in ChangeDisplayResolution \
-                   $appname \
-                   eos-connection-checker \
-                   eos-download-wallpapers \
-                   eos-pacdiff \
-                   eos-pkginfo \
-                   eos-pkg-changelog \
-                   eos-sendlog \
-                   eos-shifttime \
-                   eos-wallpaper-set \
-                   grub-colour-chooser \
-                   paccache-service-manager \
-                   su-c_wrapper \
-                   RunInTerminal \
-                   UpdateInTerminal
+    pushd ../man
+    local apps=(*)
+    popd
+    for app in "${apps[@]}"
     do
-        # was also: rate-mirrors
         Md2html $app $appname/man
     done
 

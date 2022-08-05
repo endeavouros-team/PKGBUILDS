@@ -71,13 +71,13 @@ Main()
                 | eos-grub-fix-initrd-generation | keyserver-rank* | nvidia-installer-update-db | polybar-msg | eos-kill-yad-zombies \
                 | welcome-dnd | yad-settings | yad-tools | eos-latest-arch-mirrorlist | eos-apps-info-helper | eos-install-mode-run-calamares \
                 | eos-run-cmd-with-su | *.sh | *calamares* | update-mirrorlist | nvidia-installer-kernel-para | eos-select-file-server | wormc \
-                | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | eos-quickstart | arc* | dbufstat \
-                | *.zfs | raidz* | z*)
+                | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | arc* | dbufstat \
+                | *.zfs | raidz* | z* | wgetpaste)
                 continue ;;
-            lxdm-binary | lxdm-config | lxdm)
+            lxdm-binary | lxdm-config | lxdm | arm-* | budgie-* | pacignore)
                 # why these show up ???
                 continue ;;
-            eos-pkginfo | eos-pkg-changelog | nvidia-inst)
+            eos-pkginfo | eos-pkg-changelog)
                 # deprecated for now
                 continue ;;
 
@@ -88,6 +88,8 @@ Main()
             # rename:
             eos-pkginfo-aur)  app2=eos-pkginfo ;;
             eos-welcome)      app2=welcome ;;
+            #wgetpaste)        app2=wgetpaste-eos ;;
+            yad)              app2=yad-eos ;;
             su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character !!
             *)                app2="$app" ;;
         esac

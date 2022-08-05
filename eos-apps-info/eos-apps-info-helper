@@ -333,10 +333,10 @@ Main()
         if [ "$return_url" = "yes" ] ; then
             echo "$url"
         else
-            /usr/bin/setsid $br "$url" 2>/dev/null &
+            /usr/bin/setsid $br "$url" &>/dev/null &
         fi
     else
-        DIE "sorry, no info found."
+        DIE "sorry, no info found about '$name'."
     fi
 }
 
