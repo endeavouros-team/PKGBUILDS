@@ -4,6 +4,8 @@
 
 # Implementation using libnotify.
 
+GetUsers() { /usr/bin/users | sed 's| |\n|g' | sort | uniq ; }
+
 _other_reboot_required() {
     local msg="Reboot is recommended due to the upgrade of core system package(s)."
     local title="Reboot recommended!"
@@ -14,7 +16,7 @@ _other_reboot_required() {
     # notification
     local user userid cmd
 
-    for user in $(/usr/bin/users) ; do
+    for user in $(GetUsers) ; do
         userid=$(/usr/bin/id -u $user)
         cmd=(
             DISPLAY=:0
