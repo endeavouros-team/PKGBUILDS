@@ -1,6 +1,6 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=endeavouros-theming
-pkgver=9.0
+pkgver=10.0
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
@@ -9,8 +9,8 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-md5sums=('07e2c38413daee3e06cbbc9a40482f1a')
-sha512sums=('b82c4c929cb13c980aa8dfb433fc290ed2af97cf4aaf13ae75e94f14cb110dfedd40b73c88b6c53ce3d1f41f3c8c07e94822bb049c31c9110db87441140b23ab')
+md5sums=('b582f62a8082e6e85d553951da3ad6ac')
+sha512sums=('fe430d1ee730221d63bab3b3004fba846b94dd30b6107a8b293c8a4c49af00b5aa32f2e5ff78965d27f90dd79e01f2c9e903314a1cd08f44f8c8a5c7d030a914')
 install=$pkgname.install
 
 package() {
