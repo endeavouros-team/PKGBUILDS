@@ -326,3 +326,7 @@ _tr_add2 after_install_fwtip         "Informação sobre a firewall predefinida"
 _tr_add2 ins_custom                  "Personalização do processo de instalação"
 _tr_add2 ins_custom_tip              "Como personalizar o processo de instalação"
 
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Últimas notícias do Arch"
+_tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num navegador"
+
