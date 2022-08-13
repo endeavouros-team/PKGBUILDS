@@ -1,4 +1,4 @@
-# Translations for the Welcome app.
+# Traduccions per a l'aplicaci.
 #
 # Note: variables (like $PRETTY_PROGNAME below) may be used if they are already defined either
 # - in the Welcome app
