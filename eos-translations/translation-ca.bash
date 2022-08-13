@@ -34,33 +34,33 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME app is disabled. To start it anyway, use option --enable (temporarily: --once)."  # changed 2022-Feb-21
+_tr_add2 welcome_disabled      "L'aplicació $PRETTY_PROGNAME està inhabilitada. Per iniciar-la, useu l'opció --enable (temporarily: --once)."  # changed 2022-Feb-21
 
-_tr_add2 butt_later            "See you later"
-_tr_add2 butt_latertip         "Keep $PRETTY_PROGNAME enabled"
+_tr_add2 butt_later            "Fins aviat"
+_tr_add2 butt_latertip         "Mantén $PRETTY_PROGNAME habilitat"
 
-_tr_add2 butt_noshow           "Don't show me anymore"
-_tr_add2 butt_noshowtip        "Disable $PRETTY_PROGNAME"
+_tr_add2 butt_noshow           "No ho tornis a mostrar"
+_tr_add2 butt_noshowtip        "Inhabilita $PRETTY_PROGNAME"
 
-_tr_add2 butt_help             "Help"
-
-
-_tr_add2 nb_tab_INSTALL        "INSTALL"
-_tr_add2 nb_tab_GeneralInfo    "General Info"
-_tr_add2 nb_tab_AfterInstall   "After Install"
-_tr_add2 nb_tab_AddMoreApps    "Add More Apps"
+_tr_add2 butt_help             "Ajuda"
 
 
-_tr_add2 after_install_text    "After install tasks"
+_tr_add2 nb_tab_INSTALL        "INSTAL·LA"
+_tr_add2 nb_tab_GeneralInfo    "Informació general"
+_tr_add2 nb_tab_AfterInstall   "Després de la instal·lació"
+_tr_add2 nb_tab_AddMoreApps    "Afegiu-hi més aplicacions"
 
-_tr_add2 after_install_um      "Update Mirrors"
-_tr_add2 after_install_umtip   "Update list of mirrors before system update"
 
-_tr_add2 after_install_us      "Update System"
-_tr_add2 after_install_ustip   "Update System Software"
+_tr_add2 after_install_text    "Després de les tasques d'instal·lació"
 
-_tr_add2 after_install_dsi     "Detect system issues"
-_tr_add2 after_install_dsitip  "Detect any potential issues on system packages or elsewhere"
+_tr_add2 after_install_um      "Actualitza les rèpliques"
+_tr_add2 after_install_umtip   "Actualitza la llista de rèpliques abans d'actualitzar el sistema"
+
+_tr_add2 after_install_us      "Actualitza el sistema"
+_tr_add2 after_install_ustip   "Actualitza el programari del sistema"
+
+_tr_add2 after_install_dsi     "Detecta problemes del sistema"
+_tr_add2 after_install_dsitip  "Detecta qualsevol problema potencial als paquets del sistema o en altres llocs"
 
 _tr_add2 after_install_etl     "EndeavourOS to latest$_question"
 _tr_add2 after_install_etltip  "Show what to do to get your system to the latest EndeavourOS level"
