@@ -54,75 +54,75 @@ _tr_add2 nb_tab_AddMoreApps    "Afegiu-hi més aplicacions"
 _tr_add2 after_install_text    "Després de les tasques d'instal·lació"
 
 _tr_add2 after_install_um      "Actualitza les rèpliques"
-_tr_add2 after_install_umtip   "Actualitza la llista de rèpliques abans d'actualitzar el sistema"
+_tr_add2 after_install_umtip   "Actualitza la llista de rèpliques abans d'actualitzar el sistema."
 
 _tr_add2 after_install_us      "Actualitza el sistema"
-_tr_add2 after_install_ustip   "Actualitza el programari del sistema"
+_tr_add2 after_install_ustip   "Actualitza el programari del sistema."
 
 _tr_add2 after_install_dsi     "Detecta problemes del sistema"
-_tr_add2 after_install_dsitip  "Detecta qualsevol problema potencial als paquets del sistema o en altres llocs"
+_tr_add2 after_install_dsitip  "Detecta qualsevol problema potencial als paquets del sistema o en altres llocs."
 
-_tr_add2 after_install_etl     "EndeavourOS to latest$_question"
-_tr_add2 after_install_etltip  "Show what to do to get your system to the latest EndeavourOS level"
+_tr_add2 after_install_etl     "L'EndeavourOS més recent$_question"
+_tr_add2 after_install_etltip  "Mostra què cal fer per dur el sistema a l'últim nivell d'EndeavourOS"
 
-_tr_add2 after_install_cdm     "Change Display Manager"
-_tr_add2 after_install_cdmtip  "Use a different display manager"
+_tr_add2 after_install_cdm     "Canvia el gestor de pantalla"
+_tr_add2 after_install_cdmtip  "Estableix un gestor de visualització diferent."
 
-_tr_add2 after_install_ew      "EndeavourOS default wallpaper"      # was: "EndeavourOS wallpaper"
-_tr_add2 after_install_ewtip   "Reset to the default wallpaper"     # was: "Change desktop wallpaper to EOS default"
+_tr_add2 after_install_ew      "Fons de pantalla predeterminat d'EndeavourOS"      # was: "EndeavourOS wallpaper"
+_tr_add2 after_install_ewtip   "Restableix el fons de pantalla predeterminat."     # was: "Change desktop wallpaper to EOS default"
 
 
-_tr_add2 after_install_pm      "Package management"
-_tr_add2 after_install_pmtip   "How to manage packages with pacman"
+_tr_add2 after_install_pm      "Gestió de paquets"
+_tr_add2 after_install_pmtip   "Com gestionar paquets amb el Pacman"
 
-_tr_add2 after_install_ay      "AUR $_and yay$_exclamation"
-_tr_add2 after_install_aytip   "Arch User Repository and yay info"
+_tr_add2 after_install_ay      "AUR $_i yay$_exclamation"
+_tr_add2 after_install_aytip   "Repositori d'usuaris de l'Arch i informació del Jay"
 
-_tr_add2 after_install_hn      "Hardware and Network"
-_tr_add2 after_install_hntip   "Get your hardware working"
+_tr_add2 after_install_hn      "Maquinari i xarxa"
+_tr_add2 after_install_hntip   "Feu que el  maquinari funcioni."
 
 _tr_add2 after_install_bt      "Bluetooth"
-_tr_add2 after_install_bttip   "Bluetooth advice"
+_tr_add2 after_install_bttip   "Consells sobre el Bluetooth"
 
-_tr_add2 after_install_nv      "NVIDIA users$_exclamation"
-_tr_add2 after_install_nvtip   "Use NVIDIA installer"
+_tr_add2 after_install_nv      "Usuaris d'NVIDIA$_exclamation"
+_tr_add2 after_install_nvtip   "Usa l'instal·lador d'NVIDIA"
 
-_tr_add2 after_install_ft      "Forum tips"
-_tr_add2 after_install_fttip   "Help us help you!"
+_tr_add2 after_install_ft      "Consells del fòrum"
+_tr_add2 after_install_fttip   "Ajudeu-nos a ajudar-vos!"
 
 
-_tr_add2 general_info_text     "Find your way at the EndeavourOS website$_exclamation"
+_tr_add2 general_info_text     "Trobeu el vostre camí al lloc web d'EndeavourOS$_exclamation"
 
-_tr_add2 general_info_ws       "Web site"
+_tr_add2 general_info_ws       "Lloc web"
 
 _tr_add2 general_info_wi       "Wiki"
-_tr_add2 general_info_witip    "Featured articles"
+_tr_add2 general_info_witip    "Articles destacats"
 
-_tr_add2 general_info_ne       "News"
-_tr_add2 general_info_netip    "News and articles"
+_tr_add2 general_info_ne       "Notícies"
+_tr_add2 general_info_netip    "Notícies i articles"
 
-_tr_add2 general_info_fo       "Forum"
-_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
+_tr_add2 general_info_fo       "Fòrum"
+_tr_add2 general_info_fotip    "Pregunteu, comenteu i xatejeu al nostre fòrum amigable!"
 
-_tr_add2 general_info_do       "Donate"
-_tr_add2 general_info_dotip    "Help us keep EndeavourOS running"
+_tr_add2 general_info_do       "Feu una donació"
+_tr_add2 general_info_dotip    "Ajudeu-nos a mantenir l'EndeavourOS en funcionament."
 
-_tr_add2 general_info_ab       "About $PRETTY_PROGNAME"
-_tr_add2 general_info_abtip    "More info about this app"
+_tr_add2 general_info_ab       "Quant a $PRETTY_PROGNAME"
+_tr_add2 general_info_abtip    "Més informació sobre aquesta aplicació"
 
 
-_tr_add2 add_more_apps_text    "Install popular apps"
+_tr_add2 add_more_apps_text    "Instal·leu aplicacions populars"
 
-_tr_add2 add_more_apps_lotip   "Office tools (libreoffice-fresh)"
+_tr_add2 add_more_apps_lotip   "Eines d'oficina (libreoffice-fresh)"
 
-_tr_add2 add_more_apps_ch      "Chromium Web Browser"
-_tr_add2 add_more_apps_chtip   "Web Browser"
+_tr_add2 add_more_apps_ch      "Navegador web Chromium"
+_tr_add2 add_more_apps_chtip   "Navegador web"
 
-_tr_add2 add_more_apps_fw      "Firewall"
-_tr_add2 add_more_apps_fwtip   "Gufw firewall"
+_tr_add2 add_more_apps_fw      "Tallafoc"
+_tr_add2 add_more_apps_fwtip   "Tallafoc Gufw"
 
-_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) for Xfce"
-_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) for Xfce"
+_tr_add2 add_more_apps_bt      "Bluetooth (blueberry) per a l'Xfce"
+_tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) per a l'escriptori Xfce"
 
 
 ####################### NEW STUFF AFTER THIS LINE:
