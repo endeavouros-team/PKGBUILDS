@@ -23,7 +23,7 @@
 
 ### First some useful definitions:
 
-_tr_lang=en            # required helper variable for _tr_add2
+_tr_lang=ca            # required helper variable for _tr_add2
 
 # Help with some special characters (HTML). Yad has problems without them:
 _exclamation='&#33;'   # '!'
