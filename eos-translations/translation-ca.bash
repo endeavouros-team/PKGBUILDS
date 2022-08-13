@@ -75,7 +75,7 @@ _tr_add2 after_install_ewtip   "Restableix el fons de pantalla predeterminat."  
 _tr_add2 after_install_pm      "Gestió de paquets"
 _tr_add2 after_install_pmtip   "Com gestionar paquets amb el Pacman"
 
-_tr_add2 after_install_ay      "AUR $_i yay$_exclamation"
+_tr_add2 after_install_ay      "AUR $_and Yay$_exclamation"
 _tr_add2 after_install_aytip   "Repositori d'usuaris de l'Arch i informació del Jay"
 
 _tr_add2 after_install_hn      "Maquinari i xarxa"
@@ -127,107 +127,107 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) per a l'escriptori Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "To run $PRETTY_PROGNAME again, start a terminal and run:\n<tt>   $PROGNAME --enable</tt>\nor\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
-_tr_add2 settings_dis_text       "Re-enabling $PRETTY_PROGNAME:"
-_tr_add2 settings_dis_title      "How to re-enable $PRETTY_PROGNAME"
-_tr_add2 settings_dis_butt       "I remember"
-_tr_add2 settings_dis_buttip     "I promise"
+_tr_add2 settings_dis_contents   "Per tornar a executar $PRETTY_PROGNAME, obriu un terminal i executeu el següent:\n<tt>   $PROGNAME --enable</tt>\nor\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
+_tr_add2 settings_dis_text       "Torna a habilitar $PRETTY_PROGNAME:"
+_tr_add2 settings_dis_title      "Com tornar a habilitar $PRETTY_PROGNAME"
+_tr_add2 settings_dis_butt       "Ho recordo"
+_tr_add2 settings_dis_buttip     "Ho prometo"
 
-_tr_add2 help_butt_title         "$PRETTY_PROGNAME Help"
-_tr_add2 help_butt_text          "More info about the $PRETTY_PROGNAME app"
+_tr_add2 help_butt_title         "Ajuda per a $PRETTY_PROGNAME"
+_tr_add2 help_butt_text          "Més informació sobre l'aplicació $PRETTY_PROGNAME"
 
-_tr_add2 dm_title                "Select Display Manager"
-_tr_add2 dm_col_name1            "Selected"
-_tr_add2 dm_col_name2            "DM name"
+_tr_add2 dm_title                "Seleccioneu un gestor de pantalla"
+_tr_add2 dm_col_name1            "Seleccionat"
+_tr_add2 dm_col_name2            "Nom del gestor de pantalla"
 
-_tr_add2 dm_reboot_required      "Reboot is required for the changes to take effect."
-_tr_add2 dm_changed              "DM changed to: "
-_tr_add2 dm_failed               "Changing DM failed."
-_tr_add2 dm_warning_title        "Warning"
+_tr_add2 dm_reboot_required      "Cal reiniciar perquè els canvis tinguin efecte."
+_tr_add2 dm_changed              "El gestor de pantalla s'ha canviat a"
+_tr_add2 dm_failed               "Ha fallat canviar el gestor de pantalla."
+_tr_add2 dm_warning_title        "Avís"
 
-_tr_add2 install_installer       "Installer"
-_tr_add2 install_already         "already installed"
-_tr_add2 install_ing             "Installing"
-_tr_add2 install_done            "Finished."
+_tr_add2 install_installer       "Instal·lador"
+_tr_add2 install_already         "ja instal·lat"
+_tr_add2 install_ing             "S'installa..."
+_tr_add2 install_done            "Fet"
 
-_tr_add2 sysup_no                "No updates."
-_tr_add2 sysup_check             "Checking for software updates..."
+_tr_add2 sysup_no                "No hi ha actualitzacions."
+_tr_add2 sysup_check             "Es comprova si hi ha actualitzacions de programari..."
 
-_tr_add2 issues_title            "Package issue detection"
-_tr_add2 issues_grub             "IMPORTANT: re-creating boot menu manually will be needed."
-_tr_add2 issues_run              "Running commands:"
-_tr_add2 issues_no               "No important system issues were detected."
+_tr_add2 issues_title            "Detecció de problemes de paquets"
+_tr_add2 issues_grub             "IMPORTANT: caldrà tornar a crear el menú d'arrencada manualment."
+_tr_add2 issues_run              "S'executen ordres:"
+_tr_add2 issues_no               "No s'han detectat problemes importants al sistema."
 
-_tr_add2 cal_noavail            "Not available: "        # installer program
-_tr_add2 cal_warn               "Warning"
-_tr_add2 cal_info1              "This is a community development release.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> method gives you an Xfce desktop with EndeavourOS theming.\nInternet connection is not needed.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> method lets you choose your desktop, with vanilla theming.\nInternet connection is required.\n\n"
-_tr_add2 cal_info4              "Please Note: This release is a work-in-progress, please help us making it stable by reporting bugs.\n"
-_tr_add2 cal_choose             "Choose installation method"
-_tr_add2 cal_method             "Method"
-_tr_add2 cal_nosupport          "$PROGNAME: unsupported mode: "
-_tr_add2 cal_nofile             "$PROGNAME: required file does not exist: "
-_tr_add2 cal_istarted           "Install started"
-_tr_add2 cal_istopped           "Install finished"
+_tr_add2 cal_noavail            "No disponible: "        # installer program
+_tr_add2 cal_warn               "Avís"
+_tr_add2 cal_info1              "Aquesta és una versió de desenvolupament de la comunitat.\n\n"                                   # specials needed!
+_tr_add2 cal_info2              "El mètode <b>fora de línia</b> ofereix un escriptori Xfce amb temàtica d'EndeavourOS.\nNo cal connexió a Internet.\n\n"
+_tr_add2 cal_info3              "El mètode <b>en línia</b> permet triar l'escriptori, amb el tema d'origen.\nCal connexió a Internet.\n\n"
+_tr_add2 cal_info4              "Si us plau, tingueu en compte que aquesta versió és un treball en curs; si us plau, ajudeu-nos a fer-la estable informant d'errors.\n"
+_tr_add2 cal_choose             "Trieu el mètode d'instal·lació."
+_tr_add2 cal_method             "Mètode"
+_tr_add2 cal_nosupport          "$PROGNAME: mode no admès: "
+_tr_add2 cal_nofile             "$PROGNAME: el fitxer requerit no existeix: "
+_tr_add2 cal_istarted           "S'ha iniciat la instal·lació."
+_tr_add2 cal_istopped           "Instal·lació acabada"
 
-_tr_add2 tail_butt              "Close this window"
-_tr_add2 tail_buttip            "Close only this window"
+_tr_add2 tail_butt              "Tanca aquesta finestra"
+_tr_add2 tail_buttip            "Tanca només aquesta finestra"
 
 
-_tr_add2 ins_text              "Installing EndeavourOS to disk"
-_tr_add2 ins_start             "Start the Installer"
-_tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
-_tr_add2 ins_up                "Update this app$_exclamation"
-_tr_add2 ins_uptip             "Updates this app and restarts it"
-_tr_add2 ins_keys              "Initialize pacman keys"
-_tr_add2 ins_keystip           "Initialize pacman keys"
-_tr_add2 ins_pm                "Partition manager"
-_tr_add2 ins_pmtip             "Gparted allows examining and managing disk partitions and structure"
-_tr_add2 ins_rel               "Latest release info"
-_tr_add2 ins_reltip            "More info about the latest release"
-_tr_add2 ins_tips              "Installation tips"
-_tr_add2 ins_tipstip           "Installation tips"
-_tr_add2 ins_trouble           "Troubleshoot"
-_tr_add2 ins_troubletip        "System Rescue"
+_tr_add2 ins_text              "Instal·lació de l'EndeavourOS al disc."
+_tr_add2 ins_start             "Inicia l'instal·lador"
+_tr_add2 ins_starttip          "Inicia l'instal·lador de l'EndeavourOS juntament amb un terminal de depuració."
+_tr_add2 ins_up                "Actualitza aquesta aplicació$_exclamation"
+_tr_add2 ins_uptip             "Actualitza aquesta aplicació i la reinicia."
+_tr_add2 ins_keys              "Inicialitza les claus del Pacman"
+_tr_add2 ins_keystip           "Inicialitza les claus del Pacman"
+_tr_add2 ins_pm                "Gestor de particions"
+_tr_add2 ins_pmtip             "El Gparted permet examinar i gestionar les particions i l'estructura del disc."
+_tr_add2 ins_rel               "Informació de la darrera versió"
+_tr_add2 ins_reltip            "Més infomació de la darrera versió"
+_tr_add2 ins_tips              "Consells d'instal·lació"
+_tr_add2 ins_tipstip           "Consells d'instal·lació"
+_tr_add2 ins_trouble           "Solució de problemes"
+_tr_add2 ins_troubletip        "Rescat del sistema"
 
-_tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
-_tr_add2 after_install_us_el      "Elevated privileges required."
-_tr_add2 after_install_us_done    "update done."
-_tr_add2 after_install_us_fail    "update failed!"
+_tr_add2 after_install_us_from    "Actualizacions d'"                            # AUR or upstream
+_tr_add2 after_install_us_el      "Es requereixen privilegis elevats."
+_tr_add2 after_install_us_done    "Actualització feta"
+_tr_add2 after_install_us_fail    "Ha fallat l'actualització!"
 
 # 2020-May-14:
 
-_tr_add2 nb_tab_UsefulTips     "Tips"
-_tr_add2 useful_tips_text      "Useful tips"
+_tr_add2 nb_tab_UsefulTips     "Consells"
+_tr_add2 useful_tips_text      "Consells útils"
 
 # 2020-May-16:
 
-_tr_add2 butt_changelog        "Changelog"
-_tr_add2 butt_changelogtip     "Show the changelog of Welcome"
+_tr_add2 butt_changelog        "Registre de canvis"
+_tr_add2 butt_changelogtip     "Mostra el registre de canvis de la benvinguda."
 
-_tr_add2 after_install_themevan      "Xfce vanilla theme"
-_tr_add2 after_install_themevantip   "Use vanilla Xfce theme"
+_tr_add2 after_install_themevan      "Tema original de l'Xfce"
+_tr_add2 after_install_themevantip   "Usa el tema original de l'Xfce."
 
-_tr_add2 after_install_themedef     "Xfce EndeavourOS default theme"
-_tr_add2 after_install_themedeftip  "Use EndeavourOS default Xfce theme"
+_tr_add2 after_install_themedef     "Tema de l'EndeavourOS per a l'Xfce"
+_tr_add2 after_install_themedeftip  "Usa el tema predeterminat d'EndeavourOS per a l'Xfce."
 
 # 2020-Jun-28:
-_tr_add2 after_install_pclean       "Package cleanup configuration"
-_tr_add2 after_install_pcleantip    "Configure package cache cleanup service"
+_tr_add2 after_install_pclean       "Configuració de la neteja de paquets"
+_tr_add2 after_install_pcleantip    "Configura el servei de neteja de la memòria cau de paquets."
 
 # 2020-Jul-04:
-_tr_add2 nb_tab_OwnCommands         "Personal Commands"                   # modified 2020-Jul-08
-_tr_add2 nb_tab_owncmds_text        "Personalized commands"               # modified 2020-Jul-08
+_tr_add2 nb_tab_OwnCommands         "Ordres personals"                   # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Ordres personalitzades"               # modified 2020-Jul-08
 
 # 2020-Jul-08:
-_tr_add2 nb_tab_owncmdstip          "Help on adding personal commands"
+_tr_add2 nb_tab_owncmdstip          "Ajuda per afegir ordres personals"
 
-_tr_add2 add_more_apps_akm          "A Kernel Manager"
-_tr_add2 add_more_apps_akmtip       "A small linux kernel manager and info source"
+_tr_add2 add_more_apps_akm          "Un gestor del nucli"
+_tr_add2 add_more_apps_akmtip       "Un petit gestor del nucli de Linux i font d'informació"
 
 # 2020-Jul-15:
-_tr_add2 butt_owncmds_help        "Tutorial: Personal Commands"
+_tr_add2 butt_owncmds_help        "Tutorial: ordres personals"
 
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Personal Commands drag${_and}drop"
