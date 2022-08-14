@@ -269,10 +269,10 @@ _tr_add2 updt_press_enter         "Premeu RETORN per tancar aquesta finestra."
 #       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 2020-Dec-11:
-_tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave amb pacdiff i "
+_tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave amb pacdiff i"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Configuració de l'"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_conf           "Configuració del dimoni"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Baixeu més fons de pantalla de l'EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Baixeu fons de pantalla de llegat i de la comunitat de l'EndeavourOS."
 _tr_add2 after_install_info           "-> informació"                           # last word on a sentence, means just any information
@@ -293,7 +293,7 @@ _tr_add2 ins_logtooltip               "Seleccioneu, creeu i compartiu registres 
 _tr_add2 nb_tab_DailyAssistant       "Assistent"
 _tr_add2 daily_assistant_text        "Eines per a tasques útils o quotidianes"
 _tr_add2 after_install_itab          "Seleccioneu la pestanya inicial de la benvinguda"
-_tr_add2 after_install_itab_tip      "Estableix la pestanya de la Benvinguda que es mostra quan s'inicia."
+_tr_add2 after_install_itab_tip      "Estableix la pestanya de la benvinguda que es mostra quan s'inicia."
 
 # 2021-Jun-08
 _tr_add2 daily_assist_apps           "Categories d'aplicacions"
@@ -307,8 +307,8 @@ _tr_add2 after_install_r8168         "Problema amb la xarxa amb fil$_question Ca
 _tr_add2 after_install_r8168_tip     "Canvia entre els controladors r8168 i r8169 (pot ser que calgui reiniciar)."           # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "Informació"                                         # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "Més informació sobre aquest Gestor d'escriptori / finestres"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "informació"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "més informació sobre aquest gestor d'escriptori / finestres"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Trieu aplicacions populars per instal·lar"                      # runs eos-quickstart
