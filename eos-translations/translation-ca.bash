@@ -68,14 +68,14 @@ _tr_add2 after_install_etltip  "Mostra què cal fer per dur el sistema a l'últi
 _tr_add2 after_install_cdm     "Canvia el gestor de pantalla"
 _tr_add2 after_install_cdmtip  "Estableix un gestor de visualització diferent."
 
-_tr_add2 after_install_ew      "Fons de pantalla predeterminat d'EndeavourOS"      # was: "EndeavourOS wallpaper"
+_tr_add2 after_install_ew      "Fons de pantalla predeterminat de l'EndeavourOS"      # was: "EndeavourOS wallpaper"
 _tr_add2 after_install_ewtip   "Restableix el fons de pantalla predeterminat."     # was: "Change desktop wallpaper to EOS default"
 
 
 _tr_add2 after_install_pm      "Gestió de paquets"
 _tr_add2 after_install_pmtip   "Com gestionar paquets amb el Pacman"
 
-_tr_add2 after_install_ay      "AUR $_and Yay$_exclamation"
+_tr_add2 after_install_ay      "AUR i Yay$_exclamation"
 _tr_add2 after_install_aytip   "Repositori d'usuaris de l'Arch i informació del Jay"
 
 _tr_add2 after_install_hn      "Maquinari i xarxa"
@@ -210,7 +210,7 @@ _tr_add2 after_install_themevan      "Tema original de l'Xfce"
 _tr_add2 after_install_themevantip   "Usa el tema original de l'Xfce."
 
 _tr_add2 after_install_themedef     "Tema de l'EndeavourOS per a l'Xfce"
-_tr_add2 after_install_themedeftip  "Usa el tema predeterminat d'EndeavourOS per a l'Xfce."
+_tr_add2 after_install_themedeftip  "Usa el tema predeterminat de l'EndeavourOS per a l'Xfce."
 
 # 2020-Jun-28:
 _tr_add2 after_install_pclean       "Configuració de la neteja de paquets"
@@ -269,13 +269,13 @@ _tr_add2 updt_press_enter         "Premeu RETORN per tancar aquesta finestra."
 #       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 2020-Dec-11:
-_tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave amb pacdiff"
+_tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave amb pacdiff i "
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Configuració"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_conf           "Configuració de l'"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Baixeu més fons de pantalla de l'EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Baixeu fons de pantalla de llegat i de la comunitat de l'EndeavourOS."
-_tr_add2 after_install_info           "Informació"                           # last word on a sentence, means just any information
+_tr_add2 after_install_info           "-> informació"                           # last word on a sentence, means just any information
 
 _tr_add2 butt_softnews                "Notícies de programari"
 _tr_add2 butt_softnews_tip            "Notícies importants sobre el programari de l'EndeavourOS"
@@ -292,7 +292,7 @@ _tr_add2 ins_logtooltip               "Seleccioneu, creeu i compartiu registres 
 # 2021-May-20
 _tr_add2 nb_tab_DailyAssistant       "Assistent"
 _tr_add2 daily_assistant_text        "Eines per a tasques útils o quotidianes"
-_tr_add2 after_install_itab          "Seleccioneu la pestanya inicial de benvinguda"
+_tr_add2 after_install_itab          "Seleccioneu la pestanya inicial de la benvinguda"
 _tr_add2 after_install_itab_tip      "Estableix la pestanya de la Benvinguda que es mostra quan s'inicia."
 
 # 2021-Jun-08
