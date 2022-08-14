@@ -230,24 +230,24 @@ _tr_add2 add_more_apps_akmtip       "Un petit gestor del nucli de Linux i font d
 _tr_add2 butt_owncmds_help        "Tutorial: ordres personals"
 
 # 2020-Aug-05:
-_tr_add2 butt_owncmds_dnd         "Personal Commands drag${_and}drop"
-_tr_add2 butt_owncmds_dnd_help    "Show a window where to drag field items for new buttons"
+_tr_add2 butt_owncmds_dnd         "Arrossegar i deixar anar ordres personals"
+_tr_add2 butt_owncmds_dnd_help    "Mostra una finestra on arrossegar els elements de camp per als botons nous."
 
 # 2020-Sep-03:
-_tr_add2 ins_reso                 "Change display resolution"
-_tr_add2 ins_resotip              "Change display resolution now"
+_tr_add2 ins_reso                 "Canvia la resolució de la pantalla"
+_tr_add2 ins_resotip              "Canvia la resolució de la pantalla ara."
 
 # 2020-Sep-08:
-_tr_add2 add_more_apps_arch          "Browse all Arch packages"
-_tr_add2 add_more_apps_aur           "Browse all AUR packages"
-_tr_add2 add_more_apps_done1_text    "Suggested apps already installed$_exclamation"
-_tr_add2 add_more_apps_done2_text    "or browse all Arch and AUR packages"
-_tr_add2 add_more_apps_done2_tip1    "To install, use 'pacman' or 'yay'"
-_tr_add2 add_more_apps_done2_tip2    "To install, use 'yay'"
+_tr_add2 add_more_apps_arch          "Exploreu tots els paquets de l'Arch"
+_tr_add2 add_more_apps_aur           "Exploreu tots els paquets de l'AUR"
+_tr_add2 add_more_apps_done1_text    "Aplicacions suggerides ja instal·lades$_exclamation"
+_tr_add2 add_more_apps_done2_text    "o exploreu tots els paquets de l'Arch i l'AUR."
+_tr_add2 add_more_apps_done2_tip1    "Per instal·lar-ne, useu pacman o yay."
+_tr_add2 add_more_apps_done2_tip2    "Per instal·lar-ne, useu yay."
 
 # 2020-Sep-11:
-_tr_add2 after_install_ew2        "Choose one of the EndeavourOS wallpapers"   # was: "EndeavourOS wallpaper (choose)"
-_tr_add2 after_install_ewtip2     "Wallpaper chooser"                          # was: "Choose from EndeavourOS default wallpapers"
+_tr_add2 after_install_ew2        "Trieu un dels fons de pantalla de l'EndeavourOS"   # was: "EndeavourOS wallpaper (choose)"
+_tr_add2 after_install_ewtip2     "Selector de fons de pantalla"                          # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
 #    IMPORTANT NOTE:
@@ -257,76 +257,76 @@ _tr_add2 after_install_ewtip2     "Wallpaper chooser"                          #
 #       - line 250: changed text of 'after_install_ewtip2'
 
 # 2020-Oct-23:
-_tr_add2 updt_update_check        "update check"
-_tr_add2 updt_searching           "Searching"
-_tr_add2 updt_for_updates         "for updates"
-_tr_add2 updt_failure             "failure$_exclamation"
-_tr_add2 updt_nothing_todo        "there is nothing to do"
-_tr_add2 updt_press_enter         "Press ENTER to close this window"
+_tr_add2 updt_update_check        "Comprovaciactualitzacions"
+_tr_add2 updt_searching           "Se cerquen"
+_tr_add2 updt_for_updates         "actualitzcions."
+_tr_add2 updt_failure             "Ha fallat$_exclamation"
+_tr_add2 updt_nothing_todo        "No hi ha res per fer."
+_tr_add2 updt_press_enter         "Premeu RETORN per tancar aquesta finestra."
 
 # 2020-Oct-24:
 #    IMPORTANT NOTE:
 #       - line 244: changed text of 'add_more_apps_done2_text'
 
 # 2020-Dec-11:
-_tr_add2 after_install_pacdiff_tip "Manage pacnew, pacorig $_and pacsave files with pacdiff $_and"
+_tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave amb pacdiff"
 
 # 2021-Apr-07:
-_tr_add2 after_install_conf           "Configure"                             # a starting verb on a sentence "Configure eos-update-notifier"
-_tr_add2 after_install_more_wall      "Download more EndeavourOS wallpapers"
-_tr_add2 after_install_more_wall_tip  "Download EndeavourOS legacy and community wallpapers"
-_tr_add2 after_install_info           "information"                           # last word on a sentence, means just any information
+_tr_add2 after_install_conf           "Configuració"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Baixeu més fons de pantalla de l'EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Baixeu fons de pantalla de llegat i de la comunitat de l'EndeavourOS."
+_tr_add2 after_install_info           "Informació"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Software News"
-_tr_add2 butt_softnews_tip            "Important news about EndeavourOS software"
+_tr_add2 butt_softnews                "Notícies de programari"
+_tr_add2 butt_softnews_tip            "Notícies importants sobre el programari de l'EndeavourOS"
 
-_tr_add2 install_community            "Install community editions"
-_tr_add2 install_community_tip        "Community editions collection (online required)"    # changed 2021-Oct-23
+_tr_add2 install_community            "Instal·leu edicions comunitàries"
+_tr_add2 install_community_tip        "Col·lecció d'edicions comunitàries (cal connexió en línia)"    # changed 2021-Oct-23
 
 # 2021-May-01
-_tr_add2 ins_syslog                   "How to share system logs"
-_tr_add2 ins_syslogtip                "Explains how you can share system logs when you need help"
-_tr_add2 ins_logtool                  "Logs for troubleshooting"
-_tr_add2 ins_logtooltip               "Select, create and share troubleshooting logs when asking for help"
+_tr_add2 ins_syslog                   "Com compartir els registres del sistema"
+_tr_add2 ins_syslogtip                "Explica com podeu compartir els registres del sistema quan necessiteu ajuda."
+_tr_add2 ins_logtool                  "Registres per a la resolució de problemes"
+_tr_add2 ins_logtooltip               "Seleccioneu, creeu i compartiu registres de resolució de problemes quan demaneu ajuda."
 
 # 2021-May-20
-_tr_add2 nb_tab_DailyAssistant       "Assistant"
-_tr_add2 daily_assistant_text        "Tools for useful and/or daily tasks"
-_tr_add2 after_install_itab          "Select initial Welcome tab"
-_tr_add2 after_install_itab_tip      "Sets the tab Welcome shows when started"
+_tr_add2 nb_tab_DailyAssistant       "Assistent"
+_tr_add2 daily_assistant_text        "Eines per a tasques útils o quotidianes"
+_tr_add2 after_install_itab          "Seleccioneu la pestanya inicial de benvinguda"
+_tr_add2 after_install_itab_tip      "Estableix la pestanya de la Benvinguda que es mostra quan s'inicia."
 
 # 2021-Jun-08
-_tr_add2 daily_assist_apps           "Application categories"
-_tr_add2 daily_assist_apps_tip       "Applications sorted by category"
+_tr_add2 daily_assist_apps           "Categories d'aplicacions"
+_tr_add2 daily_assist_apps_tip       "Aplicacions classificades per categories"
 
-_tr_add2 after_install_vbox1         "Enable VirtualBox Guest utilities"
-_tr_add2 after_install_vbox2         "To enable VirtualBox Guest utilities, select the <b>AfterInstall</b> tab and click button "
+_tr_add2 after_install_vbox1         "Habiliteu les utilitats de convidat de VirtualBox"
+_tr_add2 after_install_vbox2         "Per habilitar les utilitats de convidat de VirtualBox, seleccioneu la pestanya <b>Després de la instal·lació</b> i cliqueu al botó."
 
 # 2021-Jun-17
-_tr_add2 after_install_r8168         "Wired net issue$_question Toggle r8168 and r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
-_tr_add2 after_install_r8168_tip     "Toggle between r8168 and r8169 drivers (reboot may be needed)"           # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168         "Problema amb la xarxa amb fil$_question Canvieu el controlador r8168 pel r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Canvia entre els controladors r8168 i r8169 (pot ser que calgui reiniciar)."           # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "more information about this Desktop/Window Manager"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "Informació"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "Més informació sobre aquest Gestor d'escriptori / finestres"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
-_tr_add2 add_more_apps_qs            "Choose popular apps to install"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "Choose popular apps and install them"
+_tr_add2 add_more_apps_qs            "Trieu aplicacions populars per instal·lar"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Trieu aplicacions populars i instal·leu-les."
 
 # 2022-Mar-21
-_tr_add2 ins_blue_notes              "Bluetooth notes"
-_tr_add2 ins_blue_notes_tip          "Notes about setting up bluetooth"
+_tr_add2 ins_blue_notes              "Notes del Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Notes sobre la configuració del Bluetooth"
 
 # 2022-Mar-27
-_tr_add2 after_install_fw            "Firewall information"
-_tr_add2 after_install_fwtip         "Information about the default firewall"
+_tr_add2 after_install_fw            "Informació del tallafoc"
+_tr_add2 after_install_fwtip         "Informació sobre el tallafoc predeterminat"
 
 # 2022-Mar-30
-_tr_add2 ins_custom                  "Customizing the install process"
-_tr_add2 ins_custom_tip              "How to customize the install process"
+_tr_add2 ins_custom                  "Personalització del procés d'instal·lació"
+_tr_add2 ins_custom_tip              "Com personalitzar el procés d'instal·lació"
 
 # 2022-Jul-15
-_tr_add2 daily_assist_anews          "Latest Arch news"
-_tr_add2 daily_assist_anewstip       "Shows latest Arch news in a browser"
+_tr_add2 daily_assist_anews          "Darreres notícies sobre l'Arch"
+_tr_add2 daily_assist_anewstip       "Mostra les darreres notícies de l'Arch en un navegador."
 
