@@ -308,7 +308,7 @@ _tr_add2 after_install_r8168_tip     "Alterna entre controladores r8168 e r8169 
 
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "informação"                                                     # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente gráfico/Gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo_tip     "mais informação acerca deste ambiente gráfico/gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                      # runs eos-quickstart
