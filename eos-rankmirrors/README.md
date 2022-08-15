@@ -1,6 +1,6 @@
 # eos-rankmirrors
 
-`eos-rankmirrors` ranks the mirrors that provide the EndeaavourOS repository.<br>
+`eos-rankmirrors` ranks the mirrors that provide the EndeavourOS repository.<br>
 
 ## Synopsis
 ```
