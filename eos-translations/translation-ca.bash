@@ -76,7 +76,7 @@ _tr_add2 after_install_pm      "Gestió de paquets"
 _tr_add2 after_install_pmtip   "Com gestionar paquets amb el Pacman"
 
 _tr_add2 after_install_ay      "AUR i Yay$_exclamation"
-_tr_add2 after_install_aytip   "Repositori d'usuaris de l'Arch i informació del Jay"
+_tr_add2 after_install_aytip   "Repositori d'usuaris de l'Arch i informació del Yay"
 
 _tr_add2 after_install_hn      "Maquinari i xarxa"
 _tr_add2 after_install_hntip   "Feu que el  maquinari funcioni."
@@ -231,7 +231,7 @@ _tr_add2 butt_owncmds_help        "Tutorial: ordres personals"
 
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Arrossegar i deixar anar ordres personals"
-_tr_add2 butt_owncmds_dnd_help    "Mostra una finestra on arrossegar els elements de camp per als botons nous."
+_tr_add2 butt_owncmds_dnd_help    "Mostra una finestra on arrossegar els elements per als botons nous."
 
 # 2020-Sep-03:
 _tr_add2 ins_reso                 "Canvia la resolució de la pantalla"
@@ -257,9 +257,9 @@ _tr_add2 after_install_ewtip2     "Selector de fons de pantalla"                
 #       - line 250: changed text of 'after_install_ewtip2'
 
 # 2020-Oct-23:
-_tr_add2 updt_update_check        "Comprovaciactualitzacions"
-_tr_add2 updt_searching           "Se cerquen"
-_tr_add2 updt_for_updates         "actualitzcions."
+_tr_add2 updt_update_check        "Comprovació d'actualitzacions"
+_tr_add2 updt_searching           "Se cerquen actualitzacions per a"
+_tr_add2 updt_for_updates         ""
 _tr_add2 updt_failure             "Ha fallat$_exclamation"
 _tr_add2 updt_nothing_todo        "No hi ha res per fer."
 _tr_add2 updt_press_enter         "Premeu RETORN per tancar aquesta finestra."
