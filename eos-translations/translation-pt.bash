@@ -308,7 +308,7 @@ _tr_add2 after_install_r8168_tip     "Alterna entre controladores r8168 e r8169 
 
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "informação"                                                     # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "mais informação sobre este Ambiente gráfico/Gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo_tip     "mais informação acerca deste ambiente gráfico/gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                      # runs eos-quickstart
@@ -325,4 +325,8 @@ _tr_add2 after_install_fwtip         "Informação sobre a firewall predefinida"
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Personalização do processo de instalação"
 _tr_add2 ins_custom_tip              "Como personalizar o processo de instalação"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Últimas notícias do Arch"
+_tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num navegador"
 
