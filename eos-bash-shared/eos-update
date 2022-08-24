@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# Package updater for EndeavourOS and Arch.
+# Handles db lock file, keyrings, syncing, and optionally AUR with given AUR helper.
+
+Options() {
+    local opts
+    local lopts="nvidia,helper:,min-free-bytes:,paru,yay,pacman,help"
+    local sopts="h"
+
+    opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --nvidia)
+                if IsEndeavourOS ; then
+                    nvidia=eos-kernel-nvidia-update-check
+                else
+                    echo "Sorry, option $1 works only in EndeavourOS. Option ignored." >&2
+                fi
+                ;;
+            --min-free-bytes) min_free_bytes="$2" ; shift ;;
+            --helper) helper="$2" ; shift ;;
+            --paru | --yay | --pacman) helper="${1/--/}" ;;
+
+            -h | --help)
+                cat <<EOF >&2
+Package updater for EndeavourOS and Arch
+Handles:
+- disk space check
+- pacman db lock
+- keyrings
+- sync after update
+and optionally
+- AUR with given AUR helper
+- Nvidia driver vs. kernel updates (only on EndeavourOS)
+
+Usage: $progname [options]
+Options:
+  --help, -h         This help.
+  --nvidia           Check also nvidia driver vs. kernel updates.
+  --helper           AUR helper name. Supported: yay, paru, pacman. Default: pacman.
+                     Others supporting option -Sua should work as well.
+  --paru             Same as --helper=paru.
+  --yay              Same as --helper=yay.
+  --pacman           Same as --helper=pacman. Default.
+  --min-free-bytes   Minimal amount of free space (in bytes) that the root partition should have
+                     before updating. Otherwise a warning message will be displayed.
+                     Default: $min_free_bytes
+EOF
+                exit 0
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+}
+
+IsEndeavourOS() {
+    if [ "$isEndeavourOS" = "yes" ] || [ -r /usr/lib/endeavouros-release ] || [ -n "$(grep -iw endeavouros /etc/*-release)" ] ; then
+        isEndeavourOS=yes
+        return 0
+    fi
+    isEndeavourOS=no
+    return 1
+}
+
+DiskSpace() {
+    local available=$(LANG=C /usr/bin/df | /usr/bin/grep -w "/" | /usr/bin/awk '{print $4}')
+    local min=$((min_free_bytes / 1000))  # use compatible numbers
+
+    if [ $available -lt $min ] ; then
+        {
+        echo "WARNING: your root partition (/) has only $available bytes of free space."
+        if [ $(du -d0 /var/cache/pacman/pkg | awk '{print $1}') -gt $min ] ; then
+            printf "\nFor example, cleaning up the package cache may help.\n"
+            printf "Command 'sudo paccache -rk1' would do this:"
+            paccache -dk1
+            printf "Command 'sudo paccache -ruk0' would do this:"
+            paccache -duk0
+            echo ""
+        fi
+        } >&2
+    fi
+}
+
+Main() {
+    local progname="$(/usr/bin/basename "$0")"
+    local nvidia=":"
+    local helper="pacman"
+    local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
+
+    local helper2=":"
+    local lock=/var/lib/pacman/db.lck
+    local rmopt=f
+    local isEndeavourOS=""
+
+    Options "$@"
+
+    echo "$helper update with additional and useful checks" >&2
+
+    DiskSpace
+
+    if [ -e $lock ] && fuser $lock &>/dev/null ; then
+        rmopt=i
+    fi
+    local keyrings=(archlinux-keyring)
+    IsEndeavourOS && keyrings+=(endeavouros-keyring)
+    echo "Updating..."
+    if [ "$helper" = "pacman" ] ; then
+        sudo bash -c "rm -$rmopt $lock; [ -e $lock ] || { $nvidia && pacman -Sy --noconfirm --needed ${keyrings[*]} && pacman -Su && sync ; }"
+    else
+        helper2="/usr/bin/sudo -u $LOGNAME $helper -Sua"
+        sudo bash -c "rm -$rmopt $lock; [ -e $lock ] || { $nvidia && pacman -Sy --noconfirm --needed ${keyrings[*]} && pacman -Su && $helper2 ; sync ; }"
+    fi
+}
+
+Main "$@"

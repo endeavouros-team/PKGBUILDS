@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.25
+pkgver=1.26
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -54,6 +54,7 @@ source=(
   $_url/eos-run-cmd-with-su
   $_url/eos-wallpaper-set
   $_url/UpdateInTerminal
+  $_url/eos-update                        # "better" than UpdateInTerminal
   $_url/UpdateInTerminal.desktop
   $_url/eos-waiting-indicator
 #  $_url/eos-pkginfo
@@ -89,6 +90,7 @@ sha512sums=('d35a57647d7c35fb1736471c84b6c550ebd1d79ccf57d04403baebeca1f134b7786
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '7340f839bbb4dc495dda8af1b8c56e915aaeab2a13252a8b0f37835904cc46e8e85e2490216609a50701111c0e49cc7574edeb4882b2df3bbd2724ad2e3a6095'
             'b772e2a0c66d903c7d1f6f7a651b7a9fcc70c4dfa388ac100e794f9121f20b6b22a5c15335aada4923ed912f3164deb87f9745f4979123424fef91ad3bd4c765'
+            'fedeb5baf76a9f990e30254b07c5b9658dd7175d58749c0511cb142802cf49d5ac275b234046f879ce9e90be10ed3a75b1b552854a30544c5211905b1408a182'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '5ddf86c682c028f8f36f1617832306561c4b1fcc6855d44d2fec17ba21283c3be973c8e12bda137c13c664c3e00d804d661a8cc9525169e1cc16d00f174185d6'
@@ -127,6 +129,7 @@ package() {
   install -Dm755 eos-run-cmd-with-su            $pkgdir/usr/bin/eos-run-cmd-with-su
   install -Dm755 eos-wallpaper-set              $pkgdir/usr/bin/eos-wallpaper-set
   install -Dm755 UpdateInTerminal               $pkgdir/usr/bin/UpdateInTerminal
+  install -Dm755 eos-update                     $pkgdir/usr/bin/eos-update
   install -Dm755 eos-waiting-indicator          $pkgdir/usr/bin/eos-waiting-indicator
 #  install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
