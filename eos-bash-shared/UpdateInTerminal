@@ -19,6 +19,26 @@ source $translations_dir/translations.bash || {
 export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
 
+GrubCheckFwsetup() {
+    local updates="$1"
+    if [ -n "$(echo "$updates" | grep -w grub)" ] ; then
+        local version_requiring_fwsetup="2:2.06.r322.gd9b4638c5-1"
+        local curver="$(pacman -Q grub | awk '{print $NF}')"
+        if [ $(vercmp "$curver" "$version_requiring_fwsetup") -lt 0 ] ; then
+            cat <<EOF >&2
+
+==> IMPORTANT: you will have to run grub-install BEFORE reboot!
+
+    Example:
+        sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=EndeavourOS-grub
+
+    See https://forum.endeavouros.com/t/the-latest-grub-package-update-needs-some-manual-intervention
+
+EOF
+        fi
+    fi
+}
+
 Checkupdates() {
     # Variables:
     #    in:  updates
@@ -31,6 +51,8 @@ Checkupdates() {
 
     echo "$updates"
     updates="$(echo "$updates" | awk '{print $1}')"
+
+    GrubCheckFwsetup "$updates"
 
     case "$retval" in
         0)
