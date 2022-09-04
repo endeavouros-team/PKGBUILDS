@@ -3,7 +3,7 @@
 _pkgname=qtile
 pkgname=eos-skel-ce-qtile
 pkgver=1.0
-pkgrel=9
+pkgrel=10
 pkgdesc="Pre user creation skel setup for Qtile EOS-CE"
 arch=('any')
 url="https://github.com/EndeavourOS-Community-Editions/${_pkgname}"
