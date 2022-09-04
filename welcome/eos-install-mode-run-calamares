@@ -250,7 +250,7 @@ Main() {
     prelogfile="$workdir/preliminary.log"
     rm -f "$prelogfile"
 
-    BootloaderId
+    # BootloaderId
 
     _init_translations $lang || GUIDIE "language init failed"
 
