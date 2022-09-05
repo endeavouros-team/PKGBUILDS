@@ -8,7 +8,7 @@ pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=("https://github.com/endeavouros-team/$_repo_name/archive/refs/tags/$pkgver.tar.gz")
+source=("https://github.com/endeavouros-team/${_repo_name}/archive/refs/tags/$pkgver.tar.gz")
 
 sha512sums=('7e8c20a761939347bc984a70c365682b52f6b8eff83809667b0753bec9264a9bf19ee5d8dcd443780788fe5ede4657191a2066eeccf83e855ae529939f5d27f6')
 
@@ -18,11 +18,11 @@ _caldir="$pkgname/calamares"
 prepare() {
     mkdir -p "$_caldir/modules"
 
-    cp "$_repo_name-$pkgver/calamares/modules/netinstall-ce-base.yaml"            "$_caldir/modules/"
-    cp "$_repo_name-$pkgver/calamares/modules/packagechooser_ce.conf"             "$_caldir/modules/"
-    cp "$_repo_name-$pkgver/calamares/modules/netinstall_community_base.conf"     "$_caldir/modules/"
-    cp "$_repo_name-$pkgver/calamares/settings_community.conf"                    "$_caldir/"
-    cp -R "$_repo_name-$pkgver/calamares/images-ce"                               "$_caldir/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/netinstall-ce-base.yaml"            "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/packagechooser_ce.conf"             "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/netinstall_community_base.conf"     "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/settings_community.conf"                    "$_caldir/"
+    cp -R "${_repo_name}-${pkgver}/calamares/images-ce"                               "$_caldir/"
 }
 
 package() {

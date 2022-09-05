@@ -26,7 +26,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=(
   "https://github.com/endeavouros-team/$_eos_changes/archive/refs/tags/$pkgver.tar.gz"
-  "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/$_reponame-$_calamares_ver.tar.gz"
+  "https://github.com/calamares/calamares/releases/download/v$_calamares_ver/${_reponame}-${_calamares_ver}.tar.gz"
   "calamares.desktop.patch"
 )
 
@@ -36,27 +36,27 @@ sha256sums=('db3b43d3cc2830fb8301b85bc4769c6cea05331ee4611a215ddb4483d0f5e436'
 
 prepare() {
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
-    rm -r "$_reponame-$_calamares_ver/src/modules/"{fstab,mount,packages}
+    rm -r "${_reponame}-${_calamares_ver}/src/modules/"{fstab,mount,packages}
 
     # move extra modules from external repo inside calamares sources
-    rsync -va "$_eos_changes-$pkgver/calamares-extra-modules/"*       "$_reponame-$_calamares_ver/"
-    rm -rf "$_eos_changes-$pkgver"
+    rsync -va "${_eos_changes}-${pkgver}/calamares-extra-modules/"*       "${_reponame}-${_calamares_ver}/"
+    rm -rf "${_eos_changes}-${pkgver}"
 
-    mkdir -p "$_reponame-$_calamares_ver/build/$pkgname"
+    mkdir -p "${_reponame}-${_calamares_ver}/build/$pkgname"
 
     # remove default branding // keep package small
-    rm -r "$_reponame-$_calamares_ver/src/branding/default"
+    rm -r "${_reponame}-${_calamares_ver}/src/branding/default"
 
     # change some files on the go - distro-specific
-    sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame-$_calamares_ver/CMakeLists.txt"
-    patch "$_reponame-$_calamares_ver/calamares.desktop" < calamares.desktop.patch
+    sed -i "s?configuration files\" OFF?configuration files\" ON?g" "${_reponame}-${_calamares_ver}/CMakeLists.txt"
+    patch "${_reponame}-${_calamares_ver}/calamares.desktop" < calamares.desktop.patch
 
     # remove hardcoded quiet from grubcfg
-    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame-$_calamares_ver/src/modules/grubcfg/main.py"
+    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "${_reponame}-${_calamares_ver}/src/modules/grubcfg/main.py"
 }
 
 build() {
-    cd "$_reponame-$_calamares_ver/build"
+    cd "${_reponame}-${_calamares_ver}/build"
     cmake .. \
     -DCMAKE_BUILD_TYPE=Debug  \
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
@@ -79,7 +79,7 @@ build() {
     openrcdmcryptcfg packagechooserq \
     plymouthcfg plasmalnf services-openrc \
     summaryq tracking usersq webview welcomeq"
-    export DESTDIR="$srcdir/$_reponame-$_calamares_ver/build/$pkgname"
+    export DESTDIR="$srcdir/${_reponame}-${_calamares_ver}/build/$pkgname"
     make install
 }
 
@@ -87,6 +87,6 @@ package() {
     local destdir="/usr"
 
     # Commom install -D doesn't work
-    cp -r "$srcdir/$_reponame-$_calamares_ver/build/$pkgname/"* "$pkgdir$destdir"
+    cp -r "${srcdir}/${_reponame}-${_calamares_ver}/build/$pkgname/"* "${pkgdir}${destdir}"
 
 }
