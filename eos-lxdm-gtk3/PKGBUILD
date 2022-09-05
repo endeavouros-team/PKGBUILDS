@@ -7,10 +7,10 @@
 pkgbase=lxdm
 pkgname=eos-lxdm-gtk3
 pkgver=0.5.3
-pkgrel=4
+pkgrel=5
 _srcver=1.5
 pkgdesc='Lightweight X11 Display Manager for EndeavourOS'
-arch=(x86_64 aarch64 armv7h)
+arch=('x86_64' 'aarch64' 'armv7h')
 url="https://lxde.org/"
 license=('GPL')
 depends=('gtk3' 'xorg-server')

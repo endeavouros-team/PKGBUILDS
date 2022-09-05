@@ -1,8 +1,8 @@
 pkgname=eos-quickstart
 pkgver=1.3
-pkgrel=2
+pkgrel=3
 pkgdesc="An application for getting a quick start with installing packages"
-arch=(x86_64 aarch64)
+arch=('x86_64' 'aarch64')
 license=('GPL3')
 depends=('qt6-base' 'qt6-declarative' 'polkit')
 optdepends=('konsole' 'gnome-terminal' 'xfce4-terminal' 'xterm' 'alacritty' 'lxterminal')
