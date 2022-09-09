@@ -23,4 +23,5 @@ options:
   
   --install    Install the packages on the list using pacman instead of just listing them
 
-example: eos-packagelist --install "BSPWM Edition"`
+example:
+`eos-packagelist --install "BSPWM Edition"`
