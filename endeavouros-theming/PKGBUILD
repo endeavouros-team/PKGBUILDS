@@ -1,6 +1,6 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=endeavouros-theming
-pkgver=12.0
+pkgver=12.1
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
@@ -9,9 +9,20 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-md5sums=('129d268bd286829429a1b4b36b2c184b')
-sha512sums=('4ea4ce0a6857b29a1f43827e1499c49a7b94a0e8069a60d725ec5c975a16f336c15f29e168872d6855d8fc282f7b95611e5bc1c9ea9f45525319a567401b55cc')
+md5sums=('f049c1eb8fad81ba462c27e1d754554b')
+sha512sums=('27ceb4aad59e13f94afcecc7ba457207bb9b1ab28917e238260e61128c3bad17d6dd5420b2d1b93e9a9f62e0ec8b1f11ec6a72a17b77afe7be102739d69e7e39')
 install=$pkgname.install
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  if [ "${CARCH}" = "x86_64" ]; then
+    rm -rf backgrounds-arm
+  fi
+  if [ "${CARCH}" = "aarch64" ]; then
+    rm -rf backgrounds
+    mv backgrounds-arm backgrounds
+  fi
+}
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
