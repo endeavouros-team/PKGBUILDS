@@ -1,6 +1,6 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=endeavouros-theming
-pkgver=12.0
+pkgver=22.9.3.2
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
@@ -9,29 +9,23 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-md5sums=('129d268bd286829429a1b4b36b2c184b')
-sha512sums=('4ea4ce0a6857b29a1f43827e1499c49a7b94a0e8069a60d725ec5c975a16f336c15f29e168872d6855d8fc282f7b95611e5bc1c9ea9f45525319a567401b55cc')
-install=$pkgname.install
+md5sums=('e3c6c7d8d73aef3074d73767c05509b9')
+sha512sums=('79f8dab99599edd8e4b89bc20437eb4301fab515d8cb7ea4109cc6e3998e4a039e5f203f9cae94206eb8d10971f5f3869bbf3e3f5e12cdaf1408e0f6d171b8fe')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
-  install -d "${pkgdir}/usr/share/endeavouros"
-  install -d "${pkgdir}/usr/share/pixmaps"
-  install -d "${pkgdir}/usr/share/endeavouros/backgrounds"
 
-  install -Dm644 *.png *.svg           "${pkgdir}/usr/share/endeavouros"
-  install -Dm644 endeavouros.{svg,png} "${pkgdir}/usr/share/pixmaps"
-  install -Dm644 endeavouros-icon.png  "${pkgdir}/usr/share/pixmaps"
+  install -Dm644 *.png *.svg -t "${pkgdir}/usr/share/endeavouros"
+  install -Dm644 endeavouros.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
+  install -Dm644 endeavouros-icon.png  -t "${pkgdir}/usr/share/pixmaps"
   
-  cd backgrounds
-  install -Dm644 *.png                 "${pkgdir}/usr/share/endeavouros/backgrounds"
+  if [ "${CARCH}" = "aarch64" ]; then
+    install -Dm644 backgrounds/endeavouros-arm-wallpaper.png "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"
+  else
+    install -Dm644 backgrounds/endeavouros-wallpaper.png "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"
+  fi
 
   # make symlinks for KDE:
-  cd "${pkgdir}/usr/share/pixmaps"
-  ln -s endeavouros.png endeavouros-logo.png
-  ln -s endeavouros.svg endeavouros-logo.svg
-
-  # cleanup
-  cd $srcdir
-  rm -rf ../${pkgname}
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.png"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.svg"
 }
