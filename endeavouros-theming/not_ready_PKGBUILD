@@ -9,7 +9,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('79f8dab99599edd8e4b89bc20437eb4301fab515d8cb7ea4109cc6e3998e4a039e5f203f9cae94206eb8d10971f5f3869bbf3e3f5e12cdaf1408e0f6d171b8fe')
+sha512sums=('d1c75240b8ae422316ea2bbe6b7cd6ee380eb7a4559a09c9a7f8b97ddcbb28de743555469091b90a1631244e4196c45baa5cf2101adb99fc1777fb669f95d408')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
