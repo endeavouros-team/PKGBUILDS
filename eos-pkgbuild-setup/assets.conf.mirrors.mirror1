@@ -52,7 +52,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     endeavouros-skel-plasma-git
 
     endeavouros-skel-xfce4
-    # endeavouros-theming
+    endeavouros-theming
     endeavouros-xfce4-terminal-colors
     eos-apps-info
     eos-bash-shared
@@ -102,7 +102,12 @@ local PKGNAMES=(                                    # actually: dir names for pa
     zfs-dkms/aur
     zfs-utils/aur
 )
-#PKGNAMES=( budgie-control-center/aur )  # TESTING !!!
+if [ 0 -eq 1 ] ; then
+    # TESTING ONLY !!!
+    PKGNAMES=(
+        endeavouros-theming
+    )
+fi
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
 local PKGNAMES_WAIT=(
