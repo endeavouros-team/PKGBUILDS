@@ -110,10 +110,10 @@ Main() {
     if [ "$conf" = "/etc/pacman.conf" ] ; then
         if [ "$eos_is_before_arch" = "no" ] ; then
             local tmpfile=$(mktemp)
-            local bak=$conf.bak."$(date "+%Y.%m.%d-%X")"
+            local bak="$conf.bak.$(date "+%Y.%m.%d-%H:%M")"
             
             Output > $tmpfile
-            sudo bash -c "cp $conf $bak && cp $tmpfile $conf && rm $tmpfile && touch $remember_me_file"
+            sudo bash -c "cp $conf '$bak' && cp $tmpfile $conf && rm $tmpfile && touch $remember_me_file"
             printf2 "==> $conf:\n    - [endeavouros] repo moved in front of Arch repos\n    - old file copied to '$bak'\n"
         else
             touch $remember_me_file
