@@ -12,8 +12,8 @@ echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
 DIE() {
-    echo2 "Error: $1"
-    exit 1
+    echo2 "==> $progname: error: $1"
+    exit
 }
 
 Main() {
@@ -24,6 +24,7 @@ Main() {
     # File to remember that this program has already been executed.
     local remember_me_file="/etc/$progname.once"
     if [ -e "$remember_me_file" ] ; then
+        echo2 "==> Info: $progname has been executed before."
         return
     fi
 
@@ -36,7 +37,7 @@ Main() {
     if grep -E "^[[:space:]]*#[[:space:]]*EOS[[:space:]]+do[[:space:]]+not[[:space:]]+modify[[:space:]]*$" "$conf" &> /dev/null
     then
         echo2 "==> '$conf' was not modified because user declined."
-        return 2
+        return
     fi
 
     # Find the name of the first Arch repo, with or without comments.
@@ -56,10 +57,7 @@ Main() {
                 eos_found=yes
                 if [ -z "$first_arch_repo" ] ; then
                     eos_is_before_arch=yes                 # [endeavouros] is already before Arch repos in '$conf'
-                    #cat "$conf"
-                    #return
                 fi
-                #break
                 ;;
         esac
     done
