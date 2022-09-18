@@ -8,7 +8,7 @@ pkgdesc='EndeavourOS calamares configuration files and branding'
 arch=('any')
 url='https://www.endeavouros.com'
 license=('GPL3')
-source=("${_repo_name}::git+https://github.com/endeavouros-team/$_repo_name.git#branch=Calamares-3.3")
+source=("${_repo_name}::git+https://github.com/endeavouros-team/$_repo_name.git#branch=main")
 
 sha512sums=('SKIP')
 
