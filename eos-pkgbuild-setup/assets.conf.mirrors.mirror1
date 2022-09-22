@@ -67,6 +67,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-qogir-icons
     eos-quickstart
     eos-rankmirrors
+    eos-repo-before-arch-repos
     eos-sddm-theme
     eos-skel-ce-awesome
     eos-skel-ce-bspwm
