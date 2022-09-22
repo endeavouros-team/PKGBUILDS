@@ -1,6 +1,6 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 pkgname=endeavouros-theming
-pkgver=22.9.3.2
+pkgver=22.09.3.2
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons for all different DE'
 arch=('any')
