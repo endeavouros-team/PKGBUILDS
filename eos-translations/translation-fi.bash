@@ -330,3 +330,8 @@ _tr_add2 ins_custom_tip              "Miten asennusta ja asennustulosta voi muok
 _tr_add2 daily_assist_anews          "Viimeisimmät Arch-uutiset"
 _tr_add2 daily_assist_anewstip       "Viimeisimmät Arch-uutiset selaimessa"
 
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Tärkeitä uutisia saatavilla päivämäärällä"
+_tr_add2 nb_nofify_user2             "Klikkaa nappia"                                  # Software News
+_tr_add2 nb_nofify_user3             "tämän ikkunan vasemmassa alalaidassa."
+
