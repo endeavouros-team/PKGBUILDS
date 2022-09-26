@@ -330,3 +330,8 @@ _tr_add2 ins_custom_tip              "Como personalizar o processo de instalaç�
 _tr_add2 daily_assist_anews          "Últimas notícias do Arch"
 _tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num navegador"
 
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Há notícias importantes em"
+_tr_add2 nb_nofify_user2             "Clique no botão"                                  # Software News
+_tr_add2 nb_nofify_user3             "no canto inferior esquerdo desta janela."
+
