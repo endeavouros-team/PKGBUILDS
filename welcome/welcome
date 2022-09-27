@@ -384,10 +384,12 @@ ShowChangeResoButton() {
 export -f ShowChangeResoButton
 
 MirrorRankingButtons() {
-    if [ -x /usr/bin/reflector-simple ] ; then
-        tabcontents+=(
-            --field=" $(ltr after_install_um) (Arch)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn "reflector-simple"
-        )
+    if [ "$(eos_GetArch)" != "armv7h" ] ; then
+        if [ -x /usr/bin/reflector-simple ] ; then
+            tabcontents+=(
+                --field=" $(ltr after_install_um) (Arch)!$WELCOME_ICON_MIRROR_UPDATE!$(ltr after_install_umtip)":fbtn "reflector-simple"
+            )
+        fi
     fi
     if [ -x /usr/bin/eos-rankmirrors ] ; then
         tabcontents+=(
@@ -565,9 +567,7 @@ AfterInstall() {
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="<b>$(ltr after_install_text)</b>" --columns=2
   )
-  if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      MirrorRankingButtons
-  fi
+  MirrorRankingButtons
   tabcontents+=(
       --field=" $(ltr after_install_us)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
       --field=" $(ltr after_install_pclean)!$WELCOME_ICON_PACCACHE_SRV!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
@@ -654,9 +654,7 @@ DailyAssistant() {
           )
       fi
   fi
-  if [ "$(eos_GetArch)" != "armv7h" ] ; then
-      MirrorRankingButtons
-  fi
+  MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
       --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
