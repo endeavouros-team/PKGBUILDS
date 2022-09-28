@@ -334,4 +334,3 @@ _tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num n
 _tr_add2 nb_nofify_user1             "Há notícias importantes em"
 _tr_add2 nb_nofify_user2             "Clique no botão"                                  # Software News
 _tr_add2 nb_nofify_user3             "no canto inferior esquerdo desta janela."
-
