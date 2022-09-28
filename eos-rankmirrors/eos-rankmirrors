@@ -4,7 +4,7 @@
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
 
-echo2()   { echo "$1" >&2 ; }
+echo2()   { echo "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
 verbose() {
@@ -90,6 +90,10 @@ GetUpdateNumberAndTime() {
         too_low_limit=$((reference_level - 10))
     fi
 
+    if [ 0 -eq 1 ] ; then
+        [[ "$url" =~ endeavour.remi.lu ]] && url="${url}foo"    # TESTING !!!
+    fi
+
     time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
     retcode=$?
     case "$retcode" in
@@ -97,11 +101,9 @@ GetUpdateNumberAndTime() {
             nr="$(cat "$tmpfile" | head -n1)"
             rm -f "$tmpfile"
 
-            local just_testing=no                  # no=production, yes=TESTING
-
-            if [ "$just_testing" = "yes" ] ; then
+            if [ 0 -eq 1 ] ; then
                 if [ "$mirror" = 'https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch' ] ; then
-                    nr=5555
+                    nr=5555   # TESTING!
                 fi
             fi
 
@@ -123,8 +125,14 @@ GetUpdateNumberAndTime() {
             echo "$mirror $result"      # "mirror nr time"
             ;;
         *)
-            printf2 "====> Fail: no response: mirror $mirror, url $url,\n"
-            printf2 "====> Error code $retcode: '$(curl-exit-code-to-string $retcode)'\n"
+            local curl_msg="$(curl-exit-code-to-string $retcode)"
+
+            printf2 "====> Fail: no response: mirror %s, url %s,\n"   "$mirror" "$url"
+            if [ -n "$curl_msg" ] ; then
+                printf2 "====> 'curl' error code %s:\n'%s'.\n\n"   "$retcode" "$curl_msg"
+            else
+                printf2 "====> 'curl' error code %s.\n"         "$retcode"
+            fi
             rm -f "$tmpfile"
             return $retcode
             ;;
