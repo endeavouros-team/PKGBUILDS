@@ -2,7 +2,7 @@
 
 pkgname=calamares_config_ce
 pkgver=22.09.3.3
-pkgrel=1
+pkgrel=2
 _repo_name=EndeavourOS-calamares
 pkgdesc='EndeavourOS calamares configuration files for Community Editions'
 arch=('any')
@@ -17,13 +17,12 @@ _caldir="$pkgname/calamares"
 
 prepare() {
     mkdir -p "$_caldir/modules"
-    mv "$_repo_name-$pkgver"            "$_repo_name"
 
-    cp "${_repo_name}/calamares/modules/netinstall-ce-base.yaml"            "$_caldir/modules/"
-    cp "${_repo_name}/calamares/modules/packagechooser_ce.conf"             "$_caldir/modules/"
-    cp "${_repo_name}/calamares/modules/netinstall_community_base.conf"     "$_caldir/modules/"
-    cp "${_repo_name}/calamares/settings_community.conf"                    "$_caldir/"
-    cp -R "${_repo_name}/calamares/images-ce"                               "$_caldir/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/netinstall-ce-base.yaml"            "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/packagechooser_ce.conf"             "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/modules/netinstall_community_base.conf"     "$_caldir/modules/"
+    cp "${_repo_name}-${pkgver}/calamares/settings_community.conf"                    "$_caldir/"
+    cp -R "${_repo_name}-${pkgver}/calamares/images-ce"                               "$_caldir/"
 }
 
 package() {

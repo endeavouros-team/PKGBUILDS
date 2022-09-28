@@ -25,7 +25,7 @@ _yad-eos_prepare() {
     url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 
     # update pkgrel because of this patch
-    pkgrel="$pkgrel".3
+    pkgrel="$pkgrel".4
 
     source+=($url/yad-github-issue-107.patch)
 sha256sums=('65dbfa72a229f6cbd131470caf4f70fec98fe935a1436acb58c841fa2a8bddde'
@@ -36,7 +36,7 @@ sha256sums=('65dbfa72a229f6cbd131470caf4f70fec98fe935a1436acb58c841fa2a8bddde'
     provides=($orig_name)
 
     # Use any architectures
-    arch+=(aarch64 armv7h)
+    arch+=('aarch64' 'armv7h')
 }
 
 _yad-eos_prepare
