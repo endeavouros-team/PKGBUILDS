@@ -335,4 +335,4 @@ _tr_add2 daily_assist_anewstip       "Zeigt Neugkeiten über Archlinux im Browse
 # 2022-Sep-25
 _tr_add2 nb_nofify_user1             "Wichtige Neuigkeiten"
 _tr_add2 nb_nofify_user2             "Bitte klicke auf die"                                  # Software News
-_tr_add2 nb_nofify_user3             "Schaltfläche, links unten im Fenste."
+_tr_add2 nb_nofify_user3             "Schaltfläche, links unten im Fenster."
