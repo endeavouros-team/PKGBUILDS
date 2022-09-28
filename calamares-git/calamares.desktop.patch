@@ -1,0 +1,13 @@
+--- calamares.desktop	2022-09-07 18:38:12.131253000 +0200
++++ calamares.desktop.new	2022-09-07 18:47:34.690354746 +0200
+@@ -5,8 +5,8 @@
+ GenericName=System Installer
+ Comment=Calamares — System Installer
+ Keywords=calamares;system;installer;
+-TryExec=calamares
+-Exec=sh -c "pkexec calamares"
++TryExec=eos-welcome
++Exec=eos-welcome
+ 
+ Categories=Qt;System;
+ Icon=calamares

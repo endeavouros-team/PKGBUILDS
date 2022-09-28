@@ -32,7 +32,6 @@ local PKGNAMES=(                                    # actually: dir names for pa
     arc-gtk-theme-eos
     arc-x-icons-theme/aur
     bashdb/aur                                      # aur/pkgname and pkgname/aur mean the same
-    budgie-control-center/aur
 
     calamares_config_ce
     calamares_config_default
@@ -68,6 +67,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-qogir-icons
     eos-quickstart
     eos-rankmirrors
+    eos-repo-before-arch-repos
     eos-sddm-theme
     eos-skel-ce-awesome
     eos-skel-ce-bspwm
@@ -103,6 +103,12 @@ local PKGNAMES=(                                    # actually: dir names for pa
     zfs-dkms/aur
     zfs-utils/aur
 )
+if [ 0 -eq 1 ] ; then
+    # TESTING ONLY !!!
+    PKGNAMES=(
+        endeavouros-theming
+    )
+fi
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
 local PKGNAMES_WAIT=(
@@ -209,8 +215,10 @@ _budgie-control-center_hook() {
     local pkgs=(
         modemmanager
         # gnome-online-accounts
-        gsound
-        budgie-desktop libcheese colord-gtk
+        # gsound
+        budgie-desktop
+        # libcheese
+        # colord-gtk
     )
 
     InstallNeededPackages "${pkgs[@]}"
@@ -584,15 +592,15 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
 }
 
 declare -A ASSET_PACKAGE_HOOKS
-ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook
+#ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook                                           # no more needed
+#ASSET_PACKAGE_HOOKS["budgie-control-center"]=_budgie-control-center_hook
+
 ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
 
-ASSET_PACKAGE_HOOKS["budgie-control-center"]=_budgie-control-center_hook
-
 # Temporary hooks for replacing *-bin versions to non-bin versions.
-ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
-ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
+#ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
+#ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
 
 #ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version

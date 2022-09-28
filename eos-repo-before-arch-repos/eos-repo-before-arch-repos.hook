@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Upgrade
+Operation = Install
+Type = Package
+Target = eos-repo-before-arch-repos
+
+[Action]
+Description = Move the EndeavourOS repo before Arch repos in /etc/pacman.conf (only once)
+When = PostTransaction
+Exec = /usr/bin/eos-repo-before-arch-repos

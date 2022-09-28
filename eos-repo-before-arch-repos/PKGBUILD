@@ -1,0 +1,24 @@
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=eos-repo-before-arch-repos
+pkgdesc="Special package for moving the EndeavourOS repo before Arch repos."
+pkgver=1
+pkgrel=2
+arch=('any')
+license=('GPL')
+depends=(bash)
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+
+source=(
+  $_url/$pkgname
+  $_url/$pkgname.hook
+)
+
+sha512sums=('28322275116b1fc6b6c154559f2e0a3945527109f98fa18cc027de7ef43f868f46a830ead96664616992da1acc959dad88da669b600e9d0ff47d0ca7e1788c0d'
+            '7bc26e9c03addea72f43485d2d44bee559e7aea8352735cc582c238ce20664543de875409473eb3f72fc7d9aa59cd267066adcb63199128784b5d60df148c61d')
+
+package() {
+  install -Dm755 $pkgname      $pkgdir/usr/bin/$pkgname
+  install -Dm644 $pkgname.hook $pkgdir/usr/share/libalpm/hooks/$pkgname.hook
+}

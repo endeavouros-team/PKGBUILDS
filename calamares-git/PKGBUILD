@@ -1,6 +1,3 @@
-# Original Maintainer: Portergos Linux <portergoslinux@gmail.com>
-# Maintainer : EndeavourOS <info@endeavouros.com>
-# Calamares installer configured for EndeavourOS
 #
 # Configurations are in extra packages:
 # calamares_config_default - default settings
@@ -10,7 +7,7 @@ pkgname=calamares-git
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 _calamares_ver=3.3-alpha
-pkgver=529.c29b21c
+pkgver=564.a9e0d09
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
@@ -27,10 +24,12 @@ options=(!strip !emptydirs)
 source=(
   "${_eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
   "${_reponame}::git+https://github.com/$_reponame/$_reponame.git#branch=$_reponame"
+  "calamares.desktop.patch"
 )
 
 sha256sums=('SKIP'
-            'SKIP')
+            'SKIP'
+            '7d81e5db447c58ed30d45c7ca5e4c4c19da107d0a3d75d1bdd24f8749197ea6d')
             
 pkgver() {
   cd "$_eos_changes"
@@ -40,7 +39,7 @@ pkgver() {
 prepare() {
     # mv "$_reponame-$_calamares_ver"            "$_reponame"
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
-    rm -r "$_reponame/src/modules/"{fstab,mount,packages}
+    rm -r "$_reponame/src/modules/"{bootloader,packages}
 
     # move extra modules from external repo inside calamares sources
     rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
@@ -53,6 +52,7 @@ prepare() {
 
     # change some files on the go - distro-specific
     sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame/CMakeLists.txt"
+    patch "$_reponame/calamares.desktop" < calamares.desktop.patch
 
     # remove hardcoded quiet from grubcfg
     sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame/src/modules/grubcfg/main.py"
