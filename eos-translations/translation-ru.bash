@@ -63,7 +63,7 @@ _tr_add2 after_install_dsi         "Поиск ошибок"
 _tr_add2 after_install_dsitip      "Обнаружение любых потенциальных проблем в системе и программах"
 
 _tr_add2 after_install_etl         "Обновить EndeavourOS$_question"
-_tr_add2 after_install_etltip      "Показывает действия для перехода на новейший уровень EndeavourOS"
+_tr_add2 after_install_etltip      "Показ действия для перехода на новейший уровень EndeavourOS"
 
 _tr_add2 after_install_cdm         "Изменить Display Manager"
 _tr_add2 after_install_cdmtip      "Установка другого Display Manager"
@@ -84,31 +84,31 @@ _tr_add2 after_install_hntip       "Заставьте работать ваше
 _tr_add2 after_install_bt          "Bluetooth"
 _tr_add2 after_install_bttip       "Советы по использованию Bluetooth"
 
-_tr_add2 after_install_nv          "Пользователям NVIDIA"
+_tr_add2 after_install_nv          "Пользователям NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip       "Работа с NVIDIA installer"
 
 _tr_add2 after_install_ft          "Форум с советами"
 _tr_add2 after_install_fttip       "Обратитесь к нам за помощью$_exclamation"
 
 
-_tr_add2 general_info_text         "Найдите свой путь на сайте EndeavourOS"
+_tr_add2 general_info_text         "Найдите свой путь на сайте EndeavourOS$_exclamation"
 
 _tr_add2 general_info_ws           "Сайт"
 
-_tr_add2 general_info_wi           "Wiki"
-_tr_add2 general_info_witip        "Опубликованные статьи"
+_tr_add2 general_info_wi           "Вики"
+_tr_add2 general_info_witip        "Избранные статьи"
 
 _tr_add2 general_info_ne           "Новости"
 _tr_add2 general_info_netip        "Новости и статьи"
 
 _tr_add2 general_info_fo           "Форум"
-_tr_add2 general_info_fotip        "Спрашивайте, комментируйте и общайтесь на нашем дружественном форуме$_exclamation"
+_tr_add2 general_info_fotip        "Спрашивайте, комментируйте и общайтесь на нашем дружелюбном форуме$_exclamation"
 
 _tr_add2 general_info_do           "Пожертвования"
 _tr_add2 general_info_dotip        "Окажите помощь в развитии и поддержке EndeavourOS"
 
 _tr_add2 general_info_ab           "О Welcome"
-_tr_add2 general_info_abtip        "Информация о приложении Welcome"
+_tr_add2 general_info_abtip        "Информация об этом приложении"
 
 
 _tr_add2 add_more_apps_text        "Установка популярных программ"
@@ -138,10 +138,10 @@ _tr_add2 help_butt_text            "Информация о приложении
 
 _tr_add2 dm_title                  "Выбор Display Manager"
 _tr_add2 dm_col_name1              "Выбранный"
-_tr_add2 dm_col_name2              "Название Display Manager"
+_tr_add2 dm_col_name2              "Название DM"
 
 _tr_add2 dm_reboot_required        "Для применения изменений необходима перезагрузка"
-_tr_add2 dm_changed                "Изменить Display Manager на: "
+_tr_add2 dm_changed                "Display Manager изменен на: "
 _tr_add2 dm_failed                 "Ошибка при смене DM"
 _tr_add2 dm_warning_title          "Внимание"
 
@@ -153,14 +153,14 @@ _tr_add2 install_done              "Завершено"
 _tr_add2 sysup_no                  "Обновлений нет"
 _tr_add2 sysup_check               "Проверка обновлений программ..."
 
-_tr_add2 issues_title              "Обнаружена ошибка пакета"
+_tr_add2 issues_title              "Обнаружена проблема пакета"
 _tr_add2 issues_grub               "ВАЖНО: необходимо вручную воссоздать загрузочное меню"
-_tr_add2 issues_run                "Выполнение команды:"
-_tr_add2 issues_no                 "Системные ошибки не обнаружены"
+_tr_add2 issues_run                "Запуск команд:"
+_tr_add2 issues_no                 "Важных системных проблем не обнаружено"
 
-_tr_add2 cal_noavail               "Недоступно: "			# программа установки
+_tr_add2 cal_noavail               "Недоступно: "			                                        # программа установки
 _tr_add2 cal_warn                  "Внимание"
-_tr_add2 cal_info1                 "Это выпуск разработки сообщества.\n\n"                                   				# для специалистов!
+_tr_add2 cal_info1                 "Это выпуск разработки сообщества.\n\n"                  # для специалистов!
 _tr_add2 cal_info2                 "<b>Офлайн</b> вариант предоставляет рабочий стол Xfce с темой EndeavourOS.\nИнтернет-подключение не требуется.\n\n"
 _tr_add2 cal_info3                 "<b>Онлайн</b> вариант позволяет выбрать DE с оформлением по умолчанию.\nТребуется интернет-подключение.\n\n"
 _tr_add2 cal_info4                 "Внимание: Этот релиз находится в процессе разработки. Пожалуйста, сообщите нам в случае ошибки.\n"
@@ -186,8 +186,8 @@ _tr_add2 ins_pm                    "Управление разделами"
 _tr_add2 ins_pmtip                 "Создание и управление разделами на вашем диске с помощью Gparted"
 _tr_add2 ins_rel                   "Информация о выпуске"
 _tr_add2 ins_reltip                "Расширенная информация о последнем выпуске"
-_tr_add2 ins_tips                  "Полезные советы"
-_tr_add2 ins_tipstip               "Полезная информация для помощи при установке"
+_tr_add2 ins_tips                  "Советы по установке"
+_tr_add2 ins_tipstip               "Советы для помощи при установке"
 _tr_add2 ins_trouble               "Устранение неполадок"
 _tr_add2 ins_troubletip            "Восстановление системы"
 
@@ -227,7 +227,7 @@ _tr_add2 add_more_apps_akm          "Менеджер ядра Linux"
 _tr_add2 add_more_apps_akmtip       "Установка простого менеджера ядра Linux"
 
 # 2020-Jul-15:
-_tr_add2 butt_owncmds_help        "Справка: пользовательские команды"
+_tr_add2 butt_owncmds_help        "Руководство: пользовательские команды"
 
 # 2020-Aug-05:
 _tr_add2 butt_owncmds_dnd         "Создание пользовательских кнопок"
@@ -277,17 +277,17 @@ _tr_add2 after_install_more_wall      "Скачать больше обоев En
 _tr_add2 after_install_more_wall_tip  "Скачать предыдущие обои EndeavourOS и обои от сообщества"
 _tr_add2 after_install_info           "информация"                           # last word on a sentence, means just any information
 
-_tr_add2 butt_softnews                "Новости о программном обеспечении"
+_tr_add2 butt_softnews                "Новости о ПО"
 _tr_add2 butt_softnews_tip            "Важные новости о программном обеспечении EndeavourOS"
 
 _tr_add2 install_community            "Установить версии ОС от сообщества"
 _tr_add2 install_community_tip        "Коллекция версий ОС от сообщества (только онлайн установка)"    # changed
 
 # 2021-May-01
-_tr_add2 ins_syslog                   "Как поделиться системными логами?"
-_tr_add2 ins_syslogtip                "Объясняет, как вы можете обмениваться системными логами для получения помощи (на английском)"
-_tr_add2 ins_logtool                  "Логи для устранения неполадок"
-_tr_add2 ins_logtooltip               "Выбор, создание и публикация логов для устранения неполадок при обращении за помощью (на английском)"
+_tr_add2 ins_syslog                   "Как поделиться системными журналами"
+_tr_add2 ins_syslogtip                "Объясняет, как вы можете поделиться системными журналами для получения помощи (англ.)"
+_tr_add2 ins_logtool                  "Журналы для устранения неполадок"
+_tr_add2 ins_logtooltip               "Выбор, создание и публикация журналов для устранения неполадок при обращении за помощью (англ.)"
 
 # 2021-May-20
 _tr_add2 nb_tab_DailyAssistant       "Ассистент"
@@ -331,6 +331,6 @@ _tr_add2 daily_assist_anews          "Новости Arch"
 _tr_add2 daily_assist_anewstip       "Покажет последние новости Arch в браузере"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Имеется важная информация (новости)"
-_tr_add2 nb_nofify_user2             "Нажмите кнопку"                                  # Новости о программном обеспечении
-_tr_add2 nb_nofify_user3             "кнопка в левом нижнем углу этого окна."
+_tr_add2 nb_nofify_user1             "Имеются важные новости"
+_tr_add2 nb_nofify_user2             "Пожулуйста, нажмите"                                  # Новости о программном обеспечении
+_tr_add2 nb_nofify_user3             "кнопку в левом нижнем углу этого окна."
