@@ -88,7 +88,7 @@ _tr_add2 after_install_nv      "NVIDIA users$_exclamation"
 _tr_add2 after_install_nvtip   "Use NVIDIA installer"
 
 _tr_add2 after_install_ft      "Forum tips"
-_tr_add2 after_install_fttip   "Help us help you!"
+_tr_add2 after_install_fttip   "Help us help you$_exclamation"
 
 
 _tr_add2 general_info_text     "Find your way at the EndeavourOS website$_exclamation"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "News"
 _tr_add2 general_info_netip    "News and articles"
 
 _tr_add2 general_info_fo       "Forum"
-_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum!"
+_tr_add2 general_info_fotip    "Ask, comment, and chat in our friendly forum$_exclamation"
 
 _tr_add2 general_info_do       "Donate"
 _tr_add2 general_info_dotip    "Help us keep EndeavourOS running"
@@ -194,7 +194,7 @@ _tr_add2 ins_troubletip        "System Rescue"
 _tr_add2 after_install_us_from    "Updates from"                            # AUR or upstream
 _tr_add2 after_install_us_el      "Elevated privileges required."
 _tr_add2 after_install_us_done    "update done."
-_tr_add2 after_install_us_fail    "update failed!"
+_tr_add2 after_install_us_fail    "update failed$_exclamation"
 
 # 2020-May-14:
 
