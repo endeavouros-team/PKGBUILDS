@@ -10,6 +10,10 @@
 #       and file "$DIR_OF_CONFIG/eos-log-tool-filter.bash" below.
 #
 
+Breakpoint() {
+    :;
+}
+
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 
 export -f eos_yad
@@ -53,6 +57,8 @@ Footer() { printf "\n\n" ; }
 Cmd() {
     local cmd="$1"
 
+    echo "==> Handling '$*'" >&2
+
     if [ "$cmd" = "cat" ] ; then
         if [ "${2::1}" = "." ] ; then
             cd                  # $HOME stuff: go to $HOME to hide unnecessary info
@@ -67,27 +73,32 @@ Cmd() {
             SUDO_CMDS+=" ; echo '$(Footer)' >> $FILE_OF_LOGS"
             return
             ;;
-        cmd_and_lines)
-            # params: cmd_and_lines "cmd" "lines"
+        FuncCall)
+            # params: FuncCall "func"
             Header "$2" >> $FILE_OF_LOGS
-            echo "$3"   >> $FILE_OF_LOGS
+            "$2"        >> $FILE_OF_LOGS
             Footer      >> $FILE_OF_LOGS
             return
             ;;
+        "")
+            echo "==> $FUNCNAME: empty command!" >&2
+            return
+            ;;
+        *)
+            Header "$@" >> "$FILE_OF_LOGS"
+            if [ -x /usr/bin/"$cmd" ] ; then
+                "$@" 2>/dev/null >> "$FILE_OF_LOGS"
+            else
+                WarningMsg "Command '$cmd' not found."
+                echo "Sorry, command '$cmd' not found." >> "$FILE_OF_LOGS"
+            fi
+            Footer >> "$FILE_OF_LOGS"
+            ;;
     esac
-
-    Header "$@" >> "$FILE_OF_LOGS"
-    if [ -n "$cmd" ] && [ -x /usr/bin/"$cmd" ] ; then
-        "$@" >> "$FILE_OF_LOGS"
-    else
-        WarningMsg "Command '$cmd' not found."
-        echo "Sorry, command '$cmd' not found." >> "$FILE_OF_LOGS"
-    fi
-    Footer >> "$FILE_OF_LOGS"
 }
 
 SendToInternet() {
-    RemovePersonalData  # always before sending logs to the internet
+    echo "==> Sending $FILE_OF_LOGS to a pastebin service." >&2
 
     local url="$(cat "$FILE_OF_LOGS" | eos-sendlog)"
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
@@ -194,12 +205,13 @@ RemovePersonalData() {
         bash "$filter" "$FILE_OF_LOGS"
     fi
     removePersonalInfo=yes
+
+    echo "==> Personal data removed." >&2
 }
 
 IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
 
-ForeignInfo() {
-    # input & output: line
+ForeignPkgInfo() {
     local pkg ver desc
     local data ix l2
 
@@ -210,18 +222,42 @@ ForeignInfo() {
         ver="$( echo "${data[ix+1]}" | sed 's|[^:]*: ||')"
         desc="$(echo "${data[ix+2]}" | sed 's|[^:]*: ||')"
         
-        l2="$(printf "%-40s %-15s %s" "$pkg" "$ver" "$desc")"
-        if [ -n "$line" ] ; then
-            line="$(echo "$line" ; echo "$l2")"
-        else
-            line="$(echo "$l2")"
+        printf "%s|%s|%s\n" "$pkg" "$ver" "$desc"
+    done | column -t -s "|"
+}
+
+Local_ShowForeignPackages() {
+    Cmd FuncCall ForeignPkgInfo            # "$xx" "$line"    # does special handling
+}
+
+Local_ShowEosInstallLog() {
+    local install_logs=(
+        /var/log/endeavour-install.log
+        /var/log/Calamares.log
+        /home/liveuser/endeavour-install.log
+        $HOME/endeavour-install.log
+    )
+    local fname
+
+    for fname in "${install_logs[@]}" ; do
+        if [ -r "$fname" ] ; then
+            Cmd cat "$fname"
+            return
         fi
     done
+    if [ ! -r $fname ] ; then
+        WarningMsg "no EndeavourOS install log found!"
+        echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
+    fi
 }
+
+GetNameAndVersion() { pacman -Q "$1" ; }
 
 Main()
 {
     local progname=eos-log-tool
+
+    Breakpoint
 
     case "$1" in
         --changelog)
@@ -245,165 +281,178 @@ Main()
 
     rm -f "$FILE_OF_LOGS"
 
-    local rdtip="Rename personal names to generic names"
-    local sltip="Send selected logs to the internet (personal info always removed)"
+    local FieldInfo1=(
+        # Name                                   Selected    Installed  Tip                                                                    Command
+        # ----                                   --------    ---------  ---                                                                    -------
 
-    local journal0="journalctl -b -0"
-    local journal1="journalctl -b -1"
-    local journal2="journalctl -b -2"
-    local journalany="journalctl $EOS_LOG_TOOL_JOURNAL_OPTS"
-    local xsession="~/.xsession-errors"
-    local Xorg="/var/log/Xorg.0.log"
-    local lightdm="/var/log/lightdm/lightdm.log"
-    local lightdm2="/var/log/lightdm/x-0.log"
-    local install="EndeavourOS install log"
-    local fstab="/etc/fstab"
-    local grub="/boot/grub/grub.cfg"
-    local pacmanconf="/etc/pacman.conf"
-    local blame="systemd-analyze blame"
-    local fdisk="fdisk -l"
-    local lsblk="lsblk -fm"
-    local lspci="lspci -vnn"
-    local lsusb="lsusb"
-    local hwinfo="hwinfo --short"
-    local rdbut="<b>Remove personal data from logs</b>"
-    local slbut="<b>Send logs to internet</b>"
-    local inxi="inxi -Fxxc0z"
-    local foreigns="pacman -Qm"
+        "System journal, most recent"            "true"     ""         "Journal from the most recent boot"                                     "pkexec journalctl -b -0"
+        "System journal, 2nd most recent"        ""         ""         "Journal from the second most recent boot"                              "pkexec journalctl -b -1"
+        "System journal, 3rd most recent"        ""         ""         "Journal from the third most recent boot"                               "pkexec journalctl -b -2"
+        "System journal, user defined options"   ""         ""         "Journal by a user defined value in file <tt>/etc/$progname.conf</tt>"  "pkexec journalctl $EOS_LOG_TOOL_JOURNAL_OPTS"
+        "System boot-up performance statistics"  ""         ""         "Time that running units took to initialize"                            "systemd-analyze blame"
+        "Information about the PCI devices"      ""         ""         "Information related to PCI devices"                                    "lspci -vnn"
+        "Information about the USB devices"      ""         ""         "Information related to USB devices"                                    "lsusb"
+        "Information about hardware (inxi)"      "true"     "inxi"     "Information about hardware and software using <tt>inxi</tt>"           "inxi -Fxxc0z"
+        "Information about hardware (hwinfo)"    ""         ""         "Summary of hardware using <tt>hwinfo</tt>"                             "hwinfo --short"
+        "EndeavourOS install log"                ""         ""         "The log about the install of EndeavourOS"                              "Local_ShowEosInstallLog"
+        "X session errors"                       ""         ""         "Lists X session errors"                                                "cat ~/.xsession-errors"
+        "Xorg log"                               ""         ""         "Log about Xorg events"                                                 "cat /var/log/Xorg.0.log"
+        "Display manager log"                    ""         "lightdm"  "Display manager (lightdm) log"                                         "pkexec cat /var/log/lightdm/lightdm.log"
+        "Display manager log, X related"         ""         "lightdm"  "Display manager log, X server related"                                 "pkexec cat /var/log/lightdm/x-0.log"
+        "Grub configuration file"                ""         "grub"     "Grub (bootloader) configuration file"                                  "pkexec cat /boot/grub/grub.cfg"
+        "Filesystem mountpoints (fstab)"         ""         ""         "Static information about the filesystem and mointpoints"               "cat /etc/fstab"
+        "Disks and partitions (lsblk)"           ""         ""         "List information about disks, partitions, labels, uuids, ..."          "lsblk -fm"
+        "Disks and partitions (fdisk)"           ""         ""         "Another list of disk and partition information"                        "pkexec fdisk -l"
+        "Pacman configuration file"              "true"     ""         "Pacman (package manager) configuration file"                           "cat /etc/pacman.conf"
+        "Foreign packages"                       "true"     ""         "List foreign (=not from pacman repositories) packages"                 "Local_ShowForeignPackages"
+    )
+    local FieldInfo=()
+    local offset_name=0
+    local offset_selected=1
+    local offset_installed=2
+    local offset_tip=3
+    local offset_command=4
 
-    local cmds
+    local ButtonInfo=(
+        # Name                       Tip                                   Command
+        # ----                       ---                                   -------
+
+        "Save logs locally"          "Save logs to a local file"           ""                # 4
+        "Send logs to the internet"  "Send selected logs to the internet"  "SendToInternet"  # 6
+    )
+
+    local cmds=()
     local sendToInternet=no
     local removePersonalInfo=no
     local xx
     local helptext=""
+    local name selected installed tip command
+    local ix jx
 
-    helptext+="Selecting any of the boxes below (except the first two) will add\n"
-    helptext+="that particular log to a common log file <b>$FILE_OF_LOGS2</b>.\n"
-    helptext+="Once you have selected the desired boxes, including $slbut,\n"
-    helptext+="click the OK button and you will receive a URL that tells "
-    helptext+="the internet address of the logs.\n\n"
-    helptext+="Note1: You'll see the <i>default</i> selections below.\n"
-    helptext+="Note2: Personal data will be removed from the local log file by selecting $rdbut.\n"
-    helptext+="Note3: Personal data is <i>automatically</i> removed from logs before sending to internet.\n"
-    helptext+="Note4: A list of URLs is stored into folder <b>$DIR_OF_CONFIG2</b>.\n"
+    helptext+="<i><b>$(GetNameAndVersion $progname)</b></i>\n\n"
+    helptext+="Select the logs you want to save locally and optionally share to the internet. \n"
+    helptext+="Logs will will be saved to file <b>$FILE_OF_LOGS2</b>.\n"
+    helptext+="If you share, you'll receive a URL which refers to the shared page.\n\n"
+    helptext+="Note1: Personal data will <i>always</i> be removed from the logs. \n"
+    helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>. \n"
+
+    local code_cancel=1
+    local code_localsave=4
+    local code_send_to_internet=6
+    local code_close_window=252
 
     local log_tool_cmd=(
-        eos_yad --list --checklist --text="$helptext" --height=620 --grid-lines=both
-        --image=dialog-question --title="EndeavourOS log tools"
-        --no-click --multiple
-        --column=Select --column="Item!Command / File / Action" --column="Description"
+        eos_yad
+        --scroll
+        --columns=2
+        --form
+        --title="EndeavourOS log tools"
+        --text="$helptext"
+        --height=550
+        # --width=500
+        --image=dialog-question
+        --button="Cancel!!Cancel this operation":$code_cancel
+        --button="Save logs locally!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
+        --button="Share logs to the internet!!Send the logs to a pastebin service":$code_send_to_internet
     )
 
-    log_tool_cmd+=(
-        false "$slbut"      "$sltip"
-        true  "$rdbut"      "$rdtip"
+    # Skip entries that don't have the app installed
 
-        true  "$journal0"   "Journal from the most recent boot"
-        false "$journal1"   "Journal from the second most recent boot"
-        false "$journal2"   "Journal from the third most recent boot"
-        false "$journalany" "Journal by a user defined value in file <tt>/etc/$progname.conf</tt>"
-        false "$blame"      "Time that running units took to initialize"
-        false "$lspci"      "Information related to PCI devices"
-        false "$lsusb"      "Information related to USB devices"
-    )
-
-    # Note: inxi hasn't always been working reliably.
-    IsInstalled inxi && log_tool_cmd+=(true "$inxi" "Inxi log, information about hardware and software")
-
-    log_tool_cmd+=(
-        false "$hwinfo"     "Summary of hardware"
-        false "$install"    "$install"
-        false "$xsession"   "X session errors"
-        false "$Xorg"       "Xorg log"
-    )
-    if IsInstalled lightdm ; then
-        log_tool_cmd+=(
-            false "$lightdm"    "Display manager log"
-            false "$lightdm2"   "Display manager log, X server related"
-        )
-    fi
-    log_tool_cmd+=(
-        false "$fstab"      "Static information about the filesystem"
-        false "$lsblk"      "List information about disks, partitions, labels, uuids, ..."
-        false "$fdisk"      "Another list of disk and partition information"
-    )
-    IsInstalled grub && log_tool_cmd+=(false "$grub" "Grub configuration file")
-    log_tool_cmd+=(
-        true  "$pacmanconf" "Pacman package manager configuration file"
-        true  "$foreigns"   "List foreign packages"
-    )
-
-    local result=$("${log_tool_cmd[@]}")
-    if [ -z "$result" ] ; then
-        return
-    fi
-    
-    readarray -t cmds <<< "$(echo "$result" | cut -d '|' -f 2)"
-
-    for xx in "${cmds[@]}" ; do
-        case "$xx" in
-            "$journal0") Cmd pkexec $xx ;;
-            "$journal1") Cmd pkexec $xx ;;
-            "$journal2") Cmd pkexec $xx ;;
-            "$journalany") Cmd pkexec $xx ;;
-            "$fdisk")    Cmd pkexec $xx ;;
-            "$lightdm")  Cmd pkexec cat /var/log/lightdm/lightdm.log ;;
-            "$lightdm2") Cmd pkexec cat /var/log/lightdm/x-0.log ;;
-            "$grub")     Cmd pkexec cat /boot/grub/grub.cfg ;;
-            "$xsession") Cmd cat ~/.xsession-errors ;;
-            "$Xorg")     Cmd cat /var/log/Xorg.0.log ;;
-            "$install")
-                local install_logs=(
-                    /var/log/endeavour-install.log
-                    /var/log/Calamares.log
-                    /home/liveuser/endeavour-install.log
-                    $HOME/endeavour-install.log
-                )
-                local fname
-                for fname in "${install_logs[@]}" ; do
-                    if [ -r $fname ] ; then
-                        Cmd cat $fname
-                        break
-                    fi
-                done
-                if [ ! -r $fname ] ; then
-                    WarningMsg "no EndeavourOS install log found!"
-                    echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
-                fi
-                ;;
-            "$fstab")    Cmd cat /etc/fstab ;;
-            "$pacmanconf") Cmd cat $pacmanconf ;;
-            "$blame")    Cmd systemd-analyze blame ;;
-            "$lsblk")    Cmd $xx ;;
-            "$lspci")    Cmd $xx ;;
-            "$lsusb")    Cmd $xx ;;
-            "$hwinfo")   Cmd $xx ;;
-            "$inxi")     Cmd $xx ;;
-            "$foreigns")
-                local line=""
-                ForeignInfo
-                Cmd cmd_and_lines "$xx" "$line"    # does special handling
-                ;;
-        esac
+    for ((ix=0; ix < ${#FieldInfo1[@]}; ix+=5)) ; do
+        installed="${FieldInfo1[$((ix+2))]}"
+        if [ -n "$installed" ] ; then
+            IsInstalled "$installed" || continue
+        fi
+        FieldInfo+=("${FieldInfo1[$((ix + offset_name))]}")
+        FieldInfo+=("${FieldInfo1[$((ix + offset_selected))]}")
+        FieldInfo+=("${FieldInfo1[$((ix + offset_installed))]}")
+        FieldInfo+=("${FieldInfo1[$((ix + offset_tip))]}")
+        FieldInfo+=("${FieldInfo1[$((ix + offset_command))]}")
     done
+
+    # Add entries to the yad command
+
+    for ((ix=0; ix < ${#FieldInfo[@]}; ix+=5)) ; do
+        name="${FieldInfo[$((      ix + offset_name ))]}"
+        selected="${FieldInfo[$((  ix + offset_selected ))]}"
+        installed="${FieldInfo[$(( ix + offset_installed ))]}"
+        tip="${FieldInfo[$((       ix + offset_tip ))]}"
+        command="${FieldInfo[$((   ix + offset_command ))]}"
+        
+        [ -z "$selected" ] && selected=false
+
+        if [ -n "$installed" ] ; then
+            IsInstalled "$installed" || continue
+        fi
+        log_tool_cmd+=(--field="$name!$tip":chk $selected)
+    done
+
+    Breakpoint
+
+    # Run the yad command
+
+    local result retval
+    result=$("${log_tool_cmd[@]}")
+    retval=$?
+    case "$retval" in
+        $code_cancel | $code_close_window)
+            return
+            ;;
+        $code_localsave | $code_send_to_internet)
+            ;;
+        *)
+            echo "Invalid return code from yad!" >&2
+            ;;
+    esac
+    if [ -z "$result" ] ; then
+        echo "No result!" >&2
+        return 1
+    fi
+
+    # Now $retval is either $code_localsave or $code_send_to_internet
+
+    # From the command result, analyze which subcommands should be executed
+    local true_indexes=()
+    jx=1
+    for ((ix=0; ix < ${#FieldInfo[@]}; ix+=5)) ; do
+        xx="$(echo "$result" | cut -d'|' -f $jx)"
+        case "$xx" in
+            true | TRUE) true_indexes+=($ix) ;;
+        esac
+        ((jx++))
+    done
+
+    Breakpoint
+
+    for ((ix=0; ix < ${#true_indexes[@]}; ix++)) ; do
+        jx=${true_indexes[$ix]}
+        command="${FieldInfo[$((jx + offset_command))]}"
+        case "$command" in
+            Local_*)    ;;
+            "pkexec "*) command="$(echo "$command" | sed 's|^pkexec |Cmd pkexec |')" ;;
+            *)          command="$(echo "$command" | sed 's|^|Cmd |')" ;;
+        esac
+        $command
+        cmds+=("$command")
+    done
+
+    Breakpoint
+
     if [ "$SUDO_CMDS" != ":" ] ; then
         pkexec bash -c "$SUDO_CMDS"
     fi
 
-    for xx in "${cmds[@]}" ; do
-        case "$xx" in
-            "$rdbut") RemovePersonalData ;;
-            "$slbut") SendToInternet ; break ;;
-        esac
-    done
+    # All logs are now saved into a file.
 
-    if [ "$sendToInternet" = "no" ] ; then
-        if [ "$removePersonalInfo" = "yes" ] ; then
-            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info"
-        else
-            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created.\n\nNote: personal data was <b><i>not</i></b> removed." "Info"
-        fi
-    fi
+    RemovePersonalData    # always remove personal data!
+
+    [ "$removePersonalInfo" = "yes" ] && Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info"
+
+    Breakpoint
+
+    case "$retval" in
+        $code_send_to_internet) SendToInternet ;;
+    esac
 }
 
 Main "$@"
