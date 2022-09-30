@@ -333,4 +333,4 @@ _tr_add2 daily_assist_anewstip       "Покажет последние ново
 # 2022-Sep-25
 _tr_add2 nb_nofify_user1             "Имеется важная информация (новости)"
 _tr_add2 nb_nofify_user2             "Нажмите кнопку"                                  # Новости о программном обеспечении
-_tr_add2 nb_nofify_user3             "кнопка в левом нижнем углу этого окна."
+_tr_add2 nb_nofify_user3             "в левом нижнем углу этого окна."
