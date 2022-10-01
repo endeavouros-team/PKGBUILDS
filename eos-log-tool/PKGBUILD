@@ -4,7 +4,7 @@ pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 pkgver=1.8
-pkgrel=1
+pkgrel=2
 
 arch=('any')
 license=('GPL')
@@ -21,7 +21,7 @@ source=(
     $pkgname.desktop
     $pkgname.conf
 )
-sha512sums=('b103b30fba620da87253babc183089d4c3102de7e56d58b03f1fa5b342f6410be266b3b89e4c35009435cf98898724af1fdf2cd8a5ff16226e6ed766989dea12'
+sha512sums=('dbe7b865ae197aa84b61750ff7620bd7b2b347b3f8bc7266f181a7f0e3b359dc9f1b884948684b7f57526514d361ea8897a62ecd99df49702eb8c8b9fcf22932'
             '177f28300b7721ae165afc651279d619dd2924496e2f727ea2c63c131070a0d727de71619a0cf8d359486f0f91f319e58946a066c8411500976f60ff30e7d3c3'
             'ff89ed7aba63a28acfb0da06ba82d7d7db99c89c679b2b4939d3cdb0d0f8dd6ee9ac565b1fdd7124ab3fff51caf9071b3b5d8eb553984bf6f0bd516f2f25233e')
 
