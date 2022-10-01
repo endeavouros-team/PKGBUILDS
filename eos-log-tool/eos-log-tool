@@ -446,12 +446,13 @@ Main()
 
     RemovePersonalData    # always remove personal data!
 
-    [ "$removePersonalInfo" = "yes" ] && Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info"
-
     Breakpoint
 
     case "$retval" in
-        $code_send_to_internet) SendToInternet ;;
+        $code_localsave)
+            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info" ;;
+        $code_send_to_internet)
+            SendToInternet ;;
     esac
 }
 
