@@ -116,7 +116,8 @@ SendToInternet() {
     fi
     case "$url" in
         [hH][tT][tT][pP]://* | [hH][tT][tT][pP][sS]://*) ;;
-        *) ErrorMsg "The returned URL seems corrupted!" ; exit 1 ;;
+        "") ErrorMsg "Sending log data failed (returned empty URL)!" ; exit 1 ;;
+        *)  ErrorMsg "Sending log data failed (returned corrupted URL)!" ; exit 1 ;;
     esac
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
     if [[ -x /usr/bin/xclip ]]; then
