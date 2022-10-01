@@ -2,7 +2,11 @@
 
 DIE() {
     echo "$progname: error: $1" >&2
-    exit 1
+    if [ -z "$2" ] ; then
+        exit 1
+    else
+        exit "$2"
+    fi
 }
 
 Options() {
@@ -39,15 +43,20 @@ EOF
 }
 
 SendToNet() {
+    local exitcode=0
+
     case "$EOS_SENDLOG_URI" in
         wgetpaste)
             [ -x /usr/bin/wgetpaste ] || DIE "wgetpaste is not installed!"
             url=$(wgetpaste $WGETPASTE_OPTIONS 2>/dev/null)
+            exitcode=$?
             ;;
         *)
-            url=$(curl -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+            url=$(curl --fail -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+            exitcode=$?
             ;;
     esac
+    [ $exitcode -eq 0 ] || DIE "Sending data to $EOS_SENDLOG_URI failed!" $exitcode
 }
 
 Init() {
