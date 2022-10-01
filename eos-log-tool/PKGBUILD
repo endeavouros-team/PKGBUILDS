@@ -3,7 +3,7 @@
 pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=1.6
+pkgver=1.7
 pkgrel=1
 
 arch=('any')
