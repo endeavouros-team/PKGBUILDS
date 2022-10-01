@@ -116,7 +116,7 @@ SendToInternet() {
     fi
     case "$url" in
         "") local logfilesize=$(stat -c %s "$FILE_OF_LOGS")
-            if [ $logfilesize -gt 1000000 ] ; then
+            if [ $logfilesize -gt $EOS_LOG_TOOL_MAX_LOG_SIZE ] ; then
                 ErrorMsg "Sending log data failed (returned empty URL)!\nLog size $logfilesize bytes too large?"
             else
                 ErrorMsg "Sending log data failed (returned empty URL)!"
@@ -300,6 +300,7 @@ Main()
     local SUDO_CMDS=":"
 
     local EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
+    local EOS_LOG_TOOL_MAX_LOG_SIZE=500000
 
     if [ -r /etc/$progname.conf ] ; then
         source /etc/$progname.conf    # may change option values, e.g. for EOS_LOG_TOOL_JOURNAL_OPTS
