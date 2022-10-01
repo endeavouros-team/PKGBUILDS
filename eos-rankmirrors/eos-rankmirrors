@@ -4,8 +4,11 @@
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
 
-echo2()   { echo "$@" >&2 ; }
+echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
+
+notif_echo2()   { printf2 "==> " ; echo2   "$@" ; }
+notif_printf2() { printf2 "==> " ; printf2 "$@" ; }
 
 verbose() {
     if [ "$verbose" = "yes" ] ; then
@@ -23,7 +26,7 @@ DeleteTmpFiles() {
 export -f DeleteTmpFiles
 
 DIE() {
-    echo2 "$progname: error: $1"
+    notif_echo2 "$progname: error: $1"
     DeleteTmpFiles
     exit 1
 }
@@ -66,7 +69,7 @@ RankPerAge() {
         age | latest)
             sortopts="$sort_age" ;;
         *)
-            echo2 "====> value '$sort' of option --sort is unsupported, using 'age'."
+            notif_echo2 "Warning: value '$sort' of option --sort is unsupported, using 'age'."
             sortopts="$sort_age"
             ;;
     esac
@@ -110,15 +113,13 @@ GetUpdateNumberAndTime() {
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
-                    echo2 "====> Fail: update level $nr too high (cannot be more than $reference_level): $mirror"
+                    notif_echo2 "Warning: $mirror: update level $nr/$reference_level is too high (cannot be more than $reference_level)."
                     return
                 elif [ $nr -lt $too_low_limit ] ; then
-                    echo2 "====> Fail: $mirror:"
-                    echo2 "      Update level is $nr/$reference_level, problem with the mirror?"
+                    notif_echo2 "Warning: $mirror: update level is $nr/$reference_level, problem with the mirror?"
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    echo2 "====> Warning: $mirror:"
-                    echo2 "      Update level is $nr/$reference_level, some packages may be outdated."
+                    notif_echo2 "Warning: $mirror: update level is $nr/$reference_level, some packages may be outdated."
                 fi
             fi
             result="$nr $time"
@@ -127,11 +128,16 @@ GetUpdateNumberAndTime() {
         *)
             local curl_msg="$(curl-exit-code-to-string $retcode)"
 
-            printf2 "====> Fail: no response: mirror %s, url %s,\n"   "$mirror" "$url"
+            echo2 ""
+            case "$retcode" in
+                28) notif_printf2 "Warning: '%s' failed after timeout of %s seconds.\n"  "$mirror" "$timeout" ;;
+                *)  notif_printf2 "Warning: '%s' failed.\n"  "$mirror" ;;
+            esac
+            
             if [ -n "$curl_msg" ] ; then
-                printf2 "====> 'curl' error code %s:\n'%s'.\n\n"   "$retcode" "$curl_msg"
+                notif_printf2 "Curl exit code %s: %s\n"   "$retcode" "$curl_msg"
             else
-                printf2 "====> 'curl' error code %s.\n"         "$retcode"
+                notif_printf2 "Curl exit code %s.\n"      "$retcode"
             fi
             rm -f "$tmpfile"
             return $retcode
@@ -155,7 +161,7 @@ FetchLatestMirrorlist() {
         local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
         local installedv=$(pacman -Q $pkgname | awk '{print $2}')
         if [ "$cachev" = "$installedv" ] ; then
-            echo2 "Extracting $pkg ..."
+            notif_echo2 "Info: extracting $pkg ..."
             tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
             return
         fi
@@ -163,11 +169,11 @@ FetchLatestMirrorlist() {
     # package not in cache or installed package version is not the same as in cache
     local code=0
     local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
-    echo2 "Fetching $url ..."
+    notif_echo2 "Info: fetching $url ..."
     curl --fail -Lsm $timeout -o $latest_ml $url || code=$?
     case "$code" in
         0) ;;
-        *) echo2 "cannot fetch EndeavourOS mirrorlist info (curl error code $code)."
+        *) notif_echo2 "Error: cannot fetch EndeavourOS mirrorlist info (curl error code $code)."
            exit 0
            ;;
     esac
@@ -200,8 +206,10 @@ SimpleRank() {
     cat $latest_ml.orig | grep "^Server[ ]*=" | sort | uniq > $latest_ml
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
-    echo2 "Ranking EndeavourOS mirrors, please wait ..."
+    notif_echo2 "Info: ranking EndeavourOS mirrors, please wait ..."
     RankPerAge
+
+    echo2 ""
 
     # show the original list (mirrors commented out)
     /usr/bin/cat $latest_ml.orig | /usr/bin/sed 's|^Server = |#Server = |'
@@ -240,6 +248,8 @@ SimpleRank() {
         UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"
     fi
 
+    notif_printf2 "Results of ranking EndeavourOS mirrors:\n\n"
+
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 }
@@ -258,9 +268,10 @@ UserAddedMirrors() {
                 mirror="$(grep "$m" "$latest_ml.orig" | awk '{print $NF}')"
                 ;;
         esac
-        echo "User added: $mirror" >&2
+        notif_echo2 "User added: $mirror"
         echo "Server = $mirror"
     done
+    echo2 ""
     echo "# user added mirrors <<<"
 }
 
@@ -272,11 +283,13 @@ WriteSystemMirrorlist() {
     local cmd=""
 
     if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$hook_rank" = "no" ] ; then
-        printf2 "\nMoving old EndeavourOS mirrorlist to %s.\n" "$bak"
-        printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
+        echo2 ""
+        notif_printf2 "Moving old EndeavourOS mirrorlist to %s.\n" "$bak"
+        notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
         $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
     else
-        printf2 "\nWriting new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
+        echo2 ""
+        notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
         $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
     fi
 }
