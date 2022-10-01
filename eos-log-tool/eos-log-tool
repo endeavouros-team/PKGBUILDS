@@ -100,7 +100,24 @@ Cmd() {
 SendToInternet() {
     echo "==> Sending $FILE_OF_LOGS to a pastebin service." >&2
 
-    local url="$(cat "$FILE_OF_LOGS" | eos-sendlog)"
+    local logdata="$(cat "$FILE_OF_LOGS")"
+
+    if [ -z "$logdata" ] ; then
+        ErrorMsg "No logs found!"
+        return 1
+    fi
+
+    local exitcode=0
+    local url="$(echo "$logdata" | eos-sendlog)"
+    exitcode=$?
+    if [ $exitcode -ne 0 ] ; then
+        ErrorMsg "Sending log data failed!"
+        exit 1
+    fi
+    case "$url" in
+        [hH][tT][tT][pP]://* | [hH][tT][tT][pP][sS]://*) ;;
+        *) ErrorMsg "The returned URL seems corrupted!" ; exit 1 ;;
+    esac
     echo "$(date '+%Y-%m-%d %H:%M:%s'): $url" >> "$DIR_OF_CONFIG"/url-list.txt
     if [[ -x /usr/bin/xclip ]]; then
         eos_yad --text="$url" --button="cancel":1 --button="copy":0 --title="Result URL" --width=300
@@ -133,7 +150,7 @@ UserNames() {
 
 RemovePersonalData() {
     if [ ! -r "$FILE_OF_LOGS" ] ; then
-        ErrorMsg "No logs!"
+        ErrorMsg "Logs not found!"
         exit 1
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
