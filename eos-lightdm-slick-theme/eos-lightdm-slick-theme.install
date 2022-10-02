@@ -9,3 +9,13 @@ post_remove() {
 	echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
 	echo "if not LightDM will fail to start!"
 }
+
+post_install() {
+	echo [Icon Theme] > /usr/share/icons/default/index.theme
+    echo Inherits=Qogir >> /usr/share/icons/default/index.theme
+}
+
+post_upgrade() {
+	echo [Icon Theme] > /usr/share/icons/default/index.theme
+    echo Inherits=Qogir >> /usr/share/icons/default/index.theme
+}
