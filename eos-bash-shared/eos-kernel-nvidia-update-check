@@ -13,8 +13,19 @@ Main()
 {
     PATH=/usr/bin:$PATH
 
-    lsmod | grep nvidia >/dev/null || exit 0                             # NVIDIA not is use
-    [ -n "$(pacman -Qsq nvidia dkms | grep nvidia.*dkms)" ] && exit 0    # stop if any nvidia dkms driver is installed
+    lsmod | grep nvidia >/dev/null || exit 0                             # NVIDIA module not is use
+
+    local inst=$(pacman -Qsq | grep -P '^nvidia|^linux$|^linux-lts$')
+
+    while true ; do
+        if [ -n "$(echo "$inst" | grep ^nvidia$)" ] && [ -n "$(echo "$inst" | grep ^linux$)" ] ; then
+            break
+        fi
+        if [ -n "$(echo "$inst" | grep ^nvidia-lts$)" ] && [ -n "$(echo "$inst" | grep ^linux-lts$)" ] ; then
+            break
+        fi
+        exit 0   # nothing to consider
+    done
 
     local linux_lts=no
     local linux=no
