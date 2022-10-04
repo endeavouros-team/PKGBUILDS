@@ -7,7 +7,7 @@ pkgname=calamares-git
 _eos_changes=EndeavourOS-calamares
 _reponame=calamares
 _calamares_ver=3.3-alpha
-pkgver=581.61ff58f
+pkgver=588.76d71e1
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
@@ -39,7 +39,7 @@ pkgver() {
 prepare() {
     # mv "$_reponame-$_calamares_ver"            "$_reponame"
     # remove upstream modules packagechooser and netinstall for replacing with testing ones
-    rm -r "$_reponame/src/modules/"{bootloader,packages,packagechooserq}
+    rm -r "$_reponame/src/modules/"{bootloader,packages,packagechooserq,partition,dracutlukscfg}
 
     # move extra modules from external repo inside calamares sources
     rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
@@ -76,11 +76,10 @@ build() {
     -DBoost_NO_BOOST_CMAKE=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DINSTALL_CONFIG=OFF \
-    -DSKIP_MODULES="dracut dracutlukscfg \
+    -DSKIP_MODULES="dracut \
     dummycpp dummyprocess dummypython dummypythonqt \
     finishedq initcpio keyboardq license localeq notesqml oemid \
-    openrcdmcryptcfg \
-    plymouthcfg plasmalnf services-openrc \
+    openrcdmcryptcfg plymouthcfg plasmalnf services-openrc \
     summaryq tracking usersq webview welcomeq"
     export DESTDIR="$srcdir/$_reponame/build/$pkgname"
     make install
