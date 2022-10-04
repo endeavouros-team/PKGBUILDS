@@ -3,20 +3,31 @@
 # On Nvidia GPU machines, kernel and nvidia driver must update together:
 # - if linux-lts is updated, nvidia-lts should be updated too
 # - if linux     is updated, nvidia     should be updated too
+# Note that if an nvidia*dkms driver is installed, we have nothing to check.
 #
 # This app checks the above and informs the calling app with exit code:
 #     0=success
 #     1=failure
 # On failure also error messages to stderr will be displayed.
 
-Main()
-{
+Main() {
     PATH=/usr/bin:$PATH
 
-    lsmod | grep nvidia >/dev/null || exit 0                             # NVIDIA module not is use
+    # Quick check is Nvidia modules are in use.
+
+    lsmod | grep nvidia >/dev/null || exit 0
+
+    # Some NVIDIA module is in use. Check installed packages.
 
     local inst=$(pacman -Qsq | grep -P '^nvidia|^linux$|^linux-lts$')
 
+    # If any of these dkms versions are installed, we have nothing to do.
+
+    [ -n "$(echo "$inst" | grep ^nvidia-dkms$)" ]       && exit 0
+    [ -n "$(echo "$inst" | grep ^nvidia-470xx-dkms$)" ] && exit 0
+    [ -n "$(echo "$inst" | grep ^nvidia-390xx-dkms$)" ] && exit 0
+
+    # Check if "nvidia & linux" or "nvidia-lts & linux-lts" are installed.
     while true ; do
         if [ -n "$(echo "$inst" | grep ^nvidia$)" ] && [ -n "$(echo "$inst" | grep ^linux$)" ] ; then
             break
@@ -24,8 +35,16 @@ Main()
         if [ -n "$(echo "$inst" | grep ^nvidia-lts$)" ] && [ -n "$(echo "$inst" | grep ^linux-lts$)" ] ; then
             break
         fi
-        exit 0   # nothing to consider
+        exit 0   # All good, nothing more to do.
     done
+
+    # Currently installed either:
+    #    - linux     and nvidia
+    #    - linux-lts and nvidia-lts
+    # or both.
+    # No dkms version is installed.
+
+    # Now check that if linux* is in the updates list, corresponding nvidia* must be there too.
 
     local linux_lts=no
     local linux=no
@@ -52,6 +71,7 @@ Main()
     done
 
     # Notify if kernel will be updated but corresponding nvidia driver not.
+
     [ "$linux_lts $nvidia_lts" = "yes no" ] && msgs+=("'linux-lts' would be upgraded but 'nvidia-lts' not.")
     [ "$linux $nvidia" = "yes no" ]         && msgs+=("'linux' would be upgraded but 'nvidia' not.")
     if [ -n "$msgs" ] ; then
