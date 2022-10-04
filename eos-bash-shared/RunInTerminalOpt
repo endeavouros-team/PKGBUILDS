@@ -21,9 +21,11 @@
 # - Run multiple commands
 #       RunInTerminalOpt -- bash -c "pwd ; ls -la"
 # - If file name has spaces, use baskslash (\) to quote space
-#       RunInTerminalOpt -- bash -c "pwd ; ls -la foo\ bar"
+#       RunInTerminalOpt -- bash -c "pwd ; ls -la foo\ bar"      # needs file "foo bar" to exist!
 # - Use an option
 #       RunInTerminalOpt --prompt="Here you are:" -- bash -c "pwd ; ls -la"
+# - Redirection
+#       RunInTerminalOpt -E "echo '$(date)' > /tmp/foobar"
 
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
     echo "Error: cannot source eos-script-lib-yad" >&2
@@ -36,15 +38,7 @@ export -f eos_yad
 
 Main()
 {
-    local args=() xx
-
-    for xx in "$@" ; do
-        case "$xx" in
-            -*) args+=(  "$xx"  ) ;;
-            *)  args+=( "'$xx'" ) ;;
-        esac
-    done
-    eos_yad_RunCmdTermBashOpt "${args[@]}"
+    eos_yad_RunCmdTermBashOpt "$@"
 }
 
 Main "$@"
