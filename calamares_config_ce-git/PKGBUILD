@@ -1,6 +1,6 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
-pkgname=calamares_config_ce
+pkgname=calamares_config_ce-git
 pkgver=532.63c9016
 pkgrel=1
 _repo_name=EndeavourOS-calamares
