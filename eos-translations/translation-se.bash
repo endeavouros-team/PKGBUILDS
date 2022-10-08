@@ -81,7 +81,7 @@ _tr_add2 after_install_nv      "NVIDIA-användare$_exclamation"
 _tr_add2 after_install_nvtip   "Använd NVIDIA-installeraren"
 
 _tr_add2 after_install_ft      "Forum"
-_tr_add2 after_install_fttip   "Hjälp oss hjälpa dig!"
+_tr_add2 after_install_fttip   "Hjälp oss hjälpa dig$_exclamation"
 
 _tr_add2 general_info_text     "Finn din väg på EndeavourOS hemsida$_exclamation"
 
@@ -94,7 +94,7 @@ _tr_add2 general_info_ne       "Nyheter"
 _tr_add2 general_info_netip    "Nyheter och artiklar"
 
 _tr_add2 general_info_fo       "Forum"
-_tr_add2 general_info_fotip    "Fråga, kommentera, och chatta i vårt vänliga forum!"
+_tr_add2 general_info_fotip    "Fråga, kommentera, och chatta i vårt vänliga forum$_exclamation"
 
 _tr_add2 general_info_do       "Donera"
 _tr_add2 general_info_dotip    "Hjälp oss hålla igång EndeavourOS"
