@@ -81,7 +81,7 @@ local PKGNAMES=(                                    # actually: dir names for pa
     eos-update-notifier
 
     grub-theme-endeavouros
-    grub-tools
+    # grub-tools  # removed because of the major grub issue
 
     inxi/aur
 
@@ -138,10 +138,11 @@ local PKGNAMES_WAIT=(
 
 declare -A PKG_MAKEPKG_OPTIONS
 
+PKG_MAKEPKG_OPTIONS[dracut-hook]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
+PKG_MAKEPKG_OPTIONS[eos-lightdm-slick-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
-PKG_MAKEPKG_OPTIONS[dracut-hook]="--nodeps"
 
 PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
