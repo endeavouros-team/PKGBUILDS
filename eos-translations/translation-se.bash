@@ -178,7 +178,7 @@ _tr_add2 ins_troubletip        "Systemräddning"
 _tr_add2 after_install_us_from    "Uppdateringar från"                            # AUR or upstream
 _tr_add2 after_install_us_el      "Utökade rättigheter krävs."
 _tr_add2 after_install_us_done    "uppdatering färdig."
-_tr_add2 after_install_us_fail    "uppdatering misslyckades!"
+_tr_add2 after_install_us_fail    "uppdatering misslyckades$_exclamation"
 _tr_add2 nb_tab_UsefulTips     "Tips"
 _tr_add2 useful_tips_text      "Användbara Tips"
 _tr_add2 butt_changelog        "Ändringslogg"
