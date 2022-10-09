@@ -75,6 +75,12 @@ RankPerAge() {
     esac
 
     readarray -t result <<< $(SortMirrors "$latest_ml" "$sortopts")
+
+    if [ ${#result[@]} -le 1 ] ; then
+        local msg="no mirrors found!"
+        [ $timeout -lt 10 ] && msg+=" Too short timeout ($timeout)?"
+        DIE "$msg"
+    fi
 }
 
 GetUpdateNumberAndTime() {
@@ -126,19 +132,36 @@ GetUpdateNumberAndTime() {
             echo "$mirror $result"      # "mirror nr time"
             ;;
         *)
-            local curl_msg="$(curl-exit-code-to-string $retcode)"
+            local curl_msg=""
+            local msg=()
+            local add_code=no
+            local codeopt="$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY"
+            case "$codeopt" in
+                all | code | show)
+                    case "$retcode" in
+                        28) msg+=("==> '$mirror' connection failed after $timeout seconds, continuing.") ;;
+                        *)  msg+=("==> '$mirror' connection failed, continuing.") ;;
+                    esac
+                    case "$codeopt" in
+                        all)
+                            curl_msg="$(curl-exit-code-to-string $retcode)"
+                            if [ -n "$curl_msg" ] ; then
+                                msg+=("    --> (curl exit code $retcode: $curl_msg)")
+                            else
+                                add_code=yes
+                            fi
+                            ;;
+                        code)
+                            add_code=yes
+                            ;;
+                    esac
+                    [ "$add_code" = "yes" ] && msg+=("    --> (curl exit code $retcode.)")
 
-            echo2 ""
-            case "$retcode" in
-                28) notif_printf2 "Warning: '%s' failed after timeout of %s seconds.\n"  "$mirror" "$timeout" ;;
-                *)  notif_printf2 "Warning: '%s' failed.\n"  "$mirror" ;;
+                    printf2 "%s\n" "${msg[@]}"
+                    ;;
+                none)
+                    ;;
             esac
-            
-            if [ -n "$curl_msg" ] ; then
-                notif_printf2 "Curl exit code %s: %s\n"   "$retcode" "$curl_msg"
-            else
-                notif_printf2 "Curl exit code %s.\n"      "$retcode"
-            fi
             rm -f "$tmpfile"
             return $retcode
             ;;
@@ -187,7 +210,6 @@ SimpleRank() {
     # - the results of ranking
     # - the ranked mirrorlist
 
-    local pkgname=endeavouros-mirrorlist
     local result
 
     latest_ml=$(mktemp /tmp/tmp.dF3784XXXXX) ; delete_at_end+=("$latest_ml")
@@ -392,9 +414,9 @@ PackageThatOwnsApp() {
 
 Main()
 {
-    local progname="$(basename "$0")"
-    local pkgname=endeavouros-mirrorlist
-    local mlfolder=/etc/pacman.d
+    local -r progname="$(basename "$0")"
+    local -r pkgname=endeavouros-mirrorlist
+    local -r mlfolder=/etc/pacman.d
     local eos=$mlfolder/$pkgname
     local new=""
     local latest_ml=""
@@ -403,20 +425,33 @@ Main()
     local sort_default=age                    # age or rate
     local save=yes
     local hook_rank=no
-    local ranked_suffix=".pacnew"             # was: ".ranked"  !!!
+    local -r ranked_suffix=".pacnew"          # was: ".ranked"  !!!
     local ignored_mirrors=""
     local preferred_mirrors=""
     local reference_level=""
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
-        DIE "no local mirrorlist found, please install package '$pkgname'."
+        DIE "no local $eos found, please install package '$pkgname'."
     fi
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     export -f eos_GetArch
 
-    local conf=/etc/eos-rankmirrors.conf
+    local -r conf=/etc/eos-rankmirrors.conf
     source $conf || DIE "Config file $conf does not exist!"
+
+    local -r codeopt_def="show"  # default!
+    case "$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY" in
+        "")
+            EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY="$codeopt_def"
+            ;;
+        all | code | show | none)
+            ;;
+        *)  
+            echo2 "==> warning: file '$conf': EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY has unsupported value '$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY', using '$codeopt_def'."
+            EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY="$codeopt_def"
+            ;;
+    esac
 
     # option-related variables
     local verbose=no
