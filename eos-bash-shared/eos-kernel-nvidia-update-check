@@ -10,41 +10,65 @@
 #     1=failure
 # On failure also error messages to stderr will be displayed.
 
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+Exit() {
+    if  [ $1 -eq 0 ] && [ "$test_mode" = "yes" ] && [ "$need_check" = "yes" ] ; then
+        exit 2
+    else
+        exit $1
+    fi
+}
+
 Main() {
+    local opt="$1"
+    local test_mode=no
+    local need_check=no
+
     PATH=/usr/bin:$PATH
 
+    local -r progname=$(basename "$0")
+
+    case "$opt" in
+        --needed) test_mode=yes ; shift ;;
+        -*) DIE "unsupported option '$1'." ;;
+    esac
+
     # Quick check is Nvidia modules are in use.
+    lsmod | grep nvidia >/dev/null || Exit 0
 
-    lsmod | grep nvidia >/dev/null || exit 0
+    # Some NVIDIA module(s) are in use. Check installed packages.
 
-    # Some NVIDIA module is in use. Check installed packages.
+    local -r inst=$(pacman -Qsq | grep -P '^nvidia|^linux$|^linux-lts$')
 
-    local inst=$(pacman -Qsq | grep -P '^nvidia|^linux$|^linux-lts$')
+    # If any of these nvidia dkms versions are installed, we have nothing to do.
+    [ -n "$(echo "$inst" | grep ^nvidia-dkms$)" ]       && Exit 0
+    [ -n "$(echo "$inst" | grep ^nvidia-470xx-dkms$)" ] && Exit 0
+    [ -n "$(echo "$inst" | grep ^nvidia-390xx-dkms$)" ] && Exit 0
 
-    # If any of these dkms versions are installed, we have nothing to do.
-
-    [ -n "$(echo "$inst" | grep ^nvidia-dkms$)" ]       && exit 0
-    [ -n "$(echo "$inst" | grep ^nvidia-470xx-dkms$)" ] && exit 0
-    [ -n "$(echo "$inst" | grep ^nvidia-390xx-dkms$)" ] && exit 0
-
-    # Check if "nvidia & linux" or "nvidia-lts & linux-lts" are installed.
     while true ; do
+        # Check if "nvidia & linux" or "nvidia-lts & linux-lts" are installed.
         if [ -n "$(echo "$inst" | grep ^nvidia$)" ] && [ -n "$(echo "$inst" | grep ^linux$)" ] ; then
+            need_check=yes
             break
         fi
         if [ -n "$(echo "$inst" | grep ^nvidia-lts$)" ] && [ -n "$(echo "$inst" | grep ^linux-lts$)" ] ; then
+            need_check=yes
             break
         fi
-        exit 0   # All good, nothing more to do.
+        Exit 0   # no checks needed
     done
+    [ "$test_mode" = "yes" ] && Exit 0   # don't do actual checks in test mode
 
-    # Currently installed either:
+    # Currently installed:
     #    - linux     and nvidia
+    # and/or
     #    - linux-lts and nvidia-lts
-    # or both.
     # No dkms version is installed.
 
-    # Now check that if linux* is in the updates list, corresponding nvidia* must be there too.
+    # Now check that if linux/linux-lts is in the updates list, corresponding nvidia/nvidia-lts must be there too.
 
     local linux_lts=no
     local linux=no
@@ -75,11 +99,10 @@ Main() {
     [ "$linux_lts $nvidia_lts" = "yes no" ] && msgs+=("'linux-lts' would be upgraded but 'nvidia-lts' not.")
     [ "$linux $nvidia" = "yes no" ]         && msgs+=("'linux' would be upgraded but 'nvidia' not.")
     if [ -n "$msgs" ] ; then
-        local progname=$(basename "$0")
         for msg in "${msgs[@]}" ; do
             echo "==> $progname: error: $msg" >&2
         done
-        return 1
+        exit 1
     fi
 }
 
