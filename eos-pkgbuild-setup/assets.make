@@ -816,11 +816,20 @@ EOF
 
 IsInWaitList() {
     local pkg="$1"
+    local newver="$2"  # optional!
+
     if [ -n "$PKGNAMES_WAIT" ] ; then
         for xx in "${PKGNAMES_WAIT[@]}" ; do
-            if [ "$xx" = "$pkg" ] ; then
-                return 0
-            fi
+            case "$xx" in
+                "$pkg")              # old syntax - pkgname - still supported currently, may be deprecated later
+                    return 0
+                    ;;
+                "$pkg|"*)            # new syntax - pkgname|version-to-skip
+                    [ -n "$newver" ] || newver="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
+                    local skip_version="${xx#*|}"
+                    [ "$skip_version" = "$newver" ] && return 0
+                    ;;
+            esac
         done
     fi
     return 1
@@ -967,7 +976,7 @@ Main2()
                 echo2 "OK ($tmpcurr)"
                 continue
             fi
-            if IsInWaitList "$xx" ; then
+            if IsInWaitList "$xx" "$tmp" ; then
                 echo2 "WAIT $tmpcurr ==> $tmp"
                 continue
             fi
@@ -1022,7 +1031,7 @@ Main2()
             if DowngradeProbibited "$cmpresult" "$allow_downgrade" ; then
                 continue
             fi
-            if IsInWaitList "$xx" ; then
+            if IsInWaitList "$xx" "${newv['$pkgdirname']}" ; then
                 echo2 "==> $xx is in the wait list, skipping build."
                 continue
             fi

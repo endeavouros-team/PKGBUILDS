@@ -125,9 +125,10 @@ if [ 0 -eq 1 ] ; then
 fi
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
+# Also add the version to skip, like 'pkgname|version-to-skip', e.g. 'eos-lxdm-gtk3|0.5.3-5'.
 local PKGNAMES_WAIT=(
-    #arc-gtk-theme-eos
-    eos-lxdm-gtk3
+    # arc-gtk-theme-eos
+    "eos-lxdm-gtk3|0.5.3-5"
 )
 
 # HAS_GIT_VER array incldues packages whose pkgver can be anything, i.e. newer package can have lower pkgver.
