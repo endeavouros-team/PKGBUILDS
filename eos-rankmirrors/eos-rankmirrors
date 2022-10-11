@@ -42,14 +42,40 @@ SortMirrors() {
     local latest_ml="$1"
     local sortopts="$2"
     local marr mirror m m2
+    local rank_errs=0
+    local lastm=""
+    local lastix ix
 
     readarray -t marr <<< $(grep "^Server = " $latest_ml)
-    for mirror in "${marr[@]}" ; do
-        m=$(echo "$mirror" | awk '{print $3}')                    # mirror value (with variables)
-        verbose "$m"
-        m2=$(echo "$m" | sed 's|/$repo/$arch$||')                 # mirror url (without variables)
-        GetUpdateNumberAndTime "$m2/state" "$m"                   # update number from "state" and its fetch time
-    done | LC_ALL=C sort -g $sortopts
+
+    lastix=${#marr[@]}
+    while [ $lastix -gt 0 ] ; do
+        ((lastix--))
+        lastm="${marr[$lastix]}"
+        [ -n "$lastm" ] && break
+    done
+    if [ -z "$lastm" ] ; then
+        return 1   # no mirrors!
+    fi
+
+    if [ ${#marr[@]} -gt 0 ] ; then
+        for mirror in "${marr[@]}" ; do
+            m=$(echo "$mirror" | awk '{print $3}')                    # mirror value (with variables)
+            verbose "$m"
+            m2=$(echo "$m" | sed 's|/$repo/$arch$||')                 # mirror url (without variables)
+            if ! GetUpdateNumberAndTime "$m2/state" "$m"              # update number from "state" and its fetch time
+            then
+                ((rank_errs++))
+            fi
+            if [ "$mirror" = "$lastm" ] ; then
+                if [ $rank_errs -ne 0 ] ; then
+                    local secs=5
+                    # notif_printf2 "Sleeping $secs seconds...\n"
+                    sleep $secs                                       # some mirrors failed, sleep a few seconds to show it
+                fi
+            fi
+        done | LC_ALL=C sort -g $sortopts
+    fi
 }
 
 RankPerAge() {
@@ -135,14 +161,13 @@ GetUpdateNumberAndTime() {
             local curl_msg=""
             local msg=()
             local add_code=no
-            local codeopt="$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY"
-            case "$codeopt" in
+            case "$mirror_verbosity" in
                 all | code | show)
                     case "$retcode" in
                         28) msg+=("==> '$mirror' connection failed after $timeout seconds, continuing.") ;;
                         *)  msg+=("==> '$mirror' connection failed, continuing.") ;;
                     esac
-                    case "$codeopt" in
+                    case "$mirror_verbosity" in
                         all)
                             curl_msg="$(curl-exit-code-to-string $retcode)"
                             if [ -n "$curl_msg" ] ; then
@@ -318,7 +343,7 @@ WriteSystemMirrorlist() {
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:,mirror-verbosity:"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -373,6 +398,11 @@ Options:
   --verbose
              Show more detailed output.
 
+  --mirror-verbosity <value>
+             How much information will be shown when a mirror fails.
+             Supported values: see file /etc/eos-rankmirrors.conf,
+             setting EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY.
+
   --help
   -h
              This help.
@@ -393,12 +423,13 @@ EOF
                 timeout="$2" ; shift ;;
             --verbose)
                 verbose=yes ;;
+            --mirror-verbosity)
+                mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)
                 save=no
                 ;;
             --hook-rank)
                 hook_rank=yes
-                
                 ;;
             --)
                 shift ; break ;;
@@ -407,9 +438,20 @@ EOF
     done
 }
 
-PackageThatOwnsApp() {
-    local app="$1"
-    LANG=C pacman -Qo "$app" | awk '{print $5}'
+Check-mirror_verbosity() {
+    local where="$1"   # option or configfile
+    case "$mirror_verbosity" in
+        all | code | show | none) ;;
+
+        *)  printf2 "==> warning: "
+            case "$where" in
+                configfile) printf2 "file '$conf': EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY" ;;
+                option)     printf2 "option --mirror-verbosity" ;;
+            esac
+            echo2 " has unsupported value '$mirror_verbosity', will use '$mirror_verbosity_def'."
+            mirror_verbosity="$mirror_verbosity_def"
+            ;;
+    esac
 }
 
 Main()
@@ -429,6 +471,8 @@ Main()
     local ignored_mirrors=""
     local preferred_mirrors=""
     local reference_level=""
+    local -r mirror_verbosity_def="show"
+    local mirror_verbosity=""
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
@@ -440,18 +484,9 @@ Main()
     local -r conf=/etc/eos-rankmirrors.conf
     source $conf || DIE "Config file $conf does not exist!"
 
-    local -r codeopt_def="show"  # default!
-    case "$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY" in
-        "")
-            EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY="$codeopt_def"
-            ;;
-        all | code | show | none)
-            ;;
-        *)  
-            echo2 "==> warning: file '$conf': EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY has unsupported value '$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY', using '$codeopt_def'."
-            EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY="$codeopt_def"
-            ;;
-    esac
+    mirror_verbosity="$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY"
+
+    Check-mirror_verbosity configfile
 
     # option-related variables
     local verbose=no
@@ -477,6 +512,7 @@ Main()
 
     if [ "$save" = "yes" ] ; then
         WriteSystemMirrorlist "$eos" "$new"
+        notif_printf2 "Mirrorlist saved.\n"
     fi
 
     DeleteTmpFiles
@@ -485,3 +521,4 @@ Main()
 trap "sleep 0.2 ; DeleteTmpFiles" EXIT
 
 Main "$@"
+
