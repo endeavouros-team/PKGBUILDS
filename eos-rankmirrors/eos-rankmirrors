@@ -503,7 +503,7 @@ Main()
         DIE "no local $eos found, please install package '$pkgname'."
     fi
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return 1
     export -f eos_GetArch
 
     local -r conf=/etc/eos-rankmirrors.conf
