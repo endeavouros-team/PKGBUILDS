@@ -1467,6 +1467,11 @@ StartHere() {
     local activate_own_commands_tab="no"
     local columns_for_own_commands="2"
     local show_predefined_buttons_at_own_commands="yes"
+    local has_a_connection=no
+
+    if eos-connection-checker ; then
+        has_a_connection=yes
+    fi
 
     export show_installer=no    # explicitly show the installer, for testing only
     for arg in "$@" ; do
@@ -1483,12 +1488,14 @@ StartHere() {
 
         EOS_FILESERVER_SITE="$(eos-select-file-server)"        # do this first at install !!!
 
-        local timezone="$(show-location-info timezone)"
-        if [ -n "$timezone" ] ; then
-            local preprelogfile="$(eos-select-file-server --logfilename)"
-            echo "==> $PROGNAME: info: setting timezone to '$timezone'" >> "$preprelogfile"
-            timedatectl set-timezone "$timezone"
-            sleep 0.1
+        if [ "$has_a_connection" = "yes" ] ; then
+            local timezone="$(show-location-info timezone)"
+            if [ -n "$timezone" ] ; then
+                local preprelogfile="$(eos-select-file-server --logfilename)"
+                echo "==> $PROGNAME: info: setting timezone to '$timezone'" >> "$preprelogfile"
+                timedatectl set-timezone "$timezone"
+                sleep 0.1
+            fi
         fi
     fi
     export EOS_FILESERVER_SITE
@@ -1624,7 +1631,9 @@ StartHere() {
             }
         fi
     else
-        eos-kbd-set
+        if [ "$has_a_connection" = "yes" ] ; then
+            eos-kbd-set
+        fi
         if [ ! -r /tmp/mirrorlist.bu ] ; then
             if [ -r /etc/pacman.d/mirrorlist ] ; then
                 cp /etc/pacman.d/mirrorlist /tmp/mirrorlist.bu  # to be checked by update-mirrorlist
@@ -1651,11 +1660,6 @@ StartHere() {
     notebook=(eos_yad --notebook --key="$handle" --center --title="$_NOTEBOOK_TITLE")
     notebook+=(--use-interp)
     notebook+=(--expand)
-
-    local has_a_connection=no
-    if eos-connection-checker ; then
-        has_a_connection=yes
-    fi
 
     if [ "$is_installing" = "no" ] ; then
         # try to give a critical notification
@@ -1717,7 +1721,7 @@ StartHere() {
     local error_log=/tmp/$PROGNAME.log
     local comment=""
 
-    "${notebook[@]}"
+    "${notebook[@]}" 2>/dev/null
 
     local result=$?
 
