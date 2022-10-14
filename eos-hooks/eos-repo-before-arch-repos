@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# Usage1: $0
+#
+# Usage2: $0 [config-file  [> output-file]]
+# where
+#   config-file    File /etc/pacman.conf (or another similar file for testing).
+#   output-file    Output file.
+
+
+echo2()   { echo   "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+
+DIE() {
+    echo2 "==> $progname: error: $1"
+    exit
+}
+
+Main() {
+    # Move the [endeavouros] repo before Arch repos in /etc/pacman.conf.
+
+    local progname=eos-repo-before-arch-repos
+
+    # File to remember that this program has already been executed.
+    local remember_me_file="/etc/$progname.once"
+    if [ -e "$remember_me_file" ] ; then
+        echo2 "==> Info: $progname has been executed before."
+        return
+    fi
+
+    local conf="$1"
+
+    [ -n "$conf" ] || conf=/etc/pacman.conf
+    [ -r "$conf" ] || DIE "given file '$conf' cannot be read!"
+
+    # Stop if user says don't move the repo with: "# EOS do not modify"
+    if grep -E "^[[:space:]]*#[[:space:]]*EOS[[:space:]]+do[[:space:]]+not[[:space:]]+modify[[:space:]]*$" "$conf" &> /dev/null
+    then
+        echo2 "==> Info: '$conf' was not modified because user declined."
+        return
+    fi
+
+    # Find the name of the first Arch repo, with or without comments.
+    local repos first_arch_repo=""
+    local xx
+    local eos_found=no
+    local eos_is_before_arch=no
+
+    readarray -t repos <<< $(grep "^[# ]*\[[^]]*\]" "$conf" | grep -Pv '\[repo-name\]|\[options\]' | sed 's|^.*\[\([^]]*\)\].*|\1|')
+
+    for xx in "${repos[@]}" ; do
+        case "$xx" in
+            testing|core|extra|community-testing|community|multilib-testing|multilib|kde-unstable)
+                [ -z "$first_arch_repo" ] && first_arch_repo="$xx"
+                ;;
+            endeavouros)
+                eos_found=yes
+                if [ -z "$first_arch_repo" ] ; then
+                    eos_is_before_arch=yes                 # [endeavouros] is already before Arch repos in '$conf'
+                fi
+                ;;
+        esac
+    done
+    [ "$eos_found" = "no" ]     && DIE "repo [endeavouros] was not found in '$conf'."
+    [ -z "$first_arch_repo" ]   && DIE "no Arch repos found!"
+
+    # Adding the [endeavouros] repo before Arch repos.
+
+    local file line ix=0 count in_eos=no
+    local current_eos_definition=()
+
+    readarray -t file <<< "$(cat "$conf")"
+    count=${#file[@]}
+
+    if [ "$eos_is_before_arch" = "no" ] ; then
+        # Comment out existing endeavouros repo definition.
+        for ((ix=0; ix < count; ix++)) ; do
+            line=${file[$ix]}
+            case "$line" in
+                "[endeavouros]")
+                    in_eos=yes
+                    current_eos_definition=("$line")
+                    file[$ix]="# $line"
+                    ;;
+                "["*)
+                    in_eos=no
+                    ;;
+                "#SigLevel"* | "#Include"* | "#Server"*)           # commented definitions "inside" a repo
+                    if [ "$in_eos" = "yes" ] ; then
+                        current_eos_definition+=("$line")
+                    fi
+                    ;;
+                "#"*)
+                    if [ -n "$(echo "$line" | grep -E "#[ ]*\[")" ] ; then
+                        in_eos=no
+                    fi
+                    ;;
+                "")
+                    ;;
+                *)
+                    if [ "$in_eos" = "yes" ] ; then
+                        current_eos_definition+=("$line")
+                        file[$ix]="# $line"
+                    fi
+                    ;;
+            esac
+        done
+    fi
+
+    if [ "$conf" = "/etc/pacman.conf" ] ; then
+        if [ "$eos_is_before_arch" = "no" ] ; then
+            local tmpfile=$(mktemp)
+            local bak="$conf.bak.$(date "+%Y.%m.%d-%H:%M")"
+            
+            Output > $tmpfile
+            sudo bash -c "cp $conf '$bak' && cp $tmpfile $conf && rm $tmpfile && touch $remember_me_file"
+            printf2 "==> $conf:\n    - [endeavouros] repo moved in front of Arch repos\n    - old file copied to '$bak'\n"
+        else
+            touch $remember_me_file
+            echo2 "==> $conf: [endeavouros] repo is already before Arch repos."
+        fi
+    else
+        Output
+    fi
+}
+
+Output() {
+    # Add endeavouros repo before Arch repos.
+    # Write the modified file into standard output.
+
+    for ((ix=0; ix < count; ix++)) ; do
+        line=${file[$ix]}
+        case "$line" in
+            "[$first_arch_repo]" | "#[$first_arch_repo]")
+                echo ""
+                current_eos_definition="$(printf "%s\n" "${current_eos_definition[@]}")"
+                echo "$current_eos_definition"
+                echo ""
+                ;;
+        esac
+        echo "$line"
+    done
+}
+
+Main "$@"
