@@ -2,14 +2,16 @@
 
 # Find the right Nvidia driver for a card.
 
-echo2() { echo "$@" >&2 ; }
+echo2()   { echo   "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
 
 DIE() {
     echo2 "$progname: error: $1"
     exit 1
 }
 
-GetNvidiaIds()
+if false ; then
+GetNvidiaIds_old()
 {
     local version="$1"
     local ids="$(curl -Lsm 10 -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
@@ -35,6 +37,33 @@ GetNvidiaIds()
     ids=$(echo "$ids" | sort | uniq | tr '[:upper:]' '[:lower:]')
     echo "$true_series|$ids"
 }
+fi
+
+FilterIds() {
+    # supports series 390 and later
+    grep '<tr id="devid' | sed 's|.*devid\([0-9A-F]*\)["_].*|\1|' | sort -u | tr '[:upper:]' '[:lower:]'
+
+    # grep 'id="devid' | grep '<tr id="devid' | sed 's|.*devid\([0-9A-F]*\)["_].*|\1|' | sort -u | tr '[:upper:]' '[:lower:]'
+}
+
+GetNvidiaIds() {
+    local series="$1"
+    [ -n "$series" ] || return 1
+    local ids=""
+    local sid1="${series_ids[0]}"   # e.g. 520
+    local sid2="${series_ids[1]}"   # e.g. 470
+    local sid3="${series_ids[2]}"   # e.g. 390
+    local sidX="$series_id_out"
+
+    case "$series" in
+        $sid1) ids="$(echo "$ids_all" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
+        $sid2) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid2.xx\"*/,/.*\"legacy_$sid3.xx\".*/p" | FilterIds)" ;;
+        $sid3) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid3.xx\"*/,/.*\"legacy_$sidX.xx\".*/p" | FilterIds)" ;;
+        *) DIE "unsupported series '$series'" ;;
+    esac
+
+    echo "$ids"
+}
 
 ShowDriversForId() {
     local id="$1"
@@ -42,21 +71,31 @@ ShowDriversForId() {
     local ids
     local ver
     local true_series=""   # found from the Nvidia website
+    local ids_all
+    local found=no
 
-    echo "NVIDIA card id: $id"
-    echo "The nvidia-dkms version: $pacman_version"
+    ids_all="$(curl -Lsm 10 -o- "$url_of_ids")"
+
+    [ -n "$ids_all" ] || DIE "Nvidia id data not available!"
+
+    echo2 "NVIDIA card id: $id"
+    echo2 "The nvidia-dkms version: $pacman_version"
 
     for ver in "${nvidia_versions[@]}" ; do
-        ids="$(GetNvidiaIds "$ver")"
-        true_series="$(echo "$ids" | head -n1 | cut -d'|' -f1)"
-        ids="$(echo "$ids" | cut -d'|' -f2)"
+        true_series="${ver%%.*}"
+        ids="$(GetNvidiaIds "$true_series")"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-            echo "Series $true_series: supported (Nvidia: $ver)"
+            printf "\nSeries %s: supported (Nvidia: %s)\n\n" "$true_series" "$ver"     # DO NOT CHANGE THIS LINE! Other apps use it.
             [ "$all" = "no" ] && return
+            found=yes
         else
-            [ "$all" = "yes" ] && echo "Series $true_series: not supported"
+            [ "$all" = "yes" ] && echo2 "Series $true_series: not supported"
         fi
     done
+    if [ "$found" = "no" ] ; then
+        echo2 "Sorry, none of the Nvidia driver series [$(echo "${series_ids[*]}" | sed 's| |, |g')] is supported."
+        printf2 "\nMore info:\n   %s\n   %s\n" "$starting_url" "$url_of_ids"
+    fi
 }
 
 GetNvidiaVersions() {
@@ -84,14 +123,16 @@ Options() {
 
     while true ; do
         case "$1" in
-            -a | --all)   all=yes ;;
+            -a | --all) echo2 "Info: option '$1' recognized but is no more used." ;; # all=yes ;;
 
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options] [parameters]
 
 Options:
-  -a, --all         Show status for all available driver branches.
+  -a, --all         (Show status for all available driver branches.)
+                    NOTE: this option does nothing due to implementation change.
+
   -h, --help        This help.
 
 Parameters:
@@ -111,18 +152,25 @@ EOF
         esac
         shift
     done
+
     nvidia_id="$1"
+
+    case "$nvidia_id" in
+        [0-9a-f][0-9a-f][0-9a-f][0-9a-f] | "") ;;
+        *) DIE "given card id '$nvidia_id' is invalid" ;;
+    esac
 }
 
 Main() {
-    local progname="$(basename "$0")"
+    local -r progname="$(basename "$0")"
+    local -r pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}')
+    local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
+    local -r pacman_version_series=${pacman_pkgver%%.*}
+    local -r starting_url="https://www.nvidia.com/en-us/drivers/unix"
+    local -r url_of_ids="https://us.download.nvidia.com/XFree86/Linux-x86_64/$pacman_pkgver/README/supportedchips.html"
     local all=no
     local nvidia_id=""
-    local starting_url="https://www.nvidia.com/en-us/drivers/unix"
     local nvidia_versions=()
-    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}')
-    local pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
-    local pacman_version_series=${pacman_pkgver%%.*}
 
     Options "$@"
 
@@ -131,6 +179,8 @@ Main() {
         470                           # legacy series ids
         390                           # ditto
     )
+    local series_id_out=367           # may change as series_ids change!
+
     GetNvidiaVersions                 # find versions NVIDIA is currently supporting
 
     if [ -z "$nvidia_id" ] ; then
@@ -138,7 +188,6 @@ Main() {
     fi
     if [ -n "$nvidia_id" ] ; then
         ShowDriversForId "$nvidia_id"
-        printf "\nMore info: %s\n\n" "$starting_url"
     fi
 }
 
