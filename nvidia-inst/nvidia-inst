@@ -171,27 +171,29 @@ OnlyNvidia() {
 }
 
 KernelParametersToGrub() {
-    local file=/boot/grub/grub.cfg
+    local grubcnf=/boot/grub/grub.cfg
+    local grubdef=/etc/default/grub
     local param="nvidia-drm.modeset=1"
 
-    if [ -f $file ] ; then
-        case "$mode" in
-            nvidia | prime)
-                if [ -z "$(grep "$param" /etc/default/grub)" ] ; then
-                    Info "Patching kernel line with $param"
-                    AddCmd "nvidia-installer-kernel-para"
-                    AddCmd "grub-mkconfig -o $file"
-                fi
-                ;;
-            *)
-                if [ -n "$(grep "$param" /etc/default/grub)" ] ; then
-                    Info "Removing kernel parameter $param"
-                    AddCmd "nvidia-installer-kernel-para remove"
-                    AddCmd "grub-mkconfig -o $file"
-                fi
-                ;;
-        esac
-    fi
+    [ -f $grubcnf ] || return
+    [ -f $grubdef ] || return
+
+    case "$mode" in
+        nvidia | prime)
+            if [ -z "$(grep "$param" $grubdef)" ] ; then
+                Info "Patching kernel line with $param"
+                AddCmd "nvidia-installer-kernel-para"
+                AddCmd "grub-mkconfig -o $grubcnf"
+            fi
+            ;;
+        *)
+            if [ -n "$(grep "$param" $grubdef)" ] ; then
+                Info "Removing kernel parameter $param"
+                AddCmd "nvidia-installer-kernel-para remove"
+                AddCmd "grub-mkconfig -o $grubcnf"
+            fi
+            ;;
+    esac
 }
 
 AddConfFileLine() {
@@ -223,6 +225,13 @@ CreateConfFile() {
 
 IsNvidiaCard() {
     lspci -k | grep -P 'VGA|3D|Display' | grep NVIDIA >& /dev/null
+}
+
+test_for_IBT_off() {
+    local data=$(lspci -vnn | grep -P 'VGA|3D|Display' | grep "GeForce RTX [34]0[0-9][0-9]")
+    if [ -n "$data" ] ; then
+        Note "kernel parameter 'ibt=off' may be required, see https://wiki.archlinux.org/title/NVIDIA#Installation"
+    fi
 }
 
 ShowCommandsToRun() {
@@ -295,7 +304,7 @@ Options() {
             --listopts)       ListOptions "$sopts" "$lopts" ; exit 0 ;;
             --listseries)     echo "$series_now $series_prev1 $series_prev2" ; exit 0 ;;
             --drivers)
-                nvidia-driver-supported-branches -a
+                nvidia-driver-supported-branches   # -a    # this option is deprecated!
                 exit 0
                 ;;
             -v | --version)
@@ -524,6 +533,8 @@ Main()
             [ "$ignore_errors" = "no" ] && exit 0
         fi
     fi
+
+    # test_for_IBT_off
 
     ProperNvidiaPackages
 
