@@ -713,13 +713,26 @@ Wget2Curl() {
 }
 
 
+eos_is_installing() {
+    if [ "$LOGNAME" = "liveuser" ] || [ "$USER" = "liveuser" ] ; then
+        if [ -x /usr/bin/calamares ] ; then
+            return 0     # installing
+        fi
+    fi
+    return 1     # not installing
+}
+
 # check the config:
-case "$EOS_ROOTER" in
-    su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="eos-run-cmd-with-su" ;;          # default!
-    sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="sudo bash -c" ;;
-    pkexec       | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
-    su-c_wrapper)                                                export EOS_ROOTER="/usr/bin/su-c_wrapper bash -c" ;;
-    *)
-        eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
-        ;;
-esac
+if eos_is_installing ; then
+    export EOS_ROOTER="sudo bash -c"
+else
+    case "$EOS_ROOTER" in
+        su           | "su -c"          | "/usr/bin/su -c" | "")     export EOS_ROOTER="eos-run-cmd-with-su" ;;          # default!
+        sudo         | "sudo bash -c"   | "/usr/bin/sudo bash -c")   export EOS_ROOTER="sudo bash -c" ;;
+        pkexec       | "pkexec bash -c" | "/usr/bin/pkexec bash -c") export EOS_ROOTER="/usr/bin/pkexec bash -c" ;;
+        su-c_wrapper)                                                export EOS_ROOTER="/usr/bin/su-c_wrapper bash -c" ;;
+        *)
+            eos_yad_DIE "Error: configuration '$EOS_ROOTER' for EOS_ROOTER in file /etc/eos-script-lib-yad.conf is not supported!"
+            ;;
+    esac
+fi
