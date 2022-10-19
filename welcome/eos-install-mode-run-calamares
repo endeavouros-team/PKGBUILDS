@@ -54,7 +54,7 @@ InstallLog_Start() {
     local preprelogfile="$(eos-select-file-server --logfilename)"
     local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
     local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
-    local inxiout="$(inxi -Czc0 ; inxi -Gnzac0)"
+    local inxiout="$(inxi -Czc0 ; inxi -Gnmzac0)"
 
     [ -n "$calamares_version"] || calamares_version="$(pacman -Q calamares_current 2>/dev/null | awk '{print $NF}')"  # this line is probably not needed
 
