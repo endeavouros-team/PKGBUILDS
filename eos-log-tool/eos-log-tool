@@ -269,21 +269,29 @@ Local_ShowForeignPackages() {
 }
 
 Local_ShowEosInstallLog() {
-    local install_logs=(
-        /var/log/endeavour-install.log
-        /var/log/Calamares.log
+    local install_logs_noroot=(
         /home/liveuser/endeavour-install.log
         $HOME/endeavour-install.log
     )
+    local install_logs_root=(
+        /var/log/endeavour-install.log
+        /var/log/Calamares.log
+    )
     local fname
 
-    for fname in "${install_logs[@]}" ; do
+    for fname in "${install_logs_noroot[@]}" ; do
         if [ -r "$fname" ] ; then
             Cmd cat "$fname"
             return
         fi
     done
-    if [ ! -r $fname ] ; then
+    for fname in "${install_logs_root[@]}" ; do
+        if [ -f "$fname" ] ; then
+            Cmd pkexec cat "$fname"
+            return
+        fi
+    done
+    if [ ! -f $fname ] ; then
         WarningMsg "no EndeavourOS install log found!"
         echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
     fi
