@@ -1,7 +1,10 @@
 #!/bin/bash
 
+echo2()   { echo "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+
 DIE() {
-    echo "$progname: error: $1" >&2
+    echo2 "$progname: error: $1"
     if [ -z "$2" ] ; then
         exit 1
     else
@@ -26,6 +29,7 @@ options:
     -n | --nosave   Don't save returned URL.
     -h | --help     This help.
     --man           Show manual at $EOS_SENDLOG_URI.
+    -v | --verbose  Show more info about the operation.
 EOF
                 exit 0
                 ;;
@@ -36,83 +40,156 @@ EOF
             -n | --nosave)
                 save=no
                 ;;
+            -v | --verbose)
+                verbose=yes
+                ;;
+#            -f=* | --file=*) inputfile="${arg#*=}" ;;
             -*) DIE "unsupported option '$arg'" ;;
             *) DIE "unsupported parameter '$arg'" ;;
         esac
     done
 }
 
-SendToNet() {
-    local exitcode=0
+SendToNet1() {
+    local ix="$1"
+    [ -n "$ix" ] || return 1
+    local srv="${supported_uris[$ix]}"
+    local form="${supported_uris[$((ix+1))]}"
+    [ -n "$srv" ] || return 1
 
-    case "$EOS_SENDLOG_URI" in
+    case "$form" in
+        "") [ "$srv" != "wgetpaste" ] && return 1 ;;
+    esac
+
+    [ "$verbose" = "yes" ] && printf2 "==> $srv: "
+
+    local exitcode=0
+    local msgs=()
+    local msg1="warning: sending data to"
+    local msg2="failed with code "
+
+    case "$srv" in
         wgetpaste)
-            [ -x /usr/bin/wgetpaste ] || DIE "wgetpaste is not installed!"
-            url=$(wgetpaste $WGETPASTE_OPTIONS 2>/dev/null)
-            exitcode=$?
+            if [ -x /usr/bin/wgetpaste ] ; then
+                url=$(wgetpaste $WGETPASTE_OPTIONS 2>/dev/null)
+                exitcode=$?
+                if [ $exitcode -ne 0 ] ; then
+                    msgs+=("$msg1 $srv $msg2 $exitcode.")
+                    [ "$verbose" = "yes" ] && echo2 "failed"
+                fi
+            else
+                msgs+=("warning: sorry, package wgetpaste-eos is not installed!")
+                exitcode=1
+                [ "$verbose" = "yes" ] && echo2 "failed"
+            fi
             ;;
         *)
-            url=$(curl --fail -F "${EOS_SENDLOG_FORM}=<-" "$EOS_SENDLOG_URI")
+            url=$(curl --fail -Lsm 30 -F "${form}" "$srv"   2>/dev/null)
             exitcode=$?
+            if [ $exitcode -ne 0 ] ; then
+                msgs+=("$msg1 $srv $msg2 $exitcode.")
+                [ "$verbose" = "yes" ] && echo2 "failed"
+            fi
             ;;
     esac
-    [ $exitcode -eq 0 ] || DIE "Sending data to $EOS_SENDLOG_URI failed!" $exitcode
+    if [ $exitcode -eq 0 ] ; then
+        [ "$verbose" = "yes" ] && echo2 "OK"
+        return 0   # OK
+    else
+        [ "$verbose" = "yes" ] && {
+            echo2 ""
+            printf2 "%s\n" "${msgs[@]}"
+        }
+        return $exitcode
+    fi
+}
+
+SendToNet() {
+    local exitcode=0
+    local ix=$default_ix
+    local failed=()
+
+    # try the user default first
+    SendToNet1 "$ix" && return
+
+    for ((ix=0; ix < ${#supported_uris[@]}; ix+=2)) ; do
+        case "$ix" in
+            $default_ix)   # already tested
+               ;;
+            *) SendToNet1 "$ix" && return
+               [ "$verbose" = "no" ] && failed+=("${supported_uris[$ix]}")
+               ;;
+        esac
+        sleep 2
+    done
+    if [ "$verbose" = "yes" ] ; then
+        DIE "sorry, all configured pastebin like services failed!"
+    else
+        DIE "sorry, all configured pastebin like services ${failed[*]} failed!"
+    fi
 }
 
 Init() {
     local ix
 
     [ -r $configfile ] && source $configfile
-    [ -z "$WGETPASTE_OPTIONS" ] && WGETPASTE_OPTIONS="--nick nobody"
 
-    for ((ix=0; ix < ${#supported_uris[@]}; ix++)) ; do
-        if [ "$EOS_SENDLOG_URI" = "${supported_uris[$ix]}" ] ; then
-            EOS_SENDLOG_FORM="${supported_forms[$ix]}"
-            return
-        fi
-    done
-    # use default:
-    EOS_SENDLOG_URI="${supported_uris[$default_ix]}"
-    EOS_SENDLOG_FORM="${supported_forms[$default_ix]}"
+    EOS_SENDLOG_URI=""  # no more used!
+
+    return
+
+    # set default_ix based on possible EOS_SENDLOG_URI
+    if [ -n "$EOS_SENDLOG_URI" ] ; then
+        for ((ix=0; ix < ${#supported_uris[@]}; ix+=2)) ; do
+            if [ "$EOS_SENDLOG_URI" = "${supported_uris[$ix]}" ] ; then
+                default_ix=$ix
+                break
+            fi
+        done
+    fi
 }
 
 Main() {
     local progname="$(basename "$0")"
     local configfile=/etc/eos-sendlog.conf
 
-    # from config file (if values are set, they must be correct!):
+    local default_ix=0    # was 1
+
+    # 'supported_uris' lists the pastebin like services supported by this app.
+    #
+    local supported_uris=(   # and forms
+        "https://0x0.st"     'file=@-'    # default
+        "wgetpaste"          ''           # use another program!
+        "http://ix.io"       'f:1=<-'
+
+        # "https://clbin.com"  "clbin=<-"   # has serious problems?
+    )
     local EOS_SENDLOG_URI=""
-    local EOS_SENDLOG_FORM=""
-    local WGETPASTE_OPTIONS=""
+    local WGETPASTE_OPTIONS="--nick nobody"
 
-    local supported_uris=(
-        "http://ix.io"
-        "https://clbin.com"
-        "wgetpaste"           # use another program!
-    )
-    local supported_forms=(
-        "f:1"
-        "clbin"
-        ""
-    )
-    local default_ix=1      # was 0
-
+    # from config file (if values are set, they must be correct!):
     Init
+
     local save=yes
-    local db=$HOME/.config/$progname.txt
+    local verbose=no
+    local inputfile=""
+    local db="$HOME/.config/$progname.txt"
     local db2='$HOME'/.config/$progname.txt
     local url
 
     Options "$@"
 
-    SendToNet
+    if [ -n "$inputfile" ] ; then
+        cat "$inputfile" | SendToNet || return $?  # this line doesn't work...
+    else
+        SendToNet
+    fi
 
     if [ "$save" = "yes" ] ; then
-        local tmpfile=$(mktemp $HOME/.config/eos-sendlog.XXXXX)
-        [ -r $db ] && mv $db $tmpfile
-        printf "%s: %s\n" "$(date +%Y%m%d-%H%M)" "$url" > $db
-        cat $tmpfile >> $db
-        rm -f $tmpfile
+        local current_db=""
+        [ -r "$db" ] && current_db="$(cat "$db")"
+        printf "%s: %s\n" "$(date +%Y%m%d-%H%M)" "$url"  > $db
+        [ -n "$current_db" ] && echo "$current_db"      >> $db
     fi
     echo "$url"
 }
