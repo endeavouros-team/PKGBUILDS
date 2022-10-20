@@ -18,13 +18,18 @@ source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 
 export -f eos_yad
 
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
 MsgOld() {
-    local msg="$1"
-    local title="$2"
+    local -r msg="$1"
+    local -r title="$2"
     shift 2
     local width=$((${#msg} * 10))
-    local highlimit=650
-    local lowlimit=200
+    local -r highlimit=650
+    local -r lowlimit=200
 
     test $width -gt $highlimit && width=$highlimit
     test $width -lt $lowlimit  && width=$lowlimit
@@ -33,21 +38,21 @@ MsgOld() {
                           --width=$width --height=100 --button=yad-quit "$@"
 }
 Msg() {
-    local msg="$1"
-    local title="$2"
+    local -r msg="$1"
+    local -r title="$2"
     shift 2
-    local cmd=(
+    local -r cmd=(
         eos_yad --form --title="$title" --text="$msg"
         --image=user-info --button=yad-quit "$@"
     )
     "${cmd[@]}"
 }
 ErrorMsg() {
-    local msg="$1"
+    local -r msg="$1"
     Msg "$msg" "Error"
 }
 WarningMsg() {
-    local msg="$1"
+    local -r msg="$1"
     Msg "$msg" "Warning"
 }
 
@@ -55,7 +60,7 @@ Header() { printf "%s\n\n" "#################### $* ########################" ; 
 Footer() { printf "\n\n" ; }
 
 Cmd() {
-    local cmd="$1"
+    local -r cmd="$1"
 
     echo "==> Handling '$*'" >&2
 
@@ -100,7 +105,7 @@ Cmd() {
 SendToInternet() {
     echo "==> Sending $FILE_OF_LOGS2 to a pastebin service." >&2
 
-    local logdata="$(cat "$FILE_OF_LOGS")"
+    local -r logdata="$(cat "$FILE_OF_LOGS")"
 
     if [ -z "$logdata" ] ; then
         ErrorMsg "No logs found!"
@@ -108,7 +113,8 @@ SendToInternet() {
     fi
 
     local exitcode=0
-    local url="$(echo "$logdata" | eos-sendlog)"
+    local url
+    url="$(echo "$logdata" | eos-sendlog)"
     exitcode=$?
     if [ $exitcode -ne 0 ] ; then
         ErrorMsg "Sending log data failed!"
@@ -126,7 +132,7 @@ SendToInternet() {
         [hH][tT][tT][pP]://* | [hH][tT][tT][pP][sS]://*)       # OK, accept URL that start with http:// or https://.
             ;;
         "")                                                    # Reject empty URL.
-            local logfilesize=$(stat -c %s "$FILE_OF_LOGS")
+            local -r logfilesize=$(stat -c %s "$FILE_OF_LOGS")
             if [ $logfilesize -gt $EOS_LOG_TOOL_MAX_LOG_SIZE ] ; then
                 ErrorMsg "Sending log data failed (returned empty URL)!\nLog size $logfilesize bytes too large?"
             else
@@ -151,8 +157,8 @@ SendToInternet() {
 }
 
 UserNames() {
-    local low="$1"     # lowest  user id number
-    local high="$2"    # highest user id number
+    local -r low="$1"     # lowest  user id number
+    local -r high="$2"    # highest user id number
     local nr
     local user users=""
 
@@ -236,7 +242,7 @@ RemovePersonalData() {
 
     # User may create an additional filter for removing
     # any remaining personal data from the logs.
-    local filter="$DIR_OF_CONFIG"/${progname}-filter.bash
+    local -r filter="$DIR_OF_CONFIG"/${progname}-filter.bash
     if [ -r "$filter" ] ; then
         # $filter refers to user's own bash script
         # $FILE_OF_LOGS is the file containing all gathered logs
@@ -251,7 +257,7 @@ IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
 
 ForeignPkgInfo() {
     local pkg ver desc
-    local data ix l2
+    local data ix
 
     readarray -t data <<< $(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
 
@@ -269,11 +275,11 @@ Local_ShowForeignPackages() {
 }
 
 Local_ShowEosInstallLog() {
-    local install_logs_noroot=(
+    local -r install_logs_noroot=(
         /home/liveuser/endeavour-install.log
         $HOME/endeavour-install.log
     )
-    local install_logs_root=(
+    local -r install_logs_root=(
         /var/log/endeavour-install.log
         /var/log/Calamares.log
     )
@@ -301,34 +307,39 @@ GetNameAndVersion() { pacman -Q "$1" ; }
 
 Main()
 {
-    local progname=eos-log-tool
-
-    Breakpoint
-
     case "$1" in
         --changelog)
             $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)
             return
             ;;
     esac
-    local FILE_OF_LOGS=$HOME/$progname.logs
-    local FILE_OF_LOGS2="\$HOME/$progname.logs"
-    local DIR_OF_CONFIG="$HOME/.config/$progname"
-    local DIR_OF_CONFIG2="\$HOME/.config/$progname"
-    local SUDO_CMDS=":"
 
+    local -r progname=eos-log-tool
+    local -r FILE_OF_LOGS=$HOME/$progname.logs
+    local -r FILE_OF_LOGS2="\$HOME/$progname.logs"
+    local -r DIR_OF_CONFIG="$HOME/.config/$progname"
+    local -r DIR_OF_CONFIG2="\$HOME/.config/$progname"
+
+    local SUDO_CMDS=":"                                           # collects commands that need elevated privileges
+
+    # option values, can be changed in the config file
     local EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
-    local EOS_LOG_TOOL_MAX_LOG_SIZE=500000
+    local EOS_LOG_TOOL_MAX_LOG_SIZE=500000                        # bytes
 
     if [ -r /etc/$progname.conf ] ; then
-        source /etc/$progname.conf    # may change option values, e.g. for EOS_LOG_TOOL_JOURNAL_OPTS
+        source /etc/$progname.conf                                # may change option values
     fi
 
-    mkdir -p "$DIR_OF_CONFIG"
+    local FieldInfo=()                                            # information for the logging commands
 
-    rm -f "$FILE_OF_LOGS"
+    # offsets of array index for "fields" in FieldInfo and FieldInfo1
+    local -r offset_name=0
+    local -r offset_selected=1
+    local -r offset_installed=2
+    local -r offset_tip=3
+    local -r offset_command=4
 
-    local FieldInfo1=(
+    local -r FieldInfo1=(
         # Name                                   Selected    Installed  Tip                                                                    Command
         # ----                                   --------    ---------  ---                                                                    -------
 
@@ -351,22 +362,23 @@ Main()
         "Disks and partitions (lsblk)"           ""         ""         "List information about disks, partitions, labels, uuids, ..."          "lsblk -fm"
         "Disks and partitions (fdisk)"           ""         ""         "Another list of disk and partition information"                        "pkexec fdisk -l"
         "Pacman configuration file"              "true"     ""         "Pacman (package manager) configuration file"                           "cat /etc/pacman.conf"
-        "Foreign packages"                       "true"     ""         "List foreign (=not from pacman repositories) packages"                 "Local_ShowForeignPackages"
+        "Foreign packages"                       "true"     ""         "List foreign packages (=not from pacman repositories)"                 "Local_ShowForeignPackages"
     )
-    local FieldInfo=()
-    local offset_name=0
-    local offset_selected=1
-    local offset_installed=2
-    local offset_tip=3
-    local offset_command=4
 
-    local ButtonInfo=(
+    # information for the yad buttons
+    local -r ButtonInfo=(
         # Name                       Tip                                   Command
         # ----                       ---                                   -------
 
         "Save logs locally"          "Save logs to a local file"           ""                # 4
         "Send logs to the internet"  "Send selected logs to the internet"  "SendToInternet"  # 6
     )
+
+    # exit codes for the yad buttons
+    local -r code_cancel=1
+    local -r code_localsave=4
+    local -r code_send_to_internet=6
+    local -r code_close_window=252
 
     local cmds=()
     local sendToInternet=no
@@ -376,6 +388,9 @@ Main()
     local name selected installed tip command
     local ix jx
 
+    mkdir -p "$DIR_OF_CONFIG"
+    rm -f "$FILE_OF_LOGS"
+
     helptext+="<i><b>$(GetNameAndVersion $progname)</b></i>\n\n"
     helptext+="Select the logs you want to save locally and optionally share to the internet. \n"
     helptext+="Logs will will be saved to file <b>$FILE_OF_LOGS2</b>.\n"
@@ -383,20 +398,14 @@ Main()
     helptext+="Note1: Personal data will <i>always</i> be removed from the logs. \n"
     helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>. \n"
 
-    local code_cancel=1
-    local code_localsave=4
-    local code_send_to_internet=6
-    local code_close_window=252
-
-    local log_tool_cmd=(
+    local log_tool_cmd=(                 # the yad command
         eos_yad
         --scroll
         --columns=2
         --form
         --title="EndeavourOS log tools"
         --text="$helptext"
-        --height=550
-        # --width=500
+        --height=550                     # --width=?? not needed
         --image=dialog-question
         --button="Cancel!!Cancel this operation":$code_cancel
         --button="Save logs locally!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
@@ -431,30 +440,21 @@ Main()
         if [ -n "$installed" ] ; then
             IsInstalled "$installed" || continue
         fi
-        log_tool_cmd+=(--field="$name!$tip":chk $selected)
+        log_tool_cmd+=(--field="$name!$tip":chk $selected)            # adds a log command entry to the yad command
     done
-
-    Breakpoint
 
     # Run the yad command
 
     local result retval
-    result=$("${log_tool_cmd[@]}")
+
+    result=$("${log_tool_cmd[@]}")                                    # execute the yad command
     retval=$?
+
     case "$retval" in
-        $code_cancel | $code_close_window)
-            return
-            ;;
-        $code_localsave | $code_send_to_internet)
-            ;;
-        *)
-            echo "Invalid return code from yad!" >&2
-            ;;
+        $code_localsave | $code_send_to_internet) [ -n "$result" ] || DIE "No result from yad!" ;;
+        $code_cancel | $code_close_window)        return ;;
+        *)                                        DIE "Invalid exit code $retval from yad!" ;;
     esac
-    if [ -z "$result" ] ; then
-        echo "No result!" >&2
-        return 1
-    fi
 
     # Now $retval is either $code_localsave or $code_send_to_internet
 
@@ -469,8 +469,6 @@ Main()
         ((jx++))
     done
 
-    Breakpoint
-
     for ((ix=0; ix < ${#true_indexes[@]}; ix++)) ; do
         jx=${true_indexes[$ix]}
         command="${FieldInfo[$((jx + offset_command))]}"
@@ -483,8 +481,6 @@ Main()
         cmds+=("$command")
     done
 
-    Breakpoint
-
     if [ "$SUDO_CMDS" != ":" ] ; then
         pkexec bash -c "$SUDO_CMDS"
     fi
@@ -493,13 +489,9 @@ Main()
 
     RemovePersonalData    # always remove personal data!
 
-    Breakpoint
-
     case "$retval" in
-        $code_localsave)
-            Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info" ;;
-        $code_send_to_internet)
-            SendToInternet ;;
+        $code_localsave)         Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info" ;;
+        $code_send_to_internet)  SendToInternet ;;
     esac
 }
 
