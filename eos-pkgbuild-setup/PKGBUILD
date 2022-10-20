@@ -4,7 +4,7 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2022.10.10
+pkgver=2022.10.20
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -32,13 +32,15 @@ source=(
     nvidia-site-check-and-update-db
     archive-remove-old-locally
     archive-sync-to-remote
+    EndeavourOS-packages-buildlist
+    # pkg-archive-mgr
 
     # assets.conf.mirrors.mirror1
     # assets.conf.mirrors.endeavouros_calamares
     # assets.conf.repo-testing.x86_64
 )
 sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23e2025a82a1fdcf29887d9ac6c57cb23bb3473e217e2daf61a000c4e5c54a8'
-            'aa6763ac756f63e4f69a57f03cf1ef086bf00fd3974a6c751db1727b25f3803e84621d042e477c519ed4b2647ac3cb0dee3c0c4b45312ed89f90290d33ff932a'
+            'dda12a0b3f7ec2b501cef6edd29e94ca3255483ff4127fe7b51a9520fb377fc426b35c3fe7c66452e5b5dd4d393fbf9b1906543068829c551b6c45234dc02615'
             'ef917302c71ed4bcf345bb661229edb7ff96b31b16574d275e30c6d2c088e3e56f4c1254bf56d8b4e3bdd54eb2a27bf65da273b3d0ccfefab4ba42c676470902'
             '219948c044b97f7e5c5d257d7bda7b758530bfa3c0332dd36f68992077546085f642296985c4123b2eb8a8d8c36e7219232b4c983655d80b1a6026f6509f785f'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
@@ -55,7 +57,8 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '35f51ec5276dcda044d6689f75b93bc79673fb9bb4650ead0331f1d820549fe34941ffd6994bc8ca27516805f87f7d8eb03d2289bb9923cf2e7499266d8088f9'
             'bb26c94b2d80d2f798083c9f6b32b2bd6d475701b54d2fdd84ca1655b7eaeeb591559d4a948c35415c8476551d1797b399afd115806f8644f7f813d08e4c142c'
             'a5648470612516aa92ea10afe071e3a4675c39543a3224395c7c8dbd7183d9356f7673057371abb2ad24a15869f0503b2f4856d9c398b3ce83113136bfde00cf'
-            '25373cd870af3be787d1a823689ddbe1e51eb88b2ae6d23ce651e29e83b9c1652d178db4ffcfcda0ba5e1cd86c3e5a976bd9d484b55d326e4490ca5e57cd3925')
+            '25373cd870af3be787d1a823689ddbe1e51eb88b2ae6d23ce651e29e83b9c1652d178db4ffcfcda0ba5e1cd86c3e5a976bd9d484b55d326e4490ca5e57cd3925'
+            'ad095e4c48af75500c9badafc0a4a70717469f35fa38397c2a968703d0fc8c04711899de47720777e856d9557e944e6a6a06ad98cf10af1b0c96d65558919e2f')
 
 package() {
     local scripts=usr/share/endeavouros/scripts
@@ -63,6 +66,7 @@ package() {
     echo "VERSION=${pkgver}-$pkgrel" > $pkgname.version
 
     install -Dm755 $pkgname                    $pkgdir/usr/bin/$pkgname
+#    install -Dm755 pkg-archive-mgr             $pkgdir/usr/bin/pkg-archive-mgr
     install -Dm755 archive-sync-to-remote      $pkgdir/usr/bin/archive-sync-to-remote
     install -Dm755 archive-remove-old-locally  $pkgdir/usr/bin/archive-remove-old-locally
     install -Dm755 assets.make                 $pkgdir/usr/bin/assets.make
@@ -86,6 +90,7 @@ package() {
 #    install -Dm644 assets.conf.mirrors.endeavouros_calamares $pkgdir/$scripts/assets.conf.mirrors.endeavouros_calamares
 #    install -Dm644 assets.conf.repo-testing.x86_64           $pkgdir/$scripts/assets.conf.repo-testing.x86_64
     install -Dm644 $pkgname.version                          $pkgdir/$scripts/$pkgname.version
+    install -Dm644 EndeavourOS-packages-buildlist            $pkgdir/$scripts/EndeavourOS-packages-buildlist
 
     install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
 

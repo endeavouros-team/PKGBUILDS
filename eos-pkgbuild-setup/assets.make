@@ -901,6 +901,10 @@ Main2()
 
     test -r $ASSETS_CONF || DIE "cannot find local file $ASSETS_CONF"
 
+
+    local PKGNAMES=()
+    local PKGNAMES_WAIT=()
+
     source $ASSETS_CONF         # local variables (with CAPITAL letters)
 
     filelist_txt="$ASSETSDIR/repofiles.txt"
