@@ -82,6 +82,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
     paper-icon-theme
     paru/aur
 
+    qemu-arm-aarch64-static-bin
+
     rate-mirrors/aur
     reflector-bash-completion
     reflector-simple

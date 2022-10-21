@@ -26,7 +26,7 @@ local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
 
 export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD files (e.g. yay) may use this!
 
-source /usr/share/endeavouros/scripts/EndeavourOS-packages-buildlist || exit 1
+source EndeavourOS-packages-buildlist || exit 1
 
 # Add packages in PKGNAMES here if they shouldn't be built for now.
 # Also add the version to skip, like 'pkgname|version-to-skip', e.g. 'eos-lxdm-gtk3|0.5.3-5'.

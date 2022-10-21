@@ -1,6 +1,6 @@
 # EOS pkgbuild setup
 
-The build process relies mainly on github release assets instead of git folders. However, both are used for saving the built packages and can be used directly as pacman repositories.<br>
+The package build process relies mainly on github release assets instead of git folders. However, both are used for saving the built packages and can be used directly as pacman repositories.<br>
 Although git folders are faster and easier to manage, they will (eventually) consume much more space than release assets.
 
 ## Apps and files involved in building EOS packages.

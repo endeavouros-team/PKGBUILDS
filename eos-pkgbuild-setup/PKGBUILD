@@ -4,8 +4,8 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2022.10.20
-pkgrel=1
+pkgver=2022.10.21
+pkgrel=2
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -32,9 +32,9 @@ source=(
     nvidia-site-check-and-update-db
     archive-remove-old-locally
     archive-sync-to-remote
-    EndeavourOS-packages-buildlist
     # pkg-archive-mgr
 
+    # EndeavourOS-packages-buildlist
     # assets.conf.mirrors.mirror1
     # assets.conf.mirrors.endeavouros_calamares
     # assets.conf.repo-testing.x86_64
@@ -57,8 +57,7 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '35f51ec5276dcda044d6689f75b93bc79673fb9bb4650ead0331f1d820549fe34941ffd6994bc8ca27516805f87f7d8eb03d2289bb9923cf2e7499266d8088f9'
             'bb26c94b2d80d2f798083c9f6b32b2bd6d475701b54d2fdd84ca1655b7eaeeb591559d4a948c35415c8476551d1797b399afd115806f8644f7f813d08e4c142c'
             'a5648470612516aa92ea10afe071e3a4675c39543a3224395c7c8dbd7183d9356f7673057371abb2ad24a15869f0503b2f4856d9c398b3ce83113136bfde00cf'
-            '25373cd870af3be787d1a823689ddbe1e51eb88b2ae6d23ce651e29e83b9c1652d178db4ffcfcda0ba5e1cd86c3e5a976bd9d484b55d326e4490ca5e57cd3925'
-            'ad095e4c48af75500c9badafc0a4a70717469f35fa38397c2a968703d0fc8c04711899de47720777e856d9557e944e6a6a06ad98cf10af1b0c96d65558919e2f')
+            '25373cd870af3be787d1a823689ddbe1e51eb88b2ae6d23ce651e29e83b9c1652d178db4ffcfcda0ba5e1cd86c3e5a976bd9d484b55d326e4490ca5e57cd3925')
 
 package() {
     local scripts=usr/share/endeavouros/scripts
@@ -89,8 +88,8 @@ package() {
 #    install -Dm644 assets.conf.mirrors.mirror1               $pkgdir/$scripts/assets.conf.mirrors.mirror1
 #    install -Dm644 assets.conf.mirrors.endeavouros_calamares $pkgdir/$scripts/assets.conf.mirrors.endeavouros_calamares
 #    install -Dm644 assets.conf.repo-testing.x86_64           $pkgdir/$scripts/assets.conf.repo-testing.x86_64
+#    install -Dm644 EndeavourOS-packages-buildlist            $pkgdir/$scripts/EndeavourOS-packages-buildlist
     install -Dm644 $pkgname.version                          $pkgdir/$scripts/$pkgname.version
-    install -Dm644 EndeavourOS-packages-buildlist            $pkgdir/$scripts/EndeavourOS-packages-buildlist
 
     install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
 
