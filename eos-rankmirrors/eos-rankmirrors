@@ -328,17 +328,23 @@ WriteSystemMirrorlist() {
     local bak="$eos.$(date +%Y.%m.%d-%H.%M.%S)"
     local eosranked="$eos$ranked_suffix"
     local cmd=""
+    local success=yes
 
+    echo2 ""
     if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$hook_rank" = "no" ] ; then
-        echo2 ""
         notif_printf2 "Moving old EndeavourOS mirrorlist to %s.\n" "$bak"
         notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
         $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+        [ -r "$bak" ] || success=no    # probably password failure
     else
-        echo2 ""
         notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
         $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
+        [ -r "$new" ] && success=no    # probably password failure
     fi
+    case "$success" in
+        yes) notif_printf2 "New mirrorlist saved.\n" ;;
+        no)  notif_printf2 "New mirrorlist not saved.\n" ;;
+    esac
 }
 
 DumpOptions() {
@@ -539,7 +545,6 @@ Main()
 
     if [ "$save" = "yes" ] ; then
         WriteSystemMirrorlist "$eos" "$new"
-        notif_printf2 "Mirrorlist saved.\n"
     fi
 
     DeleteTmpFiles
