@@ -23,6 +23,8 @@ DIE() {
     exit 1
 }
 
+TT() { echo "<tt>$1</tt>" ; }
+
 MsgOld() {
     local -r msg="$1"
     local -r title="$2"
@@ -182,50 +184,72 @@ RemovePersonalData() {
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
     local user
+    local uid=$(id -u)
     local ssid="foobarfoobarfoobar"
     local mac="foobarfoobarfoobar"
+    local interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
 
     if [ -x /usr/bin/iwgetid ] ; then
         ssid=$(iwgetid -r)
         mac=$(iwgetid -ra)
     fi
 
+    local -r user2="_user_"
+    local -r mac2="_mac_address_"
+    local -r ip2="_ip_address_"
+    local -r ssid2="_ssid_"
+    local -r uid2="_uid_"
+    local -r interface2="_interface_"
+
     # hide real user names (that are found in /etc/passwd) from logs
     for user in $(UserNames 1000 50000) ; do
         sed -i "$FILE_OF_LOGS" \
-            -e 's| '$user' | _user_ |g' \
-            -e 's|/'$user'/|/_user_/|g' \
-            -e 's|"'$user'"|"_user_"|g' \
-            -e 's|'$user:$user'|_user_:_user_|g' \
-            -e 's|/'$user'|/_user_|g' \
-            -e 's| '$user'$| _user_|g' \
-            -e 's| '$user':| _user_:|g' \
-            -e "s|'"$user"'|'_user_'|g" \
-            -e 's| '$user'\.| _user_.|g' \
-            -e 's|:'$user' |:_user_ |g' \
-            -e 's|:'$user')|:_user_)|g' \
-            -e 's| '$user')| _user_)|g' \
-            -e 's| '$user'(| _user_(|g' \
+            -e "s| IN=$interface | IN=$interface2 |g" \
+            -e "s| $interface:| $interface2:|g" \
+            -e "s| $interface NIC| $interface2 NIC|g" \
+            -e "s|($interface)|($interface2)|g" \
+            -e "s| \([iI]nterface\) $interface\.| \1 $interface2\.|g" \
+            -e "s| on $interface\.| on $interface2\.|g" \
+            -e "s|uid=$uid |uid=$uid2 |g" \
+            -e "s|uid=$uid)|uid=$uid2)|g" \
+            -e "s|UID $uid|UID $uid2|g" \
+            -e "s|/run/user/$uid|/run/user/$uid2|g" \
+            -e "s|@$uid |@$uid2 |g" \
+            -e "s|/$uid]|/$uid2]|g" \
+            -e "s|owned by '$uid' |owned by '$uid2' |g" \
+            -e "s| $user | $user2 |g" \
+            -e "s|/$user/|/$user2/|g" \
+            -e "s|\"$user\"|\"$user2\"|g" \
+            -e "s|$user:$user|$user2:$user2|g" \
+            -e "s|/$user|/$user2|g" \
+            -e "s| $user$| $user2|g" \
+            -e "s| $user:| $user2:|g" \
+            -e "s|'$user'|'$user2'|g" \
+            -e "s| $user\.| $user2.|g" \
+            -e "s|:$user |:$user2 |g" \
+            -e "s|:$user)|:$user2)|g" \
+            -e "s| $user)| $user2)|g" \
+            -e "s| $user(| $user2(|g" \
             -e "s|‘$user:|‘_user_:|g" \
             -e "s|\[$user\]|[_user_]|g" \
-            -e 's|'$user'"|_user_"|g' \
-            -e "s|LOGNAME=$user|LOGNAME=_user_|" \
-            -e "s|USERNAME=$user|USERNAME=_user_|" \
-            -e "s|USER=$user|USER=_user_|" \
-            -e 's| with address .*\.$| with address _ip_address_.|' \
-            -e 's| new address record for .* on \(.*\)$| new address record for _ip_address on \1|' \
-            -e "s| policy: set '.*' (\(.*\)) as default for | policy: set '_ssid_' (\1) as default for |" \
-            -e "s| connection '.*' | connection '_ssid_' |" \
-            -e "s|set MAC address to .* (|set MAC address to _mac_address (|" \
-            -e "s| associate with .* (| associate with _mac_address (|" \
-            -e "s| access point '.*' | access point '_ssid_' |" \
-            -e "s|'ssid' value '.*'$|'ssid' value '_ssid_'|" \
-            -e "s|(SSID='.*' |(SSID='_ssid_' |" \
-            -e 's| wireless network ".*"$| wireless network "_ssid_"|' \
-            -e 's|192\.168\.[0-9]*\.[0-9]*|_ip_address_|' \
-            -e 's| fe80::[0-9a-f:]*\([ \.]\)|_ip_address_\1|' \
-            -e "s|'$ssid'|'_ssid_'|" \
-            -e "s|$mac|_mac_address|"
+            -e "s|$user\"|$user2\"|g" \
+            -e "s|LOGNAME=$user|LOGNAME=$user2|" \
+            -e "s|USERNAME=$user|USERNAME=$user2|" \
+            -e "s|USER=$user|USER=$user2|" \
+            -e "s| with address .*\.$| with address $ip2.|" \
+            -e "s| new address record for .* on \(.*\)$| new address record for $ip2 on \1|" \
+            -e "s| policy: set '.*' (\(.*\)) as default for | policy: set '$ssid2' (\1) as default for |" \
+            -e "s| connection '.*' | connection '$ssid2' |" \
+            -e "s|set MAC address to .* (|set MAC address to $mac2 (|" \
+            -e "s| associate with .* (| associate with $mac2 (|" \
+            -e "s| access point '.*' | access point '$ssid2' |" \
+            -e "s|'ssid' value '.*'$|'ssid' value '$ssid2'|" \
+            -e "s|(SSID='.*' |(SSID='$ssid2' |" \
+            -e "s| wireless network \".*\"$| wireless network \"$ssid2\"|" \
+            -e "s|192\.168\.[0-9]*\.[0-9]*|$ip2|" \
+            -e "s| fe80::[0-9a-f:]*\([ \.]\)|$ip2\1|" \
+            -e "s|'$ssid'|'$ssid2'|" \
+            -e "s|$mac|$mac2|"
             
     done
 
@@ -275,46 +299,83 @@ Local_ShowForeignPackages() {
 }
 
 Local_ShowEosInstallLog() {
-    local -r install_logs_noroot=(
-        /home/liveuser/endeavour-install.log
-        $HOME/endeavour-install.log
-    )
-    local -r install_logs_root=(
-        /var/log/endeavour-install.log
-        /var/log/Calamares.log
-    )
-    local fname
+    case "$instlog" in
+        /home/*)    Cmd cat "$instlog"
+                    ;;
+        /var/log/*) Cmd pkexec cat "$instlog"
+                    ;;
+        *)          WarningMsg "no EndeavourOS install log found!"
+                    echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
+                    ;;
+    esac
+}
 
-    for fname in "${install_logs_noroot[@]}" ; do
-        if [ -r "$fname" ] ; then
-            Cmd cat "$fname"
-            return
+FindInstallLog() {
+    # find where the install log exists
+    local -r instlogs=(
+        /home/liveuser/endeavour-install.log       # in the installer
+        /var/log/endeavour-install.log             # in the installed system
+        /var/log/Calamares.log                     # in the installed system (also older installs)
+    )
+    local log
+    for log in "${instlogs[@]}" ; do
+        if [ -f $log ] ; then                       #  note: some files in /var/log may be readable only by root, thus option -f
+            instlog="$log"
+            break
         fi
     done
-    for fname in "${install_logs_root[@]}" ; do
-        if [ -f "$fname" ] ; then
-            Cmd pkexec cat "$fname"
-            return
-        fi
-    done
-    if [ ! -f $fname ] ; then
-        WarningMsg "no EndeavourOS install log found!"
-        echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
-    fi
 }
 
 GetNameAndVersion() { pacman -Q "$1" ; }
 
+Options() {
+    local opts
+    local lopts="help,enable-journal,changelog"
+    local sopts="hj"
+
+    opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
+        Options -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            -j | --enable-journal)
+                enable_journal=yes
+                ;;
+            --changelog)
+                $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)
+                exit 0
+                ;;
+
+#            --option-with-value)   echo "$1: $2"; shift  ;;
+
+            -h | --help)
+                cat <<EOF >&2
+Usage: $progname [options]
+Options:
+  -j, --enable-journal         Enable showing journal logs. Note that some logs may be left with personal data.
+  -h, --help                   This help.
+EOF
+#            --changelog        Show changelog (=git commits) of this app.
+                exit 0
+                ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+}
+
 Main()
 {
-    case "$1" in
-        --changelog)
-            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)
-            return
-            ;;
-    esac
-
     local -r progname=eos-log-tool
+    local enable_journal=no
+
+    Options "$@"
+
     local -r FILE_OF_LOGS=$HOME/$progname.logs
     local -r FILE_OF_LOGS2="\$HOME/$progname.logs"
     local -r DIR_OF_CONFIG="$HOME/.config/$progname"
@@ -326,9 +387,38 @@ Main()
     local EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
     local EOS_LOG_TOOL_MAX_LOG_SIZE=500000                        # bytes
 
-    if [ -r /etc/$progname.conf ] ; then
-        source /etc/$progname.conf                                # may change option values
+    local -r conffile="/etc/$progname.conf"
+    local -r conffile_tt="<tt>$conffile</tt>"
+
+    if [ -r $conffile ] ; then
+        source $conffile                                # may change option values
     fi
+
+    local instlog=""
+
+    FindInstallLog
+
+    # commands to be logged
+    local -r cmd_inxi="inxi -Fxxc0z"
+    local -r cmd_journal0="journalctl -b -0"
+    local -r cmd_journal1="journalctl -b -1"
+    local -r cmd_journal2="journalctl -b -2"
+    local    cmd_journalX="journalctl $EOS_LOG_TOOL_JOURNAL_OPTS"
+    local -r cmd_blame="systemd-analyze blame"
+    local -r cmd_lspci="lspci -vnn"
+    local -r cmd_lsusb="lsusb"
+    local -r cmd_hwinfo="hwinfo --short"
+    local -r cmd_X_sess_err="cat ~/.xsession-errors"
+    local -r cmd_X_events="cat /var/log/Xorg.0.log"
+    local -r cmd_dm="cat /var/log/lightdm/lightdm.log"
+    local -r cmd_dm_X="cat /var/log/lightdm/x-0.log"
+    local -r cmd_grub="cat /boot/grub/grub.cfg"
+    local -r cmd_fstab="cat /etc/fstab"
+    local -r cmd_lsblk="lsblk -fm"
+    local -r cmd_fdisk="fdisk -l"
+    local -r cmd_pacman_conf="cat /etc/pacman.conf"
+    local -r cmd_instlog="cat $instlog"
+    local -r cmd_foreign="pacman -Qm"
 
     local FieldInfo=()                                            # information for the logging commands
 
@@ -339,30 +429,35 @@ Main()
     local -r offset_tip=3
     local -r offset_command=4
 
-    local -r FieldInfo1=(
-        # Name                                   Selected    Installed  Tip                                                                    Command
-        # ----                                   --------    ---------  ---                                                                    -------
-
-        "System journal, most recent"            "true"     ""         "Journal from the most recent boot"                                     "pkexec journalctl -b -0"
-        "System journal, 2nd most recent"        ""         ""         "Journal from the second most recent boot"                              "pkexec journalctl -b -1"
-        "System journal, 3rd most recent"        ""         ""         "Journal from the third most recent boot"                               "pkexec journalctl -b -2"
-        "System journal, user defined options"   ""         ""         "Journal by a user defined value in file <tt>/etc/$progname.conf</tt>"  "pkexec journalctl $EOS_LOG_TOOL_JOURNAL_OPTS"
-        "System boot-up performance statistics"  ""         ""         "Time that running units took to initialize"                            "systemd-analyze blame"
-        "Information about the PCI devices"      ""         ""         "Information related to PCI devices"                                    "lspci -vnn"
-        "Information about the USB devices"      ""         ""         "Information related to USB devices"                                    "lsusb"
-        "Information about hardware (inxi)"      "true"     "inxi"     "Information about hardware and software using <tt>inxi</tt>"           "inxi -Fxxc0z"
-        "Information about hardware (hwinfo)"    ""         ""         "Summary of hardware using <tt>hwinfo</tt>"                             "hwinfo --short"
-        "EndeavourOS install log"                ""         ""         "The log about the install of EndeavourOS"                              "Local_ShowEosInstallLog"
-        "X session errors"                       ""         ""         "Lists X session errors"                                                "cat ~/.xsession-errors"
-        "Xorg log"                               ""         ""         "Log about Xorg events"                                                 "cat /var/log/Xorg.0.log"
-        "Display manager log"                    ""         "lightdm"  "Display manager (lightdm) log"                                         "pkexec cat /var/log/lightdm/lightdm.log"
-        "Display manager log, X related"         ""         "lightdm"  "Display manager log, X server related"                                 "pkexec cat /var/log/lightdm/x-0.log"
-        "Grub configuration file"                ""         "grub"     "Grub (bootloader) configuration file"                                  "pkexec cat /boot/grub/grub.cfg"
-        "Filesystem mountpoints (fstab)"         ""         ""         "Static information about the filesystem and mointpoints"               "cat /etc/fstab"
-        "Disks and partitions (lsblk)"           ""         ""         "List information about disks, partitions, labels, uuids, ..."          "lsblk -fm"
-        "Disks and partitions (fdisk)"           ""         ""         "Another list of disk and partition information"                        "pkexec fdisk -l"
-        "Pacman configuration file"              "true"     ""         "Pacman (package manager) configuration file"                           "cat /etc/pacman.conf"
-        "Foreign packages"                       "true"     ""         "List foreign packages (=not from pacman repositories)"                 "Local_ShowForeignPackages"
+    local FieldInfo1=(
+        # Name                                                                Selected    Installed  Tip                                                                           Command
+        # ----                                                                --------    ---------  ---                                                                           -------
+    )
+    if  [ "$enable_journal" = "yes" ] ; then
+        FieldInfo1+=(
+        "System journal, most recent"                                         "true"     ""         "Journal from the most recent boot: $(TT "$cmd_journal0")"                     "pkexec $cmd_journal0"
+        "System journal, 2nd most recent"                                     ""         ""         "Journal from the second most recent boot: $(TT "$cmd_journal1")"              "pkexec $cmd_journal1"
+        "System journal, 3rd most recent"                                     ""         ""         "Journal from the third most recent boot: $(TT "$cmd_journal2")"               "pkexec $cmd_journal2"
+        "System journal, user defined options in file\n$conffile"             ""         ""         "Journal by user: $(TT "$cmd_journalX")"                                       "pkexec $cmd_journalX"
+        )
+    fi
+    FieldInfo1+=(
+        "System boot-up performance statistics"                               ""         ""         "Time that running units took to initialize: $(TT "$cmd_blame")"               "$cmd_blame"
+        "Information about the PCI devices"                                   ""         ""         "Information related to PCI devices: $(TT "$cmd_lspci")"                       "$cmd_lspci"
+        "Information about the USB devices"                                   ""         ""         "Information related to USB devices: $(TT "$cmd_lsusb")"                       "$cmd_lsusb"
+        "Information about hardware (inxi)"                                   "true"     "inxi"     "Information about hardware and software using $(TT "$cmd_inxi")"              "$cmd_inxi"
+        "Information about hardware (hwinfo)"                                 ""         ""         "Summary of hardware: $(TT "$cmd_hwinfo")"                                     "$cmd_hwinfo"
+        "EndeavourOS install log"                                             ""         ""         "The log about the install of EndeavourOS: $(TT "$cmd_instlog")"               "Local_ShowEosInstallLog"
+        "X session errors"                                                    ""         ""         "Lists X session errors: $(TT "$cmd_X_sess_err")"                              "$cmd_X_sess_err"
+        "Xorg log"                                                            ""         ""         "Log about Xorg events: $(TT "$cmd_X_events")"                                 "$cmd_X_events"
+        "Display manager log"                                                 ""         "lightdm"  "Display manager (lightdm) log: $(TT "$cmd_dm")"                               "pkexec $cmd_dm"
+        "Display manager log, X related"                                      ""         "lightdm"  "Display manager log, X server related: $(TT "$cmd_dm_X")"                     "pkexec $cmd_dm_X"
+        "Grub configuration file"                                             ""         "grub"     "Grub (bootloader) configuration file: $(TT "$cmd_grub")"                      "pkexec $cmd_grub"
+        "Filesystem mountpoints (fstab)"                                      ""         ""         "Static information about the filesystem and mointpoints: $(TT "$cmd_fstab")"  "$cmd_fstab"
+        "Disks and partitions (lsblk)"                                        ""         ""         "List information about disks, partitions, labels, uuids: $(TT "$cmd_lsblk")"  "cmd_lsblk"
+        "Disks and partitions (fdisk)"                                        ""         ""         "Another list of disk and partition information: $(TT "$cmd_fdisk")"           "pkexec $cmd_fdisk"
+        "Pacman configuration file"                                           "true"     ""         "Pacman (package manager) configuration file: $(TT "$cmd_pacman_conf")"        "$cmd_pacman_conf"
+        "Foreign packages"                                                    "true"     ""         "List foreign packages (=not from pacman repositories): $(TT "$cmd_foreign")"  "Local_ShowForeignPackages"
     )
 
     # information for the yad buttons
@@ -383,10 +478,9 @@ Main()
     local cmds=()
     local sendToInternet=no
     local removePersonalInfo=no
-    local xx
     local helptext=""
     local name selected installed tip command
-    local ix jx
+    local ix jx xx count=0
 
     mkdir -p "$DIR_OF_CONFIG"
     rm -f "$FILE_OF_LOGS"
@@ -394,9 +488,10 @@ Main()
     helptext+="<i><b>$(GetNameAndVersion $progname)</b></i>\n\n"
     helptext+="Select the logs you want to save locally and optionally share to the internet. \n"
     helptext+="Logs will will be saved to file <b>$FILE_OF_LOGS2</b>.\n"
-    helptext+="If you share, you'll receive a URL which refers to the shared page.\n\n"
-    helptext+="Note1: Personal data will <i>always</i> be removed from the logs. \n"
-    helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>. \n"
+    helptext+="If you share, you'll receive a URL which refers to the shared page.\n"
+    helptext+="Note1: $progname tries to remove personal data from the logs. but removal is not always perfect. \n"
+    helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>.\n\n"
+    helptext+="Tip: Use option --help to see <i>all</i> available features!\n"
 
     local log_tool_cmd=(                 # the yad command
         eos_yad
@@ -405,7 +500,7 @@ Main()
         --form
         --title="EndeavourOS log tools"
         --text="$helptext"
-        --height=550                     # --width=?? not needed
+        # --width=600        # not needed?
         --image=dialog-question
         --button="Cancel!!Cancel this operation":$code_cancel
         --button="Save logs locally!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
@@ -440,8 +535,10 @@ Main()
         if [ -n "$installed" ] ; then
             IsInstalled "$installed" || continue
         fi
+        ((count++))
         log_tool_cmd+=(--field="$name!$tip":chk $selected)            # adds a log command entry to the yad command
     done
+    log_tool_cmd+=( --height=$((35 * count)) )            # was: 550
 
     # Run the yad command
 
@@ -490,7 +587,7 @@ Main()
     RemovePersonalData    # always remove personal data!
 
     case "$retval" in
-        $code_localsave)         Msg "Log file <tt>$FILE_OF_LOGS2</tt> created." "Info" ;;
+        $code_localsave)         Msg "Log file $(TT "$FILE_OF_LOGS2") created." "Info" ;;
         $code_send_to_internet)  SendToInternet ;;
     esac
 }
