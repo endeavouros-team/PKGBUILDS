@@ -994,12 +994,12 @@ OwnCommands() {
 ### These variables are required:
 
 CreateNotebookCommands() {
-    IsInstalling && {
+    if IsInstalling ; then
         _NOTEBOOK_TABS=(                             # names of functions above
             INSTALL
             GeneralInfo
         )
-    } || {
+    else
         _NOTEBOOK_TABS=(                             # names of functions above
             GeneralInfo
             AfterInstall
@@ -1007,7 +1007,7 @@ CreateNotebookCommands() {
             UsefulTips
             AddMoreApps
         )
-    }
+    fi
     if [ -n "$welcome_own_commands" ] ; then
         _NOTEBOOK_TABS+=(OwnCommands)
     fi
@@ -1358,7 +1358,7 @@ Options:
                   X value syntax is the same as in 'sleep'.
 --enable | -f     Enable this $PRETTY_PROGNAME app.
 --disable         Disable this $PRETTY_PROGNAME app.
---once            Enable $PRETTY_PROGNAME once even if disabled.
+--once | -1       Enable $PRETTY_PROGNAME once even if disabled.
 --version         Show the version of this app.
 --lang=X          Use language X on the user interface.
 --changelog       Show the changelog of this package.
@@ -1569,7 +1569,7 @@ StartHere() {
             --help|-h) WelcomeHelp ; return ;;
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
-            --once) allow_run_if_disabled=yes ;;
+            --once | -1) allow_run_if_disabled=yes ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) ;;                                             # already handled!
             #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
