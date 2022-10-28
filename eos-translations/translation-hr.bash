@@ -309,3 +309,28 @@ _tr_add2 after_install_r8168_tip     "Biraj između r8168 i r8169 upravljačkih 
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "informacije"                                         # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "više informacija o ovom Desktop/Window Manager-u"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Odaberi popularne aplikacije za instalaciju"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Odaberi popularne aplikacije i instaliraj ih"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Zabilješke o Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Zabilješke o podešavanjima bluetooth-a"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Informacije o vatrozidu"
+_tr_add2 after_install_fwtip         "Informacije o zadanom vatrozidu"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Prilagodba procesa instalacije"
+_tr_add2 ins_custom_tip              "Kako prilagoditi proces instalacije"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Najnovije novosti o Arch-u"
+_tr_add2 daily_assist_anewstip       "Prikaži najnovije novosoti o Arch-u u browser-u"
+
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Bitne novosti pri"
+_tr_add2 nb_nofify_user2             "Molim kliknite na"                                  # Software News
+_tr_add2 nb_nofify_user3             "dugme u lijevom donjem uglu ovog prozora."
