@@ -4,14 +4,12 @@
 # calamares_config_ce - Community Edition settings
 
 pkgname=calamares-git
-_eos_changes=EndeavourOS-calamares
 _reponame=calamares
-_calamares_ver=3.3-alpha
-pkgver=588.76d71e1
+pkgver=3912.5630610d
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
-url="https://github.com/endeavouros-team"
+url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
 optdepends=('calamares_config_default' 'calamares_config_ce')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
@@ -21,56 +19,20 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcorea
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
 provides=("calamares")
 options=(!strip !emptydirs)
-source=(
-  "${_eos_changes}::git+https://github.com/endeavouros-team/$_eos_changes.git#branch=main"
-  "${_reponame}::git+https://github.com/$_reponame/$_reponame.git#branch=$_reponame"
-  "calamares.desktop.patch"
-)
+source=("git+https://github.com/endeavouros-team/$_reponame.git")
 
-sha256sums=('SKIP'
-            'SKIP'
-            '7d81e5db447c58ed30d45c7ca5e4c4c19da107d0a3d75d1bdd24f8749197ea6d')
+sha256sums=('SKIP')
             
 pkgver() {
-  cd "$_eos_changes"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-    # mv "$_reponame-$_calamares_ver"            "$_reponame"
-    # remove upstream modules packagechooser and netinstall for replacing with testing ones
-    rm -r "$_reponame/src/modules/"{bootloader,packages,packagechooserq,partition,dracutlukscfg}
-
-    # move extra modules from external repo inside calamares sources
-    rsync -va "$_eos_changes/calamares-extra-modules/"*       "$_reponame/"
-    #rm -rf "$_eos_changes"
-
-    mkdir -p "$_reponame/build/$pkgname"
-
-    # remove default branding // keep package small
-    rm -r "$_reponame/src/branding/default"
-
-    # change some files on the go - distro-specific
-    sed -i "s?configuration files\" OFF?configuration files\" ON?g" "$_reponame/CMakeLists.txt"
-    patch "$_reponame/calamares.desktop" < calamares.desktop.patch
-
-    # remove hardcoded quiet from grubcfg
-    sed -i "s?    kernel_params = \[\"quiet\"\]?    kernel_params = \[\]?" "$_reponame/src/modules/grubcfg/main.py"
-}
-
 build() {
-    cd "$_reponame/build"
-    cmake .. \
-    -DCMAKE_BUILD_TYPE=Debug  \
-    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
-    -DBoost_NO_BOOST_CMAKE=ON \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DINSTALL_CONFIG=OFF \
+    cmake -B build -S "${srcdir}/calamares" \
     -DWEBVIEW_FORCE_WEBKIT=OFF \
     -DWITH_PYTHONQT=OFF \
     -DWITH_KF5DBus=OFF \
     -DWITH_APPSTREAM=OFF \
-    cmake .. \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     -DBoost_NO_BOOST_CMAKE=ON \
@@ -81,14 +43,12 @@ build() {
     finishedq initcpio keyboardq license localeq notesqml oemid \
     openrcdmcryptcfg plymouthcfg plasmalnf services-openrc \
     summaryq tracking usersq webview welcomeq"
-    export DESTDIR="$srcdir/$_reponame/build/$pkgname"
-    make install
+    export DESTDIR="$srcdir/build"
+    make -C build
 }
 
 package() {
-    local destdir="/usr"
-
-    # Commom install -D doesn't work
-    cp -r "${srcdir}/${_reponame}/build/$pkgname/"* "${pkgdir}${destdir}"
-
+    make -C build DESTDIR="${pkgdir}" install
+    install -dm 755 "${pkgdir}/etc"
+    cp -rp "${srcdir}/calamares/data/eos" "${pkgdir}/etc/calamares"
 }
