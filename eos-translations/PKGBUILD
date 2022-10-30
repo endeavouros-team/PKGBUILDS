@@ -3,7 +3,7 @@
 
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
-pkgver=1.19
+pkgver=1.20
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -24,6 +24,7 @@ source=(
   $url/translation-fr.bash
   $url/translation-hi.bash
   $url/translation-hr.bash
+  $url/translation-is.bash
   $url/translation-it.bash
   $url/translation-pl.bash
   $url/translation-pt.bash
@@ -48,6 +49,7 @@ sha512sums=('4bf1c5216c0ed969a41bf43b0fc28b8cb80b6deb4482cdb1e7312adcf3c4e8ac2f7
             '263cf7bc20773b95dd830d12fa40239dfecf9f7adb7a7f627acb3f8f5752c25996f8fa0f8a0dd799b1f698566a060821d0ea38476fe650959e66218f3db40a01'
             'a201a5257b1916e21b86936b75a8217d56a245b09ec80e62eee6bb8d3288a5023c2ba11ac86f03307e0ad01a1ad9216cfd2949fc72f15d931d0046bafc991eb8'
             '3d54d139eaa5cef0b4960ab2a912ab76429bc59b727bf5fbf27fd9495c8b1631a33d85e7d3084044c07887d6353e8c3d0d3cc1ea1854b793669a4b9d14a956e3'
+            '2282de363c4da66b1fce97c9adb9a158e3fd4b5abff1c75695ca8ae144238a1ccbdc6fb6b637d4bbb11dcd6509f9797b66da71026b49a9b9ccda416dbf4bc71f'
             'b6de26693dd1cec96e3eae6880408dae8a947d7d89d0958a1afa09e1c786976f58cb3bc797b26cf2ce0d4a402e9ea1ed27c4d8345d6788b3861954cfdff2baf2'
             '059470680fa82160c54d652e892454d442d7fb29ac0e07251e1ebc22cd5c51c7f09788d52eb8ef721f25305741a264dbc14664d61d16046148e279455d708bde'
             '918c26c4d1362fdd8603ce9ec5c10e75973192d279bcb981a839a5b0fe417eaec93b8ec5870f2ef8dfa6f9fb65ce9a7dc030f26992a46dc0bb59469f2a0678ab'
