@@ -4,8 +4,8 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2022.10.21
-pkgrel=2
+pkgver=2022.11.02
+pkgrel=1
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -34,7 +34,6 @@ source=(
     archive-sync-to-remote
     # pkg-archive-mgr
 
-    # EndeavourOS-packages-buildlist
     # assets.conf.mirrors.mirror1
     # assets.conf.mirrors.endeavouros_calamares
     # assets.conf.repo-testing.x86_64
@@ -88,7 +87,6 @@ package() {
 #    install -Dm644 assets.conf.mirrors.mirror1               $pkgdir/$scripts/assets.conf.mirrors.mirror1
 #    install -Dm644 assets.conf.mirrors.endeavouros_calamares $pkgdir/$scripts/assets.conf.mirrors.endeavouros_calamares
 #    install -Dm644 assets.conf.repo-testing.x86_64           $pkgdir/$scripts/assets.conf.repo-testing.x86_64
-#    install -Dm644 EndeavourOS-packages-buildlist            $pkgdir/$scripts/EndeavourOS-packages-buildlist
     install -Dm644 $pkgname.version                          $pkgdir/$scripts/$pkgname.version
 
     install -Dm644 eos-mirrorcheck.conf   $pkgdir/etc/eos-mirrorcheck.conf
