@@ -53,7 +53,9 @@ PkgName() {
 
 Installed() {
     local version xx
-    local running=$(pacman -Q $(cat /proc/cmdline | sed 's|.*/vmlinuz-\([^ ]*\) .*|\1|') | awk '{print $2}')
+    local cmdline=$(cat /proc/cmdline)
+    local kernel=$(echo "$cmdline" | sed -E -e 's|.*initramfs-(.*).img .*|\1|' -e 's|.*/vmlinuz-([^ ]*) .*|\1|')
+    local running=$(pacman -Q $kernel | awk '{print $2}')
     local ind
     cmd+=(--field="$(Header)":LBL "")
     for xx in "${kernels[@]}" ; do
