@@ -1,7 +1,8 @@
-# Maintainers: Portergos Linux <portergoslinux@gmail.com>, EndeavourOS <info@endeavouros.com>
+# Maintainers: EndeavourOS <info@endeavouros.com>
+# Earlier maintainers: Portergos Linux <portergoslinux@gmail.com>
 
 pkgname=endeavouros-mirrorlist
-pkgver=4.9
+pkgver=4.10
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -16,7 +17,7 @@ conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
 source=($_url/$pkgname)
-sha512sums=('fcb1e3e8ceca32620612216be59e9f9c6ed180f521d02173244097af65ab1897c5b72c903a65906c558669e6b9a0523f8c7789e02bf3c3799f0ec78062c19067')
+sha512sums=('06202b76960f4a04f080bec6329989dbd641eaf4c263d2a2cccd3b8bf1177be253c9889803276ff2b9027d7f9990b5a18c12c23b401b3863308d09a4ae395876')
 
 _not_used_prepare() {
     # Create endeavouros-mirrorlist.offline for offline install.
