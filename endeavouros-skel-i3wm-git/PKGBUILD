@@ -1,5 +1,4 @@
-# Maintainer: EndeavourOS <info@endeavouros.com>
-# Contributor: joekamprad <joekamprad@endeavouros.com>
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 _pkgname=endeavouros-i3wm-setup
 pkgname=endeavouros-skel-i3wm-git
