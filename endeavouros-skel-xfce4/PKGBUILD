@@ -1,5 +1,4 @@
-# Maintainer: EndeavourOS <info@endeavouros.com>
-# Contributor: joekamprad <joekamprad@endeavouros.com>
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
