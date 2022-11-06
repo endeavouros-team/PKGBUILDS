@@ -34,7 +34,7 @@ Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
 Choose() {
     local version exist xx
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Checkboxes for installing/uninstalling kernel packages":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
         exist="$(Exist)"
@@ -45,9 +45,9 @@ Choose() {
 
 PkgName() {
     local xx
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Kernel package name":LBL "")
     for xx in "${kernels[@]}" ; do
-        cmd+=(--field="$(FormatName "$xx")":LBL "")
+        cmd+=(--field="${smallBegin}$(FormatName "$xx")${smallEnd}":LBL "")
     done
 }
 
@@ -57,7 +57,7 @@ Installed() {
     local kernel=$(echo "$cmdline" | sed -E -e 's|.*initramfs-(.*).img .*|\1|' -e 's|.*/vmlinuz-([^ ]*) .*|\1|')
     local running=$(pacman -Q $kernel | awk '{print $2}')
     local ind
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. A * marks the currently running kernel. A bolded string means the latest K.o. version":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
         ind=""
@@ -68,9 +68,9 @@ Installed() {
             esac
         fi
         if IsLatestKO "$version" ; then
-            cmd+=(--field="$(FormatVersion "<b>$version</b>" "$ind")":LBL "")
+            cmd+=(--field="${smallBegin}$(FormatVersion "<b>$version</b>" "$ind")${smallEnd}":LBL "")
         else
-            cmd+=(--field="$(FormatVersion "$version" "$ind")":LBL "")
+            cmd+=(--field="${smallBegin}$(FormatVersion "$version" "$ind")${smallEnd}":LBL "")
         fi
     done
 }
@@ -89,10 +89,10 @@ StableVersion() {
 
 Stable() {
     local version xx
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the stable repos":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(StableVersion "$xx")"
-        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+        cmd+=(--field="${smallBegin}$(FormatVersion "$version")${smallEnd}":LBL "")
     done
 }
 
@@ -108,11 +108,11 @@ Testing() {
 
     [ -n "$testinginfo" ] || DIE "Fetching info from https://archlinux.org failed!"
 
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the testing repos":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
         test -n "$version" || version="$na"
-        cmd+=(--field="$(FormatVersion "$version")":LBL "")
+        cmd+=(--field="${smallBegin}$(FormatVersion "$version")${smallEnd}":LBL "")
     done
 }
 
@@ -131,11 +131,11 @@ KernelOrgVersion() {
 
 KernelOrg() {
     local version versions xx count=${#kernels[@]}
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Kernel category at kernel.org":LBL "")
     for xx in "${org_kernels[@]}" ; do
         readarray -t versions <<< "$(KernelOrgVersion "$xx")"
         for version in "${versions[@]}" ; do
-            cmd+=(--field="$(FormatName "$xx")":LBL "")
+            cmd+=(--field="${smallBegin}$(FormatName "$xx")${smallEnd}":LBL "")
             ((count--))
         done
     done
@@ -145,19 +145,19 @@ KernelOrg() {
 KOVersion() {
     local version versions xx count=${#kernels[@]}
     local stableversion="$(KernelOrgVersion stable)"
-    cmd+=(--field="$(Header)":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Latest version announced at kernel.org":LBL "")
     for xx in "${org_kernels[@]}" ; do
         readarray -t versions <<< "$(KernelOrgVersion "$xx")"
         case "$xx" in
             stable|longterm)
                 for version in "${versions[@]}" ; do
-                    cmd+=(--field="$(FormatVersion "<b>$version</b>")":LBL "")
+                    cmd+=(--field="${smallBegin}$(FormatVersion "<b>$version</b>")${smallEnd}":LBL "")
                     ((count--))
                 done
                 ;;
             *)
                 for version in "${versions[@]}" ; do
-                    cmd+=(--field="$(FormatVersion "$version")":LBL "")
+                    cmd+=(--field="${smallBegin}$(FormatVersion "$version")${smallEnd}":LBL "")
                     ((count--))
                 done
                 ;;
@@ -185,7 +185,7 @@ IsLatestKO() {
 
 PaddingLines() {
     for ((xx=0; xx<count; xx++)) ; do
-        cmd+=(--field="$(FormatVersion "")":LBL "")
+        cmd+=(--field="${smallBegin}$(FormatVersion "")${smallEnd}":LBL "")
     done
 }
 
@@ -211,6 +211,7 @@ AkmConfig() {
         [ -n "$KERNEL_HEADER_WITH_KERNEL" ] && connect_header_with_kernel="$KERNEL_HEADER_WITH_KERNEL"
         [ -n "$AKM_KERNELS_HEADERS" ]       && akm_kernels_headers_user=("${AKM_KERNELS_HEADERS[@]}")
         [ -n "$AKM_WINDOW_WIDTH" ]          && akm_window_width=$AKM_WINDOW_WIDTH
+        [ -n "$AKM_PREFER_SMALL_WINDOW" ]   && small_font=$AKM_PREFER_SMALL_WINDOW
 
         Line2 "==> Config file $conf read."
     fi
@@ -242,12 +243,14 @@ Options() {
         case "$arg" in
             --connect-header) connect_header_with_kernel=yes ;;
             --scroll) scroll=yes ;;
+            --small) small_font=yes ;;
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options]
 options:
     --connect-header      Make kernel and header package go together at install or uninstall.
     --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
+    --small               Make the akm window smaller, meant for helping with small displays at 1366x768 resolution.
     --help | -h           This help.
 EOF
                 exit 0
@@ -359,11 +362,19 @@ Main()
     local akm_kernels_headers_user=()
     local akm_window_width=900
     local scroll=yes
+    local small_font=no                    # yes = suitable for a small window, like 1366x768 resolution
+    local smallBegin=""
+    local smallEnd=""
     local nrofkernelitems                  # 8 with only upstream kernels
 
     CommonStuff
     AkmConfig
     Options "$@"
+
+    if [ "$small_font" = "yes" ] ; then
+        smallBegin="<small>"
+        smallEnd="</small>"
+    fi
 
     Line2 "==> Info: detecting available kernel packages."
     kernels=( $(AvailableKernelsAndHeaders) )
@@ -401,20 +412,23 @@ Main()
     local t1=""
     local km="*"
 
+    t1+="$smallBegin"
     t1+="Here you'll see information about currently installed and available Linux kernels.\n"
     t1+="You can install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n"
     t1+="\n"
-    t1+="Column headers:\n"
-    t1+="<tt>"
-    t1+="    Choose        Checkboxes for installing/uninstalling kernel packages.\n"
-    t1+="    PkgName       Kernel package name.\n"
-    t1+="    Installed     Installed kernel package versions. A $km marks the currently running kernel.\n"
-    t1+="                  A bolded string means the latest K.o. version.\n"
-    t1+="    Stable        Versions available from the stable repos.\n"
-    t1+="    Testing       Versions available from the testing repos.\n"
-    t1+="    $KOName  Kernel category at kernel.org.\n"
-    t1+="    $KOVersionName   Latest version announced at kernel.org.\n\n"
-    t1+="</tt>"
+    if [ "$small_font" = "no" ] ; then
+        t1+="Column headers:\n"
+        t1+="<tt>"
+        t1+="    Choose        Checkboxes for installing/uninstalling kernel packages.\n"
+        t1+="    PkgName       Kernel package name.\n"
+        t1+="    Installed     Installed kernel package versions. A $km marks the currently running kernel.\n"
+        t1+="                  A bolded string means the latest K.o. version.\n"
+        t1+="    Stable        Versions available from the stable repos.\n"
+        t1+="    Testing       Versions available from the testing repos.\n"
+        t1+="    $KOName  Kernel category at kernel.org.\n"
+        t1+="    $KOVersionName   Latest version announced at kernel.org.\n\n"
+        t1+="</tt>"
+    fi
     t1+="Your current repos are either Stable or Testing (see /etc/pacman.conf).\n"
     t1+="Marking <b>$na</b> means: info not available.\n"
     if [ "$connect_header_with_kernel" = "yes" ] ; then
@@ -426,6 +440,7 @@ Main()
         t1+="You have configured the header and kernel to install/uninstall separately (default behavior).\n"
         t1+="See file /etc/akm.conf for more info.\n"
     fi
+    t1+="$smallEnd"
     local linenr="$(FindNewRepoLineNumber)"
     local editor="$(PacmanConfEditor $linenr)"
 
@@ -436,11 +451,11 @@ Main()
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
         --image=$WELCOME_ICON_SYSTEM_UPDATE
-        --button=" Changelog!applications-development!Show latest changes of this program":"Changelog"
+        --button=" ${smallBegin}Changelog${smallEnd}!applications-development!Show latest changes of this program":"Changelog"
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
-        --button=" Help!help-contents!Helps to use $progname":"Manual"
-        --button=' Cancel!gtk-cancel!Change nothing':1
-        --button=' Execute!system-run!Make your changes':0
+        --button=" ${smallBegin}Help${smallEnd}!help-contents!Helps to use $progname":"Manual"
+        --button=" ${smallBegin}Cancel${smallEnd}!gtk-cancel!Change nothing":1
+        --button=" ${smallBegin}Execute${smallEnd}!system-run!Make your changes":0
     )
     if [ "$scroll" = "yes" ] ; then
         cmd+=(--scroll
