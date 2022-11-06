@@ -1,0 +1,17 @@
+# Maintainer: joekamprad<joekamprad at endeavouros.com>
+
+pkgname=eos-settings-lxde
+pkgver=1.0
+pkgrel=1
+pkgdesc="LXDE settings for EndeavourOS"
+arch=('any')
+license=('GPL3')
+source=('org.freedesktop.Notifications.service'
+        'panel')
+sha256sums=('75b67e1e4d9cfa1c2316a4a35f2468f6c9977c314322449023af0ef1bbf82ca4'
+            '2d2bfb48da548fc0b683ac5cbd3a1d92ef09bd7e7806d6b0ed83b8530c950ea8')
+
+package() {
+    install -Dm755  "${srcdir}/org.freedesktop.Notifications.service" "${pkgdir}/etc/skel/.local/share/dbus-1/services/org.freedesktop.Notifications.service"
+    install -Dm755  "${srcdir}/panel" "${pkgdir}/etc/skel/.config/lxpanel/LXDE/panels/panel"
+}

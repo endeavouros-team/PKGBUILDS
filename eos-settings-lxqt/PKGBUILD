@@ -1,0 +1,17 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+pkgname=eos-settings-lxqt
+pkgver=1.0
+pkgrel=1
+pkgdesc="LXQT settings for EndeavourOS"
+arch=('any')
+license=('GPL')
+source=('set_once_lxqt.desktop'
+        'set_once_lxqt.sh')
+sha256sums=('f7716efbd992991d8bfac8d3d5487b264bddc9da759a571c3d3426b0fa8a982d'
+            '1d8d28092b070d0fe0bec87cf015bda6ff8ea38c6da54ef8f4dd187fde6a7e60')
+
+package() {
+    install -Dm755  "${srcdir}/set_once_lxqt.desktop" "${pkgdir}/etc/skel/.config/autostart/set_once_lxqt.desktop"
+    install -Dm755  "${srcdir}/set_once_lxqt.sh" "${pkgdir}/etc/skel/"
+}

@@ -1,0 +1,5 @@
+[Desktop Entry]
+Exec=bash $HOME/set_once_lxqt.sh
+Name=set_once-lxqt
+Type=Application
+Version=1.0

@@ -1,0 +1,26 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+pkgname=eos-settings-mate
+pkgver=1.0
+pkgrel=1
+pkgdesc="MATE settings for EndeavourOS"
+arch=('any')
+groups=('EndeavourOS')
+license=('GPL')
+source=('set_once_mate.sh'
+        'set_once_mate.desktop'
+        '99_endeavouros-mate.gschema.override'
+        'endeavouros.layout')
+sha256sums=('660ae2e9451c1e23ef85ba715723606e92466deb380b889a23a5c20687074e69'
+            '54c23fcb497701814ef6b46b176f5493cf566ec66a8aaa993697cb2377e5bef2'
+            '6f7bfc230a8d3f034c8274481365f9843b801cdcc125375fa1ba989733a082a3'
+            '65ff5ef067ce69804afbff708e2956c64ed5bb83e4c03af577d85fea88013d3a')
+
+package() {
+    PREFIX=/etc/skel
+    cd "$_pkgname"
+    install -Dm755 "${srcdir}/set_once_mate.sh" "${pkgdir}${PREFIX}/set_once_mate.sh"
+    install -Dm644 "${srcdir}/set_once_mate.desktop" "${pkgdir}${PREFIX}/.config/autostart/set_once_mate.desktop"
+    install -Dm755 "${srcdir}/99_endeavouros-mate.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-mate.gschema.override"
+    install -Dm755 "${srcdir}/endeavouros.layout" "${pkgdir}/usr/share/mate-panel/layouts/endeavouros.layout"
+}

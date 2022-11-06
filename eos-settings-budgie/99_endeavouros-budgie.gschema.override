@@ -1,0 +1,14 @@
+[org.gnome.desktop.interface]
+cursor-theme='Qogir'
+document-font-name='Noto Sans 10'
+font-name='Noto Sans 10'
+gtk-theme='Arc-Darker'
+icon-theme='Qogir'
+monospace-font-name='Source Code Pro 10'
+	
+[com.solus-project.icon-tasklist]
+pinned-launchers=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']
+
+[com.solus-project.budgie-panel]
+builtin-theme=true
+dark-theme=false
