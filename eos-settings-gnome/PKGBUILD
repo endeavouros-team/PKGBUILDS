@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-gnome
-pkgver=1.2
+pkgver=1.3
 pkgrel=1
 pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
@@ -10,9 +10,11 @@ url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/$pkgname/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('ff76fb7caede7ba17e4eae62aa7c07bdfad27d368d9874cb16fd320509e2c140')
+sha256sums=('105d0cab1728949675061c5f9c7010f5cf1994dfd46d8d9de4fe3090b1e6ac92')
 
 package() {
     install -Dm755 "${srcdir}/${pkgname}-${pkgver}/99_endeavouros-gnome.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-gnome.gschema.override"
     install -Dm644 "${srcdir}/${pkgname}-${pkgver}/endeavouros.xml" "${pkgdir}/usr/share/gnome-background-properties/endeavouros.xml"
+    install -Dm644 "${srcdir}/${pkgname}-${pkgver}/endeavouros-wallpaper-light.png" "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper-light.png"
+    install -Dm644 "${srcdir}/${pkgname}-${pkgver}/endeavouros-wallpaper-dark.png" "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper-dark.png"
 }
