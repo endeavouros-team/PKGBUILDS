@@ -9,7 +9,7 @@ url="https://github.com/endeavouros-team/$pkgname"
 license=('GPL3')
 depends=('plasma-workspace')
 source=("$pkgname-$pkgver.tar.gz::$url//archive/refs/tags/$pkgver.tar.gz")
-sha256sums=('d0532b988989deefb33d7fef915a25100bb91ede76fc411fe4f1888f3eb316c3')
+sha256sums=('31418195b0f34f376544d46560201c4d5e6484ec552f38766d2faf9ce306d7de')
 
 package() {
 	cp -r "${srcdir}/${pkgname}-${pkgver}"/{usr,etc} "${pkgdir}/."
