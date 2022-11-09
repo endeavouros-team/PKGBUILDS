@@ -18,6 +18,6 @@ sha256sums=('633183b976b8d57f45854a41d532a4e88076103d0ac1a4aa48e96fa4d8c1d3c6'
 package() {
     install -dm 755 $pkgdir/usr/share/sddm/themes/endeavouros
     install -dm 755 $pkgdir/etc/sddm.conf.d/
-    cp -r --no-preserve=ownership $srcdir/$pkgname/endeavouros $pkgdir/usr/share/sddm/themes/
-    cp --no-preserve=ownership $srcdir/$pkgname/10-endeavouros.conf $pkgdir/etc/sddm.conf.d/
+    cp -r --no-preserve=ownership $srcdir/$pkgname-${pkgver}.${pkgrel}/endeavouros $pkgdir/usr/share/sddm/themes/
+    cp --no-preserve=ownership $srcdir/$pkgname-${pkgver}.${pkgrel}/10-endeavouros.conf $pkgdir/etc/sddm.conf.d/
 }
