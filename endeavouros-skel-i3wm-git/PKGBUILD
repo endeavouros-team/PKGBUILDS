@@ -27,9 +27,7 @@ package() {
     cp -R ".config/dunst" "${pkgdir}${PREFIX}/.config/dunst"
     cp -R ".config/i3" "${pkgdir}${PREFIX}/.config/i3"
     chmod -R +x "${pkgdir}${PREFIX}/.config/i3/scripts"
-    cp -R ".config/nitrogen" "${pkgdir}${PREFIX}/.config/nitrogen"
     cp -R ".config/rofi" "${pkgdir}${PREFIX}/.config/rofi"
     cp ".config/example.picom.conf" "${pkgdir}${PREFIX}/.config/"
     cp ".profile" "${pkgdir}${PREFIX}/.profile"
-    install -Dm755 "set_once_i3.sh" "${pkgdir}${PREFIX}/set_once_i3.sh"
 }
