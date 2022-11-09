@@ -1,15 +1,15 @@
 # Maintainer: dalto <dalto at fastmail.com>
 
 pkgname=eos-settings-plasma
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="Plasma settings and theme for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/$pkgname"
 license=('GPL3')
-depends=('plasma-workspace')
+depends=('plasma-workspace' 'endeavouros-theming')
 source=("$pkgname-$pkgver.tar.gz::$url//archive/refs/tags/$pkgver.tar.gz")
-sha256sums=('31418195b0f34f376544d46560201c4d5e6484ec552f38766d2faf9ce306d7de')
+sha256sums=('170211170e573d4d531734a475f5ca131d210de7dc531b7b1fc43271f858a8ca')
 
 package() {
 	cp -r "${srcdir}/${pkgname}-${pkgver}"/{usr,etc} "${pkgdir}/."
