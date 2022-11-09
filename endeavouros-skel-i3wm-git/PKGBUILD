@@ -30,5 +30,4 @@ package() {
     cp -R ".config/rofi" "${pkgdir}${PREFIX}/.config/rofi"
     cp ".config/example.picom.conf" "${pkgdir}${PREFIX}/.config/"
     cp ".profile" "${pkgdir}${PREFIX}/.profile"
-    install -Dm755 "set_once_i3.sh" "${pkgdir}${PREFIX}/set_once_i3.sh"
 }
