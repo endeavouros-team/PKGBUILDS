@@ -10,10 +10,14 @@
 # - archived older EndeavourOS packages at github (currently many previous releases are missing)
 #
 # Caveats:
-# - alpha status ==> warning for potential bugs!
+# - beta status ==> warning for potential bugs!
 # - requires github.com currently for EOS packages
 # - only x86_64 architecture
 
+printf2() { printf "$@" >&2 ; }
+echo2()   { echo "$@" >&2 ; }
+
+warn2()   { echo2 "==> $progname: warning:" "$@" ; }
 
 Usage() {
     local exit_code="$1"
@@ -33,45 +37,59 @@ EOF
 }
 
 AddRemoteCurrent() {
+    echo2 "==> checking latest remote packages ..."
+
     local url="https://github.com/endeavouros-team/repo/tree/master/endeavouros/$arch"
     local remote_currents
 
-    remote_currents=$(curl -Lsm 10 -o- "$url" | grep '\.pkg\.tar\.' | grep ' Link--primary" title=' | grep -Pv '\.sig"'| sed -e 's|.* title="\([^"]*\)".*|\1|' -e 's|^|latest:  |')
+    remote_currents=$(curl -Lsm 30 -o- "$url" | grep '\.pkg\.tar\.' | grep ' Link--primary" title=' | grep -Pv '\.sig"'| sed -e 's|.* title="\([^"]*\)".*|\1|' -e 's|^|latest:  |')
 
     if [ -n "$remote_currents" ] ; then
-        printf "%s\n" "$remote_currents"
+        data_latest=$(printf "%s\n" "$remote_currents")
     fi
 }
 
 AddRemoteArchive() {
     # Get archived remote pkgname without folders.
+    echo2 "==> checking remote package archive ..."
 
+    local contents code=0
     local remote_filenames
-    remote_filenames="$(curl -Lsm 10 -o- "$archive_url" | grep /packages/ | grep 'pkg\.tar\.[xz][xzst]*"' | sed -e 's|.*/packages/\([^"]*\)".*|\1|' -e 's|^|archive: |')"
+    local archive_url=https://github.com/endeavouros-team/archive/releases/expanded_assets/packages
+
+    contents=$(curl --fail -Lsm 10 -o- "$archive_url")
+    code=$?
+    if [ $code -ne 0 ] ; then
+        warn2 "no data received from the package archive, curl code $code"
+        return 1
+    fi
+    remote_filenames="$(echo "$contents" | grep '/packages/.*pkg\.tar\.[zx][zxst]*"'  | sed -e 's|.*/packages/\([^"]*\)".*|\1|' -e 's|^|archive: |')"
 
     if [ -n "$remote_filenames" ] ; then
-        printf "%s\n" "$remote_filenames"
+        data_archive=$(printf "%s\n" "$remote_filenames")
+    else
+        warn2 "fetched package archive data is empty"
     fi
 }
 
 AddLocals() {
+    local pn="$1"
     local local_filenames
-    local eos_pkgs
     local locals=()
     local tmp
+    local pkg pkgname
 
-    local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
-    eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
+    local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/${pn}-*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
 
-    for xx in $eos_pkgs ; do
-        readarray -t tmp <<< "$(echo "$local_filenames" | grep "^${xx}-")"
-        if [ ${#tmp[@]} -gt 0 ] ; then
-            locals+=("${tmp[@]}")
+    for pkg in $local_filenames ; do
+        pkgname=$(pkg-name-components N "$pkg")     # !!!!
+        if IsEosPkg "$pkgname" ; then
+            locals+=("$pkg")
         fi
     done
 
     if [ ${#locals[@]} -gt 0 ] ; then
-        printf "cache:   %s\n" "${locals[@]}" | grep -Pv "^cache:[ ]*$"
+        data_cache=$(printf "cache:   %s\n" "${locals[@]}" | grep -Pv "^cache:[ ]*$")
     fi
 }
 
@@ -102,25 +120,25 @@ Main_eos() {
         return
     fi
     local arch=x86_64
-    local data
+    local data data_cache="" data_latest="" data_archive=""
 
-    local archive_url=https://github.com/endeavouros-team/archive/releases
     local archive_dl_url=https://github.com/endeavouros-team/archive/releases/download/packages
     local latest_dl_url=https://github.com/endeavouros-team/repo/raw/master/endeavouros/$arch
 
-    printf "Fetching info about packages, please wait ... " >&2
-    data=$( { AddLocals ; AddRemoteCurrent ; AddRemoteArchive ; } | sort -V )
-    printf "done.\n\n" >&2
+    AddRemoteArchive
+    AddRemoteCurrent
 
     local pkgname
     local filespec
     local URLs=() pkgs=()
 
     for pkgname in "$@" ; do
+        AddLocals "$pkgname"
+        data=$(printf "%s\n" "$data_cache" "$data_latest" "$data_archive" | sort -V)
         filespec="$(echo "$data" | grep "$pkgname" | fzf --tac)"
         case "$?" in
             0) ;;
-            *) echo "Nothing for $pkgname." >&2
+            *) echo2 "Nothing for $pkgname."
                continue
                ;;
         esac
@@ -129,7 +147,7 @@ Main_eos() {
             "latest:"*)  filespec="$latest_dl_url/$(          echo "$filespec" | awk '{print $2}')" ;;
             "archive:"*) filespec="$archive_dl_url/$(         echo "$filespec" | awk '{print $2}')" ;;
             *)
-                echo "Sorry, nothing found for $pkgname." >&2
+                echo2 "Sorry, nothing found for $pkgname."
                 continue
                 ;;
         esac
@@ -149,22 +167,35 @@ Main_arch() {
     fi
 }
 
+IsEosPkg() {
+    local pkg="$1"
+    local eos
+
+    # Some (obviously EndeavourOS) packages may have been removed from the current EndeavourOS packages, but they may exist in archive or local cache.
+    # Check them first.
+    case "$pkg" in
+        *-endeavouros | *-eos | endeavouros-* | eos-*) return 0 ;;
+    esac
+    for eos in $eos_pkgs ; do
+        [ "$pkg" = "$eos" ] && return 0
+    done
+    return 1
+}
+
 Separate_packages() {
-    local eos_pkgs
     local arg eos
 
-    eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
-
     for arg in "$@" ; do
-        for eos in $eos_pkgs ; do
-            [ "$arg" = "$eos" ] && break
-        done
-        [ "$arg" = "$eos" ] && pkgnames_eos+=("$arg") || pkgnames_arch+=("$arg")
+        if IsEosPkg "$arg" ; then
+            pkgnames_eos+=("$arg")
+        else
+            pkgnames_arch+=("$arg")
+        fi
     done
 
     if [ ${#pkgnames_arch[@]} -gt 0 ] ; then
         if [ ! -x /usr/bin/downgrade ] ; then
-            echo "Install 'downgrade' to downgrade Arch packages: ${pkgnames_arch[*]}" >&2
+            echo2 "Install 'downgrade' to downgrade Arch packages: ${pkgnames_arch[*]}"
             return 1
         fi
     fi
@@ -196,6 +227,7 @@ Main() {
     local pkgnames=()
     local pkgnames_eos=() pkgnames_arch=()
     local commands_eos=() commands_arch=()
+    local eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
