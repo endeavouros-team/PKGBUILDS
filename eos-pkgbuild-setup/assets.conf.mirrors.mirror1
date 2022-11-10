@@ -59,6 +59,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
     endeavouros-theming
     endeavouros-xfce4-terminal-colors
+
     eos-apps-info
     eos-bash-shared
     eos-downgrade
@@ -72,7 +73,6 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-qogir-icons
     eos-quickstart
     eos-rankmirrors
-    eos-repo-before-arch-repos
     eos-sddm-theme
 
     eos-settings-budgie
@@ -93,14 +93,12 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-translations
     eos-update-notifier
 
-    grub-theme-endeavouros
-
     inxi/aur
 
     kernel-install-for-dracut/aur
     keyserver-rank
 
-    ly/aur
+    # ly/aur
 
     mkinitcpio-openswap/aur
 
@@ -156,6 +154,7 @@ PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-lightdm-slick-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
+PKG_MAKEPKG_OPTIONS[eos-sddm-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
 
 PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
