@@ -8,8 +8,10 @@ indent2() {
 }
 
 Msg() {
-    local date=$(date "+%Y-%m-%d %H:%M:%S")
-    [ "$quiet" = "no" ] && echo2 "$date:" "$@"
+    if [ "$quiet" = "no" ] ; then
+        local date=$(date "+%Y-%m-%d %H:%M:%S")
+        echo2 "$date:" "$@"
+    fi
 }
 MsgForce() {
     local quiet_old="$quiet"
@@ -105,6 +107,7 @@ Bumblebee() {
     local exec2="Exec=optirun -b none /usr/bin/nvidia-settings -c :8"
     local desktop=/usr/share/applications/nvidia-settings.desktop
     local group
+    local -r no_such_unit=4   # see the "EXIT STATUS" of command 'man systemctl'
 
     case "$mode" in
         bumblebee)
@@ -124,7 +127,7 @@ Bumblebee() {
             fi
             systemctl status bumblebeed.service >& /dev/null
             case "$?" in
-                4)
+                $no_such_unit)
                     Info "Enabling bumblebeed.service"
                     AddCmd "systemctl enable bumblebeed.service"
                     ;;
@@ -132,18 +135,19 @@ Bumblebee() {
             ;;
         *)
             # remove bumblebee settings
-            if [ "$user" != "root" ] ; then
-                for group in bumblebee video ; do
-                    if [ -n "$(id $user | grep "($group)")" ] ; then
-                        Info "Removing user $user from group: $group"
-                        AddCmd "gpasswd -d $user $group"
-                    fi
-                done
-            fi
             systemctl status bumblebeed.service >& /dev/null
             case "$?" in
-                4) ;;
+                $no_such_unit)
+                    ;;
                 *)
+                    if [ "$user" != "root" ] ; then
+                        for group in bumblebee video ; do
+                            if [ -n "$(id $user | grep "($group)")" ] ; then
+                                Info "Removing user $user from group: $group"
+                                AddCmd "gpasswd -d $user $group"
+                            fi
+                        done
+                    fi
                     Info "Disabling bumblebeed.service"
                     AddCmd "systemctl disable bumblebeed.service"
                     ;;
@@ -154,7 +158,7 @@ Bumblebee() {
 
 Prime() {
     PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
-    KernelParametersToGrub
+    KernelParametersToBoot
 }
 
 Nouveau() {
@@ -167,33 +171,74 @@ OnlyNvidia() {
     else
         PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
     fi
+    KernelParametersToBoot
+}
+
+KernelParametersToBoot() {
+    local kernel_param="nvidia-drm.modeset=1"
+    KernelParametersToSdboot && return
     KernelParametersToGrub
+}
+
+KernelParametersToSdboot() {
+    local file=/etc/kernel/cmdline
+
+    [ -r $file ] || return 1
+
+    case "$mode" in
+        nvidia | prime)
+            if [ -z "$(grep "$kernel_param" $file)" ] ; then
+                Info "Adding kernel parameter: $kernel_param"
+                if [ -z "$(grep "root=" $file)" ] ; then
+                    AddCmd "sed -i $file -e 's|root=|$kernel_param root=|'"        # line has ... root=...
+                elif [ -z "$(grep -w "rw" $file)" ] ; then
+                    AddCmd "sed -i $file -e 's|rw|$kernel_param rw|'"              # line has ... rw ...
+                else
+                    AddCmd "sed -E 's|([ \t]*[^#].*)|$kernel_param \1|"            # insert to a non-comment line
+                fi
+            fi
+            ;;
+        *)
+            if [ -z "$(grep "$kernel_param" $file)" ] ; then
+                Info "Removing kernel parameter: $kernel_param"
+                AddCmd "sed -E -i $file -e 's|$kernel_param[ ]{0,1}||g'"
+            fi
+            ;;
+    esac
 }
 
 KernelParametersToGrub() {
     local grubcnf=/boot/grub/grub.cfg
     local grubdef=/etc/default/grub
-    local param="nvidia-drm.modeset=1"
+    local grub_warning=no
 
-    [ -f $grubcnf ] || return
-    [ -f $grubdef ] || return
+    [ -x /usr/bin/grub-mkconfig ] || return 1
+    [ -f $grubcnf ] || return 1
+    [ -f $grubdef ] || return 1
 
     case "$mode" in
         nvidia | prime)
-            if [ -z "$(grep "$param" $grubdef)" ] ; then
-                Info "Patching kernel line with $param"
+            if [ -z "$(grep "$kernel_param" $grubdef)" ] ; then
+                Info "Adding kernel parameter: $kernel_param"
                 AddCmd "nvidia-installer-kernel-para"
-                AddCmd "grub-mkconfig -o $grubcnf"
+                grub_warning=yes
             fi
             ;;
         *)
-            if [ -n "$(grep "$param" $grubdef)" ] ; then
-                Info "Removing kernel parameter $param"
+            if [ -n "$(grep "$kernel_param" $grubdef)" ] ; then
+                Info "Removing kernel parameter: $kernel_param"
                 AddCmd "nvidia-installer-kernel-para remove"
-                AddCmd "grub-mkconfig -o $grubcnf"
+                grub_warning=yes
             fi
             ;;
     esac
+    if [ "$grub_warning" = "yes" ] ; then
+        cat <<EOF >&2
+Info: kernel parameters for grub will be changed by $progname, so it is advisable to run commands:
+    grub-mkconfig -o $grubcnf
+    grub-install (with proper parameters for your system!)
+EOF
+    fi
 }
 
 AddConfFileLine() {
