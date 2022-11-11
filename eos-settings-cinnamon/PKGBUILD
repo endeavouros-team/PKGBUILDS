@@ -1,13 +1,14 @@
 # Maintainer: dalto <dalto at fastmail.com>
 
 pkgname=eos-settings-cinnamon
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="Cinnamon settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
+depends=('endeavouros-theming')
 source=('99_eos-cinnamon.gschema.override')
-sha256sums=('c0b54a695dcec69aebeaa415ba64711a9d10de1b85d9675073dc22d8330d8933')
+sha256sums=('e305986776c7725da78986d41f80dc360cb1f1482e77c4c6c7b7b12dba631e40')
 
 package() {
 	install -Dm644 "${srcdir}/99_eos-cinnamon.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_eos-cinnamon.gschema.override"

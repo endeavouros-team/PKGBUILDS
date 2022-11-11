@@ -1,3 +1,6 @@
 [org.cinnamon.desktop.interface]
 icon-theme='Qogir-dark'
 
+[org.cinnamon.desktop.background]
+picture-uri='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
+
