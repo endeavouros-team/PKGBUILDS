@@ -1,2 +1,7 @@
 [org.mate.panel]
-  default-layout='endeavouros'
+default-layout='endeavouros'
+
+[org.mate.background]
+picture-filename='/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
+picture-options='zoom'
+
