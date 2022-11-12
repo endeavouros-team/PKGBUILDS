@@ -4,17 +4,17 @@
 
 pkgname=nvidia-inst
 pkgver=1.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 arch=('any')
 license=('GPL2')
+replaces=('nvidia-installer-dkms')
 depends=(
   nvidia-installer-common
   dkms
 )
-
 optdepends=(
   "linux-headers: for $pkgname with kernel linux"
   "linux-lts-headers: for $pkgname with kernel linux-lts"
@@ -26,7 +26,7 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.bash-completion
 )
-sha512sums=('aac072e61ddc52c42dc7dd1bd14e281fb53a20cb79b9affb9f642ef1ddee9af5558f227dbf9ae021093b6f18bb021415e5aa3ace4139c8dde0e172d80930ea6d'
+sha512sums=('ceee7e3cc958898c55ff1a3270597cc63932069ffd7eca23697a6adb312d8117ecfaebd9c8c2dd6a11bba52094048892294452159593f9bdf64119d97abd2995'
             'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6')
 
 package() {
