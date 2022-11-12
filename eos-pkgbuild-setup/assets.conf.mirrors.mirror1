@@ -265,10 +265,13 @@ _rate-mirrors_hook() {
 }
 _paru_hook() {
     local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
-    # sed -i $PKGBUILD -e "/^depends=/a \ \nreplaces=(paru-bin)"
     local Pkgver=$(grep ^pkgver= "$PKGBUILD" | cut -d'=' -f2)
-    if [ "$Pkgver" = "1.11.1" ] ; then
-        sed -i "$PKGBUILD" -e 's|^\(pkgrel=[0-9.]*\)|\1.1|'
+    local Pkgrel=$(grep ^pkgrel= "$PKGBUILD" | cut -d'=' -f2)
+
+    if [ "${Pkgver}-$Pkgrel" = "1.11.1-1" ] ; then
+        sed -i "$PKGBUILD" \
+            -e 's|^pkgver=.*|pkgver=1.11.2|' \
+            -e "s|^sha256sums=.*|sha256sums=('9fd8db52894f9e7d61a3901d2c441502aab28a090083e0d6fdb58118e53a8a14')|"
     fi
 }
 
