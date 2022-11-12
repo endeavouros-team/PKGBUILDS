@@ -4,13 +4,13 @@
 
 pkgname=nvidia-inst
 pkgver=1.4
-pkgrel=2
+pkgrel=3
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 arch=('any')
 license=('GPL2')
-replaces=('nvidia-installer-dkms')
+replaces=('nvidia-installer-dkms' 'nvidia-installer-db')
 depends=(
   nvidia-installer-common
   dkms
