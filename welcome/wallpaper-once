@@ -33,6 +33,14 @@ Main() {
     case "$DE" in
         SWAY | BSPWM | QTILE | OPENBOX)
             return ;;      # don't change wallpaper on community editions
+        XFCE)
+            local pkg=endeavouros-skel-xfce4
+            local ver=$(pacman -Q $pkg 2>/dev/null | awk '{print $2}')
+
+            if [ $(vercmp "$ver" "2.17-1") -gt 0 ] ; then
+                return            # new $pkg will handle the wallpaper
+            fi
+            ;;
     esac
 
     case "$1" in
