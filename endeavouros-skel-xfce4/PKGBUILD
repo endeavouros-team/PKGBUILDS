@@ -2,16 +2,16 @@
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
-pkgver=2.17
+pkgver=2.18
 pkgrel=1
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=("any")
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=("GPL")
 makedepends=("git")
-depends=("endeavouros-skel-default")
+depends=("endeavouros-skel-default" "endeavouros-theming")
 source=("https://github.com/endeavouros-team/endeavouros-xfce4-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('49330bcd345196adeaca546349925ae300c051f846f86a81f652bffda897e0d2')
+sha256sums=('b4b0fc7a0fd12e22661820eb71577ad57ae0a3432fb91b17f43130dcf9ac75eb')
 
 package() {
     PREFIX=/etc/skel
@@ -22,4 +22,5 @@ package() {
     cp -R ".config/xfce4/panel" "${pkgdir}${PREFIX}/.config/xfce4/panel"
     cp -R ".config/xfce4/xfconf" "${pkgdir}${PREFIX}/.config/xfce4/xfconf"
     install -Dm755  ".face" "${pkgdir}${PREFIX}/.face"
+    install -Dm644 "xfce4-desktop.xml" "${pkgdir}/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
 }
