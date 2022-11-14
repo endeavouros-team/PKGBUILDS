@@ -76,7 +76,7 @@ ShowDriversForId() {
 
     ids_all="$(curl -Lsm 10 -o- "$url_of_ids")"
 
-    [ -n "$ids_all" ] || DIE "Nvidia id data not available!"
+    [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'!"
 
     echo2 "NVIDIA card id: $id"
     echo2 "The nvidia-dkms version: $pacman_version"
