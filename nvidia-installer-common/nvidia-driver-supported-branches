@@ -73,10 +73,12 @@ ShowDriversForId() {
     local true_series=""   # found from the Nvidia website
     local ids_all
     local found=no
+    local exit_code=0
 
-    ids_all="$(curl -Lsm 10 -o- "$url_of_ids")"
+    ids_all="$(curl --fail -Lsm 10 -o- "$url_of_ids")"
+    exit_code=$?
 
-    [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'!"
+    [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'! Curl exit code $exit_code."
 
     echo2 "NVIDIA card id: $id"
     echo2 "The nvidia-dkms version: $pacman_version"
