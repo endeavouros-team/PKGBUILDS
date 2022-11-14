@@ -474,7 +474,12 @@ ProperNvidiaPackages() {
         *)
             case "$mode" in
                 nouveau) ;;
-                *) DIE "Sorry, Nvidia series '$series' is not supported by $progname" ;;
+                *)
+                    case "$series" in
+                        "") DIE "$finder could not fetch card ids from Nvidia." ;;
+                        *)  DIE "Sorry, Nvidia series '$series' is not supported by $progname" ;;
+                    esac
+                    ;;
             esac
             ;;
     esac
