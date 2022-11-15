@@ -27,6 +27,9 @@ export -f eos_yad_GetDesktopName
 Main() {
     test -x /usr/bin/calamares && return   # don't change wallpaper while installing system
 
+    local EOS_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2 | cut -d' ' -f1)
+    [ $(vercmp "$EOS_version" "2022.11.15") -ge 0  ] && return  # wallpaper already set by calamares
+
     local DE="$(eos_GetDeOrWm)"
     local conf="$HOME/.config/EOS-initial-wallpaper.$DE"
 
