@@ -105,8 +105,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
     nvidia-hook
     nvidia-inst
     nvidia-installer-common
-    nvidia-installer-db
-    nvidia-installer-dkms
+    # nvidia-installer-db
+    # nvidia-installer-dkms
 
     pahis
     paper-icon-theme
@@ -156,6 +156,7 @@ PKG_MAKEPKG_OPTIONS[eos-lightdm-slick-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-sddm-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
+PKG_MAKEPKG_OPTIONS[kernel-install-for-dracut]="--nodeps"
 
 PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
