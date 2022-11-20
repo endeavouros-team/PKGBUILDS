@@ -5,7 +5,7 @@
 
 pkgname=calamares-git
 _reponame=calamares
-pkgver=3912.5630610d
+pkgver=10527.d9f2f130c
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
@@ -24,6 +24,7 @@ source=("git+https://github.com/endeavouros-team/$_reponame.git")
 sha256sums=('SKIP')
             
 pkgver() {
+  cd "${_reponame}"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
