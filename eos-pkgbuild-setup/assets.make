@@ -232,7 +232,7 @@ LocalVersion()
     Pkgname="$(JustPkgname "$Pkgname")"
 
     for xx in zst xz ; do         # order is important because of change to zstd!
-        pkgs="$(ls -1 "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$xx 2>/dev/null)"    # $_COMPRESSOR
+        pkgs="$(ls -1v "$ASSETSDIR"/${Pkgname}-[0-9]*.pkg.tar.$xx 2>/dev/null)"    # $_COMPRESSOR
         test -n "$pkgs" && break
     done
 
