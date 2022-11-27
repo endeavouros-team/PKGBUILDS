@@ -3,8 +3,8 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-installer-common
-pkgver=1.4
-pkgrel=3
+pkgver=1.5
+pkgrel=1
 pkgdesc="Common scripts for nvidia-installer-dkms and nvidia-inst"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
@@ -19,6 +19,7 @@ optdepends=(
   'linux-lts-headers: for nvidia-installer-dkms with kernel linux-lts'
   'linux-hardened-headers: for nvidia-installer-dkms with kernel linux-hardened'
   'linux-zen-headers: for nvidia-installer-dkms with kernel linux-zen'
+  'expac: faster way for finding available package versions'
 )
 
 source=(
@@ -26,7 +27,7 @@ source=(
   $_url/nvidia-driver-supported-branches
 )
 sha512sums=('98ceb7fb204bb9fef77af8e306c8e97c1f324372d2d2019295c52b0eb4357314e8af2ea7caa487b68d9907014ea70ab6edafa098cd9155fc71f11def3c8aa8b9'
-            'f46dcf95cd1cdd584b29ce353bb9391ddba43e696e6d89b0b5f1ceaf18605707bb83ccbc3b2c8e5208c3bef0c3a8bc9b5174426d2c653f75fae4582854a34242')
+            '9b49592d18456f6ac1f55b2015cb214a349eca21103401d29143f86f368e8db71e8629f86dea6c9d75e63989675a94714c05fb0eabaf6595a8136f623de1077b')
 
 package() {
   install -Dm755 nvidia-installer-kernel-para     $pkgdir/usr/bin/nvidia-installer-kernel-para

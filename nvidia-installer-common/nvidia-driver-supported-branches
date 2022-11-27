@@ -59,6 +59,9 @@ GetNvidiaIds() {
         $sid1) ids="$(echo "$ids_all" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
         $sid2) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid2.xx\"*/,/.*\"legacy_$sid3.xx\".*/p" | FilterIds)" ;;
         $sid3) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid3.xx\"*/,/.*\"legacy_$sidX.xx\".*/p" | FilterIds)" ;;
+
+        $beta_series) ids="$(echo "$ids_beta" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
+
         *) DIE "unsupported series '$series'" ;;
     esac
 
@@ -72,22 +75,30 @@ ShowDriversForId() {
     local ver
     local true_series=""   # found from the Nvidia website
     local ids_all
+    local ids_beta
     local found=no
     local exit_code=0
+    local -r url_of_ids="$(UrlOfIds "$pacman_pkgver")"
+    local -r url_of_beta_ids="$(UrlOfIds "$beta_pkgver")"
 
     ids_all="$(curl --fail -Lsm 10 -o- "$url_of_ids")"
     exit_code=$?
 
     [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'! Curl exit code $exit_code."
 
+    ids_beta="$(curl --fail -Lsm 10 -o- "$url_of_beta_ids")"
+
     echo2 "NVIDIA card id: $id"
-    echo2 "The nvidia-dkms version: $pacman_version"
+    echo2 "nvidia-dkms version of Arch: $pacman_version"
 
     for ver in "${nvidia_versions[@]}" ; do
         true_series="${ver%%.*}"
         ids="$(GetNvidiaIds "$true_series")"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
             printf "\nSeries %s: supported (Nvidia: %s)\n\n" "$true_series" "$ver"     # DO NOT CHANGE THIS LINE! Other apps use it.
+            if [ "$ver" = "$beta_pkgver" ] && [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
+                printf2 "NOTE: $beta_pkg $ver is an AUR package. To install it, use command:\n   yay -S $beta_pkg\n"
+            fi
             [ "$all" = "no" ] && return
             found=yes
         else
@@ -163,16 +174,26 @@ EOF
     esac
 }
 
+UrlOfIds() {
+    local ver="$1"
+    echo "https://us.download.nvidia.com/XFree86/Linux-x86_64/$ver/README/supportedchips.html"
+}
+
 Main() {
+    local -r infopkg=nvidia-dkms
+    local infoapp="expac -S %v $infopkg"
+    [ -x /usr/bin/expac ] || infoapp="LANG=C pacman -Si $infopkg | grep -w ^Version | awk '{print $NF}'"
     local -r progname="$(basename "$0")"
-    local -r pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}')
+    local -r pacman_version=$($infoapp)
     local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
     local -r pacman_version_series=${pacman_pkgver%%.*}
     local -r starting_url="https://www.nvidia.com/en-us/drivers/unix"
-    local -r url_of_ids="https://us.download.nvidia.com/XFree86/Linux-x86_64/$pacman_pkgver/README/supportedchips.html"
     local all=no
     local nvidia_id=""
     local nvidia_versions=()
+    local beta_pkg=nvidia-beta-dkms
+    local beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
+    local beta_series=${beta_pkgver%%.*}
 
     Options "$@"
 
@@ -181,6 +202,9 @@ Main() {
         470                           # legacy series ids
         390                           # ditto
     )
+    if [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
+        series_ids+=($beta_series)    # this must be the last!
+    fi
     local series_id_out=367           # may change as series_ids change!
 
     GetNvidiaVersions                 # find versions NVIDIA is currently supporting
