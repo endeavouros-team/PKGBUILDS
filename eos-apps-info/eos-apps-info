@@ -74,7 +74,7 @@ Main()
                 | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | arc* | dbufstat \
                 | *.zfs | raidz* | z* | wgetpaste)
                 continue ;;
-            lxdm-binary | lxdm-config | lxdm | arm-* | budgie-* | pacignore)
+            lxdm-binary | lxdm-config | lxdm | arm-* | budgie-* | pacignore | qemu-aarch64-static)
                 # why these show up ???
                 continue ;;
             eos-pkginfo | eos-pkg-changelog)
@@ -82,7 +82,8 @@ Main()
                 continue ;;
 
             # no support currently:
-            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur | eos-github2gitlab | eos-kernel-nvidia-update-check)
+            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur | eos-github2gitlab | eos-kernel-nvidia-update-check \
+                | eos-update | reinstall-kernels)
                 continue ;;
 
             # rename:
