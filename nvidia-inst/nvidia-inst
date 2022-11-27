@@ -458,8 +458,11 @@ ProperNvidiaPackages() {
     # because older nvidia drivers may be needed.
 
     local finder=nvidia-driver-supported-branches
+    local testid=""
+
     if [ -z "$series" ] ; then
-        series="$($finder | grep ^Series | awk '{print $2}' | tr -d ':')"
+        # testid=20f3      # TESTING !!!
+        series="$($finder $testid | grep ^Series | awk '{print $2}' | tr -d ':')"
     fi
 
     case "$series" in
@@ -475,7 +478,16 @@ ProperNvidiaPackages() {
             case "$mode" in
                 nouveau) ;;
                 *)
+                    local beta_pkg=nvidia-beta-dkms
+                    local beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
+                    local beta_series=${beta_pkgver%%.*}
+
                     case "$series" in
+                        $beta_series)
+                            local msg="your card is supported by an AUR package $beta_pkg,\nbut $progname does not "
+                            msg+="support beta packages.\nYou can install $beta_pkg (and related packages) manually."
+                            DIE "$msg"
+                            ;;
                         "") DIE "$finder could not fetch card ids from Nvidia." ;;
                         *)  DIE "Sorry, Nvidia series '$series' is not supported by $progname" ;;
                     esac
