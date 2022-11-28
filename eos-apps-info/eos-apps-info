@@ -1,15 +1,15 @@
 #!/bin/bash
 
-UpdateDatabase() {
-    pkexec pacman -Fy >/dev/null
-}
+UpdateDatabase() { pkexec pacman -Fy >/dev/null ; }
 
 CheckDatabaseUpdate() {
-    local txt=""
-    local cmd
 
     if ! /usr/bin/pacman -Fl eos-bash-shared >&/dev/null ; then
         # need to run pacman -Fy
+
+        local txt=""
+        local cmd
+
         txt+="\nPacman database needs updating using command:\n"
         txt+="<tt>  pacman -Fy</tt>\n"
         cmd=(
@@ -25,83 +25,70 @@ CheckDatabaseUpdate() {
     fi
 }
 
+RenameApp() {
+    # modifies 'app2' and may modify 'app'
+
+    case "$app" in
+        #su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character for yad !!
+        yad)              app2=yad-eos ;;
+        *)                app2="$app" ;;
+    esac
+}
+
+EosApps2cmd() {
+    local -r apps=(
+        akm ChangeDisplayResolution checkupdatesext curl-exit-code-to-string eos-apps-info eos-connection-checker eos-downgrade eos-download-wallpapers
+        eos-log-tool eos-pacdiff eos-packagelist eos-quickstart eos-rankmirrors eos-sendlog eos-shifttime eos-update-notifier eos-update-notifier-configure
+        eos-wallpaper-set eos-welcome grub-colour-chooser mirrorlist-rank-info nvidia-driver-supported-branches nvidia-inst paccache-service-manager
+        pahis reflector-simple RunInTerminal show-location-info su-c_wrapper UpdateInTerminal
+    )
+    local app app2
+
+    for app in "${apps[@]}" ; do
+        RenameApp                                                               # Rename some apps.
+        cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")        # Add app buttons to the command.
+    done
+}
+
+BonusApps2cmd() {
+    local -r blabel="Bonus items"
+    local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)    # local -r bonus_apps=($(eos-apps-info-helper --show-bonus))
+    local app app2
+
+    cmd+=(--field="<b><i>$blabel:</i></b>":LBL "")                              # visually separates bonus apps
+
+    for app in "${bonus_apps[@]}" ; do
+        RenameApp
+        cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")
+    done
+}
+
 Main()
 {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
     # yad command exit codes (don't use even numbers)
-    local exit_quit=11
-    local exit_updatedb=13
+    local -r exit_quit=11
+    local -r exit_updatedb=13
+    local -r update_label="Update database"
 
     CheckDatabaseUpdate
-
-    local update_label="Update database"
 
     local txt=""
     txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
     txt+="Click an app button and an information window opens.\n\n"
     txt+="Note: you may need to click the <b>$update_label</b> button below to update your package database.\n\n"
-    txt+="A special selection of <i>bonus items</i> is appended!\n\n"
+    txt+="A special selection of <i>bonus items</i> is appended!\n"
 
     local cmd=(
-        eos_yad --form --title="EndeavourOS apps info" --text="$txt" --columns=4 --align-buttons --image=dialog-information
-        # --no-buttons
+        eos_yad --form --title="EndeavourOS apps info" --text="$txt"
+        --columns=3 --align-buttons --image=dialog-information
         --button="$update_label!!Updates package database and restarts this app":$exit_updatedb
         --buttons-layout=center
     )
-    local packages=$(/usr/bin/pacman -Sl endeavouros | /usr/bin/awk '{print $2}')
-    local apps=()
-    local pkg app app2
-    local blabel="Bonus items"
 
-    readarray -t app <<< $(/usr/bin/pacman -Fl $packages 2>/dev/null | /usr/bin/grep "usr/bin/" | /usr/bin/grep -v "usr/bin/$" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's|usr/bin/||' | /usr/bin/sort)
-    [ -n "$app" ] || return 1
-    apps+=("${app[@]}")
-
-    apps+=("$blabel")                              # separation label for the bonus apps
-    apps+=($(eos-apps-info-helper --show-bonus))   # the bonus apps!
-
-    for app in "${apps[@]}" ; do
-
-        # Hide or rename some apps.
-
-        case "$app" in
-            # not needed here or deprecated:
-            ckbcomp | eos-waiting-indicator | eos-FindAppIcon | eos-kbd-set | eos-hooks-runner | eos-reboot-required* | eos-arch-news \
-                | eos-grub-fix-initrd-generation | keyserver-rank* | nvidia-installer-update-db | polybar-msg | eos-kill-yad-zombies \
-                | welcome-dnd | yad-settings | yad-tools | eos-latest-arch-mirrorlist | eos-apps-info-helper | eos-install-mode-run-calamares \
-                | eos-run-cmd-with-su | *.sh | *calamares* | update-mirrorlist | nvidia-installer-kernel-para | eos-select-file-server | wormc \
-                | nvidia-installer-check | eos-rankmirrors-from-hook | curl-exit-code-to-string | arc* | dbufstat \
-                | *.zfs | raidz* | z* | wgetpaste)
-                continue ;;
-            lxdm-binary | lxdm-config | lxdm | arm-* | budgie-* | pacignore | qemu-aarch64-static)
-                # why these show up ???
-                continue ;;
-            eos-pkginfo | eos-pkg-changelog)
-                # deprecated for now
-                continue ;;
-
-            # no support currently:
-            device-info | RunInTerminalEx | RunInTerminalOpt | bashdb | yad-icon-browser | eos-pkginfo-aur | eos-github2gitlab | eos-kernel-nvidia-update-check \
-                | eos-update | reinstall-kernels)
-                continue ;;
-
-            # rename:
-            eos-pkginfo-aur)  app2=eos-pkginfo ;;
-            eos-welcome)      app2=welcome ;;
-            #wgetpaste)        app2=wgetpaste-eos ;;
-            yad)              app2=yad-eos ;;
-            su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character !!
-            *)                app2="$app" ;;
-        esac
-
-        # Add app buttons to the command.
-
-        case "$app" in
-            "$blabel") cmd+=(--field="<b><i>$app:</i></b>":LBL "") ;;                        # add this to visually separate bonus apps
-            *)         cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'") ;;
-        esac
-    done
+    EosApps2cmd
+    BonusApps2cmd
 
     while true ; do
         "${cmd[@]}"

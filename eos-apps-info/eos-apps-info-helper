@@ -216,7 +216,10 @@ Options()
             --show-system-folder)
                 echo "${folders[1]}"; exit;;    # for bash completion
             --show-bonus)
-                echo "grub linux linux-lts nvidia virtualbox"  # supported bonus apps!
+                local bonus=(  # supported bonus apps!
+                    downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay
+                )
+                echo "${bonus[*]}"
                 exit
                 ;;
             --wipe-cache)
