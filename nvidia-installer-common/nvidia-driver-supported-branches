@@ -121,7 +121,10 @@ GetNvidiaVersions() {
                 $s.*) nvidia_versions+=("$n") ;;
             esac
         done
-    done    
+    done
+    if [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
+        nvidia_versions+=("$beta_pkgver")
+    fi
 }
 
 Options() {
@@ -202,9 +205,6 @@ Main() {
         470                           # legacy series ids
         390                           # ditto
     )
-    if [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
-        series_ids+=($beta_series)    # this must be the last!
-    fi
     local series_id_out=367           # may change as series_ids change!
 
     GetNvidiaVersions                 # find versions NVIDIA is currently supporting
