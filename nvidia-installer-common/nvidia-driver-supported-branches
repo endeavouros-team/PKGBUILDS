@@ -182,21 +182,31 @@ UrlOfIds() {
     echo "https://us.download.nvidia.com/XFree86/Linux-x86_64/$ver/README/supportedchips.html"
 }
 
+GetPacmanVersion() {
+    local infopkg="$1"
+    if [ -x /usr/bin/expac ] ; then
+        expac -S %v "$infopkg"
+    else
+        LANG=C pacman -Si "$infopkg" | grep -w ^Version | awk '{print $NF}'
+    fi
+}
+
 Main() {
-    local -r infopkg=nvidia-dkms
-    local infoapp="expac -S %v $infopkg"
-    [ -x /usr/bin/expac ] || infoapp="LANG=C pacman -Si $infopkg | grep -w ^Version | awk '{print $NF}'"
     local -r progname="$(basename "$0")"
-    local -r pacman_version=$($infoapp)
+    local -r infopkg=nvidia-dkms
+    local -r pacman_version=$(GetPacmanVersion "$infopkg")
     local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
     local -r pacman_version_series=${pacman_pkgver%%.*}
     local -r starting_url="https://www.nvidia.com/en-us/drivers/unix"
-    local all=no
+    local -r all=no                                                      # this will no more be changed!
     local nvidia_id=""
     local nvidia_versions=()
-    local beta_pkg=nvidia-beta-dkms
-    local beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
-    local beta_series=${beta_pkgver%%.*}
+    local -r beta_pkg=nvidia-beta-dkms
+    local -r beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
+    local -r beta_series=${beta_pkgver%%.*}
+
+    [ -n "$pacman_pkgver" ] || DIE "cannot determine the version of the latest available package $infopkg"
+    [ -n "$beta_pkgver" ]   || DIE "cannot determine the version of the latest available package $beta_pkg"
 
     Options "$@"
 
