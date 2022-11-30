@@ -189,17 +189,11 @@ KernelParametersToSdboot() {
         nvidia | prime)
             if [ -z "$(grep "$kernel_param" $file)" ] ; then
                 Info "Adding kernel parameter: $kernel_param"
-                if [ -z "$(grep "root=" $file)" ] ; then
-                    AddCmd "sed -i $file -e 's|root=|$kernel_param root=|'"        # line has ... root=...
-                elif [ -z "$(grep -w "rw" $file)" ] ; then
-                    AddCmd "sed -i $file -e 's|rw|$kernel_param rw|'"              # line has ... rw ...
-                else
-                    AddCmd "sed -E 's|([ \t]*[^#].*)|$kernel_param \1|"            # insert to a non-comment line
-                fi
+                AddCmd "sed -E -i $file -e 's|([ \t]*[^#].*)|$kernel_param \1|'"  # insert to a non-comment line
             fi
             ;;
         *)
-            if [ -z "$(grep "$kernel_param" $file)" ] ; then
+            if [ -n "$(grep "$kernel_param" $file)" ] ; then
                 Info "Removing kernel parameter: $kernel_param"
                 AddCmd "sed -E -i $file -e 's|$kernel_param[ ]{0,1}||g'"
             fi
