@@ -14,7 +14,7 @@ if false ; then
 GetNvidiaIds_old()
 {
     local version="$1"
-    local ids="$(curl -Lsm 10 -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
+    local ids="$(curl -Lsm $curl_timeout -o- https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html)"
     local true_series="${version%%.*}"
 
     [ -n "$ids" ] || DIE "fetcing supported ids for $version failed"
@@ -81,21 +81,22 @@ ShowDriversForId() {
     local -r url_of_ids="$(UrlOfIds "$pacman_pkgver")"
     local -r url_of_beta_ids="$(UrlOfIds "$beta_pkgver")"
 
-    ids_all="$(curl --fail -Lsm 10 -o- "$url_of_ids")"
+    ids_all="$(curl --fail -Lsm $curl_timeout -o- "$url_of_ids")"
     exit_code=$?
 
     [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'! Curl exit code $exit_code."
 
-    ids_beta="$(curl --fail -Lsm 10 -o- "$url_of_beta_ids")"
-
-    echo2 "NVIDIA card id: $id"
-    echo2 "nvidia-dkms version of Arch: $pacman_version"
+    ids_beta="$(curl --fail -Lsm $curl_timeout -o- "$url_of_beta_ids")"
+    [ -n "$ids_beta" ] || DIE "Nvidia id data not available from '$url_of_beta_ids'! Curl exit code $exit_code."
 
     for ver in "${nvidia_versions[@]}" ; do
         true_series="${ver%%.*}"
+        if [ "$testing" = "yes" ] ; then
+            [ $true_series -eq 390 ] || continue
+        fi
         ids="$(GetNvidiaIds "$true_series")"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
-            printf "\nSeries %s: supported (Nvidia: %s)\n\n" "$true_series" "$ver"     # DO NOT CHANGE THIS LINE! Other apps use it.
+            printf "\nSeries %s: supported (nvidia.com: %s)\n\n" "$true_series" "$ver"     # DO NOT CHANGE THIS LINE! Other apps use it.
             if [ "$ver" = "$beta_pkgver" ] && [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
                 printf2 "NOTE: $beta_pkg $ver is an AUR package. To install it, use command:\n   yay -S $beta_pkg\n"
             fi
@@ -112,10 +113,19 @@ ShowDriversForId() {
 }
 
 GetNvidiaVersions() {
-    local versions=$(curl --fail -Lsm 10 -o- "$starting_url" | grep "x86_64/AMD64" | sed 's|<br>|<br>\n|g' | sed 's|.*">\([0-9\.]*\)</a>.*|\1|' | grep -Pv 'AMD64|Archive')
+    echo2 "NVIDIA card id: $nvidia_id"
+    echo2 "Fetching driver data from nvidia.com ..."
+
     local s n
+    local ret=0
+    local versions=$(curl --fail -Lsm $curl_timeout -o- "$starting_url")
+    ret=$?
+    [ -n "$versions" ] || DIE "Fetching Nvidia driver info from '$starting_url' failed (curl code $ret). Please try again later."
+    versions=$(echo "$versions" | grep "x86_64/AMD64" | sed 's|<br>|<br>\n|g')
+    versions=$(echo "$versions" | sed -E "s|.*>([0-9\.]+).*|\1|" | grep -Pv 'AMD64|Archive')
 
     for n in $versions ; do
+        [ $(vercmp $n $series_id_out) -lt 0 ] && continue
         for s in "${series_ids[@]}" ; do
             case "$n" in
                 $s.*) nvidia_versions+=("$n") ;;
@@ -130,7 +140,7 @@ GetNvidiaVersions() {
 Options() {
     local opts
 
-    opts="$(/usr/bin/getopt -o=ha --longoptions help,all --name "$progname" -- "$@")" || {
+    opts="$(/usr/bin/getopt -o=hajt: --longoptions help,all,test,timeout: --name "$progname" -- "$@")" || {
         Options -h
         return 1
     }
@@ -140,12 +150,16 @@ Options() {
     while true ; do
         case "$1" in
             -a | --all) echo2 "Info: option '$1' recognized but is no more used." ;; # all=yes ;;
+            -j | --test) testing=yes ;;
+            -t | --timeout) curl_timeout="$2" ;;
 
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options] [parameters]
 
 Options:
+  -t, --timeout     Timeout in seconds for operations that fetch driver data from nvidia.com.
+                    Default: $curl_timeout_default
   -a, --all         (Show status for all available driver branches.)
                     NOTE: this option does nothing due to implementation change.
 
@@ -199,6 +213,9 @@ Main() {
     local -r pacman_version_series=${pacman_pkgver%%.*}
     local -r starting_url="https://www.nvidia.com/en-us/drivers/unix"
     local -r all=no                                                      # this will no more be changed!
+    local testing=no
+    local -r curl_timeout_default=30
+    local curl_timeout=$curl_timeout_default
     local nvidia_id=""
     local nvidia_versions=()
     local -r beta_pkg=nvidia-beta-dkms
@@ -217,11 +234,12 @@ Main() {
     )
     local series_id_out=367           # may change as series_ids change!
 
-    GetNvidiaVersions                 # find versions NVIDIA is currently supporting
-
     if [ -z "$nvidia_id" ] ; then
         nvidia_id="$(lspci -vnn | grep -P 'VGA|Display|3D' | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
     fi
+
+    GetNvidiaVersions                 # find versions NVIDIA is currently supporting
+
     if [ -n "$nvidia_id" ] ; then
         ShowDriversForId "$nvidia_id"
     fi
