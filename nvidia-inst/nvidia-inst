@@ -256,8 +256,9 @@ CreateConfFile() {
         AddConfFileLine 'EndSection'
     else
         if [ -r $conf_file ] ; then
-            Info "Removing file $conf_file"
-            AddCmd "rm -f $conf_file"
+            local conf_file_save="$conf_file".save
+            Info "Rename existing file $conf_file to $conf_file_save"
+            AddCmd "mv $conf_file $conf_file_save"
         fi
     fi
 }
@@ -317,7 +318,7 @@ ListOptions() {
 
 Options() {
     local opts
-    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries,nouveau,prime,quiet,series:,test,version"
+    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries,nouveau,prime,quiet,series:,test,version,it"
     local sopts="bfhnpqtv"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
@@ -350,6 +351,9 @@ Options() {
                 [ -n "$PROGVERSION" ] || PROGVERSION=$(pacman -Q "$progname" | awk '{print $2}')
                 echo "$progname $PROGVERSION"
                 exit 0
+                ;;
+            --it)
+                internal_testing=yes
                 ;;
             -h | --help)
                 cat <<EOF >&2
@@ -455,7 +459,10 @@ ProperNvidiaPackages() {
     local testid=""
 
     if [ -z "$series" ] ; then
-        # testid=20f3      # TESTING !!!
+        if [ "$internal_testing" = "yes" ] ; then
+            # testid=20f3
+            testid=104a
+        fi
         series="$($finder $testid | grep ^Series | awk '{print $2}' | tr -d ':')"
     fi
 
@@ -546,6 +553,7 @@ Main()
     local prime=no
     local quiet=no
     local test=no
+    local internal_testing=no
     local create_conf=no
     local bit32=no
     local ignore_errors=no
