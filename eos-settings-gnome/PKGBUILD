@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-gnome
-pkgver=1.4
+pkgver=1.5
 pkgrel=1
 pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
@@ -9,10 +9,12 @@ groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
-source=("https://github.com/endeavouros-team/$pkgname/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('a79d51f015532b1cecb909cab9baf63a24ea9c6da7fa201cf0b2695017630d86')
+source=('99_endeavouros-gnome.gschema.override'
+        'endeavouros.xml')
+sha256sums=('8257b02155bfe17ee0be601eba769a22863c38e783cd3b8c878228b9983c01ee'
+            '667db128209759a157638fb3fdc7efcfd30cf499fcb56c727da380054c6f8393')
 
 package() {
-    install -Dm755 "${srcdir}/${pkgname}-${pkgver}/99_endeavouros-gnome.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-gnome.gschema.override"
-    install -Dm644 "${srcdir}/${pkgname}-${pkgver}/endeavouros.xml" "${pkgdir}/usr/share/gnome-background-properties/endeavouros.xml"
+    install -Dm755 "${srcdir}/99_endeavouros-gnome.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-gnome.gschema.override"
+    install -Dm644 "${srcdir}/endeavouros.xml" "${pkgdir}/usr/share/gnome-background-properties/endeavouros.xml"
 }

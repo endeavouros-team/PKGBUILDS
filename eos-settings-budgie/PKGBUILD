@@ -1,14 +1,15 @@
 # Maintainer: joekamprad<joekamprad at endeavouros.com>
 
 pkgname=eos-settings-budgie
-pkgver=1.1
+pkgver=1.3
 pkgrel=1
 pkgdesc="Budgie settings for EndeavourOS"
 arch=('any')
+groups=('EndeavourOS')
 license=('GPL3')
 source=('99_endeavouros-budgie.gschema.override')
 depends=('endeavouros-theming')
-sha256sums=('e0687e62c82bdeb6a253284003c926168bd0c05ce7d88aa141eb0230de0b252d')
+sha256sums=('69e73b2097999ca00fad4a8a9f17205b16b41e2d3ba3f6e67d45b2ca86def46a')
 
 package() {
 	install -Dm644 "${srcdir}/99_endeavouros-budgie.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-budgie.gschema.override"

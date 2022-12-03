@@ -7,7 +7,7 @@ icon-theme='Qogir'
 monospace-font-name='Source Code Pro 10'
 	
 [com.solus-project.icon-tasklist]
-pinned-launchers=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']
+pinned-launchers=['firefox.desktop', 'nemo.desktop', 'org.gnome.Terminal.desktop']
 
 [com.solus-project.budgie-panel]
 builtin-theme=true
