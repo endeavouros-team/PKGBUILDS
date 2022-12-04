@@ -48,7 +48,6 @@ PKGNAMES=(                                        # Alphabetically ordered.
     ckbcomp
 
     downgrade/aur
-    dracut-hook/aur
 
     endeavouros-keyring
     endeavouros-mirrorlist
@@ -63,6 +62,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-apps-info
     eos-bash-shared
     eos-downgrade
+    eos-dracut                   # was: dracut-hook/aur
     eos-hooks
     eos-lightdm-gtk-theme
     eos-lightdm-slick-theme

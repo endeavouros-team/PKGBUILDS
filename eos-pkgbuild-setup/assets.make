@@ -425,7 +425,7 @@ Assets_clone()
     if [ -n "${ASSET_PACKAGE_EPOCH_HOOKS[*]}" ] ; then
         local oldnames oldname newname
         for xx in "${PKGNAMES[@]}" ; do
-            PkgbuildExists "$xx" 3 || continue
+            PkgbuildExists "$xx" "line $LINENO" || continue
             hook="${ASSET_PACKAGE_EPOCH_HOOKS[$xx]}"
             if [ -n "$hook" ] ; then
                 oldnames="$(/usr/bin/ls -1 ${xx}-*)"  # files *.zst and *.zst.sig
@@ -451,10 +451,13 @@ PkgbuildExists() {
         return 0
     else
         if [ "$special" != "" ] ; then
-            local line=("$yy ($special): no PKGBUILD! File listing:"
-                        "$(ls -l "$PKGBUILD_ROOTDIR/$yy" | sed 's|^|    ==> |')")
-            line="$(printf "%s\n" "${line[@]}")"
-            DebugWithLineNr "$line"
+            local files=$(ls -l "$PKGBUILD_ROOTDIR/$yy" 2>/dev/null)
+            printf2 "WARNING (${PROGNAME}, $special): no PKGBUILD!\n"
+            if [ -n "$files" ] ; then
+                printf2 "File listing:\n"
+                echo2 "$files" | sed 's|^|    ==> |'
+            fi
+            # DebugWithLineNr "$line"
         fi
         return 1
     fi
@@ -951,7 +954,7 @@ Main2()
             ShowIndented "$(JustPkgname "$xx")" 1
             pkgdirname="$(ListNameToPkgName "$xx" yes)"
             test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
-            PkgbuildExists "$pkgdirname" 1 || continue
+            PkgbuildExists "$pkgdirname" "line $LINENO" || continue
 
             # get versions from latest PKGBUILDs
             tmp="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
@@ -1024,8 +1027,8 @@ Main2()
         echo2 "Check if building is needed..."
         for xx in "${PKGNAMES[@]}" ; do
             pkgdirname="$(ListNameToPkgName "$xx" no)"
-            #PkgbuildExists "$xx" 2 || continue
-            PkgbuildExists "$xx" 2a || continue
+            #PkgbuildExists "$xx" "line $LINENO" || continue
+            PkgbuildExists "$xx" "line $LINENO" || continue
 
             cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
 
@@ -1145,6 +1148,11 @@ Main2()
                         endeavouros-testing-dev)
                             archive_git="$ASSETSDIR"/../../archive/.git
                             archive_tag=repo-testing
+                            ;;
+                        *)
+                            # TODO
+                            # archive_git="$ASSETSDIR"/../../archive/$REPONAME/.git
+                            # archive_tag=x86_64
                             ;;
                     esac
 
