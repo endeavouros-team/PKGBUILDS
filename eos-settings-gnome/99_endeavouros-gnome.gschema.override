@@ -1,0 +1,16 @@
+[org.gnome.shell]
+favorite-apps=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Console.desktop']
+
+[org.gnome.desktop.background]
+color-shading-type='solid'
+picture-options='zoom'
+picture-uri='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
+picture-uri-dark='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
+primary-color='#46226e'
+secondary-color='#000000'
+
+[org.gnome.desktop.interface]
+color-scheme='default'
+cursor-theme='Qogir'
+gtk-theme='Adwaita'
+icon-theme='Qogir'
