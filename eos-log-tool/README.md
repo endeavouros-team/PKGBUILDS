@@ -3,6 +3,14 @@ A GUI tool for copying various system logs to the internet.
 
 ![](eos-log-tool.png)
 
+## Options
+
+Name   |   Description
+:--- | :---
+`-j, --enable-journal` | Enable showing journal logs.<br>Note that some logs *may* include personal data.<br>
+`-h, --help` | This help.
+
+
 ## Use cases
 
 If a user wants help in troubleshooting an issue, with this tool user
