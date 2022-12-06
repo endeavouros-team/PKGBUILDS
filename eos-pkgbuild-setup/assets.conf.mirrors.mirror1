@@ -149,7 +149,7 @@ PKGNAMES_WAIT=(
 
 declare -A PKG_MAKEPKG_OPTIONS
 
-PKG_MAKEPKG_OPTIONS[dracut-hook]="--nodeps"
+PKG_MAKEPKG_OPTIONS[eos-dracut]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
 PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-lightdm-slick-theme]="--nodeps"

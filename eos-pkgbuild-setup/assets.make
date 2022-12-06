@@ -984,7 +984,7 @@ Main2()
                 continue
             fi
             if IsInWaitList "$xx" "$tmp" ; then
-                echo2 "WAIT $tmpcurr ==> $tmp"
+                echo2 "WAITING ($tmpcurr ==> $tmp)"
                 continue
             fi
             
