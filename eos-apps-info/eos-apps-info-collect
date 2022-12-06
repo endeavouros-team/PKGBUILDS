@@ -164,11 +164,11 @@ Main()
 
     Md2html mirrorlist-rank-info   reflector-simple/man
 
-    for app in nvidia-driver-supported-branches nvidia-installer-check ; do
-        Md2html $app nvidia-installer-db/man
+    for app in nvidia-driver-supported-branches ; do
+        Md2html $app nvidia-installer-common/man
     done
 
-    Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
+    # Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
     Md2html welcome                welcome/man
 
     # man page to html
