@@ -47,6 +47,11 @@ eos-rankmirrors [options]
   --verbose
              Show more detailed output.
 
+  --mirror-verbosity <value>
+             How much information will be shown when a mirror fails.
+             Supported values: see file /etc/eos-rankmirrors.conf, setting
+             EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY.
+
   --help
   -h
              This help.
@@ -62,6 +67,7 @@ Variable name | Default value | Description
 EOS_AUTO_MIRROR_RANKING | no | Write the ranking result to file `/etc/endeavouros-mirrorlist`<br>or `/etc/endeavouros-mirrorlist.pacnew`.
 EOS_AUTORANK_TIMEOUT | 30 | Timeout in seconds for each mirror to respond.
 ALWAYS_FIRST_EOS_MIRRORS | `''` (an empty string) | A list of mirrors to set as first in the ranking result.
+EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY | show | How much information will be shown a mirror fails to rank.<br>Supported values: `all`, `code`, `show`, `none`.<br>See `/etc/eos-rankmirrors.conf` for more details.
 
 
 Example:
@@ -73,5 +79,7 @@ EOS_AUTO_MIRROR_RANKING=no
 
 EOS_AUTORANK_TIMEOUT=10
 
-ALWAYS_FIRST_EOS_MIRRORS='https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch'
+ALWAYS_FIRST_EOS_MIRRORS='tsinghua|pizza|funami'
+
+EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY=none
 ```
