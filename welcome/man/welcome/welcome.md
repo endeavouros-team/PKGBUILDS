@@ -22,6 +22,7 @@ eos-welcome [options]
 ```
 --enable | -f     Enable this Welcome app.
 --disable         Disable this Welcome app.
+--once | -1       Allow to run Welcome even if disabled.
 --lang=X          Use language X on the user interface. Default for X: 'en'
 --version         Show the version of this app.
 --startdelay=X    Wait before actually starting this app.
@@ -48,6 +49,13 @@ To re-enable the app, click the Welcome app icon, or use the terminal command
 eos-welcome --enable
 ```
 
+To run Welcome *once* even if it is already disabled, use option `--once`:
+```
+eos-welcome --once
+```
+Welcome will stay disabled after using option `--once`.
+
+
 Note: check also settings in the configuration file `~/.config/EOS-greeter.conf`.
 
 ### Personalizing Welcome
@@ -70,12 +78,16 @@ If the extracted value is not supported by Welcome, English will be used.
 
 ## Tips
 
-### Software news
+### <b>Software news</b>
 
 Welcome app window includes a button **Software News** on the lower left corner.<br>
 It contains useful and important news for the user about the EndeavourOS software, e.g. manual interventions or important code changes.
 
 Make sure you click that button regularly!
+
+### <b>Critical info area</b>
+
+Welcome has an info area for critical or very important news near the upper edge of the window.<br>This will used for the uttermost important messages that affect all or most EndeavourOS users.<br>When this area contains text, it is a very good idea to read it!
 
 ### Add favorite packages at install time
 
