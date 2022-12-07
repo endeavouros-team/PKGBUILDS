@@ -9,7 +9,7 @@ groups=('EndeavourOS')
 license=('GPL3')
 source=('99_endeavouros-budgie.gschema.override')
 depends=('endeavouros-theming')
-sha256sums=('e257b51b57d4a2c104c6eec1f832a9f07b18cb82ee655fe4b18d819421d5a8c3')
+sha256sums=('e8a97f41cdae404087af6fa79666135c30e996d130992701161952290f8a210a')
 
 package() {
 	install -Dm644 "${srcdir}/99_endeavouros-budgie.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-budgie.gschema.override"
