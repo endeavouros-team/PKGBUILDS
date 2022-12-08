@@ -1,0 +1,48 @@
+# Original Maintainer: Portergos Linux <portergoslinux at gmail.com>
+# Maintainer : EndeavourOS <info at endeavouros.com>
+# Calamares installer configured for EndeavourOS
+
+pkgname=calamares
+pkgver=22.12.1
+pkgrel=1
+pkgdesc="Calamares installer for EndeavourOS - Development version"
+arch=('any')
+url="https://github.com/endeavouros-team/calamares"
+license=('GPL3')
+optdepends=('calamares_config_default' 'calamares_config_ce')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
+conflicts=('calamares_current')
+depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
+'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
+'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
+provides=("calamares")
+options=(!strip !emptydirs)
+source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+
+sha256sums=('9ac0cef17283b693b49f7e359bbc98fc9675b2f1fdb8134da4c69f324695507e')
+
+build() {
+    cmake -B build -S "${srcdir}/calamares-${pkgver}" \
+    -DWEBVIEW_FORCE_WEBKIT=OFF \
+    -DWITH_PYTHONQT=OFF \
+    -DWITH_KF5DBus=OFF \
+    -DWITH_APPSTREAM=OFF \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DBoost_NO_BOOST_CMAKE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_CONFIG=OFF \
+    -DSKIP_MODULES="dracut \
+    dummycpp dummyprocess dummypython dummypythonqt \
+    finishedq initcpio keyboardq license localeq notesqml oemid \
+    openrcdmcryptcfg plymouthcfg plasmalnf services-openrc \
+    summaryq tracking usersq webview welcomeq"
+    export DESTDIR="$srcdir/build"
+    make -C build
+}
+
+package() {
+    make -C build DESTDIR="${pkgdir}" install
+    install -dm 755 "${pkgdir}/etc"
+    cp -rp "${srcdir}/calamares/data/eos" "${pkgdir}/etc/calamares"
+}
