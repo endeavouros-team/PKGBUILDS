@@ -5,11 +5,10 @@
 pkgname=calamares
 pkgver=22.12.1
 pkgrel=1
-pkgdesc="Calamares installer for EndeavourOS - Development version"
+pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
-optdepends=('calamares_config_default' 'calamares_config_ce')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
 conflicts=('calamares_current')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
@@ -31,7 +30,6 @@ build() {
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     -DBoost_NO_BOOST_CMAKE=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DINSTALL_CONFIG=OFF \
     -DSKIP_MODULES="dracut \
     dummycpp dummyprocess dummypython dummypythonqt \
     finishedq initcpio keyboardq license localeq notesqml oemid \
