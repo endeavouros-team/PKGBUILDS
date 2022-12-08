@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=1.35
+pkgver=1.36
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -14,19 +14,15 @@ depends=(
   yad-eos               # a patched yad
   eos-translations
   python-dbus           # for ksetwallpaper.py
-  xorg-xrandr           # for eos-wallpaper-set
   endeavouros-theming   # for eos-wallpaper-set
-  xdg-utils             # for eos-pkginfo
+  xdg-utils             # for eos-sendlog
 )
 optdepends=(
+    "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
     "wgetpaste-eos: needed when wgetpaste is selected in eos-sendlog.conf"
     "neofetch: for additional DE detection"
-    #  "yay:      an AUR helper supported by eos-pkginfo"
-    #  "paru:     an AUR helper supported by eos-pkginfo"
     "kde-gtk-config: to remove gtk related yad warnings"
-
     'yad: upstream yad provider'
-    # 'yad-eos: alternative yad provider (includes fixes)'
 )
 
 backup=(
@@ -82,13 +78,13 @@ sha512sums=('702840a563c2dcbc117b93f2a1cc3ecd801e7062ac2007384510130e1bbf17b8eca
             '6c27a5bf1a9b54f629f27fcc75a4edb240e1df2c4122aae307f208df174a44513a9b63be3ebb0d0e563952021d9987cd46584cb229b1a4f221d97425da0df3d1'
             'a67976cb1aab264585a671c9f773bce6a033b66acdfeaac34a62f61818fabb176cb3437b9a5e42f62e6b24c2b8d9bfec850eea4d3c8f8d56804a4d43495187ed'
             'e5f57f2800602b0f45e7875811a099ba2588e0d19486dd9bf47fa71013cd7eac1add3de924689188943002ef29bea2950cb3816a19c4a3e011833914d936f64d'
-            '0193f851b4145cb761dc2e47f4bd2c00a028c016489bb2f053bba64ef88c08d02e81f9dc095ba3928de8fa0fbb1fd2b3e5289bb125fe7dcc31634b7afbf48818'
+            'c0f696426f955171688c94e47d6dc4253ee302c99b19b1b6f9a26c816ec4fc700fd3739ac3a3f38609eda495474c88ba014caf3bcac3132c49be9e253e48bf58'
             'dfb17438b66c0e17f86d3160d49866f8bbd22a60e0f97d9a1ff33fb41bddc1cd03b2fdf0fe378f937fcd836a31f7a407fd64b9714c4e1cc494e890b5f4f7a9ca'
             '1605786ecaf407078cd4b2f4db63ec46917b1186b2391478093b2a7d049e3679526a398ef84c90ca9a5b1a9c97e4b513c340b31fa560445a0a294656f7fa22e7'
             'e19bdc5dc17d0594d7ef18910263915dabe65684362584653a008391c42d27ef64f65355b7b9a3fa62f04d6ded441f1183291c09d8fb418a8d4f0176c4d5a297'
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
-            '7340f839bbb4dc495dda8af1b8c56e915aaeab2a13252a8b0f37835904cc46e8e85e2490216609a50701111c0e49cc7574edeb4882b2df3bbd2724ad2e3a6095'
+            '291176d3689d219b43302f012ea62f6a593564d204f0004c58ae63b0a80efb9d5a27667c62a2be7f4fc977f1df254152f61e651732dcc61104de3130632634dd'
             'bbaf42dbb602bc5794a0de990b1dfe1db74cf31d4a5cbb7f46d381e018fe68c6a86635b08029ef2791ffac7dc8069c130370ecc0b2595fc8eac9b9abf0a8b8cd'
             'fedeb5baf76a9f990e30254b07c5b9658dd7175d58749c0511cb142802cf49d5ac275b234046f879ce9e90be10ed3a75b1b552854a30544c5211905b1408a182'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'

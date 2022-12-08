@@ -8,6 +8,11 @@ source /usr/share/endeavouros/scripts/eos-script-lib-yad || {
 }
 export -f eos_yad
 
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
 Restart_me() {
     local tmpfile=$(mktemp)
     cat <<EOF > $tmpfile
@@ -25,6 +30,9 @@ export -f Restart_me
 yad_ChangeDisplayResolution() {
     local reso="$1"
     local progname="${BASH_SOURCE[1]}"    #  "$(basename $0)"
+    if ! type xrandr >& /dev/null ; then
+        DIE "this implementation needs package 'xorg-xrandr'."
+    fi
     local query="$(xrandr --query)"
     local output="$(echo "$query" | grep " connected " | head -n 1 | awk '{print $1}')"
     local xrandr="xrandr --output $output --mode"

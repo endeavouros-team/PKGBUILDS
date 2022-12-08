@@ -309,6 +309,10 @@ Main()
     local picfolder=/usr/share/endeavouros/backgrounds
     local pic=""
 
+    case "$DE" in
+        XFCE) type xrandr >& /dev/null || DIE "Sorry, this implementation needs package 'xorg-xrandr' on Xfce." ;;
+    esac
+
     Parameters "$@"
 
     if [ -z "$pic" ] ; then
