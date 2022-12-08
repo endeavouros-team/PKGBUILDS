@@ -44,5 +44,5 @@ build() {
 package() {
     make -C build DESTDIR="${pkgdir}" install
     install -dm 755 "${pkgdir}/etc"
-    cp -rp "${srcdir}/calamares/data/eos" "${pkgdir}/etc/calamares"
+    cp -rp "${srcdir}/calamares-${pkgver}/data/eos" "${pkgdir}/etc/calamares"
 }
