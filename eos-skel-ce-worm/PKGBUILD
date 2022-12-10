@@ -3,8 +3,8 @@
 
 _pkgname=worm
 pkgname=eos-skel-ce-worm
-pkgver=1.0
-pkgrel=11
+pkgver=1.1
+pkgrel=1
 pkgdesc="pre user creation skel setup for worm EOS-CE"
 arch=('any')
 url="https://github.com/EndeavourOS-Community-Editions/${pkgname}"
