@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-gnome
-pkgver=1.5
+pkgver=2
 pkgrel=1
 pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
@@ -10,11 +10,14 @@ url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
 source=('99_endeavouros-gnome.gschema.override'
+        '98_endeavouros-gnome-console.gschema.override'
         'endeavouros.xml')
 sha256sums=('8257b02155bfe17ee0be601eba769a22863c38e783cd3b8c878228b9983c01ee'
+            '07e38ae2006b50e813cfc67021da150597ef88d0efc81147dc5d8955032224f3'
             '667db128209759a157638fb3fdc7efcfd30cf499fcb56c727da380054c6f8393')
 
 package() {
     install -Dm755 "${srcdir}/99_endeavouros-gnome.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-gnome.gschema.override"
+    install -Dm755 "${srcdir}/98_endeavouros-gnome-console.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/98_endeavouros-gnome-console.gschema.override"
     install -Dm644 "${srcdir}/endeavouros.xml" "${pkgdir}/usr/share/gnome-background-properties/endeavouros.xml"
 }
