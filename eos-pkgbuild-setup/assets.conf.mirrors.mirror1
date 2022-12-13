@@ -37,14 +37,16 @@ export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD fil
 #
 PKGNAMES=(                                        # Alphabetically ordered.
     akm
-    arc-gtk-theme-eos
+#    arc-gtk-theme-eos
     arc-x-icons-theme/aur
 
     bashdb/aur
 
+    calamares
+    calamares_current  # ???
+
     calamares_config_ce
     calamares_config_default
-    calamares_current
     ckbcomp
 
     downgrade/aur
@@ -64,7 +66,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-downgrade
     eos-dracut                   # was: dracut-hook/aur
     eos-hooks
-    eos-lightdm-gtk-theme
+#    eos-lightdm-gtk-theme
     eos-lightdm-slick-theme
     eos-log-tool
     eos-lxdm-gtk3
@@ -98,15 +100,11 @@ PKGNAMES=(                                        # Alphabetically ordered.
     kernel-install-for-dracut/aur
     keyserver-rank
 
-    # ly/aur
-
     mkinitcpio-openswap/aur
 
     nvidia-hook
     nvidia-inst
     nvidia-installer-common
-    # nvidia-installer-db
-    # nvidia-installer-dkms
 
     pahis
     paper-icon-theme
@@ -128,6 +126,12 @@ PKGNAMES=(                                        # Alphabetically ordered.
     zfs-dkms/aur
     zfs-utils/aur
 )
+
+if false ; then
+    PKGNAMES=(
+        ckbcomp
+    )
+fi
 
 # PKGNAMES_WAIT specifies which of the packages in PKGNAMES will not be built.
 # Include them in quotes because we use the pipe character '|' to separate package name and the version.
@@ -157,6 +161,7 @@ PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-sddm-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
 PKG_MAKEPKG_OPTIONS[kernel-install-for-dracut]="--nodeps"
+PKG_MAKEPKG_OPTIONS[calamares]="--nodeps"
 
 PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
@@ -351,16 +356,17 @@ _ckbcomp_hook() {
     if [ $retval -ne 0 ] ; then
         _ckbcomp_hook_new
         return
-
-        #printf "fetching info failed, curl code $retval. " >&2
-        #return 1
     fi
     if [ -n "$(echo "$info" | grep "503 Service Unavailable")" ] ; then
         printf "fetching info failed. " >&2
         return 1
     fi
-    # local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -e 's|.*/console-setup-||' -e 's|\.tar\..*||')
-    local newver=$( echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1 | sed -E 's|.*/archive/debian/([^/]+).*|\1|' )
+    local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1)
+    newver=$(echo "$newver" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
+    if [ -n "$(echo "$newver" | sed 's|[0-9\.]*||g')" ] ; then
+        printf "finding new version failed, got '$newver'" >&2
+        return 1
+    fi
 
     if [ $(vercmp "$newver" "1.211") -le 0 ] ; then
         return                 # NOTE: 1.196 - 1.211: 'ckbcomp' hasn't changed!
