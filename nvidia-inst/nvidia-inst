@@ -270,7 +270,7 @@ IsNvidiaCard() {
 test_for_IBT_off() {
     local data=$(lspci -vnn | grep -P 'VGA|3D|Display' | grep "GeForce RTX [34]0[0-9][0-9]")
     if [ -n "$data" ] ; then
-        Note "kernel parameter 'ibt=off' may be required, see https://wiki.archlinux.org/title/NVIDIA#Installation"
+        Note "Kernel parameter 'ibt=off' may be required, see https://wiki.archlinux.org/title/NVIDIA#Installation"
     fi
 }
 
@@ -281,6 +281,8 @@ ShowCommandsToRun() {
     if [ -n "$cmd" ] ; then
         xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
         indent2 "$xx"
+    else
+        indent2 "==> Looks like all requested packages and settings are already OK!"
     fi
     echo2 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
@@ -594,7 +596,7 @@ Main()
         fi
     fi
 
-    # test_for_IBT_off
+    test_for_IBT_off
 
     ProperNvidiaPackages
 
