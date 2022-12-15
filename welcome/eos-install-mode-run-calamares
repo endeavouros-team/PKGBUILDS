@@ -49,39 +49,73 @@ CatchChrootedPacmanLog() {
     done
 }
 
-### Starts logging into the install log. ###
-InstallLog_Start() {
-    local preprelogfile="$(eos-select-file-server --logfilename)"
+inxi_output() {
+    if [ -x /usr/bin/inxi ] ; then
+        local inxiout="$(inxi -Czc0 ; inxi -Gnmzac0)"
+        cat <<EOF >> $log
+########## inxi:
+$inxiout
+EOF
+    fi
+}
+
+os-prober_output() {
+    if [ -x /usr/bin/os-prober ] ; then
+        local os_prober_out="$(sudo os-prober)"
+        cat <<EOF >> $log
+########## os-prober:
+$os_prober_out
+EOF
+    fi
+}
+
+LogHeader() {
     local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
     local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
-    local inxiout="$(inxi -Czc0 ; inxi -Gnmzac0)"
+    local date=$(date -u "+%x %X")
 
     [ -n "$calamares_version"] || calamares_version="$(pacman -Q calamares_current 2>/dev/null | awk '{print $NF}')"  # this line is probably not needed
 
     cat <<EOF > $log
 ########## $log by $progname
-########## Started (UTC): $(date -u "+%x %X")
+########## Started (UTC): $date
 ########## Install mode: $mode
 ########## ISO version: $ISO_version
 ########## Calamares version: $calamares_version
-########## inxi:
-$inxiout
+EOF
+    inxi_output
+    os-prober_output
+}
+
+PreliminaryLogFile() {
+    local preprelogfile="$(eos-select-file-server --logfilename)"
+    local output=""
+
+    if [ -r "$preprelogfile" ] ; then
+        output=$(cat "$preprelogfile")
+        cat <<EOF >> $log
 
 ## >>> Preliminary log before starting calamares:
-EOF
-    if [ -r $preprelogfile ] ; then
-        cat <<EOF >> $log
-$(cat $preprelogfile)
-
+$output
 EOF
     fi
-    cat <<EOF >> $log
-$(cat "$prelogfile")
+
+    if [ -r "$prelogfile" ] ; then
+        output=$(cat "$prelogfile")
+        cat <<EOF >> $log
+$output
 ## <<< End of preliminary log.
 
 EOF
+    fi
     rm -f "$prelogfile"
     rm -f "$preprelogfile"
+}
+
+### Starts logging into the install log. ###
+InstallLog_Start() {
+    LogHeader
+    PreliminaryLogFile
 
     if [ "$ShowInstallLog" = "TRUE" ] ; then
         FollowFile "$log" "Install log" 20 20
@@ -241,7 +275,6 @@ Main() {
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
-    local all_sudo_commands=":"                 # all root commands will be collected to this variable!
     local workdir=""
     local prelogfile=""
 
