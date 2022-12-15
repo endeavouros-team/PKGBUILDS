@@ -28,7 +28,7 @@ _yad-eos_prepare() {
     pkgrel="$pkgrel".1
 
     source+=($url/yad-github-issue-107.patch)
-sha256sums=('896c91fe8f7661ebbb28365f45003512e8954663bf9f13821bf664562092ed2c'
+sha256sums=('e490f3e149d05957969a9b2776a7c5cdfe00516fe31cf37c5e2bf2dde65238de'
             '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
 
     # Take care of conflicting packages:
