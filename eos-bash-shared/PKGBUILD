@@ -6,23 +6,22 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=1.36
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
   bash
-  yad-eos               # a patched yad
   eos-translations
   python-dbus           # for ksetwallpaper.py
   endeavouros-theming   # for eos-wallpaper-set
   xdg-utils             # for eos-sendlog
+  yad                   # provides support for graphical dialogs
 )
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
     "wgetpaste-eos: needed when wgetpaste is selected in eos-sendlog.conf"
     "neofetch: for additional DE detection"
     "kde-gtk-config: to remove gtk related yad warnings"
-    'yad: upstream yad provider'
 )
 
 backup=(
