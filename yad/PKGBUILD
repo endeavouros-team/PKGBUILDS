@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+# Latest yad release with a patch (if needed).
+
+_yad-eos_prepare() {
+    local orig_name=yad
+    local apply_patch=no       # yes = apply patch, no = do not apply patch
+    local change_name=no       # always: no !!
+
+    curl --fail -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$orig_name/trunk/PKGBUILD || exit 1
+
+    if [ "$change_name" = "yes" ] ; then
+        # keep the original pkgname in PKGBUILD for building a package
+        sed -i PKGBUILD.orig -e 's|${pkgname}|'$orig_name'|'
+    fi
+
+    # patch the dialog height issue, see https://sourceforge.net/p/yad-dialog/tickets/322/#6f2d
+    if [ "$apply_patch" = "yes" ] ; then
+        sed -i PKGBUILD.orig -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n'
+    fi
+
+    source PKGBUILD.orig
+    rm -f PKGBUILD.orig
+
+    if [ "$change_name" = "yes" ] ; then
+        # now change to the new pkgname
+        pkgname=${orig_name}-eos
+
+        # Use our web page
+        url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+    fi
+
+    if [ "$apply_patch" = "yes" ] ; then
+        # update pkgrel because of this patch
+        source+=($url/yad-github-issue-107.patch)
+        pkgrel="$pkgrel".1
+
+        # Take care of conflicting packages:
+        conflicts=($orig_name ${orig_name}-git)
+        provides=($orig_name)
+    else
+        # now the patched yad package is called 'yad' again, so if yad-eos is installed, replace it.
+        replaces=(yad-eos)
+    fi
+
+    # Add architectures
+    arch+=('aarch64' 'armv7h')
+}
+
+_yad-eos_prepare
+unset -f _yad-eos_prepare
