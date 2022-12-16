@@ -6,6 +6,7 @@
 
 _yad-eos_prepare() {
     local orig_name=yad
+    local apply_patch=no       # yes = apply patch, no = do not apply patch
 
     curl -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$orig_name/trunk/PKGBUILD || exit 1
 
@@ -13,7 +14,9 @@ _yad-eos_prepare() {
     sed -i PKGBUILD.orig -e 's|${pkgname}|'$orig_name'|'
 
     # patch the dialog height issue, see https://sourceforge.net/p/yad-dialog/tickets/322/#6f2d
-    sed -i PKGBUILD.orig -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n'
+    if [ "$apply_patch" = "yes" ] ; then
+        sed -i PKGBUILD.orig -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n'
+    fi
 
     source PKGBUILD.orig
     rm -f PKGBUILD.orig
@@ -25,10 +28,12 @@ _yad-eos_prepare() {
     url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 
     # update pkgrel because of this patch
-    pkgrel="$pkgrel".1
+    if [ "$apply_patch" = "yes" ] ; then
+        pkgrel="$pkgrel".1
+    fi
 
     source+=($url/yad-github-issue-107.patch)
-sha256sums=('e490f3e149d05957969a9b2776a7c5cdfe00516fe31cf37c5e2bf2dde65238de'
+sha256sums=('794442b03cc22c64020f44511eb97400bae2dcb82883185399f6c6be6219c009'
             '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
 
     # Take care of conflicting packages:
