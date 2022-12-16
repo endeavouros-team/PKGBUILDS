@@ -118,6 +118,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     wgetpaste-eos
     worm/aur
 
+    yad
     yad-eos
     yay/aur
 
