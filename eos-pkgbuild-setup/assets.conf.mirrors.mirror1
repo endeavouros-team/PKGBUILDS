@@ -95,8 +95,6 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-translations
     eos-update-notifier
 
-    inxi/aur
-
     kernel-install-for-dracut/aur
     keyserver-rank
 
