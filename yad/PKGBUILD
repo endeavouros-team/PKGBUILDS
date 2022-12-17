@@ -6,7 +6,7 @@
 
 _yad-eos_prepare() {
     local orig_name=yad
-    local apply_patch=no       # yes = apply patch, no = do not apply patch
+    local apply_patch=yes      # yes = apply patch, no = do not apply patch
     local change_name=no       # always: no !!
 
     curl --fail -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$orig_name/trunk/PKGBUILD || exit 1
@@ -40,14 +40,18 @@ _yad-eos_prepare() {
         # Take care of conflicting packages:
         conflicts=($orig_name ${orig_name}-git)
         provides=($orig_name)
-    else
-        # now the patched yad package is called 'yad' again, so if yad-eos is installed, replace it.
-        replaces=(yad-eos)
     fi
+
+    # Previously the patched yad package was called 'yad-eos', so if yad-eos is installed, replace it.
+    replaces=(yad-eos)
 
     # Add architectures
     arch+=('aarch64' 'armv7h')
+
+sha256sums=('794442b03cc22c64020f44511eb97400bae2dcb82883185399f6c6be6219c009'
+            '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
 }
 
 _yad-eos_prepare
 unset -f _yad-eos_prepare
+
