@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-xfce4-theming
 pkgname=endeavouros-skel-xfce4
-pkgver=3.0
+pkgver=3.1
 pkgrel=1
 pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
 arch=("any")
@@ -11,7 +11,7 @@ license=("GPL")
 makedepends=("git")
 depends=("endeavouros-skel-default" "endeavouros-theming")
 source=("https://github.com/endeavouros-team/endeavouros-xfce4-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('9eaf142812a454d88ec1cec47bd4d6a67437c519b2027bef1d346559d09bd5b9')
+sha256sums=('9f4f1f0f2d410eed60ac3016e1f761d516b982bd89a034a668c8674528d8733a')
 
 package() {
     PREFIX=/etc/skel
