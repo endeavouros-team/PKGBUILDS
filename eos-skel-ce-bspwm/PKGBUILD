@@ -1,6 +1,6 @@
-# Maintainer: Snehit Sah <snehitsah@protonmail.com>
-# Contributor: The-Repo-Club <The-Repo-Club@github.com>
-# Contributor: joekamprad <joekamprad@endeavourOS.com>
+# Maintainer: Snehit Sah <snehitsah at protonmail.com>
+# Contributor: The-Repo-Club <The-Repo-Club at github.com>
+# Contributor: joekamprad <joekamprad at endeavourOS.com>
 
 _pkgname=bspwm
 pkgname=eos-skel-ce-bspwm
