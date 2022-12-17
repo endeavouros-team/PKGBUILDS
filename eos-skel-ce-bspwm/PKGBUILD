@@ -4,7 +4,7 @@
 
 _pkgname=bspwm
 pkgname=eos-skel-ce-bspwm
-pkgver=1.2
+pkgver=1.3
 pkgrel=1
 pkgdesc="Pre user creation skel setup for Bspwm EOS-CE"
 arch=('any')
