@@ -6,13 +6,7 @@
 
 IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
-        if [ -r /proc/version ] ; then
-            # this works with grub and refind
-            running_kernel=$(cat /proc/version | sed 's|.*(\([^@]*\)@archlinux).*|\1|')
-        else
-            # this works with grub but not with refind
-            running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')
-        fi
+        running_kernel=$(eos_running_kernel)
     fi
     test "$1" = "$running_kernel"
 }
@@ -23,10 +17,12 @@ Main() {
     local targets=$(cat)  # list of updated package names from the hook (stdin)
     local target
     local running_kernel=""
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return
 
+    # do not notify if the updated package is not in use
     for target in $targets ; do
         case "$target" in
-            linux | linux-lts | linux-zen | linux-hardened | linux-lts?? | linux-lts???)
+            linux | linux-lts | linux-zen | linux-hardened | linux-rt | linux-rt-lts | linux-lts?? | linux-lts???)
                 # Note: only official and older LTS kernels are checked.
                 if IsRunningKernel "$target" ; then
                     DoNotify
