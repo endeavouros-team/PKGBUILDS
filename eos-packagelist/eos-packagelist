@@ -107,9 +107,9 @@ if __name__ == '__main__':
         url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-arm/calamares-image/main/configs/calamares/modules" \
               "/packagechooser_ce.conf"
     else:
-        url_netinstall = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
+        url_netinstall = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
               "/netinstall.yaml"
-        url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-calamares/main/calamares/modules" \
+        url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
               "/packagechooser_ce.conf"
 
     # Get the data from the internet and parse it
