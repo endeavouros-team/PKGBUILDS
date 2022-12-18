@@ -740,10 +740,29 @@ fi
 eos_running_kernel() {
     # Output the name of the running kernel, e.g. 'linux-lts'.
     # If unable to determine the running kernel, output nothing.
+    # Note the alternative (fallback) implementations below.
+
+    local running_kernel=""
+    local pkgbase="/usr/lib/modules/$(uname --kernel-release)/pkgbase"
+
+    if [ -r "$pkgbase" ] ; then
+        running_kernel="$(cat "$pkgbase")"
+        case "$running_kernel" in
+            linux*) echo "$running_kernel" ; return ;;
+        esac
+    fi
 
     if [ -r /proc/version ] ; then
-        cat /proc/version | sed 's|.*(\([^@]*\)@archlinux).*|\1|'                # this works with grub and refind
-    elif [ -r /proc/cmdline ] ; then
-        cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|'   # fallback, this works with grub but not with refind
+        running_kernel="$(cat /proc/version | sed 's|.*(\([^@]*\)@archlinux).*|\1|')"
+        case "$running_kernel" in
+            linux*) echo "$running_kernel" ; return ;;
+        esac
+    fi
+
+    if [ -r /proc/cmdline ] ; then
+        running_kernel=$(cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|')   # works only with grub
+        case "$running_kernel" in
+            linux*) echo "$running_kernel" ; return ;;
+        esac
     fi
 }
