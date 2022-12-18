@@ -54,7 +54,11 @@ PkgName() {
 Installed() {
     local version xx
     local cmdline=$(cat /proc/cmdline)
-    local kernel=$(echo "$cmdline" | sed -E -e 's|.*initramfs-(.*).img .*|\1|' -e 's|.*/vmlinuz-([^ ]*) .*|\1|')
+    local kernel=$(eos_running_kernel)
+    case "$kernel" in
+        linux*) ;;
+        *) DIE "Internal error, cannot determine the running kernel." ;;
+    esac
     local running=$(pacman -Q $kernel | awk '{print $2}')
     local ind
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. A * marks the currently running kernel. A bolded string means the latest K.o. version":LBL "")
