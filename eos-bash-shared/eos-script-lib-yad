@@ -736,3 +736,14 @@ else
             ;;
     esac
 fi
+
+eos_running_kernel() {
+    # Output the name of the running kernel, e.g. 'linux-lts'.
+    # If unable to determine the running kernel, output nothing.
+
+    if [ -r /proc/version ] ; then
+        cat /proc/version | sed 's|.*(\([^@]*\)@archlinux).*|\1|'                # this works with grub and refind
+    elif [ -r /proc/cmdline ] ; then
+        cat /proc/cmdline | awk '{print $1}' | sed 's|^.*/vmlinuz-\(.*\)$|\1|'   # fallback, this works with grub but not with refind
+    fi
+}
