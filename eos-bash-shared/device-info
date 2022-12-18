@@ -47,7 +47,7 @@ CPU_info() {
 }
 
 InVirtualBox() {
-    if "$(InVm)" = "virtualbox" ; then
+    if [ "$(InVm)" = "virtualbox" ] ; then
         echo yes
     else
         echo no
