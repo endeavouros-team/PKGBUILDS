@@ -44,6 +44,3 @@ Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 ## Ukraine
 Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
 
-## Vietnam
-Server = https://mirrors.42tm.tech/endeavouros/repo/$repo/$arch
-
