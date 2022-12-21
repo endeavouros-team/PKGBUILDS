@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-lightdm-slick-theme
-pkgver=3.1
+pkgver=3.2
 pkgrel=1
 pkgdesc='EndeavourOS theme for lightdm-slick-greeter'
 arch=('any')
@@ -11,10 +11,10 @@ depends=('lightdm' 'lightdm-slick-greeter')
 optdepends=('eos-qogir-icons' 'arc-gtk-theme-eos')
 source=('slick-greeter.conf' '10-eos-slick.conf' 'eos-lightdm-slick-theme.install')
 install=$pkgname.install
-md5sums=('42bacde3f5e06d8269973684be20ab40'
+md5sums=('04686af0e66c1137318f960745315ed1'
          '774b899451f165c993224b74089b74b3'
          'dc098474139754b9bbd9620d8dbae813')
-sha512sums=('ae45b604d705c16c2b9104fdb9c52a0f89fde01e2d5a37868822e5874ef4ade188d1f9be2a31ac8d3c91c15c0101d82b5ca35b6d7bda637a62588a6ba1745933'
+sha512sums=('4c135ee3e56b96c99da82ea6914ecbd8a93ae74470b7e1180d2b2b0de32d66ab0b1628d5075e958da2c5bd61c941e5ef94cc35ab14f2b181587f61508caceba1'
             'bcab1b65a2b8719c5fe86bcca674c58501e4e1c4db7255b40c29b6cc5498164b581cab4538251d3a43a275bba2db056e8e845267105aa8bd063ae4077dd648ca'
             '3ea43d1a809db7a8da643d367938d881d9190d6483d0879bb4229f5269f3f3335022a91d375253a2905390078a2592953f2815bbb9932e699a98eac15fa8b06e')
 
