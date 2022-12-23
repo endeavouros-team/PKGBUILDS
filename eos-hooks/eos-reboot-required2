@@ -17,7 +17,7 @@ Main() {
     local targets=$(cat)  # list of updated package names from the hook (stdin)
     local target
     local running_kernel=""
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return
 
     # do not notify if the updated package is not in use
     for target in $targets ; do
