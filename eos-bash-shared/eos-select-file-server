@@ -44,27 +44,6 @@ SelectFileServer() {
 
             sudo sed -i /etc/eos-script-lib-yad.conf -e "s|^EOS_FILESERVER_SITE=.*|EOS_FILESERVER_SITE=$fserver|"
             Msg2 "set EOS_FILESERVER_SITE to $fserver"
-
-            # run only for liveuser
-            local from to file
-            if [ "$LOGNAME" = "liveuser" ] && [ -x /usr/bin/calamares ] ; then
-
-                file=/etc/calamares/modules/welcome_online.conf
-                sudo sed -i $file -e "s|^\([ ]*internetCheckUrl:[ ]*\).*|\1https://$fserver.com|"
-                Msg2 "changed check address to use $fserver in file $(basename $file)"
-
-                file=/etc/calamares/modules/netinstall_community-base.conf
-                from="https://gitlab.com/endeavouros-filemirror/EndeavourOS-calamares/-/raw/main/calamares/files/netinstall-ce-base.yaml"
-                to="https://github.com/endeavouros-team/EndeavourOS-calamares/raw/main/calamares/files/netinstall-ce-base.yaml"
-                sudo sed -i $file -e "s|$from|$to|"
-                Msg2 "changed 'groupsUrl' to use $fserver in file $(basename $file)"
-
-                file=/etc/calamares/modules/netinstall.conf
-                from="https://gitlab.com/endeavouros-filemirror/EndeavourOS-calamares/-/raw/main/calamares/files/netinstall.yaml"
-                to="https://github.com/endeavouros-team/EndeavourOS-calamares/raw/main/calamares/files/netinstall.yaml"
-                sudo sed -i $file -e "s|$from|$to|"
-                Msg2 "changed 'groupsUrl' to use $fserver in file $(basename $file)"
-            fi
             ;;
     esac
     echo "$fserver"

@@ -57,7 +57,9 @@ FindAppIcon() {
             return
         fi
     done
-    echo "$progname: sorry, icon path not found for app '$app'." >> /tmp/${progname}-issues.log
+
+    local log="/tmp/${progname}-issues-$EUID.log"
+    echo "$progname: sorry, icon path not found for app '$app'." >> "$log"
 }
 
 FindAppIcon "$@"

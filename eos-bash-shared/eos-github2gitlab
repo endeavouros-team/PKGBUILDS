@@ -1,6 +1,75 @@
 #!/bin/bash
 
-Github2Gitlab() {
+# Convert some github URLs to corresponding gitlab mirror URLs.
+
+DIE() {
+    local progname="$(basename "$0")"
+    echo "==> $progname: error: $1" >&2
+    exit 1
+}
+
+Github2Gitlab_new() {
+    # Get value of variable EOS_FILESERVER_SITE.
+    source /etc/eos-script-lib-yad.conf || DIE "init failed."
+
+    local github_url="$1"        # This URL may be converted to gitlab mirror.
+    local keep_master=no         # PKGBUILDS repofolder defaults to branch name 'master'.
+
+    # Manage the only option, --keep-master.
+    # Note: option should be removed, used only in eos-rankmirrors (?)
+    case "$1" in
+        --keep-master)
+            github_url="$2"
+            keep_master=yes
+            ;;
+    esac
+
+    # Check parameter validity.
+    [ -n "$github_url" ] || DIE "no URL!"
+    [[ "$github_url" =~ github ]] || DIE "'$github_url' is not a github URL"
+
+    # See which conversions are needed.
+    case "$EOS_FILESERVER_SITE" in
+        github)
+            echo "$github_url"    # If github is selected, URL is already OK.
+            ;;
+        gitlab)
+            # Some repos still use the 'master' branch.
+            [[ "$github_url" =~ /endeavouros-team/PKGBUILDS/ ]] && keep_master=yes
+
+            # Start constructing needed conversions.
+            local convert_to_gitlab=(
+                sed
+                -e 's|/endeavouros-team/|/endeavouros-filemirror/|'
+                -e 's|/endeavouros-team$|/endeavouros-filemirror|'
+            )
+            if [[ "$github_url" =~ '//raw.githubusercontent.com/' ]] ; then
+                # a few more conversions needed
+                convert_to_gitlab+=(
+                    -e 's|//raw\.githubusercontent\.com/|//gitlab.com/|'
+                    -e 's|/main/|/raw/main/|'
+                    -e 's|/calamares/calamares/|/raw/calamares/calamares/|'  # ???
+                    -e 's|/blob/|/raw/|'   # ???
+                    -e 's|/tree/|/blob/|'  # ???
+                )
+                case "$keep_master" in
+                    yes) convert_to_gitlab+=(-e 's|/master/|/raw/master/|') ;;
+                    no)  convert_to_gitlab+=(-e 's|/master/|/raw/main/|') ;;
+                esac
+            elif [[ "$github_url" =~ '//github.com/' ]] ; then
+                # not much more to convert
+                convert_to_gitlab+=(
+                    -e 's|//github\.com/|//gitlab.com/|'
+                )
+            fi
+
+            # Now make the conversion.
+            echo "$github_url" | "${convert_to_gitlab[@]}"
+            ;;
+    esac
+}
+
+Github2Gitlab() {   # old implementation
     local url
     local keep_master=no
 
@@ -33,7 +102,7 @@ Github2Gitlab() {
                 -e 's|/endeavouros-team/|/endeavouros-filemirror/|'
                 -e 's|/tree/master/|/-/blob/master/|'
                 -e 's|/blob/master/|/-/blob/master/|'
-                -e 's|/eos-bash-shared$|/eos-apps-info|'
+                -e 's|/eos-bash-shared$|/eos-apps-info|' # ???
             )
             echo "$url" | "${sed[@]}"
             ;;
