@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=nvidia-hook
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc='pacman hook for nvidia'
 arch=('any')
@@ -10,10 +10,13 @@ url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 
 source=(
+  $_url/eos-nvidia-fix
   $_url/eos-nvidia-fix.hook
 )
-sha512sums=('d5e470e9a05d5a233c2720e4587cc3eccd06d586721d53472d2cd24be4d569d01a834cffe2572607892c568e229f466a59f76b89108249947aad34953c961f49')
+sha512sums=('38754946ed17c69eb4759bd1f4bb49da9c276e8b5e032b44f222c24d7023ca563cdbb90163f1c9c1ea21f6cb6f3d10a0020f89d7a9a13b6cb452c0b43713ac6d'
+            '19b4b7381d202050c740dfe43f7af50c08eae9a0bd41b2777382b74496caadcfc784203680dc8526af0f522cca7504e96ddf62fa9e3c3c1fb4fe642f8fa24371')
 
 package() {
-  install -Dm644 eos-nvidia-fix.hook  $pkgdir/usr/share/libalpm/hooks/eos-nvidia-fix.hook
+  install -Dm755 eos-nvidia-fix       "$pkgdir/usr/bin/eos-nvidia-fix"
+  install -Dm644 eos-nvidia-fix.hook  "$pkgdir/usr/share/libalpm/hooks/eos-nvidia-fix.hook"
 }
