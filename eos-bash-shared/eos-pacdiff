@@ -54,6 +54,7 @@ PacdiffCmd() {
         else
             bash -c "$prompt ; $cmd"
         fi
+        return $diffs_yes
     else
         msg="eos-pacdiff: nothing to do."
         if [ $start_new_terminal = yes ] ; then
@@ -62,17 +63,25 @@ PacdiffCmd() {
             else
                 echo "$msg" >&2
             fi
+            return $diffs_no_nt
         else
             echo "$msg" >&2
+            return $diffs_no
         fi
     fi
 }
 
 Main()
 {
+    # exit codes
+    local diffs_yes=0
+    local diffs_error=1
+    local diffs_no=2
+    local diffs_no_nt=3
+
     local start_new_terminal=no
     [ "$1" = "--nt" ] && start_new_terminal=yes
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return $diffs_error
     export -f eos_yad
     export -f eos_yad_nothing_todo
 
@@ -83,7 +92,7 @@ Main()
     for differ in "${EOS_WELCOME_PACDIFFERS[@]}" ; do
         if [ -x /usr/bin/$differ ] ; then
             PacdiffCmd "$differ"
-            break
+            return $?
         fi
     done
 }
