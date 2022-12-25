@@ -296,6 +296,7 @@ ListNameToPkgName()
     local fetch="$2"
     local pkgname
     local hook
+    local hookout=""
 
     pkgname=$(JustPkgname "$xx")
 
@@ -313,7 +314,7 @@ ListNameToPkgName()
     hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
     if [ -n "$hook" ] ; then
         if [ "$fetch" = "yes" ] ; then
-            $hook
+            hookout=$($hook)
             case $? in
                 0) HookIndicator "$hook_yes" ;;          # OK
                 11) HookIndicator "$hook_pkgver" ;;      # pkgver was updated by hook
@@ -325,7 +326,11 @@ ListNameToPkgName()
         HookIndicator "$hook_no"
     fi
 
-    echoreturn "$pkgname"
+    if [ -n "$hookout" ] ; then
+        echoreturn "$pkgname|$hookout"
+    else
+        echoreturn "$pkgname"
+    fi
 }
 
 HubRelease() {
@@ -845,6 +850,16 @@ DowngradeProbibited() {
     [ $cmpresult -lt 0 ] && [ "$allow_downgrade" = "no" ] && [ "${HAS_GIT_PKGVER[$pkgdirname]}" != "yes" ]
 }
 
+ShowResult() {
+    local verdict="$1"
+    local hookout="$2"
+    if [ -n "$hookout" ] ; then
+        echo2 "$verdict  [hook: $hookout]"
+    else
+        echo2 "$verdict"
+    fi
+}
+
 Main2()
 {
     test -n "$PKGEXT" && unset PKGEXT   # don't use env vars!
@@ -944,6 +959,7 @@ Main2()
     local notexist='<non-existing>'
     local cmpresult
     local total_items_to_build=0
+    local hookout=""
 
     if [ "$repoup" = "0" ] ; then
 
@@ -953,7 +969,16 @@ Main2()
         for xx in "${PKGNAMES[@]}" ; do
             ShowIndented "$(JustPkgname "$xx")" 1
             pkgdirname="$(ListNameToPkgName "$xx" yes)"
-            test -n "$pkgdirname" || DIE "converting or fetching '$xx' failed"
+            case "$pkgdirname" in
+                "")
+                    DIE "converting or fetching '$xx' failed"
+                    ;;
+                *"|"*)
+                    # $pkgdirname is "pkgdirname|hook output"
+                    hookout=${pkgdirname#*|}
+                    pkgdirname=${pkgdirname%%|*}
+                    ;;
+            esac
             PkgbuildExists "$pkgdirname" "line $LINENO" || continue
 
             # get versions from latest PKGBUILDs
@@ -976,11 +1001,11 @@ Main2()
             cmpresult=$(Vercmp "$tmp" "$tmpcurr")
 
             if [ $cmpresult -eq 0 ] ; then
-                echo2 "OK ($tmpcurr)"
+                ShowResult "OK ($tmpcurr)" "$hookout"
                 continue
             fi
             if DowngradeProbibited "$cmpresult" "$allow_downgrade" ; then
-                echo2 "OK ($tmpcurr)"
+                ShowResult "OK ($tmpcurr)" "$hookout"
                 continue
             fi
             if IsInWaitList "$xx" "$tmp" ; then
