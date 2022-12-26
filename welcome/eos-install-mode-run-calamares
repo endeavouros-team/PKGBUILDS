@@ -129,31 +129,32 @@ Calamares_Start() {
 
 ### Dialog that asks for the online or offline edition. ###
 AskMode() {
-    local inet_no="Internet connection is not required"
-    local inet_yes="Internet connection is required"
     local ret=0
-    local official_online="Online"
-    local official_offline="Offline"
-    local txt
 
-    txt=""
-    txt+="$(ltr cal_info3)"
-    txt+="$(ltr cal_info2)"
-
-    local cmd=(
-        eos_yad --form --title="$(ltr cal_choose)"
-        --image=$WELCOME_ICON_INSTALL_OFFICIAL # system-os-installer
-        --text="$txt"
-        --buttons-layout=spread
-        --button="Online!!Vanilla theming, internet required":12
-        --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
-    )
-    if [ 0 -eq 1 ] ; then
-    cmd+=(
-        --field=' Install Log on Terminal!Show overall log about install on a terminal':CHK $ShowInstallLog
-        #--field=' Pacman Log on Terminal!Show package management log on a terminal':CHK      $ShowPacmanLog
-        --field='':LBL ""
-    )
+    if false ; then
+        local cmd=(
+            eos_yad --form
+            --title="$(ltr cal_choose)"
+            --text="$(ltr cal_info3)$(ltr cal_info2)"
+            --image=$WELCOME_ICON_INSTALL_OFFICIAL
+            --buttons-layout=spread
+            --button="Online!!Vanilla theming, internet required":12
+            --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
+        )
+    else
+        local cmd=(
+            eos_yad --form
+            --title="$(ltr cal_choose)"
+            --text="$(ltr cal_choose)"
+            --image=$WELCOME_ICON_INSTALL_OFFICIAL
+            --field="$(ltr cal_info3)":LBL ""
+            --field="$(ltr cal_info2)":LBL ""
+            --columns=2
+            --height=200 --width=500 --scroll
+            --buttons-layout=spread
+            --button="Online!!Vanilla theming, internet required":11
+            --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
+        )
     fi
 
     local result
