@@ -7,20 +7,23 @@
 
 _ckbcomp_preparations() {
     local site="https://salsa.debian.org"
+    local parentname=console-setup
+    local archive_suffix=''
+    local name_suffix=''
 
-    _parentname=console-setup
-    _archivesuffix=''
-    _namesuffix=''
-
-    url="$site/installer-team/$_parentname"
+    url="$site/installer-team/$parentname"
 
     local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
     local dl="$site"$(echo "$data" | grep "gl-button btn btn-sm btn-confirm" | head -n1 | sed -E -e 's|.*href="([^"]+)".*|\1|' -e 's|zip$|tar.gz|')
 
-    [[ $dl =~ /archive/debian/ ]]     && _archivesuffix="/debian"
-    [[ $dl =~ console-setup-debian ]] && _namesuffix="-debian"
+    [[ $dl =~ /archive/debian/ ]]     && archive_suffix="/debian"
+    [[ $dl =~ ${parentname}-debian ]] && name_suffix="-debian"
 
     pkgver=$(echo "$dl" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
+    source=("$url/-/archive${archive_suffix}/$pkgver/${parentname}${name_suffix}-$pkgver.tar.gz")
+
+    # for package():
+    _source_archive="${parentname}${name_suffix}"
 }
 _ckbcomp_preparations
 unset -f _ckbcomp_preparations
@@ -31,16 +34,15 @@ pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or
 arch=(any)
 license=('GPL2')
 depends=('perl')
-source=($url/-/archive${_archivesuffix}/$pkgver/console-setup${_namesuffix}-$pkgver.tar.gz)
 
 sha512sums=('a12e1bc609528f795c0bdcc4e6f01de2bb02854770a5c315eec4acc851b55d89d909536bfd370f419073944de63ebc5328cac799443c102434ebe8feaa3ca3a8')
 
 package() {
-    pushd ${_parentname}${_namesuffix}-$pkgver >/dev/null
+    pushd "${_source_archive}-$pkgver" >/dev/null
 
-    install -Dm755 Keyboard/$pkgname   ${pkgdir}/usr/bin/$pkgname
+    install -Dm755 Keyboard/$pkgname   "${pkgdir}/usr/bin/$pkgname"
 
     popd >/dev/null
 
-    rm -f ../${_parentname}${_namesuffix}-$pkgver.tar.gz   # cleanup
+    rm -f "../${_source_archive}-$pkgver.tar.gz"   # cleanup
 }
