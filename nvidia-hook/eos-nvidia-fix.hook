@@ -8,6 +8,5 @@ Target = nvidia
 Target = nvidia-lts
 
 [Action]
-Depends = mkinitcpio
 When = PostTransaction
 Exec = /usr/bin/eos-nvidia-fix
