@@ -6,6 +6,8 @@
 # Ex-Maintainer:  Jeroen Bollen <jbinero at gmail dot comau>
 
 pkgname=ckbcomp
+_namesuffix=""
+_archivesuffix=""
 _parentname=console-setup
 pkgver=1.208
 pkgrel=1
@@ -14,13 +16,12 @@ arch=(any)
 url=https://salsa.debian.org/installer-team/$_parentname
 license=('GPL2')
 depends=('perl')
-source=($url/-/archive/$pkgver/${_parentname}-$pkgver.tar.gz)
+source=($url/-/archive${_archivesuffix}/$pkgver/${_parentname}${_namesuffix}-$pkgver.tar.gz)
 sha512sums=('9c87d65c9ab78cf297b8e770c7e9ce6bbfcc3d932f081ff5580473c85f1c4d90b40e9ec54abda450221c640745057e3f5df480dab29c4e0b06fe55ab4edab2a5')
 
 package() {
-    rm -f ../${_parentname}-$pkgver.tar.gz   # cleanup
+    cd ${_parentname}${_namesuffix}-$pkgver
+    install -Dm755 Keyboard/ckbcomp ${pkgdir}/usr/bin/$pkgname
 
-    cd ${_parentname}-$pkgver
-    install -d ${pkgdir}/usr/bin/
-    install -m755 Keyboard/ckbcomp ${pkgdir}/usr/bin/
+    rm -f ../${_parentname}${_namesuffix}-$pkgver.tar.gz   # cleanup
 }
