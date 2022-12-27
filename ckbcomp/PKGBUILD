@@ -5,23 +5,42 @@
 # Ex-Maintainer:  Nissar Chababy <funilrys at outlook dot com>
 # Ex-Maintainer:  Jeroen Bollen <jbinero at gmail dot comau>
 
+_ckbcomp_preparations() {
+    local site="https://salsa.debian.org"
+
+    _parentname=console-setup
+    _archivesuffix=''
+    _namesuffix=''
+
+    url="$site/installer-team/$_parentname"
+
+    local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
+    local dl="$site"$(echo "$data" | grep "gl-button btn btn-sm btn-confirm" | head -n1 | sed -E -e 's|.*href="([^"]+)".*|\1|' -e 's|zip$|tar.gz|')
+
+    [[ $dl =~ /archive/debian/ ]]     && _archivesuffix="/debian"
+    [[ $dl =~ console-setup-debian ]] && _namesuffix="-debian"
+
+    pkgver=$(echo "$dl" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
+}
+_ckbcomp_preparations
+unset -f _ckbcomp_preparations
+
 pkgname=ckbcomp
-_namesuffix='-debian'
-_archivesuffix='/debian'
-_parentname=console-setup
-pkgver=1.213
 pkgrel=1
 pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or kbdcontrol"
 arch=(any)
-url=https://salsa.debian.org/installer-team/$_parentname
 license=('GPL2')
 depends=('perl')
-source=(https://salsa.debian.org/installer-team/console-setup/-/archive/debian/1.213/console-setup-debian-1.213.tar.gz)
+source=($url/-/archive${_archivesuffix}/$pkgver/console-setup${_namesuffix}-$pkgver.tar.gz)
+
 sha512sums=('a12e1bc609528f795c0bdcc4e6f01de2bb02854770a5c315eec4acc851b55d89d909536bfd370f419073944de63ebc5328cac799443c102434ebe8feaa3ca3a8')
 
 package() {
-    cd ${_parentname}${_namesuffix}-$pkgver
-    install -Dm755 Keyboard/ckbcomp ${pkgdir}/usr/bin/$pkgname
+    pushd ${_parentname}${_namesuffix}-$pkgver >/dev/null
+
+    install -Dm755 Keyboard/$pkgname   ${pkgdir}/usr/bin/$pkgname
+
+    popd >/dev/null
 
     rm -f ../${_parentname}${_namesuffix}-$pkgver.tar.gz   # cleanup
 }
