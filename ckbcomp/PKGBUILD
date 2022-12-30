@@ -35,7 +35,7 @@ arch=(any)
 license=('GPL2')
 depends=('perl')
 
-sha512sums=('a12e1bc609528f795c0bdcc4e6f01de2bb02854770a5c315eec4acc851b55d89d909536bfd370f419073944de63ebc5328cac799443c102434ebe8feaa3ca3a8')
+sha512sums=('a361e7b063bb3ba8dd6f25c3f89c8a904d4a36ece062ab4fdd700e7d06556655fd821a80a1c8ed1b6db534a0a44beae0650ea46b4939ed2fc2963f908089bc77')
 
 package() {
     pushd "${_source_archive}-$pkgver" >/dev/null
