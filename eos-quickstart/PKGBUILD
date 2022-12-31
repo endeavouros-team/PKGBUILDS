@@ -1,6 +1,6 @@
 pkgname=eos-quickstart
-pkgver=1.3
-pkgrel=5
+pkgver=1.3.1
+pkgrel=1
 pkgdesc="An application for getting a quick start with installing packages"
 arch=('x86_64' 'aarch64')
 license=('GPL3')
@@ -9,7 +9,7 @@ optdepends=('konsole' 'gnome-terminal' 'xfce4-terminal' 'xterm' 'alacritty' 'lxt
 makedepends=('git' 'cmake' 'qt6-tools')
 backup=(etc/eos-quickstart.conf)
 source=(https://github.com/endeavouros-team/eos-quickstart/archive/refs/tags/${pkgver}.tar.gz)
-sha256sums=('683111921e96ef143d8e05e43ba2dde0f7103603a624711e657c9162c43ce812')
+sha256sums=('039ab9bbf92871fe04b9912e517ec28db3a6934ba69050fe06d69d5eb09cadc2')
 
 build() {
     cd "$srcdir/$pkgname-$pkgver"
