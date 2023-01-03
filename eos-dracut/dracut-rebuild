@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Calls kernel-install on all kernels found in /usr/lib/modules
+# Rebuild the initrds for all kernels found in /usr/lib/modules
 #
-# Run kernel install for all the installed kernels
+# Run dracut for all the installed kernels
 while read -r pkgbase; do
     kernelversion=$(basename "${pkgbase%/pkgbase}")
     kernelname=$(cat "${pkgbase}")
