@@ -4,7 +4,7 @@
 
 _pkgname=bspwm
 pkgname=eos-skel-ce-bspwm
-pkgver=1.4
+pkgver=1.5
 pkgrel=1
 pkgdesc="Pre user creation skel setup for Bspwm EOS-CE"
 arch=('any')
@@ -23,6 +23,5 @@ package() {
     chmod +x .config/polybar/*
     cp -R ".config/" "${pkgdir}${PREFIX}/"
     install -Dm644 ".gtkrc-2.0" "${pkgdir}${PREFIX}/.gtkrc-2.0"
-    install -Dm644 "xed.dconf" "${pkgdir}${PREFIX}/xed.dconf"
     install -Dm644 "IosevkaTermNerdFontComplete.ttf" "${pkgdir}${PREFIX}/.local/share/fonts/IosevkaTermNerdFontComplete.ttf"
 }
