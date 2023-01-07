@@ -37,13 +37,12 @@ export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD fil
 #
 PKGNAMES=(                                        # Alphabetically ordered.
     akm
-#    arc-gtk-theme-eos
+    arc-gtk-theme-eos
     arc-x-icons-theme/aur
 
     bashdb/aur
 
     calamares
-    calamares_current  # ???
 
     calamares_config_ce
     calamares_config_default
@@ -66,7 +65,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-downgrade
     eos-dracut                   # was: dracut-hook/aur
     eos-hooks
-#    eos-lightdm-gtk-theme
+    eos-lightdm-gtk-theme
     eos-lightdm-slick-theme
     eos-log-tool
     eos-lxdm-gtk3
@@ -128,7 +127,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
 if false ; then
     PKGNAMES=(
-        ckbcomp
+        arc-gtk-theme-eos
+        # ckbcomp
     )
 fi
 
@@ -360,8 +360,19 @@ _ckbcomp_hook() {
         printf "fetching info failed. " >&2
         return 1
     fi
+
+    local dl="https://salsa.debian.org"$(echo "$info" | grep "gl-button btn btn-sm btn-confirm" | head -n1 | sed -E -e 's|.*href="([^"]+)".*|\1|' -e 's|zip$|tar.gz|')
+    local archivesuffix=""
+    local namesuffix=""
+
+    [[ $dl =~ /archive/debian/ ]]     && archivesuffix="/debian"
+    [[ $dl =~ console-setup-debian ]] && namesuffix="-debian"
+
+    # local newver=$(echo "$info" | grep "console-setup Debian release" | head -n1 | sed -E 's|.* release ([0-9\.]+).*|\1|')
+
     local newver=$(echo "$info" | grep "console-setup-.*\.tar\.gz" | head -n1)
     newver=$(echo "$newver" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
+
     if [ -n "$(echo "$newver" | sed 's|[0-9\.]*||g')" ] ; then
         printf "finding new version failed, got '$newver'" >&2
         return 1
@@ -378,33 +389,37 @@ _ckbcomp_hook() {
     [ "$newver" = "$Pkgver" ] && return
 
     pushd "$PKGBUILD_ROOTDIR"/$tool >/dev/null
-    cp -a PKGBUILD PKGBUILD.test
-    sed -i PKGBUILD.test -e "s|^pkgver=.*|pkgver=$newver|"
-    if (! updpkgsums PKGBUILD.test >& /dev/null) ; then
+
+    sed -i PKGBUILD \
+        -e "s|^pkgver=.*|pkgver=$newver|" \
+        -e "s|^source=.*|source=($dl)|" \
+        -e "s|^_namesuffix=.*|_namesuffix='$namesuffix'|" \
+        -e "s|^_archivesuffix=.*|_archivesuffix='$archivesuffix'|"
+
+    if ! updpkgsums PKGBUILD >& /dev/null ; then
         popd >/dev/null
         printf "updpkgsums failed " >&2
         return 1
     fi
-    if (! makepkg -p PKGBUILD.test >& /dev/null) ; then
+    if ! makepkg -p PKGBUILD >& /dev/null ; then
         popd >/dev/null
         printf "makepkg failed " >&2
         return 1
     fi
+    # cleanup makepkg stuff
+    rm -rf src pkg *.zst *.xz *.gz
 
-    if [ "$newver" != "$Pkgver" ] ; then
-        # printf "new version $newver is available. " >&2
-        popd >/dev/null
-        return 11  # pkgver was changed
+    if [ ! -x /usr/bin/$tool ] ; then
+        # Cannot compare with non-existing /usr/bin/ckbcomp !!!
+        printf "sorry, ckbcomp is not installed, cannot compare. " >&2
     else
-        if [ ! -x /usr/bin/$tool ] ; then
-            # Cannot compare with non-existing /usr/bin/ckbcomp !!!
-            printf "sorry, ckbcomp is not installed, cannot compare. " >&2
-        else
-            if (! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null) ; then
-                printf "new version $newver is available, $tool differ. " >&2
-            fi
+        if ! diff src/console-setup-$newver/Keyboard/$tool /usr/bin/$tool >& /dev/null ; then
+            printf "new version $newver is available, $tool differ. " >&2
+            popd >/dev/null
+            return 11  # pkgver (and maybe download link) were changed
         fi
     fi
+
     popd >/dev/null
 }
 
@@ -637,7 +652,7 @@ declare -A ASSET_PACKAGE_HOOKS
 #ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook                                           # no more needed
 #ASSET_PACKAGE_HOOKS["budgie-control-center"]=_budgie-control-center_hook
 
-ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
+#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
 ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
 
 # Temporary hooks for replacing *-bin versions to non-bin versions.

@@ -281,6 +281,8 @@ ExplainHookMarks() {
 
 ListNameToPkgName()
 {
+    # "returns" pkgdirname and hookout
+    #
     # PKGNAMES array (from $ASSETS_CONF) uses certain syntax for package names
     # to mark where they come from, either local or AUR packages.
     # AUR packages are fetched from AUR, local packages
@@ -296,7 +298,8 @@ ListNameToPkgName()
     local fetch="$2"
     local pkgname
     local hook
-    local hookout=""
+
+    hookout=""
 
     pkgname=$(JustPkgname "$xx")
 
@@ -326,11 +329,7 @@ ListNameToPkgName()
         HookIndicator "$hook_no"
     fi
 
-    if [ -n "$hookout" ] ; then
-        echoreturn "$pkgname|$hookout"
-    else
-        echoreturn "$pkgname"
-    fi
+    pkgdirname="$pkgname"
 }
 
 HubRelease() {
@@ -955,7 +954,6 @@ Main2()
     local pkgdirname            # dir name for a package
     local pkgname
     local buildsavedir          # tmp storage for built packages
-    local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
     local notexist='<non-existing>'
     local cmpresult
     local total_items_to_build=0
@@ -968,17 +966,9 @@ Main2()
         Pushd "$PKGBUILD_ROOTDIR"
         for xx in "${PKGNAMES[@]}" ; do
             ShowIndented "$(JustPkgname "$xx")" 1
-            pkgdirname="$(ListNameToPkgName "$xx" yes)"
-            case "$pkgdirname" in
-                "")
-                    DIE "converting or fetching '$xx' failed"
-                    ;;
-                *"|"*)
-                    # $pkgdirname is "pkgdirname|hook output"
-                    hookout=${pkgdirname#*|}
-                    pkgdirname=${pkgdirname%%|*}
-                    ;;
-            esac
+            hookout=""
+            ListNameToPkgName "$xx" yes                                         # sets pkgdirname and hookout
+            [ -n "$pkgdirname" ] || DIE "converting or fetching '$xx' failed"
             PkgbuildExists "$pkgdirname" "line $LINENO" || continue
 
             # get versions from latest PKGBUILDs
@@ -1051,8 +1041,7 @@ Main2()
         # local remove_under_this_pkgname
         echo2 "Check if building is needed..."
         for xx in "${PKGNAMES[@]}" ; do
-            pkgdirname="$(ListNameToPkgName "$xx" no)"
-            #PkgbuildExists "$xx" "line $LINENO" || continue
+            ListNameToPkgName "$xx" no
             PkgbuildExists "$xx" "line $LINENO" || continue
 
             cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
@@ -1183,6 +1172,7 @@ Main2()
 
                     if [ -n "$archive_tag" ] ; then
                         local archiving=success
+                        local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
 
                         mkdir -p "$pkg_archive"                    || archiving=fail1
                         if [ "$archiving" = "success" ] ; then
@@ -1200,11 +1190,18 @@ Main2()
                                 fi
                             fi
                             if [ -d .git ] ; then
-                                archive-sync-to-remote "$archive_tag"
-                                # for xx in "${removable[@]}" ; do
-                                #     add-release-assets packages "$(basename "$xx")"
-                                #     sleep 1
-                                # done
+                                if true ; then
+                                    # TODO !!
+                                    if false ; then
+                                        archive-sync-to-remote "$archive_tag"
+                                    fi
+                                else
+                                    :
+                                    # for xx in "${removable[@]}" ; do
+                                    #     add-release-assets packages "$(basename "$xx")"
+                                    #     sleep 1
+                                    # done
+                                fi
                             else
                                 WARN "the .git folder of the pkg archive was not found"
                             fi
