@@ -118,7 +118,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     worm/aur
 
     yad
-    yad-eos
+    # yad-eos
     yay/aur
 
     zfs-dkms/aur
