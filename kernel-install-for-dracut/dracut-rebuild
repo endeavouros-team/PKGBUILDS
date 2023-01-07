@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Rebuild all the initrds using dracut
+
+# This finds the best token for systemd-boot
+find_token() {
+    if [[ -s /etc/kernel/entry-token ]] ; then
+        cat /etc/kernel/entry-token
+    elif [[ -s /etc/machine-id ]] ; then
+        cat /etc/machine-id
+    elif [[ $(grep "^IMAGE_ID=" /etc/os-release) ]] ; then
+        grep "^IMAGE_ID=" /etc/os-release | awk -F"=" '{print $2}'
+    elif [[ $(grep "^ID=" /etc/os-release) ]] ; then
+        grep "^ID=" /etc/os-release | awk -F"=" '{print $2}'
+    fi
+}
+
+ESP=$(bootctl --print-esp-path)
+TOKEN=$(find_token)
+while read -r pkgbase; do
+    kernelversion=$(basename "${pkgbase%/pkgbase}")
+    kernelname=$(cat "${pkgbase}")
+    INITRD_PATH="${ESP}/${TOKEN}/${kernelversion}"
+    if [[ ! -d "$INITRD_PATH" ]] ; then
+        echo 'Failed to build initrds, use "sudo reinstall-kernels" instead' 1>&2
+        exit 1
+    fi
+    echo "Running dracut for ${kernelname}-${kernelversion}"
+    dracut --force --hostonly --no-hostonly-cmdline "${INITRD_PATH}/initrd" "${kernelversion}"
+    dracut --force --no-hostonly "${INITRD_PATH}/initrd-fallback" "${kernelversion}"
+done < <(find /usr/lib/modules -maxdepth 2 -type f -name pkgbase)
+
+
