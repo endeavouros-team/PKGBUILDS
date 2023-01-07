@@ -4,8 +4,8 @@
 
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=23    # new numbering! Previous was: 2022.12.25
-pkgrel=1.2
+pkgver=2023    # new numbering! Previous was: 2022.12.25
+pkgrel=1
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
