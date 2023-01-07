@@ -6,15 +6,24 @@ read2()   { read   "$@" >&2 ; }
 
 FolderTests() {
     local filename_head="$1"
+    local testing="$2"             # yes or no
 
     if [ "$(basename "$PWD")" != "PKG_ARCHIVE" ] ; then
         echo2 "You seem to be in the wrong folder, should be PKG_ARCHIVE."
         return 4
     fi
     if [ -z "$(ls -1 ${filename_head}-*.zst 2>/dev/null)" ] ; then
-        echo2 "You seem to be in the wrong folder, package ${filename_head}-*.zst was not found."
+        [ "$testing" = "yes" ] || echo2 "You seem to be in the wrong folder, package ${filename_head}-*.zst was not found."
         return 4
     fi
+}
+
+FileToTag() {
+    local filename_head="$1"
+    case "$filename_head" in
+        welcome)            tag=packages ;;
+        eos-pkgbuild-setup) tag=repo-testing ;;
+    esac
 }
 
 Tag() {
@@ -34,12 +43,12 @@ Tag() {
         "$known_tag")
             case "$tag" in
                 packages)
-                    FolderTests welcome || return $?
+                    FolderTests welcome no || return $?
                     echo2 "Using tag: $tag"
                     return 0
                     ;;
                 repo-testing)
-                    FolderTests eos-pkgbuild-setup || return $?
+                    FolderTests eos-pkgbuild-setup no || return $?
                     echo2 "Using tag: $tag"
                     return 0
                     ;;
@@ -51,6 +60,14 @@ Tag() {
             esac
             ;;
         "")
+            local xx
+            for xx in eos-pkgbuild-setup welcome ; do
+                if FolderTests $xx yes ; then
+                    FileToTag $xx
+                    printf2 "Based on existing file(s) ${xx}-*.zst using tag: $tag\n"
+                    return 0
+                fi
+            done
             echo2 "Please give a tag. Available tags:" 
             printf2 "    %s\n" "${available_tags[@]}"
             return 2
@@ -98,101 +115,125 @@ EOF
     tag="$1"
 }
 
-TrimLocals() {
-    # remove local oldies first
-    if [ "$dryrun" = "no" ] ; then
-        archive-remove-old-locally --keep=$keep || return $?
-    else
-        archive-remove-old-locally --simulate --keep=$keep || return $?
-    fi
+Indent() {
+    sed 's|^|    |'
 }
 
-LocalsToRemote() {
-    # add local files to remote that are only on local
-    local add=()
-    local ll rr
+AddsAndRemoves() {
+    # combine local and remote, keep 5 latest of each file version
+    local locals_and_remotes=$(printf "%s\n" "$locals" "$remotes" | grep -v "\.sig$" | sort -V)
+    local file fileprev=""
+    local pkgname pkgnameprev=""
+    local files=()
+    local files_to_keep=()
+    local files_to_remove=()
+    local -r breaker="[A-DUMMY-BREAKER]"
+    local count
 
-    for ll in $locals ; do
-        case "$ll" in
-            *.pkg.tar.*) ;;
-            *) continue ;;
+    for file in $locals_and_remotes "$breaker" ; do
+        [ "$file" = "$breaker" ]  && break       # all files checked
+        [ "$file" = "$fileprev" ] && continue    # remove duplicates
+
+        fileprev="$file"
+
+        pkgname=$(pkg-name-components N "$file")
+        [ -z "$pkgnameprev" ] && pkgnameprev="$pkgname"
+
+        case "$pkgname" in
+            "$pkgnameprev")
+                files+=("$file")
+                ;;
+            *) 
+                # pkgname changed, files full
+                files_to_keep+=($(printf "%s\n" "${files[@]}" | tail -n$keep))
+                count=${#files[@]}
+                if [ $count -gt $keep ] ; then
+                    files_to_remove+=($(printf "%s\n" "${files[@]}" | head -n$((count-keep))))
+                fi
+
+                # prepare for the next file
+                pkgnameprev="$pkgname"
+                files=("$file")
         esac
-        for rr in $remotes ; do
-            [ "$rr" = "$ll" ] && break
-        done
-        [ "$rr" != "$ll" ] && add+=("$ll")
     done
-    if [ ${#add[@]} -gt 0 ] ; then
-        echo2 "adding ${#add[@]} assets with tag '$tag'"
-        if [ "$dryrun" = "no" ] ; then
-            add-release-assets "$tag" "${add[@]}" || return $?
-        else
-            printf2 "    %s\n" "${add[@]}"
+
+    # now we know which files to remove from local and remote, and keep
+
+    local add_remote=()
+    local remove_remote=()
+    local add_local=()
+    local remove_local=()
+
+    # Note: handle .sig files now.
+
+    for file in "${files_to_keep[@]}" ; do
+        if [ -z "$(echo "$remotes" | grep "$file")" ] ; then
+            add_remote+=("$file" "$file.sig")
         fi
-    else
-        echo2 "No local files to add to remote."
-    fi
-}
 
-RemotesToLocal() {
-    # add remote files to local that are only in remote
-    local add=()
-    local ll rr
-
-    for rr in $remotes ; do
-        case "$rr" in
-            *.pkg.tar.*) ;;
-            *) continue ;;
-        esac
-        for ll in $locals ; do
-            [ "$rr" = "$ll" ] && break
-        done
-        [ "$rr" != "$ll" ] && add+=("$rr")
+        if [ -z "$(echo "$locals" | grep "$file")" ] ; then
+            add_local+=("$file" "$file.sig")
+        fi
     done
-    if [ ${#add[@]} -gt 0 ] ; then
-        echo2 "adding ${#add[@]} assets to local"
-        if [ "$dryrun" = "no" ] ; then
-            chmod u+w .
-            for rr in "${add[@]}" ; do
-                download-release-assets "$tag" "$rr" || return $?
+    for file in "${files_to_remove[@]}" ; do
+        if [ -n "$(echo "$remotes" | grep "$file")" ] ; then
+            remove_remote+=("$file" "$file.sig")
+        fi
+
+        if [ -n "$(echo "$locals" | grep "$file")" ] ; then
+            remove_local+=("$file" "$file.sig")
+        fi
+    done
+
+    ShowFileInfo "additions to local"   "${add_local[@]}"
+    ShowFileInfo "additions to remote"  "${add_remote[@]}"
+    ShowFileInfo "removals from local"  "${remove_local[@]}"
+    ShowFileInfo "removals from remote" "${remove_remote[@]}"
+
+    local allow=true   # true or false
+
+    if $allow ; then
+        # local adds
+        if [ ${#add_local[@]} -gt 0 ] ; then
+            for file in "${add_local[@]}" ; do
+                download-release-assets "$tag" "$file" || return $?
+                sleep 1
             done
-            chmod u-w .
-        else
-            printf2 "    %s\n" "${add[@]}"
         fi
-    else
-        echo2 "No remote files to add to local."
+
+        # remote adds
+        if [ ${#add_remote[@]} -gt 0 ] ; then
+            add-release-assets "$tag" "${add_remote[@]}" || return $?
+        fi
+
+        # local removes
+        if [ ${#remove_local[@]} -gt 0 ] ; then
+            rm -f "${remove_local[@]}"
+        fi
+
+        # remote removes
+        if [ ${#remove_remote[@]} -gt 0 ] ; then
+            delete-release-assets --quietly "$tag" "${remove_remote[@]}" || return $?
+            sleep 1
+        fi
     fi
 }
 
-TrimRemotes() {
-    # remove remote files that are only in remote
-    local remove=()
-    local ll rr
+ShowFileInfo() {
+    local msg="$1"
+    shift
+    local count="$#"
 
-    for rr in $remotes ; do
-        for ll in $locals ; do
-            [ "$rr" = "$ll" ] && break
-        done
-        [ "$rr" != "$ll" ] && remove+=("$rr")
-    done
-
-    if [ ${#remove[@]} -gt 0 ] ; then
-        echo2 "deleting ${#remove[@]} remote assets with tag '$tag'"
-        if [ "$dryrun" = "no" ] ; then
-            delete-release-assets --quietly "$tag" "${remove[@]}" || return $?
-        else
-            printf2 "    %s\n" "${remove[@]}"
-        fi
-    else
-        echo2 "No remote assets to remove."   # Note: dryrun can show deleting local files, but remote doesn't know that yet...
-    fi
+    printf2 "%-5d %s\n" "$count"   "$msg"
+    [ $count -gt 0 ] && printf "%s\n" "$@" | Indent >&2
 }
+
+FilterPackages() { grep -P '\.xz$|\.zst$' ; }    # Note: exclude *.sig files for now.
 
 Main() {
     local tag=""
     local dryrun=no
-    local keep=5
+    local keep=5              # keeps max 5 of each package
     local locals=""
     local remotes=""
 
@@ -200,30 +241,10 @@ Main() {
 
     Tag || return $?
 
-    locals=$(/usr/bin/ls -1)
-    [ $? -eq 0 ] || return 1
+    locals=$(/usr/bin/ls -1 | FilterPackages)
+    remotes=$(release-asset-names "$tag" | FilterPackages)
 
-    remotes=$(release-asset-names "$tag")
-    # [ $? -eq 0 ] || return 1                 # may be empty!!
-
-    RemotesToLocal || return $?
-    TrimLocals || return 1
-
-    locals=$(/usr/bin/ls -1)
-    [ $? -eq 0 ] || return 1
-
-    # now local should be OK
-
-    LocalsToRemote || return $?
-
-    remotes=$(release-asset-names "$tag")
-    [ $? -eq 0 ] || return 1
-
-    # now remote should have all older packages (maybe more than $keep)
-
-    TrimRemotes || return $?
-
-    # now remote should be OK
+    AddsAndRemoves || return $?
 }
 
 Main "$@"
