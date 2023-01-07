@@ -1192,7 +1192,7 @@ Main2()
                             if [ -d .git ] ; then
                                 if true ; then
                                     # TODO !!
-                                    if false ; then
+                                    if true ; then
                                         archive-sync-to-remote "$archive_tag"
                                     fi
                                 else
