@@ -1,115 +1,70 @@
 #!/bin/bash
 
-# Setup some ad hoc local stuff.
+# Setup to ignore certain files from git.
+#
+# Preparations:
+#    - git clone https://github.com/endeavouros-team/PKGBUILDS.git
+#    - cd PKGBUILDS/eos-pkgbuild-setup
+#
+# We want to add/update files:
+#    - PKGBUILDS/.gitignore
+#    - ~/.config/git/ignore
 
 DIE() {
     echo "Error: $1" >&2
     exit 1
 }
 
-Settings_json() {
-    local file="$HOME/.config/Code - OSS/User/settings.json"
+AddGitIgnores() {
+    local file="$1"
+    local ignoredef count=0
+    shift
 
-    test -r "$file" && return
-
-    cat <<EOF >> "$file"
-{
-    "workbench.activityBar.visible": true,
-    "editor.minimap.enabled": false,
-    "breadcrumbs.enabled": true,
-    "debug.inlineValues": true,
-    "launch": {
-        "version": "0.2.0",
-        "configurations": [{
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Debug current bash file as a bash program",
-            "program": "${file}",
-            "cwd": "${fileDirname}",
-            "terminalKind": "external"
-            "terminalKind": "integrated"
-        }]
-    },
-    "editor.autoIndent": "advanced",
-    "editor.highlightActiveIndentGuide": false,
-    "editor.renderIndentGuides": false,
-    "debug.internalConsoleOptions": "neverOpen",
-    "search.smartCase": true,
-    "terminal.explorerKind": "external",
-    "terminal.external.linuxExec": "/usr/bin/gnome-terminal"
-       // gnome-terminal, xterm, uxterm, konsole work; terminator, xfce4-terminal, qterminal fail.
-}
-EOF
-    echo "Updating $file"
+    for ignoredef in "$@" ; do
+        if [ -z "$(grep "^$ignoredef$" "$file")" ] ; then
+            echo "$ignoredef" >> "$file"
+            ((count++))
+        fi
+    done
+    [ $count -gt 0 ] && echo "Updated $file"
 }
 
-Launch_json() {
-    local ASSETSDIR="$1"
-    local file="$ASSETSDIR/.vscode/launch.json"
-
-    test -n "$ASSETSDIR" || DIE "$FUNCNAME: ASSETSDIR is empty"
-    test -r "$ASSETSDIR"/endeavouros.db || DIE "$FUNCNAME: $ASSETSDIR does not have file endeavouros.db"
-    test -d "$ASSETSDIR"/.vscode || mkdir -p "$ASSETSDIR"/.vscode
-    test -r "$file" && return
-
-    cat <<EOF >> "$file"
-{
-    // This launch.json is useful when debugging assets.make.
-    //
-    // Assume code is started with this bash function:
-    //     code() { command code --folder-uri "$PWD" "$@" ; }
-    //
-
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Bash-Debug (/usr/bin/assets.make)",
-            "program": "/usr/bin/assets.make",
-            "terminalKind": "external",
-            "terminalKind": "integrated",
-            "showDebugOutput": true,
-            "trace": true
-        }
-    ]
-}
-EOF
-    echo "Updating $file"
-}
-
-Main()
-{
+Main() {
     local workdir=eos-pkgbuild-setup
     local file
-    local xx
+    local xx count
+    local ignores=()
+
+    # Check the working folder.
 
     case "$PWD" in
         */PKGBUILDS/$workdir) workdir="$PWD" ;;
-        *) DIE "Run this in folder <path>/PKGBUILDS/workdir" ;;
+        *) DIE "Run this in folder <path>/PKGBUILDS/$workdir" ;;
     esac
 
-    file="$workdir/../.gitignore"
-    if [ -z "$(grep '\.pkg\.tar\.' "$file")" ] ; then
-        xx="$(grep '^PKGEXT=' /etc/makepkg.conf 2>/dev/null | cut -d '=' -f2 | tr -d "'")"
-        echo "*$xx" >> "$file"
-        echo "Updating $file"
-    fi
+    # Set up PKGBUILDS/.gitignore.
 
-    file="$HOME/.config/git/ignore"
-    if [ -z "$(grep '^\.gitignore$' "$file")" ] ; then
-        echo ".gitignore" >> "$file"
-        echo "Updating $file"
-    fi
+    local pkgdef="*$(grep '^PKGEXT=' /etc/makepkg.conf 2>/dev/null | cut -d '=' -f2 | tr -d "'")"
+    ignores=(
+        "$pkgdef"             # package files to ignore, like "*.pkg.tar.zst"
+        "*~"                  # emacs backup files
+        pkg                   # makepkg leftover
+        src                   # makepkg leftover
+        REGTEST               # ad hoc stuff (optional)
+    )
+    AddGitIgnores "$workdir/../.gitignore" "${ignores[@]}"
 
-    if [ -n "$(pacman -Q code 2>/dev/null)" ] || [ -n "$(pacman -Q visual-studio-code-insiders 2>/dev/null)" ]
-    then
-        Settings_json
-        Launch_json "$workdir/../../_BUILD_/mirrors.mirror1"
-    fi
+    # Set up "global" git ignores.
+
+    ignores=(
+        ".gitignore"          # version control not needed for these files
+        ".no-cd"              # used by package cd-path (optional)
+        ".GitUpdate"          # used by package GitUpdate
+        EXPERIMENTAL          # ad hoc stuff (optional)
+        TODO                  # ditto
+        RCS                   # ditto
+    )
+    AddGitIgnores "$HOME/.config/git/ignore" "${ignores[@]}"
 }
 
 Main "$@"
