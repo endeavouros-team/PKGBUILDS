@@ -94,7 +94,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-translations
     eos-update-notifier
 
-    kernel-install-for-dracut/aur
+    kernel-install-for-dracut
     keyserver-rank
 
     mkinitcpio-openswap/aur
@@ -127,7 +127,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
 if false ; then
     PKGNAMES=(
-        arc-gtk-theme-eos
+        kernel-install-for-dracut
+        # arc-gtk-theme-eos
         # ckbcomp
     )
 fi
