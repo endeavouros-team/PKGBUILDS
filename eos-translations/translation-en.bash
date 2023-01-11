@@ -177,7 +177,7 @@ _tr_add2 tail_buttip            "Close only this window"
 
 _tr_add2 ins_text              "Installing EndeavourOS to disk"
 _tr_add2 ins_start             "Start the Installer"
-_tr_add2 ins_starttip          "Start the EndeavourOS installer along with a debug terminal"
+_tr_add2 ins_starttip          "Start the EndeavourOS installer (choose among major desktops)"   # changed 2023-Jan-12
 _tr_add2 ins_up                "Update this app$_exclamation"
 _tr_add2 ins_uptip             "Updates this app and restarts it"
 _tr_add2 ins_keys              "Initialize pacman keys"
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Software News"
 _tr_add2 butt_softnews_tip            "Important news about EndeavourOS software"
 
 _tr_add2 install_community            "Install community editions"
-_tr_add2 install_community_tip        "Community editions collection (online required)"    # changed 2021-Oct-23
+_tr_add2 install_community_tip        "Community editions collection (mostly WMs)"    # changed 2021-Oct-23, 2023-Jan-12
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "How to share system logs"

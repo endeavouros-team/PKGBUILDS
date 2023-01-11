@@ -177,7 +177,7 @@ _tr_add2 tail_buttip            "Sulje vain tämä ikkuna"
 
 _tr_add2 ins_text              "Asenna EndeavourOS"
 _tr_add2 ins_start             "Käynnistä asennus"
-_tr_add2 ins_starttip          "Käynnistä asentaja (sekä lisätietoa antava pääteikkuna)"
+_tr_add2 ins_starttip          "Käynnistä asentaja (valitse työpöytä)"
 _tr_add2 ins_up                "Päivitä tämä sovellus$_exclamation"
 _tr_add2 ins_uptip             "Päivittää tämän sovelluksen ja käynnistää sen uudelleen (käytä jos niin ohjeistetaan)"
 _tr_add2 ins_keys              "Alusta pacman-avaimet"
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Ohjelmistouutisia"
 _tr_add2 butt_softnews_tip            "Tärkeitä uutisia EndeavourOS:n ohjelmistosta"
 
 _tr_add2 install_community            "Asenna yhteisömme kanssa tehty julkaisu"
-_tr_add2 install_community_tip        "Valitse haluamasi yhteisöjulkaisu (huomaa: internet-yhteys tarvitaan)"
+_tr_add2 install_community_tip        "Valitse yhteisöjulkaisu (useita ikkunamanagereita)"
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "Kuinka saan järjestelmän lokit"
