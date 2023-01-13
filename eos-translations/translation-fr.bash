@@ -177,7 +177,7 @@ _tr_add2 tail_buttip             "Ne fermer que cette fenêtre"
 
 _tr_add2 ins_text                "Installation d'EndeavourOS sur le disque"
 _tr_add2 ins_start               "Démarrer l'installateur"
-_tr_add2 ins_starttip            "Démarrez l'installateur EndeavourOS avec un terminal de débogage"
+_tr_add2 ins_starttip            "Démarrez l'installateur EndeavourOS (en choisissant dans les bureaux majeurs)"
 _tr_add2 ins_up                  "Mettre à jour cette application $_exclamation"
 _tr_add2 ins_uptip               "Mise à jour et redémarrage de cette application"
 _tr_add2 ins_keys                "Initialiser les clés pacman"
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Nouvelles des logiciels"
 _tr_add2 butt_softnews_tip            "Nouvelles importantes sur les logiciels d'EndeavourOS"
 
 _tr_add2 install_community            "Installer édition communautaire"
-_tr_add2 install_community_tip        "Collection des éditions communautaire (note: connexion internet requise) : " # changé le 23-Oct-2021
+_tr_add2 install_community_tip        "Collection des éditions communautaire (principalement les gestionnaires de fen) : " # changé le 23-Oct-2021
 
 # 1er-mai-2021
 _tr_add2 ins_syslog                   "Partager les logs système"
