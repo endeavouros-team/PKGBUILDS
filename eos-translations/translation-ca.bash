@@ -177,7 +177,7 @@ _tr_add2 tail_buttip            "Tanca només aquesta finestra"
 
 _tr_add2 ins_text              "Instal·lació de l'EndeavourOS al disc."
 _tr_add2 ins_start             "Inicia l'instal·lador"
-_tr_add2 ins_starttip          "Inicia l'instal·lador de l'EndeavourOS juntament amb un terminal de depuració."
+_tr_add2 ins_starttip          "Inicia l'instal·lador de l'EndeavourOS (trieu entre els escriptoris principals)"
 _tr_add2 ins_up                "Actualitza aquesta aplicació$_exclamation"
 _tr_add2 ins_uptip             "Actualitza aquesta aplicació i la reinicia."
 _tr_add2 ins_keys              "Inicialitza les claus del Pacman"
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "Notícies de programari"
 _tr_add2 butt_softnews_tip            "Notícies importants sobre el programari de l'EndeavourOS"
 
 _tr_add2 install_community            "Instal·leu edicions comunitàries"
-_tr_add2 install_community_tip        "Col·lecció d'edicions comunitàries (cal connexió en línia)"    # changed 2021-Oct-23
+_tr_add2 install_community_tip        "Col·lecció d'edicions comunitàries (diversos gestors de finestres)"    # changed 2021-Oct-23
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "Com compartir els registres del sistema"
