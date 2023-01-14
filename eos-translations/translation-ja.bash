@@ -177,7 +177,7 @@ _tr_add2 tail_buttip            "このウィンドウだけを閉じます"
 
 _tr_add2 ins_text              "ディスクに EndeavourOS をインストール"
 _tr_add2 ins_start             "インストーラーを起動"
-_tr_add2 ins_starttip          "デバッグ端末とともに EndeavourOS インストーラーを起動"
+_tr_add2 ins_starttip          "EndeavourOS インストーラーを起動します (メインのデスクトップから選択します)"   # changed 2023-Jan-12
 _tr_add2 ins_up                "このアプリを更新 $_exclamation"
 _tr_add2 ins_uptip             "このアプリを更新して再起動"
 _tr_add2 ins_keys              "pacman のキーの初期化"
@@ -281,7 +281,7 @@ _tr_add2 butt_softnews                "ソフトウェアニュース"
 _tr_add2 butt_softnews_tip            "EndeavourOS ソフトウェアに関する重要なお知らせ"
 
 _tr_add2 install_community            "コミュニティ エディションをインストール"
-_tr_add2 install_community_tip        "コミュニティ版コレクション (オンラインが必要)"    # changed 2021-Oct-23
+_tr_add2 install_community_tip        "コミュニティ版コレクション (様々な WM)"    # changed 2021-Oct-23, 2023-Jan-12
 
 # 2021-May-01
 _tr_add2 ins_syslog                   "システムログを共有する方法"
