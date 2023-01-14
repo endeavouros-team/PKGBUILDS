@@ -309,3 +309,29 @@ _tr_add2 after_install_r8168_tip     "Troque entre os drivers r8168 e r8169 (Rei
 # 2021-Oct-08
 _tr_add2 daily_assist_DEinfo         "Informação"                                         # assumir o prefixo "DE:", por ex.: "Xfce: informação"
 _tr_add2 daily_assist_DEinfo_tip     "Mais informação sobre este Ambiente de Desktop/Gerenciador de janelas"  # assumir o prefixo "DE:", por ex.: "Xfce: mais informação ..."
+
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Escolha programas populares para instalar"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Escolha programas populares e isntale eles"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Notas sobre bluetooth"
+_tr_add2 ins_blue_notes_tip          "Notas sobre como configurar bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Informação do Firewall"
+_tr_add2 after_install_fwtip         "Informações sobre o Firewall padrão"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Customizando o processo de instalação"
+_tr_add2 ins_custom_tip              "Como customizar o processo de instalação"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Últimas noticias Arc"
+_tr_add2 daily_assist_anewstip       "Mostra as mais recentes noticias sobre Arc no navegador"
+
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Há importantes noticias no"
+_tr_add2 nb_nofify_user2             "Por favor, clique no"                                  # Software News
+_tr_add2 nb_nofify_user3             "botão no canto inferior esquerdo dessa janela."
