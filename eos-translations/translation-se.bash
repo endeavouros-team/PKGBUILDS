@@ -161,7 +161,7 @@ _tr_add2 tail_buttip            "Stäng bara detta fönster"
 
 _tr_add2 ins_text              "Installerar EndeavourOS till disk"
 _tr_add2 ins_start             "Starta installereraren"
-_tr_add2 ins_starttip          "Starta EndeavourOS-installeraren tillsammans med felsökningsterminal"
+_tr_add2 ins_starttip          "Starta EndeavourOS installationsprogrammet (välj bland flera olika kända skrivbordsmiljöer)"   # ändrad 2023-Jan-12
 _tr_add2 ins_up                "Uppdatera detta program$_exclamation"
 _tr_add2 ins_uptip             "Uppdaterar detta program och startar om det"
 _tr_add2 ins_keys              "Initiera pacman-nycklar"
@@ -230,7 +230,7 @@ _tr_add2 butt_softnews  "Programvarunyheter"
 _tr_add2 butt_softnews_tip "Viktiga nyheter om EndeavourOS programvara"
 
 _tr_add2 install_community            "Installera gemenskapsutgåvor"
-_tr_add2 install_community_tip        "Gemenskapsutgåvor samlingar (online anslutning krävs)"
+_tr_add2 install_community_tip        "Gemenskapsutgåvor samlingar (mest fönsterhanterare)"    # ändrad 2021-Oct-23, 2023-Jan-12
 
 _tr_add2 ins_syslog                   "Hur man delar systemloggar"
 _tr_add2 ins_syslogtip                "Förklarar hur du kan dela systemloggar när du behöver hjälp"
