@@ -1,10 +1,10 @@
-# Based on the AUR package "dracut-hook by Leonidas P. <jpegxguy at outlook dot com>
+# Based on the AUR package "dracut-hook" by Leonidas P. <jpegxguy>
 
 pkgname=eos-dracut
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Dracut scripts and hooks for EndeavourOS"
-url=https://dracut.wiki.kernel.org/index.php/Main_Page
+url=https://endeavouros.com
 arch=('any')
 license=('BSD')
 depends=('dracut')
