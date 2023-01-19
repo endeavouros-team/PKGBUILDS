@@ -268,7 +268,7 @@ IsNvidiaCard() {
 }
 
 test_for_IBT_off() {
-    local data=$(lspci -vnn | grep -P 'VGA|3D|Display' | grep "GeForce RTX [34]0[0-9][0-9]")
+    local data=$(lspci -vnn | grep -P 'VGA|3D|Display' | grep -i "GeForce RTX [34]0[0-9][0-9]")
     if [ -n "$data" ] && [ "$(device-info --cpu)" = "GenuineIntel" ] ; then
         Note "Kernel parameter 'ibt=off' may be required, see https://wiki.archlinux.org/title/NVIDIA#Installation"
     fi
