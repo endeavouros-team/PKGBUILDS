@@ -1,4 +1,4 @@
-# welcome
+# welcome (also: eos-welcome)
 
 Welcome is an application that helps users by providing
 - tools for system management and customization
