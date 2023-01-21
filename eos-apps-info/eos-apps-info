@@ -25,14 +25,35 @@ CheckDatabaseUpdate() {
     fi
 }
 
-RenameApp() {
-    # modifies 'app2' and may modify 'app'
+AdjustButtonName() {
+    # may modify '$app_button_name' because of yad quirks
 
-    case "$app" in
-        #su-c_wrapper)     app2="$app" ; app="su-c__wrapper" ;;   # handle underscore character for yad !!
-        yad)              app2=yad-eos ;;
-        *)                app2="$app" ;;
+    case "$app_button_name" in
+        su-c_wrapper) app_button_name="su-c__wrapper" ;;   # handle underscore character for yad !!
     esac
+}
+
+HelpExists() {
+    local -r app="$1"
+    [ -d "/etc/eos-apps-info/pageinfo/$app" ]
+}
+
+IsBonusApp() {
+    local -r app="$1"
+    printf "%s\n" "${bonus_apps[@]}" | grep "$app" >/dev/null
+}
+
+AddAppButton() {
+    local -r app="$1"              # e.g. su-c_wrapper  (= real app name)
+    local app_button_name="$app"   # e.g. su-c__wrapper (= app name changed for yad in RenameApp)
+    local is_bonus=no
+
+    if [ -x "/usr/bin/$app" ] || HelpExists "$app" || IsBonusApp "$app" ; then
+        AdjustButtonName
+        cmd+=(--field="$app_button_name!!$app":fbtn "eos-apps-info-helper '$app'")   # Add app buttons to the command.
+    else
+        echo "$progname: help page for '$app' not found." >> /tmp/$progname.log
+    fi
 }
 
 EosApps2cmd() {
@@ -42,30 +63,30 @@ EosApps2cmd() {
         eos-wallpaper-set eos-welcome grub-colour-chooser mirrorlist-rank-info nvidia-driver-supported-branches nvidia-inst paccache-service-manager
         pahis reflector-simple RunInTerminal show-location-info su-c_wrapper UpdateInTerminal
     )
-    local app app2
+    local app
 
     for app in "${apps[@]}" ; do
-        RenameApp                                                               # Rename some apps.
-        cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")        # Add app buttons to the command.
+        AddAppButton "$app"
     done
 }
 
 BonusApps2cmd() {
     local -r blabel="Bonus items"
-    local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)    # local -r bonus_apps=($(eos-apps-info-helper --show-bonus))
-    local app app2
+    local app
 
     cmd+=(--field="<b><i>$blabel:</i></b>":LBL "")                              # visually separates bonus apps
 
     for app in "${bonus_apps[@]}" ; do
-        RenameApp
-        cmd+=(--field="$app!!$app2":fbtn "eos-apps-info-helper '$app2'")
+        AddAppButton "$app"
     done
 }
 
 Main()
 {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local progname="$(basename "$0")"
+    # local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)
+    local -r bonus_apps=($(eos-apps-info-helper --show-bonus))
 
     # yad command exit codes (don't use even numbers)
     local -r exit_quit=11
