@@ -4,7 +4,7 @@
 
 pkgname=calamares
 pkgver=22.12.1.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
