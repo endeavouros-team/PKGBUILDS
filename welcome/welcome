@@ -1634,6 +1634,12 @@ StartHere() {
         if [ "$has_a_connection" = "yes" ] ; then
             eos-kbd-set
         fi
+        if [ -x /usr/bin/numlockx ] ; then
+            # some laptops have number pad inside the normal keyboard, so set NumLock off
+            numlockx on  # show we are adjusting numlock...
+            sleep 1
+            numlockx off
+        fi
         if [ ! -r /tmp/mirrorlist.bu ] ; then
             if [ -r /etc/pacman.d/mirrorlist ] ; then
                 cp /etc/pacman.d/mirrorlist /tmp/mirrorlist.bu  # to be checked by update-mirrorlist
