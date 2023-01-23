@@ -11,8 +11,12 @@ DIE() {
 Usage() {
     cat <<EOF
 
-Usage: $progname "parts" "package-file-name"
-  parts
+Usage:
+  $progname -h
+      Shows this help.
+
+  $progname "parts" "package-file-name"
+      parts
               String of upper case letters consisting of: N V R A C E.
               N = pkgname
               V = pkgver
@@ -22,7 +26,7 @@ Usage: $progname "parts" "package-file-name"
               E = epoch
               These letters specify what the output will contain.
               The output values are separated by the pipe '|' character.
-  package-file-name
+      package-file-name
               Name of a package file.
 
 Example:
@@ -78,6 +82,10 @@ Main() {
     local parts="$1"
     local pkg="$2"
     local progname="$(basename "$0")"
+
+    case "$1" in
+        -h | --help) Usage; return 0 ;;
+    esac
 
     if [ -n "$pkg" ] ; then
         SeparateParts "$pkg"

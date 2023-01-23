@@ -1164,15 +1164,24 @@ Main2()
                             archive_tag=repo-testing
                             ;;
                         *)
-                            # TODO
-                            # archive_git="$ASSETSDIR"/../../archive/$REPONAME/.git
-                            # archive_tag=x86_64
+                            archive_tag=archive
+                            if [ -n "$(HubRelease | grep "$archive_tag")" ] ; then
+                               archive_git="$ASSETSDIR"/.git
+                            else
+                               archive_tag=""
+                            fi
                             ;;
                     esac
+                    # This test commented out because it takes too much time!
+                    # if [ -z "$(HubRelease | grep "$archive_tag")" ] ; then
+                    #     archive_tag=""
+                    # fi
 
                     if [ -n "$archive_tag" ] ; then
                         local archiving=success
                         local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
+
+                        # local archiving
 
                         mkdir -p "$pkg_archive"                    || archiving=fail1
                         if [ "$archiving" = "success" ] ; then
@@ -1183,28 +1192,25 @@ Main2()
                         fi
 
                         if [ "$archiving" = "success" ] ; then
+
+                            # remove archiving
+
                             Pushd "$pkg_archive"
+
                             if [ ! -d .git ] ; then
                                 if [ -d "$archive_git" ] ; then
                                     ln -s "$archive_git"
                                 fi
                             fi
                             if [ -d .git ] ; then
-                                if true ; then
-                                    # TODO !!
-                                    if true ; then
-                                        archive-sync-to-remote "$archive_tag"
-                                    fi
-                                else
-                                    :
-                                    # for xx in "${removable[@]}" ; do
-                                    #     add-release-assets packages "$(basename "$xx")"
-                                    #     sleep 1
-                                    # done
-                                fi
+                                case "$SIGNER" in
+                                    EndeavourOS) archive-sync-to-remote "$archive_tag" ;;
+                                    *)           add-release-assets "$archive_tag" "${removable[@]##*/}" ;;
+                                esac
                             else
                                 WARN "the .git folder of the pkg archive was not found"
                             fi
+
                             Popd
                         else
                             WARN "($archiving) problem moving old packages to $pkg_archive"
