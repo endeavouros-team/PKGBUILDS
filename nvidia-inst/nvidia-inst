@@ -61,7 +61,7 @@ KeepsAndRemoves() {
 
     local rp kp
 
-    if [ -z "$install" ] ; then
+    if [ ${#install[@]} -eq 0 ] ; then
         PkgRemove "${pr_nvidia[@]}"
     else
         for rp in "${pr_nvidia[@]}" ; do
@@ -286,8 +286,6 @@ ShowCommandsToRun() {
     fi
     echo2 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-    [ "$test" = "yes" ] && return 1   # dryrun
-
     return 0
 }
 
@@ -391,6 +389,8 @@ EOF
 }
 
 Setup3rdPartyRepo() {
+    DIE "sorry, currently $progname does not support any 3rd party repo for legacy drivers."
+
     if [ -z "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
         Note "Setting up repository [kernel-lts]."
         Note "This repo provides legacy Nvidia drivers and LTS kernels."
@@ -613,27 +613,35 @@ Main()
     KeepsAndRemoves
     CreateConfFile
 
-    if [ -n "$install" ] ; then
+    if [ ${#install[@]} -gt 0 ] ; then
         Info "Installing packages: ${install[*]}"
         cmd="pacman -Syuq --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
     fi
-    if [ -n "$remove" ] ; then
+    if [ ${#remove[@]} -gt 0 ] ; then
         Info "Removing packages: ${remove[*]}"
         cmd="pacman -Rs --noconfirm --noprogressbar --nodeps ${remove[*]}; $cmd"
     fi
 
-    ShowCommandsToRun || return 0
+    ShowCommandsToRun
 
-    if [ -n "$aurs" ] ; then
-        local txt="\n"
+    local txt=""
+
+    if [ -n "$(printf "%s\n" "${install[@]}" | grep -P "nvidia-390|nvidia-470")" ] ; then
+        if [ -n "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
+            txt+="sorry, the [kernel-lts] repo is no more supported."
+        else
+            txt+="sorry, currently $progname does not support installing Nvidia series 390 and 470 drivers."
+        fi
+        DIE "$txt"
+    fi
+    if [ "${#aurs[@]}" -gt 0 ] ; then
         txt+="   Sorry, $progname does not support installing packages from AUR.\n"
-        txt+="   Consider using option --legacyrepo first. It adds a third party repo\n"
-        txt+="   by @jonathon (see: https://gitlab.com/m2x.dev/kernel-lts/repository).\n\n"
         txt+="   Packages missing from currently configured repositories:\n"
         txt+="       ${aurs[*]}\n"
         txt+="   Bailing out."
         DIE "$txt"
     fi
+    [ "$test" = "yes" ] && return 0   # dryrun
 
     # The commands are actually executed here.
     # If AUR packages are involved, the sudo/root password needs to be given twice!
