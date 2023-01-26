@@ -258,8 +258,8 @@ _tr_add2 after_install_ewtip2     "Selector de fons de pantalla"                
 
 # 2020-Oct-23:
 _tr_add2 updt_update_check        "- Comprovació d'actualitzacions"
-_tr_add2 updt_searching           "Se cerquen actualitzacions per a"
-_tr_add2 updt_for_updates         " "
+_tr_add2 updt_searching           "Se cerca a"
+_tr_add2 updt_for_updates         "si hi ha actualitzacions"
 _tr_add2 updt_failure             "Ha fallat$_exclamation"
 _tr_add2 updt_nothing_todo        "No hi ha res per fer."
 _tr_add2 updt_press_enter         "Premeu RETORN per tancar aquesta finestra"
