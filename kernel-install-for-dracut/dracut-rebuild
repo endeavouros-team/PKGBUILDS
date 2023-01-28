@@ -15,6 +15,7 @@ find_token() {
     fi
 }
 
+[[ -f /etc/kernel-install-for-dracut.conf ]] && source /etc/kernel-install-for-dracut.conf
 ESP=$(bootctl --print-esp-path)
 TOKEN=$(find_token)
 while read -r pkgbase; do
@@ -26,8 +27,9 @@ while read -r pkgbase; do
         exit 1
     fi
     echo "Running dracut for ${kernelname}-${kernelversion}"
-    dracut --force --hostonly --no-hostonly-cmdline "${INITRD_PATH}/initrd" "${kernelversion}"
-    dracut --force --no-hostonly "${INITRD_PATH}/initrd-fallback" "${kernelversion}"
+    [[ ${DRACUT_QUIET} == "true" ]] && DRACUT_EXTRA_PARAMS=" --quiet"
+    "dracut --force --hostonly --no-hostonly-cmdline${DRACUT_EXTRA_PARAMS} ${INITRD_PATH}/initrd ${kernelversion}"
+    [[ ${NO_DRACUT_FALLBACK} != "true" ]] && "dracut --force --no-hostonly${DRACUT_EXTRA_PARAMS} ${INITRD_PATH}/initrd-fallback ${kernelversion}"
 done < <(find /usr/lib/modules -maxdepth 2 -type f -name pkgbase)
 
 
