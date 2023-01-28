@@ -1,25 +1,28 @@
 # Based on the AUR package "dracut-hook" by Leonidas P. <jpegxguy>
 
 pkgname=eos-dracut
-pkgver=1.0
-pkgrel=2
+pkgver=1.1
+pkgrel=1
 pkgdesc="Dracut scripts and hooks for EndeavourOS"
 url=https://endeavouros.com
 arch=('any')
 license=('BSD')
+backup=('etc/eos-dracut.conf')
 depends=('dracut')
 conflicts=('dracut-hook' 'kernel-install-for-dracut')
 source=("dracut-rebuild"
-	"dracut-install"
-	"dracut-remove"
-	"90-dracut-install.hook"
-	"60-dracut-remove.hook"
+		"dracut-install"
+		"dracut-remove"
+		"90-dracut-install.hook"
+		"60-dracut-remove.hook"
+		"eos-dracut.conf"
 )
-sha256sums=('9d3723a5191d761ed43a3f3bbb0a00b44dfca73470f3595891c64088a186f24b'
-            '4539f8b4e4caef233b39a308891cf448de546efaad61579e9332e312e8c4ea3a'
-            '8d7fe6622dcbe5fb8a4b0df33265e82bd895e328d202a841a46859c1dd99d47e'
+sha256sums=('38eb43c459afb5e6fc2bcf59dc308dc06bd0ee7d95a5ba8b6d580715f461639b'
+            '329dcaf68e939f52a00b6dae152da8935a3280734288b0f2a2416465c6b8339b'
+            '2d91cdac7d52ecefd444f2d8b5352de98aeb0b045d23d80a34bad2e8e9519121'
             'de09e8e65837b189aec0a8c9a067143880faff14467a5573949f772f39c053b3'
-            'e79f8e9572c5d1af6052104eac7ff956754f7a191b52b16adf12b65a38e9b4ed')
+            'e79f8e9572c5d1af6052104eac7ff956754f7a191b52b16adf12b65a38e9b4ed'
+            '35ba4b4c82d5cceb6782c75f989bae36ba44ca626905b6db81908c1759eadfb0')
 
 package() {
 	install -Dm644 "${srcdir}/90-dracut-install.hook" "${pkgdir}/usr/share/libalpm/hooks/90-dracut-install.hook"
@@ -27,4 +30,5 @@ package() {
 	install -Dm755 "${srcdir}/dracut-install"         "${pkgdir}/usr/share/libalpm/scripts/dracut-install"
 	install -Dm755 "${srcdir}/dracut-remove"          "${pkgdir}/usr/share/libalpm/scripts/dracut-remove"
 	install -Dm755 "${srcdir}/dracut-rebuild"         "${pkgdir}/usr/bin/dracut-rebuild"
+	install -Dm644 "${srcdir}/eos-dracut.conf"        "${pkgdir}/etc/eos-dracut.conf"
 }
