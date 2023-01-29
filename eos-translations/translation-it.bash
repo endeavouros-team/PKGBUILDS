@@ -136,7 +136,7 @@ _tr_add2 settings_dis_buttip      "Lo prometto"
 _tr_add2 help_butt_title          "$PRETTY_PROGNAME Aiuto"
 _tr_add2 help_butt_text           "Maggiori informazioni su $PRETTY_PROGNAME app"
 
-_tr_add2 dm_title                 "Seleziona Display Manager"
+_tr_add2 dm_title                 "Seleziona il Display Manager"
 _tr_add2 dm_col_name1             "Seleziona"
 _tr_add2 dm_col_name2             "Nome del DM"
 
@@ -313,4 +313,25 @@ _tr_add2 daily_assist_DEinfo_tip     "maggiori informazioni sul Desktop/Window M
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Scegli le app più popolari da installare"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Scegli le app più popolari e installale"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Note sul Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Note sulla configurazione del Bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Imformazioni sul Firewall"
+_tr_add2 after_install_fwtip         "Informazioni sul firewall predefinito"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Personalizzazione del processo di installazione"
+_tr_add2 ins_custom_tip              "Come personalizzare il processo di installazione"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Ultime notizie su Arch"
+_tr_add2 daily_assist_anewstip       "Mostra le ultime notizie di Arch in un browser"
+
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Ci sono importanti novità su"
+_tr_add2 nb_nofify_user2             "Si prega di fare clic su"                                  # Software News
+_tr_add2 nb_nofify_user3             "pulsante nell'angolo in basso a sinistra di questa finestra."
 
