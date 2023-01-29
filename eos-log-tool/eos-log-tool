@@ -279,23 +279,40 @@ RemovePersonalData() {
 
 IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
 
-ForeignPkgInfo() {
+PrintPkgData() {
     local pkg ver desc
-    local data ix
-
-    readarray -t data <<< $(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
-
+    local ix
     for ((ix=0; ix<${#data[@]}; ix=ix+3 )) ; do
         pkg="$( echo "${data[ix]}"   | sed 's|[^:]*: ||')"
         ver="$( echo "${data[ix+1]}" | sed 's|[^:]*: ||')"
         desc="$(echo "${data[ix+2]}" | sed 's|[^:]*: ||')"
         
-        printf "%s|%s|%s\n" "$pkg" "$ver" "$desc"
-    done | column -t -s "|"
+        printf "%s$separator%s$separator%s\n" "$pkg" "$ver" "$desc"
+    done | Columnize
+}
+Columnize() { column -t -s "$separator" ; }
+
+ForeignPkgInfo() {
+    local data
+    readarray -t data <<< $(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
+    PrintPkgData
+}
+NativePkgInfo() {
+    if [ -x /usr/bin/expac ] ; then
+        # expac is much faster
+        expac -Q "%n$separator%v$separator%d" | Columnize
+    else
+        local data
+        readarray -t data <<< $(LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
+        PrintPkgData
+    fi
 }
 
 Local_ShowForeignPackages() {
     Cmd FuncCall ForeignPkgInfo            # "$xx" "$line"    # does special handling
+}
+Local_ShowNativePackages() {
+    Cmd FuncCall NativePkgInfo             # "$xx" "$line"    # does special handling
 }
 
 Local_ShowEosInstallLog() {
@@ -373,6 +390,7 @@ Main()
 {
     local -r progname=eos-log-tool
     local enable_journal=no
+    local -r separator=$'\x0c'    # column separator character for usage with the 'column' app (Form Feed)
 
     Options "$@"
 
@@ -418,6 +436,7 @@ Main()
     local -r cmd_fdisk="fdisk -l"
     local -r cmd_pacman_conf="cat /etc/pacman.conf"
     local -r cmd_instlog="cat $instlog"
+    local -r cmd_native="pacman -Qn"
     local -r cmd_foreign="pacman -Qm"
 
     local FieldInfo=()                                            # information for the logging commands
@@ -430,34 +449,35 @@ Main()
     local -r offset_command=4
 
     local FieldInfo1=(
-        # Name                                                                Selected    Installed  Tip                                                                           Command
-        # ----                                                                --------    ---------  ---                                                                           -------
+        # Name                                                                Selected    Installed  Tip                                                                                          Command
+        # ----                                                                --------    ---------  ---                                                                                          -------
     )
     if  [ "$enable_journal" = "yes" ] ; then
         FieldInfo1+=(
-        "System journal, most recent"                                         "true"     ""         "Journal from the most recent boot: $(TT "$cmd_journal0")"                     "pkexec $cmd_journal0"
-        "System journal, 2nd most recent"                                     ""         ""         "Journal from the second most recent boot: $(TT "$cmd_journal1")"              "pkexec $cmd_journal1"
-        "System journal, 3rd most recent"                                     ""         ""         "Journal from the third most recent boot: $(TT "$cmd_journal2")"               "pkexec $cmd_journal2"
-        "System journal, user defined options in file\n$conffile"             ""         ""         "Journal by user: $(TT "$cmd_journalX")"                                       "pkexec $cmd_journalX"
+        "System journal, most recent"                                         "true"     ""         "Journal from the most recent boot: $(TT "$cmd_journal0")"                                    "pkexec $cmd_journal0"
+        "System journal, 2nd most recent"                                     ""         ""         "Journal from the second most recent boot: $(TT "$cmd_journal1")"                             "pkexec $cmd_journal1"
+        "System journal, 3rd most recent"                                     ""         ""         "Journal from the third most recent boot: $(TT "$cmd_journal2")"                              "pkexec $cmd_journal2"
+        "System journal, user defined options in file\n$conffile"             ""         ""         "Journal by user: $(TT "$cmd_journalX")"                                                      "pkexec $cmd_journalX"
         )
     fi
     FieldInfo1+=(
-        "System boot-up performance statistics"                               ""         ""         "Time that running units took to initialize: $(TT "$cmd_blame")"               "$cmd_blame"
-        "Information about the PCI devices"                                   ""         ""         "Information related to PCI devices: $(TT "$cmd_lspci")"                       "$cmd_lspci"
-        "Information about the USB devices"                                   ""         ""         "Information related to USB devices: $(TT "$cmd_lsusb")"                       "$cmd_lsusb"
-        "Information about hardware (inxi)"                                   "true"     "inxi"     "Information about hardware and software using $(TT "$cmd_inxi")"              "$cmd_inxi"
-        "Information about hardware (hwinfo)"                                 ""         ""         "Summary of hardware: $(TT "$cmd_hwinfo")"                                     "$cmd_hwinfo"
-        "EndeavourOS install log"                                             ""         ""         "The log about the install of EndeavourOS: $(TT "$cmd_instlog")"               "Local_ShowEosInstallLog"
-        "X session errors"                                                    ""         ""         "Lists X session errors: $(TT "$cmd_X_sess_err")"                              "$cmd_X_sess_err"
-        "Xorg log"                                                            ""         ""         "Log about Xorg events: $(TT "$cmd_X_events")"                                 "$cmd_X_events"
-        "Display manager log"                                                 ""         "lightdm"  "Display manager (lightdm) log: $(TT "$cmd_dm")"                               "pkexec $cmd_dm"
-        "Display manager log, X related"                                      ""         "lightdm"  "Display manager log, X server related: $(TT "$cmd_dm_X")"                     "pkexec $cmd_dm_X"
-        "Grub configuration file"                                             ""         "grub"     "Grub (bootloader) configuration file: $(TT "$cmd_grub")"                      "pkexec $cmd_grub"
-        "Filesystem mountpoints (fstab)"                                      ""         ""         "Static information about the filesystem and mointpoints: $(TT "$cmd_fstab")"  "$cmd_fstab"
-        "Disks and partitions (lsblk)"                                        ""         ""         "List information about disks, partitions, labels, uuids: $(TT "$cmd_lsblk")"  "$cmd_lsblk"
-        "Disks and partitions (fdisk)"                                        ""         ""         "Another list of disk and partition information: $(TT "$cmd_fdisk")"           "pkexec $cmd_fdisk"
-        "Pacman configuration file"                                           "true"     ""         "Pacman (package manager) configuration file: $(TT "$cmd_pacman_conf")"        "$cmd_pacman_conf"
-        "Foreign packages"                                                    "true"     ""         "List foreign packages (=not from pacman repositories): $(TT "$cmd_foreign")"  "Local_ShowForeignPackages"
+        "System boot-up performance statistics"                               ""         ""         "Time that running units took to initialize: $(TT "$cmd_blame")"                              "$cmd_blame"
+        "Information about the PCI devices"                                   ""         ""         "Information related to PCI devices: $(TT "$cmd_lspci")"                                      "$cmd_lspci"
+        "Information about the USB devices"                                   ""         ""         "Information related to USB devices: $(TT "$cmd_lsusb")"                                      "$cmd_lsusb"
+        "Information about hardware (inxi)"                                   "true"     "inxi"     "Information about hardware and software using $(TT "$cmd_inxi")"                             "$cmd_inxi"
+        "Information about hardware (hwinfo)"                                 ""         ""         "Summary of hardware: $(TT "$cmd_hwinfo")"                                                    "$cmd_hwinfo"
+        "EndeavourOS install log"                                             ""         ""         "The log about the install of EndeavourOS: $(TT "$cmd_instlog")"                              "Local_ShowEosInstallLog"
+        "X session errors"                                                    ""         ""         "Lists X session errors: $(TT "$cmd_X_sess_err")"                                             "$cmd_X_sess_err"
+        "Xorg log"                                                            ""         ""         "Log about Xorg events: $(TT "$cmd_X_events")"                                                "$cmd_X_events"
+        "Display manager log"                                                 ""         "lightdm"  "Display manager (lightdm) log: $(TT "$cmd_dm")"                                              "pkexec $cmd_dm"
+        "Display manager log, X related"                                      ""         "lightdm"  "Display manager log, X server related: $(TT "$cmd_dm_X")"                                    "pkexec $cmd_dm_X"
+        "Grub configuration file"                                             ""         "grub"     "Grub (bootloader) configuration file: $(TT "$cmd_grub")"                                     "pkexec $cmd_grub"
+        "Filesystem mountpoints (fstab)"                                      ""         ""         "Static information about the filesystem and mointpoints: $(TT "$cmd_fstab")"                 "$cmd_fstab"
+        "Disks and partitions (lsblk)"                                        ""         ""         "List information about disks, partitions, labels, uuids: $(TT "$cmd_lsblk")"                 "$cmd_lsblk"
+        "Disks and partitions (fdisk)"                                        ""         ""         "Another list of disk and partition information: $(TT "$cmd_fdisk")"                          "pkexec $cmd_fdisk"
+        "Pacman configuration file"                                           "true"     ""         "Pacman (package manager) configuration file: $(TT "$cmd_pacman_conf")"                       "$cmd_pacman_conf"
+        "Native packages"                                                     ""         ""         "List native packages (=from pacman repositories): $(TT "$cmd_native") (slow without expac)"  "Local_ShowNativePackages"
+        "Foreign packages"                                                    "true"     ""         "List foreign packages (=not from pacman repositories): $(TT "$cmd_foreign")"                 "Local_ShowForeignPackages"
     )
 
     # information for the yad buttons

@@ -4,7 +4,7 @@ pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 pkgver=1.14
-pkgrel=4
+pkgrel=5
 
 arch=('any')
 license=('GPL')
@@ -15,6 +15,7 @@ depends=(eos-bash-shared
         )
 
 optdepends=(
+    'expac: for showing native packages (much faster)'
     'xclip: for automatic copying the returned URL to clipboard'
     'inxi: for inxi logs'
     'polkit: for pkexec'
@@ -26,7 +27,7 @@ source=(
     $pkgname.desktop
     $pkgname.conf
 )
-sha512sums=('d5b6f938c2e26457b8517ebab0a382f923d0d70623881309eef918625d4e80b0750dc7aa7ccf5c7fad65c4021401d9938a43e6116e8f931b3403298f3a9406d6'
+sha512sums=('ea0fde04300b17dc233f1d3259a5f75dc2d40a1c17f10850cb359ddefdfb765d5cd0f14c3352f30f1c3b23f2a6e35bba745a18cc0b2e47f640283a10b636b9c5'
             '177f28300b7721ae165afc651279d619dd2924496e2f727ea2c63c131070a0d727de71619a0cf8d359486f0f91f319e58946a066c8411500976f60ff30e7d3c3'
             '781f2d48101d0a0a23da049ccbaa70d3da30dda7e2e31458bcb671ceb25721dec86c7f32d87245554e5a3043cdf35fd9664761efe0a8cc82aeb982055488d229')
 
