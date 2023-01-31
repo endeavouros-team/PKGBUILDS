@@ -44,8 +44,6 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
     calamares
 
-    calamares_config_ce
-    calamares_config_default
     ckbcomp
 
     downgrade/aur
