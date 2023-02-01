@@ -7,37 +7,38 @@ ShowUpdates() {
     /usr/bin/grep "^\[testing\]" /etc/pacman.conf >/dev/null && prog=/usr/bin/head || prog=/usr/bin/tail
 
     for ((ix=0; ix < ${#updates[@]}; ix++)) ; do
-        pkgname="$(echo "${updates[$ix]}" | awk '{print $1}')"
+        pkgname="$(echo "${updates[$ix]}" | cut -d"$fieldsep" -f1)"
         pkginfo="$(LANG=C /usr/bin/pacman -Si $pkgname)"
-        dlsize="$(echo "$pkginfo" | grep "Download Size" | $prog -n 1 | awk '{print $4$5}')"
-        echo "${updates[$ix]} $dlsize"
+        dlsize="$(echo "$pkginfo" | grep "Download Size" | $prog -n 1 | awk '{print $4,$5}')"
+        echo "${updates[$ix]}$fieldsep$dlsize"
     done
 }
 
 ShowUpdatesHeader() {
-    echo "Name Current -> New DownloadSize"
-    echo "---- ------- -- --- ------------"
+    echo "Name${fieldsep}Current${fieldsep}->${fieldsep}New${fieldsep}Download Size"
+    echo "----${fieldsep}-------${fieldsep}--${fieldsep}---${fieldsep}-------------"
 }
 
 Main()
 {
     local show_header=yes
     local updates
-    local retcode=1
+    local retcode
+    local fieldsep=$'\x0c'   # form feed!
+    local rawupdates
 
-    test "$1" = "--nh" && show_header=no
-
-    updates="$(/usr/bin/checkupdates)"
+    rawupdates=$(checkupdates)
     retcode=$?
 
     case "$retcode" in
         0)
+            test "$1" = "--nh" && show_header=no
+            updates="$(echo "$rawupdates" | sed -E "s|[[:space:]]+|$fieldsep|g")"  # $fieldsep can not be '|' used in 'sed' command
             readarray -t updates <<< $(echo "$updates")
-            while true ; do
-                test "$show_header" = "yes" && ShowUpdatesHeader | tr ' ' '|'
-                ShowUpdates | tr ' ' '|'
-                break
-            done | column -t -s "|" | sed 's|\([0-9][0-9.,]*\)\([a-zA-Z][a-zA-Z]*\)$|\1 \2|'
+            {
+                test "$show_header" = "yes" && ShowUpdatesHeader
+                ShowUpdates
+            } | column -t -s "$fieldsep"
             ;;
         1 | 2)
             return $retcode
