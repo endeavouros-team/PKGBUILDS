@@ -5,7 +5,7 @@
 
 pkgname=calamares-git
 _reponame=calamares
-pkgver=10527.d9f2f130c
+pkgver=.
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
