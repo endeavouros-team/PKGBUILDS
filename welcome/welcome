@@ -1026,12 +1026,15 @@ DIE() {
     exit 1
 }
 
-WelcomeHelp() {
+WelcomeHelp_opt() {
     Usage | eos_yad --text-info --title="$WH_BUTT_TITLE" --width=700 --height=500 \
                     --fontname="Mono 10" \
                     --text="<b>$WH_BUTT_TEXT</b>" \
                     --text-align=left \
                     --image=$WELCOME_ICON_HELP --button=yad-ok:0
+}
+WelcomeHelp() {
+    WelcomeBrowser "https://discovery.endeavouros.com/endeavouros-tools/welcome"
 }
 export -f WelcomeHelp
 
@@ -1566,7 +1569,7 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
-            --help|-h) WelcomeHelp ; return ;;
+            --help|-h) WelcomeHelp_opt ; return ;;
             --enable|-f) WelcomeSettings enable ;;
             --disable)   WelcomeSettings disable ; return ;;
             --once | -1) allow_run_if_disabled=yes ;;
