@@ -303,6 +303,7 @@ Main() {
         online | offline | community)
             sudo cp $cfolder/settings_$mode.conf $cfolder/settings.conf
             PreLog "File settings.conf updated."
+            sudo bash /home/$EOS_LIVEUSER/user_commands.bash --iso-config $mode
             ;;
         *)
             GUIDIE "unsupported mode '$mode'"
