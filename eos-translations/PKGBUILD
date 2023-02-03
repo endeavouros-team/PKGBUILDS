@@ -4,43 +4,43 @@
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
 pkgver=23
-pkgrel=7
+pkgrel=8
 arch=('any')
 license=('GPL')
 depends=(bash)
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
 )
-# url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/eos-translations
+_url_dl=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 
 source=(
-  $url/translations.bash
-  $url/translation-ca.bash
-  $url/translation-de.bash
-  $url/translation-en.bash
-  $url/translation-es.bash
-  $url/translation-fa.bash
-  $url/translation-fi.bash
-  $url/translation-fr.bash
-  $url/translation-hi.bash
-  $url/translation-hr.bash
-  $url/translation-is.bash
-  $url/translation-it.bash
-  $url/translation-ja.bash
-  $url/translation-pl.bash
-  $url/translation-pt.bash
-  $url/translation-pt_BR.bash
-  $url/translation-ro.bash
-  $url/translation-rs.bash
-  $url/translation-ru.bash
-  $url/translation-se.bash
-  $url/translation-sk.bash
-  $url/translation-th.bash
-  $url/translation-zh_CN.bash
-  $url/translation-zh_HK.bash
-  $url/translation-zh_SG.bash
-  $url/translation-zh_TW.bash
+  $_url_dl/translations.bash
+  $_url_dl/translation-ca.bash
+  $_url_dl/translation-de.bash
+  $_url_dl/translation-en.bash
+  $_url_dl/translation-es.bash
+  $_url_dl/translation-fa.bash
+  $_url_dl/translation-fi.bash
+  $_url_dl/translation-fr.bash
+  $_url_dl/translation-hi.bash
+  $_url_dl/translation-hr.bash
+  $_url_dl/translation-is.bash
+  $_url_dl/translation-it.bash
+  $_url_dl/translation-ja.bash
+  $_url_dl/translation-pl.bash
+  $_url_dl/translation-pt.bash
+  $_url_dl/translation-pt_BR.bash
+  $_url_dl/translation-ro.bash
+  $_url_dl/translation-rs.bash
+  $_url_dl/translation-ru.bash
+  $_url_dl/translation-se.bash
+  $_url_dl/translation-sk.bash
+  $_url_dl/translation-th.bash
+  $_url_dl/translation-zh_CN.bash
+  $_url_dl/translation-zh_HK.bash
+  $_url_dl/translation-zh_SG.bash
+  $_url_dl/translation-zh_TW.bash
 )
 sha512sums=('4bf1c5216c0ed969a41bf43b0fc28b8cb80b6deb4482cdb1e7312adcf3c4e8ac2f7db014c5cf166fd6994468e024633fca3469456cd8bb070770235559c921c9'
             'd4de1875194bfdffb42bdee1f6d040eeaa6df06ac6f2c58a5afd0b798446aece93ec07bf333d9f1d16b3a4f9377ae20a9d0ad8d1ad09481f8eed9c7e06db44be'
@@ -68,21 +68,12 @@ sha512sums=('4bf1c5216c0ed969a41bf43b0fc28b8cb80b6deb4482cdb1e7312adcf3c4e8ac2f7
             'e3cb6cd3250b1e634504467ed97e905aec5c759e6206db2c27f2836d667ceaeb0374bba087c152b765df09f8e46fb402b26be90ce02a64ca7a81f7e927d43fe3'
             'fe741e4bdf7c68737ba7857eafe7bed0b52c97b5ad79a5dad94eabbd84a890e91fdc3a962ff9a472aae8bb33c9117c22ad3994f5932679cb413fffa583c26092'
             '284a6aef0e51b8b73d54eff10a6548521620d45e9e3038ad5761ab234883ac43e349c8c4939336600f0f93c424bfc0eee80d311e5a355104f9cfddfc0e94798b')
+
 package() {
+  local src filename
 
-  local folderspec=usr/share/endeavouros/scripts
-  local lang xx
-
-  install -d $pkgdir/$folderspec
-
-  install -Dm644 translations.bash             $pkgdir/$folderspec/translations.bash
-
-  for xx in "${source[@]}" ; do
-    case "$xx" in
-      $url/translation-*.bash)
-        lang="$(basename "$xx" .bash | sed 's|translation-||')"
-        install -Dm644 translation-$lang.bash  $pkgdir/$folderspec/translation-$lang.bash
-        ;;
-    esac
+  for src in "${source[@]}" ; do
+      filename="${src##*/}"
+      install -Dm644 "$filename"   "$pkgdir/usr/share/endeavouros/scripts/$filename"
   done
 }
