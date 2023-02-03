@@ -329,7 +329,7 @@ _tr_add2 ins_custom_tip              "Möglichkeiten die Installation anzupassen
 
 # 2022-Jul-15
 _tr_add2 daily_assist_anews          "Arch Linux Neuigkeiten"
-_tr_add2 daily_assist_anewstip       "Zeigt Neugkeiten über Arch Linux im Browser an"
+_tr_add2 daily_assist_anewstip       "Zeigt Neuigkeiten über Arch Linux im Browser an"
 
 
 # 2022-Sep-25
