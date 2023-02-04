@@ -150,6 +150,13 @@ HandlePossibleEpoch() {
     fi
 }
 
+IncludesOption() {
+    local where="$1"     # list of options, e.g. "-r --rmdeps"
+    local opt="$2"       # e.g. "-r"
+
+    printf "%s\n" $where | grep -w "\\$opt" >/dev/null
+}
+
 Build()
 {
     local pkgdirname="$1"
@@ -159,8 +166,9 @@ Build()
     local pkg pkgs
     local workdir=$(mktemp -d)
     local log=$workdir/buildlog-"$pkgdirname".log
-    local missdeps="Missing dependencies:"
+    local missdeps="Missing dependencies"
     local opts=""
+    local msg=""
 
     if [ "${#PKG_MAKEPKG_OPTIONS[@]}" -gt 0 ] ; then
         if [ -n "${PKG_MAKEPKG_OPTIONS[$pkgdirname]}" ] ; then   # from assets.conf
@@ -176,14 +184,22 @@ Build()
       # now build, assume we have PKGBUILD
       # special handling for missing dependencies
       LANG=C makepkg --clean $opts 2>/dev/null >"$log" || {
-          if [ -z "$(grep "$missdeps" "$log")" ] ; then
+          if [ -z "$(grep "$missdeps:" "$log")" ] ; then
               Popd -c2
               DIE "makepkg for '$pkgname' failed"
           fi
-          echo2 "Installing $(echo "$missdeps" | tr [:upper:] [:lower:])"
-          grep -A100 "$missdeps" "$log" | grep "^  -> " >&2
-          :
-          makepkg --syncdeps --clean $opts >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
+          msg="Installing $(echo "$missdeps" | tr [:upper:] [:lower:])"
+          if IncludesOption "$opts" "--rmdeps" || IncludesOption "$opts" "-r" ; then
+              msg+=" and removing them right after build"
+          fi
+          echo2 "$msg:"
+          # grep -A100 "$missdeps:" "$log" | grep "^  -> " >&2
+
+          # use special pacman wrapper in the makepkg call below
+          local wrapper=/usr/bin/pacman-for-assets.make
+          [ -x "$wrapper" ] || DIE "sorry, $wrapper does not exist!"
+
+          PACMAN=$wrapper makepkg --syncdeps --clean $opts >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
       }
       pkgs="$(ls -1 *.pkg.tar.$_COMPRESSOR)"
       [ -n "$pkgs" ] || DIE "$pkgdirname: build failed"
