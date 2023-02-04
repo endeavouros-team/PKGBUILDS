@@ -999,12 +999,12 @@ Main2()
                 continue
             fi
             if IsInWaitList "$xx" "$tmp" ; then
-                echo2 "WAITING ($tmpcurr ==> $tmp)"
+                ShowResult "WAITING ($tmpcurr ==> $tmp)" "$hookout"
                 continue
             fi
             
             ((total_items_to_build++))
-            echo2 "CHANGED $tmpcurr ==> $tmp"
+            ShowResult "CHANGED $tmpcurr ==> $tmp" "$hookout"
             if [ $cmpresult -gt 0 ] ; then
                 WantAurDiffs "$xx" "$pkgdirname"
             fi
@@ -1014,12 +1014,12 @@ Main2()
         fi
         Popd
 
-        if [ $total_items_to_build -eq 0 ] ; then
-            total_items_to_build=NONE
-        fi
-        printf2 "\nItems to build: %s\n" "$total_items_to_build"
+        #if [ $total_items_to_build -eq 0 ] ; then
+        #    total_items_to_build=NONE
+        #fi
+        printf2 "\nItems to build: %s/%s\n" "$total_items_to_build" "${#PKGNAMES[@]}"
 
-        if [ 0 -eq 1 ] ; then
+        if true ; then
             ExplainHookMarks
         else
             printf2 "\n"
