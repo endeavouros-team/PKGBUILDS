@@ -183,9 +183,8 @@ Build()
           echo2 "Installing $(echo "$missdeps" | tr [:upper:] [:lower:])"
           grep -A100 "$missdeps" "$log" | grep "^  -> " >&2
           :
-          makepkg --syncdeps --clean >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
+          makepkg --syncdeps --clean $opts >/dev/null || { Popd -c2 ; DIE "makepkg for '$pkgname' failed" ; }
       }
-      # pkg="$(ls -1 ${pkgname}-[0-9]*.pkg.tar.$_COMPRESSOR)"
       pkgs="$(ls -1 *.pkg.tar.$_COMPRESSOR)"
       [ -n "$pkgs" ] || DIE "$pkgdirname: build failed"
       for pkg in $pkgs ; do
@@ -197,7 +196,6 @@ Build()
       Popd
     Popd
     rm -rf "$workdir"
-    # echoreturn "$pkg"
 }
 
 PkgBuildName()
