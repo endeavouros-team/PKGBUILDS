@@ -1456,6 +1456,20 @@ CheckUserPkglist_old() {
 }
 fi
 
+GetIsoDateStr() {
+  local iso_date_str=""
+
+  if [ "$is_installing" = "yes" ] ; then
+      if [ -r /usr/lib/endeavouros-release ] ; then
+          iso_date_str="$(grep "^VERSION=" /usr/lib/endeavouros-release | sed -E 's|^VERSION=([0-9\.]+).*|\1|')"
+          if [ -n "$iso_date_str" ] ; then
+              iso_date_str="ISO: $iso_date_str"
+          fi
+      fi
+  fi
+  echo "$iso_date_str"
+}
+
 StartHere() {
     local arg lang
     local yad_zombie_log=/tmp/yad-zombies.log
@@ -1564,6 +1578,10 @@ StartHere() {
     export user_pkglist_url=""
     local start_delay=0
     local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
+
+    if [ "$is_installing" = "yes" ] ; then
+        _NOTEBOOK_TITLE+="  [$(GetIsoDateStr)]"
+    fi
 
     #local netlog=0
 
