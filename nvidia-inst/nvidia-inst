@@ -347,7 +347,11 @@ Options() {
             --32)             bit32=yes ;;
             --series)         series="$2" ; shift ;;
             --listopts)       ListOptions "$sopts" "$lopts" ; exit 0 ;;
-            --listseries)     echo "$series_now $series_prev1 $series_prev2" ; exit 0 ;;
+            --listseries)
+                [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
+                echo "$series_now $series_prev1 $series_prev2"
+                exit 0
+                ;;
             --drivers)
                 nvidia-driver-supported-branches   # -a    # this option is deprecated!
                 exit 0
@@ -546,10 +550,6 @@ Main()
     # - the latest from Arch
     # - two latest from the kernel-lts repo
 
-    local series_now=$(GetSeriesFromPacman)
-    local series_prev1=470
-    local series_prev2=390
-
     local progname=nvidia-inst
 
     local pacmanconf=/etc/pacman.conf
@@ -572,12 +572,18 @@ Main()
     local p_nvidia32=""
     local install=()
     local remove=()
-    local aurs=()        # collect needed AUR packages in this array
+    local aurs=()            # collect needed AUR packages in this array
     local cmd=""
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local series_now=""      # get it later because of the speed for bash completion
+    local series_prev1=470
+    local series_prev2=390
 
     Options "$@"
+
+    [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
+
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
     SanityChecks
     local all_installed_packages="$(pacman -Qsq)"
