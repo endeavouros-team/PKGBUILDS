@@ -61,11 +61,11 @@ PacdiffCmd() {
             if HasLibs ; then
                 eos_yad_nothing_todo "<tt>$msg</tt>" 5
             else
-                echo "$msg" >&2
+                echo "$indent$msg" >&2
             fi
             return $diffs_no_nt
         else
-            echo "$msg" >&2
+            echo "$indent$msg" >&2
             return $diffs_no
         fi
     fi
@@ -80,7 +80,11 @@ Main()
     local diffs_no_nt=3
 
     local start_new_terminal=no
-    [ "$1" = "--nt" ] && start_new_terminal=yes
+    local indent=""
+    case "$1" in
+        --indent=*) indent="${1#*=}" ;;
+        --nt)       start_new_terminal=yes ;;
+    esac
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return $diffs_error
     export -f eos_yad
     export -f eos_yad_nothing_todo
