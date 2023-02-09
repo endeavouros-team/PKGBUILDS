@@ -1456,18 +1456,32 @@ CheckUserPkglist_old() {
 }
 fi
 
-GetIsoDateStr() {
-  local iso_date_str=""
+GetIsoVersion() {
+    if [ -z "$ISO_VERSION" ] ; then
+        local file=/usr/lib/endeavouros-release
+        if [ -r $file ] ; then
+            ISO_VERSION="$(grep "^VERSION=" $file | sed -E 's|^VERSION=([0-9\.]+).*|\1|')"
+        fi
+    fi
+}
 
-  if [ "$is_installing" = "yes" ] ; then
-      if [ -r /usr/lib/endeavouros-release ] ; then
-          iso_date_str="$(grep "^VERSION=" /usr/lib/endeavouros-release | sed -E 's|^VERSION=([0-9\.]+).*|\1|')"
-          if [ -n "$iso_date_str" ] ; then
-              iso_date_str="ISO: $iso_date_str"
-          fi
-      fi
-  fi
-  echo "$iso_date_str"
+GetIsoDateStr() {
+    echo "ISO: $ISO_VERSION"
+}
+
+SetCalamaresVersionInfo() {
+    if [ -n "$ISO_VERSION" ] ; then
+        local file=/etc/calamares/branding/endeavouros/branding.desc
+        if [ -f $file ] ; then
+            local str
+
+            for str in "version:" "shortVersion:" ; do
+                if [ "$(grep -w "$str" $file | awk '{print $2}')" != "$ISO_VERSION" ] ; then
+                    sudo sed -i $file -E "s|^([ ]+$str[ ]+).*|\1$ISO_VERSION|"
+                fi
+            done
+        fi
+    fi
 }
 
 StartHere() {
@@ -1485,6 +1499,7 @@ StartHere() {
     local columns_for_own_commands="2"
     local show_predefined_buttons_at_own_commands="yes"
     local has_a_connection=no
+    local ISO_VERSION=""                      # only for the installer
 
     if eos-connection-checker ; then
         has_a_connection=yes
@@ -1514,6 +1529,9 @@ StartHere() {
                 sleep 0.1
             fi
         fi
+
+        GetIsoVersion
+        # SetCalamaresVersionInfo
     fi
     export EOS_FILESERVER_SITE
 
@@ -1580,7 +1598,7 @@ StartHere() {
     local _NOTEBOOK_TITLE="$PRETTY_PROGNAME v$PROG_VERSION"        # main window title
 
     if [ "$is_installing" = "yes" ] ; then
-        _NOTEBOOK_TITLE+="  [$(GetIsoDateStr)]"
+        [ -n "$ISO_VERSION" ] && _NOTEBOOK_TITLE+="  [$(GetIsoDateStr)]"
     fi
 
     #local netlog=0
