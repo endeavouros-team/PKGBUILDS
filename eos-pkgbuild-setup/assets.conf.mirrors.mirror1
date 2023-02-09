@@ -124,7 +124,9 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
 if false ; then
     PKGNAMES=(
-        kernel-install-for-dracut
+        eos-lightdm-gtk-theme
+        # wgetpaste-eos
+        # kernel-install-for-dracut
         # arc-gtk-theme-eos
         # ckbcomp
     )
@@ -160,7 +162,7 @@ PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
 PKG_MAKEPKG_OPTIONS[kernel-install-for-dracut]="--nodeps"
 PKG_MAKEPKG_OPTIONS[calamares]="--nodeps"
 
-PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
+#PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
 #PKG_MAKEPKG_OPTIONS[polybar]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[worm]="--rmdeps"
@@ -278,7 +280,19 @@ _paru_hook() {
     fi
 }
 
+_eos-lightdm-gtk-theme_hook() {
+    # Clone package source of eos-lightdm-gtk-theme from EndeavourOS ARM
 
+    local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
+
+    pushd /tmp >/dev/null || return 1
+    rm -rf PKGBUILDS
+    git clone https://github.com/endeavouros-arm/PKGBUILDS.git >& /dev/null || return 1   # Get all from EOS ARM.
+    [ -d "$PKGBUILD_ROOTDIR"/$Pkgname ] && rm -rf "$PKGBUILD_ROOTDIR"/$Pkgname            # Replace old local eos-lightdm-gtk-theme dir
+    mv PKGBUILDS/$Pkgname "$PKGBUILD_ROOTDIR"/ || return 1                                # with the new eos-lightdm-gtk-theme dir.
+    popd >/dev/null
+    rm -rf /tmp/PKGBUILDS                                                                 # clean up
+}
 
 _bashdb_hook() {
     local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
@@ -656,6 +670,7 @@ ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper
 # Temporary hooks for replacing *-bin versions to non-bin versions.
 #ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
 ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
+ASSET_PACKAGE_HOOKS["eos-lightdm-gtk-theme"]=_eos-lightdm-gtk-theme_hook
 
 #ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
