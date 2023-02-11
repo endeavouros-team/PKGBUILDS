@@ -363,6 +363,25 @@ HubReleaseShow() {
     HubRelease show "$@" | sed -e 's|%2B|+|g'     # -e 's|%3A|:|g'
 }
 
+AskFetchingFromGithub() {
+    if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
+        printf2 "\n%s " "Fetch assets from github (Y/n)?"
+        read2
+
+        case "$REPLY" in
+            [yY]*|"")
+                echo2 "==> Using remote assets."
+                ;;
+            *)
+                echo2 "==> Using local assets."
+                echo2 ""
+                return 1
+                ;;
+        esac
+    fi
+    return 0
+}
+
 Assets_clone()
 {
     if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
@@ -370,19 +389,20 @@ Assets_clone()
     fi
     if [ "$use_release_assets" = "no" ] ; then
         if [ -n "$GITREPOURL" ] && [ -n "$GITREPODIR" ] ; then
+            AskFetchingFromGithub || return 0
             echo2 "==> Copying files from the git repo to local dir."
             local tmpdir=$(mktemp -d)
             Pushd $tmpdir
-            git clone "$GITREPOURL" >& /dev/null || DIE "cloning '$GITREPOURL' failed"
+            git clone --filter=blob:none "$GITREPOURL" >& /dev/null || DIE "cloning '$GITREPOURL' failed"
             rm -f "$ASSETSDIR"/*.{db,files,sig,old,xz,zst,txt}
             cp "$GITREPODIR"/*.{db,files,sig,xz,zst} "$ASSETSDIR"
             sync
             Popd
             rm -rf $tmpdir
-            return
         else
             DIE "GITREPOURL and/or GITREPODIR missing for $REPONAME while USE_RELEASE_ASSETS = '$use_release_assets'"
         fi
+        return
     fi
 
     local xx yy hook
@@ -399,21 +419,7 @@ Assets_clone()
                 echo2 "==> Using local assets."
                 return
             fi
-            if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
-                printf2 "\n%s " "Fetch assets from github (Y/n)?"
-                read2
-
-                case "$REPLY" in
-                    [yY]*|"")
-                        echo2 "==> Using remote assets."
-                        ;;
-                    *)
-                        echo2 "==> Using local assets."
-                        echo2 ""
-                        return
-                        ;;
-                esac
-            fi
+            AskFetchingFromGithub || return 0
             ;;
     esac
 
