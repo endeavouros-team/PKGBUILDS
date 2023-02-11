@@ -368,6 +368,22 @@ Assets_clone()
     if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
         return
     fi
+    if [ "$use_release_assets" = "no" ] ; then
+        if [ -n "$GITREPOURL" ] && [ -n "$GITREPODIR" ] ; then
+            echo2 "==> Copying files from the git repo to local dir."
+            local tmpdir=$(mktemp -d)
+            Pushd $tmpdir
+            git clone "$GITREPOURL" >& /dev/null || DIE "cloning '$GITREPOURL' failed"
+            rm -f "$ASSETSDIR"/*.{db,files,sig,old,xz,zst,txt}
+            cp "$GITREPODIR"/*.{db,files,sig,xz,zst} "$ASSETSDIR"
+            sync
+            Popd
+            rm -rf $tmpdir
+            return
+        else
+            DIE "GITREPOURL and/or GITREPODIR missing for $REPONAME while USE_RELEASE_ASSETS = '$use_release_assets'"
+        fi
+    fi
 
     local xx yy hook
 
@@ -808,13 +824,22 @@ Vercmp() {
 }
 
 PkgnameFilter() {
-    sed 's|-[^-]*-[^-]*-[^-]*$||'
+    # remove trailing parts after the 'pkgname'
+    # sed 's|-[^-]*-[^-]*-[^-]*$||'    
+    sed -E 's|-[^-]+-[^-]+-[^\.]+\.pkg\.tar\..*$||'
 }
 
 PkgnameFromPkg() {
     local pkg="$1"
     pkg="$(basename "$pkg")"
     echo "$pkg" | PkgnameFilter
+}
+
+ListPkgsWithName() {
+    local pkgname="$1"
+    local compr="$2"
+
+    ls -1 "$pkgname"-*.pkg.tar.$compr 2> /dev/null | grep -E "${pkgname}-[^-]+-[^-]+-[^\.]+\.pkg\.tar\.$compr$"
 }
 
 Usage() {
@@ -1086,19 +1111,23 @@ Main2()
                 #echo2  "    ==> $yy"
             done
 
-            # determine old pkgs
+            # determine old pkgs, may be many
             for zz in zst xz ; do
                 for yy in "${built_under_this_pkgname[@]}" ; do
                     pkgname="$(PkgnameFromPkg "$yy")"
-                    pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"    # $_COMPRESSOR
-                    test -n "$pkg" && {
-                        removable+=("$pkg")
-                        removable+=("$pkg".sig)
+                    # pkg="$(ls -1 "$ASSETSDIR/$pkgname"-[0-9]*.pkg.tar.$zz 2> /dev/null)"
+                    pkg=$(ListPkgsWithName "$pkgname" "$zz")
+                    if [ -n "$pkg" ] ; then
+                        local xyz
+                        for xyz in $pkg ; do
+                            removable+=("$xyz")
+                            removable+=("$xyz".sig)
 
-                        yy="$(basename "$pkg")"
-                        removableassets+=("$yy")
-                        #removableassets+=("$yy".sig)
-                    }
+                            yy="$(basename "$xyz")"
+                            removableassets+=("$yy")
+                            #removableassets+=("$yy".sig)
+                        done
+                    fi
                 done
             done
         done
@@ -1274,9 +1303,8 @@ Main2()
         GitUpdate_repo "${built[@]}"
 
         sleep 3
-        echo2 "Syncing $REPONAME release assets with github:"
 
-        if [ 0 -eq 1 ] ; then
+        if false ; then
             case "$REPONAME" in
                 endeavouros)
                     case "$use_release_assets" in
@@ -1371,17 +1399,15 @@ AssetCmdLast() {
 ManualCheckOfAssets() {
     local op="$1"
     local what="$2"
+
+    case "$what" in
+        repo) [ "$use_release_assets" = "yes" ] || return ;;
+    esac
+
     sleep 1
     while true ; do
-        if [ 0 -eq 1 ] ; then
-            HubReleaseShow -f %as%n $tag | sed 's|^.*/||' >&2
-            printf2 "\n%s "  "The above assets list is the situation after $op. Is it OK (y/n)?"
-        else
-            : #printf2 "\n%s "  "Is $op OK (y/n)?"
-        fi
         case "$what" in
-            assets) what="$tag" ;;
-            repo)   ;;
+            assets) what="assets in $tag" ;;
         esac
         read2 -t 10 -p "$what: Is $op OK (Y/n)? "
         case "$REPLY" in
@@ -1406,6 +1432,8 @@ ManageGithubReleaseAssets() {
     case "$use_release_assets" in
         no) return ;;
     esac
+
+    echo2 "Syncing $REPONAME release assets with github:"
 
     local last_tag=$((${#RELEASE_TAGS[@]} - 1))
     local assets
