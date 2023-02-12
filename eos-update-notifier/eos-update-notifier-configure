@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# This program manages and configures eos-update-notifier with a small GUI.
+# This program manages and configures eos-update-notifier (= $TARGET_PROG) with a small GUI.
 
 ERROR() { echo "$progname: error: $1" >&2 ; }
 DIE()   { ERROR "$1" ; exit 1 ; }
+
+export TARGET_PROG=eos-update-notifier
 
 GetLibCode() {
     local libcode=/usr/share/endeavouros/scripts/eos-script-lib-yad
     source $libcode || DIE "loading $libcode failed."
     export -f eos_yad
+    export -f eos_yad_nothing_todo
 }
 
 GetSudoEditor() {
@@ -29,38 +32,64 @@ GetSudoEditor() {
     DIE "suitable editor not found"
 }
 
+ServiceAction() {
+    local action="$1"
+    case "$action" in
+        disable)
+            systemctl --user stop $TARGET_PROG.timer
+            systemctl --user disable $TARGET_PROG.timer
+            eos_yad_nothing_todo "<tt>$TARGET_PROG ${action}d</tt>" 5
+            ;;
+        enable)
+            systemctl --user enable $TARGET_PROG.timer
+            systemctl --user start $TARGET_PROG.timer
+            eos_yad_nothing_todo "<tt>$TARGET_PROG ${action}d</tt>" 5
+            ;;
+        status)
+            $TARGET_PROG --show-timer
+            ;;
+    esac
+}
+export -f ServiceAction
+
 Main()
 {
-    local targetprog=eos-update-notifier
-    local progname=${targetprog}-configure
+    local progname="$(basename "$0")"
     local Editor=""
+
+    [ "$progname" = "${TARGET_PROG}-configure" ] || DIE "internal problem with program name"
 
     GetLibCode
     GetSudoEditor
 
     local cmd=(
         eos_yad
-        --form --title="Configure $targetprog"
+        --form --title="Configure $TARGET_PROG"
         --image=system-settings
-        --text="Configure and manage features of $targetprog"
-        --width=420
+        --text="Configure and manage features of $TARGET_PROG"
+        # --width=420
         --columns=2
+        --use-interp
+        --align-buttons
+        --buttons-layout=center
 
-        --field="Edit config!!<tt>View and modify configuration file /etc/$targetprog.conf with '$Editor'</tt>":fbtn \
-               "/usr/bin/RunInTerminalEx $EOS_ROOTER '$Editor /etc/$targetprog.conf'"
-        --field="Schedule!!<tt>View and modify the schedule of update checks</tt>":fbtn \
-               "/usr/bin/$targetprog --conf"
-        --field="Reset!!<tt>Reset eos-update-notifier's systemd service files to defaults</tt>":fbtn \
-               "/usr/bin/RunInTerminal /usr/bin/$targetprog --init-force"
-        --field="Timer status!!<tt>Show status of systemd timer</tt>":fbtn \
-               "/usr/bin/$targetprog --show-timer"
-        --field="Operation test!!<tt>Run $targetprog now</tt>":fbtn 
-               "/usr/bin/RunInTerminal /usr/bin/$targetprog --systemd -iw=0s"
+        --field="Edit config!!<tt>View and modify configuration file /etc/$TARGET_PROG.conf with '$Editor'</tt>":fbtn
+               "/usr/bin/RunInTerminalEx $EOS_ROOTER '$Editor /etc/$TARGET_PROG.conf'"
+        --field="Schedule!!<tt>View and modify the schedule of update checks</tt>":fbtn
+               "/usr/bin/$TARGET_PROG --conf"
+        --field="Reset!!<tt>Reset $TARGET_PROG's systemd service files to defaults</tt>":fbtn
+               "/usr/bin/RunInTerminal /usr/bin/$TARGET_PROG --init-force"
+        --field="Operation test!!<tt>Run $TARGET_PROG now</tt>":fbtn
+               "/usr/bin/RunInTerminal /usr/bin/$TARGET_PROG --systemd -iw=0s"
 
-        --button="Changelog!help-about!<tt>Show changelog of $targetprog</tt>":"/usr/bin/$targetprog --changelog"
+        # --button="Changelog!help-about!<tt>Show changelog of $TARGET_PROG</tt>":"/usr/bin/$TARGET_PROG --changelog"
+        --button="Disable!notifications-disabled!Disable $TARGET_PROG service timer":"ServiceAction disable"
+        --button="Enable!notifications!Enable $TARGET_PROG service timer":"ServiceAction enable"
+        --button="Status!dialog-information!Show status of $TARGET_PROG service timer":"ServiceAction status"
         --button="yad-quit!!<tt>Quit now</tt>"
     )
-    "${cmd[@]}" #> /dev/null
+
+    "${cmd[@]}"
 }
 
 Main "$@"
