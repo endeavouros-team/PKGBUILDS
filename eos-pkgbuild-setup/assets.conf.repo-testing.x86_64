@@ -16,6 +16,11 @@ local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
 local GITDIR="$ASSETSDIR/../../repo-testing"        # not $REPONAME ...
 local USE_RELEASE_ASSETS=yes
+#if [ "$USE_RELEASE_ASSETS" = "no" ] ; then
+local GITREPOURL=https://github.com/endeavouros-team/eos-tools.git
+local GITREPODIR="$(basename "$GITREPOURL" .git)/$REPONAME"
+#fi
+
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages

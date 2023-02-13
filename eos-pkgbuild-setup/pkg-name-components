@@ -30,7 +30,7 @@ Usage:
               Name of a package file.
 
 Example:
-  $ $progname NEVRACE foo-bar-2:22.04.23-1-any.pkg.tar.zst
+  $ $progname NEVRAC foo-bar-2:22.04.23-1-any.pkg.tar.zst
   foo-bar|2|22.04.23|1|any|zst
 
 EOF

@@ -5,14 +5,23 @@
 #   - older: check if deletion of e.g. pamac-aur might remove also pamac-aur-git (names have same beginning)
 #   - better epoch handling
 
+DebugBreak() {
+    local from_function="${FUNCNAME[1]}"
+
+    case "$from_function" in
+        source) from_function="[PROGRAM]" ;;
+    esac
+
+    case "$DEBUG_BREAK" in
+        5) echo "Function '$FUNCNAME' <--- line ${BASH_LINENO[0]} function $from_function" ;;
+    esac
+    :  # this is the break line
+}
+
 echoreturn() { echo "$@" ; }     # for "return" values!
 
 echo2()      { echo   "$@" >&2 ; }    # output to stderr
 printf2()    { printf "$@" >&2 ; }    # output to stderr
-
-DebugWithLineNr() {
-    printf2 "%s\n" "${PROGNAME}, line ${BASH_LINENO[1]}: $1"
-}
 
 DIE() {
     echo2 "Error: $@"
@@ -125,28 +134,62 @@ Popd()  {
     done
 }
 
+Get_PKGBUILD_item_value() {
+    local Pkgbuild="$1"
+    local item="$2"
+    local -n out="$3"
+
+    out=$(cat "$Pkgbuild" | /usr/bin/grep "^$item=" | cut -d '=' -f2 | sed "s|^[\"']\(.*\)[\"']$|\1|")   # remove possible surrounding quotes
+}
+
+IsListedPackage() {
+    # Is a package one of the listed packages in PKGNAMES?
+    local pkgname="$1"
+    printf "%s\n" "${PKGNAMES[@]}" | grep -P "^$pkgname/aur$|^$pkgname$" >/dev/null
+}
+
+IsAurPackage() {
+    # Determine AUR from PKGNAMES array directly since we don't have PKGBUILD yet.
+    local pkgname="$1"
+    printf "%s\n" "${PKGNAMES[@]}" | grep "^$pkgname/aur$" >/dev/null
+}
+
 HandlePossibleEpoch() {
-    # Separate epoch value in the package name.
-    # Might be able to handle this here for every package?
+    # Github release assets cannot have colon (:) in the file name.
+    # So if a package has an epoch value in PKGBUILD, return a new fixed name for a package
+    # fetched from github release assets.
 
     local pkgname="$1"  # e.g. welcome
-    local pkg="$2"      # e.g. welcome-3.9.6-1-any.pkg.tar.zst
+    local pkg="$2"      # e.g. welcome-2.3.9.6-1-any.pkg.tar.zst  # assumes: epoch=2
+    local -n Newname="$3"
+    local cwd=""
+    local Epoch=""
 
-    local epoch="$(/usr/bin/grep "^epoch=" PKGBUILD | /usr/bin/cut -d'=' -f2)"
-    if [ -z "$epoch" ] ; then
-        echo "$pkg"
-    else
-        echo "$pkg" | sed "s|\(${pkgname}-[0-9][0-9]*\)\.\(.*\)|\1:\2|"
+    if [ ! -r PKGBUILD ] ; then
+        cwd="$PWD"
+
+        if [ ! -r "$PKGBUILD_ROOTDIR/$pkgname/PKGBUILD" ] ; then
+            if IsAurPackage "$pkgname" ; then
+                cd "$PKGBUILD_ROOTDIR"
+                yay -Ga "$pkgname" >/dev/null || DIE "fetching PKGBUILD of '$pkgname' failed."
+            else
+                DIE "sorry, getting PKGBUILD of '$pkgname' not supported yet."
+            fi
+        fi
+        cd "$PKGBUILD_ROOTDIR/$pkgname"
     fi
-    return
 
-    
-    local hook="${ASSET_PACKAGE_EPOCH_HOOKS[$pkgname]}"
+    Get_PKGBUILD_item_value "PKGBUILD" "epoch" Epoch
 
-    if [ -n "$hook" ] ; then
-        $hook "$pkg"
+    if [ -z "$Epoch" ] ; then
+        Newname="$pkg"
     else
-        echo "$pkg"
+        Newname=$(echo "$pkg" | sed "s|\(${pkgname}-[0-9][0-9]*\)\.\(.*\)|\1:\2|")
+    fi
+
+    if [ -n "$cwd" ] ; then
+        cd "$cwd"
+        [ -n "$tmpdir" ] && rm -rf $tmpdir
     fi
 }
 
@@ -204,7 +247,7 @@ Build()
       pkgs="$(ls -1 *.pkg.tar.$_COMPRESSOR)"
       [ -n "$pkgs" ] || DIE "$pkgdirname: build failed"
       for pkg in $pkgs ; do
-          pkg="$(HandlePossibleEpoch "$pkgname" "$pkg")"
+          # HandlePossibleEpoch "$pkgname" "$pkg" pkg     # not needed here since makepkg should handle epoch OK (?)
           mv $pkg "$assetsdir"
           built+=("$assetsdir/$pkg")
           built_under_this_pkgname+=("$pkg")
@@ -266,13 +309,18 @@ LocalVersion()
     echoreturn "${ver}-$rel"
 }
 
+AurMarkingFail() {
+    local fakepath="$1"     # no more: "aur/pkgname"
+    DIE "marking AUR packages as $fakepath is no more supported!"
+}
+
 JustPkgname()
 {
     local fakepath="$1"
     case "$fakepath" in
         ./*)      fakepath="${fakepath:2}" ;;
-        aur/*)    fakepath="${fakepath:4}" ;;
         */aur)    fakepath="${fakepath:: -4}" ;;
+        aur/*)    AurMarkingFail "$fakepath" ;;
         *)        fakepath="${fakepath}"   ;;
     esac
     echoreturn "$(basename "$fakepath")"
@@ -305,7 +353,7 @@ ListNameToPkgName()
     # Supported syntax:
     #    pkgname          local package
     #    ./pkgname        local package (emphasis)
-    #    aur/pkgname      AUR package
+    #    aur/pkgname      AUR package                           "aur/pkgname" NO MORE SUPPORTED!
     #    pkgname/aur      AUR package  (another way)
 
     local xx="$1"
@@ -317,18 +365,20 @@ ListNameToPkgName()
 
     pkgname=$(JustPkgname "$xx")
 
-    if [ "${xx::4}" = "aur/" ] || [ "${xx: -4}" = "/aur" ] ; then
+    [ "${xx::4}" = "aur/" ] && AurMarkingFail "$xx"
+
+    if [ "${xx: -4}" = "/aur" ] ; then
         case "$fetch" in
             yes)
                 rm -rf "$pkgname"
                 yay -Ga "$pkgname" >/dev/null || DIE "'yay -Ga $pkgname' failed."
-                #rm -rf "$pkgname"/.git                          # not needed
+                # rm -rf "$pkgname"/.git                          # not needed
                 ;;
         esac
     fi
 
     # A pkg may need some changes:
-    hook="${ASSET_PACKAGE_HOOKS["$pkgname"]}"
+    hook="${ASSET_PACKAGE_HOOKS[$pkgname]}"
     if [ -n "$hook" ] ; then
         if [ "$fetch" = "yes" ] ; then
             hookout=$($hook)
@@ -346,13 +396,16 @@ ListNameToPkgName()
     pkgdirname="$pkgname"
 }
 
-HubRelease() {
+LogStuff() {
     if which logstuff >& /dev/null ; then
         if ! logstuff state ; then
             echo2 "==> logstuff on"
             logstuff on
         fi
     fi
+}
+
+HubRelease() {
     hub release "$@"
 }
 
@@ -364,22 +417,49 @@ HubReleaseShow() {
 }
 
 AskFetchingFromGithub() {
-    if [ -n "$(ls -1 *.pkg.tar.{xz,zst} 2> /dev/null)" ] ; then   # $_COMPRESSOR
-        printf2 "\n%s " "Fetch assets from github (Y/n)?"
-        read2
+    printf2 "\n%s " "Fetch assets from github (Y/n)?"
+    read2
+    case "$REPLY" in
+        [yY]*|"")
+            echo2 "==> Using remote assets."
+            # return 0
+            ;;
+        *)
+            echo2 "==> Using local assets."
+            echo2 ""
+            return 1
+            ;;
+    esac
 
+    DebugBreak
+
+    local local_files=""
+    local remote_files=""
+
+    if [ "$use_release_assets" = "yes" ] ; then
+        local_files=$(ls -1 *.{db,files,zst,xz,sig} 2> /dev/null | sort)   # $asset_file_endings
+        remote_files=$(release-asset-names ${RELEASE_TAGS[0]} | sort)
+    fi
+
+    if [ "$local_files" != "$remote_files" ] ; then
+        # There are differences in file names.
+        # Could be the epoch related file name change, they will be fixed.
+
+        local tmpdir_local=$(mktemp -d /tmp/local.XXX)
+        local tmpdir_remote=$(mktemp -d /tmp/remote.XXX)
+        touch $(echo "$local_files"  | sed "s|^|$tmpdir_local/|")
+        touch $(echo "$remote_files" | sed "s|^|$tmpdir_remote/|")
+        LANG=C diff $tmpdir_local $tmpdir_remote | sed -E \
+                                                       -e "s|^Only in /tmp/remote[^:]+: |Only in REMOTE: |" \
+                                                       -e "s|^Only in /tmp/local[^:]+: |Only in LOCAL:  |"
+        rm -rf $tmpdir_local $tmpdir_remote
+
+        echo2 ""
+        read -p "Local and remote file lists differ (NOTE: epoch diffs will be fixed!), continue (y/N)? " >&2
         case "$REPLY" in
-            [yY]*|"")
-                echo2 "==> Using remote assets."
-                ;;
-            *)
-                echo2 "==> Using local assets."
-                echo2 ""
-                return 1
-                ;;
+            "" | [nN]*) Exit 1 ;;
         esac
     fi
-    return 0
 }
 
 Assets_clone()
@@ -393,9 +473,9 @@ Assets_clone()
             echo2 "==> Copying files from the git repo to local dir."
             local tmpdir=$(mktemp -d)
             Pushd $tmpdir
-            git clone --filter=blob:none "$GITREPOURL" >& /dev/null || DIE "cloning '$GITREPOURL' failed"
-            rm -f "$ASSETSDIR"/*.{db,files,sig,old,xz,zst,txt}
-            cp "$GITREPODIR"/*.{db,files,sig,xz,zst} "$ASSETSDIR"
+            git clone  "$GITREPOURL" >& /dev/null || DIE "cloning '$GITREPOURL' failed"
+            rm -f "$ASSETSDIR"/*.{db,files,zst,xz,sig,txt,old}      # $asset_file_endings
+            cp "$GITREPODIR"/*.{db,files,zst,xz,sig} "$ASSETSDIR"   # $asset_file_endings
             sync
             Popd
             rm -rf $tmpdir
@@ -407,10 +487,9 @@ Assets_clone()
 
     local xx yy hook
 
-    # echo2 "It is possible that your local release assets in folder $ASSETSDIR"
-    # echo2 "are not in sync with github."
-    # echo2 "If so, you can delete your local assets and fetch assets from github now."
-    # read -p "Delete local assets and fetch them from github now (y/N)? " xx >&2
+    # It is possible that your local release assets in folder $ASSETSDIR
+    # are not in sync with github.
+    # If so, you can delete your local assets and fetch assets from github now.
 
     case "$REPONAME" in
         endeavouros_calamares) ;;  # many maintainers, so make sure we have the same assets!
@@ -425,59 +504,65 @@ Assets_clone()
 
     Pushd "$ASSETSDIR"
 
-    if [ 1 -eq 1 ] ; then
-        local tag
-        local remotes remote
-        local waittime=30
-        for tag in "${RELEASE_TAGS[@]}" ; do
-            remotes="$(HubReleaseShow -f %as%n $tag | sed 's|^.*/||')"
-            for remote in $remotes ; do
-                if [ ! -r $remote ] ; then
-                    break
-                fi
-            done
-            break
+    local tag
+    local remotes remote
+    local waittime=30
+
+    for tag in "${RELEASE_TAGS[@]}" ; do
+        remotes="$(HubReleaseShow -f %as%n $tag | sed 's|^.*/||')"
+        for remote in $remotes ; do
+            [ -r $remote ] || break
         done
-        if [ -r $remote ] ; then
-            read2 -p "Asset names at github are the same as here, fetch anyway (y/N)? " -t $waittime
-            case "$REPLY" in
-                [yY]*) ;;
-                *) Popd ; return ;;
-            esac
-        fi
+        break
+    done
+
+    DebugBreak
+
+    if [ -r $remote ] ; then
+        read2 -p "Asset names at github are the same as here, fetch anyway (y/N)? " -t $waittime
+        case "$REPLY" in
+            [yY]*) ;;
+            *) Popd ; return ;;
+        esac
     fi
 
-    echo2 "Deleting all local assets..."
+    echo2 "==> Deleting all local assets..."
+
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
-    rm -f *.{db,files,sig,old,xz,zst,txt}
-    local leftovers="$(command ls *.{db,files,sig,old,xz,zst} 2>/dev/null)"
+
+    rm -f *.{db,files,zst,xz,sig,txt,old}                                     # $asset_file_endings
+    local leftovers="$(command ls *.{db,files,zst,xz,sig,old} 2>/dev/null)"   # $asset_file_endings
     test -z "$leftovers" || DIE "removing local assets failed!"
 
-    echo2 "Fetching all github assets..."
-    hook="${ASSET_PACKAGE_HOOKS["assets_mirrors"]}"
+    echo2 "==> Fetching all github assets..."
+
+    hook="${ASSET_PACKAGE_HOOKS[assets_mirrors]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
         HubRelease download $xx
         test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
-
-    # because of possible epoch and github, some packages must be renamed
-    if [ -n "${ASSET_PACKAGE_EPOCH_HOOKS[*]}" ] ; then
-        local oldnames oldname newname
-        for xx in "${PKGNAMES[@]}" ; do
-            PkgbuildExists "$xx" "line $LINENO" || continue
-            hook="${ASSET_PACKAGE_EPOCH_HOOKS[$xx]}"
-            if [ -n "$hook" ] ; then
-                oldnames="$(/usr/bin/ls -1 ${xx}-*)"  # files *.zst and *.zst.sig
-                for oldname in $oldnames ; do
-                    newname="$($hook "$oldname")"
-                    echo2 "renaming $oldname to $newname"
-                    mv "$oldname" "$newname" || DIE "renaming failed"
-                done
-            fi
-        done
-    fi
     sleep 1
+
+    # Unfortunately github release assets cannot contain a colon (epoch mark) in file name, so rename those packages locally
+    # after fetching them above.
+
+    local oldname newname pkgname
+
+    for oldname in *.pkg.tar.{zst,xz} ; do
+        case "$oldname" in
+            "*.pkg."*) continue ;;
+        esac
+        pkgname=$(pkg-name-components N "$oldname")
+        IsListedPackage "$pkgname" || continue
+        HandlePossibleEpoch "$pkgname" "$oldname" newname
+        if [ "$newname" != "$oldname" ] ; then
+            echo2 "==> Fix: $oldname     --> $newname"
+            echo2 "==> Fix: $oldname.sig --> $newname.sig"
+            mv $oldname $newname
+            mv $oldname.sig $newname.sig
+        fi
+    done
 
     Popd
 }
@@ -497,7 +582,6 @@ PkgbuildExists() {
                 printf2 "File listing:\n"
                 echo2 "$files" | sed 's|^|    ==> |'
             fi
-            # DebugWithLineNr "$line"
         fi
         return 1
     fi
@@ -572,18 +656,8 @@ Constructor()
 
 }
 
-DebugInit() {
-    : # rm -f /tmp/assets-make-foo.log
-}
-Debug() {
-    :
-    # local date="$(date)"
-    # echo "$date: $1" >> /tmp/assets-make-foo.log
-}
-
 Destructor()
 {
-    #test -L "$ASSETSDIR"/.git && rm -f "$ASSETSDIR"/.git
     test -n "$buildsavedir" && rm -rf "$buildsavedir"
 }
 
@@ -694,11 +768,12 @@ WantAurDiffs() {
     local xx="$1"
     local pkgdirname="$2"
     local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/?h=$pkgdirname&context=1"
-#   local diff_url="https://aur.archlinux.org/cgit/aur.git/commit/?h=$pkgdirname&context=1"
-#   local browser=/usr/bin/xdg-open   # firefox by default
 
     case "$xx" in
-        aur/* | */aur)
+        aur/*)
+            AurMarkingFail "$xx"
+            ;;
+        */aur)
             if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
                 already_asked_diffs=1
                 read2 -p "AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
@@ -712,7 +787,10 @@ WantAurDiffs() {
             fi
             if [ "$aurdiff" = "1" ] ; then
                 case "$xx" in
-                    aur/* | */aur)
+                    aur/*)
+                        AurMarkingFail "$xx"
+                        ;;
+                    */aur)
                         AUR_DIFFS+=("$diff_url")
                         AUR_DIFF_PKGS+=("$pkgdirname")
                         #$browser "$diff_url" >& /dev/null
@@ -838,7 +916,8 @@ PkgnameFilter() {
 PkgnameFromPkg() {
     local pkg="$1"
     pkg="$(basename "$pkg")"
-    echo "$pkg" | PkgnameFilter
+    # echo "$pkg" | PkgnameFilter
+    echo "$pkg" | pkg-name-components N
 }
 
 ListPkgsWithName() {
@@ -975,6 +1054,10 @@ Main2()
     use_release_assets="$USE_RELEASE_ASSETS"
     test -n "$use_release_assets" || use_release_assets=yes
 
+    LogStuff
+
+    DebugBreak
+    
     RationalityTests            # check validity of values in $ASSETS_CONF
 
     Constructor
@@ -1019,7 +1102,7 @@ Main2()
             # get versions from latest PKGBUILDs
             tmp="$(PkgBuildVersion "$PKGBUILD_ROOTDIR/$pkgdirname")"
             test -n "$tmp" || DIE "PkgBuildVersion for '$xx' failed"
-            newv["$pkgdirname"]="$tmp"
+            newv[$pkgdirname]="$tmp"
 
             # get current versions from local asset files
             pkgname="$(PkgBuildName "$pkgdirname")"
@@ -1031,7 +1114,7 @@ Main2()
                     tmpcurr="$notexist"
                     ;;
             esac
-            oldv["$pkgdirname"]="$tmpcurr"
+            oldv[$pkgdirname]="$tmpcurr"
 
             cmpresult=$(Vercmp "$tmp" "$tmpcurr")
 
@@ -1047,13 +1130,18 @@ Main2()
                 ShowResult "WAITING ($tmpcurr ==> $tmp)" "$hookout"
                 continue
             fi
-            
+
+            DebugBreak
+
             ((total_items_to_build++))
             ShowResult "CHANGED $tmpcurr ==> $tmp" "$hookout"
             if [ $cmpresult -gt 0 ] ; then
                 WantAurDiffs "$xx" "$pkgdirname"
             fi
         done
+
+        DebugBreak
+
         if [ -n "$AUR_DIFFS" ] ; then
             ShowAurDiffs
         fi
@@ -1089,7 +1177,7 @@ Main2()
             ListNameToPkgName "$xx" no
             PkgbuildExists "$xx" "line $LINENO" || continue
 
-            cmpresult=$(Vercmp "${newv["$pkgdirname"]}" "${oldv["$pkgdirname"]}")
+            cmpresult=$(Vercmp "${newv[$pkgdirname]}" "${oldv[$pkgdirname]}")
 
             # See if we have to build.
             [ "$cmpresult" -eq 0 ] && continue
@@ -1539,7 +1627,7 @@ ManageGithubNormalFiles() {
     test -d "$targetdir"     || DIE "target folder $targetdir does not exist."
 
     Pushd "$workdir"
-    cp_output="$(cp -uv "$ASSETSDIR"/*.{db,files,xz,zst,sig} "$targetdir")"
+    cp_output="$(cp -uv "$ASSETSDIR"/*.{db,files,zst,xz,sig} "$targetdir")"   # $asset_file_endings
     Popd
 
     if [ -n "$cp_output" ] ; then
@@ -1580,6 +1668,7 @@ Main() {
     local reponame="$(AssetsConfLocalVal REPONAME)"
     local signer="$(  AssetsConfLocalVal SIGNER)"
     local fail=0
+    # local asset_file_endings="db,files,zst,xz,sig"
 
     local _COMPRESSOR="$(grep "^PKGEXT=" /etc/makepkg.conf | tr -d "'" | sed 's|.*\.pkg\.tar\.||')"
     local REPO_COMPRESSOR="$(AssetsConfLocalVal REPO_COMPRESSOR)"
@@ -1612,8 +1701,8 @@ Main() {
         echo2 "VERSION: $(grep ^VERSION= $verfile | cut -d '=' -f 2)"
     fi
 
-    DebugInit
-    
+    DebugBreak
+
     Main2 "$@"
 }
 
