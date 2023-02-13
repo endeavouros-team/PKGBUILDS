@@ -24,9 +24,9 @@ local GITREPODIR="$(basename "$GITREPOURL" .git)/$REPONAME"
 
 # package name specifications
 local PKGNAMES=(                                    # actually: dir names for packages
-    aur/b43-firmware
-    aur/python3-gpg_batch_sign
-    aur/repo-add_and_sign
+    b43-firmware/aur
+    python3-gpg_batch_sign/aur
+    repo-add_and_sign/aur
 #    aur/archupdate-indicator
 
     eos-pkgbuild-setup
