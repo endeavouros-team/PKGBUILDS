@@ -526,12 +526,14 @@ Assets_clone()
         esac
     fi
 
-    echo2 "==> Deleting all local assets..."
+    save_folder=$(mktemp -d "$PWD"/SAVED.XXX)
+    echo2 "==> Saving current local assets to '$save_folder' ..."
 
     # $pkgname in PKGBUILD may not be the same as values in $PKGNAMES,
     # so delete all packages and databases.
 
-    rm -f *.{db,files,zst,xz,sig,txt,old}                                     # $asset_file_endings
+    # rm -f *.{db,files,zst,xz,sig,txt,old}                                   # $asset_file_endings
+    mv *.{db,files,zst,xz,sig,txt,old} "$save_folder"/ 2>/dev/null            # $asset_file_endings
     local leftovers="$(command ls *.{db,files,zst,xz,sig,old} 2>/dev/null)"   # $asset_file_endings
     test -z "$leftovers" || DIE "removing local assets failed!"
 
@@ -658,6 +660,7 @@ Constructor()
 
 Destructor()
 {
+    [ -n "$save_folder" ] && rm -rf "$save_folder"
     test -n "$buildsavedir" && rm -rf "$buildsavedir"
 }
 
@@ -1005,6 +1008,7 @@ Main2()
     local AUR_DIFF_PKGS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
+    local save_folder=""
 
     local hook_pkgver="#"
     local hook_multiversion="+"
