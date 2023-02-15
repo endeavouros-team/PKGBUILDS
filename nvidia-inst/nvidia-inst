@@ -156,13 +156,13 @@ Bumblebee() {
     esac
 }
 
-Prime() {
-    PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
-    KernelParametersToBoot
-}
-
 Nouveau() {
     PkgInstall xf86-video-nouveau
+}
+
+Prime() {
+    PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
+    KernelParametersToBoot2
 }
 
 OnlyNvidia() {
@@ -171,68 +171,16 @@ OnlyNvidia() {
     else
         PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
     fi
-    KernelParametersToBoot
+    KernelParametersToBoot2
 }
 
-KernelParametersToBoot() {
-    local kernel_param="nvidia-drm.modeset=1"
-    KernelParametersToSdboot && return
-    KernelParametersToGrub
-}
-
-KernelParametersToSdboot() {
-    local file=/etc/kernel/cmdline
-
-    [ -r $file ] || return 1
-
+KernelParametersToBoot2() {
+    local mode2
     case "$mode" in
-        nvidia | prime)
-            if [ -z "$(grep "$kernel_param" $file)" ] ; then
-                Info "Adding kernel parameter: $kernel_param"
-                AddCmd "sed -E -i $file -e 's|([ \t]*[^#].*)|$kernel_param \1|'"  # insert to a non-comment line
-            fi
-            ;;
-        *)
-            if [ -n "$(grep "$kernel_param" $file)" ] ; then
-                Info "Removing kernel parameter: $kernel_param"
-                AddCmd "sed -E -i $file -e 's|$kernel_param[ ]{0,1}||g'"
-            fi
-            ;;
+        nvidia | prime) mode2=add ;;
+        *)              mode2=remove ;;
     esac
-}
-
-KernelParametersToGrub() {
-    local grubcnf=/boot/grub/grub.cfg
-    local grubdef=/etc/default/grub
-    local grub_warning=no
-
-    [ -x /usr/bin/grub-mkconfig ] || return 1
-    [ -f $grubcnf ] || return 1
-    [ -f $grubdef ] || return 1
-
-    case "$mode" in
-        nvidia | prime)
-            if [ -z "$(grep "$kernel_param" $grubdef)" ] ; then
-                Info "Adding kernel parameter: $kernel_param"
-                AddCmd "nvidia-installer-kernel-para"
-                grub_warning=yes
-            fi
-            ;;
-        *)
-            if [ -n "$(grep "$kernel_param" $grubdef)" ] ; then
-                Info "Removing kernel parameter: $kernel_param"
-                AddCmd "nvidia-installer-kernel-para remove"
-                grub_warning=yes
-            fi
-            ;;
-    esac
-    if [ "$grub_warning" = "yes" ] ; then
-        cat <<EOF >&2
-Info: kernel parameters for grub will be changed by $progname, so it is advisable to run commands:
-    grub-mkconfig -o $grubcnf
-    grub-install (with proper parameters for your system!)
-EOF
-    fi
+    AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
 }
 
 AddConfFileLine() {
