@@ -1,53 +1,103 @@
 #!/bin/bash
 
-# Add missing kernel parameter nvidia-drm.modeset=1 to /etc/default/grub.
+# Add or remove a kernel parameter for grub or sd-boot
 
-SetKernelParameter() {
-    # return value:
-    #   0 = parameter was added
-    #   * = parameter was not added (already exists or a failure)
+Info() { echo "==> $progname: info:" "$@" ; }
 
-    local pname="$1"      # parameter name in $file
-    local pvalue="$2"     # parameter value in $file
-    local mode="$3"       # add (default) or remove
+DIE() {
+    echo "==> $progname: error: $@" >&2
+    exit 1
+}
 
-    [ -n "$mode" ] || mode=add
-
+SetKernelParameterGrub() {
     local file=/etc/default/grub
+    [ -r $file ] || return                                              # return if grub not used
     local varname="GRUB_CMDLINE_LINUX_DEFAULT"
-    local currline="$(grep ^"$varname"= $file | grep "$pname"=)"
+    local currline="$(grep ^"$varname"= $file | grep "$kernel_param")"
 
     if [ -n "$currline" ] ; then
         case "$mode" in
+            add)
+                Info "already set: '$currline'"
+                exit 1    # nothing changed
+                ;;
             remove)
-                echo "==> removing kernel parameter $pname=$pvalue"
+                Info "removing kernel parameter $kernel_param"
                 # first sed change below fails if $pname=$pvalue is first
                 sed -i $file \
-                    -e "s|^\($varname=\".*\) $pname=$pvalue\(.*\)$|\1\2|" \
-                    -e "s|^\($varname=\".*\)$pname=$pvalue \(.*\)$|\1\2|"
-                ;;
-            add)
-                printf "==> already set:\n%s\n" "$currline"
-                return 1    # nothing changed
+                    -e "s|^\($varname=\".*\) $kernel_param\(.*\)$|\1\2|" \
+                    -e "s|^\($varname=\".*\)$kernel_param \(.*\)$|\1\2|"
                 ;;
         esac
     else
         case "$mode" in
             add)
-                echo "==> adding kernel parameter $pname=$pvalue"
-                sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $pname=$pvalue\"|"
+                Info "adding kernel parameter $kernel_param"
+                sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $kernel_param\"|"
                 ;;
             remove)
                 currline="$(grep ^"$varname"= $file)"
-                printf "==> already removed:\n%s\n" "$currline"
-                return 1    # nothing changed
+                Info "already removed: '$currline'"
+                exit 1    # nothing changed
                 ;;
         esac
     fi
+    cat <<EOF >&2
+Info: kernel parameters for grub will be changed by $progname, so it is advisable to run commands:
+    grub-mkconfig -o $grubcnf
+    grub-install (with proper parameters for your system!)
+EOF
+    exit 0 # parameter changed
+}
+
+SetKernelParameterSdboot() {
+    local file=/etc/kernel/cmdline
+    [ -r $file ] || return                                              # return if sd-boot not used
+
+    local paramline=$(grep "$kernel_param" $file)
+
+    case "$mode" in
+        add)
+            [ "$paramline" != "" ] && exit 1                            # 1 = nothing changed
+            Info "adding kernel parameter: $kernel_param"
+            if [ "$(stat -c %s $file)" = "0" ] ; then
+                echo "$kernel_param" > $file
+            else
+                sed -E -i $file -e "s|([ \t]*[^#].*)|$kernel_param \1|"     # insert to a non-comment line
+            fi
+            ;;
+        remove)
+            [ "$paramline" = "" ] && exit 1                             # 1 = nothing changed
+            Info "removing kernel parameter: $kernel_param"
+            sed -E -i $file -e "s|$kernel_param[ ]{0,1}||g"
+            ;;
+    esac
+
+    reinstall-kernels
+    exit 0   # parameter changed
 }
 
 Main() {
-    SetKernelParameter "nvidia-drm.modeset" "1" "$@"
+    local progname="$(basename "$0")"
+    # exit value:
+    #   0 = parameter was added
+    #   * = parameter was not added (already exists or a failure)
+
+    local kernel_param="$1"
+    local mode="$2"               # optional: add (default) or remove
+
+    # check given parameters
+    [ "$kernel_param" = "" ] && DIE "kernel parameter is required but missing"
+    case "$mode" in
+        add | remove) ;;
+        "") mode=add ;;
+        *) DIE "$progname: error: value '$mode' for the second parameter is not supported" ;;
+    esac
+
+    SetKernelParameterSdboot      # exits if using sd-boot
+    SetKernelParameterGrub        # exits if using grub
+
+    Info "sd-boot or grub not in use"
 }
 
 Main "$@"
