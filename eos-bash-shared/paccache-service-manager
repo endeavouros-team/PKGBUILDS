@@ -15,8 +15,12 @@ export -f eos_yad
 DIE() {
     local msg="$1"
     shift
-    echo "Error: $msg" | eos_yad --text-info --image=error --title="$progname error" \
-                                 --wrap --width=500 --height=300 --button=yad-quit:1 "$@"
+    if false ; then
+        echo "Error: $msg" | eos_yad --text-info --image=error --title="$progname error" \
+                                     --wrap --width=500 --height=300 --button=yad-quit:1 "$@"
+    else
+        eos_yad --form --image=error --title="$progname error" --text="Error: $msg" --button=yad-quit:1 --scroll "$@"
+    fi
     exit 1
 }
 
@@ -42,10 +46,17 @@ GetCurrentValues() {
     case "$current_keepcount" in
         -r) current_keepcount=3 ;;                        # original value
         -rk*)
+            [ "$(echo "${current_keepcount:3}" | sed 's|[0-9]||g')" = "" ] || {
+                local line=$(grep "^ExecStart=" $s)
+                DIE "invalid value for option <tt>-k</tt> in file\n<tt>$s</tt>\nline:\n\n<tt>${line::70}</tt>"
+            }
             current_keepcount="${current_keepcount:3}"    # value after using this app
-            [ -z "$current_keepcount" ] && DIE "file '$s': paccache option 'k' requires an argument."
+            [ -z "$current_keepcount" ] && DIE "file '$s': paccache option '-k' requires a value."
             ;;
-        *) DIE "sorry, variable 'keepcount' has value '$current_keepcount' from file '$service', cannot parse it." --width=800 ;;
+        *)
+            local line=$(grep "^ExecStart=" $s)
+            DIE "invalid line in file\n<tt>$s</tt>\nline:\n\n<tt>${line::70}</tt>"
+            ;;
     esac
 }
 
@@ -98,6 +109,7 @@ _paccache_cleaner_manager()
     local first_time=no
     local verbose=no
     local vfile=""     # temporary file for showing all commands in verbose mode
+    local keepcount_max=100
 
     if [ ! -r $service ] ; then
         first_time=yes
@@ -141,12 +153,27 @@ _paccache_cleaner_manager()
             --field='Remove uninstalled but still cached packages now':CHK "$current_delete_uninstalled"
         )
 
-        result="$("${cmd_yad[@]}")" ; [ -n "$result" ] || return    # package kde-gtk-config should remove possible gtk related yad warnings
+        result="$("${cmd_yad[@]}" 2>/dev/null)"
+        [ -n "$result" ] || return    # package kde-gtk-config should remove possible gtk related yad warnings...
 
         # New values
         period="$(            echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
         keepcount="$(         echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
         delete_uninstalled="$(echo "$result" | cut -d '|' -f $field_nr)" ; ((++field_nr))
+
+        # ad hoc value checks
+        [ "$(echo "$keepcount" | sed 's|[0-9]||g')" = "" ] || DIE "sorry, keep count value '$keepcount' is not a number"
+        [ $keepcount -le $keepcount_max  ]                 || DIE "sorry, keep count value '$keepcount' is more than $keepcount_max and not supported"
+
+        case "$period" in
+            daily | weekly | monthly) ;;
+            *) DIE "sorry, cleaning period '$period' is unsupported" ;;
+        esac
+
+        case "$delete_uninstalled" in
+            TRUE | FALSE) ;;
+            *) DIE "sorry, value '$delete_uninstalled' for removing uninstalled packages is unsupported" ;;
+        esac
     fi
 
     # Build the final paccache command list.
