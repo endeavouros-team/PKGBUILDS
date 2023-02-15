@@ -7,23 +7,14 @@
 
 _ckbcomp_preparations() {
     local site="https://salsa.debian.org"
-    local parentname=console-setup
-    local archive_suffix=''
-    local name_suffix=''
 
-    url="$site/installer-team/$parentname"
+    url="$site/installer-team/console-setup"
 
     local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
-    local dl="$site"$(echo "$data" | grep "gl-button btn btn-sm btn-confirm" | head -n1 | sed -E -e 's|.*href="([^"]+)".*|\1|' -e 's|zip$|tar.gz|')
-
-    [[ $dl =~ /archive/debian/ ]]     && archive_suffix="/debian"
-    [[ $dl =~ ${parentname}-debian ]] && name_suffix="-debian"
+    local dl="$site$(echo "$data" | grep '"nofollow" download' | grep \.tar\.gz | head -n1 | sed -e 's|.* href="||' -e 's|".*||')"
 
     pkgver=$(echo "$dl" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
-    source=("$url/-/archive${archive_suffix}/$pkgver/${parentname}${name_suffix}-$pkgver.tar.gz")
-
-    # for package():
-    _source_archive="${parentname}${name_suffix}"
+    source=("$dl")
 }
 _ckbcomp_preparations
 unset -f _ckbcomp_preparations
@@ -35,14 +26,12 @@ arch=(any)
 license=('GPL2')
 depends=('perl')
 
-sha512sums=('43f950f920d4b98bab200163e0130a4f97dbe1db223f9b6de054797ac428391a010a698f0dcd80ebc0f2446d01dd0c0a5097c6b95e5c030481091510bdeb73f6')
+sha512sums=('20b148e3ffa1a57509e1bdab091ae36df04f363c7ca54e1decc15c14325df85b3d100e4b9a1e5884c18d47d45066b029bd450c9588f3103c03ad102d348869ad')
 
 package() {
-    pushd "${_source_archive}-$pkgver" >/dev/null
+    local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
 
-    install -Dm755 Keyboard/$pkgname   "${pkgdir}/usr/bin/$pkgname"
+    install -Dm755 "${appname}-$pkgver/Keyboard/$pkgname"   "${pkgdir}/usr/bin/$pkgname"
 
-    popd >/dev/null
-
-    rm -f "../${_source_archive}-$pkgver.tar.gz"   # cleanup
+    rm -f "../${appname}-$pkgver.tar.gz"   # cleanup
 }
