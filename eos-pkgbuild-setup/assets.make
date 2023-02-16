@@ -455,9 +455,11 @@ AskFetchingFromGithub() {
         rm -rf $tmpdir_local $tmpdir_remote
 
         echo2 ""
-        read -p "Local and remote file lists differ (NOTE: epoch diffs will be fixed!), continue (y/N)? " >&2
+        echo2 "Local and remote file lists differ (NOTE: epoch diffs will be fixed!)."
+        read -p "Continue with local assets (y/N)? " >&2
         case "$REPLY" in
             "" | [nN]*) Exit 1 ;;
+            *) return 1 ;;
         esac
     fi
 }
