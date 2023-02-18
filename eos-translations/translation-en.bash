@@ -331,7 +331,7 @@ _tr_add2 daily_assist_anews          "Latest Arch news"
 _tr_add2 daily_assist_anewstip       "Shows latest Arch news in a browser"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "There is important news at"
+_tr_add2 nb_nofify_user1             "There is important news at"                        # one (or more) dates, e.g. 2023-Feb-18
 _tr_add2 nb_nofify_user2             "Please click the"                                  # Software News
 _tr_add2 nb_nofify_user3             "button at the low left corner of this window."
 
