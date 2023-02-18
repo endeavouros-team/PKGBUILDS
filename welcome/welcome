@@ -1709,7 +1709,7 @@ StartHere() {
     if [ "$is_installing" = "no" ] ; then
         # try to give a critical notification
         if [ "$has_a_connection" = "yes" ] ; then
-            local news_date_url="$(Github2Gitlab https://raw.githubusercontent.com/endeavouros-team/Important-news/main/do_notify)"
+            local news_date_url="$(Github2Gitlab https://raw.githubusercontent.com/endeavouros-team/Important-news/main/do_notify)"  # this file can contain one or more date defs, one per line
             local news_date="$(curl -Lsm 10 -o- $news_date_url)"
             if [ -n "$news_date" ] ; then
                 notebook+=(--text="$(ltr nb_nofify_user1)\n$news_date\n$(ltr nb_nofify_user2) <b>$(ltr butt_softnews)</b> $(ltr nb_nofify_user3)\n")
