@@ -656,7 +656,7 @@ Constructor()
     test -e "$ASSETSDIR"/.git || ln -s "$GITDIR"/.git "$ASSETSDIR"
 
     test "$GITDIR"/.git -ef "$ASSETSDIR"/.git || \
-        DIE "$ASSETS_CONF: error: folder '$ASSETSDIR/.git' differs from '$GITDIR/.git'"
+        DIE "error: \$ASSETSDIR/.git != \$GITDIR/.git, check $ASSETS_CONF !"
 
 }
 

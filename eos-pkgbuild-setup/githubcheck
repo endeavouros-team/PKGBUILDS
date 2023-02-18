@@ -131,10 +131,11 @@ Main()
 
     for arg in "$@" ; do
         case "$arg" in
-            --2)           # check mirror2 instead of mirror1
-                MIRROR_URL=https://github.com/endeavouros-team/mirrors/releases/tag/"${RELEASE_TAGS[1]}"
-                findpart=/endeavouros-team/mirrors/releases/download/"${RELEASE_TAGS[1]}"/
-                ;;
+            --2) : # not used anymore
+                 # check mirror2 instead of mirror1
+                 # MIRROR_URL=https://github.com/endeavouros-team/mirrors/releases/tag/"${RELEASE_TAGS[1]}"
+                 # findpart=/endeavouros-team/mirrors/releases/download/"${RELEASE_TAGS[1]}"/
+                 ;;
             --slow) mode=slow ;;
             --fast) mode=fast ;;
             --optimized) mode=optimized ;;

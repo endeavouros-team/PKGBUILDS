@@ -7,7 +7,8 @@
 
 local REPONAME="endeavouros"
 local RELEASE_TAGS=(
-    mirror1
+    endeavouros
+    # mirror1
     # mirror2
 )
 
@@ -16,13 +17,13 @@ local SIGNER="EndeavourOS"
 
 # general options
 local USE_GENERATED_FILELIST="no"                   # may generate 'repofiles.txt' into the repo
-# local USE_RELEASE_ASSETS="no"                       # either 'release assets' or "ordinary" github files
+# local USE_RELEASE_ASSETS="no"                     # either 'release assets' or "ordinary" github files
 local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
 
 # local folders
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
-local GITDIR="$ASSETSDIR/../../mirrors"             # not $REPONAME...
+local GITDIR="$ASSETSDIR/../../repo"                # not $REPONAME...
 
 export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD files (e.g. yay) may use this!
 

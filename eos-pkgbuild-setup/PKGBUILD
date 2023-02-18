@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=11
+pkgrel=12
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -25,9 +25,9 @@ source=(
                                     # pkgver (3.45) and pkgname (welcome) from "welcome-3.45-1-any.pkg.tar.zst".
 
     ### Helper apps for the package builder
-    add-release-assets              # Copies packages from local machine to github as release assets into folder tag (= 'mirror1').
+    add-release-assets              # Copies packages from local machine to github as release assets into folder tag (= 'endeavouros').
     add-release-assets.completion   # Bash completion for all *-release-assets apps.
-    delete-release-assets           # Removes packages from github release assets folder tag (= 'mirror1').
+    delete-release-assets           # Removes packages from github release assets folder tag (= 'endeavouros').
     download-release-assets         # Downloads release assets from github to local machine.
     release-asset-names             # Shows all release asset files at github (with a given tag).
 
@@ -52,10 +52,10 @@ source=(
     # pkg-archive-mgr
     # push-ISOs-to-github
 )
-sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23e2025a82a1fdcf29887d9ac6c57cb23bb3473e217e2daf61a000c4e5c54a8'
+sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '15b4a800e60d65a5b4e888a6baa5cb6336b78255ff39f8c54563c77bdbff2299b84e65d456452097c5cbd36df1fae2cdcab41f65b9d86a2c0b6b973f5cc577a9'
             'be63de6c49f05f909a0b15e406eb43cad59cd15992ad1fa1ebda58245761fccd309f3aae76e6f3f86e6cd1e0d6279ed43a08aa7f7a2c312a493a55fe819dbc87'
-            '0e45cf7c6aa87d29c9823f917390f15b9b88abdb5cd7734d2250bfd9bb347ae17606ee86deb011d303596847f50b242edb55bb4832294fe0a281500d0f03bca7'
+            '49ff11482406df37ba86fb37cae287b2aecce93ec867b236391f5c96f77c1807f24502ad87bdd21d8e019f1eb976a5801e9e8819098ac892e58163b8d92046ba'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
             '81df0308e079dddc1f7631147cd70ca991406e5848dd7c2d08022dc0ae663432af2cbc89b0a3ea0d8578cc6a224504ddb1001f600682597889f4ad792a715a26'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
@@ -63,7 +63,7 @@ sha512sums=('d8b5c598b82ce838527ae71729241ef3dca4d108871cb124000a9f5c7981169ec23
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
-            'e666f229c342ac91fcf7e4c235fd99e013e55277886e3db1fc336d99432f6f570c8a599565df5afbe6276a528b34eab57fd01d5531fb340e8f798f406c8365f1'
+            'df6563de36c029bfc9db84a584a777d89951ba67e162e989b2c2927e748d65090a9060a5eb9263718352c25f134d636f208a36abda3b49f6b8f725ba67d4633a'
             '0591f55edcda1760005d606604f4326f3bb6060e3619d0e87465eac1e95af5112df2a621ee5fa18519596682534ac966591dad851ce478873d82eea8d84f06f9'
             '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
             '38e3200c9fc91ac4f77c856c1950776ea5da566532e6565942f250d0b5959109d1544d0485d54f5d4f43cabe0a54a65de0a827e8953a715a8182d573a147e347')
