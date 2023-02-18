@@ -14,7 +14,8 @@ local SIGNER="EndeavourOS"
 # local folders
 local ASSETSDIR="$PWD"
 local PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"       # temporary copy only, will always be overwritten
-local GITDIR="$ASSETSDIR/../../repo-testing"        # not $REPONAME ...
+#local GITDIR="$ASSETSDIR/../../repo-testing"       # not $REPONAME ...
+local GITDIR="$ASSETSDIR/../../eos-tools"           # not $REPONAME ...
 local USE_RELEASE_ASSETS=yes
 #if [ "$USE_RELEASE_ASSETS" = "no" ] ; then
 local GITREPOURL=https://github.com/endeavouros-team/eos-tools.git
