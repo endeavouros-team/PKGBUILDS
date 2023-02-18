@@ -13,4 +13,5 @@ List of recent *changes* finally available to assist the translators!
 
 Date | Description
 :---- | :------- 
+2023-Feb-18 | Added a comment for `nb_notify_user1`.
 2023-Jan-12 | `ins_starttip` and `install_community_tip` changed.
