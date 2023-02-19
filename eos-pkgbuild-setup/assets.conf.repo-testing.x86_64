@@ -6,7 +6,7 @@
 # so all variables are made 'local'.
 
 local REPONAME="endeavouros-testing-dev"
-local RELEASE_TAGS=(x86_64)
+local RELEASE_TAGS=(endeavouros-pkgbuild-tools)
 
 # user to sign packages
 local SIGNER="EndeavourOS"
