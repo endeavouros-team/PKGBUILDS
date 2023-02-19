@@ -397,6 +397,9 @@ ListNameToPkgName()
 }
 
 LogStuff() {
+    if [ "$cmd" = "dryrun-local" ] ; then
+        return  # avoid unnecessary pw asking
+    fi
     if which logstuff >& /dev/null ; then
         if ! logstuff state ; then
             echo2 "==> logstuff on"
@@ -466,7 +469,7 @@ AskFetchingFromGithub() {
 
 Assets_clone()
 {
-    if [ $use_local_assets -eq 1 ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
+    if [ "$cmd" = "dryrun-local" ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
         return
     fi
     if [ "$use_release_assets" = "no" ] ; then
@@ -999,7 +1002,6 @@ Main2()
     local repoup=0
     local pkgver_suffix=""
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
-    local use_local_assets=0         # 0 = offer to fetch assets
     local aurdiff=0                  # 1 = show AUR diff
     local already_asked_diffs=0
     local filelist_txt
@@ -1024,22 +1026,15 @@ Main2()
     if [ -n "$1" ] ; then
         for xx in "$@" ; do
             case "$xx" in
-                --dryrun-local | -nl | -n)
-                    cmd=dryrun ; use_local_assets=1 ;;
-                --dryrun | -nr | -nn)
-                    cmd=dryrun ;;
-                --repoup)
-                    repoup=1 ;;                  # sync repo even when no packages are built
-                --aurdiff)
-                    aurdiff=1 ;;
-                --allow-downgrade | -ad)
-                    allow_downgrade=yes ;;
+                --dryrun-local | -nl | -n) cmd=dryrun-local ;;
+                --dryrun | -nr | -nn)      cmd=dryrun ;;
+                --repoup)                  repoup=1 ;;                  # sync repo even when no packages are built
+                --aurdiff)                 aurdiff=1 ;;
+                --allow-downgrade | -ad)   allow_downgrade=yes ;;
 
                 # currently not used!
-                --mirrorcheck=*)
-                    mirror_check_wait="${xx#*=}";;
-                --versuffix=*)
-                    pkgver_suffix="${xx#*=}" ;;
+                --mirrorcheck=*)           mirror_check_wait="${xx#*=}";;
+                --versuffix=*)             pkgver_suffix="${xx#*=}" ;;
 
                 *) Usage 0  ;;
             esac
@@ -1166,7 +1161,7 @@ Main2()
     fi
 
     case "$cmd" in
-        dryrun)
+        dryrun | dryrun-local)
             Exit 0
             ;;
     esac
