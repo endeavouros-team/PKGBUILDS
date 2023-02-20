@@ -93,6 +93,10 @@ AfterTranslations() {
     export AFTER_INSTALL_US_FAIL="$(ltr after_install_us_fail)"
     export UPDT_NOTHING_TODO="$(ltr updt_nothing_todo)"
     export UPDT_UPDATE_CHECK="$(ltr updt_update_check):"
+
+    export INS_CUST_TEXT="$(ltr ins_cust_text)"
+    export INS_CUST_TEXT2="$(ltr ins_cust_text2)"
+    export INS_CUST_TEXT3="$(ltr ins_cust_text3)"
 }
 
 IsInstalled() { /usr/bin/pacman -Q "$1" >& /dev/null ; }
@@ -434,13 +438,31 @@ INSTALL() {
   tabcontents+=(
       --field=" $(ltr ins_rel)!$WELCOME_ICON_LATEST_RELEASE!$(ltr ins_reltip)":fbtn              "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
       --field=" $(ltr ins_tips)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_tipstip)":fbtn            "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
-    # --field=" $(ltr ins_trouble)!$WELCOME_ICON_SYSTEM_RESCUE!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
+      # --field=" $(ltr ins_trouble)!$WELCOME_ICON_SYSTEM_RESCUE!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
       --field=" $(ltr ins_syslog)!$WELCOME_ICON_SYSTEM_LOGS_HOWTO!$(ltr ins_syslogtip)":fbtn        "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-#      --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
+      # --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
+
+      --field=" $(ltr ins_customized)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr ins_cust_text)":fbtn   "AskUserCustomUrl"
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
+
+AskUserCustomUrl() {
+    local url=""
+    local cmd=(
+        eos_yad --entry
+        --title="$INS_CUST_TEXT"
+        --text="${INS_CUST_TEXT2}. $INS_CUST_TEXT3."
+        --image=$WELCOME_ICON_QUESTION
+    )
+
+    url=$("${cmd[@]}")
+    if [ $? -eq 0 ] ; then
+        MagicId_new "$url"
+    fi
+}
+export -f AskUserCustomUrl
 
 GeneralInfo() {
   local handle="$1"
@@ -1260,12 +1282,16 @@ MagicId_new() {
 
     # local EOS_LIVEUSER=$LOGNAME  # TESTING !!!
 
+    if [ ! -r /home/$EOS_LIVEUSER/user_commands.bash.bak ] ; then
+        cp /home/$EOS_LIVEUSER/user_commands.bash /home/$EOS_LIVEUSER/user_commands.bash.bak
+    fi
     if ! curl --fail -Lsm 10 -o/home/$EOS_LIVEUSER/user_commands.bash "$url" ; then
         echo "Sorry, cannot find URL $url" >&2
         return 1
     fi
     return 0
 }
+export -f MagicId_new
 
 MagicId() {
     local ENDEAVOUROS_TEAM=https://raw.githubusercontent.com/endeavouros-team
