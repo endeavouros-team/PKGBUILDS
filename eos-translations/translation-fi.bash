@@ -335,3 +335,9 @@ _tr_add2 nb_nofify_user1             "Tärkeitä uutisia saatavilla päivämää
 _tr_add2 nb_nofify_user2             "Klikkaa nappia"                                  # Software News
 _tr_add2 nb_nofify_user3             "tämän ikkunan vasemmassa alalaidassa."
 
+# 2023-Feb-20
+_tr_add2 ins_customized              "Hae asennuksen muokkaustiedostosi (tehokäyttäjille)"
+_tr_add2 ins_cust_text               "Anna URL muokattuun user_commands.bash-tiedostoosi"
+_tr_add2 ins_cust_text2              "Haettu tiedosto korvaa tiedoston ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Tämä on hyödyllisintä <b>online</b>-asennuksessa"
+

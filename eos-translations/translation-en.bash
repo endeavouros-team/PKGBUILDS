@@ -335,3 +335,9 @@ _tr_add2 nb_nofify_user1             "There is important news at"               
 _tr_add2 nb_nofify_user2             "Please click the"                                  # Software News
 _tr_add2 nb_nofify_user3             "button at the low left corner of this window."
 
+# 2023-Feb-20
+_tr_add2 ins_customized              "Fetch your install customization file (advanced)"
+_tr_add2 ins_cust_text               "Give URL to your customized user_commands.bash"
+_tr_add2 ins_cust_text2              "The fetched file will replace ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "This is most useful for <b>online</b> install"
+
