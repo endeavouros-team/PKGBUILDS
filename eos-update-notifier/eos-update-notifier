@@ -85,10 +85,11 @@ ShowNotify() {
     esac
     if [ 0 -eq 1 ] ; then
         expiretime="--expire-time=$expiretime"
-        /usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
+        cmd=$(/usr/bin/notify-send --icon="$_UpdateNotifyIcon" --urgency=normal $expiretime \
                              --app-name="EndeavourOS Update Notifier" \
                              "Updates available ($progname)" \
-			     "$msg"
+			     "$msg" --action "UpdateInTerminal --nt"=update)
+	bash -c "$cmd"
     else
         eos_notification "$_UpdateNotifyIcon" "normal" "$expiretime" "EndeavourOS Update Notifier" \
                          "Updates available ($progname)" \
