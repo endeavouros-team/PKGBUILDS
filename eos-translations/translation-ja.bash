@@ -91,9 +91,9 @@ _tr_add2 after_install_ft      "フォーラムの便利な使い方"
 _tr_add2 after_install_fttip   "ヘルプの求め方 $_exclamation"
 
 
-_tr_add2 general_info_text     "EndeavourOS のWeb サイトを見る $_exclamation"
+_tr_add2 general_info_text     "EndeavourOS のWebサイトを見ませんか $_exclamation"
 
-_tr_add2 general_info_ws       "Web サイト"
+_tr_add2 general_info_ws       "Webサイト"
 
 _tr_add2 general_info_wi       "Wiki"
 _tr_add2 general_info_witip    "注目の記事"
@@ -333,4 +333,11 @@ _tr_add2 daily_assist_anewstip       "Arch の最新ニュースをブラウザ�
 # 2022-Sep-25
 _tr_add2 nb_nofify_user1             "重要なお知らせがあります "
 _tr_add2 nb_nofify_user2             "クリックしてください "                                  # Software News
-_tr_add2 nb_nofify_user3             "このウィンドウの左下隅にあるボタンを"
+_tr_add2 nb_nofify_user3             "（このウィンドウの左下にボタンはあります）"
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "インストール カスタマイズ ファイルを取得します (上級者向け)"
+_tr_add2 ins_cust_text               "カスタマイズした user_commands.bash に URL を指定します"
+_tr_add2 ins_cust_text2              "取得したファイルで ~/user_commands.bash を置き換えます"
+_tr_add2 ins_cust_text3              "これは、<b>online</b> 指定でインストールする場合に最も便利です"
+
