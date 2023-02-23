@@ -50,8 +50,16 @@ Checkupdates() {
 
     local retval
 
-    updates=$(checkupdates)
-    retval=$?
+    if [ -n "$ufile" ] ; then
+        updates=$(cat "$ufile")
+        if [ -n "$(echo "$updates" | grep "Download Size")" ] ; then
+            updates=$(echo "$updates" | tail -n +3)
+        fi
+        retval=0
+    else
+        updates=$(checkupdates)
+        retval=$?
+    fi
 
     echo "$updates"
     updates="$(echo "$updates" | awk '{print $1}')"
@@ -71,23 +79,62 @@ Checkupdates() {
     return $retval
 }
 
-Options() {
+OptionsHandler() {
+    IsBashFunction() {
+        [ "$(LANG=C type "$1" 2>/dev/null | head -n1 | awk '{print $NF}')" = "function" ]
+    }
+
+    if [ -z "$progname" ] ; then
+        local progname="$(/usr/bin/basename "$0")"
+    fi
+    local sopts="$1"
+    local lopts="$2"
+    local OptFunc="$3"
+    local opts
+    shift 3
+
+    if [ -z "$sopts" ] || [ -z "$lopts" ] || [ -z "$OptFunc" ] ; then
+        echo "$progname: parameter(s) missing" >&2
+        return 1
+    fi
+    if ! IsBashFunction "$OptFunc"  ; then
+        echo "$progname: parameter OptFunc is not a bash function" >&2
+        return 1
+    fi
+
+    opts="$(/usr/bin/getopt -o="$sopts" --longoptions "$lopts" --name "$progname" -- "$@")" || {
+        $OptFunc -h
+        return 1
+    }
+
+    eval set -- "$opts"
+
+    $OptFunc "$@"
+}
+
+MyOptions() {
     local pp
-    for pp in "$@" ; do
-        case "$pp" in
-            --noup) checkArchEos=no ;;
-            --noaur) checkAur=no ;;
-            --lang=*) lang="${pp#*=}" ;;
-            --nt) new_terminal=yes ;;
-            --sync) allow_sync=yes ;;
-            --keyring) keyring_first=yes ;;
+    while true ; do
+        pp="$1"
+        case "$1" in
+            --noup)     checkArchEos=no ;;
+            --noaur)    checkAur=no ;;
+            --nt)       new_terminal=yes ;;
+            --sync)     allow_sync=yes ;;
+            --keyring)  keyring_first=yes ;;
+            --lang)     new_terminal_options+=" $pp=$2" ; lang="$2"  ; shift ;;
+            --updates)  new_terminal_options+=" $pp=$2" ; ufile="$2" ; shift ;;
+
             --help | -h) Usage ; return 1 ;;
-            -*) DIE "unsupported option '$pp'" ;;
-            *)  DIE "unsupported parameter '$pp'" ;;
+            --) shift ; break ;;
+            -*) DIE "unsupported option '$1'" ;;
+            *)  DIE "unsupported parameter '$1'" ;;
         esac
-        if [ "$pp" != "--nt" ] ; then
-            new_terminal_options+=" $pp"
-        fi
+        case "$pp" in
+            --nt | --lang | --updates) ;;
+            *) new_terminal_options+=" $pp" ;;
+        esac
+        shift
     done
 }
 
@@ -152,15 +199,17 @@ Main() {
     local updates
     local args=()
     local krpkg=()
+    local ufile=""
 
     # make sure we have reasonable values
     [ -n "$keyring_first" ] || keyring_first=no
     [ -n "$aur_helper" ]    || aur_helper=yay
 
-    Options "$@" || return
+    OptionsHandler "h" "noup,noaur,lang:,nt,sync,keyring,updates:" MyOptions "$@" || return
 
     if [ "$new_terminal" = "yes" ] ; then
         eos_yad_RunCmdTermBash "$progname $new_terminal_options"
+        [ -n "$ufile" ] && rm -f "$ufile"
         return
     fi
 

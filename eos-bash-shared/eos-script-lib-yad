@@ -166,6 +166,7 @@ eos_notification() {
     local appname="$4"
     local summary="$5"
     local body="$6"
+    local action="$7"
     [ -n "$urgency" ] || urgency=normal
 
     local cmd=(
@@ -174,6 +175,7 @@ eos_notification() {
         --urgency="$urgency"
         --expire-time="$expiretime"
         --app-name="appname"
+        --action="$action"
         "$summary"
 	"$body"
     )
