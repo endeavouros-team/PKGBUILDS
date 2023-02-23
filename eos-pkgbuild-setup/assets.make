@@ -420,24 +420,32 @@ HubReleaseShow() {
 }
 
 AskFetchingFromGithub() {
-    printf2 "\n%s " "Fetch assets from github (Y/n)?"
+    printf2 "\n%s " "Fetch assets from github (Yes/no/force)?"
     read2
     case "$REPLY" in
         [yY]*|"")
-            echo2 "==> Using remote assets."
-            # return 0
+            echo2 "==> Using remote assets if there are differences."
+            ;;
+        [fF]*|"")
+            echo2 "==> Using remote assets without checks."
+            return 0
             ;;
         *)
-            echo2 "==> Using local assets."
+            echo2 "==> Using local assets without checks."
             echo2 ""
             return 1
             ;;
     esac
 
+    # Selected using remote assets with checks.
+    # Check if there differences between local and remote file names.
+    # If not, use local assets.
+
     DebugBreak
 
     local local_files=""
     local remote_files=""
+    local diffs=none        # what kind of diffs, if any?
 
     if [ "$use_release_assets" = "yes" ] ; then
         local_files=$(ls -1 *.{db,files,zst,xz,sig} 2> /dev/null | sort)   # $asset_file_endings
@@ -446,25 +454,55 @@ AskFetchingFromGithub() {
 
     if [ "$local_files" != "$remote_files" ] ; then
         # There are differences in file names.
-        # Could be the epoch related file name change, they will be fixed.
+        # Could be the epoch related file name change, they will be fixed later.
 
-        local tmpdir_local=$(mktemp -d /tmp/local.XXX)
-        local tmpdir_remote=$(mktemp -d /tmp/remote.XXX)
-        touch $(echo "$local_files"  | sed "s|^|$tmpdir_local/|")
-        touch $(echo "$remote_files" | sed "s|^|$tmpdir_remote/|")
-        LANG=C diff $tmpdir_local $tmpdir_remote | sed -E \
-                                                       -e "s|^Only in /tmp/remote[^:]+: |Only in REMOTE: |" \
-                                                       -e "s|^Only in /tmp/local[^:]+: |Only in LOCAL:  |"
-        rm -rf $tmpdir_local $tmpdir_remote
+        if OnlyEpochDiffs ; then
+            diffs=epoch
+        else
+            diffs=real
 
-        echo2 ""
-        echo2 "Local and remote file lists differ (NOTE: epoch diffs will be fixed!)."
-        read -p "Continue with local assets (y/N)? " >&2
-        case "$REPLY" in
-            "" | [nN]*) Exit 1 ;;
-            *) return 1 ;;
-        esac
+            local tmpdir_local=$(mktemp -d /tmp/local.XXX)
+            local tmpdir_remote=$(mktemp -d /tmp/remote.XXX)
+
+            touch $(echo "$local_files"  | sed "s|^|$tmpdir_local/|")
+            touch $(echo "$remote_files" | sed "s|^|$tmpdir_remote/|")
+
+            LANG=C diff $tmpdir_local $tmpdir_remote | sed -E \
+                                                           -e "s|^Only in /tmp/remote[^:]+: |Only in REMOTE: |" \
+                                                           -e "s|^Only in /tmp/local[^:]+: |Only in LOCAL:  |"
+            rm -rf $tmpdir_local $tmpdir_remote
+        fi
     fi
+
+    case "$diffs" in
+        none) return 1 ;;         # no diffs               ==> local
+        epoch)return 1 ;;         # only epoch no diffs    ==> local
+        real) return 0 ;;         # real diffs             ==> remote
+    esac
+}
+
+OnlyEpochDiffs() {
+    # input: $local_files and $remote_files
+    local count_ll=$(echo "$local_files" | wc -l)
+    local count_rr=$(echo "$remote_files" | wc -l)
+    local loc rem
+    local ll rr ix
+
+    [ "$count_ll" != "$count_rr" ] && return 1
+
+    readarray -t loc <<< $(echo "$local_files")
+    readarray -t rem <<< $(echo "$remote_files")
+
+    for ((ix=0; ix < count; ix++)) ; do
+        ll="${loc[$ix]}"
+        rr="${rem[$ix]}"
+        if [ "${ll/:/.}" != "$rr" ] ; then        # change first colon in local to dot and compare to remote
+            return 1                              # real diffs found
+        fi
+    done
+    echo2 "Local and remote file names have only epoch diffs (because of github) and they will be fixed automatically."
+    echo2 ""
+    return 0
 }
 
 Assets_clone()
