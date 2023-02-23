@@ -162,10 +162,6 @@ Main() {
     local file_sdboot=/etc/kernel/cmdline
     local file_grub=/etc/default/grub
 
-    # TESTING !!!
-    file_sdboot=$HOME/cmdline.test
-    file_grub=$HOME/grub.test
-
     case "$bootloader" in
         "")
             [ -r $file_sdboot ] && SetKernelParameterSdboot
