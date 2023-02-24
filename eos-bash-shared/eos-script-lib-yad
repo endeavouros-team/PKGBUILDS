@@ -175,10 +175,12 @@ eos_notification() {
         --urgency="$urgency"
         --expire-time="$expiretime"
         --app-name="appname"
-        --action="$action"
         "$summary"
 	"$body"
     )
+    if [ -n "$action" ] ; then
+        cmd+=(--action="$action")
+    fi
     "${cmd[@]}"
 }
 
