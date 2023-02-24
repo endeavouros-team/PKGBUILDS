@@ -487,21 +487,29 @@ OnlyEpochDiffs() {
     local count_rr=$(echo "$remote_files" | wc -l)
     local loc rem
     local ll rr ix
+    local epoch_diff_count=0
 
     [ "$count_ll" != "$count_rr" ] && return 1
 
     readarray -t loc <<< $(echo "$local_files")
     readarray -t rem <<< $(echo "$remote_files")
 
-    for ((ix=0; ix < count; ix++)) ; do
+    # epoch test: change first colon in local to dot and compare to remote
+
+    for ((ix=0; ix < count_ll; ix++)) ; do
         ll="${loc[$ix]}"
         rr="${rem[$ix]}"
-        if [ "${ll/:/.}" != "$rr" ] ; then        # change first colon in local to dot and compare to remote
-            return 1                              # real diffs found
-        fi
+        [ "${ll}" = "$rr" ] && continue            # local = remote
+        [ "${ll/:/.}" = "$rr" ] && {
+            ((epoch_diff_count++))
+            continue                               # only epoch diff, will be fixed later
+        }
+        return 1                                   # real diff found
     done
-    echo2 "Local and remote file names have only epoch diffs (because of github) and they will be fixed automatically."
-    echo2 ""
+    if [ $epoch_diff_count -gt 0 ] ; then
+        echo2 "Local and remote file names have only epoch diffs (because of github limitations) and they will be fixed automatically."
+        echo2 ""
+    fi
     return 0
 }
 
@@ -693,12 +701,18 @@ RationalityTests()
 
 Constructor()
 {
-    # make sure .git symlink exists
-    test -e "$ASSETSDIR"/.git || ln -s "$GITDIR"/.git "$ASSETSDIR"
+    # make sure proper .git symlink exists; create new or change existing if necessary
 
-    test "$GITDIR"/.git -ef "$ASSETSDIR"/.git || \
-        DIE "error: \$ASSETSDIR/.git != \$GITDIR/.git, check $ASSETS_CONF !"
-
+    if [ -e "$ASSETSDIR"/.git ] ; then
+        [ -L "$ASSETSDIR"/.git ] || DIE "'$ASSETSDIR/.git' must be a symlink to '$GITDIR/.git'!"
+        if [ ! "$GITDIR"/.git -ef "$ASSETSDIR"/.git ] ; then
+            echo2 "Warning: '$ASSETSDIR/.git' does not refer to proper place, fixing..."
+            rm -f "$ASSETSDIR"/.git || DIE "failed to remove: '$ASSETSDIR/.git'"
+            ln -s "$GITDIR"/.git "$ASSETSDIR" || DIE "failed to symlink: '$ASSETSDIR/.git' -> '$GITDIR/.git'"
+        fi
+    else
+        ln -s "$GITDIR"/.git "$ASSETSDIR" || DIE "failed to symlink: '$ASSETSDIR/.git' -> '$GITDIR/.git'"
+    fi
 }
 
 Destructor()
