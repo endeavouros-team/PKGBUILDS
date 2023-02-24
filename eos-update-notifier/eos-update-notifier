@@ -84,22 +84,34 @@ ShowNotify() {
 	    msg="$(printf "$update_count $source updates available at $date:\n$pkgs\n")" ;;
     esac
 
-    local bop=update
-    local bname=Update
-
-    local cmd=$(eos_notification \
+    case "$ShowHowAboutUpdates" in
+        notify)
+            local bop=update
+            local bname=Update
+            local action=$(eos_notification \
+                               "$_UpdateNotifyIcon" \
+                               "normal" \
+                               "$expiretime" \
+                               "EndeavourOS Update Notifier" \
+                               "Updates available ($progname)" \
+		               "$msg" \
+                               "$bop=$bname")
+            case "$action" in
+                $bop)
+                    local tmp_ufile=$(mktemp)
+                    echo "$updates" > $tmp_ufile
+                    UpdateInTerminal --nt --updates=$tmp_ufile
+                    ;;
+            esac
+            ;;
+        "notify+tray")
+            eos_notification \
                 "$_UpdateNotifyIcon" \
                 "normal" \
                 "$expiretime" \
                 "EndeavourOS Update Notifier" \
                 "Updates available ($progname)" \
-		"$msg" \
-                "$bop=$bname")
-    case "$cmd" in
-        $bop)
-            local tmp_ufile=$(mktemp)
-            echo "$updates" > $tmp_ufile
-            UpdateInTerminal --nt --updates=$tmp_ufile
+		"$msg"
             ;;
     esac
 }
