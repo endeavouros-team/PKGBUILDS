@@ -218,7 +218,7 @@ IsNvidiaCard() {
 test_for_IBT_off() {
     if [ "$(device-info --cpu)" = "GenuineIntel" ] ; then
         # only Intel gen 11 CPU or newer seem to be affected?
-        local cpu_gen=$(inxi -Caz | grep -w gen: | sed -E 's|.* gen: core ([0-9]+) .*|\1|')
+        local cpu_gen=$(inxi -Cazc0 | grep -w gen: | sed -E 's|.* gen: core ([0-9]+) .*|\1|')
         if [ -n "$cpu_gen" ] ; then
             [ $cpu_gen -lt 11 ] && return
         fi
