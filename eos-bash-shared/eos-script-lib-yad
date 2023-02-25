@@ -590,7 +590,7 @@ eos_yad_nothing_todo() {
     [ -n "$image" ]   || image=info
 
     local cmd=(
-        eos_yad --form --text="$text" --title="$title" --no-focus
+        eos_yad --form --text="$text" --title="$title" --no-focus --image="$image"
                 --height=100 --width=300 --timeout="$timeout" --timeout-indicator=left
                 --button=yad-close:0
     )
