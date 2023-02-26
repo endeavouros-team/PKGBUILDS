@@ -28,8 +28,8 @@ while read -r pkgbase; do
     fi
     echo "Running dracut for ${kernelname}-${kernelversion}"
     [[ ${DRACUT_QUIET} == "true" ]] && DRACUT_EXTRA_PARAMS=" --quiet"
-    dracut --force --hostonly --no-hostonly-cmdline${DRACUT_EXTRA_PARAMS} "${INITRD_PATH}/initrd ${kernelversion}"
-    [[ ${NO_DRACUT_FALLBACK} != "true" ]] && dracut --force --no-hostonly${DRACUT_EXTRA_PARAMS} "${INITRD_PATH}/initrd-fallback ${kernelversion}"
+    dracut --force --hostonly --no-hostonly-cmdline${DRACUT_EXTRA_PARAMS} "${INITRD_PATH}/initrd" "${kernelversion}"
+    [[ ${NO_DRACUT_FALLBACK} != "true" ]] && dracut --force --no-hostonly${DRACUT_EXTRA_PARAMS} "${INITRD_PATH}/initrd-fallback" "${kernelversion}"
 done < <(find /usr/lib/modules -maxdepth 2 -type f -name pkgbase)
 
 
