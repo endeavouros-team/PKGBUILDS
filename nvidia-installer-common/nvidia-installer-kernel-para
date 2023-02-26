@@ -9,6 +9,56 @@ DIE() {
     exit 1
 }
 
+
+ValueOfGrubVar() {
+    local -r varname="$1"           # e.g. GRUB_CMDLINE_LINUX_DEFAULT
+    local -n current_value1="$2"    # out
+    local -n quote1="$3"            # out
+    local file="$4"
+
+    source "$file" || return 1
+
+    current_value1="$(echo ${!varname})"
+    quote1='"'                            # may change the quote character around the value
+}
+
+AddValueToGrubVar() {
+    local -r varname="$1"
+    local -r addvalue="$2"
+    local file="$3"
+    local current_value="" quote=""
+
+    ValueOfGrubVar "$varname" current_value quote "$file" || return 1
+
+    case "$current_value" in
+        "") current_value="$addvalue" ;;
+        *)  current_value+=" $addvalue" ;;
+    esac
+
+    sed -i "$file" -e "s|^[ \t]*$varname=.*|$varname=$quote$current_value$quote|"
+}
+
+RemoveValueFromGrubVar() {
+    local -r varname="$1"
+    local -r removevalue="$2"
+    local file="$3"
+    local current_value="" quote=""
+
+    ValueOfGrubVar "$varname" current_value quote "$file" || return 1
+
+    local pp newvalue=()
+    for pp in $current_value ; do
+        case "$pp" in
+            "$removevalue") ;;
+            *) newvalue+=("$pp") ;;
+        esac
+    done
+    newvalue="$(echo ${newvalue[*]})"   # get rid of potential extra spaces
+
+    sed -i "$file" -e "s|^[ \t]*$varname=.*|$varname=$quote$newvalue$quote|"
+}
+
+
 SetKernelParameterGrub() {
     local file="$file_grub"
     local varname="GRUB_CMDLINE_LINUX_DEFAULT"
@@ -24,20 +74,19 @@ SetKernelParameterGrub() {
                 exit 1    # nothing changed
                 ;;
             remove)
-                # first sed change below fails if $kernel_param is first, hence the second change
-                sed -i $file \
-                    -e "s|^\($varname=\".*\) $kernel_param\(.*\)$|\1\2|" \
-                    -e "s|^\($varname=\".*\)$kernel_param \(.*\)$|\1\2|"
+                # caveats:
+                #    - $kernel_param value may not be part of some unrelated string inside $varname
+                #    - $kernel_param with multiple values may fail, e.g. module_blacklist=aa,bb,cc
+                #
+                cp "$file" "$file.bak"
+                RemoveValueFromGrubVar "$varname" "$kernel_param" "$file"
                 ;;
         esac
     else
         case "$mode" in
             add)
-                if [ ! -e $file ] ; then
-                    Info "sorry, file $file does not exist"
-                    exit 1
-                fi
-                sed -i $file -e "s|^\($varname=\".*\)\"$|\1 $kernel_param\"|"
+                cp "$file" "$file.bak"
+                AddValueToGrubVar $varname "$kernel_param" "$file"
                 ;;
             remove)
                 currline="$(grep ^"$varname"= $file)"
