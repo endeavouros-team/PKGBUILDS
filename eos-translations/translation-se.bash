@@ -270,3 +270,8 @@ _tr_add2 daily_assist_anewstip       "Visa senaste Arch nyheter i en webbläsare
 _tr_add2 nb_nofify_user1             "Det finns viktiga nyheter på"
 _tr_add2 nb_nofify_user2             "Klicka på"                                  # Software News
 _tr_add2 nb_nofify_user3             "knappen i den nedre vänstra hörnet av detta fönster"
+
+_tr_add2 ins_customized              "Hämta din installationsanpassningsfil (avancerat)"
+_tr_add2 ins_cust_text               "Ge URL till din anpassade user_commands.bash"
+_tr_add2 ins_cust_text2              "Den hämtade filen kommer att ersätta ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Detta är mest användbart för <b>online</b> installation"
