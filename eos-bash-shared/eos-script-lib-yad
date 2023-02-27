@@ -149,8 +149,14 @@ eos_select_browser() {
         return
     fi
 
+    # If _WELCOME_BROWSER is not exported, use the user configurable list of browsers
+    # in file /etc/eos-script-lib-yad.conf
+
+    local old_list="xdg-open exo-open firefox chromium vivaldi-stable opera"   # for backwards compatibility
     local browser
-    for browser in firefox xdg-open exo-open chromium vivaldi-stable opera ; do
+
+    for browser in "${EOS_PREFERRED_BROWSERS[@]}" $old_list
+    do
         if (/usr/bin/which "$browser" >& /dev/null) ; then
             echo "$browser"
             return
