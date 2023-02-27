@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23
-pkgrel=2
+pkgrel=3
 arch=('any')
 license=('GPL')
 depends=(
@@ -61,6 +61,7 @@ source=(
   $_url/eos-download-wallpapers
   $_url/eos-send-gpuinfo
   $_url/eos-pacdiff
+  $_url/pkg-name-components
   $_url/eos-kernel-nvidia-update-check
   $_url/eos-github2gitlab
   $_url/eos-select-file-server
@@ -94,6 +95,7 @@ sha512sums=('88f98f182cf6930100c87f7c3a4f94e2df9e4390d0fef958e1375930487619dded4
             '77eba34090f4327caa01e584153bf7f319c7957f959917ffc26032aa06a2f6fde20a556324a099945f28bfa19cf37e68d9bc8fa67614fdc7563c27412e87d953'
             'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
             'd301d5628d456c1f16b1bb095b4a26382f54ff85c938a15d99f8716c1275dadf8e62e922d5d2422df336606eb80a9a7d71fb8657b9ddcf60f67fe012a7724c33'
+            '477e172a4476779a16dd954893d9d9387734994a9f975c1599aeecd8ceb75366580b6955aa4c0dedf670df06b965db6715337aac5c420e99f18da0695d01dd54'
             '745e2f92aebd3046a0d75a7ed3eacfaaa5fa65fd23d9f333a8290d058d2fd929ab9433484c0c97805464b279d94264c87004f53e40a288c922770c476a61e8af'
             'bcb4cee120d36e0c321a064e3b81ec716df4795038de13da3e78c65f236b9aac05babcd60ae2d353a8a94e98184e6a8a8beaefdf50c10b439889faa78722d753'
             'a62d71bc1a750e3dc5516aefafd7e407a7d33bb9761ba21b456863cb042ff7f073375bce18426321f54e5343ac728bf117d181b9ee3e3186917b63f0b2b88b07'
@@ -129,6 +131,7 @@ package() {
 #  install -Dm755 eos-pkg-changelog              $pkgdir/usr/bin/eos-pkg-changelog
   install -Dm755 eos-download-wallpapers        $pkgdir/usr/bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $pkgdir/usr/bin/eos-pacdiff
+  install -Dm755 pkg-name-components            $pkgdir/usr/bin/pkg-name-components
   install -Dm755 eos-kernel-nvidia-update-check $pkgdir/usr/bin/eos-kernel-nvidia-update-check
   install -Dm755 eos-shifttime                  $pkgdir/usr/bin/eos-shifttime
   install -Dm755 eos-github2gitlab              $pkgdir/usr/bin/eos-github2gitlab
