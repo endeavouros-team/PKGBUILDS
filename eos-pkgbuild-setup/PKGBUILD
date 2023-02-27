@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=15
+pkgrel=16
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -21,8 +21,6 @@ source=(
     archive-sync-to-remote          # Sync the package archive (= older packages) between local machine and github.
     assets.make                     # The main builder script.
     pacman-for-assets.make          # pacman wrapper for the makepkg call
-    pkg-name-components             # Extracts various info fields from a package file name, e.g.
-                                    # pkgver (3.45) and pkgname (welcome) from "welcome-3.45-1-any.pkg.tar.zst".
 
     ### Helper apps for the package builder
     add-release-assets              # Copies packages from local machine to github as release assets into folder tag (= 'endeavouros').
@@ -57,7 +55,6 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'be63de6c49f05f909a0b15e406eb43cad59cd15992ad1fa1ebda58245761fccd309f3aae76e6f3f86e6cd1e0d6279ed43a08aa7f7a2c312a493a55fe819dbc87'
             'f7c17d8a5a36bacf6fb670ad8fcdaf4ae0ba59d1877bfdfb5ed70a18a994ca1e00126e7722993ea18831ce10093b2111f270f554a4ed7887bb76347da7bd23dc'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
-            '81df0308e079dddc1f7631147cd70ca991406e5848dd7c2d08022dc0ae663432af2cbc89b0a3ea0d8578cc6a224504ddb1001f600682597889f4ad792a715a26'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
@@ -83,7 +80,6 @@ package() {
     install -Dm755 delete-release-assets       "$pkgdir/usr/bin/delete-release-assets"
     install -Dm755 download-release-assets     "$pkgdir/usr/bin/download-release-assets"
     install -Dm755 release-asset-names         "$pkgdir/usr/bin/release-asset-names"
-    install -Dm755 pkg-name-components         "$pkgdir/usr/bin/pkg-name-components"
     install -Dm755 pacman-for-assets.make      "$pkgdir/usr/bin/pacman-for-assets.make"
 
     install -Dm755 githubcheck                 "$pkgdir/usr/local/bin/githubcheck"
