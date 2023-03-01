@@ -198,11 +198,13 @@ UrlOfIds() {
 
 GetPacmanVersion() {
     local infopkg="$1"
-    if [ -x /usr/bin/expac ] ; then
-        expac -S %v "$infopkg"
-    else
-        LANG=C pacman -Si "$infopkg" | grep -w ^Version | awk '{print $NF}'
-    fi
+    {
+        if [ -x /usr/bin/expac ] ; then
+            expac -S %v "$infopkg"
+        else
+            LANG=C pacman -Si "$infopkg" | grep -w ^Version | awk '{print $NF}'
+        fi
+    } | head -n1   # in case multiple repos have it, take the first
 }
 
 Main() {
