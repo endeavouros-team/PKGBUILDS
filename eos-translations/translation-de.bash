@@ -336,3 +336,9 @@ _tr_add2 daily_assist_anewstip       "Zeigt Neuigkeiten über Arch Linux im Brow
 _tr_add2 nb_nofify_user1             "Wichtige Neuigkeiten"
 _tr_add2 nb_nofify_user2             "Bitte klicke auf die"                                  # Software News
 _tr_add2 nb_nofify_user3             "Schaltfläche, links unten im Fenster."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Lade eine Konfigurations Datei (anspruchsvoll)"
+_tr_add2 ins_cust_text               "Nutze alternative URL zu deiner angepassten user_commands.bash"
+_tr_add2 ins_cust_text2              "Die geladene Datei ersetzt ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Diese Methode ist nur für die <b>online</b> Installation möglich"
