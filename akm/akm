@@ -28,7 +28,7 @@ Header() {
 
 LocalVersion() {
     local pkg="$(/usr/bin/basename "$1")"
-    $pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+    expac -Q %v "$pkg"       # $pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
 }
 Exist()        { test -n "$version" && echo TRUE || echo FALSE ; }
 
@@ -58,7 +58,7 @@ Installed() {
         linux*) ;;
         *) DIE "Internal error, cannot determine the running kernel." ;;
     esac
-    local running=$(pacman -Q $kernel | awk '{print $2}')
+    local running=$(expac -Q %v $kernel)     # $(pacman -Q $kernel | awk '{print $2}')
     local ind
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. A * marks the currently running kernel. A bolded string means the latest K.o. version":LBL "")
     for xx in "${kernels[@]}" ; do
@@ -84,10 +84,12 @@ StableVersion() {
 
     # prevent usage of the 'testing' repo:
     case "$pkg" in
-        linux | linux-headers | linux-lts*) repo=core/ ;;
-        linux-zen* | linux-hardened*)       repo=extra/ ;;
+        linux | linux-headers | linux-lts | linux-lts-headers)
+            repo=core/ ;;
+        linux-zen | linux-zen-headers | linux-hardened | linux-hardened-headers | linux-rt | linux-rt-headers | linux-rt-lts | linux-rt-lts-headers)
+            repo=extra/ ;;
     esac
-    LANG=C $pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | awk '{print $3}'
+    expac -S %v "$repo$pkg"      # LANG=C $pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | head -n1 | awk '{print $NF}'
 }
 
 Stable() {
@@ -387,6 +389,8 @@ Main()
     #    linux-lts         linux-lts-headers
     #    linux-zen         linux-zen-headers
     #    linux-hardened    linux-hardened-headers
+    #    linux-rt          linux-rt-headers
+    #    linux-rt-lts      linux-rt-lts-headers
     #)
 
     local functions=(  # order is important!
