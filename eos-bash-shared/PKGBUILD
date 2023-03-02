@@ -6,12 +6,13 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23
-pkgrel=4
+pkgrel=5
 arch=('any')
 license=('GPL')
 depends=(
   bash
   eos-translations
+  expac                 # for many EOS apps
   python-dbus           # for ksetwallpaper.py
   endeavouros-theming   # for eos-wallpaper-set
   xdg-utils             # for eos-sendlog
@@ -85,7 +86,7 @@ sha512sums=('74cd274f572d6900ee9062a4d7f99f56dc4c23ad5ad4534b4321fbe7632cc844232
             '41db1ee874df0d6617e5a2f7b7fe090dd591cddd7a7d4b805924e75eb3b68a86bc07f61dee6424055e133c2579ed7401ea8de3c4f03c01f1870ec2504d00ed15'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '291176d3689d219b43302f012ea62f6a593564d204f0004c58ae63b0a80efb9d5a27667c62a2be7f4fc977f1df254152f61e651732dcc61104de3130632634dd'
-            '784e0711c7bddcc9d13c3d7354d3d4a34c33225f4f85205604301267f6299276dbf03c4994937a95423ed9c88fdb595ebc688fd8ad39512709a7f7020b2f024f'
+            'bd8b576c4265a0e4c855be722e7676b7b81d10b44eeaba64bee68b73a228db42f62956c0b33cb87c1f1ed77baee1540dd65edd1f0073f205f592e18a039a70b1'
             'fedeb5baf76a9f990e30254b07c5b9658dd7175d58749c0511cb142802cf49d5ac275b234046f879ce9e90be10ed3a75b1b552854a30544c5211905b1408a182'
             'd977f02e5d9d13327cb731a349db98e8a9c882d65aafd347bc8c28c865294eb691eba403a4927afe53d0c0165d6c58038f02b8c2b62cb9c66e0fd63130a1833b'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'

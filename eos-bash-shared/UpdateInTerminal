@@ -25,8 +25,8 @@ GrubCheckFwsetup() {
             local updates="$1"
             if [ -n "$(echo "$updates" | grep -w grub)" ] ; then
                 local version_requiring_fwsetup="2:2.06.r322.gd9b4638c5-1"
-                local curver="$(pacman -Q grub 2>/dev/null | awk '{print $NF}')"
-                if [ $(vercmp "$curver" "$version_requiring_fwsetup") -lt 0 ] ; then
+                local curver ; curver="$(pacman -Q grub 2>/dev/null | awk '{print $NF}')"
+                if [ "$(vercmp "$curver" "$version_requiring_fwsetup")" -lt "0" ] ; then
                     cat <<EOF >&2
 
 ==> IMPORTANT: you will have to run grub-install BEFORE reboot!
@@ -85,7 +85,7 @@ OptionsHandler() {
     }
 
     if [ -z "$progname" ] ; then
-        local progname="$(/usr/bin/basename "$0")"
+        local progname ; progname="$(/usr/bin/basename "$0")"
     fi
     local sopts="$1"
     local lopts="$2"
@@ -189,7 +189,7 @@ Main() {
     local checkAur=yes
     local keyring_first="$EOS_UPDATE_ARCH_KEYRING_FIRST"
     local lang=""
-    local progname="$(basename "$0")"
+    local progname ; progname="$(basename "$0")"
     local upname="Arch & EndeavourOS"
     local aur_helper="$EOS_AUR_HELPER"
     local new_terminal=no
@@ -229,7 +229,7 @@ Main() {
                     $EOS_ROOTER "pacman -Sy ${krpkg[*]} ${args[*]}"
                 fi
                 ;;
-            1) DIE "$(echo Checkupdates: $(ltr updt_failure) | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
+            1) DIE "$(echo Checkupdates: "$(ltr updt_failure)" | sed 's|&#33;$|!|')" ;;  # sed: exclamation mark conversion
             2) echo2 " $(ltr updt_nothing_todo)" ;;
         esac
         [ "$checkAur" = "yes" ] && echo2 ""
@@ -258,6 +258,7 @@ Main() {
     fi
 
     if [ "$updates_found" = "yes" ] ; then
+        ## shellcheck disable=SC2154
         if [ "$allow_sync" = "yes" ] || [ "$SyncAfterUpdate" = "yes" ] ; then  # SyncAfterUpdate is an environment variable
             echo2 "==> Running 'sync' after update."
             sync
