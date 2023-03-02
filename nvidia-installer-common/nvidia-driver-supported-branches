@@ -100,6 +100,11 @@ ShowDriversForId() {
             if [ "$ver" = "$beta_pkgver" ] && [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
                 printf2 "NOTE: $beta_pkg $ver is an AUR package. To install it, use command:\n   yay -S $beta_pkg\n"
             fi
+            case "$true_series" in
+                ${series_ids[1]} | ${series_ids[2]} | 470 | 390)
+                    printf2 "NOTE: nvidia-inst does not support series $true_series. To install, use the 'yay' command.\n"
+                    ;;
+            esac
             [ "$all" = "no" ] && return
             found=yes
         else
