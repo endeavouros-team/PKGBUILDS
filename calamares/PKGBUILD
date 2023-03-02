@@ -3,7 +3,7 @@
 # Calamares installer configured for EndeavourOS
 
 pkgname=calamares
-pkgver=22.12.3.2
+pkgver=22.12.3.4
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -18,7 +18,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('83a6e593e12c44d49a87c7f5f8a0d0160980864fd9931a70a1229ed523a61804')
+sha256sums=('3c561fb8f594b262a0180a7cd879cf87a66861259293e27297d5b603c5a64399')
 
 build() {
     cmake -B build -S "${srcdir}/calamares-${pkgver}" \
