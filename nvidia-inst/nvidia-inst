@@ -176,11 +176,26 @@ OnlyNvidia() {
 
 KernelParametersToBoot2() {
     local mode2
+    local para=nvidia-drm.modeset=1
+    local file_sdboot=/etc/kernel/cmdline
+    local file_grub=/etc/default/grub
+
     case "$mode" in
         nvidia | prime) mode2=add ;;
         *)              mode2=remove ;;
     esac
-    AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
+    case "$mode2" in
+        add)
+            if [ -z "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
+                AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
+            fi
+            ;;
+        remove)
+            if [ -n "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
+                AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
+            fi
+            ;;
+    esac
 }
 
 AddConfFileLine() {
@@ -297,7 +312,12 @@ Options() {
             --listopts)       ListOptions "$sopts" "$lopts" ; exit 0 ;;
             --listseries)
                 [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
-                echo "$series_now $series_prev1 $series_prev2"
+                if false ; then
+                    echo "$series_now $series_prev1 $series_prev2"
+                else
+                    echo "$series_now"
+                    echo2 "(Note: $series_prev1, $series_prev2 are not supported currently.)"
+                fi
                 exit 0
                 ;;
             --drivers)
@@ -486,7 +506,7 @@ SanityChecks() {
 }
 
 GetSeriesFromPacman() {
-    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
+    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | head -n1 | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
     local pacman_version_series=${pacman_version%%.*}
     echo "$pacman_version_series"
 }
@@ -536,7 +556,7 @@ Main()
     SanityChecks
     local all_installed_packages="$(pacman -Qsq)"
 
-    local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | awk '{print $3}' | cut -d '.' -f1)
+    local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | head -n1 | awk '{print $NF}' | cut -d '.' -f1)
     if [ "$latest_from_arch" != "$series_now" ] ; then
         Warn "Series $series_now is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
     fi
