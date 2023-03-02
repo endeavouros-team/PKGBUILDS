@@ -277,7 +277,7 @@ RemovePersonalData() {
     echo "==> Personal data removed from file $FILE_OF_LOGS2." >&2
 }
 
-IsInstalled() { /usr/bin/pacman -Q "$1" &> /dev/null ; }
+IsInstalled() { expac -Q %n "$1" &> /dev/null ; }
 
 PrintPkgData() {
     local pkg ver desc
@@ -343,7 +343,7 @@ FindInstallLog() {
     done
 }
 
-GetNameAndVersion() { pacman -Q "$1" ; }
+GetNameAndVersion() { expac -Q '%n %v' "$1" ; }
 
 Options() {
     local opts
