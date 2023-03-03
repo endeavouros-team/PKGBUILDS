@@ -71,10 +71,9 @@ EOF
 
 LogHeader() {
     local ISO_version=$(cat /usr/lib/endeavouros-release | cut -d'=' -f2)
-    local calamares_version="$(pacman -Q calamares 2>/dev/null | awk '{print $NF}')"
+    local calamares="$(pacman -Qs calamares | grep ^local/ | head -n1 | sed -E 's|^local/([^ ]+).*|\1|')"
+    local calamares_version="$(pacman -Q $calamares 2>/dev/null | awk '{print $NF}')"
     local date=$(date -u "+%x %X")
-
-    [ -n "$calamares_version"] || calamares_version="$(pacman -Q calamares_current 2>/dev/null | awk '{print $NF}')"  # this line is probably not needed
 
     cat <<EOF > $log
 ########## $log by $progname
@@ -264,15 +263,19 @@ CheckUserPkglist() {
 
 ###  Everything starts in the Main function. ###
 Main() {
+    local progname="$(basename "$0")"           # for help and messages
+
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
-    source /usr/share/endeavouros/scripts/translations.bash || exit 1
     export -f eos_yad
+    if [ ! -x /usr/bin/calamares ] ; then
+        GUIDIE "this program is only for installing EndeavourOS with calamares"
+    fi
+    source /usr/share/endeavouros/scripts/translations.bash || exit 1
 
     local lang="$1"
     local mode="$2"                             # 'community' or '' (empty)
     local ShowInstallLog="FALSE"                # TRUE --> show install log terminal window
     local ShowPacmanLog="FALSE"                 # TRUE --> show pacman  log terminal window
-    local progname="$(basename "$0")"           # for help and messages
     local Home=/home/liveuser                   # liveuser's home folder
     local log=$Home/endeavour-install.log       # install log
     local cfolder=/etc/calamares                # folder for calamares configuration files
