@@ -125,22 +125,12 @@ GetUpdateNumberAndTime() {
         too_low_limit=$((reference_level - 10))
     fi
 
-    if [ 0 -eq 1 ] ; then
-        [[ "$url" =~ endeavour.remi.lu ]] && url="${url}foo"    # TESTING !!!
-    fi
-
     time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
     retcode=$?
     case "$retcode" in
         0)
             nr="$(cat "$tmpfile" | head -n1)"
             rm -f "$tmpfile"
-
-            if [ 0 -eq 1 ] ; then
-                if [ "$mirror" = 'https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch' ] ; then
-                    nr=5555   # TESTING!
-                fi
-            fi
 
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
