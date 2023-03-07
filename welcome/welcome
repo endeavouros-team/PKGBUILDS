@@ -537,43 +537,10 @@ NothingToDo_other() {
 export -f NothingToDo_other
 fi
 
-UpdateWithAurHelper() {
-    local helper="$1"
-    local opts="-Syu --nocombinedupgrade"        # first pacman update, then AUR update
-    declare -A has_updates
-    local updates=""
-
-    echo "$UPDT_UPDATE_CHECK"
-
-    # check AUR updates
-    updates="$($helper -Qua)"
-    if [ -n "$updates" ] ; then
-        has_updates[aur]=yes
-    else
-        has_updates[aur]=no
-    fi
-
-    # if no AUR updates, check pacman updates
-    if [ "${has_updates[aur]}" = "no" ] ; then
-        checkupdates > /dev/null
-        case "$?" in
-            0) has_updates[main]=yes ;;
-            1) return 1 ;;                  # an error!
-            2) has_updates[main]=no ;;
-        esac
-    fi
-
-    [ "${has_updates[main]}" = "yes" ] && echo "Official updates available."
-    [ "${has_updates[aur]}"  = "yes" ] && echo "AUR updates available."
-
-    if [ "${has_updates[main]}" = "yes" ] || [ "${has_updates[aur]}" = "yes" ] ; then
-        echo "\$ $helper $opts"
-        $helper $opts
-    else
-        echo "$UPDT_NOTHING_TODO"
-    fi
+UpdateWithEosAurHelper() {
+    [ -x /usr/bin/"$EOS_AUR_HELPER" ] && RunInTerminal "echo '==> $EOS_AUR_HELPER' ; $EOS_AUR_HELPER"
 }
-export -f UpdateWithAurHelper
+export -f UpdateWithEosAurHelper
 
 AfterInstall() {
   local handle="$1"
@@ -591,7 +558,7 @@ AfterInstall() {
   )
   MirrorRankingButtons
   tabcontents+=(
-      --field=" $(ltr after_install_us)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
       --field=" $(ltr after_install_pclean)!$WELCOME_ICON_PACCACHE_SRV!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
@@ -662,20 +629,9 @@ DailyAssistant() {
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="<b>$(ltr daily_assistant_text)</b>" --columns=2
-      --field=" $(ltr after_install_us)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
+      --field=" $(ltr after_install_us) (UpdateInTerminal)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
-  if [ "$EOS_WELCOME_USE_AUR_HELPERS_TESTING" = "yes" ] ; then
-      if [ -x /usr/bin/yay ] ; then
-          tabcontents+=(
-              --field=" $(ltr after_install_us) (yay)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper yay"
-          )
-      fi
-      if [ -x /usr/bin/paru ] ; then
-          tabcontents+=(
-              --field=" $(ltr after_install_us) (paru)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateWithAurHelper paru"
-          )
-      fi
-  fi
   MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
@@ -1560,7 +1516,7 @@ StartHere() {
         # SetCalamaresVersionInfo
     fi
     export EOS_FILESERVER_SITE
-
+    export EOS_AUR_HELPER
     export WELCOME_ARGS="$*"
 
     for arg in "$@" ; do
