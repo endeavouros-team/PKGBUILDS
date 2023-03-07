@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=16
+pkgrel=17
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -66,43 +66,47 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '38e3200c9fc91ac4f77c856c1950776ea5da566532e6565942f250d0b5959109d1544d0485d54f5d4f43cabe0a54a65de0a827e8953a715a8182d573a147e347')
 
 package() {
-    local scripts=usr/share/endeavouros/scripts
+    local -r _eos="$pkgdir/usr/share/endeavouros/scripts"
+    local -r _bin="$pkgdir/usr/bin"
+    local -r _lob="$pkgdir/usr/local/bin"
+    local -r _etc="$pkgdir/etc"
+    local -r _cpl="$pkgdir/usr/share/bash-completion/completions"
 
     echo "VERSION=${pkgver}-$pkgrel" > "$pkgname.version"
 
-    install -Dm644 "$pkgname.version"          "$pkgdir/$scripts/$pkgname.version"
-    install -Dm755 local-general-setup         "$pkgdir/$scripts/local-general-setup"
+    install -Dm644 "$pkgname.version"          "$_eos/$pkgname.version"
+    install -Dm755 local-general-setup         "$_eos/local-general-setup"
 
-    install -Dm755 "$pkgname"                  "$pkgdir/usr/bin/$pkgname"
-    install -Dm755 archive-sync-to-remote      "$pkgdir/usr/bin/archive-sync-to-remote"
-    install -Dm755 assets.make                 "$pkgdir/usr/bin/assets.make"
-    install -Dm755 add-release-assets          "$pkgdir/usr/bin/add-release-assets"
-    install -Dm755 delete-release-assets       "$pkgdir/usr/bin/delete-release-assets"
-    install -Dm755 download-release-assets     "$pkgdir/usr/bin/download-release-assets"
-    install -Dm755 release-asset-names         "$pkgdir/usr/bin/release-asset-names"
-    install -Dm755 pacman-for-assets.make      "$pkgdir/usr/bin/pacman-for-assets.make"
+    install -Dm755 "$pkgname"                  "$_bin/$pkgname"
+    install -Dm755 archive-sync-to-remote      "$_bin/archive-sync-to-remote"
+    install -Dm755 assets.make                 "$_bin/assets.make"
+    install -Dm755 add-release-assets          "$_bin/add-release-assets"
+    install -Dm755 delete-release-assets       "$_bin/delete-release-assets"
+    install -Dm755 download-release-assets     "$_bin/download-release-assets"
+    install -Dm755 release-asset-names         "$_bin/release-asset-names"
+    install -Dm755 pacman-for-assets.make      "$_bin/pacman-for-assets.make"
 
-    install -Dm755 githubcheck                 "$pkgdir/usr/local/bin/githubcheck"
-    install -Dm755 mirrorcheck                 "$pkgdir/usr/local/bin/mirrorcheck"
+    install -Dm755 githubcheck                 "$_lob/githubcheck"
+    install -Dm755 mirrorcheck                 "$_lob/mirrorcheck"
 
-    install -Dm644 eos-mirrorcheck.conf        "$pkgdir/etc/eos-mirrorcheck.conf"
-    install -Dm644 mirrorcheck.completion      "$pkgdir/usr/share/bash-completion/completions/mirrorcheck"
+    install -Dm644 eos-mirrorcheck.conf        "$_etc/_eos-mirrorcheck.conf"
 
     # common completions
-    install -Dm644 add-release-assets.completion "$pkgdir/usr/share/bash-completion/completions/add-release-assets"
-    ln -s add-release-assets                     "$pkgdir/usr/share/bash-completion/completions/delete-release-assets"      # helps with the tag
-    ln -s add-release-assets                     "$pkgdir/usr/share/bash-completion/completions/release-asset-names"        # helps with the tag
-    ln -s add-release-assets                     "$pkgdir/usr/share/bash-completion/completions/download-release-assets"    # helps with the tag
+    install -Dm644 mirrorcheck.completion        "$_cpl/mirrorcheck"
+    install -Dm644 add-release-assets.completion "$_cpl/add-release-assets"
+    ln -s add-release-assets                     "$_cpl/delete-release-assets"      # helps with the tag
+    ln -s add-release-assets                     "$_cpl/release-asset-names"        # helps with the tag
+    ln -s add-release-assets                     "$_cpl/download-release-assets"    # helps with the tag
 
-#    install -Dm644 assets.conf.mirrors.mirror1               "$pkgdir"/"$scripts"/assets.conf.mirrors.mirror1
-#    install -Dm644 assets.conf.mirrors.endeavouros_calamares "$pkgdir"/"$scripts"/assets.conf.mirrors.endeavouros_calamares
-#    install -Dm644 assets.conf.repo-testing.x86_64           "$pkgdir"/"$scripts"/assets.conf.repo-testing.x86_64
+#    install -Dm644 assets.conf.mirrors.mirror1               "$_eos"/assets.conf.mirrors.mirror1
+#    install -Dm644 assets.conf.mirrors.endeavouros_calamares "$_eos"/assets.conf.mirrors.endeavouros_calamares
+#    install -Dm644 assets.conf.repo-testing.x86_64           "$_eos"/assets.conf.repo-testing.x86_64
 
-#    install -Dm755 pkg-archive-mgr                  "$pkgdir"/usr/bin/pkg-archive-mgr
-#    install -Dm755 archive-remove-old-locally       "$pkgdir"/usr/bin/archive-remove-old-locally
-#    install -Dm755 easy.make                        "$pkgdir"/usr/bin/easy.make
-#    install -Dm755 copy2-new-eos-repo               "$pkgdir"/usr/bin/copy2-new-eos-repo
-#    install -Dm755 push-ISOs-to-github              "$pkgdir"/usr/bin/push-ISOs-to-github
-#    install -Dm755 nvidia-site-check-and-update-db  "$pkgdir"/usr/bin/nvidia-site-check-and-update-db
-#    install -Dm755 eos-assets-sign                  "$pkgdir"/"$scripts"/eos-assets-sign
+#    install -Dm755 pkg-archive-mgr                  "$_bin/pkg-archive-mgr
+#    install -Dm755 archive-remove-old-locally       "$_bin/archive-remove-old-locally
+#    install -Dm755 easy.make                        "$_bin/easy.make
+#    install -Dm755 copy2-new-eos-repo               "$_bin/copy2-new-eos-repo
+#    install -Dm755 push-ISOs-to-github              "$_bin/push-ISOs-to-github
+#    install -Dm755 nvidia-site-check-and-update-db  "$_bin/nvidia-site-check-and-update-db
+#    install -Dm755 eos-assets-sign                  "$_eos"/eos-assets-sign
 }
