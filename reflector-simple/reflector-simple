@@ -7,6 +7,7 @@ source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 export -f eos_yad
 export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
+export -f eos_select_browser
 
 
 DIE() {
@@ -105,23 +106,64 @@ Method34_IP() {
     IP="$IP_method34"
 }
 
+AllAreInstalled() {
+    local pkg ok=yes
+    for pkg in "$@" ; do
+        if [ -z "${pinst[$pkg]}" ] ; then
+            if expac -Q %n "$pkg" >& /dev/null ; then
+                pinst[$pkg]=yes
+            else
+                pinst[$pkg]=no
+                INFO "package $pkg is not installed"
+                ok=no
+            fi
+        else
+            [ "${pinst[$pkg]}" = "no" ] && ok=no
+        fi
+    done
+    echo "$ok"
+}
+
+RunMethod() {
+    local method="$1"
+    case "${supported_methods[$method]}" in
+        yes) Method$method && return 0 ;;
+        *)   INFO "method $method not supported due to missing dependencies" ;;
+    esac
+    return 1
+}
+
 GetYourCountryCode() {
     local IP
     local IP_method12=""
     local IP_method34=""
+    declare -A pinst=()
+    local supported_methods=()
+
+    AllAreInstalled bind geoip whois >/dev/null
+
+    supported_methods=(
+        yes                             # 0
+        $(AllAreInstalled bind geoip)   # 1
+        $(AllAreInstalled bind whois)   # 2
+        $(AllAreInstalled bind geoip)   # 3
+        $(AllAreInstalled bind whois)   # 4
+        yes                             # 5
+    )
 
     # try the preferred method first
     case "$REFLECTOR_SIMPLE_COUNTRY_METHOD" in
         default) ;;
-        [0-5]) Method$REFLECTOR_SIMPLE_COUNTRY_METHOD && return ;;
-        *) DIE "method $REFLECTOR_SIMPLE_COUNTRY_METHOD of REFLECTOR_SIMPLE_COUNTRY_METHOD in unsupported" ;;
+        [0-5])   RunMethod $REFLECTOR_SIMPLE_COUNTRY_METHOD && return ;;
+        *)       DIE "method $REFLECTOR_SIMPLE_COUNTRY_METHOD of REFLECTOR_SIMPLE_COUNTRY_METHOD in unsupported" ;;
     esac
 
     # come here if the preferred method failed, or default was chosen
+    
     local method
     for method in $(seq 0 5) ; do
         if [ "$method" != "$REFLECTOR_SIMPLE_COUNTRY_METHOD" ] ; then
-            Method$method && return
+            RunMethod $method && return
         fi
     done
 
@@ -373,6 +415,7 @@ AskCountriesAndOptions() {
 
     command=(eos_yad --form --columns=$REFLECTOR_SIMPLE_COLUMNS --title="Select Arch mirrors with $progname v$VERSION_INFO")
     command+=(--scroll --width=$REFLECTOR_SIMPLE_WIDTH --height=$REFLECTOR_SIMPLE_HEIGHT)
+    command+=(--use-interp)
     tip=""
     for xx in "${tips[@]}" ; do
         tip+="${xx}\n"
@@ -421,15 +464,14 @@ AskCountriesAndOptions() {
     fi
     command+=(--field="Optional reflector params" " $free_params")    # note the initial space in value !!!
 
-    command+=(--button="Changelog!applications-development!reflector-simple changelog":2 --button=yad-cancel:1 --button=yad-ok:0)
+    command+=(--button=" Changelog!applications-development!Show the changes of this program":"Changelog"
+              --button=yad-cancel:1
+              --button=yad-ok:0)
     Verbose "done."
 
     reflector_info="$("${command[@]}")"
     case "$?" in
         1) Destructor ; exit 1 ;;
-        2)
-            $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/reflector-simple)
-            Destructor ; exit 0 ;;
     esac
     test -z "$(echo "$reflector_info" | tr -d ' ')" && exit 1      # stop if $reflector_info has no words
     if [ "$(echo "$reflector_info" | wc -l)" != "1" ] ; then
@@ -437,6 +479,11 @@ AskCountriesAndOptions() {
     fi
     reflector_info=($(echo $reflector_info))                       # make it an array
 }
+
+Changelog() {
+    $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/reflector-simple)
+}
+export -f Changelog
 
 BuildReflectorCommand() {
     local ix xx
@@ -649,6 +696,10 @@ ReadToolConf() {
 }
 
 Main() {
+    local internal_testing=no
+    case "$1" in
+        --testing) internal_testing=yes ;;
+    esac
     local progname=reflector-simple
     local VERSION_INFO="added by PKGBUILD"
     local ARCH_SITE=https://www.archlinux.org
@@ -689,7 +740,10 @@ Main() {
 
     ReadToolConf
 
+    [ $internal_testing = yes ] && REFLECTOR_SIMPLE_COUNTRY_METHOD=2
+
     local local_country_code="$(GetYourCountryCode)"
+    CCCheck "$local_country_code" >/dev/null || DIE "internal error with country code"
     local countrynames
     local countrycodes
     local reflector_info
