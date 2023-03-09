@@ -46,7 +46,7 @@ export PROG_PACKAGENAME="welcome"
 export INSTALLER_PROGRAM=/usr/bin/calamares
 export EOS_LIVEUSER=liveuser
 export EOS_KEEP_PKGS
-export PROG_VERSION="$(/usr/bin/pacman -Q $PROG_PACKAGENAME | awk '{print $2}')"
+export PROG_VERSION="$(expac -Q %v $PROG_PACKAGENAME)"
 export INSTALL_LOG_FILE=/home/$EOS_LIVEUSER/endeavour-install.log
 
 
@@ -99,7 +99,7 @@ AfterTranslations() {
     export INS_CUST_TEXT3="$(ltr ins_cust_text3)"
 }
 
-IsInstalled() { /usr/bin/pacman -Q "$1" >& /dev/null ; }
+IsInstalled() { expac -Q %n "$1" >& /dev/null ; }
 export -f IsInstalled
 
 IsInstalling() {
@@ -107,23 +107,6 @@ IsInstalling() {
     test -x $INSTALLER_PROGRAM && test "$LOGNAME" = "$EOS_LIVEUSER"
 }
 export -f IsInstalling
-
-yad_tailer() {
-    local file="$1"
-
-    tail -f "$file" | \
-        eos_yad --text-info --title="$(basename "$file")" \
-                --button=" $(ltr tail_butt)!dialog-close!$(ltr tail_buttip)":0 \
-                --width=$width --height=$height --tail --wrap --posx=$posx --posy=$posy \
-                >& /dev/null &
-}
-export -f yad_tailer
-
-eos_yad_WARN_debug() {
-    test "$debugging" = "yes" && eos_yad_WARN "$1"
-}
-export -f eos_yad_WARN_debug
-
 
 Welog() {
     [ -d /home/$EOS_LIVEUSER ] && echo "$PROGNAME: " "$@" >> $INSTALL_LOG_FILE
@@ -156,35 +139,6 @@ yad_Install() {
     done |& "${yadcmd[@]}"
 }
 export -f yad_Install
-
-yad_Remove() {
-    # Remove one or more given packages.
-
-    # TODO: translate these!
-    local REMOVER="Remover"
-    local REMOVING="Removing"
-    local NOT_INSTALLED="not installed"
-
-    local yadcmd=(
-        eos_yad --text-info --title="$REMOVER" --wrap --tail --width=600 --height=500 --button=yad-quit:0 --fontname="Mono 10"
-    )
-
-    local pkg pkgs=()
-    for pkg in "$@" ; do
-        IsInstalled "$pkg" >& /dev/null && pkgs+=("$pkg")
-    done
-    test -z "$pkgs" && {
-        echo "$*: $NOT_INSTALLED" | "${yadcmd[@]}"
-        return
-    }
-    while true ; do
-        echo "$REMOVING ${pkgs[*]} ..."
-        pkexec pacman -Rdd --noconfirm "${pkgs[@]}"
-        echo "$INSTALL_DONE"
-        break
-    done |& "${yadcmd[@]}"
-}
-export -f yad_Remove
 
 yad_GetCurrentDM() {
     local current=$(ls -l /etc/systemd/system/display-manager.service | awk '{print $NF}')
@@ -239,104 +193,6 @@ yad_ChangeDisplayManager() {
 }
 export -f yad_ChangeDisplayManager
 
-yad_vanilla_xfce4_theme() {
-    local log="$HOME/.config/EOS-xfce-theme.log"
-    local DE="$(eos_yad_GetDesktopName)"
-    local new_theme_name="vanilla"
-    case "$DE" in
-        XFCE)
-            local conf="$HOME/.config/xfce4"
-            local datetime="$(date '+%Y%m%d-%H:%M:%S')"
-            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf.$datetime</b>\n\n"
-            msg+="To restore the previous theme:\n     - remove folder <b>$conf</b>\n     - rename <b>$conf.$datetime</b> into <b>$conf</b>\n\n"
-            msg+="(Note: this info is stored into file $log).\n\n"
-            msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
-            printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
-            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=$WELCOME_ICON_XFCE_THEME_VANILLA \
-                    --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
-            case "$?" in
-                0) mv $conf $conf.$datetime ; reboot ;;
-            esac
-            ;;
-        *)  echo "Sorry $DE user, only Xfce is supported." > "$log"
-            ;;
-    esac
-}
-export -f yad_vanilla_xfce4_theme
-
-yad_endeavouros_xfce4_theme() {
-    local log2='$HOME/.config/EOS-xfce-theme.log'
-    local log="$(eval echo $log2)"
-    local DE="$(eos_yad_GetDesktopName)"
-    local new_theme_name="EndeavourOS default"
-    case "$DE" in
-        XFCE)
-            local conf="$HOME/.config/xfce4"
-            local conf2='$HOME/.config/xfce4'
-            local datetime="$(date '+%Y%m%d-%H:%M:%S')"
-            local msg="If you agree to change Xfce theme to $new_theme_name, your previous theme\nwill be saved into folder <b>$conf2.$datetime</b>\n\n"
-            msg+="To restore the previous theme:\n     - remove folder <b>$conf2</b>\n     - rename <b>$conf2.$datetime</b> into <b>$conf2</b>\n\n"
-            msg+="(Note: this info is stored into file $log2).\n\n"
-            msg+="Reboot is required for the theme change to take effect.\n\nAccept theme change and reboot now?"
-            printf "%s\n" "$msg" | sed -e 's|\\n|\n|g' -e 's|<[/]*b>||g' > "$log"
-            eos_yad --form --title="Change Xfce theme to $new_theme_name" --text="$msg" --image=$WELCOME_ICON_XFCE_THEME_EOS \
-                    --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
-            case "$?" in
-                0)
-                    # Backup old xfce4 configuration.
-                    mv $conf $conf.$datetime
-
-                    # Fetch the EndeavourOS default Xfce theme from github.
-                    local tmpdir=$(mktemp -d)
-                    pushd $tmpdir >/dev/null
-
-                    if [ 1 -eq 1 ] ; then
-                        git clone $(Github2Gitlab https://github.com/endeavouros-team/endeavouros-xfce4-theming.git) 2>/dev/null || {
-                            popd >/dev/null
-                            rm -rf $tmpdir
-                            return 1
-                        }
-                        local pkgs2=$(cat endeavouros-xfce4-theming/xfce4-packages-list)
-                        local pkg pkg2 group_members pkgs=""
-                        for pkg in $pkgs2 ; do
-                            pacman -Qq $pkg >& /dev/null && continue
-                            if pacman -Si $pkg >& /dev/null ; then
-                                pkgs+=" $pkg"
-                            else
-                                group_members="$(pacman -Sqg $pkg)"      # find group members
-                                for pkg2 in $group_members ; do
-                                    pacman -Qq $pkg2 >& /dev/null && continue
-                                    pkgs+=" $pkg2"
-                                done
-                            fi
-                        done
-                        if [ -n "$pkgs" ] ; then
-                            pkgs="${pkgs:1}"
-                            RunInTerminal "echo 'pacman -S $pkgs' ; $EOS_ROOTER 'pacman -S $pkgs'"
-                        fi
-                        dbus-launch dconf load / < endeavouros-xfce4-theming/xed.dconf
-                        mv endeavouros-xfce4-theming/.config/xfce4      "$(dirname "$conf")"
-                        mv endeavouros-xfce4-theming/.config/gtk-3.0    "$(dirname "$conf")"
-                    else
-                        # the old way
-                        git clone $(Github2Gitlab https://github.com/endeavouros-team/EndeavourOS-iso-next.git) 2>/dev/null
-                        mv EndeavourOS-iso-next/airootfs/etc/skel/.config/xfce4   "$(dirname "$conf")"
-                        mv EndeavourOS-iso-next/airootfs/etc/skel/.config/gtk-3.0 "$(dirname "$conf")"
-                    fi
-
-                    popd >/dev/null
-                    rm -rf $tmpdir
-                    /usr/share/endeavouros/scripts/wallpaper-once -rr   # allows default wallpaper question after reboot
-                    reboot
-                    ;;
-            esac
-            ;;
-        *)  echo "Sorry $DE user, only Xfce is supported." > "$log"
-            ;;
-    esac
-}
-export -f yad_endeavouros_xfce4_theme
-
 WelcomeDevelConf() {
     # Supported config file variables, defaults, and supported values:
     #    local _show_change_reso=no      # yes or no
@@ -348,8 +204,6 @@ WelcomeDevelConf() {
         echo "Error: ${FUNCNAME[1]} calling ${FUNCNAME[0]}: must give two parameters!" >&2
         return 1
     }
-
-    # echo "$fallback" ; return
 
     local devconf="$HOME/.config/welcome-devel.conf"
     local answer="$fallback"
@@ -523,20 +377,6 @@ RunIfInstalled() {
 }
 export -f RunIfInstalled
 
-if [ 0 -eq 1 ] ; then
-NothingToDo_other() {
-    local text="$1"
-    local timeout="$2"
-    local sleep=$(echo "scale=3; $timeout*2/100" | bc -l)
-    local ix
-    for ((ix=0; ix<=100; ix+=2)) ; do
-        echo $ix
-        sleep 0.1
-    done | eos_yad --progress --auto-close --width=200 --text="$text" --title="Info" --hide-text
-}
-export -f NothingToDo_other
-fi
-
 UpdateWithEosAurHelper() {
     [ -x /usr/bin/"$EOS_AUR_HELPER" ] && RunInTerminal "echo '==> $EOS_AUR_HELPER' ; $EOS_AUR_HELPER"
 }
@@ -583,14 +423,6 @@ AfterInstall() {
       )
   fi
   tabcontents+=(--field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
-  case "$(eos_yad_GetDesktopName)" in
-      XFCE)
-          tabcontents+=(
-              --field=" $(ltr after_install_themevan)!$WELCOME_ICON_XFCE_THEME_VANILLA!$(ltr after_install_themevantip)":fbtn  'yad_vanilla_xfce4_theme'
-              --field=" $(ltr after_install_themedef)!$WELCOME_ICON_XFCE_THEME_EOS!$(ltr after_install_themedeftip)":fbtn  'yad_endeavouros_xfce4_theme'
-          )
-          ;;
-  esac
   VboxGuestEnable
   tabcontents+=(--field=" $(ltr after_install_itab)!$WELCOME_ICON_INITIAL_TAB!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
 
@@ -638,11 +470,6 @@ DailyAssistant() {
       --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool"
       --field=" $(ltr daily_assist_anews)!$WELCOME_ICON_NEWS!$(ltr daily_assist_anewstip)":fbtn "WelcomeBrowser https://archlinux.org/news"
   )
-  #IsInstalled eos-apps-info && {
-  #    tabcontents+=(
-  #        --field=" EndeavourOS apps help!$WELCOME_ICON_EOS_GENERIC!Show manual pages of EndeavourOS apps":fbtn "/usr/bin/eos-apps-info"
-  #    )
-  #}
 
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
@@ -662,23 +489,6 @@ DailyAssistant() {
   local DE=""
   eos_yad__detectDE          # lowercase
 
-  if [ 0 -eq 1 ] ; then
-      # Adjust DE names for the Arch web page! Note: all could be lower case...
-      case "$DE" in
-          xfce)         DE=Xfce;;
-          budgie)       DE=Budgie;;
-          cinnamon)     DE=Cinnamon;;
-          lxqt)         DE=LXQt;;
-          i3)           DE=i3;;
-          bspwm)        DE=bspwm;;
-          sway)         DE=sway;;
-          openbox)      DE=Openbox;;
-          qtile)        DE=Qtile;;
-          gnome3)       DE=GNOME;;
-          gnome|kde|mate) ;;
-          *)            DE="";;
-      esac
-  fi
   if [ -n "$DE" ] ; then
       tabcontents+=(
           --field=" $DE: $(ltr daily_assist_DEinfo)!!$DE: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$DE"
@@ -755,8 +565,7 @@ UsefulTips() {
       --field=" $(ltr after_install_hn)!$WELCOME_ICON_TIPS!$(ltr after_install_hntip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=Hardware'"
       --field=" $(ltr after_install_bt)!$WELCOME_ICON_TIPS!$(ltr after_install_bttip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03'"  # 'https://discovery.endeavouros.com/bluetooth'
   )
-  test "$(eos_GetArch)" != "armv7h" && \
-      tabcontents+=(--field=" $(ltr after_install_nv)!$WELCOME_ICON_TIPS!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser https://discovery.endeavouros.com/category/nvidia")
+  test "$(eos_GetArch)" != "armv7h" && tabcontents+=(--field=" $(ltr after_install_nv)!$WELCOME_ICON_TIPS!$(ltr after_install_nvtip)":fbtn "WelcomeBrowser https://discovery.endeavouros.com/category/nvidia")
   tabcontents+=(
       --field=" $(ltr after_install_ft)!$WELCOME_ICON_TIPS!$(ltr after_install_fttip)":fbtn     "WelcomeBrowser https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
       --field=" EndeavourOS $_and ARM!$WELCOME_ICON_ARM!EndeavourOS $_and ARM $(ltr after_install_info)":fbtn      "WelcomeBrowser https://arm.endeavouros.com"
@@ -765,19 +574,6 @@ UsefulTips() {
   )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
-}
-
-IsEosYadInstalled() {
-    # Determines if yad-eos is installed.
-    # Some yad alternative must be installed if we can use this program!
-
-    local installed_yad="$(LANG=C /usr/bin/pacman -Qi yad 2>/dev/null | /usr/bin/grep -w ^Name | /usr/bin/awk '{print $3}')"
-
-    if [ "$installed_yad" = "yad-eos" ] ; then
-        return 0        # yad-eos is installed
-    else
-        return 1        # some other yad alternative is installed
-    fi
 }
 
 AddMoreApps() {
@@ -790,65 +586,6 @@ AddMoreApps() {
       --image=$WELCOME_ICON_INSTALL_INFO
   )
   local shown_app_buttons=0
-  local use_eos_quickstart=no
-
-  local WELCOME_ICON_LIBREOFFICE=libreoffice-fresh
-  local WELCOME_ICON_CHROMIUM=chromium
-  local WELCOME_ICON_AKM=system-software-install
-  local WELCOME_ICON_BLUETOOTH=$(eos_IconGrasp bluetooth)
-
-  [ -x /usr/bin/eos-quickstart ] && use_eos_quickstart=yes
-
-  if [ "$use_eos_quickstart" = "no" ] ; then
-      local DE="$(eos_yad_GetDesktopName)"
-      # local gufw="$(eos_IconGrasp gufw network-firewall firewall-config)"
-      # local libreoffice="$(eos_IconGrasp libreoffice-writer)"
-      local chromium="$(eos_IconGrasp chromium web-browser)"
-      local libreoffice="libreoffice-fresh"
-
-      IsInstalled "$libreoffice" || {
-          ((shown_app_buttons++))
-          tabcontents+=( --field=" LibreOffice fresh!$WELCOME_ICON_LIBREOFFICE!$(ltr add_more_apps_lotip)":fbtn "yad_Install $libreoffice")
-      }
-      IsInstalled chromium || {
-          ((shown_app_buttons++))
-          tabcontents+=(--field=" $(ltr add_more_apps_ch)!$WELCOME_ICON_CHROMIUM!$(ltr add_more_apps_chtip)":fbtn 'yad_Install chromium')
-      }
-      #IsInstalled gufw || {
-      #    ((shown_app_buttons++))
-      #    tabcontents+=(--field=" $(ltr add_more_apps_fw)!$gufw!$(ltr add_more_apps_fwtip)":fbtn 'yad_Install gufw')
-      #}
-
-      if [ "$(eos_GetArch)" != "armv7h" ] ; then
-          IsInstalled akm || {
-              ((shown_app_buttons++))
-              tabcontents+=(--field=" $(ltr add_more_apps_akm)!$WELCOME_ICON_AKM!$(ltr add_more_apps_akmtip)":fbtn 'yad_Install akm')
-          }
-      fi
-      #IsInstalled eos-apps-info || {
-      #    ((shown_app_buttons++))
-      #    tabcontents+=(--field=" EndeavourOS apps info!$system_software_install!Show info about EndeavourOS apps":fbtn 'yad_Install eos-apps-info')
-      #}
-      case "$DE" in
-          XFCE)
-              while true ; do                       # Show buttons only if none of them are installed.
-                  IsInstalled blueberry && break
-                  IsInstalled blueman && break
-                  ((shown_app_buttons+=2))
-                  local bluetooth="$(eos_IconGrasp bluetooth)"
-                  tabcontents+=(
-                      --field=" $(ltr add_more_apps_bt)!$WELCOME_ICON_BLUETOOTH!Blueberry":fbtn                   'yad_Install blueberry bluez-utils'
-                      --field=" $(ltr add_more_apps_bt_bm)!$WELCOME_ICON_BLUETOOTH!Blueman":fbtn                  'yad_Install blueman bluez-utils pulseaudio-bluetooth'
-                  )
-                  break
-              done
-              ;;
-      esac
-
-      if (! IsEosYadInstalled) ; then
-          tabcontents+=(--field=" Yad (patched)!$(yad-tools -i yad)!Patched version of yad fixes the window height issue":fbtn "yad_Install yad-eos")
-      fi
-  fi
 
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
@@ -858,10 +595,8 @@ AddMoreApps() {
   fi
   tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages")
 
-  if [ "$use_eos_quickstart" = "yes" ] ; then
-      ((shown_app_buttons++))
-      tabcontents+=(--field=" $(ltr add_more_apps_qs)!$EOS_WICON!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
-  fi
+  ((shown_app_buttons++))
+  tabcontents+=(--field=" $(ltr add_more_apps_qs)!$EOS_WICON!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
 
   # Now we know if we have any apps in the install list.
 
@@ -1105,7 +840,6 @@ EOF
             grep "^Greeter=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2
             ;;
         continue)
-            # IsInstalling && { echo yes ; return ; }  # not needed, installer has default values
             if [ "$(grep "^OnceDaily=" "$WELCOME_CONFIG" 2>/dev/null | cut -d '=' -f 2)" = "no" ] ; then
                 echo yes
                 return
@@ -1236,8 +970,6 @@ MagicId_new() {
             ;;
     esac
 
-    # local EOS_LIVEUSER=$LOGNAME  # TESTING !!!
-
     if [ ! -r /home/$EOS_LIVEUSER/user_commands.bash.bak ] ; then
         cp /home/$EOS_LIVEUSER/user_commands.bash /home/$EOS_LIVEUSER/user_commands.bash.bak
     fi
@@ -1293,24 +1025,6 @@ MagicId() {
     echo "$target: OK" >&2
 }
 
-ShowProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-
-    local msg="$1"
-    local barlen=50
-    local percent_increment=17
-
-    ProgressBar "$msg" $pb_percent $barlen
-    ((pb_percent+=percent_increment))
-    [ $pb_percent -gt 100 ] && pb_percent=100
-}
-EndProgress() {
-    [ "$show_progress_bar" = "yes" ] || return
-    pb_percent=100
-    ShowProgress "Done."
-    ProgressBarEnd
-}
-
 VboxGuestEnable() {
     case "$(device-info --vm)" in
         virtualbox)
@@ -1343,16 +1057,9 @@ Options:
                   X value syntax is the same as in 'sleep'.
 --enable | -f     Enable this $PRETTY_PROGNAME app.
 --disable         Disable this $PRETTY_PROGNAME app.
---once | -1       Enable $PRETTY_PROGNAME once even if disabled.
+--once | -1       Run $PRETTY_PROGNAME once, even if it is disabled.
 --version         Show the version of this app.
 --lang=X          Use language X on the user interface.
---changelog       Show the changelog of this package.
-
-Experimental options:
---genlang=X       Generate language X support for the user interface of the Welcome app.
-                  X is a shorthand of two lowercase letters, like de, en, or fr.
-                  Note: requires package 'translate-shell' to be already installed.
-                  Try command 'trans -R' to see a list of available languages.
 
 To have $PRETTY_PROGNAME app started when you log in, make sure
 - $PRETTY_PROGNAME app is selected in the Autostart feature of the DE
@@ -1367,16 +1074,26 @@ You may also disable the $PRETTY_PROGNAME app from the app itself
 To re-enable the app, use the terminal command
     $PROGNAME --enable
 
-Note: check also settings in the configuration file $WELCOME_CONFIG.
+Note: check also settings in the configuration file $WELCOME_CONFIG2.
 
 Option --lang=X is currently experimental and supports only a very small set
-of languages. The X should consist of two lowercase letters
+of languages. The value X should consist of two lowercase letters
 (like 'en' for English or 'de' for German).
-If option --lang is not given, the (default) value is extracted from
-the first two letters of the environment variable LANG.
+If option --lang is not given, the value is extracted from
+the first two letters of the environment variable LANG (now: ${LANG::2}).
 EOF
 }
 export -f Usage
+
+
+#Experimental options:
+#--genlang=X       Generate language X support for the user interface of the Welcome app.
+#                  X is a shorthand of two lowercase letters, like de, en, or fr.
+#                  Note: requires package 'translate-shell' to be already installed.
+#                  Try command 'trans -R' to see a list of available languages.
+
+#--changelog       Show the changelog of this package.
+
 # --tr-prefer=X     Prefer either 'manual' or 'generated' language on the user interface.
 #                   Note: value 'generated' is meaningful only after option --genlang has
 #                   been used at least once.
@@ -1386,57 +1103,6 @@ export -f Usage
 #                  to install. Package names are listed as one package name per line.
 #                  Empty lines and comments (lines starting with character #) are allowed.
 
-
-if [ 0 -eq 1 ] ; then
-
-# NOTE: CheckUserPkglist() moved to eos-install-mode-run-calamares
-
-CheckUserPkglist_old() {
-    local userlistfile="/home/$EOS_LIVEUSER/user_pkglist.txt"
-
-    if [ -r "$userlistfile" ] ; then
-        # Remove comments (sed), empty lines (grep), and trim lines from spaces (sed):
-        local user_pkgs=$(cat "$userlistfile" | sed 's|\([^#]*\)#.*|\1|' | grep -Pv "^[ \t]*$" | sed -e 's|^[ \t]*||' -e 's|[ \t]*$||')
-        local up up2
-        local failed=()
-        local aur=()
-        local has_spaces=no
-        local txt=""
-
-        # allow only one pkgname per line
-        readarray -t user_pkgs <<< $(echo "$user_pkgs")
-
-        for up in "${user_pkgs[@]}" ; do
-            [ -n "$up" ] || continue
-            if ! pacman -Si "$up" >& /dev/null ; then
-                if [ "$up" != "$(echo "$up" | sed 's|[ \t]||g')" ] ; then
-                    has_spaces=yes
-                fi
-                up2="\t'$up'"
-                if yay -Sia "$up" >& /dev/null ; then
-                    aur+=("$up2")
-                else
-                    failed+=("$up2")
-                fi
-            fi
-        done
-
-        if [ -n "$failed" ] ; then
-            txt="The following package names listed in <b>$userlistfile</b> do not exist:\n$(printf "<tt>%s</tt>\n" "${failed[@]}")\n\n"
-        fi
-        if [ -n "$aur" ] ; then
-            txt+="AUR packages listed in <b>$userlistfile</b> are not supported:\n$(printf "<tt>%s</tt>\n" "${aur[@]}")\n\n"
-        fi
-        if [ "$has_spaces" = "yes" ] ; then
-            txt+="Note that only one package name per line is allowed.\n"
-        fi
-        if [ -n "$txt" ] ; then
-            eos_yad --form --title="Error" --text="$txt" --image=dialog-error --button=yad-quit:1
-            exit 1
-        fi
-    fi
-}
-fi
 
 GetIsoVersion() {
     if [ -z "$ISO_VERSION" ] ; then
@@ -1472,7 +1138,6 @@ StartHere() {
     local tr_engine=bing
     local tr_prefer=manual
     local pb_percent=0
-    local show_progress_bar=no   # was: yes
     local testing=no
     local allow_run_if_disabled=no            # yes = allow run even if disabled
 
@@ -1521,9 +1186,6 @@ StartHere() {
 
     for arg in "$@" ; do
         case "$arg" in
-            --no-progress)
-                show_progress_bar=no
-                ;;
             --changelog)
                 WelcomeChangelog
                 return
@@ -1541,24 +1203,15 @@ StartHere() {
         esac
     done
 
-    [ "$show_progress_bar" = "yes" ] && ProgressBarInit
-
-    ShowProgress Translating...
-
     _init_translations --tr-prefer="$tr_prefer" "$lang" || { echo "language fail" >&2 ; exit 1 ; }
 
     AfterTranslations
 
     KillExtraYad > /tmp/yad-zombies.log
 
-    # if [ "$is_installing" = "yes" ] ; then
-    #     CheckUserPkglist
-    # fi
-
-    ShowProgress Processing...
-
-    local WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"     # "Welcome" used to be "Greeter" ...
-    export welcome_configurator="$HOME/.config/welcome.conf"  # another welcome config... should combine these
+    local -r WELCOME_CONFIG="$HOME/.config/EOS-greeter.conf"      # "Welcome" used to be "Greeter" ...
+    local -r WELCOME_CONFIG2='$HOME/.config/EOS-greeter.conf'
+    export welcome_configurator="$HOME/.config/welcome.conf"      # another welcome config... should combine these
 
     if [ -r "$welcome_configurator" ] ; then
         if [ -n "$(grep "^local ConfVersion" "$welcome_configurator")" ] || [ -n "$(grep "^local MaxButtonNameLength" "$welcome_configurator")" ] ; then
@@ -1583,8 +1236,6 @@ StartHere() {
         [ -n "$ISO_VERSION" ] && _NOTEBOOK_TITLE+="  [$(GetIsoDateStr)]"
     fi
 
-    #local netlog=0
-
     for arg in "$@" ; do
         case "$arg" in
             --help|-h) WelcomeHelp_opt ; return ;;
@@ -1593,11 +1244,9 @@ StartHere() {
             --once | -1) allow_run_if_disabled=yes ;;
             --startdelay=*) start_delay="${arg#*=}" ;;
             --installer) ;;                                             # already handled!
-            #--pkglist=*) export user_pkglist_url="${arg#*=}" ;;        # only for online installs currently
             --version) echo "$PROG_VERSION" >&2 ; return ;;
-            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --ni=* | --no-progress) ;; # already handled!
+            --lang=* | --tr-prefer=* | --tr-engine=* | --id=* | --ni=*) ;; # already handled!
             --testing) testing=yes ;;
-            #--netlog) netlog=1 ;;
             -*) DIE "unsupported option '$arg'" ;;
             *)  DIE "unsupported parameter '$arg'" ;;
         esac
@@ -1614,8 +1263,6 @@ StartHere() {
         source "$own_commands_conf"
     fi
 
-    ShowProgress "Creating commands..."
-
     CreateNotebookCommands
 
     if [ "$(WelcomeSettings check)" != "enable" ] && [ "$allow_run_if_disabled" = "no" ]; then
@@ -1628,7 +1275,6 @@ StartHere() {
     fi
 
     if [ "$start_delay" != "0" ] ; then
-        ShowProgress "Sleeping..."
         sleep "$start_delay"
     fi
 
@@ -1639,7 +1285,6 @@ StartHere() {
         else
             verbosity=none
         fi
-        ShowProgress "Checking connection..."
 
         eos_yad_check_internet_connection $verbosity 2 "3s" "Welcome" || return 1
 
@@ -1668,9 +1313,6 @@ StartHere() {
                 Welog "Warning: cannot make a backup of mirrorlist!"
             fi
         fi
-        #if [ -z "$(grep '=/usr/share/endeavouros/scripts/welcome' /home/$EOS_LIVEUSER/.config/xfce4/panel/launcher-*/*.desktop)" ] ; then
-        #    xfce4-panel --add=launcher $EOS_SCRIPTS_DIR/welcome-panel.desktop
-        #fi
     fi
 
     SetBrowser
@@ -1679,7 +1321,6 @@ StartHere() {
     local tab tabname
     local notebook   # contains the main yad command
 
-    ShowProgress "Building yad window..."
     PrepareTabs "$handle" || DIE "PrepareTabs failed"
 
     # Create the yad command gradually into an array 'notebook':
@@ -1718,7 +1359,6 @@ StartHere() {
             case "$activate_own_commands_tab" in
                 [Yy][Ee][Ss])
                     active_tab_nr=6                       # 6 = the Personal Commands tab
-                    #test "$is_installing" = "yes" && active_tab_nr=3
                     ;;
             esac
         fi
@@ -1743,8 +1383,6 @@ StartHere() {
             ;;
     esac
 
-    ShowProgress "Showing window..."
-
     local error_log=/tmp/$PROGNAME.log
     local comment=""
 
@@ -1752,13 +1390,10 @@ StartHere() {
 
     local result=$?
 
-    EndProgress
-
     case "$result" in
         5) WelcomeSettings disable ;;
         0) sleep 0.5 ; WelcomeSettings enable ;;
         252) ;;
-        # 0|252) sleep 0.5 ; WelcomeSettings enable ;;
         *)
             case "$result" in
                 143) comment="   # likely caused by restarting the Welcome app" ;;
