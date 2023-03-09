@@ -419,6 +419,17 @@ HubReleaseShow() {
     HubRelease show "$@" | sed -e 's|%2B|+|g'     # -e 's|%3A|:|g'
 }
 
+GetRemoteAssetNames() {
+    if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
+        Pushd "$GITDIR"/endeavouros/x86_64
+        git pull >& /dev/null
+        remote_files=$(ls -1 | sort)
+        Popd
+    else
+        remote_files=$(release-asset-names ${RELEASE_TAGS[0]} | sort)
+    fi
+}
+
 AskFetchingFromGithub() {
     printf2 "\n%s " "Fetch assets from github (Yes/no/force)?"
     read2
@@ -449,18 +460,22 @@ AskFetchingFromGithub() {
 
     if [ "$use_release_assets" = "yes" ] ; then
         local_files=$(ls -1 *.{db,files,zst,xz,sig} 2> /dev/null | sort)   # $asset_file_endings
-        remote_files=$(release-asset-names ${RELEASE_TAGS[0]} | sort)
+        GetRemoteAssetNames
     fi
 
     if [ "$local_files" != "$remote_files" ] ; then
         # There are differences in file names.
         # Could be the epoch related file name change, they will be fixed later.
 
-        if OnlyEpochDiffs ; then
-            diffs=epoch
+        if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
+            diffs=real
+        elif OnlyEpochDiffs ; then
+            diffs=epoch      # because of github
         else
             diffs=real
+        fi
 
+        if [ $diffs = real ] ; then
             local tmpdir_local=$(mktemp -d /tmp/local.XXX)
             local tmpdir_remote=$(mktemp -d /tmp/remote.XXX)
 
@@ -475,9 +490,9 @@ AskFetchingFromGithub() {
     fi
 
     case "$diffs" in
-        none) return 1 ;;         # no diffs               ==> local
-        epoch)return 1 ;;         # only epoch no diffs    ==> local
-        real) return 0 ;;         # real diffs             ==> remote
+        none)  return 1 ;;         # no diffs               ==> local
+        epoch) return 1 ;;         # only epoch no diffs    ==> local
+        real)  return 0 ;;         # real diffs             ==> remote
     esac
 }
 
@@ -592,29 +607,34 @@ Assets_clone()
 
     hook="${ASSET_PACKAGE_HOOKS[assets_mirrors]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
-        HubRelease download $xx
-        test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
-    done
-    sleep 1
+        if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
+            echo2 "==> Copying files from '$GITDIR/endeavouros/x86_64' ..."
+            cp "$GITDIR"/endeavouros/x86_64/* .
+        else
+            HubRelease download $xx
+            sleep 1
 
-    # Unfortunately github release assets cannot contain a colon (epoch mark) in file name, so rename those packages locally
-    # after fetching them above.
+            # Unfortunately github release assets cannot contain a colon (epoch mark) in file name, so rename those packages locally
+            # after fetching them above.
 
-    local oldname newname pkgname
+            local oldname newname pkgname
 
-    for oldname in *.pkg.tar.{zst,xz} ; do
-        case "$oldname" in
-            "*.pkg."*) continue ;;
-        esac
-        pkgname=$(pkg-name-components N "$oldname")
-        IsListedPackage "$pkgname" || continue
-        HandlePossibleEpoch "$pkgname" "$oldname" newname
-        if [ "$newname" != "$oldname" ] ; then
-            echo2 "==> Fix: $oldname     --> $newname"
-            echo2 "==> Fix: $oldname.sig --> $newname.sig"
-            mv $oldname $newname
-            mv $oldname.sig $newname.sig
+            for oldname in *.pkg.tar.{zst,xz} ; do
+                case "$oldname" in
+                    "*.pkg."*) continue ;;
+                esac
+                pkgname=$(pkg-name-components N "$oldname")
+                IsListedPackage "$pkgname" || continue
+                HandlePossibleEpoch "$pkgname" "$oldname" newname
+                if [ "$newname" != "$oldname" ] ; then
+                    echo2 "==> Fix: $oldname     --> $newname"
+                    echo2 "==> Fix: $oldname.sig --> $newname.sig"
+                    mv $oldname $newname
+                    mv $oldname.sig $newname.sig
+                fi
+            done
         fi
+        test -n "$hook" && { $hook && break ; }  # we need assets from only one tag since assets in other tags are the same
     done
 
     Popd
