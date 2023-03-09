@@ -19,6 +19,7 @@ local SIGNER="EndeavourOS"
 local USE_GENERATED_FILELIST="no"                   # may generate 'repofiles.txt' into the repo
 # local USE_RELEASE_ASSETS="no"                     # either 'release assets' or "ordinary" github files
 local USE_RELEASE_ASSETS="yes"                      # either 'release assets' or "ordinary" github files
+local PREFER_GIT_OVER_RELEASE=yes
 
 # local folders
 local ASSETSDIR="$PWD"
@@ -93,8 +94,12 @@ PKGNAMES=(                                        # Alphabetically ordered.
     eos-translations
     eos-update-notifier
 
+    filesystem
+
     kernel-install-for-dracut
     keyserver-rank
+
+    lsb-release
 
     mkinitcpio-openswap/aur
 
@@ -139,7 +144,9 @@ fi
 # If all versions of a package should be in wait mode, write only the package name, e.g. 'eos-lxdm-gtk3'.
 #
 PKGNAMES_WAIT=(
-    # 'eos-lxdm-gtk3|0.5.3-5'
+    eos-hooks
+    filesystem
+    lsb-release
 )
 
 
@@ -616,6 +623,85 @@ _yad_hook_add_gspell() {
         -e 's|^\(pkgrel=[0-9]*\)$|\1.1|'
 }
 
+
+
+
+# Common helper functions.
+
+_helper_get_files_from_Arch() {
+    local PKGNAME="$1"             # must include "repo/" prefix, e.g. "community/yad"
+
+    case "$PKGNAME" in
+        */*) ;;
+        *) return 1 ;;
+    esac
+
+    local tmpdir=$(mktemp -d)
+    pushd $tmpdir >/dev/null
+    yay -G $PKGNAME || return 1
+    popd >/dev/null
+    mv $tmpdir/$PKGNAME/trunk/* . || return 1
+    rm -rf $tmpdir
+}
+_helper_compare_pkg_version_info() {
+    # Compare pkgver and pkgrel of Arch and EOS PKGBUILDs.
+    # If changed, manual intervention is needed: simply update PKGBUILD in EOS with new from Arch.
+
+    local PKGNAME="$1"
+
+    local -r ver1="$(grep "^pkgver=" PKGBUILD)"
+    local -r rel1="$(grep "^pkgrel=" PKGBUILD        | sed 's|\.1$||')"
+    local -r ver2="$(grep "^pkgver=" PKGBUILD.eos)"
+    local -r rel2="$(grep "^pkgrel=" PKGBUILD.eos    | sed 's|\.1$||')"
+    [ "$ver1" = "$ver2" ] || { echo "NOTE: $PKGNAME PKGBUILD (pkgver) has changed, manual intervention needed!" >&2; return 1; }
+    [ "$rel1" = "$rel2" ] || { echo "NOTE: $PKGNAME PKGBUILD (pkgrel) has changed, manual intervention needed!" >&2; return 1; }
+}
+_helper_eos_branding_and_marking() {
+    # - append ".eos" to 'pkgver' value to mark EOS changes
+    # - add the EOS maintainer line
+    # - update checksums because some files were changed here
+
+    sed -i PKGBUILD -e "s|^\(pkgver=.*\)|\1.eos|"
+    if [ -z "$(grep "Maintainer.*endeavouros" PKGBUILD)" ] ; then
+        sed -i PKGBUILD -e "/^# Maintainer:/i \# Maintainer: EndeavourOS-Team <info@endeavouros.com>"
+    fi
+    updpkgsums PKGBUILD >& /dev/null
+}
+
+
+_yad_hook() {
+
+    return    # 2023-Mar-08: currently not used!
+
+
+    # patch the dialog height issue, see https://sourceforge.net/p/yad-dialog/tickets/322/#6f2d
+
+    local workdir="$PKGBUILD_ROOTDIR"/yad
+    local url=https://github.com/endeavouros-team/PKGBUILDS/raw/master/yad
+
+    pushd "$workdir" >/dev/null
+
+    cp PKGBUILD PKGBUILD.eos
+
+    _helper_get_files_from_Arch community/yad       || return 1
+    _helper_compare_pkg_version_info community/yad  || return 1
+
+    sed -i PKGBUILD -E \
+        -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n' \
+        -e "s|^(sha256sums=.*)\)|\1 '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f'\)|" \
+        -e "s|^(arch=.*)\)|\1 'aarch64' 'armv7'\)|" \
+        -e "s|^(source=.*)\)$|\1 '$url/yad-github-issue-107.patch'\)|" \
+        -e "s|^(pkgver=.*)|\1.eos|"
+
+    sed -i PKGBUILD \
+        -e 's|${pkgver}|${pkgver%.eos}|' \
+        -e '/sha256sums=/a \conflicts=(yad yad-git)\nprovides=(yad)\nreplaces=(yad-eos)'
+
+    _helper_eos_branding_and_marking
+
+    popd >/dev/null
+}
+
 _diff_file_and_data() {
     local file="$1"
     local data="$2"
@@ -681,6 +767,7 @@ ASSET_PACKAGE_HOOKS["eos-lightdm-gtk-theme"]=_eos-lightdm-gtk-theme_hook
 #ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
 #ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
 #ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
+
 # Special hooks. Implemented via package hooks.
 
 _assets_download_break() {
