@@ -420,14 +420,32 @@ HubReleaseShow() {
 }
 
 GetRemoteAssetNames() {
-    if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
-        Pushd "$GITDIR"/endeavouros/x86_64
-        git pull >& /dev/null
-        remote_files=$(ls -1 | sort)
-        Popd
-    else
-        remote_files=$(release-asset-names ${RELEASE_TAGS[0]} | sort)
+    GetFromGit() {
+        local dir="$1"
+
+        if [ -r "$dir/$REPONAME.db" ] && [ -d "$GITDIR/.git" ] ; then
+            Pushd "$dir"
+            git pull >& /dev/null
+            remote_files=$(ls -1 | sort)
+            Popd
+            return 0
+        else
+            return 1
+        fi
+    }
+
+    if [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] ; then
+        names_from_git=yes
+        case "$REPONAME" in
+            endeavouros)               GetFromGit "$GITDIR/$REPONAME/$ARCH" && return ;;
+            endeavouros-testing-dev)   GetFromGit "$GITDIR/$REPONAME"       && return ;;
+            *)                         GetFromGit "$GITDIR/repo"            && return ;;
+        esac
     fi
+
+    # fallback to release assets
+    remote_files=$(release-asset-names ${RELEASE_TAGS[0]} | sort)
+    names_from_git=no
 }
 
 AskFetchingFromGithub() {
@@ -467,7 +485,7 @@ AskFetchingFromGithub() {
         # There are differences in file names.
         # Could be the epoch related file name change, they will be fixed later.
 
-        if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
+        if [ "$names_from_git" = "yes" ] ; then
             diffs=real
         elif OnlyEpochDiffs ; then
             diffs=epoch      # because of github
@@ -530,6 +548,8 @@ OnlyEpochDiffs() {
 
 Assets_clone()
 {
+    local names_from_git=no
+
     if [ "$cmd" = "dryrun-local" ] && [ "$REPONAME" != "endeavouros_calamares" ] ; then
         return
     fi
@@ -607,9 +627,19 @@ Assets_clone()
 
     hook="${ASSET_PACKAGE_HOOKS[assets_mirrors]}"
     for xx in "${RELEASE_TAGS[@]}" ; do
-        if [ "$REPONAME" = "endeavouros" ] && [ "$PREFER_GIT_OVER_RELEASE" = "yes" ] && [ -r "$GITDIR"/endeavouros/x86_64/endeavouros.db ] ; then
-            echo2 "==> Copying files from '$GITDIR/endeavouros/x86_64' ..."
-            cp "$GITDIR"/endeavouros/x86_64/* .
+        if [ "$names_from_git" = "yes" ] ; then
+            local cpdir=""
+            case "$REPONAME" in
+                endeavouros)
+                    cpdir="$GITDIR/$REPONAME/$ARCH" ;;
+                endeavouros-testing-dev)
+                    cpdir="$GITDIR/$REPONAME" ;;
+                *)
+                    cpdir="$GITDIR/repo" ;;
+            esac
+            [ -n "$cpdir" ] || DIE "git dir is empty, cannot copy files"
+            echo2 "==> Copying files from '$cpdir' ..."
+            cp "$cpdir"/* .
         else
             HubRelease download $xx
             sleep 1
@@ -819,7 +849,7 @@ GitUpdate_repo() {
             if [ -x /usr/bin/GitUpdate ] ; then
                 FinalStopBeforeSyncing "$REPONAME repo"
                 pushd "$newrepodir" >/dev/null
-                /usr/bin/GitUpdate "x86_64: $*" || DIE "GitUpdate failed!"
+                /usr/bin/GitUpdate "$ARCH: $*" || DIE "GitUpdate failed!"
                 popd >/dev/null
                 ManualCheckOfAssets addition repo
             else
@@ -1731,6 +1761,7 @@ Main() {
     esac
     local ASSETS_CONF=assets.conf   # This file must exist in the current folder when building packages.
     local PROGNAME="$(basename "$0")"
+    local ARCH=x86_64
 
     [ "$PROGNAME" = "bashdb" ] && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
     [ -n "$PROGNAME" ] || PROGNAME="assets.make"
