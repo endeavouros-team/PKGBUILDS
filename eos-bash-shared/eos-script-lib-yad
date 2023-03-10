@@ -318,7 +318,7 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
             --term | -t)
                 termopts="$2" ; shift ;;        # e.g. --term="-T 'my title' --geometry=100x200"
             --wait | -w)
-                waitopt="$2" ; shift ;;         # e.g. --wait="--no-enter-wait"
+                waitopt="$2" ; shift ;;         # either --wait="--no-enter-wait" or --wait="sleep=30" (30 (seconds) can be something else too)
             --no-enter-wait | -E)
                 waitopt="--no-enter-wait" ;;    # alternative to --wait
             --)
@@ -344,9 +344,17 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
         /usr/bin/deepin-terminal | deepin-terminal) ;;
         *)
             _init_translations
-            if [ "$waitopt" != "--no-enter-wait" ] ; then
-                echo "read -p '$(ltr updt_press_enter): '"    >> "$tmpfile"
-            fi
+            case "$waitopt" in
+                --no-enter-wait | no-enter-wait) ;;
+                sleep=*)
+                    local waittime="${waitopt#*=}"
+                    echo "echo Waiting $waittime before closing."   >> "$tmpfile"
+                    echo "eos-sleep-counter $waittime"              >> "$tmpfile"
+                    ;;
+                *)
+                    echo "read -p '$(ltr updt_press_enter): '"      >> "$tmpfile"
+                    ;;
+            esac
             ;;
     esac
     echo "rm -f $tmpfile"                                >> "$tmpfile"                    # this may cause issues in very special cases!

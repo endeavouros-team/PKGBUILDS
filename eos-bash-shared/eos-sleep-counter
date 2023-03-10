@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# After each second, show seconds remaining until this program exists.
+#
+# The output is displayed on one line.
+# Pressing any key will stop this program.
+#
+# Exit code is
+#   - 0 if any regular key was pressed
+#   - 130 if the program was interrupted with Ctrl-C
+#   - 142 if timeout occurred
+#
+# Parameters:
+#   $1 = number of seconds (integer) before the program exists
+#   $2 = (optional) prompt to show before showing the remaining seconds
+
+printf2()  { printf "$@" >&2 ; }
+ShowTime() { printf2 "\r%s %-5s\r" "$prompt" "$s" ; }
+
+Main() {
+    local -r seconds="$1"
+    local prompt="$2"
+    local s
+    local ret=0
+    local str=""
+
+    [ -n "$prompt" ] || prompt="Seconds left:"
+
+    for ((s=seconds; s>0; s--)) ; do
+        ShowTime
+        read -t1 -n1 str
+        ret=$?
+        [ $ret -eq 0 ] && break
+    done
+    ShowTime
+    if [ $ret -ne 0 ] || [ -n "$str" ] ; then
+        printf2 "\n"
+    fi
+    return $ret
+}
+
+Main "$@"

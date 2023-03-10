@@ -6,14 +6,14 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23
-pkgrel=5
+pkgrel=6
 arch=('any')
 license=('GPL')
 depends=(
   bash
   eos-translations
   expac                 # for many EOS apps
-  python-dbus           # for ksetwallpaper.py
+  dbus-python           # for ksetwallpaper.py
   endeavouros-theming   # for eos-wallpaper-set
   xdg-utils             # for eos-sendlog
   yad                   # provides support for graphical dialogs
@@ -67,12 +67,13 @@ source=(
   $_url/eos-github2gitlab
   $_url/eos-select-file-server
   $_url/curl-exit-code-to-string
+  $_url/eos-sleep-counter
   $_url/show-location-info
   $_url/eos-shifttime                # Thanks, @freebird54!
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
-sha512sums=('74cd274f572d6900ee9062a4d7f99f56dc4c23ad5ad4534b4321fbe7632cc844232a0556539531c25b924512c4658b3b8253407a9ba6a358ed256de70c9ce36e'
+sha512sums=('c6d12436ffcccab3acc4b8702286c29c90fa53af7855902736bfdc8afb8977ceda1227fb6986ef3e0b654d3f996add419a56f5646fcc6a67ba51bb7e4b092b4a'
             'e949e5428714de16e6543e76fcfb5faaef523ff731e96b64776823edb1a610e21ed4475d74af0f10dc00142302b3af37622c68b20c90568545818210801277d6'
             '3d9682e5775c19224c5790ae2e86a5eba142d3671dd1d3d525790207ca87f2b816ae08697ea9750ec6c7bb850d20d5b5a996530b7b3adbd4852d5d984b804f4c'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
@@ -101,6 +102,7 @@ sha512sums=('74cd274f572d6900ee9062a4d7f99f56dc4c23ad5ad4534b4321fbe7632cc844232
             'bcb4cee120d36e0c321a064e3b81ec716df4795038de13da3e78c65f236b9aac05babcd60ae2d353a8a94e98184e6a8a8beaefdf50c10b439889faa78722d753'
             'a62d71bc1a750e3dc5516aefafd7e407a7d33bb9761ba21b456863cb042ff7f073375bce18426321f54e5343ac728bf117d181b9ee3e3186917b63f0b2b88b07'
             'e9eba3e7a15a179727e98325d46a75ded7dcac2dc1bad65019cd893e2f3223b00646ff9be95b913f5873b67d1106c861930176140263ccc02f47b485ab811100'
+            '1111e85a5f1c6be67455b473b1f3bb9d1afe506249395a043a623502879f1f2c20a997888d695b22681725e65785784d720fcae799de1a03352538fb5344d440'
             '10316db21c5587250eaa44c26156ed16d576fda4d1327e3dc51edfbad89d4e755a04cb7941c9d8af3c356e91535c43d5afb98d4412b37b2d6860c0b58ce3f180'
             'ba055d67ba50959cf9c63e456ee3ddd470a8ee2f9a1042bbc5f650e4f00ca2c56738b5170189455b5b510a505308c612a284a3c1077219ffbeaf4370ba5451ff'
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
@@ -119,6 +121,7 @@ package() {
   install -Dm755 RunInTerminal                  $pkgdir/usr/bin/RunInTerminal
   install -Dm755 RunInTerminalOpt               $pkgdir/usr/bin/RunInTerminalOpt
   install -Dm755 RunInTerminalEx                $pkgdir/usr/bin/RunInTerminalEx
+  install -Dm755 eos-sleep-counter              $pkgdir/usr/bin/eos-sleep-counter
   install -Dm755 ChangeDisplayResolution        $pkgdir/usr/bin/ChangeDisplayResolution
   install -Dm755 device-info                    $pkgdir/usr/bin/device-info
   install -Dm755 eos-connection-checker         $pkgdir/usr/bin/eos-connection-checker
