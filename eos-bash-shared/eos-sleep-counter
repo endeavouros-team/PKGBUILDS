@@ -15,7 +15,27 @@
 #   $2 = (optional) prompt to show before showing the remaining seconds
 
 printf2()  { printf "$@" >&2 ; }
-ShowTime() { printf2 "\r%s %-5s\r" "$prompt" "$s" ; }
+
+ShowTime() {
+    CountOfSubtrings() {
+        # how many "substring"s there are in the given "string"
+        local string="$1"
+        local substring="$2"
+        local length=${#string}
+        local sublength=${#substring}
+        
+        string=${string//$substring/}
+        local newlength=${#string}
+        return $(( (length - newlength) / sublength ))
+    }
+
+    CountOfSubtrings "$prompt" "%s"
+    case "$?" in
+        1) printf2 "\r$prompt\r" "$s" ;;
+        2) printf2 "\r$prompt\r" "$s" "$seconds" ;;
+        *) printf2 "unsupported prompt '%s'\n" "$prompt" ;;
+    esac
+}
 
 Main() {
     local -r seconds="$1"
@@ -24,7 +44,7 @@ Main() {
     local ret=0
     local str=""
 
-    [ -n "$prompt" ] || prompt="Seconds left:"
+    [ -n "$prompt" ] || prompt="Waiting %s/%s seconds before closing (Ctrl-S = pause, Ctrl-Q = continue)"
 
     for ((s=seconds; s>0; s--)) ; do
         ShowTime

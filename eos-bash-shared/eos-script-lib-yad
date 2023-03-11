@@ -348,7 +348,6 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
                 --no-enter-wait | no-enter-wait) ;;
                 sleep=*)
                     local waittime="${waitopt#*=}"
-                    echo "echo Waiting $waittime seconds before closing."   >> "$tmpfile"
                     echo "eos-sleep-counter $waittime"                      >> "$tmpfile"
                     ;;
                 *)
