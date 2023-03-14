@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=19
+pkgrel=20
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -89,7 +89,7 @@ package() {
     install -Dm755 githubcheck                 "$_lob/githubcheck"
     install -Dm755 mirrorcheck                 "$_lob/mirrorcheck"
 
-    install -Dm644 eos-mirrorcheck.conf        "$_etc/_eos-mirrorcheck.conf"
+    install -Dm644 eos-mirrorcheck.conf        "$_etc/eos-mirrorcheck.conf"
 
     # common completions
     install -Dm644 mirrorcheck.completion        "$_cpl/mirrorcheck"
