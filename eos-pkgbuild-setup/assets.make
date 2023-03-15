@@ -791,31 +791,36 @@ ShowOldCompressedPackages() {
     done
 }
 
+_ASSERT_() {
+    local ret=0
+    "$@" &> /dev/null || ret=$?
+    if [ $ret -ne 0 ] ; then
+       echo "'$*' failed" >&2
+       exit $ret
+    fi
+}
+
 _pkgbuilds_eos_hook()
 {
     # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
 
-    local dir_above_pkgbuilds="$PKGBUILD_ROOTDIR"/..
-    local conf=assets.conf
+    local PKGBUILDS=PKGBUILDS
 
-    pushd "$dir_above_pkgbuilds" >/dev/null || {
-        echo2 "Error: $conf: cannot cd to '$dir_above_pkgbuilds'."
-        exit 1
-    }
-    rm -rf "$PKGBUILD_ROOTDIR"
-    git clone https://github.com/endeavouros-team/PKGBUILDS.git >& /dev/null || {
-        echo2 "Error: $conf: git clone https://github.com/endeavouros-team/PKGBUILDS.git failed."
-        Popd
-        exit 1
-    }
-    rm -rf "$PKGBUILD_ROOTDIR"/.git
-    touch "$PKGBUILD_ROOTDIR"/NOTE-THIS-IS-A-TEMPORARY-FOLDER
-    popd >/dev/null
-}
-
-RunPreHooksEOS()
-{
-    test "$SIGNER" = "EndeavourOS" && _pkgbuilds_eos_hook
+    if [ -d "$ASSETSDIR/.$REPONAME/$PKGBUILDS/.git" ] ; then
+        _ASSERT_ pushd "$ASSETSDIR/.$REPONAME/$PKGBUILDS"
+        printf "git pull... " >&2
+        _ASSERT_ git pull
+    else
+        local GITPKGBUILDSURL=https://github.com/endeavouros-team/$PKGBUILDS.git
+        _ASSERT_ pushd "$ASSETSDIR"
+        printf "git clone... " >&2
+        _ASSERT_ git clone "$GITPKGBUILDSURL"                              # get PKGBUILDS.git
+        _ASSERT_ mkdir ".$REPONAME"
+        _ASSERT_ mv "$PKGBUILDS" ".$REPONAME/$PKGBUILDS"
+        ln -s ".$REPONAME/$PKGBUILDS"
+    fi
+    echo "done" >&2
+    _ASSERT_ popd
 }
 
 RunPreHooks()
@@ -823,14 +828,19 @@ RunPreHooks()
     if [ "$repoup" = "1" ] ; then
         return
     fi
-    RunPreHooksEOS
-    if [ -n "$ASSET_HOOKS" ] ; then
-        ShowIndented "Running asset hooks"
-        local xx
-        for xx in "${ASSET_HOOKS[@]}" ; do
-            $xx
-        done
-        echo2 "done."
+
+    ShowIndented "Running asset hooks..."
+
+    if [ "$SIGNER" = "EndeavourOS" ] ; then
+        _pkgbuilds_eos_hook
+    else
+        if [ -n "$ASSET_HOOKS" ] ; then
+            local xx
+            for xx in "${ASSET_HOOKS[@]}" ; do
+                $xx
+            done
+            echo2 "done."
+        fi
     fi
 }
 
