@@ -26,7 +26,7 @@ arch=(any)
 license=('GPL2')
 depends=('perl')
 
-sha512sums=('20b148e3ffa1a57509e1bdab091ae36df04f363c7ca54e1decc15c14325df85b3d100e4b9a1e5884c18d47d45066b029bd450c9588f3103c03ad102d348869ad')
+sha512sums=('ea2c497fceaf38d2ca671e8a6a9b6e7c73e5c858decf1920598983f012cd6e5a199767ded6f70534f9874a28bd9b31268fc005d27e937d46bdc51d97d012a063')
 
 package() {
     local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
