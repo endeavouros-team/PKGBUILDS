@@ -336,7 +336,7 @@ eos_yad_RunCmdTermBashOpt() {  # like eos_yad_RunCmdTermBash, but supports certa
     mkdir -p "$HOME/.cache"
     local tmpfile; tmpfile=$(mktemp "$HOME/.cache/${FUNCNAME[0]}.XXXXX")
 
-    trap "sleep 0.2; rm -f $tmpfile" EXIT
+    trap "sleep 0.2; rm -f '$tmpfile'" EXIT
 
     echo "#!/bin/bash"                                   >> "$tmpfile"
     test -n "$prompt" && echo "echo $prompt"             >> "$tmpfile"
