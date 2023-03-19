@@ -329,3 +329,9 @@ _tr_add2 ins_custom_tip              "Comment personnaliser le processus d'insta
 # 15-juillet-2022
 _tr_add2 daily_assist_anews          "Dernières nouvelles Arch"
 _tr_add2 daily_assist_anewstip       "Montre les dernières nouvelles d'Arch dans un navigateur"
+
+# 20-fevrier-2023
+_tr_add2 ins_customized              "Récupérer le fichier de personnalisation de l'installation (avancé)"
+_tr_add2 ins_cust_text               "Donnez l'URL de votre fichier user_commands.bash personnalisé"
+_tr_add2 ins_cust_text2              "Le fichier récupéré remplacera ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Cette fonction est surtout utile pour les installations <b>en ligne</b>."
