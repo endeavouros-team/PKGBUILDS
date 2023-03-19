@@ -212,14 +212,17 @@ _Updpkgsums() {
 
 _Get_pkgver() {
     local Pkgbuild="$1"
-    grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2 | sed "s|^[\"']\(.*\)[\"']$|\1|"
+    # grep "^pkgver=" "$Pkgbuild" | cut -d '=' -f 2 | sed "s|^[\"']\(.*\)[\"']$|\1|"
+    local val=""
+    GetPkgbuildValue "$Pkgbuild" pkgver val
+    echo "$val"
 }
 
-_GetSource0() {
-    local Pkgbuild="$1"
-    source "$Pkgbuild"
-    echo "${source[0]}"
-}
+#_GetSource0() {
+#    local Pkgbuild="$1"
+#    source "$Pkgbuild"
+#    echo "${source[0]}"
+#}
 
 _fetch_that_file() {
     local file="$1"
@@ -278,8 +281,11 @@ _rate-mirrors_hook() {
 }
 _paru_hook() {
     local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
-    local Pkgver=$(grep ^pkgver= "$PKGBUILD" | cut -d'=' -f2)
-    local Pkgrel=$(grep ^pkgrel= "$PKGBUILD" | cut -d'=' -f2)
+    local Pkgver=""   # =$(grep ^pkgver= "$PKGBUILD" | cut -d'=' -f2)
+    local Pkgrel=""   # =$(grep ^pkgrel= "$PKGBUILD" | cut -d'=' -f2)
+
+    GetPkgbuildValue "$PKGBUILD" pkgver Pkgver
+    GetPkgbuildValue "$PKGBUILD" pkgrel Pkgrel
 
     if [ "${Pkgver}-$Pkgrel" = "1.11.1-1" ] ; then
         sed -i "$PKGBUILD" \
@@ -305,8 +311,13 @@ _eos-lightdm-gtk-theme_hook() {
 _bashdb_hook() {
     local Pkgname="$(__generic_get_pkgname $FUNCNAME)"
     local Pkgbuild="$PKGBUILD_ROOTDIR"/$Pkgname/PKGBUILD
+    local VER=""
+    local PKGREL=""
 
-    if [ "$(grep "^_ver=" "$Pkgbuild" | cut -d'=' -f2)" = "'5.0-1.1.2'" ] ; then
+    GetPkgbuildValue "$Pkgbuild" _ver VER
+
+    # if [ "$(grep "^_ver=" "$Pkgbuild" | cut -d'=' -f2)" = "'5.0-1.1.2'" ] ; then
+    if [ "$VER" = "5.0-1.1.2" ] ; then
         # support also bash version 5.1
 
         local line="s/'5.0')/'5.0' | '5.1')/"
@@ -315,7 +326,9 @@ _bashdb_hook() {
             -e "/^[ ]*#sed /a \  sed -i configure -e \"$line\""
 
         # show in pkgrel we changed this package
-        if [ "$(grep ^pkgrel= "$Pkgbuild" | cut -d'=' -f2)" = "'1'" ] ; then
+        GetPkgbuildValue "$Pkgbuild" pkgrel PKGREL
+        # if [ "$(grep ^pkgrel= "$Pkgbuild" | cut -d'=' -f2)" = "'1'" ] ; then
+        if [ "$PKGREL" = "1" ] ; then
             sed -i "$Pkgbuild" \
                 -e 's|^pkgrel=.*|pkgrel=1.1|'
         fi

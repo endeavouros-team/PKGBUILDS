@@ -134,13 +134,35 @@ Popd()  {
     done
 }
 
-Get_PKGBUILD_item_value() {
-    local Pkgbuild="$1"
-    local item="$2"
-    local -n out="$3"
+GetPkgbuildValue() {
+    local PKGBUILD="$1"
+    local varname="$2"
+    local -n retvar="$3"
 
-    out=$(cat "$Pkgbuild" | /usr/bin/grep "^$item=" | cut -d '=' -f2 | sed "s|^[\"']\(.*\)[\"']$|\1|")   # remove possible surrounding quotes
+    source "$PKGBUILD" || return 1
+    case "$varname" in
+        depends)     retvar=("${depends[@]}") ;;
+        makedepends) retvar=("${makedepends[@]}") ;;
+        epoch)       retvar="$epoch" ;;
+        pkgver)      retvar="$pkgver" ;;
+        pkgrel)      retvar="$pkgrel" ;;
+        _ver)        retvar="$_ver" ;;
+        *) return 1 ;;
+    esac
 }
+
+#Get_PKGBUILD_item_value() {
+#    local Pkgbuild="$1"
+#    local item="$2"
+#    local -n out="$3"
+#
+#    if true ; then
+#        GetPkgbuildValue "$Pkgbuild" "$item" "$out"
+#    else
+#        out=$(cat "$Pkgbuild" | /usr/bin/grep "^$item=" | cut -d '=' -f2 | sed "s|^[\"']\(.*\)[\"']$|\1|")   # remove possible surrounding quotes
+#    fi
+#}
+
 
 IsListedPackage() {
     # Is a package one of the listed packages in PKGNAMES?
@@ -179,7 +201,7 @@ HandlePossibleEpoch() {
         cd "$PKGBUILD_ROOTDIR/$pkgname"
     fi
 
-    Get_PKGBUILD_item_value "PKGBUILD" "epoch" Epoch
+    GetPkgbuildValue "PKGBUILD" "epoch" Epoch
 
     if [ -z "$Epoch" ] ; then
         Newname="$pkg"
