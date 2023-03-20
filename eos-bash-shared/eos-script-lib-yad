@@ -180,7 +180,7 @@ eos_notification() {
         --icon="$icon"
         --urgency="$urgency"
         --expire-time="$expiretime"
-        --app-name="appname"
+        --app-name="$appname"
         "$summary"
 	"$body"
     )
