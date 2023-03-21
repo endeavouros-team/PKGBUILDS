@@ -424,9 +424,55 @@ AfterInstall() {
   fi
   tabcontents+=(--field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn  "eos-log-tool" )
   VboxGuestEnable
+
+  case "$CurrentDesktop" in
+      xfce) AddXfceThemingButtons ;;
+  esac
+
   tabcontents+=(--field=" $(ltr after_install_itab)!$WELCOME_ICON_INITIAL_TAB!$(ltr after_install_itab_tip)":fbtn "bash -c WelcomeInitialTab")
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
+}
+
+AddXfceThemingButtons() {
+    XfceTheming() {
+        local -r new_theme="$1"
+        local -r date_time=$(date +%Y%m%d-%H:%M.%S)
+        local -r conf="$HOME/.config"
+        local -r conf2='~/.config'
+        local -r bak=xfce-theme-bak
+        local -r dirs=(xfce4 Thunar)
+        local -r dirs_list=$(echo "${dirs[*]}" | tr ' ' ',')
+        local dir
+        local msg=""
+        msg+="About to change the Xfce theme to '$new_theme'.\n"
+        msg+="The current theme will be saved under folder $conf2/$bak/$date_time\n"
+        msg+="The new theme will be in folders $conf2/{$dirs_list}\n\n"
+        msg+="Accept theme change and reboot now?"
+
+        eos_yad --form --title="Change Xfce theme to $new_theme" --text="$msg" --image=preferences-desktop-theme \
+                --button='yad-cancel!!Do nothing':1 --button='yad-ok!!Accept theme change and reboot now':0
+
+        case "$?" in
+            0)
+                mkdir -p "$conf/$bak/$date_time"
+                for dir in "${dirs[@]}" ; do
+                    mv "$conf/$dir" "$conf/$bak/$date_time/$dir" || return 1                   # save current theme
+                    case "$new_theme" in
+                        EOS) cp -r "/etc/skel/.config/$dir" "$conf/" || return 1 ;;            # apply EOS theme
+                        vanilla) ;;                                                            # will apply vanilla theme after reboot
+                    esac
+                done
+                sleep 1
+                reboot
+                ;;
+        esac
+    }
+    export -f XfceTheming
+    tabcontents+=(
+        --field=" $(ltr after_install_themevan)!preferences-desktop-theme!$(ltr after_install_themevantip)":fbtn "XfceTheming vanilla"
+        --field=" $(ltr after_install_themedef)!preferences-desktop-theme!$(ltr after_install_themedeftip)":fbtn "XfceTheming EOS"
+    )
 }
 
 
@@ -486,10 +532,7 @@ DailyAssistant() {
       --field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications"
   )
 
-  local DE=""
-  eos_yad__detectDE          # lowercase
-
-  if [ -n "$DE" ] ; then
+  if [ -n "$CurrentDesktop" ] ; then
       tabcontents+=(
           --field=" $DE: $(ltr daily_assist_DEinfo)!!$DE: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$DE"
       )
@@ -1103,6 +1146,11 @@ export -f Usage
 #                  to install. Package names are listed as one package name per line.
 #                  Empty lines and comments (lines starting with character #) are allowed.
 
+GetCurrentDesktop() {
+    local -n _de="$1"
+    local DE="" ; eos_yad__detectDE
+    _de="$DE"
+}
 
 GetIsoVersion() {
     if [ -z "$ISO_VERSION" ] ; then
@@ -1147,6 +1195,9 @@ StartHere() {
     local show_predefined_buttons_at_own_commands="yes"
     local has_a_connection=no
     local ISO_VERSION=""                      # only for the installer
+    local CurrentDesktop=""
+
+    GetCurrentDesktop CurrentDesktop
 
     if eos-connection-checker ; then
         has_a_connection=yes
