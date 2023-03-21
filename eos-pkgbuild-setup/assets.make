@@ -471,18 +471,19 @@ GetRemoteAssetNames() {
 }
 
 AskFetchingFromGithub() {
-    printf2 "\n%s " "Fetch assets from github (Yes/no/force)?"
+    # printf2 "\n%s " "Fetch assets from github (Yes/no/force)?"
+    printf2 "\n%s " "Fetch assets from github (Y=only if different, n=no, f=yes)? "
     read2
     case "$REPLY" in
         [yY]*|"")
-            echo2 "==> Using remote assets if there are differences."
+            echo2 "==> Using remote assets if there are differences, otherwise local."
             ;;
         [fF]*|"")
-            echo2 "==> Using remote assets without checks."
+            echo2 "==> Using remote assets."
             return 0
             ;;
         *)
-            echo2 "==> Using local assets without checks."
+            echo2 "==> Using local assets."
             echo2 ""
             return 1
             ;;
