@@ -130,7 +130,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
 if false ; then
     PKGNAMES=(
-        eos-lightdm-gtk-theme
+        eos-hooks
+        # eos-lightdm-gtk-theme
         # wgetpaste-eos
         # kernel-install-for-dracut
         # arc-gtk-theme-eos

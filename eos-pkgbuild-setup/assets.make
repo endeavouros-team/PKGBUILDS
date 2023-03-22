@@ -701,6 +701,7 @@ PkgbuildExists() {
     if [ -r "$PKGBUILD_ROOTDIR/$yy/PKGBUILD" ] ; then
         return 0
     else
+        ((no_pkgbuild_count++))
         if [ "$special" != "" ] ; then
             local files=$(ls -l "$PKGBUILD_ROOTDIR/$yy" 2>/dev/null)
             printf2 "WARNING (${PROGNAME}, $special): no PKGBUILD!\n"
@@ -1221,6 +1222,8 @@ Main2()
     local notexist='<non-existing>'
     local cmpresult
     local total_items_to_build=0
+    local items_waiting=0
+    local no_pkgbuild_count=0
     local hookout=""
 
     if [ "$repoup" = "0" ] ; then
@@ -1254,16 +1257,17 @@ Main2()
 
             cmpresult=$(Vercmp "$tmp" "$tmpcurr")
 
+            if IsInWaitList "$xx" "$tmp" ; then
+                ((items_waiting++))
+                ShowResult "WAITING ($tmpcurr ==> $tmp)" "$hookout"
+                continue
+            fi
             if [ $cmpresult -eq 0 ] ; then
                 ShowResult "OK ($tmpcurr)" "$hookout"
                 continue
             fi
             if DowngradeProbibited "$cmpresult" "$allow_downgrade" ; then
                 ShowResult "OK ($tmpcurr)" "$hookout"
-                continue
-            fi
-            if IsInWaitList "$xx" "$tmp" ; then
-                ShowResult "WAITING ($tmpcurr ==> $tmp)" "$hookout"
                 continue
             fi
 
@@ -1283,10 +1287,16 @@ Main2()
         fi
         Popd
 
-        #if [ $total_items_to_build -eq 0 ] ; then
-        #    total_items_to_build=NONE
-        #fi
-        printf2 "\nItems to build: %s/%s\n" "$total_items_to_build" "${#PKGNAMES[@]}"
+        if true ; then
+            [ $total_items_to_build -eq 0 ] && total_items_to_build=NONE
+            printf2 "\nItems to build: %s/%s\n" "$total_items_to_build" "${#PKGNAMES[@]}"
+        fi
+        if [ "$items_waiting" != "0" ] ; then
+            printf2   "Items waiting:  %s\n" "$items_waiting"
+        fi
+        if [ "$no_pkgbuild_count" != "0" ] ; then
+            printf2   "No PKGBUILD:    %s\n" "$no_pkgbuild_count"
+        fi
 
         if true ; then
             ExplainHookMarks
