@@ -24,6 +24,7 @@ _other_reboot_required() {
             /usr/bin/notify-send
             --icon=system-reboot
             --urgency=critical
+            --app-name="eos-reboot-required"
             "'$title'"
             "'$msg'"
         )
