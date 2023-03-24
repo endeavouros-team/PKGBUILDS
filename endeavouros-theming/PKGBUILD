@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=endeavouros-theming
-pkgver=22.12.1.1
+pkgver=22.12.1.2
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('5455deadc4decccaf47a44d04890ce934e9c0ead73039ff5ef1b529dedbf2b098cec01724c84d4524bc04abf4c37591e79c9b9c0a4f1fd0134cf836eb8486574')
+sha512sums=('8b4da80ba0dfa983406c3558c74d3d9f76346725942385ae36ab41cbb299baa3a0278a3011144fa59b33a56b74ee73a44165da432af9add1eeab683ba2c87b0e')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -18,6 +18,7 @@ package() {
   install -Dm644 *.png *.svg -t "${pkgdir}/usr/share/endeavouros"
   install -Dm644 endeavouros.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
   install -Dm644 endeavouros-icon.png  -t "${pkgdir}/usr/share/pixmaps"
+  install -Dm644 endeavouros-dark.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
   
   if [ "${CARCH}" = "aarch64" ]; then
     install -Dm644 backgrounds/endeavouros-arm-wallpaper.png "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"
@@ -25,7 +26,12 @@ package() {
     install -Dm644 backgrounds/endeavouros-wallpaper.png "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"
   fi
 
-  # make symlinks for KDE:
+  # make symlinks for KDE and GNOME:
   ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.png"
   ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.svg"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-light.svg"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-light.png"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-light.svg"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros-dark.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.png"
+  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros-dark.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.svg"
 }
