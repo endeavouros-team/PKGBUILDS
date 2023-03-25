@@ -534,7 +534,7 @@ DailyAssistant() {
 
   if [ -n "$CurrentDesktop" ] ; then
       tabcontents+=(
-          --field=" $DE: $(ltr daily_assist_DEinfo)!!$DE: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$DE"
+          --field=" $CurrentDesktop: $(ltr daily_assist_DEinfo)!!$CurrentDesktop: $(ltr daily_assist_DEinfo_tip)":fbtn   "WelcomeBrowser https://wiki.archlinux.org/title/$CurrentDesktop"
       )
   fi
 
