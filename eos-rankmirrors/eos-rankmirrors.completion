@@ -31,9 +31,9 @@ _eos-rankmirrors_() {
     local cur prev #words cword split
     _init_completion -s || return
 
-    # local opts="$(eos-rankmirrors --dump-options)"   # alternative, slower
+    # local opts=( --help -h --sort --ignore --prefer --timeout -t --verbose --mirror-verbosity --no-save -n )
+    local opts="$(eos-rankmirrors --dump-options)"   # alternative, slower
 
-    local opts=( --help -h --sort --ignore --prefer --timeout -t --verbose --mirror-verbosity --no-save -n )
     local verbosities=( all code show none )
 
     # Handle options that need sub-options.

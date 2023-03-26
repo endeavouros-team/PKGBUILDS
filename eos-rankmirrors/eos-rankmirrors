@@ -193,6 +193,12 @@ GetReferenceUpdateLevel() {
 FetchLatestMirrorlist() {
     # Grab endeavouros-mirrorlist from the package cache, or fetch it from github/gitlab.
 
+    if [ "$use_local_mirrorlist" = "yes" ] ; then
+        # Use file /etc/pacman.d/endeavouros-mirrorlist. Remove potential ranking results first.
+        sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' /etc/pacman.d/endeavouros-mirrorlist  > $latest_ml
+        return
+    fi
+
     local pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
     if [ -n "$pkg" ] ; then
         # the package exists in the cache
@@ -340,13 +346,14 @@ WriteSystemMirrorlist() {
 DumpOptions() {
     local all_user_options=(
         --help -h
-        --sort
         --ignore
-        --prefer
-        --timeout -t
-        --verbose
         --mirror-verbosity
         --no-save -n
+        --prefer
+        --sort
+        --timeout -t
+        --use-local-mirrorlist
+        --verbose
     )
     echo "${all_user_options[*]}"
     exit 0
@@ -354,7 +361,7 @@ DumpOptions() {
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:,mirror-verbosity:,dump-options"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:,mirror-verbosity:,dump-options,use-local-mirrorlist"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -412,6 +419,9 @@ Options:
              Note that the list must be enclosed in single quotes.
              Example:
                  eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
+  --use-local-mirrorlist
+             For testing purposes.
+             Uses information in local $mlfolder/$pkgname as the base for ranking.
 
   --verbose
              Show more detailed output.
@@ -439,6 +449,8 @@ EOF
                 ignored_mirrors="$2" ; shift ;;
             --prefer)
                 preferred_mirrors="$2" ; shift ;;
+            --use-local-mirrorlist)
+                use_local_mirrorlist=yes ;;
             --timeout | -t)
                 timeout="$2" ; shift ;;
             --verbose)
@@ -494,6 +506,7 @@ Main()
     local reference_level=""
     local -r mirror_verbosity_def="show"
     local mirror_verbosity=""
+    local use_local_mirrorlist=no
 
     if [ ! -r "$eos" ] ; then               # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
