@@ -4,7 +4,7 @@
 
 pkgname=nvidia-inst
 pkgver=23
-pkgrel=2
+pkgrel=3
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
@@ -26,7 +26,7 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.bash-completion
 )
-sha512sums=('f402d1b11d314e57ef4cc1497a7abb41ada135b27e74b34010270616461e62800e56d1ce89e513ba997d62b5387cd2ca492e34b5a2b7f82f3414701209e20eec'
+sha512sums=('81afd8fbb44aa89d22ea3a11cffc8f1eb2602cc6150a4d68faabcb4ad58524092d80a380477fa108eff66e60eaa6eb512fff328c98a345dbde77035aecdd2016'
             'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6')
 
 package() {
