@@ -257,25 +257,37 @@ MirrorRankingButtons() {
 }
 export -f MirrorRankingButtons
 
+ButtonsMayHide() {
+  local -n _text_="$1"
+  if [ "$has_a_connection" = "no" ] ; then
+      _text_+="\nNote: no internet connection available, some buttons are hidden or do not work."
+  fi
+}
+
 INSTALL() {
   local handle="$1"
   local tabnum="$2"
-  local _exclamation='&#33;'   # '!'
   local btdoc="https://discovery.endeavouros.com/bluetooth/bluetooth/2021/03"
   local INSTALLER_BROWSER=firefox
+  local text="<b>$(ltr ins_text)</b>"
+
+  ButtonsMayHide text
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form  --columns=2
       --image=$WELCOME_ICON_INSTALL_OFFICIAL                       # $WELCOME_ICON_INSTALL_TAB
-      --text="<b>$(ltr ins_text)</b>" --text-align=left
+      --text="$text"
+      --text-align=left
 
       --field=" $(ltr ins_start)!$WELCOME_ICON_INSTALL_OFFICIAL!$(ltr ins_starttip)":fbtn                   "eos-install-mode-run-calamares '$lang' ''"
       --field=" $(ltr install_community)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr install_community_tip)":fbtn "eos-install-mode-run-calamares '$lang' community"
       --field=" EndeavourOS ARM Image Installer!calamares!Start installing EndeavourOS ARM edition":fbtn    "arm-eos-welcome-installer"
-      --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_custom_tip)":fbtn               "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
   )
   if [ "$has_a_connection" = "yes" ] ; then
+      tabcontents+=(
+          --field=" $(ltr ins_custom)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_custom_tip)":fbtn "$INSTALLER_BROWSER 'https://discovery.endeavouros.com/installation/customizing-the-endeavouros-install-process/2022/03'"
+      )
       MirrorRankingButtons
   fi
 
@@ -287,17 +299,12 @@ INSTALL() {
   if [ "$has_a_connection" = "yes" ] ; then
       tabcontents+=(
           --field=" $(ltr ins_blue_notes)!$WELCOME_ICON_BLUETOOTH_INFO!$(ltr ins_blue_notes_tip)":fbtn    "$INSTALLER_BROWSER '$btdoc'"
+          --field=" $(ltr ins_rel)!$WELCOME_ICON_LATEST_RELEASE!$(ltr ins_reltip)":fbtn                   "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
+          --field=" $(ltr ins_tips)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_tipstip)":fbtn              "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
+          --field=" $(ltr ins_syslog)!$WELCOME_ICON_SYSTEM_LOGS_HOWTO!$(ltr ins_syslogtip)":fbtn          "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
+          --field=" $(ltr ins_customized)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr ins_cust_text)":fbtn      "AskUserCustomUrl"
       )
   fi
-  tabcontents+=(
-      --field=" $(ltr ins_rel)!$WELCOME_ICON_LATEST_RELEASE!$(ltr ins_reltip)":fbtn              "$INSTALLER_BROWSER https://endeavouros.com/latest-release"
-      --field=" $(ltr ins_tips)!$WELCOME_ICON_INSTALLATION_TIPS!$(ltr ins_tipstip)":fbtn            "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/installation"
-      # --field=" $(ltr ins_trouble)!$WELCOME_ICON_SYSTEM_RESCUE!$(ltr ins_troubletip)":fbtn      "$INSTALLER_BROWSER https://discovery.endeavouros.com/category/system-rescue"
-      --field=" $(ltr ins_syslog)!$WELCOME_ICON_SYSTEM_LOGS_HOWTO!$(ltr ins_syslogtip)":fbtn        "$INSTALLER_BROWSER https://discovery.endeavouros.com/forum-log-tool-options/how-to-include-systemlogs-in-your-post"
-      # --field=" $(ltr ins_logtool)!$WELCOME_ICON_SYSTEM_LOGS!$(ltr ins_logtooltip)":fbtn           "eos-log-tool"
-
-      --field=" $(ltr ins_customized)!$WELCOME_ICON_INSTALL_COMMUNITY!$(ltr ins_cust_text)":fbtn   "AskUserCustomUrl"
-  )
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -321,11 +328,16 @@ export -f AskUserCustomUrl
 GeneralInfo() {
   local handle="$1"
   local tabnum="$2"
+  local text="<b>$(ltr general_info_text)</b>"
+
+  ButtonsMayHide text
+
   local tabcontents=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$WELCOME_ICON_QUESTION
-      --text="<b>$(ltr general_info_text)</b>" --text-align=left
+      --text="$text"
+      --text-align=left
       --field=" $(ltr general_info_ws)!$WELCOME_ICON_WEBSITE!https://endeavouros.com":fbtn          "WelcomeBrowser https://endeavouros.com"
       --field=" $(ltr general_info_wi)!$WELCOME_ICON_WIKI!$(ltr general_info_witip)":fbtn        "WelcomeBrowser https://discovery.endeavouros.com"
       --field=" $(ltr general_info_ne)!$WELCOME_ICON_NEWS!$(ltr general_info_netip)":fbtn        "WelcomeBrowser https://endeavouros.com/news"
@@ -385,6 +397,9 @@ export -f UpdateWithEosAurHelper
 AfterInstall() {
   local handle="$1"
   local tabnum="$2"
+  local text="<b>$(ltr after_install_text)</b>"
+
+  ButtonsMayHide text
 
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
@@ -394,7 +409,7 @@ AfterInstall() {
       eos_yad --align-buttons
       --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
-      --text="<b>$(ltr after_install_text)</b>" --columns=2
+      --text="$text" --columns=2
   )
   MirrorRankingButtons
   tabcontents+=(
@@ -494,6 +509,9 @@ PacdiffIcon() {
 DailyAssistant() {
   local handle="$1"
   local tabnum="$2"
+  local text="<b>$(ltr daily_assistant_text)</b>"
+
+  ButtonsMayHide text
 
   local _exclamation='&#33;'   # '!'
   local _and='&#38;'           # '&'
@@ -506,7 +524,7 @@ DailyAssistant() {
   local tabcontents=(
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
-      --text="<b>$(ltr daily_assistant_text)</b>" --columns=2
+      --text="$text" --columns=2
       --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
       --field=" $(ltr after_install_us) (UpdateInTerminal)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
@@ -591,12 +609,15 @@ UsefulTips() {
   local handle="$1"
   local tabnum="$2"
   local _and='&#38;'           # '&'
+  local text="<b>$(ltr useful_tips_text)</b>"
+
+  ButtonsMayHide text
 
   local tabcontents+=(
       eos_yad --align-buttons --use-interp
       --plug="$handle" --tabnum="$tabnum" --form --columns=2
       --image=$WELCOME_ICON_TIPS
-      --text="<b>$(ltr useful_tips_text)</b>"
+      --text="$text"
 
       --field=" $(ltr after_install_pm)!$WELCOME_ICON_TIPS!$(ltr after_install_pmtip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/?s=pacman'"
       --field=" $(ltr after_install_ay)!$WELCOME_ICON_TIPS!$(ltr after_install_aytip)":fbtn     "WelcomeBrowser 'https://discovery.endeavouros.com/category/aur'"
@@ -622,6 +643,7 @@ UsefulTips() {
 AddMoreApps() {
   local handle="$1"
   local tabnum="$2"
+  local text=""
 
   local tabcontents=(
       eos_yad --align-buttons --use-interp
@@ -644,10 +666,12 @@ AddMoreApps() {
   # Now we know if we have any apps in the install list.
 
   if [ $shown_app_buttons -eq 0 ] ; then
-      tabcontents+=(--text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>")
+      text="<b>$(ltr add_more_apps_done1_text)$(ltr add_more_apps_done2_text)</b>"
   else
-      tabcontents+=(--text="<b>$(ltr add_more_apps_text) $(ltr add_more_apps_done2_text)</b>")
+      text="<b>$(ltr add_more_apps_text) $(ltr add_more_apps_done2_text)</b>"
   fi
+  ButtonsMayHide text
+  tabcontents+=(--text="$text")
 
   [ "$handle" != "calculate" ] && "${tabcontents[@]}" >& /dev/null &
 }
@@ -1416,21 +1440,29 @@ StartHere() {
     fi
     notebook+=(--active-tab=$active_tab_nr)
 
-    notebook+=(--button=" $(ltr butt_softnews)!$WELCOME_ICON_APPDEV!$(ltr butt_softnews_tip)":"ImportantNews")
-    notebook+=(--button=" $(ltr butt_changelog)!$WELCOME_ICON_CHANGELOG!$(ltr butt_changelogtip)":"WelcomeChangelog")
+    if [ "$has_a_connection" = "yes" ] ; then
+        notebook+=(--button=" $(ltr butt_softnews)!$WELCOME_ICON_APPDEV!$(ltr butt_softnews_tip)":"ImportantNews")
+        notebook+=(--button=" $(ltr butt_changelog)!$WELCOME_ICON_CHANGELOG!$(ltr butt_changelogtip)":"WelcomeChangelog")
+    fi
     case "$EOS_WELCOME_HAS_SEE_YOU_LATER_BUTTON" in
         yes)
-            notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
+            if [ "$has_a_connection" = "yes" ] ; then
+                notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
+            fi
             if [ "$is_installing" = "no" ] ; then
                 notebook+=(--button=" $(ltr butt_noshow)!$WELCOME_ICON_LEAVE!$(ltr butt_noshow)":5)
             fi
             notebook+=(--button=" $(ltr butt_later)!face-cool!$(ltr butt_latertip)":0)
             ;;
         no|*)
-            if [ "$is_installing" = "no" ] ; then
-                notebook+=(--button=" $(ltr butt_noshow)!$WELCOME_ICON_LEAVE!$(ltr butt_noshow)":5)
+            if [ "$has_a_connection" = "yes" ] ; then
+                if [ "$is_installing" = "no" ] ; then
+                    notebook+=(--button=" $(ltr butt_noshow)!$WELCOME_ICON_LEAVE!$(ltr butt_noshow)":5)
+                fi
+                notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
+            else
+                notebook+=(--button=yad-quit:1)
             fi
-            notebook+=(--button=" $(ltr butt_help)!$WELCOME_ICON_HELP_CONTENTS!":"WelcomeHelp")
             ;;
     esac
 

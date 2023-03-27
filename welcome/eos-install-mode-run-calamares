@@ -130,28 +130,26 @@ Calamares_Start() {
 AskMode() {
     local ret=0
 
-    if false ; then
-        local cmd=(
-            eos_yad --form
-            --title="$(ltr cal_choose)"
-            --text="$(ltr cal_info3)$(ltr cal_info2)"
-            --image=$WELCOME_ICON_INSTALL_OFFICIAL
-            --buttons-layout=spread
-            --button="Online!!Vanilla theming, internet required":12
-            --button="Offline!!Xfce, EndeavourOS theming, internet not required":14
-        )
-    else
-        local cmd=(
+    local cmd=(
             eos_yad --form
             --title="$(ltr cal_choose)"
             --text="$(ltr cal_choose)"
             --image=$WELCOME_ICON_INSTALL_OFFICIAL
-            --field="$(ltr cal_info3)":LBL ""
-            --field="$(ltr cal_info2)":LBL ""
             --columns=2
             --height=200 --width=500 --scroll
             --buttons-layout=spread
+    )
+    if [ $has_connection = yes ] ; then
+        cmd+=(
+            --field="$(ltr cal_info3)":LBL ""
+            --field="$(ltr cal_info2)":LBL ""
             --button="Online!!Vanilla theming, internet required":11
+            --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
+        )
+    else
+        # without connection only offline is possible
+        cmd+=(
+            --field="$(ltr cal_info2)":LBL ""
             --button="Offline!!Xfce, EndeavourOS theming, internet not required":13
         )
     fi
@@ -167,8 +165,6 @@ AskMode() {
         13|14) mode=offline ;;
         252|*) exit $ret ;;
     esac
-    #ShowInstallLog=$(echo "$result" | cut -d'|' -f1)
-    #ShowPacmanLog=$( echo "$result" | cut -d'|' -f2)
 }
 
 ### Starts the calamares installer process and logging. ###
@@ -264,6 +260,9 @@ CheckUserPkglist() {
 ###  Everything starts in the Main function. ###
 Main() {
     local progname="$(basename "$0")"           # for help and messages
+    local has_connection=no
+
+    eos-connection-checker && has_connection=yes
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     export -f eos_yad
@@ -298,7 +297,7 @@ Main() {
         "" | test) AskMode ;;    # ask the value for $mode
     esac
 
-    if eos-connection-checker ; then
+    if [ $has_connection = yes ] ; then
         run_hotfix_start              # run possible hotfixes before copying settings.conf file
     fi
 
