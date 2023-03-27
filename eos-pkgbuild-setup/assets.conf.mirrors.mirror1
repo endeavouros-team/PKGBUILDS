@@ -145,7 +145,6 @@ fi
 # If all versions of a package should be in wait mode, write only the package name, e.g. 'eos-lxdm-gtk3'.
 #
 PKGNAMES_WAIT=(
-    eos-hooks
     filesystem
     lsb-release
 )
