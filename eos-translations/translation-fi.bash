@@ -341,3 +341,6 @@ _tr_add2 ins_cust_text               "Anna URL muokattuun user_commands.bash-tie
 _tr_add2 ins_cust_text2              "Haettu tiedosto korvaa tiedoston ~/user_commands.bash"
 _tr_add2 ins_cust_text3              "Tämä on hyödyllisintä <b>online</b>-asennuksessa"
 
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Huom: internet-yhteys ei saatavilla, osa nappuloista on näkymättömissä tai ei toimi,"
+

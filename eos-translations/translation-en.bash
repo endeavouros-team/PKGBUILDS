@@ -341,3 +341,6 @@ _tr_add2 ins_cust_text               "Give URL to your customized user_commands.
 _tr_add2 ins_cust_text2              "The fetched file will replace ~/user_commands.bash"
 _tr_add2 ins_cust_text3              "This is most useful for <b>online</b> install"
 
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Note: no internet connection available, some buttons are hidden or do not work."
+
