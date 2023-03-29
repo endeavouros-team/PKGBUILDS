@@ -260,7 +260,7 @@ export -f MirrorRankingButtons
 ButtonsMayHide() {
   local -n _text_="$1"
   if [ "$has_a_connection" = "no" ] ; then
-      _text_+="\nNote: no internet connection available, some buttons are hidden or do not work."
+      _text_+="\n$(ltr ins_no_connection)"
   fi
 }
 
