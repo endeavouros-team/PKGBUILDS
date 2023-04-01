@@ -126,7 +126,7 @@ GetNvidiaVersions() {
     local versions=$(curl --fail -Lsm $curl_timeout -o- "$starting_url")
     ret=$?
     [ -n "$versions" ] || DIE "Fetching Nvidia driver info from '$starting_url' failed (curl code $ret). Please try again later."
-    versions=$(echo "$versions" | grep "x86_64/AMD64" | sed 's|<br>|<br>\n|g')
+    versions=$(echo "$versions" | grep "x86_64/AMD64" | sed -e 's|<br>|<br>\n|g' -e 's|</a>|\n</a>|g')
     versions=$(echo "$versions" | sed -E "s|.*>([0-9\.]+).*|\1|" | grep -Pv 'AMD64|Archive')
 
     for n in $versions ; do
