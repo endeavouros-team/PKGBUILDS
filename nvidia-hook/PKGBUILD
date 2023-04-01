@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=nvidia-hook
-pkgver=1.2
+pkgver=1.3
 pkgrel=1
 pkgdesc='pacman hook for nvidia'
 arch=('any')
@@ -14,7 +14,7 @@ source=(
   $_url/eos-nvidia-fix.hook
 )
 sha512sums=('38754946ed17c69eb4759bd1f4bb49da9c276e8b5e032b44f222c24d7023ca563cdbb90163f1c9c1ea21f6cb6f3d10a0020f89d7a9a13b6cb452c0b43713ac6d'
-            '7af7626287d9cb4292e2022e50fa2e82f7715374273ff6f5f5105f3fc0127627d1465cbd4438b2386ff35363a957cd9fcf1458f0d2588a23e6a613f7cb25c0ea')
+            'ca4ca4060aa59718e917cc05deeb65f03f8e5c393d9945262ee46f7f47845ae74c364fae3b0695d65a5577b64995363405bf95d4c8299b4458bc7d22c5974b24')
 
 package() {
   install -Dm755 eos-nvidia-fix       "$pkgdir/usr/bin/eos-nvidia-fix"
