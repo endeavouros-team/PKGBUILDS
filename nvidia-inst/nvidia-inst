@@ -426,6 +426,7 @@ AllRemovables() {
 
     # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
     # Currently we support the [kernel-lts] repo which contains some older Nvidia drivers.
+    # EDIT: [kernel-lts] is no more supported.
 
     if [ 0 -eq 1 ] ; then
         # nvidia packages from AUR:
@@ -555,6 +556,10 @@ Main()
     local series_now=""      # get it later because of the speed for bash completion
     local series_prev1=470
     local series_prev2=390
+
+    if grep "^\[kernel-lts\]" $pacmanconf >/dev/null ; then
+        DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
+    fi
 
     Options "$@"
 
