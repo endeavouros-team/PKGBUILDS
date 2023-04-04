@@ -819,7 +819,7 @@ _ASSERT_() {
     local ret=0
     "$@" &> /dev/null || ret=$?
     if [ $ret -ne 0 ] ; then
-       echo "'$*' failed" >&2
+       echo2 "'$*' failed"
        exit $ret
     fi
 }
@@ -1287,10 +1287,10 @@ Main2()
         fi
         Popd
 
-        if true ; then
-            [ $total_items_to_build -eq 0 ] && total_items_to_build=NONE
-            printf2 "\nItems to build: %s/%s\n" "$total_items_to_build" "${#PKGNAMES[@]}"
-        fi
+        local exit_code=$total_items_to_build
+        [ $total_items_to_build -eq 0 ] && total_items_to_build=NONE
+        printf2 "\nItems to build: %s/%s\n" "$total_items_to_build" "${#PKGNAMES[@]}"
+
         if [ "$items_waiting" != "0" ] ; then
             printf2   "Items waiting:  %s\n" "$items_waiting"
         fi
@@ -1307,7 +1307,7 @@ Main2()
 
     case "$cmd" in
         dryrun | dryrun-local)
-            Exit 0
+            Exit $exit_code
             ;;
     esac
 
@@ -1321,7 +1321,7 @@ Main2()
         echo2 "Check if building is needed..."
         for xx in "${PKGNAMES[@]}" ; do
             ListNameToPkgName "$xx" no
-            PkgbuildExists "$xx" "line $LINENO" || continue
+            PkgbuildExists "$xx" "line $LINENO ($xx)" || continue
 
             cmpresult=$(Vercmp "${newv[$pkgdirname]}" "${oldv[$pkgdirname]}")
 
