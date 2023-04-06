@@ -1307,7 +1307,7 @@ Main2()
 
     case "$cmd" in
         dryrun | dryrun-local)
-            Exit $exit_code
+            Exit $((exit_code + 100))   # return 100 + number of items that need building
             ;;
     esac
 
