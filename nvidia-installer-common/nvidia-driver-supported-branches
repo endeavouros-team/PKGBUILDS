@@ -123,11 +123,14 @@ GetNvidiaVersions() {
 
     local s n
     local ret=0
-    local versions=$(curl --fail -Lsm $curl_timeout -o- "$starting_url")
+    local versions
+    versions=$(curl --fail -Lsm $curl_timeout -o- "$starting_url")       # get the html data about the versions of the Nvidia drivers
     ret=$?
     [ -n "$versions" ] || DIE "Fetching Nvidia driver info from '$starting_url' failed (curl code $ret). Please try again later."
-    versions=$(echo "$versions" | grep "x86_64/AMD64" | sed -e 's|<br>|<br>\n|g' -e 's|</a>|\n</a>|g')
-    versions=$(echo "$versions" | sed -E "s|.*>([0-9\.]+).*|\1|" | grep -Pv 'AMD64|Archive')
+
+    versions=$(echo "$versions" | grep "Linux x86_64/AMD64")                   # extract the line with only Linux x86_64 versions
+    versions=$(echo "$versions" | sed 's|</a>|</a>\n|g' | grep Latest)         # make each version appear on a separate line
+    versions=$(echo "$versions" | sed -E 's|.*>[ ]*([0-9\.]+)[ ]*<.*|\1|')     # extract version number on each line between '>' and '<' (excluding spaces)
 
     for n in $versions ; do
         [ $(vercmp $n $series_id_out) -lt 0 ] && continue
