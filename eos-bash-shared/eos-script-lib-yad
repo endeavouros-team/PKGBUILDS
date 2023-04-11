@@ -165,7 +165,7 @@ eos_select_browser() {
     eos_yad_WARN "${FUNCNAME[0]}: cannot find a browser"
 }
 
-eos_notification() {
+eos_notification() {   # sending notification to the current user
     local icon="$1"
     local urgency="$2"        # low, normal, critical
     local expiretime="$3"
@@ -188,6 +188,43 @@ eos_notification() {
         cmd+=(--action="$action")
     fi
     "${cmd[@]}"
+}
+
+eos_notification_all() {   # sending notification to all users
+    eos_GetUsers() { /usr/bin/users | sed 's| |\n|g' | sort -u ; }
+
+    local icon="$1"
+    local urgency="$2"        # low, normal, critical
+    local expiretime="$3"     # milliseconds
+    local appname="$4"
+    local summary="$5"        # title
+    local body="$6"           # msg
+    local body_to_tty="$7"    # action not supported!
+
+    [ -n "$urgency" ] || urgency=normal
+
+    [ "$body_to_tty" = "yes" ] && echo "==> INFO: $body" >&2     # meant to print to TTY
+
+    local users=() user userid
+    local cmd=()
+
+    readarray -t users <<< $(eos_GetUsers)
+
+    for user in "${users[@]}" ; do
+        userid=$(/usr/bin/id -u "$user")
+        cmd=(
+            DISPLAY=:0
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$userid/bus
+            notify-send
+            --icon="$icon"
+            --urgency="$urgency"
+            --expire-time="$expiretime"
+            --app-name="$appname"
+            "'$summary'"
+	    "'$body'"
+        )
+        /usr/bin/su "$user" -c "${cmd[*]}"
+    done
 }
 
 eos_yad_terminal() {
