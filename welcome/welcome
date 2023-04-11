@@ -652,16 +652,18 @@ AddMoreApps() {
   )
   local shown_app_buttons=0
 
+  ((shown_app_buttons++))
+  tabcontents+=(--field=" $(ltr add_more_apps_qs)!$EOS_WICON!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
+
+  tabcontents+=(--field=" $(ltr daily_assist_apps)!!$(ltr daily_assist_apps_tip)":fbtn "WelcomeBrowser https://wiki.archlinux.org/title/List_of_applications")
+  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages")
+
   # General app browsing buttons:
   if [ "$(eos_GetArch)" = "armv7h" ] ; then
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinuxarm.org/packages")
   else
       tabcontents+=(--field=" $(ltr add_more_apps_arch)!!$(ltr add_more_apps_done2_tip1)":fbtn "WelcomeBrowser https://www.archlinux.org/packages")
   fi
-  tabcontents+=(--field=" $(ltr add_more_apps_aur)!!$( ltr add_more_apps_done2_tip2)":fbtn "WelcomeBrowser https://aur.archlinux.org/packages")
-
-  ((shown_app_buttons++))
-  tabcontents+=(--field=" $(ltr add_more_apps_qs)!$EOS_WICON!$(ltr add_more_apps_qstip)":fbtn "eos-quickstart")
 
   # Now we know if we have any apps in the install list.
 
