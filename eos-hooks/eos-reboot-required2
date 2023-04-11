@@ -11,7 +11,22 @@ IsRunningKernel() {
     test "$1" = "$running_kernel"
 }
 
-DoNotify() { /usr/bin/eos-reboot-required ; exit 0 ; }
+DoNotify() {
+    local cmd=(
+        eos_notification_all       # function to notify all users
+        system-reboot              # icon
+        critical                   # urgency
+        0                          # expire time (not used!)
+        eos-reboot-required2       # appname
+        # title:
+        "Reboot recommended!"
+        # message:
+        "Reboot is recommended due to the upgrade of core system package(s)."
+    )
+    "${cmd[@]}"
+
+    exit 0
+}
 
 Main() {
     local targets=$(cat)  # list of updated package names from the hook (stdin)
