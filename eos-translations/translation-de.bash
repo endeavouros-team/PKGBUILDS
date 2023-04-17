@@ -342,3 +342,6 @@ _tr_add2 ins_customized              "Lade eine Konfigurations Datei (anspruchsv
 _tr_add2 ins_cust_text               "Nutze alternative URL zu deiner angepassten user_commands.bash"
 _tr_add2 ins_cust_text2              "Die geladene Datei ersetzt ~/user_commands.bash"
 _tr_add2 ins_cust_text3              "Diese Methode ist nur für die <b>online</b> Installation möglich"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Achtung: Keine Internetverbindung verfügbar, einige Schaltflächen fehlen oder funktionieren nicht."
