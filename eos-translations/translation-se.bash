@@ -275,3 +275,6 @@ _tr_add2 ins_customized              "Hämta din installationsanpassningsfil (av
 _tr_add2 ins_cust_text               "Ge URL till din anpassade user_commands.bash"
 _tr_add2 ins_cust_text2              "Den hämtade filen kommer att ersätta ~/user_commands.bash"
 _tr_add2 ins_cust_text3              "Detta är mest användbart för <b>online</b> installation"
+
+_tr_add2 ins_no_connection           "Notera: ingen internetanslutning tillgänglig, vissa knappar är dolda eller fungerar inte som dom ska."
+
