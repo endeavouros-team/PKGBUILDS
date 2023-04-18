@@ -28,6 +28,9 @@ local GITDIR="$ASSETSDIR/../../repo"                # not $REPONAME...
 
 export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD files (e.g. yay) may use this!
 
+local ARCHIVE_GIT="$ASSETSDIR/../../archive/.git"
+local ARCHIVE_TAG=packages
+
 
 # source EndeavourOS-packages-buildlist || exit 1
 
@@ -49,6 +52,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     ckbcomp
 
     downgrade/aur
+    dracut
 
     endeavouros-keyring
     endeavouros-mirrorlist
@@ -147,6 +151,7 @@ fi
 PKGNAMES_WAIT=(
     filesystem
     lsb-release
+    dracut
 )
 
 

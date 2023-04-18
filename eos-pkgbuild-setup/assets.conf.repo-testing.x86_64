@@ -23,6 +23,8 @@ local PREFER_GIT_OVER_RELEASE=yes
 local GITREPOURL=https://github.com/endeavouros-team/eos-tools.git
 local GITREPODIR="$(basename "$GITREPOURL" .git)/$REPONAME"
 #fi
+local ARCHIVE_GIT="$ASSETSDIR/../../archive/.git"
+local ARCHIVE_TAG=repo-testing
 
 
 # package name specifications

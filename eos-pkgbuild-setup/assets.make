@@ -1434,33 +1434,7 @@ Main2()
                     # Save them automatically into an archive at github.
                     # Then downgrading of EOS packages can be supported with app 'eos-downgrade'.
 
-                    local archive_git=""
-                    local archive_tag=""
-
-                    case "$REPONAME" in
-                        endeavouros)
-                            archive_git="$ASSETSDIR"/../../archive/.git
-                            archive_tag=packages
-                            ;;
-                        endeavouros-testing-dev)
-                            archive_git="$ASSETSDIR"/../../archive/.git
-                            archive_tag=repo-testing
-                            ;;
-                        *)
-                            archive_tag=archive
-                            if [ -n "$(HubRelease | grep "$archive_tag")" ] ; then
-                               archive_git="$ASSETSDIR"/.git
-                            else
-                               archive_tag=""
-                            fi
-                            ;;
-                    esac
-                    # This test commented out because it takes too much time!
-                    # if [ -z "$(HubRelease | grep "$archive_tag")" ] ; then
-                    #     archive_tag=""
-                    # fi
-
-                    if [ -n "$archive_tag" ] ; then
+                    if [ -n "$ARCHIVE_TAG" ] ; then
                         local archiving=success
                         local pkg_archive="$ASSETSDIR/PKG_ARCHIVE"
 
@@ -1481,14 +1455,14 @@ Main2()
                             Pushd "$pkg_archive"
 
                             if [ ! -d .git ] ; then
-                                if [ -d "$archive_git" ] ; then
-                                    ln -s "$archive_git"
+                                if [ -d "$ARCHIVE_GIT" ] ; then
+                                    ln -s "$ARCHIVE_GIT"
                                 fi
                             fi
                             if [ -d .git ] ; then
                                 case "$SIGNER" in
-                                    EndeavourOS) archive-sync-to-remote "$archive_tag" ;;
-                                    *)           add-release-assets "$archive_tag" "${removable[@]##*/}" ;;
+                                    EndeavourOS) archive-sync-to-remote "$ARCHIVE_TAG" ;;
+                                    *)           add-release-assets "$ARCHIVE_TAG" "${removable[@]##*/}" ;;
                                 esac
                             else
                                 WARN "the .git folder of the pkg archive was not found"
