@@ -237,23 +237,9 @@ IsoVersion() {
     echo "$VERSION"
 }
 
-test_for_IBT_off() {
-    [ $(vercmp "$(IsoVersion)" "2023.03.06") -gt 0 ] && return
-        
-    if [ "$(device-info --cpu)" = "GenuineIntel" ] ; then
-        # only Intel gen 11 CPU or newer seem to be affected?
-        local cpu_gen=$(inxi -Cazc0 | grep -w gen: | sed -E 's|.* gen: core ([0-9]+) .*|\1|')
-        if [ -n "$cpu_gen" ] ; then
-            [ $cpu_gen -lt 11 ] && return
-        fi
-
-        Note "Kernel parameter 'ibt=off' may be required, see https://wiki.archlinux.org/title/NVIDIA#Installation"
-    fi
-}
-
 ShowCommandsToRun() {
     echo2 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo2 "COMMANDS TO RUN:"
+    echo2 "$commands_to_run_string:"
     local xx
     if [ -n "$cmd" ] ; then
         xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
@@ -295,7 +281,7 @@ ListOptions() {
 
 Options() {
     local opts
-    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries,nouveau,prime,quiet,series:,test,version,it"
+    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries,nouveau,prime,quiet,series:,test,version,it,id:"
     local sopts="bfhnpqtv"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
@@ -338,8 +324,9 @@ Options() {
                 echo "$progname $PROGVERSION"
                 exit 0
                 ;;
-            --it)
-                internal_testing=yes
+            --id)
+                nvidia_card_id="$2"
+                shift
                 ;;
             -h | --help)
                 cat <<EOF >&2
@@ -445,14 +432,10 @@ ProperNvidiaPackages() {
     # because older nvidia drivers may be needed.
 
     local finder=nvidia-driver-supported-branches
-    local testid=""
+    local testid="$nvidia_card_id"     # e.g. 20f3 104a
 
     if [ -z "$series" ] ; then
-        if [ "$internal_testing" = "yes" ] ; then
-            # testid=20f3
-            testid=104a
-        fi
-        series="$($finder $testid | grep ^Series | awk '{print $2}' | tr -d ':')"
+        series="$($finder --hide-nvidia-inst-msgs $testid | grep ^Series | awk '{print $2}' | tr -d ':')"
     fi
 
     case "$series" in
@@ -538,7 +521,6 @@ Main()
     local prime=no
     local quiet=no
     local test=no
-    local internal_testing=no
     local create_conf=no
     local bit32=no
     local ignore_errors=no
@@ -552,6 +534,8 @@ Main()
     local remove=()
     local aurs=()            # collect needed AUR packages in this array
     local cmd=""
+    local nvidia_card_id=""  # for option --id to test any card id
+    local -r commands_to_run_string="COMMANDS TO RUN"
 
     local series_now=""      # get it later because of the speed for bash completion
     local series_prev1=470
@@ -589,8 +573,6 @@ Main()
         fi
     fi
 
-    test_for_IBT_off
-
     ProperNvidiaPackages
 
     # Now all packages in various situations are known.
@@ -608,7 +590,11 @@ Main()
 
     if [ ${#install[@]} -gt 0 ] ; then
         Info "Installing packages: ${install[*]}"
-        cmd="pacman -Syuq --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+        if [ "${#aurs[@]}" -gt 0 ] ; then
+            cmd="yay -Syu ${install[*]}; $cmd"
+        else
+            cmd="pacman -Syuq --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
+        fi
     fi
     if [ ${#remove[@]} -gt 0 ] ; then
         Info "Removing packages: ${remove[*]}"
@@ -621,17 +607,13 @@ Main()
 
     if [ -n "$(printf "%s\n" "${install[@]}" | grep -P "nvidia-390|nvidia-470")" ] ; then
         if [ -n "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
-            txt+="sorry, the [kernel-lts] repo is no more supported."
+            txt+="Sorry, the [kernel-lts] repo is no more supported.\n"
         else
-            txt+="sorry, currently $progname does not support installing Nvidia series 390 and 470 drivers."
+            txt+="Sorry, $progname does not support installing packages from AUR.\n"
         fi
-        DIE "$txt"
     fi
     if [ "${#aurs[@]}" -gt 0 ] ; then
-        txt+="   Sorry, $progname does not support installing packages from AUR.\n"
-        txt+="   Packages missing from currently configured repositories:\n"
-        txt+="       ${aurs[*]}\n"
-        txt+="   Bailing out."
+        txt+="    To continue, manually run all commands from $commands_to_run_string above.\n"
         DIE "$txt"
     fi
     [ "$test" = "yes" ] && return 0   # dryrun
