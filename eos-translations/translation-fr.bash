@@ -335,3 +335,6 @@ _tr_add2 ins_customized              "Récupérer le fichier de personnalisation
 _tr_add2 ins_cust_text               "Donnez l'URL de votre fichier user_commands.bash personnalisé"
 _tr_add2 ins_cust_text2              "Le fichier récupéré remplacera ~/user_commands.bash"
 _tr_add2 ins_cust_text3              "Cette fonction est surtout utile pour les installations <b>en ligne</b>."
+
+# 29-mars-2023
+_tr_add2 ins_no_connection           "Note : aucune connexion internet n'est disponible, certains boutons sont cachés ou ne fonctionnent pas."
