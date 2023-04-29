@@ -304,14 +304,14 @@ _tr_add2 after_install_vbox2         "Para ativar os utilitários VirtualBox Gue
 
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Problemas com a rede por cabo$_question Alternar controlador r8168 e r8169$_exclamation"    # changed 2021-Dec-14 !!
-_tr_add2 after_install_r8168_tip     "Alterna entre controladores r8168 e r8169 (necessário reiniciar)"                        # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Alterna entre controladores r8168 e r8169 (necessário reiniciar)"                           # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "informação"                                                     # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo         "informação"                                                       # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "mais informação acerca deste ambiente gráfico/gestor de janelas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
-_tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qs            "Escolher aplicações populares a instalar"                         # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Escolha aplicações populares e instale-as"
 
 # 2022-Mar-21
@@ -331,6 +331,16 @@ _tr_add2 daily_assist_anews          "Últimas notícias do Arch"
 _tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num navegador"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Há notícias importantes em"
+_tr_add2 nb_nofify_user1             "Há notícias importantes em"                       # one (or more) dates, e.g. 2023-Feb-18
 _tr_add2 nb_nofify_user2             "Clique no botão"                                  # Software News
 _tr_add2 nb_nofify_user3             "no canto inferior esquerdo desta janela."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Obter o ficheiro de personalização da instalação (avançado)"
+_tr_add2 ins_cust_text               "Forneça o URL para o seu user_commands.bash personalizado"
+_tr_add2 ins_cust_text2              "O ficheiro obtido substituirá o ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Isto é mais útil para a instalação <b>online</b>"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Nota: sem ligação à Internet disponível, alguns botões estão ocultos ou não funcionam."
+
