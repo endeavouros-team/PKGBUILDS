@@ -167,7 +167,7 @@ GetYourCountryCode() {
         fi
     done
 
-    DIE "failed to find country code"
+    WARN "failed to find country code"
 }
 
 ArgsYesNo() {
@@ -743,7 +743,10 @@ Main() {
     [ $internal_testing = yes ] && REFLECTOR_SIMPLE_COUNTRY_METHOD=2
 
     local local_country_code="$(GetYourCountryCode)"
-    CCCheck "$local_country_code" >/dev/null || DIE "internal error with country code"
+
+    if [ -n "$local_country_code" ] ; then
+        CCCheck "$local_country_code" >/dev/null || DIE "internal error with country code"
+    fi
     local countrynames
     local countrycodes
     local reflector_info
