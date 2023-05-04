@@ -2,13 +2,13 @@
 
 pkgname=eos-hooks
 pkgver=1.12
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
 license=('GPL3')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
-depends=(libnotify)
+depends=(libnotify eos-bash-shared)
 
 source=(
   $_url/eos-os-release.hook
