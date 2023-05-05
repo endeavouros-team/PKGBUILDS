@@ -3,10 +3,10 @@
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
 pkgver=23
-pkgrel=3
+pkgrel=4
 arch=('any')
 license=('GPL')
-depends=(eos-bash-shared pacman-contrib xdg-utils)
+depends=(eos-bash-shared pacman-contrib xdg-utils libnotify)
 optdepends=(
   "yay:   alternative AUR helper supported by $pkgname"
   "paru:  alternative AUR helper supported by $pkgname"
