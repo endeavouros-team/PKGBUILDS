@@ -1,23 +1,21 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.12
-pkgrel=2
+pkgver=1.13
+pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
 license=('GPL3')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
-depends=(libnotify eos-bash-shared)
+
+depends=()
 
 source=(
   $_url/eos-os-release.hook
   $_url/eos-lsb-release.hook
   $_url/${pkgname}.hook
   $_url/${pkgname}-runner
-  $_url/eos-reboot-required2
-  $_url/eos-reboot-required
-  $_url/eos-reboot-required.hook
 )
 source+=(  # Planned to be removed near the end of year 2023:
   $_url/eos-repo-before-arch-repos
@@ -28,9 +26,6 @@ sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c4
             '20568a779c4ec34e9a79559a125efb1a85aacde8474df4ab9c5f766b6eb7a6b5848c049387f78306ad844e7571cf8a22afc89e6aab18c47b5be419e3d0e4e2e7'
             '11940266adb37425e9b89b448a005a99dfc978ec0c91555cfa78f2e955a35bcd175374b775d7d31a395ce135587be106cbc8ad55eef1a9c933cea1806bf4dcfc'
             'be6f5e4bbc9facbfec771ad29c0724cd8e4e31fcdc091c8c6bf2eddb9be6ff8db4e49e5c1212271edbb9915b8719f4c3e77636715ac9f39804650de0072a36ae'
-            'a9c1fdab062c6a99c69f5e3d9a9212276b92cf9775e5760328618d8654c8cdaada3a57e3d8d10144283af3aa0e199d3299b1c15ac11d220398638b6c41e9b36d'
-            '0d4fa2fc6ab59493603c12f3c1b01849f3b89fd8ad9b79752bdd056098f58424c6d20dfe8804b66a7804818145873789027998dfc8b724371546114458e6066b'
-            '195cc83df58e1f65b43f39202fe60aecf348e843c9c1b414897dbf6577ee7ffc67b1d1ba5ca0325e501cffebd304b6eca90f1c8fd4af4dd75b94fbc7834f59f4'
             '869fed4379749817456417ea17dad002ae0e4343c6cb38ed9c86708bb8ef843bfa77e17bea830c18e905922cc58e0d53c9c73f3270b6686461ee3092cc5ddbe4'
             '22a73598a4e0cea5b25bfa701890b4851962fb5bf88c376ad24f9eed63ce25949d8a26a49f9d2a2729adb04605132ae0e2080789a6f56f832b41aab3ab8688fa')
 
@@ -41,10 +36,7 @@ package() {
   install -Dm644 eos-lsb-release.hook      $hooks/eos-lsb-release.hook
   install -Dm644 eos-os-release.hook       $hooks/eos-os-release.hook
   install -Dm644 ${pkgname}.hook           $hooks/${pkgname}.hook
-  install -Dm644 eos-reboot-required.hook  $hooks/eos-reboot-required.hook
 
-  install -Dm755 eos-reboot-required       $bin/eos-reboot-required
-  install -Dm755 eos-reboot-required2      $bin/eos-reboot-required2
   install -Dm755 ${pkgname}-runner         $bin/${pkgname}-runner
 
   # Planned to be removed near the end of year 2023:
