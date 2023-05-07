@@ -1,7 +1,7 @@
-# Based on the AUR package "dracut-hook" by Leonidas P. <jpegxguy>
+# Originally based on the AUR package "dracut-hook" by Leonidas P. <jpegxguy>
 
 pkgname=eos-dracut
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="Dracut scripts and hooks for EndeavourOS"
 url=https://endeavouros.com
@@ -16,13 +16,17 @@ source=("dracut-rebuild"
 		"90-dracut-install.hook"
 		"60-dracut-remove.hook"
 		"eos-dracut.conf"
+		"snapshot-overlay.sh"
+		"module-setup.sh"
 )
 sha256sums=('38eb43c459afb5e6fc2bcf59dc308dc06bd0ee7d95a5ba8b6d580715f461639b'
             '329dcaf68e939f52a00b6dae152da8935a3280734288b0f2a2416465c6b8339b'
             '2d91cdac7d52ecefd444f2d8b5352de98aeb0b045d23d80a34bad2e8e9519121'
             'de09e8e65837b189aec0a8c9a067143880faff14467a5573949f772f39c053b3'
             'e79f8e9572c5d1af6052104eac7ff956754f7a191b52b16adf12b65a38e9b4ed'
-            '35ba4b4c82d5cceb6782c75f989bae36ba44ca626905b6db81908c1759eadfb0')
+            '35ba4b4c82d5cceb6782c75f989bae36ba44ca626905b6db81908c1759eadfb0'
+            '0a22c7bee8f25580b696d8457979b59a77274ade0a5c246a2db9d4e4430e4ba4'
+            '335a2a33a1490dc103945b8492737b2ab29bcdb868a0dc56d01a4b9a49f77dec')
 
 package() {
 	install -Dm644 "${srcdir}/90-dracut-install.hook" "${pkgdir}/usr/share/libalpm/hooks/90-dracut-install.hook"
@@ -31,4 +35,7 @@ package() {
 	install -Dm755 "${srcdir}/dracut-remove"          "${pkgdir}/usr/share/libalpm/scripts/dracut-remove"
 	install -Dm755 "${srcdir}/dracut-rebuild"         "${pkgdir}/usr/bin/dracut-rebuild"
 	install -Dm644 "${srcdir}/eos-dracut.conf"        "${pkgdir}/etc/eos-dracut.conf"
+	install -Dm755 "${srcdir}/snapshot-overlay.sh"    "${pkgdir}/usr/lib/dracut/modules.d/91btrfs-snapshot-overlay/snapshot-overlay.sh"
+	install -Dm755 "${srcdir}/module-setup.sh"        "${pkgdir}/usr/lib/dracut/modules.d/91btrfs-snapshot-overlay/module-setup.sh"
 }
+
