@@ -151,7 +151,6 @@ fi
 PKGNAMES_WAIT=(
     filesystem
     lsb-release
-    dracut
 )
 
 
