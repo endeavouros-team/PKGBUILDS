@@ -873,9 +873,11 @@ GitUpdate_repo() {
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
         case "$REPONAME" in
             endeavouros)
-                newrepodir="$ASSETSDIR/../../repo" ;;
+                # newrepodir="$ASSETSDIR/../../repo"
+                newrepodir="$GITDIR" ;;
             endeavouros-testing-dev)
-                newrepodir="$ASSETSDIR/../../eos-tools" ;;
+                # newrepodir="$ASSETSDIR/../../eos-tools"
+                newrepodir="$GITDIR" ;;
             *)
                 newrepodir="$GITDIR" ;;
         esac
@@ -1182,8 +1184,12 @@ Main2()
 
     local PKGNAMES=()
     local PKGNAMES_WAIT=()
+    local EOS_ROOT=""                       # configures the base folder for all EOS stuff
 
-    source $ASSETS_CONF         # local variables (with CAPITAL letters)
+    source /etc/eos-pkgbuild-setup.conf     # sets the base folder of everything
+    [ -n "$EOS_ROOT" ] || DIE "EOS_ROOT cannot be empty!"
+
+    source $ASSETS_CONF                     # local variables (with CAPITAL letters)
 
     filelist_txt="$ASSETSDIR/repofiles.txt"
     use_filelist="$USE_GENERATED_FILELIST"

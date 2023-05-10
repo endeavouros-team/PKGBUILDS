@@ -31,6 +31,11 @@ export MAKEPKG_CLEANUP=yes                          # some of *our* PKGBUILD fil
 local ARCHIVE_GIT="$ASSETSDIR/../../archive/.git"
 local ARCHIVE_TAG=packages
 
+# new way with absolute paths:
+ASSETSDIR="$EOS_ROOT/_BUILD_/$REPONAME"
+PKGBUILD_ROOTDIR="$ASSETSDIR/PKGBUILDS"
+GITDIR="$EOS_ROOT/repo"
+ARCHIVE_GIT="$EOS_ROOT/archive/.git"
 
 # source EndeavourOS-packages-buildlist || exit 1
 
