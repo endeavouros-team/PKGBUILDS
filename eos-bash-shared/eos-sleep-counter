@@ -44,7 +44,7 @@ Main() {
     local ret=0
     local str=""
 
-    [ -n "$prompt" ] || prompt="Waiting %s/%s seconds before closing (Ctrl-S = pause, Ctrl-Q = continue)"
+    [ -n "$prompt" ] || prompt="[Close in %s/%s seconds (or press a key to close)]"
 
     for ((s=seconds; s>0; s--)) ; do
         ShowTime

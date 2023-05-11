@@ -4,7 +4,8 @@ Encoding=UTF-8
 Name=UpdateInTerminal
 Comment=Update system in terminal
 Comment[fi]=Päivitä järjestelmä uudessa pääteikkunassa
-Exec=UpdateInTerminal --nt
+Exec=bash -c "echo '==> yay'; yay; eos-sleep-counter 60"
+Terminal=true
 Icon=endeavouros-icon
 Hidden=false
 X-GNOME-Autostart-enabled=true
