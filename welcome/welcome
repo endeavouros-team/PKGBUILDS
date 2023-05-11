@@ -538,7 +538,7 @@ DailyAssistant() {
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="$text" --columns=2
       --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
-      --field=" $(ltr after_install_us) (UpdateInTerminal)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+      # --field=" $(ltr after_install_us) (UpdateInTerminal)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
   MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
