@@ -201,6 +201,12 @@ Main() {
     local krpkg=()
     local ufile=""
 
+    cat <<EOF >&2
+
+Note: '$progname' is deprecated, consider using 'yay', 'paru', or 'pacman' instead.
+
+EOF
+
     # make sure we have reasonable values
     [ -n "$keyring_first" ] || keyring_first=no
     [ -n "$aur_helper" ]    || aur_helper=yay
