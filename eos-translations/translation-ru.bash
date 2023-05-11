@@ -334,3 +334,13 @@ _tr_add2 daily_assist_anewstip       "Покажет последние ново
 _tr_add2 nb_nofify_user1             "Имеются важные новости"
 _tr_add2 nb_nofify_user2             "Нажмите кнопку"                                  # Новости о программном обеспечении
 _tr_add2 nb_nofify_user3             "в левом нижнем углу этого окна."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Извлеките файл настройки установки (дополнительно)"
+_tr_add2 ins_cust_text               "Укажите URL-адрес вашего настроенного user_commands.bash"
+_tr_add2 ins_cust_text2              "Выбранный файл заменит ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Это наиболее полезно для <b>онлайн</b> установки"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Примечание: Подключение к Интернету недоступно, некоторые кнопки скрыты или не работают."
+
