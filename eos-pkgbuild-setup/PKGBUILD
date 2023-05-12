@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=28
+pkgrel=29
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -57,7 +57,7 @@ source=(
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '15b4a800e60d65a5b4e888a6baa5cb6336b78255ff39f8c54563c77bdbff2299b84e65d456452097c5cbd36df1fae2cdcab41f65b9d86a2c0b6b973f5cc577a9'
             'be63de6c49f05f909a0b15e406eb43cad59cd15992ad1fa1ebda58245761fccd309f3aae76e6f3f86e6cd1e0d6279ed43a08aa7f7a2c312a493a55fe819dbc87'
-            'c91c0ffa1e67616960d553b1edc8099e7aa33e5c35571ccaacbc69e2a51e5f874e842742b4ed64d88a1fc0aa93c814cf78426c10a8b056be23118b613f0c07e5'
+            '1e40b8181f1abc00d4ab257474d7705efa9ce93d8df779e67d61cc1e5700139a17ed19744a56369000318868d125cdf8d3afb07301cee9326bffb2ff0a2f6035'
             '6185ce690604d382eda4e9edf5d3a113f71d89c54e0fe23384bb53e421e127c98263dea799126776203c48ac8ba9c2732beb98360047da87226845436ab10c91'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'

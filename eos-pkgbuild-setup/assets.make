@@ -838,10 +838,8 @@ _pkgbuilds_eos_hook()
         local GITPKGBUILDSURL=https://github.com/endeavouros-team/$PKGBUILDS.git
         _ASSERT_ pushd "$ASSETSDIR"
         printf "git clone... " >&2
-        _ASSERT_ git clone "$GITPKGBUILDSURL"                              # get PKGBUILDS.git
-        _ASSERT_ mkdir ".$REPONAME"
-        _ASSERT_ mv "$PKGBUILDS" ".$REPONAME/$PKGBUILDS"
-        ln -s ".$REPONAME/$PKGBUILDS"
+        _ASSERT_ git clone "$GITPKGBUILDSURL" ".$REPONAME/$PKGBUILDS"              # get PKGBUILDS.git
+        _ASSERT_ ln -s ".$REPONAME/$PKGBUILDS"
     fi
     echo "done" >&2
     _ASSERT_ popd
