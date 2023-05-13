@@ -2,7 +2,7 @@
 # Earlier maintainers: Portergos Linux <portergoslinux@gmail.com>
 
 pkgname=endeavouros-mirrorlist
-pkgver=23.2
+pkgver=23.3
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')

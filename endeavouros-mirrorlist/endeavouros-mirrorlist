@@ -48,9 +48,6 @@ Server = https://mirror.linux.pizza/endeavouros/repo/$repo/$arch
 ## Taiwan
 Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 
-## Ukraine
-Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
-
 ## United States
 Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
 
