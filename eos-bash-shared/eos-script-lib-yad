@@ -74,28 +74,27 @@ eos_IconGrasp() {
 #   --field=...
 #   --image=...
 
-if [ "$1" != "--limit-icons" ] ; then
-    export WELCOME_ICON_INSTALL_TAB=$(eos_IconGrasp system-software-install)
-    export WELCOME_ICON_PARTITION_MANAGER=$(eos_IconGrasp gparted)
-    export WELCOME_ICON_BLUETOOTH=$(eos_IconGrasp bluetooth)
-    export WELCOME_ICON_SYSTEM_LOGS=$(eos_IconGrasp face-worried)
-    export WELCOME_ICON_TOGGLE_r8169_DRIVER="$(eos_IconGrasp system-software-update)"
-    export WELCOME_ICON_LEAVE=$(eos_IconGrasp face-crying)
-    export WELCOME_ICON_HONEST=$(eos_IconGrasp face-angel)
-fi
+export WELCOME_ICON_SYSTEM_LOGS=search                               # face-worried
+export WELCOME_ICON_LEAVE=stop                                       # face-crying
+export WELCOME_ICON_HONEST=face-angel
+
+export WELCOME_ICON_INSTALL_TAB=system-software-install              # $(eos_IconGrasp system-software-install)
+export WELCOME_ICON_PARTITION_MANAGER=gparted                        # $(eos_IconGrasp gparted)
+export WELCOME_ICON_BLUETOOTH=bluetooth                              # $(eos_IconGrasp bluetooth)
+export WELCOME_ICON_TOGGLE_r8169_DRIVER=system-software-update       # $(eos_IconGrasp system-software-update)
 
 export WELCOME_ICON_CHANGE_RESOLUTION=preferences-desktop-display
 export WELCOME_ICON_CHANGE_DISPLAY_MANAGER=preferences-desktop-display
-export WELCOME_ICON_INSTALL_OFFICIAL=calamares                              # $WELCOME_ICON_INSTALL_TAB
-export WELCOME_ICON_INSTALL_COMMUNITY=calamares                             # $WELCOME_ICON_INSTALL_TAB
+export WELCOME_ICON_INSTALL_OFFICIAL=calamares
+export WELCOME_ICON_INSTALL_COMMUNITY=calamares
 export WELCOME_ICON_INSTALL_INFO=$WELCOME_ICON_INSTALL_TAB
-export WELCOME_ICON_MIRROR_UPDATE=software-update-available  # $(eos_IconGrasp software-update-available)     # or applications-internet ?
+export WELCOME_ICON_MIRROR_UPDATE=software-update-available                 # or applications-internet ?
 export WELCOME_ICON_BLUETOOTH_INFO=$WELCOME_ICON_BLUETOOTH
-export WELCOME_ICON_LATEST_RELEASE=user-info                            # or info ?
+export WELCOME_ICON_LATEST_RELEASE=user-info                                # or info ?
 export WELCOME_ICON_INSTALLATION_TIPS=user-info
 export WELCOME_ICON_SYSTEM_RESCUE=user-info
 export WELCOME_ICON_SYSTEM_LOGS_HOWTO=user-info
-export WELCOME_ICON_WEBSITE=user-info                    # or info ?
+export WELCOME_ICON_WEBSITE=user-info                                       # or info ?
 export WELCOME_ICON_WIKI=user-info
 export WELCOME_ICON_NEWS=user-info
 export WELCOME_ICON_FORUM=user-info
@@ -116,7 +115,7 @@ export WELCOME_ICON_ARM=system-run
 export WELCOME_ICON_RUNINTERMINAL=preferences-system
 export WELCOME_ICON_QUESTION=dialog-question
 export WELCOME_ICON_INFO=dialog-information
-export WELCOME_ICON_PREFERENCES=system-preferences
+export WELCOME_ICON_PREFERENCES=preferences-system                          # was: system-preferences
 export WELCOME_ICON_OWN_COMMANDS=applications-other
 export WELCOME_ICON_HELP=help-about
 export WELCOME_ICON_ERROR=dialog-error
