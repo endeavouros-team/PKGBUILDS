@@ -123,6 +123,8 @@ export WELCOME_ICON_WARNING=dialog-warning
 export WELCOME_ICON_APPDEV=applications-development
 export WELCOME_ICON_CHANGELOG=applications-development
 export WELCOME_ICON_HELP_CONTENTS=help-contents
+export WELCOME_ICON_NOTIFICATIONS=notifications
+export WELCOME_ICON_NOTIFICATIONS_DISABLED=notifications-disabled
 
 eos_GetArch() {
     local arch; arch="$(/usr/bin/uname -m)"
