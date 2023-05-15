@@ -65,7 +65,7 @@ Main()
     local cmd=(
         eos_yad
         --form --title="Configure $TARGET_PROG"
-        --image=system-settings
+        --image=$WELCOME_ICON_UPDATE_NOTIFIER_CONF
         --text="Configure and manage features of $TARGET_PROG"
         # --width=420
         --columns=2
@@ -83,9 +83,9 @@ Main()
                "/usr/bin/RunInTerminal /usr/bin/$TARGET_PROG --systemd -iw=0s"
 
         # --button="Changelog!help-about!<tt>Show changelog of $TARGET_PROG</tt>":"/usr/bin/$TARGET_PROG --changelog"
-        --button="Disable!notifications-disabled!Disable $TARGET_PROG service timer":"ServiceAction disable"
-        --button="Enable!notifications!Enable $TARGET_PROG service timer":"ServiceAction enable"
-        --button="Status!dialog-information!Show status of $TARGET_PROG service timer":"ServiceAction status"
+        --button="Disable!$WELCOME_ICON_NOTIFICATIONS_DISABLED!Disable $TARGET_PROG service timer":"ServiceAction disable"
+        --button="Enable!$WELCOME_ICON_NOTIFICATIONS!Enable $TARGET_PROG service timer":"ServiceAction enable"
+        --button="Status!$WELCOME_ICON_INFO!Show status of $TARGET_PROG service timer":"ServiceAction status"
         --button="yad-quit!!<tt>Quit now</tt>"
     )
 
