@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=30
+pkgrel=31
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -32,6 +32,8 @@ source=(
     delete-release-assets           # Removes packages from github release assets folder tag (= 'endeavouros').
     download-release-assets         # Downloads release assets from github to local machine.
     release-asset-names             # Shows all release asset files at github (with a given tag).
+
+    PackageFunc
 
     ### Testing and checking package files are in order locally and remotely
     githubcheck                     # Check that local machine and github assets are in sync.
@@ -65,6 +67,7 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
+            '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
             'df6563de36c029bfc9db84a584a777d89951ba67e162e989b2c2927e748d65090a9060a5eb9263718352c25f134d636f208a36abda3b49f6b8f725ba67d4633a'
             '0591f55edcda1760005d606604f4326f3bb6060e3619d0e87465eac1e95af5112df2a621ee5fa18519596682534ac966591dad851ce478873d82eea8d84f06f9'
             '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
@@ -80,6 +83,7 @@ package() {
     echo "VERSION=${pkgver}-$pkgrel" > "$pkgname.version"
 
     install -Dm644 "$pkgname.version"          "$_eos/$pkgname.version"
+    install -Dm644 PackageFunc                 "$_eos/PackageFunc"
     install -Dm755 local-general-setup         "$_eos/local-general-setup"
 
     install -Dm755 "$pkgname"                  "$_bin/$pkgname"
