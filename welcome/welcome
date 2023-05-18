@@ -402,9 +402,22 @@ RunIfInstalled() {
 export -f RunIfInstalled
 
 UpdateWithEosAurHelper() {
-    [ -x /usr/bin/"$EOS_AUR_HELPER" ] && RunInTerminal "echo '==> $EOS_AUR_HELPER' ; $EOS_AUR_HELPER"
+    local helper="$1"
+    RunInTerminal "echo '==> $helper' ; $helper"
 }
 export -f UpdateWithEosAurHelper
+
+AddEosAurHelpers() {
+    local helper
+    for helper in $EOS_AUR_HELPER $EOS_AUR_HELPER_OTHER ; do
+        if [ -x /usr/bin/$helper ] ; then
+            tabcontents+=(
+                --field=" $(ltr after_install_us) ($helper)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper $helper"
+            )
+        fi
+    done
+}
+export -f AddEosAurHelpers
 
 AfterInstall() {
   local handle="$1"
@@ -424,8 +437,9 @@ AfterInstall() {
       --text="$text" --columns=2
   )
   MirrorRankingButtons
+  AddEosAurHelpers
   tabcontents+=(
-      --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
+      #--field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"     # "RunInTerminal UpdateInTerminal --lang=$lang"
       --field=" $(ltr after_install_pclean)!$WELCOME_ICON_PACCACHE_SRV!$(ltr after_install_pcleantip)":fbtn 'paccache-service-manager'
   )
 
@@ -537,9 +551,10 @@ DailyAssistant() {
       eos_yad --align-buttons --use-interp  # don't need explicit 'bash -c' construct when calling functions
       --plug="$handle" --tabnum="$tabnum" --form --image=$WELCOME_ICON_INFO
       --text="$text" --columns=2
-      --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
+      # --field=" $(ltr after_install_us) ($EOS_AUR_HELPER)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "UpdateWithEosAurHelper"    # "RunInTerminal UpdateInTerminal --lang=$lang"
       # --field=" $(ltr after_install_us) (UpdateInTerminal)!$WELCOME_ICON_SYSTEM_UPDATE!$(ltr after_install_ustip)":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
   )
+  AddEosAurHelpers
   MirrorRankingButtons
   tabcontents+=(--field=" Pacdiff $_and $differ!$differ_icon!$(ltr after_install_pacdiff_tip) $differ":fbtn "eos-pacdiff --nt")
   tabcontents+=(
@@ -1299,6 +1314,7 @@ StartHere() {
     fi
     export EOS_FILESERVER_SITE
     export EOS_AUR_HELPER
+    [ -n "$EOS_AUR_HELPER_OTHER" ] && export EOS_AUR_HELPER_OTHER
     export WELCOME_ARGS="$*"
 
     for arg in "$@" ; do
