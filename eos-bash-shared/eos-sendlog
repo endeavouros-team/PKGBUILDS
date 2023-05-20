@@ -195,19 +195,39 @@ Main_old() {
 }
 
 Main() {
-    local logfile="$HOME/eos-sendlog.log"
+    local progname="${0##*/}"
+    local logfile="$HOME/$progname.log"
 
     # pastebin providers
     _0x0.st() { curl -F'file=@-' https://0x0.st ; }
     _ix.io()  { curl -F'f:1=<-'  ix.io | tee -a "$logfile" ; }      # no https at 2023-06-20
-    _wgetpaste() { wgetpaste | tee -a "$logfile" ; }
+    _wgetpaste() {
+	if [ ! -x /bin/wgetpaste ] ; then
+	    echo "$progname: warning: wgetpaste-eos not installed" >&2
+	    return 1
+	fi
+	local exitcode=0 output
+	output=$(echo "$input" | wgetpaste -n anonymous)
+	exitcode=$?
+	if [ $exitcode -eq 0 ] ; then
+	    echo "$output"
+	    echo "$(date "+%Y-%m-%d"): $output" >> "$logfile"
+	else
+	    echo "==> $progname: warning: wgetpaste failed, code $exitcode." >&2
+	    return $exitcode
+	fi
+    }
 
     # run one of them
     local input=$(cat)
+    if [ -z "$input" ] ; then
+	echo "==> $progname: warning: nothing to send." >&2
+	return 1
+    fi
     # echo "$input" | _0x0.st 2>/dev/null && return             # fails at 2023-06-20
-    echo "$input" | _wgetpaste 2>/dev/null && return
+    _wgetpaste 2>/dev/null && return
     echo "$input" | _ix.io 2>/dev/null && return
-    echo "eos-sendlog: warning: configured pastebin sites failed." >&2
+    echo "$progname: warning: configured pastebin sites failed." >&2
 }
 
 Main "$@"
