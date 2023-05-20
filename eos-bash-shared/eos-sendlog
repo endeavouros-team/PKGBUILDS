@@ -149,7 +149,7 @@ Init() {
     fi
 }
 
-Main() {
+Main_old() {
     local progname="$(basename "$0")"
     local configfile=/etc/eos-sendlog.conf
 
@@ -192,6 +192,22 @@ Main() {
         [ -n "$current_db" ] && echo "$current_db"      >> $db
     fi
     echo "$url"
+}
+
+Main() {
+    local logfile="$HOME/eos-sendlog.log"
+
+    # pastebin providers
+    _0x0.st() { curl -F'file=@-' https://0x0.st ; }
+    _ix.io()  { curl -F'f:1=<-'  ix.io | tee -a "$logfile" ; }      # no https at 2023-06-20
+    _wgetpaste() { wgetpaste | tee -a "$logfile" ; }
+
+    # run one of them
+    local input=$(cat)
+    # echo "$input" | _0x0.st 2>/dev/null && return             # fails at 2023-06-20
+    echo "$input" | _wgetpaste 2>/dev/null && return
+    echo "$input" | _ix.io 2>/dev/null && return
+    echo "eos-sendlog: warning: configured pastebin sites failed." >&2
 }
 
 Main "$@"

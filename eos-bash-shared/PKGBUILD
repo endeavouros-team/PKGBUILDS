@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23
-pkgrel=17
+pkgrel=18
 arch=('any')
 license=('GPL')
 depends=(
@@ -20,7 +20,7 @@ depends=(
 )
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
-    "wgetpaste-eos: needed when wgetpaste is selected in eos-sendlog.conf"
+    "wgetpaste-eos: needed by eos-sendlog"
     "neofetch: for additional DE detection"
     "kde-gtk-config: to remove gtk related yad warnings"
     "libnotify: for eos-reboot-required2"
