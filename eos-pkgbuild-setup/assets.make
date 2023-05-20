@@ -1391,7 +1391,7 @@ Main2()
         
         # now we have: removable (and removableassets), built and signed
 
-        if [ "$PWD" != "$ASSETSDIR" ] ; then
+        if [ ! "$PWD" -ef "$ASSETSDIR" ] ; then
             DIE "wrong directory: $PWD != $ASSETSDIR"
         fi
 
