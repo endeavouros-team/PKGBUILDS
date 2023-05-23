@@ -1,5 +1,5 @@
 pkgname=endeavouros-keyring
-pkgver=20220614
+pkgver=20230523
 pkgrel=1
 pkgdesc='EndeavourOS keyring'
 arch=('any')
@@ -19,7 +19,7 @@ validpgpkeys=('8F43FC374CD4CEEA19CEE323E3D8752ACDF595A1'  # joekamprad
               '8AD2DB862F3CA7B90B9CAF578B7B0A2203562CF6'  # sradjoker
               )
 sha512sums=('7d046b44ee059384cf95aced62c354bf5401aaeea286df113ef74c1b0c186210e9b4fdf55e54b6f2fc28991c28fec9f6aee018505668e44bdc19286761d24609'
-            '47ba969ce76fe76073c93db5a999be46f4f0cf18d04a61c2aefd74f1e6dd2cc516b8e10e74f5e75f5181eedc90bc1d9815edcc500f564e6a9ce8067b816383bf'
+            '12034eefbbfe314ba085e15923109c426f68cbfec93a0744089bc603e0cb5f2cefcc1a6f231f6c86600de5aae5e6944d95115b6ab008d45fa15baf06bfc80123'
             'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'
             '57b1603729122bbfad15e591da1d1bbadc9cbe5f6bcd1525c5045ef341c71993a5c6fef277bac60e841401b42d8c98b8e82e43a090d8b3917c155ac9f590b968')
 
