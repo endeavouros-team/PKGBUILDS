@@ -129,7 +129,7 @@ GetUpdateNumberAndTime() {
     retcode=$?
     case "$retcode" in
         0)
-            nr="$(cat "$tmpfile" | head -n1)"
+            nr="$(head -n1 "$tmpfile")"
             rm -f "$tmpfile"
 
             if [ -n "$reference_level" ] ; then
@@ -231,14 +231,28 @@ SimpleRank() {
     # - the results of ranking
     # - the ranked mirrorlist
 
-    local result
+    local result IGNORE=""
 
     latest_ml=$(mktemp /tmp/tmp.dF3784XXXXX) ; delete_at_end+=("$latest_ml")
 
     FetchLatestMirrorlist
 
-    if [ -n "$ignored_mirrors" ] ; then
-        cat $latest_ml | grep -Pv "$ignored_mirrors" > $latest_ml.tmp
+    if [ ${#EOS_IGNORED_MIRRORS[@]} -gt 0 ] ; then
+        IGNORE=${EOS_IGNORED_MIRRORS[*]}
+        IGNORE=${IGNORE// /\|}
+        [ -n "$ignored_mirrors" ] && ignored_mirrors+="|"
+        ignored_mirrors+="$IGNORE"
+    fi
+
+    local pref="$preferred_mirrors $ALWAYS_FIRST_EOS_MIRRORS"
+    if [ "$pref" != " " ] ; then
+        pref=${pref//\|/ }
+        notif_echo2 "Info: preferring mirrors: $pref"
+    fi
+
+    if [ "$ignored_mirrors" != "" ] ; then
+        notif_echo2 "Info: ignoring mirrors: ${ignored_mirrors//\|/ }"
+        grep -Pv "$ignored_mirrors" $latest_ml > $latest_ml.tmp
         rm -f $latest_ml
         mv $latest_ml.tmp $latest_ml
     fi
@@ -246,7 +260,7 @@ SimpleRank() {
     rm -f $latest_ml.orig
     mv $latest_ml $latest_ml.orig
     delete_at_end+=("$latest_ml.orig")
-    cat $latest_ml.orig | grep "^Server[ ]*=" | sort | uniq > $latest_ml
+    grep "^Server[ ]*=" $latest_ml.orig | sort | uniq > $latest_ml
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
     notif_echo2 "Info: ranking EndeavourOS mirrors, please wait ..."
@@ -255,27 +269,29 @@ SimpleRank() {
     echo2 ""
 
     # show the original list (mirrors commented out)
-    /usr/bin/cat $latest_ml.orig | /usr/bin/sed 's|^Server = |#Server = |'
+    if [ "$mirrorlist_only" = "no" ] ; then
+        sed 's|^Server = |#Server = |' $latest_ml.orig
 
-    # show the results of ranking (in comments)
-    printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
-    printf "# The following fields are shown for each mirror:\n"
-    printf "#   mirror:          The mirror address\n"
-    printf "#   update-level:    Ordinal number of the latest update (larger is newer)\n"
-    printf "#   fetch-time:      Measures the speed of the mirror (smaller is faster)\n"
-    printf "#\n"
-    while true ; do
-        echo "mirror update-level fetch-time"
-        echo "~~~~~~ ~~~~~~~~~~~~ ~~~~~~~~~~"
-        ShowArray "${result[@]}"
-        break
-    done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
+        # show the results of ranking (in comments)
+        printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
+        printf "# The following fields are shown for each mirror:\n"
+        printf "#   mirror:          The mirror address\n"
+        printf "#   update-level:    Ordinal number of the latest update (larger is newer)\n"
+        printf "#   fetch-time:      Measures the speed of the mirror (smaller is faster)\n"
+        printf "#\n"
+        while true ; do
+            echo "mirror update-level fetch-time"
+            echo "~~~~~~ ~~~~~~~~~~~~ ~~~~~~~~~~"
+            ShowArray "${result[@]}"
+            break
+        done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
+    fi
 
     # This is the actual ranked result.
 
     echo ""
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "# EndeavourOS mirrorlist:"
+    echo "# EndeavourOS mirrorlist, ranked by $progname at $(date +%x\ %X)."
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
@@ -284,11 +300,8 @@ SimpleRank() {
         UserAddedMirrors "$preferred_mirrors"
     fi
 
-    # Example configuration:
-    #    ALWAYS_FIRST_EOS_MIRRORS='https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch|https://mirror.moson.org/endeavouros/repo/$repo/$arch'
-
     if [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
-        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"
+        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"    # Example: ALWAYS_FIRST_EOS_MIRRORS='tuna|moson|umu'
     fi
 
     notif_printf2 "Results of ranking EndeavourOS mirrors:\n\n"
@@ -361,7 +374,7 @@ DumpOptions() {
 
 Options() {
     local opts
-    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:,mirror-verbosity:,dump-options,use-local-mirrorlist"
+    local longopts="verbose,help,_help_,no-save,timeout:,sort:,hook-rank,ignore:,prefer:,mirror-verbosity:,dump-options,use-local-mirrorlist,list-only"
 
     opts=$(getopt -o=hnt: --longoptions $longopts --name "$progname" -- "$@")
     case "$?" in
@@ -460,6 +473,9 @@ EOF
             --no-save | -n)
                 save=no
                 ;;
+            --list-only)
+                mirrorlist_only=yes  # and no other output
+                ;;
             --)
                 shift ; break ;;
         esac
@@ -507,8 +523,9 @@ Main()
     local -r mirror_verbosity_def="show"
     local mirror_verbosity=""
     local use_local_mirrorlist=no
+    local mirrorlist_only=no                  # 'no' provides rather verbose output, 'yes' provides only the essential list
 
-    if [ ! -r "$eos" ] ; then               # this test is not really needed...
+    if [ ! -r "$eos" ] ; then                 # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
     fi
 
