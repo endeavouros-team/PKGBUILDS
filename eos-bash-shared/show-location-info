@@ -10,8 +10,8 @@ DIE() {
 
 Options() {
     local opts
-    local lopts="help,timeout:,tolower"
-    local sopts="ht:l"
+    local lopts="help,timeout:,tolower,url:"
+    local sopts="ht:lu:"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -24,6 +24,7 @@ Options() {
         case "$1" in
             -t | --timeout)   timeout="$2" ; shift ;;
             -l | --tolower)   tolower=yes ;;
+            -u | --url)       infourl="$2" ; shift ;;
             -h | --help)
                 cat <<EOF >&2
 $progname - show info about your current location
@@ -39,6 +40,7 @@ Options:
   -l, --tolower    Convert letters to lower case on the output.
   -t, --timeout    Max number of seconds to wait for a response from
                    $infourl (default: $timeout_default).
+  -u, --url        The URL used for getting the location information.
 EOF
                 exit 0
                 ;;
@@ -72,9 +74,22 @@ Main() {
     local items=(city country hostname ip loc org postal region timezone "")   # "" means: all
 
     # info source
-    local infourl=https://ipinfo.io
+    local infourl="$EOS_LOCATION_PROVIDER_URL"
+    [ -n "$infourl" ] || infourl="https://ipinfo.io"
 
     Options "$@"
+
+    case "$infourl" in
+        https://ipinfo.io) ;;
+        https://ipapi.co)
+            case "$item" in
+                hostname | loc | "")
+                    DIE "sorry, item '$item' is not supported for url $infourl"
+                    ;;
+            esac
+            ;;
+        *) DIE "'$infourl' is not supported. See /etc/eos-script-lib-yad.conf for supported URLs" ;;
+    esac
 
     # show the wanted location info
     local output="$(LANG=C curl -Lsm $timeout $infourl/$item)"
