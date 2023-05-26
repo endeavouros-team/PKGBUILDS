@@ -48,7 +48,7 @@ ARCHIVE_GIT="$EOS_ROOT/archive/.git"
 PKGNAMES=(                                        # Alphabetically ordered.
     akm
     arc-gtk-theme-eos
-    arc-x-icons-theme/aur
+    #arc-x-icons-theme/aur
 
     bashdb/aur
 
@@ -117,7 +117,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     nvidia-installer-common
 
     pahis
-    paper-icon-theme
+    #paper-icon-theme
     paru/aur
 
     qemu-arm-aarch64-static-bin
