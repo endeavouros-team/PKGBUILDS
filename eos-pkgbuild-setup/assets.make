@@ -653,12 +653,9 @@ Assets_clone()
         if [ "$names_from_git" = "yes" ] ; then
             local cpdir=""
             case "$REPONAME" in
-                endeavouros)
-                    cpdir="$GITDIR/$REPONAME/$ARCH" ;;
-                endeavouros-testing-dev)
-                    cpdir="$GITDIR/$REPONAME" ;;
-                *)
-                    cpdir="$GITDIR/repo" ;;
+                endeavouros)              cpdir="$GITDIR/$REPONAME/$ARCH" ;;
+                endeavouros-testing-dev)  cpdir="$GITDIR/$REPONAME" ;;
+                *)                        cpdir="$GITDIR/repo" ;;
             esac
             [ -n "$cpdir" ] || DIE "git dir is empty, cannot copy files"
             echo2 "==> Copying files from '$cpdir' ..."
@@ -856,32 +853,26 @@ RunPreHooks()
 
     ShowIndented "Running asset hooks..."
 
-    if [ "$SIGNER" = "EndeavourOS" ] ; then
-        _pkgbuilds_eos_hook
-    else
-        if [ -n "$ASSET_HOOKS" ] ; then
-            local xx
-            for xx in "${ASSET_HOOKS[@]}" ; do
-                $xx
-            done
-            echo2 "done."
-        fi
-    fi
+    case "$REPONAME" in
+        endeavouros | endeavouros-testing-dev)
+            _pkgbuilds_eos_hook
+            ;;
+        *)
+            if [ -n "$ASSET_HOOKS" ] ; then
+                local xx
+                for xx in "${ASSET_HOOKS[@]}" ; do
+                    $xx
+                done
+                echo2 "done."
+            fi
+            ;;
+    esac
 }
 
 GitUpdate_repo() {
     local newrepodir
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
-        case "$REPONAME" in
-            endeavouros)
-                # newrepodir="$ASSETSDIR/../../repo"
-                newrepodir="$GITDIR" ;;
-            endeavouros-testing-dev)
-                # newrepodir="$ASSETSDIR/../../eos-tools"
-                newrepodir="$GITDIR" ;;
-            *)
-                newrepodir="$GITDIR" ;;
-        esac
+        newrepodir="$GITDIR"
         if [ -e "$newrepodir/.GitUpdate" ] ; then
             if [ -x /usr/bin/GitUpdate ] ; then
                 FinalStopBeforeSyncing "$REPONAME repo"
@@ -1380,9 +1371,9 @@ Main2()
         done
     fi
 
-    case "$SIGNER" in
-        EndeavourOS) reposig=0 ;;
-        *)           reposig=1 ;;
+    case "$REPONAME" in
+        endeavouros | endeavouros-testing-dev) reposig=0 ;;
+        *)                                     reposig=1 ;;
     esac
 
     if [ -n "$built" ] || [ "$repoup" = "1" ] ; then
@@ -1467,9 +1458,9 @@ Main2()
                                 fi
                             fi
                             if [ -d .git ] ; then
-                                case "$SIGNER" in
-                                    EndeavourOS) archive-sync-to-remote "$ARCHIVE_TAG" ;;
-                                    *)           add-release-assets "$ARCHIVE_TAG" "${removable[@]##*/}" ;;
+                                case "$REPONAME" in
+                                    endeavouros | endeavouros-testing-dev) archive-sync-to-remote "$ARCHIVE_TAG" ;;
+                                    *)                                     add-release-assets "$ARCHIVE_TAG" "${removable[@]##*/}" ;;
                                 esac
                             else
                                 WARN "the .git folder of the pkg archive was not found"
@@ -1534,10 +1525,7 @@ Main2()
                     esac
                     ;;
                 *)
-                    case "$SIGNER" in
-                        EndeavourOS) ManageGithubReleaseAssets ;;
-                        *) ManageGithubReleaseAssets ;;
-                    esac
+                    ManageGithubReleaseAssets
                     ;;
             esac
         else
@@ -1793,8 +1781,8 @@ Main() {
     [ -r $ASSETS_CONF ] || DIE "file './$ASSETS_CONF' does not exist in $PWD."
     # [ -L $ASSETS_CONF ] || DIE "$PWD/$ASSETS_CONF must be a symlink to the real $ASSETS_CONF!"
 
-    local reponame="$(AssetsConfLocalVal REPONAME)"
-    local signer="$(  AssetsConfLocalVal SIGNER)"
+    # local reponame="$(AssetsConfLocalVal REPONAME)"
+    # local signer="$(  AssetsConfLocalVal SIGNER)"
     local fail=0
     # local asset_file_endings="db,files,zst,xz,sig"
 
