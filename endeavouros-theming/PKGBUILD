@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-theming
 pkgver=22.12.3.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
 replaces=('EndeavourOS-theming')
@@ -29,8 +29,8 @@ package() {
   fi
 
   # make symlinks for KDE and GNOME:
-  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.png"
-  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.svg"
-  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros-dark.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.png"
-  ln -s "${pkgdir}/usr/share/pixmaps/endeavouros-dark.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.svg"
+  ln -s "/usr/share/pixmaps/endeavouros.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.png"
+  ln -s "/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.svg"
+  ln -s "/usr/share/pixmaps/endeavouros-dark.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.png"
+  ln -s "/usr/share/pixmaps/endeavouros-dark.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.svg"
 }
