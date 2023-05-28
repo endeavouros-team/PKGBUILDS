@@ -877,7 +877,7 @@ GitUpdate_repo() {
             if [ -x /usr/bin/GitUpdate ] ; then
                 FinalStopBeforeSyncing "$REPONAME repo"
                 pushd "$newrepodir" >/dev/null
-                /usr/bin/GitUpdate "$ARCH: $*" || DIE "GitUpdate failed!"
+                /usr/bin/GitUpdate "$ARCH: $*" "$ASSETSDIR" || DIE "GitUpdate failed!"
                 popd >/dev/null
                 ManualCheckOfAssets addition repo
             else
