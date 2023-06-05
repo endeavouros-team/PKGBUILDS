@@ -4,5 +4,12 @@ icon-theme='Qogir-dark'
 [org.cinnamon.desktop.background]
 picture-uri='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
 
+[org/cinnamon/desktop/interface]
+cursor-theme='Qogir'
+gtk-theme='Arc-Darker'
+
+[org/cinnamon/theme]
+name='Arc'
+
 [org/cinnamon/desktop/applications/calculator]
 exec='galculator'
