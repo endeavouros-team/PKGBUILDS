@@ -1,15 +1,15 @@
-[org.cinnamon.desktop.interface]
-icon-theme='Qogir-dark'
-
 [org.cinnamon.desktop.background]
 picture-uri='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
 
-[org/cinnamon/desktop/interface]
+[org.cinnamon.desktop.interface]
 cursor-theme='Qogir'
 gtk-theme='Arc-Darker'
 
-[org/cinnamon/theme]
+[org.cinnamon.theme]
 name='Arc'
 
-[org/cinnamon/desktop/applications/calculator]
+[org.cinnamon.desktop.interface]
+icon-theme='Qogir-dark'
+
+[org.cinnamon.desktop.applications.calculator]
 exec='galculator'
