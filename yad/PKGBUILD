@@ -9,7 +9,9 @@ _yad-eos_prepare() {
     local apply_patch=yes      # yes = apply patch, no = do not apply patch
     local change_name=no       # always: no !!
 
-    curl --fail -Lsm 10 -o PKGBUILD.orig https://github.com/archlinux/svntogit-community/raw/packages/$orig_name/trunk/PKGBUILD || exit 1
+    yay -G yad || exit 1
+    mv yad/PKGBUILD PKGBUILD.orig
+    rm -rf yad
 
     if [ "$change_name" = "yes" ] ; then
         # keep the original pkgname in PKGBUILD for building a package
@@ -48,8 +50,10 @@ _yad-eos_prepare() {
     # Add architectures
     arch+=('aarch64' 'armv7h')
 
-sha256sums=('794442b03cc22c64020f44511eb97400bae2dcb82883185399f6c6be6219c009'
+sha256sums=('194198c4a58e20ceffd9a3206633c3726d962d7d4219edb77aeb748897403e34'
             '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
+sha512sums=('89f438a49722b9aa63ec942a200b4684f88e0e2b489b77b909c03208af644c46d22601a072bcbad1c36707013ee308417d73ce08f2494b8962bce9bf06d58a16'
+            '058d6b762e14dee5a81e23199e0a70634e496994f3de456ed0cc3ed827c2de669e2a6e66f284c54323d6f8d7a5efcd758259657ac48da154a956812b5119d827')
 }
 
 _yad-eos_prepare
