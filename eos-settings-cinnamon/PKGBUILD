@@ -9,7 +9,7 @@ arch=('any')
 license=('GPL3')
 depends=('endeavouros-theming')
 source=('99_eos-cinnamon.gschema.override')
-sha256sums=('65db397c88f902e1169b7aafde9a4194b5187b53a72978b211d74b4b591e3619')
+sha256sums=('f365b2d6f692ca02e840c17f6fab848402f43fa45402e0543867ab457204557c')
 
 package() {
 	install -Dm644 "${srcdir}/99_eos-cinnamon.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_eos-cinnamon.gschema.override"
