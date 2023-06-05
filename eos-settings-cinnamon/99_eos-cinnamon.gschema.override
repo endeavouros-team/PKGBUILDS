@@ -10,6 +10,3 @@ name='Arc'
 
 [org.cinnamon.desktop.interface]
 icon-theme='Qogir-dark'
-
-[org.cinnamon.desktop.default-applications.calculator]
-exec='galculator'
