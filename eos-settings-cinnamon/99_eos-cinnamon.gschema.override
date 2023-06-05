@@ -11,5 +11,5 @@ name='Arc'
 [org.cinnamon.desktop.interface]
 icon-theme='Qogir-dark'
 
-[org.cinnamon.desktop.applications.calculator]
+[org.cinnamon.desktop.default-applications.calculator]
 exec='galculator'
