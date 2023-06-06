@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-rankmirrors
-pkgver=2.12
+pkgver=2.13
 pkgrel=1
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
@@ -21,7 +21,7 @@ source=(
   $url/eos-rankmirrors.hook
   $url/eos-rankmirrors.conf
 )
-sha512sums=('b4ec537cb65403ae6e73e2885b96974b1051141fe4a8feb906772e196ee68f76337491195af859fbf6852dc06f9988cf6bccb0c94b064dd36b28f97703850579'
+sha512sums=('6aa12c8b7d88a87ac89c604f69f593bdea6818c47960080e4ee8a2159098680a86cb806e6225fb88bf57b1980f4e01d5198f5d1196418da679e41bf2c7f448b7'
             'e0cc7bbd4644574810c19b18cb57098f62011aeb2f5b115a16d78489efbf7f74eab411bd31eaf233e4380916b4890472dd23e17ccc0ef4a0f456321c414dc9e2'
             '580511c676cf56b5b8580d6819e0d1a4c85a40a3cd10f4b4f04fb9c004b14025b56cf4c3048e0fe8f9eef48d924b32b97d1e9669fac39b96f4203e2d68e3bd07'
             'f01f6267f624992febfec29c76f2de1c503693086ade5783e2b9cbef359f5155bf6df520ff06299193c842aef2a05cac5078977ee0dabf55cff66f44aec6e44a'

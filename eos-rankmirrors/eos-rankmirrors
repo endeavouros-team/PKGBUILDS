@@ -232,6 +232,7 @@ SimpleRank() {
     # - the ranked mirrorlist
 
     local result IGNORE=""
+    local xx
 
     latest_ml=$(mktemp /tmp/tmp.dF3784XXXXX) ; delete_at_end+=("$latest_ml")
 
@@ -252,9 +253,12 @@ SimpleRank() {
 
     if [ "$ignored_mirrors" != "" ] ; then
         notif_echo2 "Info: ignoring mirrors: ${ignored_mirrors//\|/ }"
-        grep -Pv "$ignored_mirrors" $latest_ml > $latest_ml.tmp
-        rm -f $latest_ml
-        mv $latest_ml.tmp $latest_ml
+        # grep -Pv "$ignored_mirrors" $latest_ml > $latest_ml.tmp
+        # rm -f $latest_ml
+        # mv $latest_ml.tmp $latest_ml
+        for xx in ${ignored_mirrors//\|/ } ; do
+            sed -i $latest_ml -E -e "s|^(Server[ ]*=[ ]*.*$xx.*)|#\1|"
+        done
     fi
 
     rm -f $latest_ml.orig
