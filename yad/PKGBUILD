@@ -9,9 +9,14 @@ _yad-eos_prepare() {
     local apply_patch=yes      # yes = apply patch, no = do not apply patch
     local change_name=no       # always: no !!
 
+    local curdir="$PWD"
+    local tmpdir=$(mktemp -d)
+    chmod go-rwx $tmpdir
+    cd $tmpdir
     yay -G yad || exit 1
-    mv yad/PKGBUILD PKGBUILD.orig
+    mv yad/PKGBUILD "$curdir"/PKGBUILD.orig
     rm -rf yad
+    cd "$curdir"
 
     if [ "$change_name" = "yes" ] ; then
         # keep the original pkgname in PKGBUILD for building a package
