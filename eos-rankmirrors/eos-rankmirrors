@@ -296,6 +296,10 @@ SimpleRank() {
     echo ""
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "# EndeavourOS mirrorlist, ranked by $progname at $(date +%x\ %X)."
+    if [ -n "$preferred_mirrors" ] || [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
+        echo "# Preferred mirrors: ${preferred_mirrors//\|/ } ${ALWAYS_FIRST_EOS_MIRRORS//\|/ }"
+    fi
+    [ -n "$ignored_mirrors" ]   && echo "# Ignored mirrors: ${ignored_mirrors//\|/ }"
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
