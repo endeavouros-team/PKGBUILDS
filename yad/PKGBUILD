@@ -13,7 +13,7 @@ _yad-eos_prepare() {
     local tmpdir=$(mktemp -d)
     chmod go-rwx $tmpdir
     cd $tmpdir
-    yay -G yad || exit 1
+    yay -G yad > /dev/null || exit 1
     mv yad/PKGBUILD "$curdir"/PKGBUILD.orig
     rm -rf yad
     cd "$curdir"
