@@ -651,7 +651,7 @@ _yad_hook_add_gspell() {
 # Common helper functions.
 
 _helper_get_files_from_Arch() {
-    local PKGNAME="$1"             # must include "repo/" prefix, e.g. "community/yad"
+    local PKGNAME="$1"             # must include "repo/" prefix, e.g. "extra/yad"
 
     case "$PKGNAME" in
         */*) ;;
@@ -705,8 +705,8 @@ _yad_hook() {
 
     cp PKGBUILD PKGBUILD.eos
 
-    _helper_get_files_from_Arch community/yad       || return 1
-    _helper_compare_pkg_version_info community/yad  || return 1
+    _helper_get_files_from_Arch extra/yad       || return 1
+    _helper_compare_pkg_version_info extra/yad  || return 1
 
     sed -i PKGBUILD -E \
         -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n' \
