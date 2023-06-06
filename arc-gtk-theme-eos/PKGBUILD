@@ -10,10 +10,20 @@ _prepare_arc-gtk-theme-eos() {
 
     local _pkgname_orig=arc-gtk-theme
     local _empty_prepare=no
-    local _url_orig=https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD
+    # local _url_orig=https://github.com/archlinux/svntogit-community/raw/packages/$_pkgname_orig/trunk/PKGBUILD
 
     ################## Fetch and source the upstream PKGBUILD:
-    curl -Lsm 10 -o PKGBUILD.orig $_url_orig || exit 1
+    # curl -Lsm 10 -o PKGBUILD.orig $_url_orig || exit 1
+
+    local curdir="$PWD"
+    local tmpdir=$(mktemp -d)
+    chmod go-rwx $tmpdir
+    cd $tmpdir
+    yay -G $_pkgname_orig > /dev/null || exit 1
+    mv $_pkgname_orig/PKGBUILD "$curdir"/PKGBUILD.orig
+    cd "$curdir"
+    rm -rf $tmpdir
+
 
     if [ 1 -eq 1 ] ; then     # TODO !!
         _empty_prepare=yes
