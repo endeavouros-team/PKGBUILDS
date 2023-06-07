@@ -107,8 +107,8 @@ Main()
                 esac
                 ;;
             *)
-                MIRROR_URL=https://github.com/$SIGNER/$REPONAME/releases/tag/"${RELEASE_TAGS[0]}"/
-                findpart=/$SIGNER/$REPONAME/releases/download/"${RELEASE_TAGS[0]}"/
+                MIRROR_URL=https://github.com/$REPO_OWNER/$REPONAME/releases/tag/"${RELEASE_TAGS[0]}"/
+                findpart=/$REPO_OWNER/$REPONAME/releases/download/"${RELEASE_TAGS[0]}"/
                 ;;
         esac
     else
