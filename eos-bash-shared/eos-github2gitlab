@@ -94,6 +94,7 @@ Github2Gitlab() {   # old implementation
                 else
                     sed+=(-e 's|/master/|/-/raw/main/|')
                 fi
+                sed+=(-e 's|/endeavouros-team/calamares/|/endeavouros-team/calamares/-/raw/|' )
                 sed+=(-e 's|/install-scripts-next/|/install-scripts-next/-/raw/|')
             else
                 sed+=(-e 's|/github\.com/|/gitlab.com/|')
