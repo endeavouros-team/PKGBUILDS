@@ -26,7 +26,6 @@ Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
 
 ## France
 Server = https://endeavour.remi.lu/repo/$repo/$arch
-Server = https://mirror.jordanrey.me/endeavouros/repo/$repo/$arch
 
 ## India
 Server = https://mirror.albony.xyz/endeavouros/repo/$repo/$arch
