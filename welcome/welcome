@@ -1290,7 +1290,7 @@ StartHere() {
                         --text="Internet connection not found.\nDo you want to quit, wait for a connection, or continue without a connection?" \
                         --button="Quit!Quit this program":1 \
                         --button="Wait $((sleeptime * rounds))s and ask!Wait a few seconds for a connection":3 \
-                        --button="Wait indefinitely!Wait indefinitely for a connection":7 \
+                        --button="Wait indefinitely!dialog-question!Wait indefinitely for a connection":7 \
                         --button="Continue!Continue without connection":5
                 case "$?" in
                     1) return ;;
