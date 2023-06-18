@@ -5,7 +5,7 @@
 _pkgname=sway
 pkgname=eos-skel-ce-sway
 pkgver=1.0
-pkgrel=12
+pkgrel=13
 pkgdesc="pre user creation skel setup for SWAY EOS-CE"
 arch=('any')
 url="https://github.com/EndeavourOS-Community-Editions/${_pkgname}"
