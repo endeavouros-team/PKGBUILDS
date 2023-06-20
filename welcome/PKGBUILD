@@ -3,7 +3,7 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=3.66
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -19,8 +19,12 @@ optdepends=(
   'vim: alternative app for pacdiff to use'
 )
 
-url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+# url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+# _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+# https://github.com/endeavouros-team/welcome/raw/main/LICENSE
+# https://raw.githubusercontent.com/endeavouros-team/welcome/main/LICENSE
+url=https://github.com/endeavouros-team/welcome
+_url=https://raw.githubusercontent.com/endeavouros-team/welcome/main
 
 source=(
   $_url/$pkgname
