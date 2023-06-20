@@ -21,7 +21,10 @@ Md2html() {
     if [ "${dir::1}" = "/" ] ; then
         pkgbuildsdir=""
     else
-        pkgbuildsdir=../..
+        case "$app" in
+            welcome) pkgbuildsdir=../../.. ;;    # welcome src separated from PKGBUILD!
+            *)       pkgbuildsdir=../.. ;;
+        esac
         [ -n "$dir" ] && dir="/$dir"
     fi
     mkdir -p $app
@@ -164,17 +167,18 @@ Main()
 
     Md2html mirrorlist-rank-info   reflector-simple/man
 
-    for app in nvidia-driver-supported-branches ; do
-        Md2html $app nvidia-installer-common/man
-    done
+    #for app in nvidia-driver-supported-branches ; do
+    #    Md2html $app nvidia-installer-common/man         # does not exist?
+    #done
 
     # Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
     Md2html welcome                welcome/man
 
-    # man page to html
-    for app in downgrade inxi polybar yad yay ; do
-        Man2html $app
-    done
+    # man page to html: no more needed...
+    #for app in #downgrade #yad # yay polybar inxi
+    #do
+    #    Man2html $app
+    #done
 
     # update the tar.gz archive
     cd ..

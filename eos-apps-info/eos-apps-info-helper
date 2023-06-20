@@ -216,8 +216,8 @@ Options()
             --show-system-folder)
                 echo "${folders[1]}"; exit;;    # for bash completion
             --show-bonus)
-                local bonus=(  # supported bonus apps!
-                    downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay
+                local bonus=(  # supported bonus apps / app-info!
+                    linux linux-lts nvidia grub rate-mirrors virtualbox #worm yad yay inxi downgrade paru
                 )
                 echo "${bonus[*]}"
                 exit

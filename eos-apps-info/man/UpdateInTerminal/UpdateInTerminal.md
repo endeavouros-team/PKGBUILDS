@@ -1,5 +1,13 @@
 # UpdateInTerminal
 
+<b>
+NOTE: this app is deprecated and will be removed before September 2023.<br>
+Recommended alternatives:
+- `eos-update`
+- `yay`
+- `paru`
+</b>
+
 Simple system updater using only command line.
 
 ## Synopsis

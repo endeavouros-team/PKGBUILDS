@@ -33,14 +33,20 @@ nvidia-inst [options]
   --listseries            List Nvidia driver versions supported by nvidia-inst.
   --series                (Advanced) Use the given Nvidia driver version (for testing).
 ```
+
+*Note*: option `--legacyrepo` is deprecated and does nothing.
+
 ## Tips
 
 ### Older Nvidia cards
-If you have an older Nvidia graphics card that is no longer supported by the latest driver from the Arch repos, you can add a 3rd party repo to `/etc/pacman.conf` with command
+
+You can try installing a legacy Nvidia driver from the AUR.
+
+<strike>If you have an older Nvidia graphics card that is no longer supported by the latest driver from the Arch repos, you can add a 3rd party repo to `/etc/pacman.conf` with command
 ```
 nvidia-inst --legacyrepo
 ```
-and install a legacy driver using pacman.
+and install a legacy driver using pacman.</strike>
 
 ### Check and test
 
