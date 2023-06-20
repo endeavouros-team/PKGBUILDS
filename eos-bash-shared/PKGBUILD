@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23
-pkgrel=19.3
+pkgrel=20
 arch=('any')
 license=('GPL')
 depends=(
@@ -31,8 +31,11 @@ backup=(
   etc/eos-sendlog.conf
 )
 #url=https://github.com/endeavouros-team/PKGBUILDS/$pkgname
-url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+#url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+#_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+
+url=https://github.com/endeavouros-team/$pkgname
+_url=https://raw.githubusercontent.com/endeavouros-team/$pkgname/main
 
 source=(
   $_url/eos-script-lib-yad
