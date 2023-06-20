@@ -741,9 +741,11 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
 
     local file=ksetwallpaper.py
     local url="https://github.com/pashazz/ksetwallpaper/raw/master/$file"
-    local current="$PKGBUILD_ROOTDIR"/eos-bash-shared/$file
+    local current="$PKGBUILD_ROOTDIR"/eos-bash-shared/$file                     # old place
     local new
     local diffs answer
+
+    current="$EOS_ROOT/eos-bash-shared/$file"                                  # new place
 
     new="$(_fetch_that_file - "$url")"
     if [ $? -ne 0 ] ; then
@@ -757,14 +759,16 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
         # echo "" >&2
         # echo "$diffs" >&2
         # echo "" >&2
-        read -p "eos-bash-shared: file '$file' differs from current, update (Y/n)? " answer >&2
-        case "$answer" in
-            "" | [yY]*)
-                rm -f $current
-                mv $newfile $current
-                _Updpkgsums "$current"
-                ;;
-        esac
+        if false ; then
+            read -p "eos-bash-shared: file '$file' differs from current, update (Y/n)? " answer >&2
+            case "$answer" in
+                "" | [yY]*)
+                    rm -f $current
+                    mv $newfile $current
+                    _Updpkgsums "$current"
+                    ;;
+            esac
+        fi
         rm -f "$newfile"
     fi
 }
