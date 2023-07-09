@@ -57,7 +57,7 @@ PKGNAMES=(                                        # Alphabetically ordered.
     ckbcomp
 
     downgrade/aur
-    dracut
+    # dracut
 
     endeavouros-keyring
     endeavouros-mirrorlist
@@ -139,7 +139,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
 
 if false ; then
     PKGNAMES=(
-        eos-hooks
+        dracut
+        # eos-hooks
         # eos-lightdm-gtk-theme
         # wgetpaste-eos
         # kernel-install-for-dracut
@@ -288,6 +289,20 @@ _rate-mirrors_hook() {
     sed -i $PKGBUILD \
         -e "/^depends=/a \ \nreplaces=(rate-mirrors-bin)"
 }
+
+_dracut_hook() {
+    local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
+    local eos_pkgver=""
+    local eos_pkgrel=""
+    GetPkgbuildValue "$PKGBUILD" pkgver eos_pkgver
+    GetPkgbuildValue "$PKGBUILD" pkgrel eos_pkgrel
+    local extra_ver=$(expac -S %v extra/dracut)
+
+    if [ $(vercmp $extra_ver ${eos_pkgver}-$eos_pkgrel) -ge 0 ] ; then
+        printf "$FUNCNAME: dracut: Arch version is not older than EndeavourOS ==> skip the EndeavourOS version. " >&2
+    fi
+}
+
 _paru_hook() {
     local PKGBUILD="$PKGBUILD_ROOTDIR"/"$(__generic_get_pkgname $FUNCNAME)"/PKGBUILD
     local Pkgver=""   # =$(grep ^pkgver= "$PKGBUILD" | cut -d'=' -f2)
@@ -784,6 +799,7 @@ ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper
 #ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
 ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
 ASSET_PACKAGE_HOOKS["eos-lightdm-gtk-theme"]=_eos-lightdm-gtk-theme_hook
+ASSET_PACKAGE_HOOKS[dracut]=_dracut_hook
 
 #ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
 #ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
