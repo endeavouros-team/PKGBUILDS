@@ -24,6 +24,7 @@ Os_release() {
     local doc=https://discovery.endeavouros.com
     local support=https://forum.endeavouros.com
     local bugs=https://forum.endeavouros.com/c/arch-based-related-questions/bug-reports
+    local privacy=https://endeavouros.com/privacy-policy-2
 
     sed -i $file \
         -e 's|^NAME=.*$|NAME=EndeavourOS|' \
@@ -34,7 +35,8 @@ Os_release() {
         -e "s|^BUG_REPORT_URL=.*$|BUG_REPORT_URL='$bugs'|" \
         -e "s|^LOGO=.*$|LOGO=endeavouros|" \
         -e "s|^ID=.*$|ID=endeavouros|" \
-        -e "s|^ID_LIKE=.*$|ID_LIKE=arch|"
+        -e "s|^ID_LIKE=.*$|ID_LIKE=arch|" \
+        -e "s|^PRIVACY_POLICY_URL=.*$|PRIVACY_POLICY_URL=$privacy|"
 
     if [ -z "$(grep "^ID_LIKE=" $file)" ] && [ -n "$(grep "^ID=" $file)" ] ; then
         # add missing ID_LIKE=
