@@ -7,12 +7,13 @@ Lsb_release() {
 
     if [ -z "$(grep "^DISTRIB_CODENAME=" $file)" ] ; then
         # add missing DISTRIB_CODENAME=
-        echo "DISTRIB_CODENAME=rolling" >> $file
+        echo "DISTRIB_CODENAME=${quote}rolling${quote}" >> $file
     fi
     sed -i $file \
-        -e 's|^DISTRIB_ID=.*$|DISTRIB_ID=EndeavourOS|' \
-        -e 's|^DISTRIB_CODENAME=.*$|DISTRIB_CODENAME=rolling|' \
-        -e 's|^DISTRIB_DESCRIPTION=.*$|DISTRIB_DESCRIPTION=\"EndeavourOS Linux\"|'
+        -e "s|^DISTRIB_ID=.*|DISTRIB_ID=${quote}EndeavourOS${quote}|" \
+        -e "s|^DISTRIB_CODENAME=.*|DISTRIB_CODENAME=${quote}rolling${quote}|" \
+        -e "s|^DISTRIB_DESCRIPTION=.*|DISTRIB_DESCRIPTION=${quote}EndeavourOS Linux${quote}|" \
+        -e "s|^DISTRIB_RELEASE=\"\(.*\)\"|DISTRIB_RELEASE=${quote}\1${quote}|"
 }
 
 Os_release() {
@@ -27,25 +28,26 @@ Os_release() {
     local privacy=https://endeavouros.com/privacy-policy-2
 
     sed -i $file \
-        -e 's|^NAME=.*$|NAME=EndeavourOS|' \
-        -e 's|^PRETTY_NAME=.*$|PRETTY_NAME=EndeavourOS|' \
-        -e "s|^HOME_URL=.*$|HOME_URL='$home'|" \
-        -e "s|^DOCUMENTATION_URL=.*$|DOCUMENTATION_URL='$doc'|" \
-        -e "s|^SUPPORT_URL=.*$|SUPPORT_URL='$support'|" \
-        -e "s|^BUG_REPORT_URL=.*$|BUG_REPORT_URL='$bugs'|" \
-        -e "s|^LOGO=.*$|LOGO=endeavouros|" \
-        -e "s|^ID=.*$|ID=endeavouros|" \
-        -e "s|^ID_LIKE=.*$|ID_LIKE=arch|" \
-        -e "s|^PRIVACY_POLICY_URL=.*$|PRIVACY_POLICY_URL=$privacy|"
+        -e "s|^NAME=.*|NAME=${quote}EndeavourOS${quote}|" \
+        -e "s|^PRETTY_NAME=.*|PRETTY_NAME=${quote}EndeavourOS${quote}|" \
+        -e "s|^HOME_URL=.*|HOME_URL=${quote}$home${quote}|" \
+        -e "s|^DOCUMENTATION_URL=.*|DOCUMENTATION_URL=${quote}$doc${quote}|" \
+        -e "s|^SUPPORT_URL=.*|SUPPORT_URL=${quote}$support${quote}|" \
+        -e "s|^BUG_REPORT_URL=.*|BUG_REPORT_URL=${quote}$bugs${quote}|" \
+        -e "s|^LOGO=.*|LOGO=${quote}endeavouros${quote}|" \
+        -e "s|^ID=.*|ID=${quote}endeavouros${quote}|" \
+        -e "s|^ID_LIKE=.*|ID_LIKE=${quote}arch${quote}|" \
+        -e "s|^PRIVACY_POLICY_URL=.*|PRIVACY_POLICY_URL=${quote}$privacy${quote}|" \
+        -e "s|^ANSI_COLOR=\"\(.*\)\"|ANSI_COLOR=${quote}\1${quote}|"
 
     if [ -z "$(grep "^ID_LIKE=" $file)" ] && [ -n "$(grep "^ID=" $file)" ] ; then
         # add missing ID_LIKE=
-        sed -i $file -e '/^ID=/a \ID_LIKE=arch'
+        sed -i $file -e "/^ID=/a \ID_LIKE=${quote}arch${quote}"
     fi
     if [ -r $eosfile ] ; then
         # fix BUILD_ID for EndeavourOS
         local buildid="$(grep "^VERSION=" $eosfile | awk '{print $1}' | cut -d '=' -f 2)"
-        sed -i $file -e "s|^BUILD_ID=.*$|BUILD_ID=$buildid|"
+        sed -i $file -e "s|^BUILD_ID=.*|BUILD_ID=${quote}$buildid${quote}|"
     fi
 }
 
@@ -56,6 +58,8 @@ Issues() {
 Main()
 {
     local hookname="$1"
+    local quote="'"
+    quote='\"'
 
     case "$hookname" in
         os-release)  Os_release ;;
