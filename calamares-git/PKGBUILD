@@ -18,7 +18,7 @@ depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcorea
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt5' 'python' 'solid' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
 provides=("calamares")
 options=(!strip !emptydirs)
-source=("git+https://github.com/endeavouros-team/$_reponame.git")
+source=("git+https://github.com/endeavouros-team/$_reponame.git#branch=main")
 
 sha256sums=('SKIP')
             
