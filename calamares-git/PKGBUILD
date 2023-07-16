@@ -1,7 +1,5 @@
-#
-# Configurations are in extra packages:
-# calamares_config_default - default settings
-# calamares_config_ce - Community Edition settings
+# Maintainer : EndeavourOS <info at endeavouros.com>
+# Calamares installer (fork) configured for EndeavourOS
 
 pkgname=calamares-git
 _reponame=calamares
