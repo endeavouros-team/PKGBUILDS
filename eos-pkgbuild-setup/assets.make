@@ -138,13 +138,22 @@ GetPkgbuildValue() {
     local PKGBUILD="$1"
     local varname="$2"
     local -n retvar="$3"
+    local retval2=""
 
     source "$PKGBUILD" || return 1
     case "$varname" in
         depends)     retvar=("${depends[@]}") ;;
         makedepends) retvar=("${makedepends[@]}") ;;
         epoch)       retvar="$epoch" ;;
-        pkgver)      retvar="$pkgver" ;;
+        pkgver)
+            if declare -F pkgver &> /dev/null ; then
+                retvar="$(pkgver)"
+                retval2="$(echo "$retvar" | tail -n1)"   # $retvar may have 2 items in 2 lines !?
+                [ -n "$retval2" ] && retvar="$retval2"
+            else
+                retvar="$pkgver"
+            fi
+            ;;
         pkgrel)      retvar="$pkgrel" ;;
         _ver)        retvar="$_ver" ;;
         *) return 1 ;;
@@ -294,11 +303,13 @@ PkgBuildVersion()
     if [ ! -r "$srcfile" ] ; then
         DIE "'$srcfile' does not exist."
     fi
+    local Pkgver=""
+    GetPkgbuildValue "$srcfile" pkgver Pkgver
     source "$srcfile"
     if [ -n "$epoch" ] ; then
-        echoreturn "$epoch:${pkgver}-$pkgrel"
+        echoreturn "$epoch:${Pkgver}-$pkgrel"
     else
-        echoreturn "${pkgver}-$pkgrel"
+        echoreturn "${Pkgver}-$pkgrel"
     fi
 }
 
