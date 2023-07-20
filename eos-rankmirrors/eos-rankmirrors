@@ -329,11 +329,14 @@ UserAddedMirrors() {
                 mirror="$m"
                 ;;
             *)
-                mirror="$(grep "$m" "$latest_ml.orig" | awk '{print $NF}')"
+                m=${m//./\\.}
+                mirror="$(grep "Server = http" "$latest_ml.orig" | grep "$m"  | awk '{print $NF}')"
                 ;;
         esac
-        notif_echo2 "User added: $mirror"
-        echo "Server = $mirror"
+        if [ -n "$mirror" ] ; then
+            notif_echo2 "User added: $mirror"
+            echo "Server = $mirror"
+        fi
     done
     echo2 ""
     echo "# user added mirrors <<<"
