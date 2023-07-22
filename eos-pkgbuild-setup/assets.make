@@ -147,7 +147,12 @@ GetPkgbuildValue() {
         epoch)       retvar="$epoch" ;;
         pkgver)
             if declare -F pkgver &> /dev/null ; then
+                Pushd ${PKGBUILD%/*}
+                printf2 " please wait... "
+                makepkg --skipinteg -od &> /dev/null || DIE "$FUNCNAME: cannot determine 'pkgver' from $PKGBUILD."
+                source "$PKGBUILD"
                 retvar="$(pkgver)"
+                Popd
                 retval2="$(echo "$retvar" | tail -n1)"   # $retvar may have 2 items in 2 lines !?
                 [ -n "$retval2" ] && retvar="$retval2"
             else
