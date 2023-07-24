@@ -159,7 +159,7 @@ URL_from_bonus() {
         #libreoffice)  url=https://documentation.libreoffice.org/en/english-documentation;;
         linux)         url=https://www.kernel.org;;
         linux-lts)     url=https://www.kernel.org;;
-        nvidia)        url=https://www.nvidia.com/en-us/drivers/unix;;
+        nvidia)        url=http://www.nvidia.com/object/unix.html;;  # https://www.nvidia.com/en-us/drivers/unix;;
         virtualbox)    url=https://www.virtualbox.org/manual/UserManual.html;;
     esac
 }

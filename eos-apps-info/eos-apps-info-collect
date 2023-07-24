@@ -87,6 +87,11 @@ Man2html() {
     echo "$app" >&2
 }
 
+GetDescription() {
+    local app="$1"
+    expac -Q %d $app || expac -Q %d $app || LANG=C yay -Si $app | grep Description | sed 's|^Description[ ]*: ||'
+}
+
 Help2html() {
     local app      # e.g. rate-mirrors and others
     local descr
@@ -109,7 +114,7 @@ Help2html() {
         esac
         mkdir -p $tmpdir/$app
         tmpfile=$tmpdir/$app/foobar123.md
-        descr="$(LANG=C yay -Si $app | grep Description | sed 's|^Description[ ]*: ||')"
+        descr=$(GetDescription $app)
         cat <<EOF > $tmpfile
 # $app
 
