@@ -1090,6 +1090,7 @@ Options:
     -n  | -nl | --dryrun-local  Show what would be done, but do nothing. Use local assets.
     -nn | -nr | --dryrun        Show what would be done, but do nothing.
     -ad | --allow-downgrade     New package may have smaller version number.
+    --pkgnames="X"              X is a space separated list of packages to use instead of PKGNAMES array in assets.conf.
     --repoup                    (Advanced) Force update of repository database files.
     --aurdiff                   Show PKGBUILD diff for AUR packages.
 EOF
@@ -1159,6 +1160,7 @@ Main2()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
     local save_folder=""
+    local PKGNAMES_PARAMETER=""
 
     local hook_pkgver="#"
     local hook_multiversion="+"
@@ -1177,6 +1179,8 @@ Main2()
                 --repoup)                  repoup=1 ;;                  # sync repo even when no packages are built
                 --aurdiff)                 aurdiff=1 ;;
                 --allow-downgrade | -ad)   allow_downgrade=yes ;;
+
+                --pkgnames=*)              PKGNAMES_PARAMETER="$xx" ;;
 
                 # currently not used!
                 --mirrorcheck=*)           mirror_check_wait="${xx#*=}";;
@@ -1197,7 +1201,7 @@ Main2()
     source /etc/eos-pkgbuild-setup.conf     # sets the base folder of everything
     [ -n "$EOS_ROOT" ] || DIE "EOS_ROOT cannot be empty!"
 
-    source $ASSETS_CONF                     # local variables (with CAPITAL letters)
+    source $ASSETS_CONF "$PKGNAMES_PARAMETER"                    # local variables (with CAPITAL letters)
 
     filelist_txt="$ASSETSDIR/repofiles.txt"
     use_filelist="$USE_GENERATED_FILELIST"
