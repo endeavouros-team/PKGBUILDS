@@ -75,7 +75,7 @@ _tr_add2 after_install_ew         "Fondo de pantalla EOS"
 _tr_add2 after_install_ewtip      "Cambiar el fondo de pantalla al que trae EndeavourOS por defecto"
 
 
-_tr_add2 after_install_pm         "Gestor Paquetes"
+_tr_add2 after_install_pm         "Gestor de Paquetes"
 _tr_add2 after_install_pmtip      "Cómo manejar los paquetes con pacman"
 
 _tr_add2 after_install_ay         "${_exclamation_down}AUR $_and yay$_exclamation"
@@ -108,7 +108,7 @@ _tr_add2 general_info_fo          "Foro"
 _tr_add2 general_info_fotip       "${_exclamation_down}Pregunte, comente y charle en nuestro amigable foro$_exclamation"
 
 _tr_add2 general_info_do          "Donar"
-_tr_add2 general_info_dotip       "${_exclamation_down}Ayúdanos a mantener el EndeavourOS funcionando"
+_tr_add2 general_info_dotip       "Ayúdanos a mantener el EndeavourOS funcionando"
 
 _tr_add2 general_info_ab          "Acerca de $PRETTY_PROGNAME"
 _tr_add2 general_info_abtip       "Más información sobre esta aplicación"
@@ -244,7 +244,7 @@ _tr_add2 ins_resotip              "Cambiar la resolución de la pantalla ahora"
 _tr_add2 add_more_apps_arch          "Ver todos los paquetes de Arch"
 _tr_add2 add_more_apps_aur           "Ver todos los paquetes de AUR"
 _tr_add2 add_more_apps_done1_text    "${_exclamation_down}Aplicaciones sugeridas ya instaladas$_exclamation"
-_tr_add2 add_more_apps_done2_text    "\n\nTambién puedes ver todos los paquetes de Arch y AUR (e instalarlos usando la terminal).\n"
+_tr_add2 add_more_apps_done2_text    "o ver todos los paquetes de Arch y AUR"
 _tr_add2 add_more_apps_done2_tip1    "Para instalar, usa 'pacman' o 'yay'"
 _tr_add2 add_more_apps_done2_tip2    "Para instalar, usa 'yay'"
 
@@ -266,3 +266,84 @@ _tr_add2 updt_for_updates         "actualizaciones"
 _tr_add2 updt_failure             "${_exclamation_down}falló$_exclamation"
 _tr_add2 updt_nothing_todo        "no hay nada que hacer"
 _tr_add2 updt_press_enter         "Pulse ENTER para cerrar esta ventana"
+
+# 2020-Oct-24:
+#    IMPORTANT NOTE:
+#       - line 244: changed text of 'add_more_apps_done2_text'
+
+# 2020-Dec-11:
+_tr_add2 after_install_pacdiff_tip "Maneja los archivos pacnew, pacorig y pacsave con pacdiff y"
+
+# 2021-Apr-07:
+_tr_add2 after_install_conf           "Configurar"                             # a starting verb on a sentence "Configure eos-update-notifier"
+_tr_add2 after_install_more_wall      "Descargar más fondos de pantalla de EndeavourOS"
+_tr_add2 after_install_more_wall_tip  "Descargar fondos de pantalla de EndeavourOS anteriores y comunitarios"
+_tr_add2 after_install_info           "información"                           # last word on a sentence, means just any information
+
+_tr_add2 butt_softnews                "Noticias de Software"
+_tr_add2 butt_softnews_tip            "Noticias importantes sobre software de EndeavourOS"
+
+_tr_add2 install_community            "Instalar ediciones comunitarias"
+_tr_add2 install_community_tip        "Colección de ediciones comunitarias (GVs principalmente)"    # changed 2021-Oct-23, 2023-Jan-12
+
+# 2021-May-01
+_tr_add2 ins_syslog                   "Como compartir logs del sistema"
+_tr_add2 ins_syslogtip                "Explica cómo puedes compartir logs del sistema cuando necesitas ayuda"
+_tr_add2 ins_logtool                  "Logs para solución de problemas"
+_tr_add2 ins_logtooltip               "Seleccionar, crear y compartir logs para solución de problemas cuando pides ayuda"
+
+# 2021-May-20
+_tr_add2 nb_tab_DailyAssistant       "Asistente"
+_tr_add2 daily_assistant_text        "Herramientas para tareas útiles y/o diarias"
+_tr_add2 after_install_itab          "Seleccionar la pestaña inicial de Welcome"
+_tr_add2 after_install_itab_tip      "Define la pestaña que Welcome muestra cuando se inicia"
+
+# 2021-Jun-08
+_tr_add2 daily_assist_apps           "Aplicaciones por categoría"
+_tr_add2 daily_assist_apps_tip       "Aplicaciones ordenadas por categoría"
+
+_tr_add2 after_install_vbox1         "Habilitar las utilidades de Invitado de VirtualBox"
+_tr_add2 after_install_vbox2         "Para habilitar las utilidades de Invitado de VirtualBox, seleccione la pestaña <b>Después Instalación</b> y haga clic en el botón "
+
+# 2021-Jun-17
+_tr_add2 after_install_r8168         "${_question_down}Problemas con la red cableada$_question ${_exclamation_down}Cambia los controladores r8168 y r8169$_exclamation"    # changed 2021-Dec-14 !!
+_tr_add2 after_install_r8168_tip     "Cambia entre los controladores r8168 y r8169 (puede requerir reiniciar)"           # changed 2021-Dec-14 !!
+
+# 2021-Oct-08
+_tr_add2 daily_assist_DEinfo         "información"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "más información sobre este Gestor de Escritorio/Ventanas"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+
+# 2022-Feb-16
+_tr_add2 add_more_apps_qs            "Elegir aplicaciones populares para instalar"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qstip         "Elegir aplicaciones populares e instalarlas"
+
+# 2022-Mar-21
+_tr_add2 ins_blue_notes              "Notas del Bluetooth"
+_tr_add2 ins_blue_notes_tip          "Notas sobre la configuración del Bluetooth"
+
+# 2022-Mar-27
+_tr_add2 after_install_fw            "Información del cortafuegos"
+_tr_add2 after_install_fwtip         "Información sobre el cortafuegos predeterminado"
+
+# 2022-Mar-30
+_tr_add2 ins_custom                  "Personalizando el proceso de instalación"
+_tr_add2 ins_custom_tip              "Cómo personalizar el proceso de instalación"
+
+# 2022-Jul-15
+_tr_add2 daily_assist_anews          "Últimas noticias de Arch"
+_tr_add2 daily_assist_anewstip       "Muestra las últimas noticias de Arch en un navegador"
+
+# 2022-Sep-25
+_tr_add2 nb_nofify_user1             "Hay noticias importantes el"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_nofify_user2             "Por favor haga clic en el botón"                                  # Software News
+_tr_add2 nb_nofify_user3             "en la esquina inferior izquierda de esta ventana."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Traer su archivo de personalización de instalación (avanzado)"
+_tr_add2 ins_cust_text               "Indique la URL de su user_commands.bash personalizado"
+_tr_add2 ins_cust_text2              "El archivo obtenido reemplazará a ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Esto es más útil para la instalación <b>en línea</b>"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Nota: conexión a Internet no disponible, algunos botones están ocultos o no funcionan."
+
