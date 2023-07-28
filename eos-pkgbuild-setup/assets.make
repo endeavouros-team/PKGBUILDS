@@ -1201,7 +1201,9 @@ Main2()
     source /etc/eos-pkgbuild-setup.conf     # sets the base folder of everything
     [ -n "$EOS_ROOT" ] || DIE "EOS_ROOT cannot be empty!"
 
-    source $ASSETS_CONF "$PKGNAMES_PARAMETER"                    # local variables (with CAPITAL letters)
+    source $ASSETS_CONF                     # local variables (with CAPITAL letters)
+
+    [ -n "$PKGNAMES_PARAMETER" ] && PKGNAMES=(${PKGNAMES_PARAMETER#*=})
 
     filelist_txt="$ASSETSDIR/repofiles.txt"
     use_filelist="$USE_GENERATED_FILELIST"

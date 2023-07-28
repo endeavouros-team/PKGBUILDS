@@ -137,30 +137,8 @@ PKGNAMES=(                                        # Alphabetically ordered.
     zfs-utils/aur
 )
 
-case "$1" in
-    --pkgnames=*)              # set PKGNAMES from command line
-        PKGNAMES=( ${1#*=} )
-        ;;
-    "")
-        if false ; then
-            # set certain PKGNAMES to build
-            PKGNAMES=(
-                rate-mirrors/aur
-                # dracut
-                # eos-hooks
-                # eos-lightdm-gtk-theme
-                # wgetpaste-eos
-                # kernel-install-for-dracut
-                # arc-gtk-theme-eos
-                # ckbcomp
-            )
-        fi
-        ;;
-    *)
-        echo "assets.conf: unsupported parameter '$1'" >&2
-        exit 1
-        ;;
-esac
+# Use option --pkgnames="names" for special checks!
+
 
 # PKGNAMES_WAIT specifies which of the packages in PKGNAMES will not be built.
 # Include them in quotes because we use the pipe character '|' to separate package name and the version.
