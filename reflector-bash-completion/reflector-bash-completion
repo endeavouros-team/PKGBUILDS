@@ -6,6 +6,18 @@ _reflector_complete() {
     compopt -o nosort
 }
 
+_reflector_complete_delay() {
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))          # float
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o nosort
+}
+
+_reflector_complete_threads() {
+    COMPREPLY=($(compgen -W "{1..99}" -- "$cur"))     # uint8
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o nosort
+}
+
 _reflector_complete_countries() {
     local folder=$HOME/.config/reflector-complete
     local countrylist=$folder/countrylist
@@ -17,7 +29,7 @@ _reflector_complete_countries() {
         country_names="$(cat $countrylist.$date)"
     else
         rm -f $countrylist.*
-        country_names="$(/usr/bin/reflector --list-countries 2>/dev/null | /usr/bin/sed -n '/^-----/,//'p | /usr/bin/sed -e '1d' -e 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
+        country_names="$(/bin/reflector --list-countries 2>/dev/null | /bin/sed -n '/^-----/,//'p | /bin/sed -e '1d' -e 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
         echo "$country_names" > $countrylist.$date
     fi
 
@@ -42,6 +54,7 @@ _reflector_options() {
         --cache-timeout
         --completion-percent
         --connection-timeout
+        --delay
         --download-timeout
         --info
         --ipv4
@@ -51,6 +64,7 @@ _reflector_options() {
         --save
         --score
         --sort
+        --threads
         --url
         --verbose
     )
@@ -77,6 +91,8 @@ _reflector_()
         --country | -c)  _reflector_complete_countries ;;
         --protocol | -p) _reflector_complete "https http rsync" ;;
         --sort)          _reflector_complete "age rate country score delay" ;;
+        --threads)       _reflector_complete ;;
+        --delay)         _reflector_complete ;;
         --save)          _filedir ;;
         --url) ;;
         --include | -i | --exclude | -x) ;;
