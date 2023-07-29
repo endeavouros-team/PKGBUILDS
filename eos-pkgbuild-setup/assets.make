@@ -790,15 +790,10 @@ Constructor()
 {
     # make sure proper .git symlink exists; create new or change existing if necessary
 
-    if [ -e "$ASSETSDIR"/.git ] ; then
-        [ -L "$ASSETSDIR"/.git ] || DIE "'$ASSETSDIR/.git' must be a symlink to '$GITDIR/.git'!"
-        if [ ! "$GITDIR"/.git -ef "$ASSETSDIR"/.git ] ; then
-            echo2 "Warning: '$ASSETSDIR/.git' does not refer to proper place, fixing..."
-            rm -f "$ASSETSDIR"/.git || DIE "failed to remove: '$ASSETSDIR/.git'"
-            ln -s "$GITDIR"/.git "$ASSETSDIR" || DIE "failed to symlink: '$ASSETSDIR/.git' -> '$GITDIR/.git'"
-        fi
-    else
-        ln -s "$GITDIR"/.git "$ASSETSDIR" || DIE "failed to symlink: '$ASSETSDIR/.git' -> '$GITDIR/.git'"
+    if [ ! "$GITDIR"/.git -ef "$ASSETSDIR"/.git ] ; then
+        echo2 "Warning: '$ASSETSDIR/.git' ($(ls -l $ASSETSDIR/.git)) does not refer to proper place, fixing..."
+        rm -f "$ASSETSDIR"/.git                || DIE "failed to remove: '$ASSETSDIR/.git'"
+        ln -s "$GITDIR"/.git "$ASSETSDIR"/.git || DIE "failed to symlink: '$ASSETSDIR/.git' -> '$GITDIR/.git'"
     fi
 }
 
@@ -837,6 +832,23 @@ _ASSERT_() {
     fi
 }
 
+_pkgbuilds_alt_hook() {
+    if [ -d "$ASSETSDIR/.$REPONAME/.git" ] ; then
+        _ASSERT_ pushd "$ASSETSDIR/.$REPONAME"
+        printf2 "git pull... "
+        _ASSERT_ git pull
+    else
+        _ASSERT_ pushd "$ASSETSDIR"
+        _ASSERT_ rmdir "$PKGBUILD_ROOTDIR"
+        _ASSERT_ rm -f "${PKGBUILD_ROOTDIR##*/}"
+        printf2 "git clone... "
+        _ASSERT_ git clone "$GITREPOURL" ".$REPONAME"
+        _ASSERT_ ln -s ".$REPONAME/${PKGBUILD_ROOTDIR##*/}"
+    fi
+    _ASSERT_ popd
+    echo2 "done."
+}
+
 _pkgbuilds_eos_hook()
 {
     # A hook function to make sure local EndeavourOS PKGBUILDS are up to date.
@@ -845,7 +857,7 @@ _pkgbuilds_eos_hook()
 
     if [ -d "$ASSETSDIR/.$REPONAME/$PKGBUILDS/.git" ] ; then
         _ASSERT_ pushd "$ASSETSDIR/.$REPONAME/$PKGBUILDS"
-        printf "git pull... " >&2
+        printf2 "git pull... "
         _ASSERT_ git pull
     else
         local GITPKGBUILDSURL=https://github.com/endeavouros-team/$PKGBUILDS.git
@@ -853,11 +865,11 @@ _pkgbuilds_eos_hook()
         if [ -d $PKGBUILDS ] && [ ! -L $PKGBUILDS ] ; then
             rmdir $PKGBUILDS
         fi
-        printf "git clone... " >&2
-        _ASSERT_ git clone "$GITPKGBUILDSURL" ".$REPONAME/$PKGBUILDS"              # get PKGBUILDS.git
+        printf2 "git clone... "
+        _ASSERT_ git clone "$GITPKGBUILDSURL" ".$REPONAME/$PKGBUILDS"
         _ASSERT_ ln -s ".$REPONAME/$PKGBUILDS"
     fi
-    echo "done" >&2
+    echo2 "done"
     _ASSERT_ popd
 }
 
@@ -871,17 +883,9 @@ RunPreHooks()
 
     case "$REPONAME" in
         endeavouros | endeavouros-testing-dev)
-            _pkgbuilds_eos_hook
-            ;;
+            _pkgbuilds_eos_hook ;;
         *)
-            if [ -n "$ASSET_HOOKS" ] ; then
-                local xx
-                for xx in "${ASSET_HOOKS[@]}" ; do
-                    $xx
-                done
-                echo2 "done."
-            fi
-            ;;
+            _pkgbuilds_alt_hook ;;
     esac
 }
 
