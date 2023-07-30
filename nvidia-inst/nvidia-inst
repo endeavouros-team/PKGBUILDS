@@ -357,15 +357,26 @@ Options:
   --listopts              List options supported by $progname.
   --legacyrepo            (*1) Adds a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
 
-Note:
-  - Package nvidia-dkms will be selected for install if none of options
+(*1) Option --legacyrepo is no more supported.
+     Instead, 'yay' can be used for installing legacy Nvidia drivers from the AUR.
+
+Notes:
+  1. Package nvidia-dkms will be selected for install if none of options
        --bumblebee
        --nouveau
        --open
-    is used.
+     is used.
 
-(*1) Option --legacyrepo is no more supported.
-     Instead, 'yay' can be used for installing legacy Nvidia drivers from the AUR.
+  2. If you have hybrid graphics, then you may need a tool that can switch GPUs.
+     There are several popular tools in the AUR, e.g.
+       - envycontrol
+       - optimus-manager
+       - supergfxctl
+     just to mention a few.
+     See also:
+       - https://discovery.endeavouros.com/?s=nvidia
+       - https://wiki.archlinux.org/title/NVIDIA_Optimus
+
 EOF
                 exit 0
                 ;;
