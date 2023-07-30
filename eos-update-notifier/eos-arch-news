@@ -88,9 +88,18 @@ EOF
 }
 
 Main() {
+    local url=https://archlinux.org/news
+
+    # New implementation.
+
+    local browser=$(eos_select_browser)
+    if [ -n "$browser" ] ; then
+        setsid "$browser" $url &> /dev/null
+    fi
+    return
+
     local progname="$(basename "$0")"
     local latestfile="$HOME/.config/EOS-arch-news.conf"
-    local url=https://archlinux.org/news
     local arg stop=no
     local keep_quiet=no
     local dates
