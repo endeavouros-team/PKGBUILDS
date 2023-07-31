@@ -1,148 +1,57 @@
 #!/bin/bash
 #
-# Shows latest Arch news.
-# Keeps simple record of what you've already seen.
+# Shows all Arch news in a browser.
+# To show only "unseen" news, saves the date of the latest news flash you've seen
+# and shows the news page only if there's more after that.
 
-source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
-
-export -f eos_yad
-
-ShowAll() {
-    echo "Showing all Arch news..." >&2
-    local latest="${dates[0]}"
-    local browser
-
-    for browser in firefox chromium xdg-open exo-open ; do
-        if [ -x /usr/bin/$browser ] ; then
-            /usr/bin/$browser "$url" >& /dev/null
-            echo "$latest" > "$latestfile"
-            return
-        fi
-    done
-    echo "Error: no browser found." >&2
-}
-
-IsTooEarlyToShowArchNews() {
-    local log=/var/log/Calamares.log
-    local yes=0
-    local no=1
-    local timediff ftime now max=$((3600*1))   # don't show Arch news right after install (?)
-
-    test -r "$log" || return $no  # log not found, probably removed
-    now=$(date +%s)
-    ftime=$(stat -c %Y $log)
-    timediff=$((now - ftime))
-    if [ $timediff -lt $max ] ; then
-        return $yes
-    else
-        return $no
-    fi
-}
-
-ShowIfNotSeen() {
-    local latest="${dates[0]}"
-
-    if [ ! -r "$latestfile" ] ; then
-        IsTooEarlyToShowArchNews && return
-        #if [ -z "$(checkupdates)" ] ; then
-        #    # No need to show Arch news right after install or reset (?)
-        #    echo "$latest" > "$latestfile"
-        #    echo "Saving the latest Arch news date $latest." >&2
-        #    return
-        #fi
-        echo "0" > "$latestfile"
-    fi
-    local latest_seen="$(cat "$latestfile")"
-    if [ -n "$(echo "$latest_seen" | tr -d '0-9-')" ] ; then
-        mv "$latestfile" "$latestfile.bak.$(date "+%Y%m%d-%H:%M:%S")"
-        echo "0" > "$latestfile"
-        latest_seen="0"   # also: "$(cat "$latestfile")"
-        echo "Fixed a corrupt file: $latestfile (backup created)." >&2
-        echo "Re-checking Arch news." >&2
-    fi
-    local msg
-
-    if [[ "$latest" > "$latest_seen" ]] ; then
-        msg="Important Arch news are available! Want to see the news list now?"
-        eos_yad --form --text="$msg" --title="$progname" --image=info --no-focus --geometry=+60+30 \
-                --button=" Later!calendar!Show it later, please.":1 --button=yad-yes:0 && {
-            ShowAll
-        } || {
-            echo "Later it is!" >&2
-        }
-    else
-        if [ "$keep_quiet" = "no" ] ; then
-            msg="$(printf "Latest Arch news date: %s (already visited).\n" "$latest_seen")"
-            echo "$msg" >&2
-        fi
-    fi
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
 }
 
 Usage() {
     cat <<EOF >&2
 Usage: $progname [options]
 Options:
-    -f | --force     Show all Arch news.
-    -r | --reset     Reset the file that knows the last news you've seen.
+    -h | --help      This help.
+    -u | --unread    "Unread" all Arch news.
 EOF
 }
 
 Main() {
-    local url=https://archlinux.org/news
+    local -r progname="${0##*/}"
+    local -r latestfile="$HOME/.config/EOS-arch-news.conf"
 
-    # New implementation.
+    while [ -n "$1" ] ; do
+        case "$1" in
+            --help | -h)
+                Usage; return ;;
+            --unread | -u)
+                rm -f "$latestfile"; return ;;
+        esac
+        shift
+    done
 
-    local browser=$(eos_select_browser)
-    if [ -n "$browser" ] ; then
+    local -r latest_seen="$(cat "$latestfile" 2>/dev/null)"    # get the date of the latest visited news
+    local -r url=https://archlinux.org/news
+    local -r data=$(curl -Lsm 20 $url)
+
+    [ -n "$data" ]  || DIE "sorry, cannot fetch Arch news. Please try again later."
+
+    local -r bashlib=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    source $bashlib || DIE "failed to read file '$bashlib'."
+
+    local dates=()
+    readarray -t dates <<< $(echo "$data" | grep '^[ \t]*<td>[0-9-]*</td>$' | sed 's|^[ \t]*<td>\([0-9-]*\)</td>$|\1|')
+
+    local -r latest=${dates[0]}
+
+    if [[ "$latest" > "$latest_seen" ]] ; then
+        local browser=$(eos_select_browser)            # find the default browser
+        [ -n "$browser" ] || DIE "browser not found!"
+        echo "$latest" > "$latestfile"                 # save the date of the latest news
         setsid "$browser" $url &> /dev/null
     fi
-    return
-
-    local progname="$(basename "$0")"
-    local latestfile="$HOME/.config/EOS-arch-news.conf"
-    local arg stop=no
-    local keep_quiet=no
-    local dates
-    local data="$(curl -s $url/)"
-    #local data="$(wget -q -O- $url)"
-
-    if [ -z "$data" ] ; then
-        echo "Sorry, cannot fetch Arch news. Please try again later." >&2
-        return 1
-    fi
-
-    readarray -t dates <<< $(echo "$data" | grep '^[ \t]*<td>[0-9-]*</td>$' | sed 's|^[ \t]*<td>\([0-9-]*\)</td>$|\1|')
-   #readarray -t dates <<< $(echo "$data" | grep '<td>20[0-9-]*</td>' | sed -e 's|^.*<td>||' -e 's|</td>$||')
-
-    for arg in "$@" ; do
-        case "$arg" in
-            -q | --quiet)
-                keep_quiet=yes
-                ;;
-            -f | --force)
-                ShowAll
-                stop=yes
-                ;;
-            -r | --reset)
-                rm -f "$latestfile"
-                stop=yes
-                ;;
-            -fr | -rf)                                   # the order is significant!
-                local ix
-                for ((ix=1; ix<${#arg}; ix++)) ; do
-                    $FUNCNAME -${arg:$ix:1}              # sets the 'stop' variable of the inner scope!
-                done
-                stop=yes
-                ;;
-            *)
-                Usage
-                return 1
-                ;;
-        esac
-    done
-    test "$stop" = "yes" && return
-
-    ShowIfNotSeen
 }
 
 Main "$@"
