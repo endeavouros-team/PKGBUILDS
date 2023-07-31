@@ -214,6 +214,7 @@ CommonStuff() {
     export -f eos_yad
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
+    AssignIconVariables_in_eos_bash_shared
 
     curl --silent --connect-timeout 8 https://archlinux.org >/dev/null || DIE "Sorry, archlinux site is unavailable!"
 }
@@ -233,7 +234,7 @@ AkmConfig() {
 }
 
 DIE() {
-    eos_yad --form --width=400 --title="AKM failure" --image=$WELCOME_ICON_ERROR --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="AKM failure" --image=$ICO_ERROR --text="$1" --button=yad-quit
     exit 1
 }
 
@@ -369,7 +370,7 @@ PacmanConfEditor() {
 
 Main()
 {
-    local progname="$(basename "$0")"
+    local progname="${0##*/}"
     local pacman=/usr/bin/pacman
     local na="(-)"
     local kernels=()
@@ -469,7 +470,7 @@ Main()
         --use-interp
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
-        --image=$WELCOME_ICON_SYSTEM_UPDATE
+        --image=$ICO_UPDATE
         --button=" ${smallBegin}Changelog${smallEnd}!applications-development!Show latest changes of this program":"Changelog"
         # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" ${smallBegin}Help${smallEnd}!help-contents!Helps to use $progname":"Manual"
@@ -485,7 +486,7 @@ Main()
     local progress_cmd=(
         eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
         --width=400 --no-buttons
-        --image=$WELCOME_ICON_INFO
+        --image=$ICO_INFO
         --title="AKM progress"
         --text="Fetching information, please wait..."
     )
