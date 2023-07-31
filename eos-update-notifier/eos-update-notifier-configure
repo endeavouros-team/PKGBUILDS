@@ -12,6 +12,7 @@ GetLibCode() {
     source $libcode || DIE "loading $libcode failed."
     export -f eos_yad
     export -f eos_yad_nothing_todo
+    AssignIconVariables_in_eos_bash_shared
 }
 
 GetSudoEditor() {
@@ -65,7 +66,7 @@ Main()
     local cmd=(
         eos_yad
         --form --title="Configure $TARGET_PROG"
-        --image=$WELCOME_ICON_UPDATE_NOTIFIER_CONF
+        --image=$ICO_PREFERENCES_SYSTEM
         --text="Configure and manage features of $TARGET_PROG"
         # --width=420
         --columns=2
@@ -83,9 +84,9 @@ Main()
                "/usr/bin/RunInTerminal /usr/bin/$TARGET_PROG --systemd -iw=0s"
 
         # --button="Changelog!help-about!<tt>Show changelog of $TARGET_PROG</tt>":"/usr/bin/$TARGET_PROG --changelog"
-        --button="Disable!$WELCOME_ICON_NOTIFICATIONS_DISABLED!Disable $TARGET_PROG service timer":"ServiceAction disable"
-        --button="Enable!$WELCOME_ICON_NOTIFICATIONS!Enable $TARGET_PROG service timer":"ServiceAction enable"
-        --button="Status!$WELCOME_ICON_INFO!Show status of $TARGET_PROG service timer":"ServiceAction status"
+        --button="Disable!$ICO_NOTIFICATION_DISABLE!Disable $TARGET_PROG service timer":"ServiceAction disable"
+        --button="Enable!$ICO_NOTIFICATION!Enable $TARGET_PROG service timer":"ServiceAction enable"
+        --button="Status!$ICO_INFO!Show status of $TARGET_PROG service timer":"ServiceAction status"
         --button="yad-quit!!<tt>Quit now</tt>"
     )
 
