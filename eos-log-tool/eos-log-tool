@@ -17,6 +17,7 @@ Breakpoint() {
 source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
 
 export -f eos_yad
+AssignIconVariables_in_eos_bash_shared
 
 DIE() {
     echo "$progname: error: $1" >&2
@@ -42,16 +43,23 @@ MsgOld() {
 Msg() {
     local -r msg="$1"
     local -r title="$2"
-    shift 2
+    local icon="$3"
+
+    if [ -n "$icon" ] ; then
+        shift 3
+    else
+        icon="$ICO_TIPS"
+        shift 2
+    fi
     local -r cmd=(
         eos_yad --form --title="$title" --text="$msg"
-        --image=user-info --button=yad-quit "$@"
+        --image=$icon --button=yad-quit "$@"
     )
     "${cmd[@]}"
 }
 ErrorMsg() {
     local -r msg="$1"
-    Msg "$msg" "Error"
+    Msg "$msg" "Error" $ICO_ERROR
 }
 WarningMsg() {
     local -r msg="$1"
@@ -521,10 +529,10 @@ Main()
         --title="EndeavourOS log tools"
         --text="$helptext"
         # --width=600        # not needed?
-        --image=dialog-question
-        --button="Cancel!!Cancel this operation":$code_cancel
-        --button="Save logs locally!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
-        --button="Share logs to the internet!!Send the logs to a pastebin service":$code_send_to_internet
+        --image=$ICO_QUESTION
+        --button="yad-cancel!Cancel this operation":$code_cancel
+        --button="yad-save!Save the logs to file $FILE_OF_LOGS2":$code_localsave
+        --button="Share logs to the internet!$ICO_SHARE!Send the logs to a pastebin service":$code_send_to_internet
     )
 
     # Skip entries that don't have the app installed
