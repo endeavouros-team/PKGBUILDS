@@ -9,9 +9,10 @@ export -f eos_yad_terminal
 export -f eos_yad_RunCmdTermBash
 export -f eos_select_browser
 
+AssignIconVariables_in_eos_bash_shared
 
 DIE() {
-    eos_yad --form --width=400 --title="reflector-simple problem" --image=error --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="reflector-simple problem" --image=$ICO_ERROR --text="$1" --button=yad-quit
     Destructor
     exit 1
 }
@@ -19,7 +20,7 @@ echo2() { echo "$@" >&2; }
 INFO() { echo2 "$progname: info: $1"; }
 WARN() {
     echo2 "$progname: warning: $1"
-    # eos_yad --form --width=400 --title="reflector-simple warning" --image=dialog-warning --text="$1" --button=yad-quit
+    # eos_yad --form --width=400 --title="reflector-simple warning" --image=$ICO_WARNING --text="$1" --button=yad-quit
 }
 
 Verbose() {
@@ -432,7 +433,7 @@ AskCountriesAndOptions() {
         command+=(--field="${countrynames[$ix]}:chk" $included)
     done
     command+=(--separator=" ")                      # assumes all returned values lack spaces
-    command+=(--image="preferences-system")
+    command+=(--image=$ICO_PREFERENCES_SYSTEM)
 
     #command+=(--field=":LBL" "")
     command+=(--field="<span font='italic 14'>Feature selection\:</span>:LBL" "")
@@ -464,7 +465,7 @@ AskCountriesAndOptions() {
     fi
     command+=(--field="Optional reflector params" " $free_params")    # note the initial space in value !!!
 
-    command+=(--button=" Changelog!applications-development!Show the changes of this program":"Changelog"
+    command+=(--button=" Changelog!$ICO_CHANGES!Show the changes of this program":"Changelog"
               --button=yad-cancel:1
               --button=yad-ok:0)
     Verbose "done."
@@ -630,7 +631,7 @@ SaveMirrorlist() {
         txt+="You may need to change some option values,\n"
         txt+="e.g. use bigger <i>age</i> for mirrors or add different/more countries."
         txt=$(eos_FormMonoText "$txt")
-        opts=( --form --title="Error" --image=error --button=yad-quit --text="$txt")
+        opts=( --form --title="Error" --image=$ICO_ERROR --button=yad-quit --text="$txt")
         eos_yad "${opts[@]}"
         return 1
     fi
@@ -640,7 +641,7 @@ SaveMirrorlist() {
           --width=750
           --height=500
           --title="New Arch mirrorlist"
-          --button=yad-quit:1 --button=" Save to $ml!document-save":0
+          --button=yad-quit:1 --button="yad-save!!Save to $ml":0
           --filename=$tmpfile
          )
     if [ -n "$font" ] ; then
@@ -812,7 +813,7 @@ Main() {
     local progress_cmd=(
         eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 200 --auto-close
         --width=900 --no-buttons
-        --image=applications-internet
+        --image=$ICO_MIRROR_RANK
         --title="Mirror ranking"
         --text="Rating mirrors, please wait...\nNote: rating log will be saved in file <b>$ranklog</b>."
     )
