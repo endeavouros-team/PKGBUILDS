@@ -323,19 +323,12 @@ UserAddedMirrors() {
     local mirror m
 
     echo "# user added mirrors >>>"
-    for m in $(echo "$mirrors" | tr '|' ' ') ; do
-        case "$m" in
-            https://* | http://* | rsync://*)
-                mirror="$m"
-                ;;
-            *)
-                m=${m//./\\.}
-                mirror="$(grep "Server = http" "$latest_ml.orig" | grep "$m"  | awk '{print $NF}')"
-                ;;
-        esac
+
+    for m in ${mirrors//\|/ } ; do
+        mirror="$(grep "^[ ]*Server[ ]*=[ ]*" "$latest_ml.orig" | grep "$m")"
         if [ -n "$mirror" ] ; then
             notif_echo2 "User added: $mirror"
-            echo "Server = $mirror"
+            echo "$mirror"
         fi
     done
     echo2 ""
