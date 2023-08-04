@@ -1478,8 +1478,10 @@ Main2()
 
                             Pushd "$pkg_archive"
 
-                            if [ ! -d .git ] ; then
+                            # (re)create proper symlink
+                            if [ ! -e .git ] || [ -L .git ] ; then
                                 if [ -d "$ARCHIVE_GIT" ] ; then
+                                    rm -f .git
                                     ln -s "$ARCHIVE_GIT"
                                 fi
                             fi
