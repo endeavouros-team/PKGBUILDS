@@ -1634,6 +1634,7 @@ AssetCmdLast() {
 ManualCheckOfAssets() {
     local op="$1"
     local what="$2"
+    local timeout=5    # was 10
 
     case "$what" in
         repo) [ "$use_release_assets" = "yes" ] || return ;;
@@ -1644,7 +1645,7 @@ ManualCheckOfAssets() {
         case "$what" in
             assets) what="assets in $tag" ;;
         esac
-        read2 -t 10 -p "$what: Is $op OK (Y/n)? "
+        read2 -t $timeout -p "$what: Is $op OK (Y/n)? "
         case "$REPLY" in
             [yY]* | "") break ;;
             *) ;;
