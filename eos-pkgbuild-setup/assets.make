@@ -258,7 +258,7 @@ Build()
     Pushd "$workdir"
       cp -r "$pkgbuilddir" .
       pkgname="$(PkgBuildName "$pkgdirname")"
-      Pushd "$pkgdirname"
+      Pushd "$workdir/$pkgdirname"
 
       # now build, assume we have PKGBUILD
       # special handling for missing dependencies

@@ -169,7 +169,7 @@ PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-sddm-theme]="--nodeps"
 PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
 PKG_MAKEPKG_OPTIONS[kernel-install-for-dracut]="--nodeps"
-PKG_MAKEPKG_OPTIONS[calamares]="--nodeps"
+#PKG_MAKEPKG_OPTIONS[calamares]="--nodeps"
 
 #PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
 PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
