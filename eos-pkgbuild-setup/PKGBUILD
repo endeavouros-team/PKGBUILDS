@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=32.12
+pkgrel=32.13
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/eos-pkgbuild-setup"
@@ -13,6 +13,7 @@ depends=(git hub yay curl wget xdg-utils)
 backup=(
     etc/eos-mirrorcheck.conf
     etc/eos-pkgbuild-setup.conf
+    etc/eos-pkgbuild-setup-general.conf
 )
 
 source=(
@@ -24,6 +25,7 @@ source=(
     archive-sync-to-remote          # Sync the package archive (= older packages) between local machine and github.
     assets.make                     # The main builder script.
     eos-pkgbuild-setup.conf         # Config file for the above.
+    eos-pkgbuild-setup-general.conf # Config file for the above, general stuff.
     pacman-for-assets.make          # pacman wrapper for the makepkg call
 
     ### Helper apps for the package builder
@@ -59,8 +61,9 @@ source=(
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '15b4a800e60d65a5b4e888a6baa5cb6336b78255ff39f8c54563c77bdbff2299b84e65d456452097c5cbd36df1fae2cdcab41f65b9d86a2c0b6b973f5cc577a9'
             'be63de6c49f05f909a0b15e406eb43cad59cd15992ad1fa1ebda58245761fccd309f3aae76e6f3f86e6cd1e0d6279ed43a08aa7f7a2c312a493a55fe819dbc87'
-            '4fec64d091f991fafc67a67b49375ffa904c379fc7459e6cb8a6719e6dd5225ba043fc50c47efe12674c8ae712f5e64bed9377c71520a6186d84195336b67a1d'
-            '6185ce690604d382eda4e9edf5d3a113f71d89c54e0fe23384bb53e421e127c98263dea799126776203c48ac8ba9c2732beb98360047da87226845436ab10c91'
+            '2b8cf91fa839c1c4dd4e9dfb11ccc050689b6b8998447e8304244d0c556d76b19601199a470a5a71726ccddbfc7c7477b06ef6256e00722024ceb1e898067f2d'
+            '5a73b5996de89842e28aa8b62f50a5c436c38b8ac8e2b8aa253c0db934c512987dd714dfa9551784d88b4a02326ffdaa5d2c25ef8536294e2514ce0f2f994716'
+            '46a4123eee031144508d713cf63b44cdd9e5ec1609948e8e2257e0cf2247589bc793ab5b933a0922a5e73f274b38d64f7a5fcd58ffcb7924524675da8ae98898'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
@@ -100,6 +103,7 @@ package() {
 
     install -Dm644 eos-mirrorcheck.conf        "$_etc/eos-mirrorcheck.conf"
     install -Dm644 eos-pkgbuild-setup.conf     "$_etc/eos-pkgbuild-setup.conf"
+    install -Dm644 eos-pkgbuild-setup-general.conf "$_etc/eos-pkgbuild-setup-general.conf"
 
     # common completions
     install -Dm644 mirrorcheck.completion        "$_cpl/mirrorcheck"

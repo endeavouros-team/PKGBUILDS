@@ -1636,7 +1636,9 @@ AssetCmdLast() {
 ManualCheckOfAssets() {
     local op="$1"
     local what="$2"
-    local timeout=5    # was 10
+    local timeout="$EOS_PKGBUILD_GITHUB_TIMEOUT"
+
+    [ -n "$timeout" ] || timeout=5    # was 10
 
     case "$what" in
         repo) [ "$use_release_assets" = "yes" ] || return ;;
