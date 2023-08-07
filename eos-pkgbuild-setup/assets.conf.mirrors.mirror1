@@ -152,6 +152,18 @@ PKGNAMES_WAIT=(
 
 
 
+declare -A PKG_CHANGELOGS
+
+PKG_CHANGELOGS[downgrade]="https://github.com/archlinux-downgrade/downgrade/blob/main/CHANGELOG.md"
+PKG_CHANGELOGS[eos-bash-shared]="https://github.com/endeavouros-team/eos-bash-shared/commits"
+PKG_CHANGELOGS[paru]="https://github.com/Morganamilo/paru/releases"
+PKG_CHANGELOGS[rate-mirrors]="https://github.com/westandskif/rate-mirrors/releases"
+PKG_CHANGELOGS[yad]="https://github.com/v1cont/yad/blob/master/NEWS"
+PKG_CHANGELOGS[yay]="https://github.com/Jguer/yay/releases"
+PKG_CHANGELOGS[welcome]="https://github.com/endeavouros-team/welcome/commits"
+PKG_CHANGELOGS[zfs-dkms]="https://github.com/openzfs/zfs/releases"
+PKG_CHANGELOGS[zfs-utils]="https://github.com/openzfs/zfs/releases"
+
 
 # HAS_GIT_VER array incldues packages whose pkgver can be anything, i.e. newer package can have lower pkgver.
 # Sometimes e.g. -git packages have that property.
