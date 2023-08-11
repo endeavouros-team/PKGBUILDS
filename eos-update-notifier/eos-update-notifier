@@ -98,9 +98,17 @@ ShowNotify() {
                                "$bop=$bname")
             case "$action" in
                 $bop)
-                    local tmp_ufile=$(mktemp)
-                    echo "$updates" > $tmp_ufile
-                    UpdateInTerminal --nt --updates=$tmp_ufile
+                    if false ; then
+                        local tmp_ufile=$(mktemp)
+                        echo "$updates" > $tmp_ufile
+                        UpdateInTerminal --nt --updates=$tmp_ufile
+                    else
+                        if [ "$CheckAurUpdates" = "yes" ] ; then
+                            RunInTerminal eos-update --yay
+                        else
+                            RunInTerminal eos-update
+                        fi
+                    fi
                     ;;
             esac
             ;;
