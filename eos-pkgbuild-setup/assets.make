@@ -922,70 +922,41 @@ RunPostHooks()
     fi
 }
 
-WantAurDiffs() {
-    local xx="$1"
-    local pkgdirname="$2"
-    local diff_url="https://aur.archlinux.org/cgit/aur.git/diff/?h=$pkgdirname&context=1"
-
-    case "$xx" in
-        aur/*)
-            AurMarkingFail "$xx"
-            ;;
-        */aur)
-            if [ "$aurdiff" = "0" ] && [ "$already_asked_diffs" = "0" ] ; then
-                already_asked_diffs=1
-                read2 -p "AUR updates are available. Want to see diffs (Y/n)? " -t $ask_timeout
-                if [ $? -eq 0 ] ; then
-                    case "$REPLY" in
-                        ""|[yY]*) aurdiff=1 ;;
-                    esac
-                else
-                    echo2 no.   # no diffs if timeout
-                fi
-            fi
-            if [ "$aurdiff" = "1" ] ; then
-                case "$xx" in
-                    aur/*)
-                        AurMarkingFail "$xx"
-                        ;;
-                    */aur)
-                        AUR_DIFFS+=("$diff_url")
-                        AUR_DIFF_PKGS+=("$pkgdirname")
-                        #$browser "$diff_url" >& /dev/null
-                        ;;
-                esac
-            fi
-            ;;
-    esac
-}
-
 Browser() {
     local browser
-    if [ -x /usr/bin/firefox ] ; then
-        browser=/usr/bin/firefox
-    elif [ -x /usr/bin/chromium ] ; then
-        browser=/usr/bin/chromium
-    else
-        browser=/usr/bin/xdg-open
-    fi
-    $browser "$@"
-}
-
-ShowAurDiffs() {
-    # If we have git source code available, then check diffs from that!
-    local xx ix
-
-    for ((ix=0; ix < ${#AUR_DIFFS[@]}; ix++)) ; do
-        xx="${AUR_DIFF_PKGS[$ix]}"
-        if [ -d "$ASSETSDIR/AUR/$xx/.git" ] ; then
-            Pushd "$ASSETSDIR/AUR/$xx"
-            git pull >& /dev/null
-            /usr/bin/gitk                              # gitk stops here
-            Popd
-        else
-            Browser "${AUR_DIFFS[$ix]}" >& /dev/null   # xdg-open does not stop here...
+    for browser in firefox firefox-developer-edition exo-open kde-open xdg-open ; do
+        if [ -x /usr/bin/$browser ] ; then
+            /usr/bin/$browser "$@" &> /dev/null
+            return
         fi
     done
+}
+
+WantPkgDiffs() {
+    local xx="$1"
+    local pkgdirname="$2"
+
+    if [ -n "${PKG_CHANGELOGS[$pkgdirname]}" ] ; then
+        if [ "$pkgdiff" = "unknown" ] ; then
+            pkgdiff=no
+            read2 -p "Updates and their changelogs are available. Want to see changelogs (Y/n)? " -t $ask_timeout
+            if [ $? -eq 0 ] ; then
+                case "$REPLY" in
+                    ""|[yY]*) pkgdiff=yes ;;
+                esac
+            fi
+            [ "$pkgdiff" = "no" ] && echo2 no.
+        fi
+        [ "$pkgdiff" = "yes" ] && PKG_DIFFS+=("${PKG_CHANGELOGS[$pkgdirname]}")
+    fi
+}
+
+ShowPkgDiffs() {
+    if [ "$pkgdiff" = "yes" ] ; then
+        if [ ${#PKG_DIFFS[@]} -gt 0 ] ; then
+            Browser "${PKG_DIFFS[@]}"
+        fi
+    fi
 }
 
 Exit()
@@ -1096,7 +1067,7 @@ Options:
     -ad | --allow-downgrade     New package may have smaller version number.
     --pkgnames="X"              X is a space separated list of packages to use instead of PKGNAMES array in assets.conf.
     --repoup                    (Advanced) Force update of repository database files.
-    --aurdiff                   Show PKGBUILD diff for AUR packages.
+    --pkgdiff                   Show changelog for modified packages.
 EOF
 #   --versuffix=X               Append given suffix (X) to pkgver of PKGBUILD.
 #   --mirrorcheck=X             X is the time (in seconds) to wait before starting the mirrorcheck.
@@ -1153,14 +1124,12 @@ Main2()
     local repoup=0
     local pkgver_suffix=""
     local reposig                    # 1 = sign repo too, 0 = don't sign repo
-    local aurdiff=0                  # 1 = show AUR diff
-    local already_asked_diffs=0
+    local pkgdiff=unknown            # yes=show AUR diff, no=don't show, unknown=need to ask for yes or no
     local filelist_txt
     local use_filelist               # yes or no
     local ask_timeout=60
     local allow_downgrade=no
-    local AUR_DIFFS=()
-    local AUR_DIFF_PKGS=()
+    local PKG_DIFFS=()
     local mirror_check_wait=180
     local use_release_assets         # currently only for [endeavouros] repo
     local save_folder=""
@@ -1181,7 +1150,7 @@ Main2()
                 --dryrun-local | -nl | -n) cmd=dryrun-local ;;
                 --dryrun | -nr | -nn)      cmd=dryrun ;;
                 --repoup)                  repoup=1 ;;                  # sync repo even when no packages are built
-                --aurdiff)                 aurdiff=1 ;;
+                --pkgdiff)                 pkgdiff=yes ;;
                 --allow-downgrade | -ad)   allow_downgrade=yes ;;
 
                 --pkgnames=*)              PKGNAMES_PARAMETER="$xx" ;;
@@ -1299,16 +1268,14 @@ Main2()
 
             ((total_items_to_build++))
             ShowResult "CHANGED $tmpcurr ==> $tmp" "$hookout"
-            if [ $cmpresult -gt 0 ] ; then
-                WantAurDiffs "$xx" "$pkgdirname"
-            fi
+
+            [ $cmpresult -gt 0 ] && WantPkgDiffs "$xx" "$pkgdirname"
         done
 
         DebugBreak
 
-        if [ -n "$AUR_DIFFS" ] ; then
-            ShowAurDiffs
-        fi
+        [ "${#PKG_DIFFS[@]}" -gt 0 ] && ShowPkgDiffs
+
         Popd
 
         local exit_code=$total_items_to_build
