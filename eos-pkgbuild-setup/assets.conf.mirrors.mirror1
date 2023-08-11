@@ -175,23 +175,21 @@ declare -A PKG_CHANGELOGS=(
 # HAS_GIT_PKGVER[???-git]=yes
 
 
-declare -A PKG_MAKEPKG_OPTIONS
+declare -A PKG_MAKEPKG_OPTIONS=(
+    endeavouros-skel-i3wm      "--nodeps"
+    endeavouros-skel-xfce4     "--nodeps"
+    eos-dracut                 "--nodeps"
+    eos-lightdm-slick-theme    "--nodeps"
+    eos-plasma-sddm-config     "--nodeps"
+    eos-sddm-theme             "--nodeps"
+    eos-settings-plasma        "--nodeps"
+    kernel-install-for-dracut  "--nodeps"
+    eos-quickstart             "--rmdeps"
+    worm                       "--rmdeps"
+    yay                        "--rmdeps"
 
-PKG_MAKEPKG_OPTIONS[eos-dracut]="--nodeps"
-PKG_MAKEPKG_OPTIONS[endeavouros-skel-i3wm]="--nodeps"
-PKG_MAKEPKG_OPTIONS[endeavouros-skel-xfce4]="--nodeps"
-PKG_MAKEPKG_OPTIONS[eos-lightdm-slick-theme]="--nodeps"
-PKG_MAKEPKG_OPTIONS[eos-plasma-sddm-config]="--nodeps"
-PKG_MAKEPKG_OPTIONS[eos-sddm-theme]="--nodeps"
-PKG_MAKEPKG_OPTIONS[eos-settings-plasma]="--nodeps"
-PKG_MAKEPKG_OPTIONS[kernel-install-for-dracut]="--nodeps"
-#PKG_MAKEPKG_OPTIONS[calamares]="--nodeps"
-
-#PKG_MAKEPKG_OPTIONS[calamares_current]="--rmdeps"
-PKG_MAKEPKG_OPTIONS[eos-quickstart]="--rmdeps"
-#PKG_MAKEPKG_OPTIONS[polybar]="--rmdeps"
-PKG_MAKEPKG_OPTIONS[worm]="--rmdeps"
-PKG_MAKEPKG_OPTIONS[yay]="--rmdeps"
+    # calamares                "--nodeps"
+)
 
 # Hook functions are run in the beginning after RationalityTests in assets.make.
 # There may be several hook functions.
@@ -795,31 +793,30 @@ _eos-bash-shared_hook_check_ksetwallpaper_py() {
     fi
 }
 
-declare -A ASSET_PACKAGE_HOOKS
-#ASSET_PACKAGE_HOOKS["bashdb"]=_bashdb_hook                                           # no more needed
-#ASSET_PACKAGE_HOOKS["budgie-control-center"]=_budgie-control-center_hook
-
-#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook
-ASSET_PACKAGE_HOOKS["eos-bash-shared"]=_eos-bash-shared_hook_check_ksetwallpaper_py
-
-# Temporary hooks for replacing *-bin versions to non-bin versions.
-#ASSET_PACKAGE_HOOKS["rate-mirrors"]=_rate-mirrors_hook
-ASSET_PACKAGE_HOOKS["paru"]=_paru_hook
-ASSET_PACKAGE_HOOKS["eos-lightdm-gtk-theme"]=_eos-lightdm-gtk-theme_hook
-ASSET_PACKAGE_HOOKS[dracut]=_dracut_hook
-
-#ASSET_PACKAGE_HOOKS["nvidia-installer-db"]=_nvidia-installer-db_hook
-#ASSET_PACKAGE_HOOKS["ckbcomp"]=_ckbcomp_hook_change_version
-#ASSET_PACKAGE_HOOKS["downgrade"]=_downgrade_hook_check_latest
-#ASSET_PACKAGE_HOOKS["inxi"]=_inxi_hook_check_latest
-#ASSET_PACKAGE_HOOKS["kalu"]=_kalu_hook_fix_files
-#ASSET_PACKAGE_HOOKS["yad"]=_yad_hook_add_gspell
-#ASSET_PACKAGE_HOOKS["yay"]=_yay_hook_check_latest
-#ASSET_PACKAGE_HOOKS["paper-icon-theme-git"]=_paper-icon-theme-git_hook
-
 # Special hooks. Implemented via package hooks.
 
 _assets_download_break() {
     return 0  # same contents under different asset tags, so always break after first download
 }
-ASSET_PACKAGE_HOOKS["assets_mirrors"]=_assets_download_break
+
+declare -A ASSET_PACKAGE_HOOKS=(
+    assets_mirrors         _assets_download_break    # special hook
+
+    eos-bash-shared        _eos-bash-shared_hook_check_ksetwallpaper_py
+    eos-lightdm-gtk-theme  _eos-lightdm-gtk-theme_hook
+    paru                   _paru_hook
+    dracut                 _dracut_hook
+
+    # bashdb                 _bashdb_hook                                           # no more needed
+    # budgie-control-center  _budgie-control-center_hook
+    # ckbcomp                _ckbcomp_hook
+    # ckbcomp                _ckbcomp_hook_change_version
+    # downgrade              _downgrade_hook_check_latest
+    # inxi                   _inxi_hook_check_latest
+    # kalu                   _kalu_hook_fix_files
+    # nvidia-installer-db    _nvidia-installer-db_hook
+    # paper-icon-theme-git   _paper-icon-theme-git_hook
+    # rate-mirrors           _rate-mirrors_hook
+    # yad                    _yad_hook_add_gspell
+    # yay                    _yay_hook_check_latest
+)
