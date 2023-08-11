@@ -87,14 +87,30 @@ Man2html() {
     echo "$app" >&2
 }
 
-GetDescription() {
-    local app="$1"
-    expac -Q %d $app || expac -Q %d $app || LANG=C yay -Si $app | grep Description | sed 's|^Description[ ]*: ||'
+GetInfoItem() {
+    local -r app="$1"   # pkgname
+    local -r word="$2"  # field name from the output of command 'yay -Si $pkgname'
+
+    case "$word" in
+        Description) type=d ;;
+        Version)     type=v ;;
+    esac
+    expac -Q %$type $app || LANG=C yay -Si $app | grep -w "^$word" | sed "s|^$word[ ]*: ||"
+}
+
+ShowVersion() {
+    local version="$1"
+    if [ -n "$version" ] ; then
+        printf "\nVersion: %s<br>\n" "$version"
+    else
+        printf "\n"
+    fi
 }
 
 Help2html() {
     local app      # e.g. rate-mirrors and others
     local descr
+    local version
     local help
     local fmt='```'
     local usage usage_def="$(printf "\n## Usage\n\n")"
@@ -105,7 +121,7 @@ Help2html() {
         case "$app" in
             rate-mirrors)
                 usage=""
-                help="$($app -h | grep -v "Usually default options should work")"  # fix!
+                help="$($app -h 2>/dev/null)"
                 ;;
             *)
                 usage="$usage_def"
@@ -114,10 +130,11 @@ Help2html() {
         esac
         mkdir -p $tmpdir/$app
         tmpfile=$tmpdir/$app/foobar123.md
-        descr=$(GetDescription $app)
+        descr=$(GetInfoItem "$app" Description)
+        version=$(GetInfoItem "$app" Version)
         cat <<EOF > $tmpfile
 # $app
-
+$(ShowVersion "$version")
 $descr
 $usage
 $fmt
@@ -144,9 +161,13 @@ Main()
     mkdir -p $infos_folder || DIE "creating folder '$infos_folder' failed"
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
 
-    # help option to html
+    # app's help option to html
     for app in eos-packagelist nvidia-inst rate-mirrors ; do
-        Help2html $app
+        if [ -x /usr/bin/$app ] ; then
+            Help2html $app
+        else
+            DIE "app $app is not available, please install it."
+        fi
     done
 
     # direct pages
@@ -156,7 +177,6 @@ Main()
     done
 
     # indirect via man folder
-    # note: added 'rate-mirrors' here!
     pushd ../man
     local apps=(*)
     popd
