@@ -1773,6 +1773,8 @@ Main() {
     local PROGNAME="$(basename "$0")"
     local ARCH=x86_64
 
+    eos-connection-checker || DIE "internet connection not available."
+
     [ "$PROGNAME" = "bashdb" ] && PROGNAME="${BASH_ARGV[-1]}"  # could always be like this?
     [ -n "$PROGNAME" ] || PROGNAME="assets.make"
     [ -L .git ] || DIE "$PWD/.git must be a symlink to the real .git!"
