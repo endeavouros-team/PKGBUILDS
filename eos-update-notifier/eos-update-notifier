@@ -330,7 +330,7 @@ CheckArchNews() {
         case "$ArchNewsProg" in
             eos-arch-news)
                 # eos-arch-news does not (yet) use $newsdays ...
-                tmpdays=""
+                tmpdays="--save"
                 ;;
             arch-news-for-you)
                 if [ "$newsdays" -gt 0 ] ; then

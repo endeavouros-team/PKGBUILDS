@@ -1,8 +1,11 @@
 #!/bin/bash
 #
-# Shows all Arch news in a browser.
-# To show only "unseen" news, saves the date of the latest news flash you've seen
+# Shows Arch news in a browser.
+#
+# To avoid showing the news page every time (and to show only "unseen" news),
+# saves the date of the latest news flash you've seen
 # and shows the news page only if there's more after that.
+# This happens with option --save.
 
 DIE() {
     echo "$progname: error: $1" >&2
@@ -14,43 +17,51 @@ Usage() {
 Usage: $progname [options]
 Options:
     -h | --help      This help.
-    -u | --unread    "Unread" all Arch news.
+    -s | --save      Show news only if there are newer than you've already seen.
+    -u | --unread    "Unread" all Arch news, i.e. news reading starts fresh.
 EOF
 }
 
+ShowNews() { setsid "$browser" "$news_url" &> /dev/null ; }
+
 Main() {
     local -r progname="${0##*/}"
-    local -r latestfile="$HOME/.config/EOS-arch-news.conf"
+    local -r file_for_latest_news_read_date="$HOME/.config/EOS-arch-news.conf"  # stores the date of the latest news "seen"
+    local -r news_url=https://archlinux.org/news
+    local -r bashlib=/usr/share/endeavouros/scripts/eos-script-lib-yad
+    source $bashlib || DIE "failed to read file '$bashlib'."
+    local -r browser=$(eos_select_browser)                                      # find the default browser
+    local show_always=yes
+
+    [ -n "$browser" ] || DIE "browser not found!"
 
     while [ -n "$1" ] ; do
         case "$1" in
-            --help | -h)
-                Usage; return ;;
-            --unread | -u)
-                rm -f "$latestfile"; return ;;
+            -h | --help)    Usage; return ;;
+            -s | --save)    show_always=no ;;
+            -u | --unread)  rm -f "$file_for_latest_news_read_date"; return ;;
         esac
         shift
     done
+    if [ $show_always = yes ] ; then
+        ShowNews
+        return
+    fi
 
-    local -r latest_seen="$(cat "$latestfile" 2>/dev/null)"    # get the date of the latest visited news
-    local -r url=https://archlinux.org/news
-    local -r data=$(curl -Lsm 20 $url)
+    local -r latest_read_date="$(cat "$file_for_latest_news_read_date" 2>/dev/null)"    # the date of the latest visited news
+    local -r news_data=$(curl -Lsm 20 $news_url)                                        # Reads the first page only, currently (Aug-2023)
+                                                                                        # less than 30 000 bytes.
 
-    [ -n "$data" ]  || DIE "sorry, cannot fetch Arch news. Please try again later."
-
-    local -r bashlib=/usr/share/endeavouros/scripts/eos-script-lib-yad
-    source $bashlib || DIE "failed to read file '$bashlib'."
+    [ -n "$news_data" ] || DIE "sorry, cannot fetch Arch news. Please try again later."
 
     local dates=()
-    readarray -t dates <<< $(echo "$data" | grep '^[ \t]*<td>[0-9-]*</td>$' | sed 's|^[ \t]*<td>\([0-9-]*\)</td>$|\1|')
+    readarray -t dates <<< $(echo "$news_data" | grep '^[ \t]*<td>[0-9-]*</td>$' | sed 's|^[ \t]*<td>\([0-9-]*\)</td>$|\1|')
 
-    local -r latest=${dates[0]}
+    local -r latest_news_dates=${dates[0]}
 
-    if [[ "$latest" > "$latest_seen" ]] ; then
-        local browser=$(eos_select_browser)            # find the default browser
-        [ -n "$browser" ] || DIE "browser not found!"
-        echo "$latest" > "$latestfile"                 # save the date of the latest news
-        setsid "$browser" $url &> /dev/null
+    if [[ "$latest_news_dates" > "$latest_read_date" ]] ; then
+        echo "$latest_news_dates" > "$file_for_latest_news_read_date"                 # save the date of the latest news
+        ShowNews
     fi
 }
 
