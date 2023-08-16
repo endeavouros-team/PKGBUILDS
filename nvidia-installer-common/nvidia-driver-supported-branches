@@ -116,6 +116,23 @@ GetNvidiaVersions() {
     fi
 }
 
+UrlOfIds() {
+    local ver="$1"
+    echo "https://download.nvidia.com/XFree86/Linux-x86_64/$ver/README/supportedchips.html"
+    # echo "https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html"   # no more works (?)
+}
+
+GetPacmanVersion() {
+    local infopkg="$1"
+    {
+        if [ -x /usr/bin/expac ] ; then
+            expac -S %v "$infopkg"
+        else
+            LANG=C pacman -Si "$infopkg" | grep -w ^Version | awk '{print $NF}'
+        fi
+    } | head -n1   # in case multiple repos have it, take the first
+}
+
 Options() {
     local opts
 
@@ -138,6 +155,10 @@ Options() {
 
             -h | --help)
                 cat <<EOF >&2
+
+$progname finds the latest Nvidia driver series info that supports
+your Nvidia graphics card. This information should help in installing the proper Nvidia driver.
+
 Usage: $progname [options] [parameters]
 
 Options:
@@ -155,8 +176,9 @@ Parameters:
 
 Tip: the "card_id" value can be found with command:
 
-  lspci -vnn | grep -P 'VGA|3D|Display' | sed 's|.*\[10de:\([0-9a-f]*\)\].*|\1|'
+  lspci -vnn | grep -P 'VGA|3D|Display' | sed -E 's|.*\[10de:([0-9a-f]*)\].*|\1|'
 
+See also: $starting_url
 EOF
                 exit 0
                 ;;
@@ -175,29 +197,9 @@ EOF
     esac
 }
 
-UrlOfIds() {
-    local ver="$1"
-    echo "https://download.nvidia.com/XFree86/Linux-x86_64/$ver/README/supportedchips.html"
-    # echo "https://us.download.nvidia.com/XFree86/Linux-x86_64/$version/README/supportedchips.html"   # no more works (?)
-}
-
-GetPacmanVersion() {
-    local infopkg="$1"
-    {
-        if [ -x /usr/bin/expac ] ; then
-            expac -S %v "$infopkg"
-        else
-            LANG=C pacman -Si "$infopkg" | grep -w ^Version | awk '{print $NF}'
-        fi
-    } | head -n1   # in case multiple repos have it, take the first
-}
-
 Main() {
-    local -r progname="$(basename "$0")"
+    local -r progname="${0##*/}"
     local -r infopkg=nvidia-dkms
-    local -r pacman_version=$(GetPacmanVersion "$infopkg")
-    local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
-    local -r pacman_version_series=${pacman_pkgver%%.*}
     local -r starting_url="https://www.nvidia.com/en-us/drivers/unix"
     local -r all=no                                                      # this will no more be changed!
     local testing=no
@@ -207,13 +209,18 @@ Main() {
     local nvidia_versions=()
     local hide_nvidia_inst_msgs=no
     local -r beta_pkg=nvidia-beta-dkms
+
+    Options "$@"
+
+    local -r pacman_version=$(GetPacmanVersion "$infopkg")
+    local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
+    local -r pacman_version_series=${pacman_pkgver%%.*}
+
     local -r beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
     local -r beta_series=${beta_pkgver%%.*}
 
     [ -n "$pacman_pkgver" ] || DIE "cannot determine the version of the latest available package $infopkg"
     [ -n "$beta_pkgver" ]   || DIE "cannot determine the version of the latest available package $beta_pkg"
-
-    Options "$@"
 
     local series_ids=(
         $pacman_version_series        # latest provided by Arch
