@@ -64,9 +64,9 @@ EosApps2cmd() {
         eos-log-tool eos-pacdiff eos-packagelist eos-quickstart eos-rankmirrors eos-sendlog eos-shifttime
         eos-update eos-update-notifier eos-update-notifier-configure
         eos-wallpaper-set eos-welcome grub-colour-chooser mirrorlist-rank-info
-        nvidia-inst paccache-service-manager
+        nvidia-inst nvidia-driver-supported-branches
+        paccache-service-manager
         pahis reflector-simple RunInTerminal show-location-info su-c_wrapper
-        # UpdateInTerminal  nvidia-driver-supported-branches
     )
     local app
 

@@ -123,6 +123,10 @@ Help2html() {
                 usage=""
                 help="$($app -h 2>/dev/null)"
                 ;;
+            nvidia-driver-supported-branches)
+                usage=""
+                help="$($app -h 2>&1)"
+                ;;
             *)
                 usage="$usage_def"
                 help="$($app -h 2>&1)"
@@ -162,7 +166,7 @@ Main()
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
 
     # app's help option to html
-    for app in eos-packagelist nvidia-inst rate-mirrors ; do
+    for app in eos-packagelist nvidia-inst nvidia-driver-supported-branches rate-mirrors ; do
         if [ -x /usr/bin/$app ] ; then
             Help2html $app
         else
