@@ -338,3 +338,7 @@ _tr_add2 ins_cust_text3              "Cette fonction est surtout utile pour les 
 
 # 29-mars-2023
 _tr_add2 ins_no_connection           "Note : aucune connexion internet n'est disponible, certains boutons sont cachés ou ne fonctionnent pas."
+
+# 21-aout-2023
+_tr_add2 cal_info5              "\nAprès l'installation mettre à jour le système est recommandé\n\n"
+_tr_add2 cal_info6              "\nAprès l'instalaltion, le système est à jour.\n\n"
