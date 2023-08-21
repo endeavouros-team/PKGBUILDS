@@ -164,6 +164,8 @@ _tr_add2 cal_info1              "Esta é uma versão desenvolvida pela comunidad
 _tr_add2 cal_info2              "<b>Offline</b> Este método vai te dar um ambiente de trabalho %%s .\nNão é necessária conexão à Internet.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> Este método lhe permite escolher o seu ambiente de trabalho.\nÉ necessária conexão à Internet.\n\n"
 _tr_add2 cal_info4              "Atenção: Esta versão está em aperfeiçoamento, ajude-nos a torná-la mais estável, reportando falhas.\n"
+_tr_add2 cal_info5              "\nDepois de instalar, atualizar o sistema é recomendado.\n\n"
+_tr_add2 cal_info6              "\nADepois de instalar, o sistema já está atualizado.\n\n"
 _tr_add2 cal_choose             "Escolha o método de instalação"
 _tr_add2 cal_method             "Método"
 _tr_add2 cal_nosupport          "$PROGNAME: modo não suportado: "
