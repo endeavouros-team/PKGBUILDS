@@ -161,7 +161,7 @@ _tr_add2 issues_no               "Aucun problème important n'a été détecté 
 _tr_add2 cal_noavail             "Non disponible : "	# programme d'installation
 _tr_add2 cal_warn                "Avertissement"
 _tr_add2 cal_info1               "C'est une version de développement communautaire.\n\n"	# besoins spéciaux !
-_tr_add2 cal_info2               "<b>Offline</b> ce mode vous donne un bureau Xfce avec le thème EndeavourOS.\nUne connexion Internet n'est pas nécessaire.\n\n"
+_tr_add2 cal_info2               "<b>Hors ligne</b> méthode vous donnant le bureau %%s.\nLa connexion internet n'est pas nécessaire.\n\n"
 _tr_add2 cal_info3               "<b>Online</b> ce mode vous laisse choisir votre bureau, avec le thème d'origine (vanilla).\nUne connexion Internet est requise.\n\n"
 _tr_add2 cal_info4               "Veuillez noter : Cette version est un travail en cours, veuillez nous aider à la rendre stable en signalant les bogues.\n"
 _tr_add2 cal_choose              "Choisir le mode d'installation"
