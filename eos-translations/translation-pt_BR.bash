@@ -162,7 +162,7 @@ _tr_add2 cal_noavail            "Não disponível: "        # programa de instal
 _tr_add2 cal_warn               "Alerta"
 _tr_add2 cal_info1              "Esta é uma versão desenvolvida pela comunidade.\n\n"                                   # specials needed!
 _tr_add2 cal_info2              "<b>Offline</b> Este método vai te dar um ambiente de trabalho %%s .\nNão é necessária conexão à Internet.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> Este método lhe permite escolher o seu ambiente de trabalho, com temas padrão.\nÉ necessária conexão à Internet.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> Este método lhe permite escolher o seu ambiente de trabalho.\nÉ necessária conexão à Internet.\n\n"
 _tr_add2 cal_info4              "Atenção: Esta versão está em aperfeiçoamento, ajude-nos a torná-la mais estável, reportando falhas.\n"
 _tr_add2 cal_choose             "Escolha o método de instalação"
 _tr_add2 cal_method             "Método"
