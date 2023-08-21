@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Não foram detectados problemas de sistema imp
 _tr_add2 cal_noavail            "Não disponível: "        # programa de instalação
 _tr_add2 cal_warn               "Alerta"
 _tr_add2 cal_info1              "Esta é uma versão desenvolvida pela comunidade.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> Este método dá-lhe um ambiente Xfce com tema do EndeavourOS.\nNão é necessária ligação à Internet.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> Este método permite-lhe escolher o seu ambiente de trabalho, com temas padrão.\nÉ necessária ligação à Internet.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> Este método vai te dar um ambiente de trabalho %%s .\nNão é necessária conexão à Internet.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> Este método lhe permite escolher o seu ambiente de trabalho, com temas padrão.\nÉ necessária conexão à Internet.\n\n"
 _tr_add2 cal_info4              "Atenção: Esta versão está em aperfeiçoamento, ajude-nos a torná-la mais estável, reportando falhas.\n"
 _tr_add2 cal_choose             "Escolha o método de instalação"
 _tr_add2 cal_method             "Método"
@@ -335,3 +335,12 @@ _tr_add2 daily_assist_anewstip       "Mostra as mais recentes noticias sobre Arc
 _tr_add2 nb_nofify_user1             "Há importantes noticias no"
 _tr_add2 nb_nofify_user2             "Por favor, clique no"                                  # Software News
 _tr_add2 nb_nofify_user3             "botão no canto inferior esquerdo dessa janela."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Obter seu arquivo de customização de instalação (avançado)"
+_tr_add2 ins_cust_text               "Dar URL personalizada do user_commands.bash"
+_tr_add2 ins_cust_text2              "O arquivo obtido irá substituir ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Isso é mais útil para instalações <b>online</b>"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Nota: Conexão com a internet não está disponível, alguns botões estarão escondidos ou não funcionarão"
