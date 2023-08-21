@@ -147,7 +147,7 @@ _tr_add2 issues_no               "Inga viktiga systemfel upptäcktes."
 _tr_add2 cal_noavail            "Icke tillgängligt: "        # installer program
 _tr_add2 cal_warn               "Varning"
 _tr_add2 cal_info1              "Det här är ett gemenskapsutvecklat släpp.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> metoden ger dig en Xfce-desktop med EndeavourOS-tema.\nInternetuppkoppling 	är inte nödvändig.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> metoden ger dig %%s skrivbordet.\nInternet-uppkoppling behövs inte.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> metoden låter dig välja skrivbordsbakgrund, med vaniljtema.\nInternetuppkoppling krävs.\n\n"
 _tr_add2 cal_info4              "OBS: Detta släpp är ett pågående arbete, vänligen hjälp oss att göra det stabilt genom att rapportera buggar\n"
 _tr_add2 cal_choose             "Välj installationsmetod"

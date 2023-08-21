@@ -1,6 +1,6 @@
 # Modifications in the English translation
 
-*Last updated: 2021-Dec-21*
+*Last updated: 2023-Aug-21*
 
 Here you will find a list of *changes* to the original English version.<br>
 The changes can be
@@ -34,3 +34,4 @@ Change date | Placeholder name | Reason for the change
 2021-Dec-14 | after_install_r8168 | Changed the action performed by the button.
 2021-Dec-14 | after_install_r8168_tip | Changed the action performed by the button.
 2021-Dec-21 | settings_dis_contents | Text layout change.
+2023-Aug-21 | cal_info2 | Support for printf-like positional parameters (added %%s).
