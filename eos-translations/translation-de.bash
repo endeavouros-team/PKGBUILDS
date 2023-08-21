@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Es wurden keine wichtigen Systemprobleme festg
 _tr_add2 cal_noavail            "Nicht verfügbar: "        # installer program
 _tr_add2 cal_warn               "Warnung"
 _tr_add2 cal_info1              "Dies ist eine Community-Entwicklungsversion.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b>Mit dieser Methode erhältst du einen Xfce4-Desktop mit EndeavourOS-Theme.\nEs ist keine Internetverbindung erforderlich.\n\n"
-_tr_add2 cal_info3              "<b>Online</b>Mit dieser Methode kannst du eine der Desktop-Umgebungen ohne verändertes Thema auswählen.\nEs wird eine Internetverbindung benötigt.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b>Mit dieser Methode erhältst du den %%s Desktop.\nEs ist keine Internetverbindung erforderlich.\n\n"
+_tr_add2 cal_info3              "<b>Online</b>Mit dieser Methode kannst du eine der Desktop-Umgebungen auswählen.\nEs wird eine Internetverbindung benötigt.\n\n"
 _tr_add2 cal_info4              "Bitte beachte: Diese Version liefert einen unfertigen Zustand. Bitte hilf uns sie stabil zu machen, indem du uns Fehler meldest.\n"
 _tr_add2 cal_choose             "Wähle die Installationsmethode"
 _tr_add2 cal_method             "Methode"
@@ -255,6 +255,7 @@ _tr_add2 after_install_ewtip2   "Bildschirmhintergrund-Auswahl"
 #       - line 72:  changed text of 'after_install_ewtip'
 #       - line 249: changed text of 'after_install_ew2'
 #       - line 250: changed text of 'after_install_ewtip2'
+
 # 2020-Oct-23:
 _tr_add2 updt_update_check        "Update-Check"
 _tr_add2 updt_searching           "Suche"
