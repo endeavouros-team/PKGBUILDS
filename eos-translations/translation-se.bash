@@ -147,9 +147,10 @@ _tr_add2 issues_no               "Inga viktiga systemfel upptäcktes."
 _tr_add2 cal_noavail            "Icke tillgängligt: "        # installer program
 _tr_add2 cal_warn               "Varning"
 _tr_add2 cal_info1              "Det här är ett gemenskapsutvecklat släpp.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> metoden ger dig %%s skrivbordet.\nInternet-uppkoppling behövs inte.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> metoden låter dig välja skrivbordsbakgrund, med vaniljtema.\nInternetuppkoppling krävs.\n\n"
-_tr_add2 cal_info4              "OBS: Detta släpp är ett pågående arbete, vänligen hjälp oss att göra det stabilt genom att rapportera buggar\n"
+_tr_add2 cal_info3              "<b>Online</b> metod låter dig välja ditt skrivbord.\nInternet-anslutning krävs.\n\n"
+_tr_add2 cal_info4              "Vänligen notera: Detta släpp är ett pågående arbete, snälla hjälp oss att göra den stabil genom att rapportera buggar.\n"
+_tr_add2 cal_info5              "\nEfter installationen rekommenderas att uppdatera systemet.\n\n"
+_tr_add2 cal_info6              "\nEfter installation är systemet uppdaterat.\n\n"
 _tr_add2 cal_choose             "Välj installationsmetod"
 _tr_add2 cal_method             "Metod"
 _tr_add2 cal_nosupport          "$PROGNAME: Icke stött läge: "
