@@ -13,6 +13,10 @@ _tr_add() {
     local ix="$2"
     local str="$3"
 
+    shift 3
+
+    printf -v str "$str" "$@"   # add possible parameters into the given string
+
     tr_strings["Lang_${lang}__$ix"]="$str"
 
     tr_indexes+=("$ix")
@@ -35,7 +39,9 @@ _tr_add2() {
 ltr() {                                              # puts string to stdout
     local ix="$1"
     local str="${tr_strings["Lang_${SELECTED_EOS_LANGUAGE}__$ix"]}"
-    test -n "$2" && str+="$2"                        # remove this line some day...
+    shift
+    test -n "$2" && { str+="$2"; shift; }            # remove this line some day...
+    printf -v str "$str" "$@"
     echo "$str"
 }
 ltr2() {                                             # puts string to stderr

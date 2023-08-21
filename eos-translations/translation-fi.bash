@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Korjattavaa ei löydetty."
 _tr_add2 cal_noavail            "Ei saatavilla: "        # installer program
 _tr_add2 cal_warn               "Varoitus"
 _tr_add2 cal_info1              "Tämä on Community Development -julkaisu.\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> asentaa Xfce-työpöydän ja EndeavourOS-teeman.\nNettiyhteyttä ei tarvita.\n\n"
-_tr_add2 cal_info3              "<b>Online</b> antaa valita asennettavan työpöydän, johon tulee oletusteema.\nNettiyhteys tarvitaan.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> asentaa %%s-työpöydän.\nNettiyhteyttä ei tarvita.\n\n"
+_tr_add2 cal_info3              "<b>Online</b> antaa valita asennettavan työpöydän.\nNettiyhteys tarvitaan.\n\n"
 _tr_add2 cal_info4              "\nHUOM: Tätä julkaisua kehitetään jatkuvasti. Ole hyvä ja auta tekemään siitä parempi raportoimalla mahdolliset virheet.\n"
 _tr_add2 cal_choose             "Valitse asennustapa"
 _tr_add2 cal_method             "Tapa"
