@@ -165,7 +165,7 @@ _tr_add2 cal_info2              "<b>Offline</b>Mit dieser Methode erhältst du d
 _tr_add2 cal_info3              "<b>Online</b>Mit dieser Methode kannst du eine der Desktop-Umgebungen auswählen.\nEs wird eine Internetverbindung benötigt.\n\n"
 _tr_add2 cal_info4              "Bitte beachte: Diese Version liefert einen unfertigen Zustand. Bitte hilf uns sie stabil zu machen, indem du uns Fehler meldest.\n"
 _tr_add2 cal_info5              "\nNach der Installation bitte das System updaten.\n\n"
-_tr_add2 cal_info6              "\nNach der Installion ist das System up-to-date.\n\n"
+_tr_add2 cal_info6              "\nNach der Installation ist das System up-to-date.\n\n"
 _tr_add2 cal_choose             "Wähle die Installationsmethode"
 _tr_add2 cal_method             "Methode"
 _tr_add2 cal_nosupport          "$PROGNAME: Methode nicht unterstützt: "

@@ -164,9 +164,11 @@ _tr_add2 issues_no                "No se detectaron problemas importantes del si
 _tr_add2 cal_noavail              "No está disponible : "        # programa de instalación
 _tr_add2 cal_warn                 "Alerta"
 _tr_add2 cal_info1                "Este es un lanzamiento de desarrollo comunitario.\n\n"                                   # specials needed !
-_tr_add2 cal_info2                "<b>Offline</b> Este método te da un escritorio Xfce con temas de EndeavourOS.\nNo es necesario tener conexión a internet.\n\n"
-_tr_add2 cal_info3                "<b>Online</b> Este método te permite elegir tu escritorio, con temas sin personalización.\nEs necesario tener conexión a internet.\n\n"
-_tr_add2 cal_info4                "Por favor tenga en cuenta : Este lanzamiento es un trabajo en progreso, por favor ayúdenos a estabilizarlo reportando errores..\n"
+_tr_add2 cal_info2                "<b>Offline</b> Este método te da el escritorio %%s.\nNo es necesario tener conexión a Internet.\n\n"
+_tr_add2 cal_info3                "<b>Online</b> Este método te permite elegir tu escritorio.\nEs necesario tener conexión a Internet.\n\n"
+_tr_add2 cal_info4                "Por favor tenga en cuenta: Este lanzamiento es un trabajo en progreso, por favor ayúdenos a estabilizarlo reportando errores.\n"
+_tr_add2 cal_info5                "\nSe recomienda actualizar el sistema después de instalar.\n\n"
+_tr_add2 cal_info6                "\nEl sistema queda actualizado después de instalar.\n\n"
 _tr_add2 cal_choose               "Elija el método de instalación"
 _tr_add2 cal_method               "Método"
 _tr_add2 cal_nosupport            "$PROGNAME : modo no soportado : "
