@@ -10,7 +10,7 @@ monospace-font-name='Source Code Pro 10'
 pinned-launchers=['firefox.desktop', 'nemo.desktop', 'org.gnome.Terminal.desktop']
 
 [com.solus-project.budgie-panel]
-builtin-theme=true
+builtin-theme=false
 dark-theme=false
 
 [org.gnome.desktop.background:Budgie]
