@@ -346,3 +346,5 @@ _tr_add2 ins_cust_text3              "Tämä on hyödyllisintä <b>online</b>-as
 # 2023-Mar-29
 _tr_add2 ins_no_connection           "Huom: internet-yhteys ei saatavilla, osa nappuloista on näkymättömissä tai ei toimi,"
 
+# 2023-Aug-25
+_tr_add2 ins_pmtip2             "Partitionmanager sallii levyn osioiden tutkimisen ja muokkaamisen (käytä tarvittaessa)"

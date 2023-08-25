@@ -346,3 +346,5 @@ _tr_add2 ins_cust_text3              "This is most useful for <b>online</b> inst
 # 2023-Mar-29
 _tr_add2 ins_no_connection           "Note: no internet connection available, some buttons are hidden or do not work."
 
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Partitionmanager allows examining and managing disk partitions and structure"
