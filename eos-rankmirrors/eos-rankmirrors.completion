@@ -6,24 +6,25 @@ GetMirrors() {
     # Grab endeavouros-mirrorlist from the latest package.
     # First try the package cache. If no luck, fetch it from github/gitlab.
 
-    local pkgname=endeavouros-mirrorlist
-    local pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
+    local -r pkgname=endeavouros-mirrorlist
+    local -r pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
 
     if [ -n "$pkg" ] ; then
         # The package exists in the cache.
         # Check if the installed version is the same as in the cache.
-        local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
-        local installedv=$(pacman -Q $pkgname | awk '{print $2}')
-        if [ "$cachev" = "$installedv" ] ; then
+        #
+        # local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
+        # local installedv=$(expac -Q %v $pkgname)
+        # if [ $(vercmp "$installedv" "$cachev") -ge 0 ] ; then
             tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist | FilterMirrorUrls
             return 0
-        fi
+        # fi
     fi
 
-    # Package not in cache or installed package version is not the same as in cache.
+    # Package not in cache # or installed package version is not the same as in cache.
     # Fetch it.
-    local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
-    local timeout=5  # not too long...
+    local -r url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
+    local -r timeout=5  # not too long...
     curl --fail -Lsm $timeout -o- "$url" | FilterMirrorUrls
 }
 
@@ -31,10 +32,8 @@ _eos-rankmirrors_() {
     local cur prev #words cword split
     _init_completion -s || return
 
-    # local opts=( --help -h --sort --ignore --prefer --timeout -t --verbose --mirror-verbosity --no-save -n )
-    local opts="$(eos-rankmirrors --dump-options)"   # alternative, slower
-
-    local verbosities=( all code show none )
+    local -r opts="$(eos-rankmirrors --dump-options)"   # alternative, slower
+    local -r verbosities=( all code show none )
 
     # Handle options that need sub-options.
     # Each option "case" should return immediately.
