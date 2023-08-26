@@ -367,11 +367,11 @@ WriteSystemMirrorlist() {
 
 DumpOptions() {
     local user_options=(
-        $(echo "$SHORT_OPTIONS" | sed -E -e 's|([a-zA-Z])|-\1 |g' -e 's| :|:|g')
-        $(echo "--""$LONG_OPTIONS"  | sed -E 's|,| --|g')
+        $(echo "$SHORT_OPTIONS" | sed -E -e 's|([a-zA-Z])|-\1 |g' -e 's| :||g')
+        $(echo "--""$LONG_OPTIONS"  | sed -E -e 's|,| --|g' -e 's|:||g')
     )
     local internal_options=(
-        $(echo "--""$LONG_OPTIONS_INTERNAL"  | sed -E 's|,| --|g')
+        $(echo "--""$LONG_OPTIONS_INTERNAL"  | sed -E -e 's|,| --|g' -e 's|:||g')
     )
     case "$1" in
         --all) echo "${user_options[*]} ${internal_options[*]}" ;;
