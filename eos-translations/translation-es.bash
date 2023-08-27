@@ -349,3 +349,5 @@ _tr_add2 ins_cust_text3              "Esto es más útil para la instalación <b
 # 2023-Mar-29
 _tr_add2 ins_no_connection           "Nota: conexión a Internet no disponible, algunos botones están ocultos o no funcionan."
 
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Gestor de particiones permite examinar y gestionar las particiones y la estructura del disco"
