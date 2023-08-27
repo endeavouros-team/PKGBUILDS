@@ -5,10 +5,11 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=33
+pkgrel=34
 arch=(any)
 license=(GPL2)
-url="https://github.com/endeavouros-team/eos-pkgbuild-setup/raw/main"
+url="https://github.com/endeavouros-team/$pkgname"
+_url="https://raw.githubusercontent.com/endeavouros-team/$pkgname/main"
 depends=(git hub yay curl wget xdg-utils)
 backup=(
     etc/eos-mirrorcheck.conf
@@ -16,13 +17,45 @@ backup=(
     etc/eos-pkgbuild-setup-general.conf
 )
 source=(
-    git+https://github.com/endeavouros-team/eos-pkgbuild-setup.git
+    # git+https://github.com/endeavouros-team/eos-pkgbuild-setup.git
+
+    $_url/$pkgname
+    $_url/PackageFunc
+    $_url/add-release-assets
+    $_url/add-release-assets.completion
+    $_url/archive-sync-to-remote
+    $_url/assets.make
+    $_url/delete-release-assets
+    $_url/download-release-assets
+    $_url/eos-mirrorcheck.conf
+    $_url/eos-pkgbuild-setup.conf
+    $_url/eos-pkgbuild-setup-general.conf
+    $_url/githubcheck
+    $_url/local-general-setup
+    $_url/mirrorcheck
+    $_url/mirrorcheck.completion
+    $_url/pacman-for-assets.make
+    $_url/release-asset-names
 )
-sha512sums=('SKIP')
+sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
+            '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
+            '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
+            '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
+            'be63de6c49f05f909a0b15e406eb43cad59cd15992ad1fa1ebda58245761fccd309f3aae76e6f3f86e6cd1e0d6279ed43a08aa7f7a2c312a493a55fe819dbc87'
+            'd824cda9b407a1588ab866da422c171944cb8ee8b79bb487255ce8968d2b264174be8f2ada612db9728d1f00e33bff7b75d59eb431f285c12f69e11a90b83038'
+            '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
+            '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
+            '2be041304f33d20e54b0d843e1905d393ab4552367b435039989ad94dab64a230f0cf288b00213e60f2bc69e4b36a6cb6894522ac79add56d8eff86c6852c11c'
+            '5a73b5996de89842e28aa8b62f50a5c436c38b8ac8e2b8aa253c0db934c512987dd714dfa9551784d88b4a02326ffdaa5d2c25ef8536294e2514ce0f2f994716'
+            '46a4123eee031144508d713cf63b44cdd9e5ec1609948e8e2257e0cf2247589bc793ab5b933a0922a5e73f274b38d64f7a5fcd58ffcb7924524675da8ae98898'
+            'bf5481ea3792fa04a334119bc5e92fc7a722b7ec2c1cccba11aa1a5dcaa1f1c76d886782c35f9575bd194e7b49e6865544d187d3f2294b0a5cb16b5ffcc98fef'
+            '15b4a800e60d65a5b4e888a6baa5cb6336b78255ff39f8c54563c77bdbff2299b84e65d456452097c5cbd36df1fae2cdcab41f65b9d86a2c0b6b973f5cc577a9'
+            '0591f55edcda1760005d606604f4326f3bb6060e3619d0e87465eac1e95af5112df2a621ee5fa18519596682534ac966591dad851ce478873d82eea8d84f06f9'
+            '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
+            '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
+            'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7')
 
 package() {
-    cd $pkgname
-
     local -r _scripts="$pkgdir/usr/share/endeavouros/scripts"
     local -r _usr_bin="$pkgdir/usr/bin"
     local -r _usr_local_bin="$pkgdir/usr/local/bin"
@@ -57,10 +90,4 @@ package() {
     ln -s add-release-assets                     "$_bash_completion/delete-release-assets"      # helps with the tag
     ln -s add-release-assets                     "$_bash_completion/release-asset-names"        # helps with the tag
     ln -s add-release-assets                     "$_bash_completion/download-release-assets"    # helps with the tag
-
-    # cleanup
-    cd ../..
-    if [ -d $pkgname/refs ] && [ -r $pkgname/config ] ; then
-        rm -rf $pkgname
-    fi
 }
