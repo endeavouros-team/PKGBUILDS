@@ -8,10 +8,6 @@ Printf2() { printf "$@" >&2 ; }
 FormatVersion()     { printf "%s%s  " "$1" "$2" ; }
 FormatName()        { FormatVersion "$1" ; }
 
-RepoType() {
-    test -z "$(grep "^\[testing\]$" /etc/pacman.conf)" && echo "Stable" || echo "Testing"
-}
-
 Header() {
     local fname="${FUNCNAME[1]}"
     case "$fname" in
@@ -20,15 +16,15 @@ Header() {
     esac
     local hdr="<b>$fname</b>"
 
-    if [ "$fname" = "$(RepoType)" ] ; then
+    if [ "$fname" = "$RepoType" ] ; then
         hdr="<i>$hdr</i>"                    # currently used repo: italics font
     fi
     FormatVersion "$hdr"
 }
 
 LocalVersion() {
-    local pkg="${1##*/}"     # "$(/usr/bin/basename "$1")"
-    expac -Q %v "$pkg"       # $pacman -Q "$pkg" 2>/dev/null | /usr/bin/awk '{print $2}'
+    local pkg="${1##*/}"
+    expac -Q %v "$pkg"
 }
 Exist()        { [ -n "$version" ] && echo TRUE || echo FALSE ; }
 
@@ -83,19 +79,19 @@ StableVersion() {
     local pkg="$1"
     local repo=""
 
-    # prevent usage of the 'testing' repo:
+    # prevent usage of the '*-testing' repos:
     case "$pkg" in
         linux | linux-headers | linux-lts | linux-lts-headers)
-            repo=core/ ;;
+            pkg="core/$pkg" ;;
         linux-zen | linux-zen-headers | linux-hardened | linux-hardened-headers | linux-rt | linux-rt-headers | linux-rt-lts | linux-rt-lts-headers)
-            repo=extra/ ;;
+            pkg="extra/$pkg" ;;
     esac
-    expac -S %v "$repo$pkg"      # LANG=C $pacman -Si $repo"$pkg" 2>/dev/null | grep ^Version | head -n1 | awk '{print $NF}'
+    expac -S %v "$pkg"
 }
 
 Stable() {
     local version xx in_use=""
-    if [ "$FUNCNAME" = "$(RepoType)" ] ; then
+    if [ "$FUNCNAME" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the stable repos$in_use":LBL "")
@@ -106,16 +102,24 @@ Stable() {
 }
 
 TestingVersion() {
-    local pkg="${1##*/}"   #"$(/usr/bin/basename "$1")"
-    echo "$testinginfo" | grep -A2 /packages/testing/x86_64/$pkg/ | tail -n 1 | sed 's|^.*>\([0-9][0-9a-z\.\-]*\)<.*$|\1|'
+    local pkg="${1##*/}"
+    if true ; then
+        local tmp="$testinginfo"
+        tmp=$(echo "$tmp" | grep -A2 /packages/core-testing/x86_64/$pkg/)
+        tmp=$(echo "$tmp" | tail -n1)
+        tmp=$(echo "$tmp" | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|')
+        echo "$tmp"
+    else
+        echo "$testinginfo" | grep -A2 /packages/core-testing/x86_64/$pkg/ | tail -n 1 | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|'
+    fi
 }
 
 Testing() {
     local in_use=""
-    if [ "$FUNCNAME" = "$(RepoType)" ] ; then
+    if [ "$FUNCNAME" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
-    local URL="https://archlinux.org/packages/?sort=&repo=Testing&q=linux+kernel+and+modules"
+    local URL="https://archlinux.org/packages/?repo=Core-Testing&q=linux+kernel+and+modules"
     local testinginfo="$(/usr/bin/curl -s $URL_timeout $URL)"
     local version xx
 
@@ -297,7 +301,7 @@ AvailableKernelsAndHeaders() {
     local header
     local kernel
     local pacman=/usr/bin/pacman
-    local headers=$($pacman -Sl | awk '{printf("%s/%s\n", $1, $2)}' | grep "/linux[^ ]*-headers$" | grep -Pv '^testing/|/linux-api-headers$')
+    local headers=$(expac -Ss '%r/%n' 'linux[-]*[^ pi]*-headers' | grep -Pv 'testing/linux-')    # 'pi' removes all 'linux-api-headers'
 
     # Get kernel names from header names and display them all
     for header in $headers ; do
@@ -368,6 +372,18 @@ PacmanConfEditor() {
     esac
 }
 
+ShowTimePoint() {    # just debugging stuff
+    case "$1" in
+        "") printf "%s: "    "${BASH_LINENO[0]}" >&2 ;;
+        *)  printf "%s (after %s): " "${BASH_LINENO[0]}" "$1" >&2 ;;
+    esac
+    date +%S.%N >&2
+}
+
+RepoType() {
+    grep "^\[core-testing\]$" /etc/pacman.conf >/dev/null && echo "Testing" || echo "Stable"   # tests only one of the testing repos...
+}
+
 Main()
 {
     local progname="${0##*/}"
@@ -382,6 +398,7 @@ Main()
     local smallBegin=""
     local smallEnd=""
     local nrofkernelitems                  # 8 with only upstream kernels
+    local RepoType=$(RepoType)
 
     CommonStuff
     AkmConfig
@@ -432,7 +449,8 @@ Main()
 
     t1+="$smallBegin"
     t1+="Here's information about currently installed and available Linux kernels.\n"
-    t1+="Install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n"
+    t1+="Install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n\n"
+    t1+="<i>Please make sure the system is fully updated when starting <b>$progname</b></i>.\n"
     t1+="\n"
     if [ "$small_font" = "no" ] ; then
         t1+="Column headers:\n"
@@ -450,16 +468,16 @@ Main()
         t1+="</tt>"
     fi
     t1+="Your currently used repo (Stable or Testing) is printed in italics (see also /etc/pacman.conf).\n"
-    t1+="Marking <b>$na</b> means: info not available.\n"
+    t1+="Marking <b>$na</b> means: info not available.\n\n"
     if [ "$connect_header_with_kernel" = "yes" ] ; then
-        t1+="\n"
-        t1+="You have configured the header to install/uninstall along with the kernel.\n"
-        t1+="If a chosen kernel setting below contradicts its header setting, the kernel setting is used for header, too.\n"
+        :
+        # t1+="\nYou have configured the header to install/uninstall along with the kernel.\n"
+        # t1+="If a chosen kernel setting below contradicts its header setting, the kernel setting is used for header, too.\n"
     else
-        t1+="\n"
-        t1+="You have configured the header and kernel to install/uninstall separately (default behavior).\n"
-        t1+="See file /etc/akm.conf for more info.\n"
+        :
+        # t1+="\nYou have configured the header and kernel to install/uninstall separately (default behavior).\n"
     fi
+    t1+="See file <tt>/etc/akm.conf</tt> for configuration details.\n"
     t1+="$smallEnd"
     local linenr="$(FindNewRepoLineNumber)"
     local editor="$(PacmanConfEditor $linenr)"
@@ -605,4 +623,4 @@ Main()
     fi
 }
 
-Main "$@"
+Main "$@" &
