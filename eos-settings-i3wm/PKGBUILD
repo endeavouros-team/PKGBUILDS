@@ -12,7 +12,7 @@ license=('GPL')
 makedepends=('git')
 depends=()
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('4e4a9a07fd4f576155e8d4042f70c97996922f5e8119e1188166624a13021915')
+sha256sums=('498b8e0b4c9cd54a3f8b488d293bdacb205d92789511b93b609433da4e79b2c6')
 
 package() {
     cd "$_pkgname-$pkgver"
