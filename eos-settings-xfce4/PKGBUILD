@@ -1,0 +1,18 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+_pkgname=endeavouros-xfce4-theming
+pkgname=eos-settings-xfce4
+pkgver=1.0
+pkgrel=1
+pkgdesc="pre user creation skel setup for xfce4 under EndeavourOS"
+arch=("any")
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=("GPL")
+makedepends=("git")
+source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('afdd2729356a2fab03f102fcb3e762f7df8264ca347ca82476287b349c529f35')
+
+package() {
+    cd "$_pkgname-$pkgver"
+    cp -R "etc" "${pkgdir}/"
+}
