@@ -348,3 +348,6 @@ _tr_add2 ins_cust_text3              "Diese Methode ist nur für die <b>online</
 
 # 2023-Mar-29
 _tr_add2 ins_no_connection           "Achtung: Keine Internetverbindung verfügbar, einige Schaltflächen fehlen oder funktionieren nicht."
+
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Der Partitionmanager ermöglicht das Untersuchen und Verwalten von Festplattenpartitionen und Aufbau"
