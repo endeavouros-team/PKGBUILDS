@@ -280,3 +280,4 @@ _tr_add2 ins_cust_text3              "Detta är mest användbart för <b>online<
 
 _tr_add2 ins_no_connection           "Notera: ingen internetanslutning tillgänglig, vissa knappar är dolda eller fungerar inte som dom ska."
 
+_tr_add2 ins_pmtip2                  "Partitionshanterare tillåter att undersöka och hantera diskpartitioner och struktur"
