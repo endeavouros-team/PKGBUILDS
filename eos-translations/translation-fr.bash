@@ -342,3 +342,6 @@ _tr_add2 ins_no_connection           "Note : aucune connexion internet n'est dis
 # 21-aout-2023
 _tr_add2 cal_info5              "\nAprès l'installation mettre à jour le système est recommandé\n\n"
 _tr_add2 cal_info6              "\nAprès l'instalaltion, le système est à jour.\n\n"
+
+# 25-aout-2023
+_tr_add2 ins_pmtip2                  "Partitionmanager permet l'examen et la gestion des partitionsd du disque et la structure"
