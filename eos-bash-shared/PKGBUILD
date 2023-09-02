@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23.4
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -53,13 +53,13 @@ source=(
   $_url/su-c_wrapper
   $_url/eos-run-cmd-with-su
   $_url/eos-wallpaper-set
-  $_url/UpdateInTerminal
   $_url/eos-update                        # "better" than UpdateInTerminal
   $_url/eos-update.completion
   $_url/eos-update-extras
-  $_url/UpdateInTerminal.desktop
   $_url/eos-waiting-indicator
 
+#  $_url/UpdateInTerminal
+#  $_url/UpdateInTerminal.desktop
 #  $_url/eos-pkginfo
 #  $_url/eos-pkginfo.completion
 #  $_url/eos-pkg-changelog
@@ -88,7 +88,7 @@ source=(
 )
 
 sha512sums=('b6116f48573afb92881df99a68d139edc8c71076e0527613f651606e02d018a1c6b8ecffca9337a58dd6fa1e1be59500023c4343dc36ac2b30e7740955e2afcb'
-            'cd5a12d95919bef697626298d3ef0082d3364b83815cf8fb180c3b69bb81b51f3be7fcd8d27feadc12feaa42516e43593a728a684ff9db7bfcc533dbdb33ef00'
+            'b1dc6625eba217701af96f359deff275e89cfd91cc5f2fa46e0ecc8aec60a772b12def43a60f0e6a629aadb4f78ed992b64db0b114dd1abc2a792398dd854ae1'
             '3d9682e5775c19224c5790ae2e86a5eba142d3671dd1d3d525790207ca87f2b816ae08697ea9750ec6c7bb850d20d5b5a996530b7b3adbd4852d5d984b804f4c'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
             '6c27a5bf1a9b54f629f27fcc75a4edb240e1df2c4122aae307f208df174a44513a9b63be3ebb0d0e563952021d9987cd46584cb229b1a4f221d97425da0df3d1'
@@ -101,11 +101,9 @@ sha512sums=('b6116f48573afb92881df99a68d139edc8c71076e0527613f651606e02d018a1c6b
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '291176d3689d219b43302f012ea62f6a593564d204f0004c58ae63b0a80efb9d5a27667c62a2be7f4fc977f1df254152f61e651732dcc61104de3130632634dd'
-            '1b2082cd984580731f72c3fcdcdc1086a1e5f63e3572ce3f7775b3a89a1b3c5b077f7932fc9ca0e95eaad020d8dfdebb5b577848c83ae20def811d18ff99c654'
             'e0f911682ed863ceaaa3d7ad75b2f8287b40f7a410d9c62b975efedd4c1796b1675010380d56e5c974eb8bd93126eb6c65b5952ba801101c3041ce8ee8893c9d'
             'e8703f8bee02b58160db9432b6629731285c3259d71885b4cc0511e90f12f1b57f975a3572c7a51e066a82f41b0e01d7f325047d85f1b15eb916db6fc7056f8e'
             '8c30d3964bec417e849d4fe52788ea6a2124db566236cd1fbe90ca069f79ea3dd5d95e71d99eaa50d46ba5fa5b1ad7c2b5276c77b6486bdc23c9bda47d28f42d'
-            'b210ce3345045cae1da003899a50bbd991f51f357751124ce6c62c54b8d6d692bc912237f8bad9782d46f3e1ada2d183ed120098b8123e3acbb655fa3110c6a2'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             'f9b2ee135a22ecb79df838bf91ece857c7cbe5a0f858b96682f1d1fe60092d81bed4c61ac3b30bc776cc8693fefe6dc6fbc5a3a597a7a692937b5276900756ec'
             '8fa9714585139383dd6da40193fa73454d4382cb91fb8bce1d41673a83c84e0c2328ae78c0d3f94ec450eafc87cdb5732b9dc26129caeceee707e831cd4ccef6'
@@ -154,7 +152,7 @@ package() {
   install -Dm755 su-c_wrapper                   $bin/su-c_wrapper
   install -Dm755 eos-run-cmd-with-su            $bin/eos-run-cmd-with-su
   install -Dm755 eos-wallpaper-set              $bin/eos-wallpaper-set
-  install -Dm755 UpdateInTerminal               $bin/UpdateInTerminal
+#  install -Dm755 UpdateInTerminal               $bin/UpdateInTerminal
   install -Dm755 eos-update                     $bin/eos-update
   install -Dm755 eos-update-extras              $bin/eos-update-extras
   install -Dm755 eos-waiting-indicator          $bin/eos-waiting-indicator
@@ -177,7 +175,7 @@ package() {
 # install -Dm755 eos-pkg-changelog              $bin/eos-pkg-changelog
 # install -Dm755 eos-send-gpuinfo               $bin/eos-send-gpuinfo
 
-  install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
+#  install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
 
   install -Dm644 eos-update.completion          $pkgdir/usr/share/bash-completion/completions/eos-update
 
