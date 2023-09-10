@@ -22,7 +22,7 @@ example version: **22.03.1.1**
 
 **03** - The month of Release  -- up from cassini it will be the Month of the initial Release
 
-**1** - 1 for the main release, 2 for neo, 3 for nova (bug fix relases)
+**1** - 1 for the main release, 2 for neo, 3 for nova (bug fix releases)
 
 **1** - The current iteration of the package
 
