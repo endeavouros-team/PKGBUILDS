@@ -104,7 +104,7 @@ ShowNotify() {
                         UpdateInTerminal --nt --updates=$tmp_ufile
                     else
                         if [ "$CheckAurUpdates" = "yes" ] ; then
-                            RunInTerminal eos-update --yay
+                            RunInTerminal eos-update --${AurUpdaterProg##*/}
                         else
                             RunInTerminal eos-update
                         fi
