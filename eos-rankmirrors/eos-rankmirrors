@@ -488,6 +488,12 @@ Options() {
             --no-save | -n)
                 save=no
                 ;;
+            --test-all | -a)
+                save=no
+                EOS_IGNORED_MIRRORS=()
+                ignored_mirrors=""
+                timeout=10
+                ;;
             --list-only)
                 mirrorlist_only=yes  # and no other output
                 ;;
@@ -516,8 +522,8 @@ Check-mirror_verbosity() {
 
 Main()
 {
-    local -r SHORT_OPTIONS="hnt:"
-    local -r LONG_OPTIONS="verbose,help,no-save,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
+    local -r SHORT_OPTIONS="ahnt:"
+    local -r LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:"
 
     case "$1" in
@@ -594,4 +600,3 @@ Main()
 trap "sleep 0.2 ; DeleteTmpFiles" EXIT
 
 Main "$@"
-
