@@ -158,8 +158,18 @@ _init_translations() {
 
     if [ -z "$lang" ] ; then
         # See /usr/share/i18n/locales
-        f1="$(echo "$LANG" | cut -d '_' -f 1)"
-        f2="$(echo "$LANG" | sed "s|^${f1}_\([A-Z@]*[a-z]*\).*$|\1|")"
+
+        #f1="$(echo "$LANG" | cut -d '_' -f 1)"
+        #f2="$(echo "$LANG" | sed "s|^${f1}_\([A-Z@]*[a-z]*\).*$|\1|")"
+        case "$LANG" in
+            *_*) f1="${LANG%%_*}"
+                 f2="${LANG#*_}"
+                 ;;
+            *)   f1="${LANG}"
+                 f2=""
+                 ;;
+        esac
+
         if [ -r "$trdir/translation-${f1}_$f2.bash" ] ; then
             lang="${f1}_$f2"
         elif [ -r "$trdir/translation-$f1.bash" ] ; then
