@@ -327,17 +327,27 @@ ChangeNamesToCodes() {
 FixCountryName() {   # simple fix to country name to be the same as in 'reflector --list-countries'
     local name="$1"
 
-    if [ -z "$(CountryToCode "$name")" ] ; then
-        local official_name
-        name=${name,,}  # make lowercase
-        for official_name in "${countrynames[@]}" ; do
-            if [ "$name" = "${official_name,,}" ] ; then
-                name="$official_name"
-                break
-            fi
-        done
+    if [ -n "$(CountryToCode "$name")" ] ; then
+        echo "$name"
+        return 0
     fi
-    echo "$name"
+    local official_name
+    name=${name,,}  # make lowercase
+    for official_name in "${countrynames[@]}" ; do
+        if [ "$name" = "${official_name,,}" ] ; then
+            echo "$official_name"
+            return 0
+        fi
+    done
+    return 1        # country name not found!
+}
+
+ToCountryName() {
+    local item="$1"
+    case "$item" in
+        [a-zA-Z][a-zA-Z]) CodeToCountry  "$item" ;;
+        *)                FixCountryName "$item" ;;
+    esac
 }
 
 IsInSelectedCountries() {
@@ -382,10 +392,9 @@ IsPositiveNumber() {
 
 AskCountriesAndOptions() {
     local tips=(
-        "Select countries to include in mirror ranking"
-        "  - select one or more countries"
-        "  - closest locations are usually the fastest"
-        "  - https is the preferred protocol"
+        "Mirror ranking preferences"
+        "  - select one or more <i>countries</i>"
+        "  - select <i>features</i> based on your preferences"
     )
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         tips+=("\nNote: configuration file <b>$REFLECTOR_X_CONF</b> options are in use.")
@@ -396,7 +405,7 @@ AskCountriesAndOptions() {
     local command
     local default_age=2
     local default_sort='age!^rate!country!score!delay'
-    local default_number=10
+    local default_number=20
     local use_saved=""
 
     Verbose "Creating the yad command..."
@@ -458,6 +467,8 @@ AskCountriesAndOptions() {
         command+=(--field="Max number of freshest mirrors":num $default_number)    # --latest
     fi
     command+=(--field="Download timeout in seconds":num 5)                         # --download-timeout
+
+    command+=(--field="Threads":num 5)                         # --threads
 
     local free_params=""
     if [ -r "$free_params_file" ] ; then
@@ -545,15 +556,34 @@ BuildReflectorCommand() {
     fi
     ((ix++))
     reflector_cmd+=(--download-timeout "${reflector_info[$((ix++))]}")
+    reflector_cmd+=(--threads "${reflector_info[$((ix++))]}")
 
     # add optional free parameters to the command and save free params to file
     printf "" > "$free_params_file"
+    local prev=""
+    local item items=()
     while true ; do
         xx="${reflector_info[$((ix++))]}"
-        [ -n "$xx" ] || break
+        case "$xx" in
+            "") break ;;
+            -c) prev="-c" ;;
+            *)  case "$prev" in
+                    -c)
+                        # $xx may need some adjustment
+                        readarray -t items <<< $(echo "$xx" | tr ',' '\n')
+                        for item in "${items[@]}" ; do
+                            conf_selected_countries+=("$(ToCountryName "$item")")
+                        done
+                        prev=""
+                        ;;
+                esac
+                ;;
+        esac
         reflector_cmd+=("$xx")
         echo "$xx" >> "$free_params_file"
     done
+
+    # echo "${reflector_cmd[*]}" > /tmp/foobar
 }
 
 ShowMirrorlistSaved() {
@@ -751,7 +781,7 @@ Main() {
     local countrynames
     local countrycodes
     local reflector_info
-    local reflector_cmd
+    local reflector_cmd=()
     local ml=/etc/pacman.d/mirrorlist
     local conf_selected_countries=()
     local conf_dropped_countries=()
