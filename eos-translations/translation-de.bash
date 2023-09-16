@@ -351,3 +351,13 @@ _tr_add2 ins_no_connection           "Achtung: Keine Internetverbindung verfügb
 
 # 2023-Aug-25
 _tr_add2 ins_pmtip2                  "Der Partitionmanager ermöglicht das Untersuchen und Verwalten von Festplattenpartitionen und Aufbau"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "EndeavourOS ARM Image Installationsprogramm"
+_tr_add2 ins_arm_starttip          "Installation der EndeavourOS ARM Variante"
+
+
+
+
+
+
