@@ -179,7 +179,7 @@ _tr_add2 tail_buttip            "Nur dieses Fenster schließen"
 
 _tr_add2 ins_text              "EndeavourOS auf der Festplatte installieren"
 _tr_add2 ins_start             "Das Installationsprogramm starten"
-_tr_add2 ins_starttip          "Starte das EndeavourOS-Installationsprogramm zusammen mit einem Terminal zur Fehlersuche"
+_tr_add2 ins_starttip          "Starte das EndeavourOS-Installationsprogramm (wähle aus populären Desktop Umgebungen)"
 _tr_add2 ins_up                "Dieses Programm aktualisieren$_exclamation"
 _tr_add2 ins_uptip             "Aktualisiert dieses Programm startet es neu"
 _tr_add2 ins_keys              "Pacman-Schlüssel initialisieren"
