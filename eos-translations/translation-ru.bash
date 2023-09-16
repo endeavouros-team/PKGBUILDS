@@ -348,3 +348,7 @@ _tr_add2 ins_no_connection           "Примечание: Подключени
 
 # 2023-Aug-25
 _tr_add2 ins_pmtip2                  "Менеджер разделов позволяет просматривать и управлять разделами и структурой диска."
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Установщик образа EndeavourOS ARM"
+_tr_add2 ins_arm_starttip          "Старт установки EndeavourOS ARM edition"
