@@ -348,3 +348,8 @@ _tr_add2 ins_no_connection           "Huom: internet-yhteys ei saatavilla, osa n
 
 # 2023-Aug-25
 _tr_add2 ins_pmtip2             "Partitionmanager sallii levyn osioiden tutkimisen ja muokkaamisen (käytä tarvittaessa)"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Asenna EndeavourOS ARM"
+_tr_add2 ins_arm_starttip          "Aloita EndeavourOS ARM:n asennus"
+
