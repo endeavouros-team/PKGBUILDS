@@ -623,4 +623,9 @@ Main()
     fi
 }
 
-Main "$@" &
+# if [ "${BASH_SOURCE[*]}" != "${BASH_SOURCE[*]//\/bashdb/}" ] ; then
+
+case "$_Dbg_debugger_name" in
+    bashdb) Main "$@"   ;;         # when debugging with bashdb, do not go background
+    *)      Main "$@" & ;;
+esac
