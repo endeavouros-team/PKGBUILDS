@@ -5,11 +5,12 @@
 pkgname=calamares
 pkgver=22.12.3.6
 pkgrel=6
+release_name="Cassini"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
-makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
 conflicts=('calamares_current')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
@@ -19,6 +20,18 @@ options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
 sha256sums=('cb9a90fe2578e0abd3af8e7110cc5272fb2cc3344e563499d7bb89ff9f7e6424')
+
+prepare() {
+    # Update branding.desc with the proper values
+    replace_command='
+    {
+        gsub(/\${version}/,version);
+        gsub(/\${release_name}/,release);
+        print
+    }
+    '
+    awk -i inplace -v version="${pkgver}" -v release="${release_name}" "$replace_command" "${srcdir}/calamares-${pkgver}/data/eos/branding/endeavouros/branding.desc"
+}
 
 build() {
     cmake -B build -S "${srcdir}/calamares-${pkgver}" \
