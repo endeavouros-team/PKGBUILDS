@@ -345,3 +345,7 @@ _tr_add2 cal_info6              "\nAprès l'instalaltion, le système est à jou
 
 # 25-aout-2023
 _tr_add2 ins_pmtip2                  "Partitionmanager permet l'examen et la gestion des partitionsd du disque et la structure"
+
+# 16-sept-2023
+_tr_add2 ins_arm_start             "Image installateur EndeavourOS ARM"
+_tr_add2 ins_arm_starttip          "Démarre l'installation de l'édition EndeavourOS ARM"
