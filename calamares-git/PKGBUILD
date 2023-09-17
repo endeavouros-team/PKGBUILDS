@@ -3,13 +3,14 @@
 
 pkgname=calamares-git
 _reponame=calamares
+release_name=$pkgname
 pkgver=.
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
-makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
 conflicts=('calamares_current')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
@@ -23,6 +24,18 @@ sha256sums=('SKIP')
 pkgver() {
   cd "${_reponame}"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    # Update branding.desc with the proper values
+    replace_command='
+    {
+        gsub(/\${version}/,version);
+        gsub(/\${release_name}/,release);
+        print
+    }
+    '
+    awk -i inplace -v version="$(pkgver)" -v release="${release_name}" "$replace_command" "${srcdir}/calamares/data/eos/branding/endeavouros/branding.desc"
 }
 
 build() {
