@@ -111,6 +111,16 @@ RankPerAge() {
     fi
 }
 
+Warning() {
+    local id="$1"
+    shift
+    local explanations=("$@")
+    explanations+=("Continuing.")
+    
+    printf2 "==> Warning about %s:\n" "$id"
+    printf2 "    %s\n" "${explanations[@]}"
+}
+
 GetUpdateNumberAndTime() {
     local url="$1"
     local mirror="$2"
@@ -137,13 +147,13 @@ GetUpdateNumberAndTime() {
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
-                    notif_echo2 "Warning: $mirror: update level $nr/$reference_level is too high (cannot be more than $reference_level)."
+                    Warning "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
                     return
                 elif [ $nr -lt $too_low_limit ] ; then
-                    notif_echo2 "Warning: $mirror: update level is $nr/$reference_level, problem with the mirror?"
+                    Warning "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    notif_echo2 "Warning: $mirror: update level is $nr/$reference_level, some packages may be outdated."
+                    Warning "$mirror" "Update level is $nr/$reference_level, some packages may be outdated."
                 fi
             fi
             result="$nr $time"
@@ -156,14 +166,15 @@ GetUpdateNumberAndTime() {
             case "$mirror_verbosity" in
                 all | code | show)
                     case "$retcode" in
-                        28) msg+=("==> '$mirror' connection failed after $timeout seconds, continuing.") ;;
-                        *)  msg+=("==> '$mirror' connection failed, continuing.") ;;
+                        28) msg+=("Connection failed after $timeout seconds.") ;;
+                        7)  msg+=("Connection failed. The mirror may be temporarily or permanently offline.") ;;
+                        *)  msg+=("Connection failed.") ;;
                     esac
                     case "$mirror_verbosity" in
                         all)
                             curl_msg="$(curl-exit-code-to-string $retcode)"
                             if [ -n "$curl_msg" ] ; then
-                                msg+=("    --> (curl exit code $retcode: $curl_msg)")
+                                msg+=("--> (curl exit code $retcode: $curl_msg)")
                             else
                                 add_code=yes
                             fi
@@ -172,9 +183,9 @@ GetUpdateNumberAndTime() {
                             add_code=yes
                             ;;
                     esac
-                    [ "$add_code" = "yes" ] && msg+=("    --> (curl exit code $retcode.)")
+                    [ "$add_code" = "yes" ] && msg+=("--> (curl exit code $retcode.)")
 
-                    printf2 "%s\n" "${msg[@]}"
+                    Warning "$mirror" "${msg[@]}"
                     ;;
                 none)
                     ;;
