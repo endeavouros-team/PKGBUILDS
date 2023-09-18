@@ -53,6 +53,3 @@ Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
 ## United States
 Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
 
-## Vietnam
-Server = https://mirrors.nguyenhoang.cloud/endeavouros/repo/$repo/$arch
-
