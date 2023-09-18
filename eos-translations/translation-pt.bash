@@ -348,3 +348,7 @@ _tr_add2 ins_no_connection           "Nota: sem ligação à Internet disponíve
 
 # 2023-Aug-25
 _tr_add2 ins_pmtip2                  "O Gestor de Partições permite analisar e gerir as partições e a estrutura do disco."
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Instalador da Imagem ARM do EndeavourOS"
+_tr_add2 ins_arm_starttip          "Iniciar a instalação da edição ARM do EndeavourOS"
