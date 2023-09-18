@@ -282,5 +282,4 @@ _tr_add2 ins_no_connection           "Notera: ingen internetanslutning tillgäng
 
 _tr_add2 ins_arm_start             "EndeavourOS ARM Avbild installationsprogram"
 _tr_add2 ins_arm_starttip          "Starta installationen av EndeavourOS ARM-utgåvan
-
-_tr_add2 ins_pmtip2                  "Partitionshanterare tillåter att undersöka och hantera diskpartitioner och struktur"
+_tr_add2 ins_pmtip2                "Partitionshanterare tillåter att undersöka och hantera diskpartitioner och struktur"
