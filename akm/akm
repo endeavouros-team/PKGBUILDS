@@ -384,9 +384,14 @@ RepoType() {
     grep "^\[core-testing\]$" /etc/pacman.conf >/dev/null && echo "Testing" || echo "Stable"   # tests only one of the testing repos...
 }
 
-Main()
-{
+Main() {
     local progname="${0##*/}"
+
+    CommonStuff                   # fetches common bash definitions
+    _bg_or_bashdb Main2 "$@"
+}
+
+Main2() {
     local pacman=/usr/bin/pacman
     local na="(-)"
     local kernels=()
@@ -400,7 +405,6 @@ Main()
     local nrofkernelitems                  # 8 with only upstream kernels
     local RepoType=$(RepoType)
 
-    CommonStuff
     AkmConfig
     Options "$@"
 
@@ -623,9 +627,4 @@ Main()
     fi
 }
 
-# if [ "${BASH_SOURCE[*]}" != "${BASH_SOURCE[*]//\/bashdb/}" ] ; then
-
-case "$_Dbg_debugger_name" in
-    bashdb) Main "$@"   ;;         # when debugging with bashdb, do not go background
-    *)      Main "$@" & ;;
-esac
+Main "$@"
