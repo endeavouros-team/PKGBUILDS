@@ -346,3 +346,10 @@ _tr_add2 ins_cust_text3              "Isso é mais útil para instalações <b>o
 
 # 2023-Mar-29
 _tr_add2 ins_no_connection           "Nota: Conexão com a internet não está disponível, alguns botões estarão escondidos ou não funcionarão"
+
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Partitionmanager permite examinar e gerenciar partições e estruturas de disco"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Instalador EndeavourOS ARM Image"
+_tr_add2 ins_arm_starttip          "Começar a instalar EndeavourOS ARM edition"
