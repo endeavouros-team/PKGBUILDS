@@ -13,7 +13,7 @@
 ######################################################
 
 ## Canada
-#Server = https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch
+Server = https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch
 
 ## China
 Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
