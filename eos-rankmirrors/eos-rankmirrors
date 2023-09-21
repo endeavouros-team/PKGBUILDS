@@ -530,9 +530,10 @@ Options() {
                 ;;
             --test-all | -a)
                 save=no
+                test_all=yes
                 EOS_IGNORED_MIRRORS=()
                 ignored_mirrors=""
-                timeout=10
+                [ $timeout -lt $timeout_default ] && timeout=$timeout_default
                 ;;
             --list-only)
                 mirrorlist_only=yes  # and no other output
@@ -590,6 +591,7 @@ Main()
     local mirrorlist_only=no                  # 'no' provides rather verbose output, 'yes' provides only the essential list
     local added_mirror=""
     local internal_testing=no
+    local test_all=no
 
     if [ ! -r "$eos" ] ; then                 # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
@@ -598,7 +600,7 @@ Main()
     source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return 1
     export -f eos_GetArch
 
-    local -r conf=/etc/eos-rankmirrors.conf
+    local -r conf=/etc/$progname.conf
     source $conf || DIE "Config file $conf does not exist!"
 
     mirror_verbosity="$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY"
@@ -619,6 +621,8 @@ Main()
     GetReferenceUpdateLevel
 
     Options "$@"
+
+    [ "$test_all" = "no" ] && source /etc/$progname.disabled
 
     new=$(/usr/bin/mktemp) ; delete_at_end+=("$new")
 

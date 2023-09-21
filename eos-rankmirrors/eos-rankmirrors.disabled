@@ -1,0 +1,7 @@
+# Do not edit!
+# This file is prone to be overwritten by
+# future updates of package eos-rankmirrors.
+
+EOS_IGNORED_MIRRORS+=(
+    jingk
+)
