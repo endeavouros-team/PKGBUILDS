@@ -17,7 +17,7 @@ verbose() {
 }
 
 DeleteTmpFiles() {
-    if [ -n "$delete_at_end" ] ; then
+    if [ ${#delete_at_end[@]} -gt 0 ] ; then
         echo2 ""
         verbose "Deleting temporary files: ${delete_at_end[*]}"
         rm -f "${delete_at_end[@]}"
@@ -25,8 +25,25 @@ DeleteTmpFiles() {
 }
 export -f DeleteTmpFiles
 
+RemoveFromDelList() {
+    if [ ${#delete_at_end[@]} -gt 0 ] ; then
+        echo2 "delete list count = ${#delete_at_end[@]}"
+        local -r remove_me="$1"
+        local oldlist=("${delete_at_end[@]}")
+        local xx
+        delete_at_end=()
+        for xx in "${oldlist[@]}" ; do
+            [ "$xx" != "$remove_me" ] && delete_at_end+=("$xx")
+        done
+    fi
+}
+
 DIE() {
-    notif_echo2 "$progname: error: $1"
+    local msg="$1"
+    local level="$2" ; [ -n "$level" ] || level=0
+
+    notif_echo2 "$progname: error detected at function ${FUNCNAME[$((level+1))]}, line ${BASH_LINENO[$level]}:"
+    echo2 "    $msg"
     DeleteTmpFiles
     exit 1
 }
@@ -203,23 +220,36 @@ GetReferenceUpdateLevel() {
     reference_level=$(echo "$result" | awk '{print $2}')
 }
 
+CheckMirrorlist() {
+    if [ "$internal_testing" = "yes" ] ; then
+        local file="$1"
+        if grep "^#[ ]*Server = " "$file" ; then
+            RemoveFromDelList "$latest_ml"
+            DIE "endeavouros-mirrorlist (see file $file) has one or more mirrors commented out!" 1    # 1 = level of BASH_LINENO array (which starts from 0)
+        fi
+    fi
+}
+
 FetchLatestMirrorlist() {
     # Grab endeavouros-mirrorlist from the package cache, or fetch it from github/gitlab.
 
     if [ "$use_local_mirrorlist" = "yes" ] ; then
         # Use file /etc/pacman.d/endeavouros-mirrorlist. Remove potential ranking results first.
         sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' /etc/pacman.d/endeavouros-mirrorlist  > $latest_ml
+        CheckMirrorlist "$latest_ml"
         return
     fi
 
-    local pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
-    if [ -n "$pkg" ] ; then
+    local pkg=(/var/cache/pacman/pkg/${pkgname}-*.zst)
+    if [ ${#pkg[@]} -gt 0 ] ; then
+        pkg="${pkg[$(( ${#pkg[@]} - 1 ))]}"
         # the package exists in the cache
         local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
         local installedv=$(pacman -Q $pkgname | awk '{print $2}')
         if [ "$cachev" = "$installedv" ] ; then
             notif_echo2 "Info: extracting $pkg ..."
             tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
+            CheckMirrorlist "$latest_ml"
             return
         fi
     fi
@@ -234,6 +264,7 @@ FetchLatestMirrorlist() {
            exit 0
            ;;
     esac
+    CheckMirrorlist "$latest_ml"
 }
 
 SimpleRank() {
@@ -247,7 +278,7 @@ SimpleRank() {
     local result IGNORE=""
     local xx
 
-    latest_ml=$(mktemp /tmp/tmp.dF3784XXXXX) ; delete_at_end+=("$latest_ml")
+    latest_ml=$(mktemp /tmp/tmp.XXXXX) ; delete_at_end+=("$latest_ml")
 
     FetchLatestMirrorlist
 
@@ -449,17 +480,16 @@ EOF
 Options() {
     local opts
 
-    opts=$(getopt -o=$SHORT_OPTIONS --longoptions $LONG_OPTIONS,$LONG_OPTIONS_INTERNAL --name "$progname" -- "$@")
-    case "$?" in
-        0) ;;
-        *) DIE "getopt detected unsupported option, cannot continue." ;;
-    esac
+    opts=$(getopt -o=$SHORT_OPTIONS --longoptions $LONG_OPTIONS,$LONG_OPTIONS_INTERNAL --name "$progname" -- "$@") || DIE "getopt detected unsupported option, will not continue."
 
     eval set -- "$opts"
 
-    while true ; do
+    while [ "$1" ] ; do
         case "$1" in
             # internal tool options:
+            --internal-testing)
+                internal_testing=yes
+                ;;
             --hook-rank)
                 hook_rank=yes
                 ;;
@@ -508,8 +538,6 @@ Options() {
             --list-only)
                 mirrorlist_only=yes  # and no other output
                 ;;
-            --)
-                shift ; break ;;
         esac
         shift
     done
@@ -535,7 +563,7 @@ Main()
 {
     local -r SHORT_OPTIONS="ahnt:"
     local -r LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
-    local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:"
+    local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing"
 
     case "$1" in
         --dump-options) DumpOptions ;;
@@ -562,6 +590,7 @@ Main()
     local use_local_mirrorlist=no
     local mirrorlist_only=no                  # 'no' provides rather verbose output, 'yes' provides only the essential list
     local added_mirror=""
+    local internal_testing=no
 
     if [ ! -r "$eos" ] ; then                 # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
