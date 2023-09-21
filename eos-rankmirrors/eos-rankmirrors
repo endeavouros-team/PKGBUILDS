@@ -27,7 +27,6 @@ export -f DeleteTmpFiles
 
 RemoveFromDelList() {
     if [ ${#delete_at_end[@]} -gt 0 ] ; then
-        echo2 "delete list count = ${#delete_at_end[@]}"
         local -r remove_me="$1"
         local oldlist=("${delete_at_end[@]}")
         local xx
