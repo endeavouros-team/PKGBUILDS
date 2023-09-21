@@ -351,3 +351,7 @@ _tr_add2 ins_no_connection           "Nota: conexión a Internet no disponible, 
 
 # 2023-Aug-25
 _tr_add2 ins_pmtip2                  "Gestor de particiones permite examinar y gestionar las particiones y la estructura del disco"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Instalador de imagen ARM de EndeavourOS"
+_tr_add2 ins_arm_starttip          "Comenzar a instalar la edición ARM de EndeavourOS"
