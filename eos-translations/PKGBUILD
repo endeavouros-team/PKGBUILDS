@@ -3,7 +3,7 @@
 
 pkgname=eos-translations
 pkgdesc="EndeavourOS translation support"
-pkgver=23.11
+pkgver=23.12
 pkgrel=1
 arch=('any')
 license=('GPL')

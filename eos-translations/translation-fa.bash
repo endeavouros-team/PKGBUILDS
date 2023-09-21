@@ -34,8 +34,7 @@ _question='&#x61F;'      # '؟'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      ".برنامه غیر فعال است. به هر حال، برای اجرای برنامه از گزینه روبرو استفاده کنید
---enable"
+_tr_add2 welcome_disabled      ".برنامه غیر فعال است. به هر حال، برای اجرای برنامه از گزینه روبرو استفاده کنید --enable"
 
 _tr_add2 butt_later            "بعدا می‌بینمت"
 _tr_add2 butt_latertip         "برنامه را فعال نگه دار"
