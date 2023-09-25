@@ -3,5 +3,4 @@
 # future updates of package eos-rankmirrors.
 
 EOS_IGNORED_MIRRORS+=(
-    jingk
 )
