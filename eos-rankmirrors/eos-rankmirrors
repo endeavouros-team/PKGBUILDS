@@ -473,6 +473,13 @@ Options:
 
   --verbose
              Show more detailed output.
+
+Advanced options:
+  --list-only
+             Save only the mirrorlist without the ranking statistics.
+
+  --mirror-add
+             Temporarily add a mirror URL for ranking (for testing purposes only).
 EOF
 }
 
@@ -483,61 +490,33 @@ Options() {
 
     eval set -- "$opts"
 
-    while [ "$1" ] ; do
+    while true ; do
         case "$1" in
             # internal tool options:
-            --internal-testing)
-                internal_testing=yes
-                ;;
-            --hook-rank)
-                hook_rank=yes
-                ;;
-            --dump-options)
-                DumpOptions
-                ;;
-            --dump-options=all)
-                DumpOptions --all
-                ;;
-            --mirror-add)
-                #  --mirror-add <mirror-url>
-                #             Manually adds a non-existing mirror for ranking.
-                #             Meant for testing unlisted mirrors only.
-                added_mirror="$2"
-                ;;
+            --internal-testing)         internal_testing=yes ;;
+            --hook-rank)                hook_rank=yes ;;
+            --dump-options)             DumpOptions ;;
+            --dump-options=all)         DumpOptions --all ;;
+            --mirror-add)               added_mirror="$2" ;;
 
             # all user options
-            --help | -h)
-                Usage
-                exit 0
-                ;;
-
-            --sort)
-                sort="$2" ; shift ;;
-            --ignore)
-                ignored_mirrors="$2" ; shift ;;
-            --prefer)
-                preferred_mirrors="$2" ; shift ;;
-            --use-local-mirrorlist)
-                use_local_mirrorlist=yes ;;
-            --timeout | -t)
-                timeout="$2" ; shift ;;
-            --verbose)
-                verbose=yes ;;
-            --mirror-verbosity)
-                mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
-            --no-save | -n)
-                save=no
-                ;;
-            --test-all | -a)
-                save=no
-                test_all=yes
-                EOS_IGNORED_MIRRORS=()
-                ignored_mirrors=""
-                [ $timeout -lt $timeout_default ] && timeout=$timeout_default
-                ;;
-            --list-only)
-                mirrorlist_only=yes  # and no other output
-                ;;
+            --help | -h)                Usage; exit 0 ;;
+            --sort)                     sort="$2" ; shift ;;
+            --ignore)                   ignored_mirrors="$2" ; shift ;;
+            --prefer)                   preferred_mirrors="$2" ; shift ;;
+            --use-local-mirrorlist)     use_local_mirrorlist=yes ;;
+            --timeout | -t)             timeout="$2" ; shift ;;
+            --verbose)                  verbose=yes ;;
+            --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
+            --no-save | -n)             save=no ;;
+            --list-only)                mirrorlist_only=yes ;;  # and no other output
+            --test-all | -a)            save=no
+                                        test_all=yes
+                                        EOS_IGNORED_MIRRORS=()
+                                        ignored_mirrors=""
+                                        [ $timeout -lt $timeout_default ] && timeout=$timeout_default
+                                        ;;
+            --)                         shift; break ;;
         esac
         shift
     done

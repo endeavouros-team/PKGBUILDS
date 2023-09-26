@@ -1,70 +1,64 @@
 # bash completion for eos-rankmirrors        -*- shell-script -*-
 
-FilterMirrorUrls() { grep -E "^[ \t]*Server[ \t]+=[ \t]+" | awk '{print $3}' | sed -E "s|^(.*)$|'\1'|" ; }
+_eos-rankmirrors_FilterMirrorUrls() {
+    grep -E "^[ \t]*Server[ \t]+=[ \t]+" | awk '{print $3}' | sed -E "s|^(.*)$|'\1'|"
+}
 
-GetMirrors() {
+_eos-rankmirrors_GetMirrors() {
     # Grab endeavouros-mirrorlist from the latest package.
     # First try the package cache. If no luck, fetch it from github/gitlab.
+
+    local tmp_mirrorlist=/tmp/tmp.ml172549udf8   # save the list here for performance
+
+    if [ -r $tmp_mirrorlist ] ; then
+        cat $tmp_mirrorlist
+        return 0
+    fi
 
     local -r pkgname=endeavouros-mirrorlist
     local -r pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
 
     if [ -n "$pkg" ] ; then
         # The package exists in the cache.
-        # Check if the installed version is the same as in the cache.
-        #
-        # local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
-        # local installedv=$(expac -Q %v $pkgname)
-        # if [ $(vercmp "$installedv" "$cachev") -ge 0 ] ; then
-            tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist | FilterMirrorUrls
-            return 0
-        # fi
+        tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist | _eos-rankmirrors_FilterMirrorUrls > $tmp_mirrorlist
+        _eos-rankmirrors_GetMirrors
+        return 0
     fi
 
-    # Package not in cache # or installed package version is not the same as in cache.
+    # Package not in cache, or installed package version is not the same as in cache.
     # Fetch it.
     local -r url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
     local -r timeout=5  # not too long...
-    curl --fail -Lsm $timeout -o- "$url" | FilterMirrorUrls
+    curl --fail -Lsm $timeout -o- "$url" | _eos-rankmirrors_FilterMirrorUrls > $tmp_mirrorlist
+    _eos-rankmirrors_GetMirrors
 }
 
 _eos-rankmirrors_() {
     local cur prev #words cword split
     _init_completion -s || return
 
-    local -r opts="$(eos-rankmirrors --dump-options)"   # alternative, slower
+    local -r opts="$(eos-rankmirrors --dump-options=all)"
     local -r verbosities=( all code show none )
 
     # Handle options that need sub-options.
     # Each option "case" should return immediately.
 
     case "$prev" in
-        --sort)
-            COMPREPLY=($(compgen -W "age rate" -- "$cur"))
-            ;;
-        --timeout | -t)
-            COMPREPLY=($(compgen -P "$cur" -W "{1..60}"))
-            compopt -o nospace
-            compopt -o nosort
-            ;;
-        --ignore | --prefer)
-            COMPREPLY=($(compgen -P "'" -S "'" -W "$(GetMirrors)" -- "$cur"))
-            ;;
-        --mirror-verbosity)
-            COMPREPLY=($(compgen -W "${verbosities[*]}" -- "$cur"))
-            ;;
+        --sort)                COMPREPLY=($(compgen -W "age rate" -- "$cur")) ;;
+        --timeout | -t)        COMPREPLY=($(compgen -P "$cur" -W "{0..9}")); compopt -o nospace; compopt -o nosort ;;
+        --ignore | --prefer)   COMPREPLY=($(compgen -P "'" -S "'" -W "$(_eos-rankmirrors_GetMirrors)" -- "$cur")) ;;
+        --mirror-verbosity)    COMPREPLY=($(compgen -W "${verbosities[*]}" -- "$cur")) ;;
         *)
-            # Handle all top-level parameters.
-            case "$cur" in
-                -* | "")
-                    # Any option or nothing yet.
-                    COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
-                    ;;
-                *)
-                    # Non-option parameters.
-                    ;;
-            esac
-            ;;
+                               case "$cur" in                     # Handle all top-level parameters.
+                                   -* | "")
+                                       # Any option or nothing yet.
+                                       COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+                                       ;;
+                                   *)
+                                       # Non-option parameters.
+                                       ;;
+                               esac
+                               ;;
     esac
 } &&
 complete -F _eos-rankmirrors_ eos-rankmirrors
