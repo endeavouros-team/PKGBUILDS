@@ -284,7 +284,7 @@ Options() {
     local opts
     local sopts="bfhnopqtv"
     local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries"
-    lopts+=",nouveau,nvidia-open,prime,quiet,series:,test,version,it,id:"
+    lopts+=",nouveau,open,prime,quiet,series:,test,version,it,id:"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h

@@ -4,7 +4,7 @@
 
 pkgname=nvidia-inst
 pkgver=23
-pkgrel=7
+pkgrel=8
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
@@ -26,10 +26,17 @@ source=(
   $_url/$pkgname
   $_url/$pkgname.bash-completion
 )
-sha512sums=('4cc5051ad4263a9ce276c7f5ee3fe4860e806d2aee76cc0c52d5761633f1419aadc5a0e594b080c6f0dc2ea173612f55e6de5a13de5dbdc665b3e74e520aee4c'
+sha512sums=('a6f9c31cea2565eb3713d46b0f659944db4486ed539a99e5a7107e8048c495714348cc39d00fd87ca92300a911cda605fa09927d89ae439f86819e6ebc6a1d64'
             'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6')
 
 package() {
-  install -Dm755 $pkgname                         $pkgdir/usr/bin/$pkgname
-  install -Dm644 $pkgname.bash-completion         $pkgdir/usr/share/bash-completion/completions/$pkgname
+    local src file
+
+    for src in "${source[@]}" ; do
+        file="${src##*/}"
+        case "$src" in
+            *.bash-completion) install -Dm644 "$file"  "$pkgdir/usr/share/bash-completion/completions/${file%.*}" ;;
+            *)                 install -Dm755 "$file"  "$pkgdir/usr/bin/$file"
+        esac
+    done
 }
