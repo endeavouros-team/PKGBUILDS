@@ -11,7 +11,7 @@ license=("GPL")
 conflics=("endeavouros-skel-xfce4" "endeavouros-skel-default" "endeavouros-skel-i3wm")
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('6b9103ddc4550a92318605662860f1d0fa1b6169798debf52bcdbefb5d8ada84')
+sha256sums=("6b9103ddc4550a92318605662860f1d0fa1b6169798debf52bcdbefb5d8ada84")
 
 package() {
     cd "$_pkgname-$pkgver"
