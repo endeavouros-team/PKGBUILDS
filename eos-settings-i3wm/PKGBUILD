@@ -9,9 +9,7 @@ arch=('any')
 groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
-conflics=('endeavouros-skel-xfce4'
-          'endeavouros-skel-default'
-          'endeavouros-skel-i3wm')
+conflics=("endeavouros-skel-xfce4" "endeavouros-skel-default" "endeavouros-skel-i3wm")
 makedepends=('git')
 depends=()
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
