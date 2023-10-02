@@ -454,13 +454,16 @@ Initialize() {    # initialize service and timer for the current user
         test "$fetch_files" = "1" && UseInitialFiles "$configdir" "$progname"
         case "$arg" in
             -conf | --conf)
-                # add any missing setting
-                [ -n "$(grep "^Persistent="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \Persistent=$persistent"
-                [ -n "$(grep "^OnCalendar="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnCalendar=$oncalendar"
-                [ -n "$(grep "^OnStartupSec=" "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnStartupSec=$onstartupsec"
+                # add any missing setting under [Timer] (in reverse order)
+                [ -n "$(grep ".*Persistent="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \Persistent=$persistent"
+                [ -n "$(grep ".*OnCalendar="   "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnCalendar=$oncalendar"
+                [ -n "$(grep ".*OnStartupSec=" "$timer")" ] || sed -i "$timer" -e "/^\[Timer\]/a \OnStartupSec=$onstartupsec"
                 # write new settings
+                case "${onstartupsec,,}" in
+                    ""|false) sed -E -i "$timer" -e "s|.*OnStartupSec=.*|# OnStartupSec=|" ;;
+                    *)        sed -E -i "$timer" -e "s|.*OnStartupSec=.*|OnStartupSec=30sec|" ;;
+                esac
                 sed -i "$timer" \
-                    -e "s|^OnStartupSec=.*|OnStartupSec=$onstartupsec|" \
                     -e 's|^OnCalendar=.*$|OnCalendar='"$oncalendar"'|' \
                     -e "s|^Persistent=.*|Persistent=$persistent|"
                 ;;
@@ -510,14 +513,19 @@ Configure() {
                 *) oncalendar=daily ;;
             esac
             times=$(echo "$times" | sed "s|$oncalendar|^$oncalendar|")
+            # temporarily set this to boolean value:
+            case "${onstartupsec,,}" in
+                ""|false) onstartupsec=false ;;
+                *)        onstartupsec=true ;;
+            esac
             cmd=(
                 eos_yad
                 --form
                 --title="Configure update checking"
                 --text="$progname: configure the schedule of system update checks."
                 --image=preferences-system
-                --field="First check after system startup!See <b>man systemd.time</b> how to set time" "$onstartupsec"
                 --field="Check period!How often checks will be executed":CB "$times"
+                --field="Check always after system startup!Enable/disable update check right after boot":CHK "$onstartupsec"
                 --field="Persistent!If selected and checks are missed, a check will be done at next login":CHK "$persistent"
                 --button=yad-ok
             )
@@ -525,8 +533,8 @@ Configure() {
             retval=$?
             [ "$retval" -eq 0 ] || return 1
 
-            onstartupsec=$(echo "$result" | cut -d'|' -f1)
-            oncalendar=$(  echo "$result" | cut -d'|' -f2)
+            oncalendar=$(  echo "$result" | cut -d'|' -f1)
+            onstartupsec=$(echo "$result" | cut -d'|' -f2)
             persistent=$(  echo "$result" | cut -d'|' -f3 | tr '[:upper:]' '[:lower:]')
             ;;
         1)
@@ -697,13 +705,16 @@ Main()
     local EOS_UPDATE_NOTIFIER_CONF=/etc/$progname.conf
     #local NOTIFIER_LOG_FILE=/tmp/$progname.log
 
-    local oncalendar="$(  grep "^OnCalendar="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
-    local onstartupsec="$(grep "^OnStartupSec=" $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
-    local persistent="$(  grep "^Persistent="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+    local oncalendar="$(  grep ".*OnCalendar="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+    local onstartupsec="$(grep ".*OnStartupSec=" $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
+    local persistent="$(  grep ".*Persistent="   $configdir/$progname.timer 2>/dev/null | cut -d '=' -f 2)"
 
     [ -n "$oncalendar" ]   || oncalendar=daily
-    [ -n "$onstartupsec" ] || onstartupsec=30sec
     [ -n "$persistent" ]   || persistent=false
+    case "${onstartupsec,,}" in
+        ""|false) onstartupsec="" ;;
+        *)        onstartupsec=30sec ;;
+    esac
 
     mkdir -p "$configdir"
 
@@ -723,7 +734,7 @@ Main()
                 return
                 ;;
             -show-timer | --show-timer)
-                RunInTerminal "systemctl --user status eos-update-notifier.timer | cat -"
+                RunInTerminal "systemctl --user status eos-update-notifier.timer"
                 return
                 ;;
             --changelog)
