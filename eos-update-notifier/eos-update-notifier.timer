@@ -1,9 +1,9 @@
 [Unit]
-Description=Runs EOS update notifier runs periodically.
+Description=EOS update notifier runs periodically, and optionally after each boot, or if missed.
 
 [Timer]
-# OnStartupSec=
 OnCalendar=weekly
+# OnStartupSec=
 Persistent=false
 RandomizedDelaySec=10min
  

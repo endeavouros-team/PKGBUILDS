@@ -531,7 +531,7 @@ Configure() {
                 --image=preferences-system
                 --field="Check period!How often checks will be executed":CB "$times"
                 --field="Check always after system startup!Enable/disable update check right after boot":CHK "$onstartupsec"
-                --field="Persistent!If selected and checks are missed, a check will be done at next login":CHK "$persistent"
+                --field="Persistent!When selected, if a check is missed, the check will be executed as soon as possible":CHK "$persistent"
                 --button=yad-ok
             )
             result=$("${cmd[@]}")
