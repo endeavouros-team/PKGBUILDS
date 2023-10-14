@@ -338,32 +338,13 @@ FindNewRepoLineNumber() {
     echo "$linenr"
 }
 
-GetSudoEditor() {
-    local editor ed1
-
-    for editor in "${EOS_SUDO_EDITORS[@]}" "$SUDO_EDITOR" "$VISUAL" "$EDITOR" nano ; do
-        ed1="$(echo "$editor" | awk '{print $1}')"
-        if (/usr/bin/which "$ed1" >& /dev/null) ; then
-            case "$ed1" in
-                mousepad | /usr/bin/mousepad)
-                    Editor="/usr/bin/dbus-launch $editor" ;;
-                *)
-                    Editor="$editor" ;;
-            esac
-            echo "$Editor"
-            return
-        fi
-    done
-    DIE "suitable editor not found"
-}
-
 PacmanConfEditor() {
     local linenr="$1"
-    local editor="$(GetSudoEditor)"
-    local ed1="$(echo "$editor" | awk '{print $1}')"
+    local editor="$(EosSudoEditor)"
+    local ed1="${editor%% *}"
 
     case "$ed1" in
-        emacs|vim|nano | /usr/bin/emacs|/usr/bin/vim|/usr/bin/nano)
+        emacs|vim|nano|rnano | /usr/bin/emacs|/usr/bin/vim|/usr/bin/nano|/usr/bin/rnano)
             echo "$editor +$linenr"
             ;;
         *)
@@ -484,7 +465,7 @@ Main2() {
     t1+="See file <tt>/etc/akm.conf</tt> for configuration details.\n"
     t1+="$smallEnd"
     local linenr="$(FindNewRepoLineNumber)"
-    local editor="$(PacmanConfEditor $linenr)"
+    # local editor="$(PacmanConfEditor $linenr)"
 
     local cmd=(
         eos_yad
