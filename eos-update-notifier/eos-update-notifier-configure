@@ -15,24 +15,6 @@ GetLibCode() {
     AssignIconVariables_in_eos_bash_shared
 }
 
-GetSudoEditor() {
-    local editor ed1
-
-    for editor in "${EOS_SUDO_EDITORS[@]}" "$SUDO_EDITOR" "$VISUAL" "$EDITOR" nano ; do
-        ed1="$(echo "$editor" | awk '{print $1}')"
-        if (/usr/bin/which "$ed1" >& /dev/null) ; then
-            case "$ed1" in
-                mousepad | /usr/bin/mousepad)
-                    Editor="/usr/bin/dbus-launch $editor" ;;
-                *)
-                    Editor="$editor" ;;
-            esac
-            return
-        fi
-    done
-    DIE "suitable editor not found"
-}
-
 ServiceAction() {
     local action="$1"
     case "$action" in
@@ -61,7 +43,7 @@ Main()
     [ "$progname" = "${TARGET_PROG}-configure" ] || DIE "internal problem with program name"
 
     GetLibCode
-    GetSudoEditor
+    Editor="$(EosSudoEditor)"
 
     local cmd=(
         eos_yad
