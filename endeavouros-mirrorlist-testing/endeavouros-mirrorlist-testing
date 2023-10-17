@@ -1,0 +1,62 @@
+######################################################
+####                                              ####
+###        EndeavourOS Repository Mirrorlist       ###
+####                                              ####
+######################################################
+#### Entry in file /etc/pacman.conf:
+###     [endeavouros]
+###     SigLevel = PackageRequired
+###     Include = /etc/pacman.d/endeavouros-mirrorlist
+######################################################
+### Tip: Use the 'eos-rankmirrors' program to rank
+###      these mirrors or re-order them manually.
+######################################################
+
+## Belgium
+Server = https://ftp.belnet.be/mirror/endeavouros/repo/$repo/$arch
+
+## Canada
+Server = https://ca.gate.endeavouros.com/endeavouros/repo/$repo/$arch
+
+## China
+Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
+Server = https://mirrors.jlu.edu.cn/endeavouros/repo/$repo/$arch
+Server = https://mirror.sjtu.edu.cn/endeavouros/repo/$repo/$arch
+
+## Germany
+Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
+Server = https://de.freedif.org/EndeavourOS/repo/$repo/$arch
+Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
+
+## Greece
+Server = https://fosszone.csd.auth.gr/endeavouros/repo/$repo/$arch
+
+## France
+Server = https://endeavour.remi.lu/repo/$repo/$arch
+
+## India
+Server = https://mirror.albony.xyz/endeavouros/repo/$repo/$arch
+Server = https://mirrors.nxtgen.com/endeavouros-mirror/repo/$repo/$arch
+
+## Moldova
+Server = https://md.mirrors.hacktegic.com/endeavouros/repo/$repo/$arch
+
+## Singapore
+Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
+Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
+
+## South Korea
+Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
+
+## Sweden
+Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
+
+## Taiwan
+Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
+
+## Ukraine
+Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
+
+## United States
+Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
+

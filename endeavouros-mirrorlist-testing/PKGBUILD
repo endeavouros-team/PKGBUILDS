@@ -1,0 +1,26 @@
+# Maintainers: EndeavourOS <info@endeavouros.com>
+
+pkgname=endeavouros-mirrorlist-testing
+_source_filename=endeavouros-mirrorlist-testing
+_target_filename=endeavouros-mirrorlist
+pkgver=1
+pkgrel=1
+pkgdesc="EndeavourOS mirrorlist"
+arch=('any')
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+
+license=('GPL3')
+options=(!strip !emptydirs)
+backup=("etc/pacman.d/$_target_filename")  # to keep possibly ranked mirrorlist
+
+conflicts=(endeavouros-mirrorlist)
+conflicts_aarch64=(endeavouros-arm-mirrorlist)
+conflicts_armv7h=(endeavouros-arm-mirrorlist)
+
+source=("$_url/$_source_filename")
+sha512sums=('443ea97c5076d3a94f34fa357e690bee7b94f821de84d7f0fe356f743c55536a4c664d4ebdbdbcc8d3000e4a0b5ca6bca7becdf64c7970409217c9f0aa55af95')
+
+package() {
+ install -Dm644 "$_source_filename"   "$pkgdir/etc/pacman.d/$_target_filename"
+}
