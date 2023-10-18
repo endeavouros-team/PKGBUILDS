@@ -4,8 +4,8 @@
 
 pkgname=calamares
 pkgver=23.10.1.1
-pkgrel=1
-release_name="Cassini"
+pkgrel=2
+release_name="Galileo"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
