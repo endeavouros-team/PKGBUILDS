@@ -3,8 +3,8 @@
 # Calamares installer configured for EndeavourOS
 
 pkgname=calamares
-pkgver=22.12.3.6
-pkgrel=6
+pkgver=23.10.1.1
+pkgrel=1
 release_name="Cassini"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('cb9a90fe2578e0abd3af8e7110cc5272fb2cc3344e563499d7bb89ff9f7e6424')
+sha256sums=('6aa165be09d495b13e62039cd3946bf1288e2801bf855159bdfc4213e7ac85c8')
 
 prepare() {
     # Update branding.desc with the proper values
