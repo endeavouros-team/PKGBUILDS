@@ -4,7 +4,7 @@
 pkgname=calamares-git
 _reponame=calamares
 release_name=$pkgname
-pkgver=1               # simple '.' will change pkgrel ???
+pkgver=.
 pkgrel=2
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
