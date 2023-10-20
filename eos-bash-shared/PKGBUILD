@@ -5,8 +5,8 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=23.19
-pkgrel=2
+pkgver=23.20
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -75,6 +75,7 @@ source=(
   $_url/eos-reboot-required.service
 
   $_url/eos-sendlog
+  $_url/eos-sendlog-helper
   $_url/eos-sendlog.conf
   $_url/eos-kbd-set
   $_url/eos-download-wallpapers
@@ -115,6 +116,7 @@ sha512sums=('2a90394fb941dd3514f6838845b466aa39d2c0a4f7048b1fd3f421767a6cf67d8c1
             '195cc83df58e1f65b43f39202fe60aecf348e843c9c1b414897dbf6577ee7ffc67b1d1ba5ca0325e501cffebd304b6eca90f1c8fd4af4dd75b94fbc7834f59f4'
             'b26a06683f6ab8039df3befe93140a72c9e750f9c6a1e5e9b9f653a776a3ef9ab61e14a8485c53022e5959dd17eb94d8fd0be6f81a5e6a0aef95701f0100817a'
             '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f'
+            'fd9b85a41a665f56780b30ac23b8583b92abdf6975a74f5554f73d01d76d9df6fa23302b979afdde3b021132fa238528b152c06deed90e81cdad6cf12a933100'
             '7f3b0ef97a13952de50142ec9848f282350ba53ec9e2e13cf9c03af0d26ec223dcd315f8e5d2ef50bd4f514c1e154f3684c4b5ea8879fb1adce197a4947c845b'
             'f2fa1a132e3971562cfc6463c4773043eacde6bc1ee521d7f330764d3ae0897c8bd8545c801e320954ebca9fc7ea59ba32b0ad93aae96a0652e2f0383c8198f7'
             '457da2c9ffd9cf619cb230c7cb58eca9eef72d11e850e42870f7d5de0654d1aa7f58e91842056199bd48c7b06aeea248abf42735c387ca8d176d0778c7ab69d8'
@@ -145,6 +147,7 @@ package() {
   install -Dm755 show-location-info             $bin/show-location-info
   install -Dm755 eos-FindAppIcon                $bin/eos-FindAppIcon
   install -Dm755 eos-sendlog                    $bin/eos-sendlog
+  install -Dm755 eos-sendlog-helper             $bin/eos-sendlog-helper
   install -Dm755 eos-kbd-set                    $bin/eos-kbd-set
   install -Dm755 RunInTerminal                  $bin/RunInTerminal
   install -Dm755 RunInTerminalOpt               $bin/RunInTerminalOpt
