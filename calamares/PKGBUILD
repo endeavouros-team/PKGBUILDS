@@ -4,14 +4,14 @@
 
 pkgname=calamares
 pkgver=23.10.1.3
-pkgrel=1
+pkgrel=2
 release_name="Galileo"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
-conflicts=('calamares_current')
+conflicts=('calamares-git')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons5' 'kconfig5' 'ki18n5' 'kservice5' \
 'kwidgetsaddons5' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
 'gptfdisk' 'hwinfo' 'kparts5' 'polkit-qt5' 'python' 'solid5' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
