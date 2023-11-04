@@ -87,7 +87,7 @@ KeepsAndRemoves() {
 
     # check if install contains any AUR stuff
 
-    local repopkgs="$(pacman -Ssq)"
+    local repopkgs="$(expac -S %n)"
 
     for kp in "${install[@]}" ; do
         if ! IsRepoPkg "$kp" ; then
@@ -323,7 +323,7 @@ Options() {
                 exit 0
                 ;;
             -v | --version)
-                [ -n "$PROGVERSION" ] || PROGVERSION=$(pacman -Q "$progname" 2>/dev/null | awk '{print $2}')
+                [ -n "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
                 echo "$progname $PROGVERSION"
                 exit 0
                 ;;
@@ -434,7 +434,7 @@ AllRemovables() {
         xf86-video-nouveau
 
         # nvidia packages from repos:
-        $(pacman -Ssq nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-cg-|beta')
+        $(expac -Ss %n nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-cg-|beta')
     )
 
     # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
@@ -529,7 +529,7 @@ SanityChecks() {
 }
 
 GetSeriesFromPacman() {
-    local pacman_version=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | head -n1 | awk '{print $NF}' | sed 's|-[0-9.]*$||')   # only pkgver
+    local pacman_version=$(echo "$latest_arch_version_full" | sed 's|-[0-9.]*$||')   # only pkgver
     local pacman_version_series=${pacman_version%%.*}
     echo "$pacman_version_series"
 }
@@ -582,16 +582,18 @@ Main()
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
     SanityChecks
-    local all_installed_packages="$(pacman -Qsq)"
+    local all_installed_packages="$(expac -Q %n)"
 
-    local latest_from_arch=$(LANG=C pacman -Si nvidia-dkms | grep -w ^Version | head -n1 | awk '{print $NF}' | cut -d '.' -f1)
+    local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
+
+    local -r latest_from_arch=$(echo "$latest_arch_version_full" | cut -d '.' -f1)
     if [ "$latest_from_arch" != "$series_now" ] ; then
         Warn "Series $series_now is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
     fi
 
     AllRemovables
 
-    [ -n "$PROGVERSION" ] || PROGVERSION=$(pacman -Q "$progname" 2>/dev/null | awk '{print $2}')
+    [ -n "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
     Info "Selected mode: $mode"
