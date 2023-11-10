@@ -576,6 +576,7 @@ Main()
     fi
 
     Options "$@"
+    local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
 
     [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
 
@@ -583,8 +584,6 @@ Main()
 
     SanityChecks
     local all_installed_packages="$(expac -Q %n)"
-
-    local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
 
     local -r latest_from_arch=$(echo "$latest_arch_version_full" | cut -d '.' -f1)
     if [ "$latest_from_arch" != "$series_now" ] ; then
