@@ -5,7 +5,6 @@ pkgver=1.6
 pkgrel=1
 pkgdesc="Budgie settings for EndeavourOS"
 arch=('any')
-groups=('EndeavourOS')
 license=('GPL3')
 source=('99_endeavouros-budgie.gschema.override')
 depends=('endeavouros-theming')

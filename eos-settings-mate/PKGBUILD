@@ -5,7 +5,6 @@ pkgver=1.1
 pkgrel=1
 pkgdesc="MATE settings for EndeavourOS"
 arch=('any')
-groups=('EndeavourOS')
 depends=('endeavouros-theming')
 license=('GPL')
 source=('set_once_mate.sh'

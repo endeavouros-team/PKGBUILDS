@@ -1,11 +1,10 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-gnome
-pkgver=2
+pkgver=2.1
 pkgrel=1
 pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
-groups=('EndeavourOS')
 url="https://github.com/endeavouros-team/${_pkgname}"
 license=('GPL')
 makedepends=('git')
