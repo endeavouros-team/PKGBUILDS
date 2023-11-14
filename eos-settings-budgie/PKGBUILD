@@ -2,7 +2,7 @@
 
 pkgname=eos-settings-budgie
 pkgver=1.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Budgie settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
