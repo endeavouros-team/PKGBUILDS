@@ -3,7 +3,7 @@
 # Calamares installer configured for EndeavourOS
 
 pkgname=calamares
-pkgver=23.10.1.7
+pkgver=23.11.1.1
 pkgrel=1
 release_name="Galileo"
 pkgdesc="Calamares installer for EndeavourOS"
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('92ced4c69761e77d19a949512121ada60b0d236cc78c081a67e08840caa27e22')
+sha256sums=('023047ef1719b09778e1976091039dbf88f06b0db6333ab180233ce228bd3fce')
 
 prepare() {
     # Update branding.desc with the proper values
