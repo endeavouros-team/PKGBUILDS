@@ -1,8 +1,8 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=endeavouros-theming
-pkgver=22.12.3.3
-pkgrel=2
+pkgver=23.11.1.1
+pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
 replaces=('EndeavourOS-theming')
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('720443f8b3ff1803e4e2fa137fce77d38003ee9b44e8bdb1d57504dbd51da8c53ff425cf13d49c4733d52da7bcf2f009288262c6515faf18383cbb49edfdfcbe')
+sha512sums=('b94e46ee95d3d694e6ecd79b90089f5ba10b7d440f2c84f6784d235d8c8f55503e5a3232f242ece3817050ebe64339db473d8691020759875db6dca0c27c12d1')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
