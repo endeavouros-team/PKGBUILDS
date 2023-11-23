@@ -7,8 +7,8 @@ A GUI tool for copying various system logs to the internet.
 
 Name   |   Description
 :--- | :---
-`-j, --enable-journal` | Enable showing journal logs.<br>Note that some logs *may* include personal data.<br>
-`-h, --help` | This help.
+`-j`<br>`--enable-journal` | Enable showing journal logs.<br>Note that some logs *may* include personal data.<br>
+`-h`<br>`--help` | This help.
 
 
 ## Use cases
@@ -17,8 +17,7 @@ If a user wants help in troubleshooting an issue, with this tool user
 can share logs for other users to see e.g. on the EndeavourOS forum.<br>
 Note that without logs and/or other system information troubleshooting can be practically impossible.
 
-This tool aims to hide all personal information from the logs that will be sent to the internet when the<br>
-**Remove personal data from logs** is selected.
+This tool aims to hide all personal information from the logs that will be sent to the internet. But hiding is not perfect (especially on journals), so it is a good idea to **Save logs locally** before sending.
 
-If **Send logs to internet** is selected, then the logs will be sent to the internet, and an <u>URL</u> is returned after a successful send.<br>
-This <u>URL</u> is the thing to share with others that help troubleshooting the issue.
+Button **Share logs to internet** sends the logs to the internet, and an <u>URL</u> is returned after a successful send.<br>
+This <u>URL</u> is the thing to share with those that help troubleshooting the issue.
