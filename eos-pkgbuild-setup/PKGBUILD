@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2023    # new numbering! Previous was: 2022.12.25
-pkgrel=43
+pkgrel=44
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/$pkgname"
@@ -36,9 +36,8 @@ source=(
     $_url/mirrorcheck.completion
     $_url/pacman-for-assets.make
     $_url/release-asset-names
-    $_url/wgetc
 )
-sha512sums=('2e7ecffe7140b801615a99b235bf97585723311391fe2f00b342e7961e02db2367dfaa20da4c51aac049118e21a44dc7dd6a74166c4e5ebaf9b80271a2bbbda4'
+sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
@@ -49,13 +48,12 @@ sha512sums=('2e7ecffe7140b801615a99b235bf97585723311391fe2f00b342e7961e02db2367d
             '2be041304f33d20e54b0d843e1905d393ab4552367b435039989ad94dab64a230f0cf288b00213e60f2bc69e4b36a6cb6894522ac79add56d8eff86c6852c11c'
             '93d064a6e922d798f7d45e4a769d079631e6750c3947b184dc54929c56e46480579f80523c15753e045715dfd6d12e16a72387be4eaf5328565964a9d8199034'
             '46a4123eee031144508d713cf63b44cdd9e5ec1609948e8e2257e0cf2247589bc793ab5b933a0922a5e73f274b38d64f7a5fcd58ffcb7924524675da8ae98898'
-            'f23297b3060d0423068bbb6be8cc10c3ac994c2d208aeeadb0720f375066b5cd2305c9c1ca2fed0fdca12da6333044babf8f4f8373775629ace59139cfb97f9f'
+            'f477134bb69d5ea6885bd8e84a2189ecf190c7800264862dbd7b3461a6b3a455b792881ee651a87fa565bfc7048fb155ed0d3d4901f775d059c5554ea84f753e'
             '15b4a800e60d65a5b4e888a6baa5cb6336b78255ff39f8c54563c77bdbff2299b84e65d456452097c5cbd36df1fae2cdcab41f65b9d86a2c0b6b973f5cc577a9'
             '53aa6b85961b2012d0d65c3aea851babc711ddf23d4f854ab39b904a7e9501c2153392a22b28190d1b604d325ccc31eb565da0988d9ca47eecef6d7ab23a9215'
             '10956ecb1ee4d6a75a40cdb99e9735d0ab5fa3223b9dbaf6150cf93686edc38fd4a98cf16c1b8ffd8ea84cbfb241292a30245b233f118a0f8216b9bb00a9a365'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
-            'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
-            '43a6885db8bdeadeee706ced9db48e1950fc55adf6938f089a41a4c271f7dc29bc336cc2b9a11e9db519df87dc3975b80124e9083c84e6bfda491894b4e00b76')
+            'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7')
 
 package() {
     local -r _scripts="$pkgdir/usr/share/endeavouros/scripts"
@@ -79,7 +77,6 @@ package() {
     install -Dm755 release-asset-names         "$_usr_bin/release-asset-names"
     install -Dm755 pacman-for-assets.make      "$_usr_bin/pacman-for-assets.make"
 
-    install -Dm755 wgetc                       "$_usr_local_bin/wgetc"
     install -Dm755 githubcheck                 "$_usr_local_bin/githubcheck"
     install -Dm755 mirrorcheck                 "$_usr_local_bin/mirrorcheck"
 
