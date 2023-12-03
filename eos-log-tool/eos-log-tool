@@ -519,7 +519,7 @@ Main()
     helptext+="If you share, you'll receive a URL which refers to the shared page.\n"
     helptext+="Note1: $progname tries to remove personal data from the logs. but removal is not always perfect. \n"
     helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>.\n\n"
-    helptext+="Tip: Use option --help to see <i>all</i> available features!\n"
+    helptext+="Tip: Use option <tt>--enable-journal</tt> to see <i>journalctl</i> choices.\n"
 
     local log_tool_cmd=(                 # the yad command
         eos_yad
@@ -530,9 +530,9 @@ Main()
         --text="$helptext"
         # --width=600        # not needed?
         --image=$ICO_QUESTION
-        --button="yad-cancel!Cancel this operation":$code_cancel
-        --button="yad-save!Save the logs to file $FILE_OF_LOGS2":$code_localsave
-        --button="Share logs to the internet!$ICO_SHARE!Send the logs to a pastebin service":$code_send_to_internet
+        --button="yad-cancel!!Cancel this operation":$code_cancel
+        --button="yad-save!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
+        --button="Share logs to the internet!$ICO_SHARE!Send the logs using <tt>eos-sendlog</tt>":$code_send_to_internet
     )
 
     # Skip entries that don't have the app installed
