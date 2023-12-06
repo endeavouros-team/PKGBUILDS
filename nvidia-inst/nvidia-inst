@@ -97,7 +97,7 @@ KeepsAndRemoves() {
 }
 
 AddCmd() {
-    [ -n "$cmd" ] && cmd+="; "
+    [ "$cmd" ] && cmd+="; "
     cmd+="$1"
 }
 
@@ -122,7 +122,7 @@ Bumblebee() {
 		    fi
                 done
             fi
-            if [ -n "$(grep "$exec1" $desktop 2>/dev/null)" ] ; then
+            if [ "$(grep "$exec1" $desktop 2>/dev/null)" ] ; then
                 Info "Patching $desktop (with optirun)"
                 AddCmd "sed -i $desktop -e 's|$exec1|$exec2|'"
             fi
@@ -143,7 +143,7 @@ Bumblebee() {
                 *)
                     if [ "$user" != "root" ] ; then
                         for group in bumblebee video ; do
-                            if [ -n "$(id $user | grep "($group)")" ] ; then
+                            if [ "$(id $user | grep "($group)")" ] ; then
                                 Info "Removing user $user from group: $group"
                                 AddCmd "gpasswd -d $user $group"
                             fi
@@ -192,7 +192,7 @@ KernelParametersToBoot2() {
             fi
             ;;
         remove)
-            if [ -n "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
+            if [ "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
                 AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
             fi
             ;;
@@ -242,7 +242,7 @@ ShowCommandsToRun() {
     echo2 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo2 "$commands_to_run_string:"
     local xx
-    if [ -n "$cmd" ] ; then
+    if [ "$cmd" ] ; then
         xx=$(echo "$cmd"  | sed -e 's|; |\n|g')
         indent2 "$xx"
     else
@@ -255,7 +255,7 @@ ShowCommandsToRun() {
 
 SeparateShortOpts() {
     local opts="$1"
-    if [ -n "$opts" ] ; then
+    if [ "$opts" ] ; then
         opts=$(echo "$opts" | sed -e 's|:|=|g' -e 's|\([a-zA-Z]\)| -\1|g')
         opts="${opts:1}"
     fi
@@ -264,7 +264,7 @@ SeparateShortOpts() {
 
 SeparateLongOpts() {
     local opts="$1"
-    if [ -n "$opts" ] ; then
+    if [ "$opts" ] ; then
         opts=$(echo "$opts" | sed -e 's|:||g' -e 's|,| --|g')
         opts="--$opts"
     fi
@@ -284,7 +284,7 @@ Options() {
     local opts
     local sopts="bfhnopqtv"
     local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries"
-    lopts+=",nouveau,open,prime,quiet,series:,test,version,it,id:"
+    lopts+=",nouveau,open,prime,quiet,series:,test,version,id:"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -309,12 +309,12 @@ Options() {
             --series)           series="$2" ; shift ;;
             --listopts)         ListOptions "$sopts" "$lopts" ; exit 0 ;;
             --listseries)
-                [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
+                [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
                 if false ; then
                     echo "$series_now $series_prev1 $series_prev2"
                 else
                     echo "$series_now"
-                    echo2 "(Note: $series_prev1, $series_prev2 are not supported currently.)"
+                    # echo2 "(Note: $series_prev1, $series_prev2 are not supported currently.)"
                 fi
                 exit 0
                 ;;
@@ -323,7 +323,7 @@ Options() {
                 exit 0
                 ;;
             -v | --version)
-                [ -n "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
+                [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
                 echo "$progname $PROGVERSION"
                 exit 0
                 ;;
@@ -575,10 +575,10 @@ Main()
         DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
     fi
 
-    Options "$@"
     local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
+    Options "$@"
 
-    [ -n "$series_now" ] || series_now=$(GetSeriesFromPacman)
+    [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
@@ -592,7 +592,7 @@ Main()
 
     AllRemovables
 
-    [ -n "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
+    [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
     Info "Selected mode: $mode"
@@ -636,8 +636,8 @@ Main()
 
     local txt=""
 
-    if [ -n "$(printf "%s\n" "${install[@]}" | grep -P "nvidia-390|nvidia-470")" ] ; then
-        if [ -n "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
+    if [ "$(printf "%s\n" "${install[@]}" | grep -P "nvidia-390|nvidia-470")" ] ; then
+        if [ "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
             txt+="Sorry, the [kernel-lts] repo is no more supported.\n"
         else
             txt+="Sorry, $progname does not support installing packages from AUR.\n"
@@ -652,7 +652,7 @@ Main()
     # The commands are actually executed here.
     # If AUR packages are involved, the sudo/root password needs to be given twice!
 
-    if [ -n "$cmd" ] ; then
+    if [ "$cmd" ] ; then
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
         $EOS_ROOTER "$cmd" && Note "To have the changes in effect, you must reboot the computer."
     fi
