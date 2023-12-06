@@ -37,9 +37,6 @@ _eos-rankmirrors_() {
     local cur prev #words cword split
     _init_completion -s || return
 
-    local -r opts="$(eos-rankmirrors --dump-options=all)"
-    local -r verbosities=( all code show none )
-
     # Handle options that need sub-options.
     # Each option "case" should return immediately.
 
@@ -47,12 +44,12 @@ _eos-rankmirrors_() {
         --sort)                COMPREPLY=($(compgen -W "age rate" -- "$cur")) ;;
         --timeout | -t)        COMPREPLY=($(compgen -P "$cur" -W "{0..9}")); compopt -o nospace; compopt -o nosort ;;
         --ignore | --prefer)   COMPREPLY=($(compgen -P "'" -S "'" -W "$(_eos-rankmirrors_GetMirrors)" -- "$cur")) ;;
-        --mirror-verbosity)    COMPREPLY=($(compgen -W "${verbosities[*]}" -- "$cur")) ;;
+        --mirror-verbosity)    COMPREPLY=($(compgen -W "all code show none" -- "$cur")) ;;
         *)
                                case "$cur" in                     # Handle all top-level parameters.
                                    -* | "")
                                        # Any option or nothing yet.
-                                       COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))
+                                       COMPREPLY=($(compgen -W "$(/bin/eos-rankmirrors --dump-options=all)" -- "$cur"))
                                        ;;
                                    *)
                                        # Non-option parameters.
