@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=23.29
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -28,7 +28,6 @@ optdepends=(
     "webkit2gtk-4.1: for eos-pacdiff to show message windows implemented with yad"
     "yay: alternative for AUR updates in eos-update"
     "paru: alternative for AUR updates in eos-update"
-    "flatpak: for flatpak updates in eos-update"
 )
 
 backup=(
@@ -62,7 +61,7 @@ source=(
   $_url/eos-update.desktop
   $_url/eos-update.completion
   $_url/eos-update-extras
-  $_url/eos-update-after
+#  $_url/eos-update-after
   $_url/eos-waiting-indicator
 
 #  $_url/UpdateInTerminal
@@ -109,11 +108,10 @@ sha512sums=('2a90394fb941dd3514f6838845b466aa39d2c0a4f7048b1fd3f421767a6cf67d8c1
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '291176d3689d219b43302f012ea62f6a593564d204f0004c58ae63b0a80efb9d5a27667c62a2be7f4fc977f1df254152f61e651732dcc61104de3130632634dd'
-            '178b8bba52f5fed5bd87509f840a347bd6b226a89c1f62ef6bda4349b57b455bde87be430b5990a8c5474e29b5497cbb9a21b8a7dbdb5aa1b8d3a0dafd86c264'
+            '3b111ba0d27584609d6b0bd30ee468cf4948ac9f170f90770aace0e95674356122f549d864e9760b81dbab08df44049ce58228108f1c2c1f9074b02d5519e440'
             '89c34c867b33dce39a165fc37eb51309aeda20b2a42830c77fe7a772fdcc6796c281b264ec6dcc71e82e0f4109e2c3004fd74c5c205a5a14292f829895c54661'
             'e8703f8bee02b58160db9432b6629731285c3259d71885b4cc0511e90f12f1b57f975a3572c7a51e066a82f41b0e01d7f325047d85f1b15eb916db6fc7056f8e'
             '8c30d3964bec417e849d4fe52788ea6a2124db566236cd1fbe90ca069f79ea3dd5d95e71d99eaa50d46ba5fa5b1ad7c2b5276c77b6486bdc23c9bda47d28f42d'
-            'e306532a938ae20d7e4a810d04438a949b8688ba4ce357b7993487b599685f0b12a896bf48b820fc357a7b96570d81e5162d6abdc59b10cbd523f21b9a83f4f0'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '18efb6d77a29c7da2fb41f1438e9894699104f83593ce9889d825072a1ef2a1c3176a893ee8313506adc4eae0fb67934308beb231100a2338a1cf2aa96fff4c1'
             '91e3271c105b50fc38758951574c53faa35e1b5025ff00ab76f3d25cd576c78ac19f8ef75155f5bbe179d11cc3f569e6784941ec7dd45e1d096351ad31122680'
@@ -167,7 +165,7 @@ package() {
 #  install -Dm755 UpdateInTerminal               $bin/UpdateInTerminal
   install -Dm755 eos-update                     $bin/eos-update
   install -Dm755 eos-update-extras              $bin/eos-update-extras
-  install -Dm755 eos-update-after               $bin/eos-update-after
+#  install -Dm755 eos-update-after               $bin/eos-update-after
   install -Dm755 eos-waiting-indicator          $bin/eos-waiting-indicator
   install -Dm755 eos-download-wallpapers        $bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $bin/eos-pacdiff
