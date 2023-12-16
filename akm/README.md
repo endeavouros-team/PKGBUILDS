@@ -1,17 +1,20 @@
 # akm
 Simple kernel manager for EndeavourOS and Arch.<br>
-Note: does not support kernels in AUR.
+Note: does not support kernels in the AUR.
 
 ![](akm.png)
 
 ## Usage
 ```
-akm [--connect-header | --scroll]
+akm [options]
 
-where
-    --connect-header    Tie the header package to the kernel package when installing/uninstalling.
-    --scroll            Enable scrolling in the kernel info window.
+Options:
+    --connect-header      Make kernel and header package go together at install or uninstall.
+    --small               Make the akm window smaller, meant for helping with small displays at 1366x768 resolution.
+    --help | -h           This help.
 ```
+Option `--scroll` (enables scrolling in the window) is also available, but it is enabled by default.
+
 ## Options
 
 Without options, `akm` installs selected packages and uninstalls unselected packages.<br>
@@ -42,6 +45,8 @@ If the repository contains linux kernel packages, `akm` tries to automagically a
 
 The picture below shows `akm` window after adding the following unofficial repo:
 ```
+# NOTE: this particular repo is no more supported!
+
 [kernel-lts]
 Server = https://repo.m2x.dev/current/$repo/$arch
 ```
