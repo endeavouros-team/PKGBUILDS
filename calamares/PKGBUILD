@@ -4,7 +4,7 @@
 
 pkgname=calamares
 pkgver=23.11.1.1
-pkgrel=1
+pkgrel=2
 release_name="Galileo"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
