@@ -3,12 +3,47 @@
 #
 # Simple ranking of mirrors for the EndeavourOS mirrorlist.
 #
+# TODO:
+#   - option to test timeouts from small to larger
 
-echo2()   { echo   "$@" >&2 ; }
+echo2()   { echo -e  "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
 notif_echo2()   { printf2 "==> " ; echo2   "$@" ; }
 notif_printf2() { printf2 "==> " ; printf2 "$@" ; }
+
+Red()     { echo2 "$RED""$@""$RESET" ; }
+Blue()    { echo2 "$BLUE""$@""$RESET" ; }
+Magenta() { echo2 "$MAGENTA""$@""$RESET" ; }
+Green()   { echo2 "$GREEN""$@""$RESET" ; }
+
+WARN() {
+    local msg="$1"
+    Magenta "==> $progname: warning: $msg"
+}
+INFO() {
+    local msg="$1"
+    local prefix="$2"
+    case "$prefix" in
+        "") Blue "==> $progname: info: $msg" ;;
+        *)  Blue "$prefix$msg" ;;
+    esac
+}
+ERROR() {
+    local metadata="$1"
+    local realdata="$2"
+    Red "==> $progname: error: $metadata"
+    [ "$realdata" ] && Red "    $realdata"
+}
+
+DIE() {
+    local msg="$1"
+    local level="$2" ; [ -n "$level" ] || level=0
+    ERROR "error detected at function ${FUNCNAME[$((level+1))]}, line ${BASH_LINENO[$level]}:" "$msg"
+    DeleteTmpFiles
+    Usage
+    exit 1
+}
 
 verbose() {
     if [ "$verbose" = "yes" ] ; then
@@ -35,16 +70,6 @@ RemoveFromDelList() {
             [ "$xx" != "$remove_me" ] && delete_at_end+=("$xx")
         done
     fi
-}
-
-DIE() {
-    local msg="$1"
-    local level="$2" ; [ -n "$level" ] || level=0
-
-    notif_echo2 "$progname: error detected at function ${FUNCNAME[$((level+1))]}, line ${BASH_LINENO[$level]}:"
-    echo2 "    $msg"
-    DeleteTmpFiles
-    exit 1
 }
 
 ShowArray() {
@@ -113,7 +138,7 @@ RankPerAge() {
         age | latest)
             sortopts="$sort_age" ;;
         *)
-            notif_echo2 "Warning: value '$sort' of option --sort is unsupported, using 'age'."
+            WARN "value '$sort' of option --sort is unsupported, using 'age'."
             sortopts="$sort_age"
             ;;
     esac
@@ -127,14 +152,11 @@ RankPerAge() {
     fi
 }
 
-Warning() {
+WarningAbout() {
     local id="$1"
     shift
-    local explanations=("$@")
-    explanations+=("Continuing.")
-    
-    printf2 "==> Warning about %s:\n" "$id"
-    printf2 "    %s\n" "${explanations[@]}"
+    printf2 "${MAGENTA}==> Warning about %s:${RESET}\n" "$id"
+    [ "$1" ] && printf2 "    ${MAGENTA}%s${RESET}\n" "$@" "Continuing."
 }
 
 GetUpdateNumberAndTime() {
@@ -163,13 +185,13 @@ GetUpdateNumberAndTime() {
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
-                    Warning "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
+                    WarningAbout "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
                     return
                 elif [ $nr -lt $too_low_limit ] ; then
-                    Warning "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
+                    WarningAbout "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    Warning "$mirror" "Update level is $nr/$reference_level, some packages may be outdated."
+                    WarningAbout "$mirror" "Update level is $nr/$reference_level, some packages may be outdated."
                 fi
             fi
             result="$nr $time"
@@ -201,7 +223,7 @@ GetUpdateNumberAndTime() {
                     esac
                     [ "$add_code" = "yes" ] && msg+=("--> (curl exit code $retcode.)")
 
-                    Warning "$mirror" "${msg[@]}"
+                    WarningAbout "$mirror" "${msg[@]}"
                     ;;
                 none)
                     ;;
@@ -246,7 +268,7 @@ FetchLatestMirrorlist() {
         local cachev=$(echo "$pkg" | sed 's|.*list-\(.*\)-any.*|\1|')
         local installedv=$(pacman -Q $pkgname | awk '{print $2}')
         if [ "$cachev" = "$installedv" ] ; then
-            notif_echo2 "Info: extracting $pkg ..."
+            INFO "extracting $pkg ..."
             tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
             CheckMirrorlist "$latest_ml"
             return
@@ -255,11 +277,11 @@ FetchLatestMirrorlist() {
     # package not in cache or installed package version is not the same as in cache
     local code=0
     local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
-    notif_echo2 "Info: fetching $url ..."
+    INFO "fetching $url ..."
     curl --fail -Lsm $timeout -o $latest_ml $url || code=$?
     case "$code" in
         0) ;;
-        *) notif_echo2 "Error: cannot fetch EndeavourOS mirrorlist info (curl error code $code)."
+        *) ERROR "cannot fetch EndeavourOS mirrorlist info (curl error code $code)."
            exit 0
            ;;
     esac
@@ -291,11 +313,11 @@ SimpleRank() {
     local pref="$preferred_mirrors $ALWAYS_FIRST_EOS_MIRRORS"
     if [ "$pref" != " " ] ; then
         pref=${pref//\|/ }
-        notif_echo2 "Info: preferring mirrors: $pref"
+        INFO "preferring mirrors: $pref"
     fi
 
     if [ "$ignored_mirrors" != "" ] ; then
-        notif_echo2 "Info: ignoring mirrors: ${ignored_mirrors//\|/ }"
+        INFO "ignoring mirrors: ${ignored_mirrors//\|/ }"
         # grep -Pv "$ignored_mirrors" $latest_ml > $latest_ml.tmp
         # rm -f $latest_ml
         # mv $latest_ml.tmp $latest_ml
@@ -310,7 +332,7 @@ SimpleRank() {
     grep "^Server[ ]*=" $latest_ml.orig | sort | uniq > $latest_ml
 
     # $result will contain an array of lines like: "mirror update-ordinal fetch-time"
-    notif_echo2 "Info: ranking EndeavourOS mirrors, please wait ..."
+    INFO "ranking EndeavourOS mirrors, please wait ..."
     RankPerAge
 
     echo2 ""
@@ -355,7 +377,7 @@ SimpleRank() {
         UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"    # Example: ALWAYS_FIRST_EOS_MIRRORS='tuna|moson|umu'
     fi
 
-    notif_printf2 "Results of ranking EndeavourOS mirrors:\n\n"
+    INFO "Results of ranking EndeavourOS mirrors:\n" "==> Info: "
 
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -370,7 +392,7 @@ UserAddedMirrors() {
     for m in ${mirrors//\|/ } ; do
         mirror="$(grep "^[ ]*Server[ ]*=[ ]*" "$latest_ml.orig" | grep "$m")"
         if [ -n "$mirror" ] ; then
-            notif_echo2 "User added: $mirror"
+            INFO "User added: $mirror"
             echo "$mirror"
         fi
     done
@@ -545,6 +567,13 @@ Main()
     local -r SHORT_OPTIONS="ahnt:"
     local -r LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing"
+
+    local -r RED=$'\e[0;91m'         # starts this foreground text color
+    local -r GREEN=$'\e[0;92m'
+    local -r YELLOW=$'\e[0;93m'
+    local -r BLUE=$'\e[0;94m'
+    local -r MAGENTA=$'\e[0;95m'
+    local -r RESET=$'\e[0m'          # back to normal colors
 
     case "$1" in
         --dump-options) DumpOptions ;;
