@@ -1,7 +1,7 @@
 #!/bin/bash
 
 Main() {
-    local installed="$(pacman -Qq kernel-install-for-dracut eos-dracut mkinitcpio 2>/dev/null)"
+    local installed="$(expac -Q %n kernel-install-for-dracut eos-dracut mkinitcpio)"
 
     if [[ "$installed" =~ kernel-install-for-dracut ]] ; then
         reinstall-kernels
@@ -10,8 +10,8 @@ Main() {
     elif [[ "$installed" =~ mkinitcpio ]] ; then
         mkinitcpio -P
     else
-        local progname="$(basename "$0")"
-        echo "warning: $progname: cannot perform requested operation because required package(s) are missing."
+        local progname="${0##*/}"
+        echo "$progname: warning: cannot perform requested operation because required package(s) are missing."
     fi
 }
 
