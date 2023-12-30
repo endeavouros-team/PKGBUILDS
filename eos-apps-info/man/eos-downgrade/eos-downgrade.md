@@ -13,5 +13,5 @@ Options:
 
 ## Example
 ```
-eos-downgrade akm
+eos-downgrade akm eos-log-tool    # downgrades two packages
 ```
