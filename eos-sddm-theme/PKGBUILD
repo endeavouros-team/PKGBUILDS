@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-sddm-theme
-pkgver=2.4
+pkgver=2.5
 pkgrel=1
 pkgdesc='EndeavourOS Theme for SDDM'
 arch=('any')
@@ -12,7 +12,7 @@ makedepends=('git')
 install=eos-sddm-theme.install
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz"
 "eos-sddm-theme.install")
-sha256sums=('67c10396a4eeb2276b6a1b1b186d2c29af0b92baaa6032d73f108254d55b2876'
+sha256sums=('53318760d551bb447620ac0249862b26f4cac8062aae7d8a540305bc92dbd2f6'
             '966f385c87ac8a20924968e5e3b5f940d35fb9c6a50e365bb77af545a410c3da')
 
 package() {
