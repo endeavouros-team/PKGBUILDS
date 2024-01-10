@@ -194,6 +194,17 @@ GetUpdateCount() {
     fi
 }
 
+OpenWebPage() {
+    local app
+    for app in /bin/kde-open /bin/xdg-open /bin/exo-open ; do
+        if [ -x $app ] ; then
+            $app "$1"
+            return 0
+        fi
+    done
+    eos_yad_DIE "sorry, cannot open web page '$1'"
+}
+
 Update_common() {
     # Check upstream updates first.
 
@@ -215,6 +226,7 @@ Update_common() {
     GetUpdateCount
 
     if [ -n "$updates" ] ; then
+        [ "$ShowArchNewsPage" = "yes" ] && OpenWebPage https://archlinux.org/news
         local retvalue=0
         local tmpfile=$(mktemp)
         eos-kernel-nvidia-update-check $(echo "$updates" | tail -n +3 | awk '{print $1}') 2> $tmpfile || {
