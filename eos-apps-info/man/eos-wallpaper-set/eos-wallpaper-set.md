@@ -2,6 +2,8 @@
 
 Sets the wallpaper from the given file, or lets user to select it from the given folder.
 
+The file name of the chosen wallpaper will be saved into a history file `$HOME/.eos-wallpaper-set.history-of-wallpapers`.
+
 ![](eos-wallpaper-set.png)
 
 ## Synopsis
