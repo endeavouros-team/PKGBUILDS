@@ -45,6 +45,9 @@ Server = https://md.mirrors.hacktegic.com/endeavouros/repo/$repo/$arch
 Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
 Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
 
+## South Africa
+Server = https://mirrors.urbanwave.co.za/endeavouros/repo/$repo/$arch
+
 ## South Korea
 Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 
