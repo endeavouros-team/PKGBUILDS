@@ -259,7 +259,7 @@ _tr_add2 after_install_ewtip2     "Selector de fons de pantalla"                
 #       - line 250: changed text of 'after_install_ewtip2'
 
 # 2020-Oct-23:
-_tr_add2 updt_update_check        "- Comprovació d'actualitzacions"
+_tr_add2 updt_update_check        "Comprovació d'actualitzacions"
 _tr_add2 updt_searching           "Se cerca a"
 _tr_add2 updt_for_updates         "si hi ha actualitzacions"
 _tr_add2 updt_failure             "Ha fallat$_exclamation"
@@ -277,7 +277,7 @@ _tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave 
 _tr_add2 after_install_conf           "Configuració del dimoni"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Baixeu més fons de pantalla de l'EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Baixeu fons de pantalla de llegat i de la comunitat de l'EndeavourOS."
-_tr_add2 after_install_info           "-> informació"                           # last word on a sentence, means just any information
+_tr_add2 after_install_info           "informació"                           # last word on a sentence, means just any information
 
 _tr_add2 butt_softnews                "Notícies de programari"
 _tr_add2 butt_softnews_tip            "Notícies importants sobre el programari de l'EndeavourOS"

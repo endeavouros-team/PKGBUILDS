@@ -30,7 +30,10 @@ The actual translation strings will be implemented using the `_tr_add2` function
 _tr_add2 <unique-string-id>  "<string-contents-in-your-language>"
 ```
 
-Note that the string contents *must* be written inside quotes (because the string can include spaces or special characters).<br>
+Note that the string contents *must* be written inside quotes (because the string can include spaces or special characters).
+
+<i>Important: the string should **not** start with a hyphen (`-`) because it will be interpreted unexpectedly and may cause errors.</i>
+
 See also the examples below.
 
 ### Special features
