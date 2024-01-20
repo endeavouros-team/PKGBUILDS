@@ -7,6 +7,14 @@ tr_indexes=()
 # Declare variable that hold translations:
 declare -A tr_strings
 
+_UserWarning() {
+    if [ "$2" ] ; then
+        echo "$PRETTY_PROGNAME: warning: translation string '$1' or parameters '$2' was not properly recognized." >&2
+    else
+        echo "$PRETTY_PROGNAME: warning: translation string '$1' was not properly recognized." >&2
+    fi
+}
+
 # Helper functions:
 _tr_add() {
     local lang="$1"
@@ -16,6 +24,7 @@ _tr_add() {
     shift 3
 
     printf -v str "$str" "$@"   # add possible parameters into the given string
+    [ $? -eq 0 ] || _UserWarning "$str" "$*"
 
     tr_strings["Lang_${lang}__$ix"]="$str"
 
@@ -42,6 +51,7 @@ ltr() {                                              # puts string to stdout
     shift
     test -n "$2" && { str+="$2"; shift; }            # remove this line some day...
     printf -v str "$str" "$@"
+    [ $? -eq 0 ] || _UserWarning "$str" "$*"
     echo "$str"
 }
 ltr2() {                                             # puts string to stderr
@@ -224,7 +234,7 @@ _init_translations() {
 
     local xx ix
     local silent_lang_warnings=no
-    local pname="$PRETTY_PROGNAME"
+    local -r pname="$PRETTY_PROGNAME"
     local selected=0
 
     export SELECTED_EOS_LANGUAGE=en
