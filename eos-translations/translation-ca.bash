@@ -164,6 +164,8 @@ _tr_add2 cal_info1              "Aquesta és una versió de desenvolupament de l
 _tr_add2 cal_info2              "El mètode <b>fora de línia</b> ofereix un escriptori Xfce amb temàtica d'EndeavourOS.\nNo cal connexió a Internet.\n\n"
 _tr_add2 cal_info3              "El mètode <b>en línia</b> permet triar l'escriptori, amb el tema d'origen.\nCal connexió a Internet.\n\n"
 _tr_add2 cal_info4              "Si us plau, tingueu en compte que aquesta versió és un treball en curs; si us plau, ajudeu-nos a fer-la estable informant d'errors.\n"
+_tr_add2 cal_info5              "\nDesprés de la instal·lació, és recomanat actualitzar el sistema.\n\n"
+_tr_add2 cal_info6              "\nDesprés de la instal·lació, el sistema està actualitzat.\n\n"
 _tr_add2 cal_choose             "Trieu el mètode d'instal·lació."
 _tr_add2 cal_method             "Mètode"
 _tr_add2 cal_nosupport          "$PROGNAME: mode no admès: "
@@ -334,4 +336,20 @@ _tr_add2 daily_assist_anewstip       "Mostra les darreres notícies de l'Arch en
 _tr_add2 nb_nofify_user1             "Hi ha notícies importants a"
 _tr_add2 nb_nofify_user2             "Si us plau, cliqueu al botó"                                  # Software News
 _tr_add2 nb_nofify_user3             "del cantó de baix a l'esquerra d'aquesta finestra."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Obteniu el vostre fitxer de personalització d'instal·lació (avançat)"
+_tr_add2 ins_cust_text               "Doneu l'URL del vostre user_commands.bash personalitzat"
+_tr_add2 ins_cust_text2              "El fitxer obtingut substituirà ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Això és molt útil per a la instal·lació <b>en línia</b>"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Nota: no hi ha connexió a Internet disponible, alguns botons estan ocults o no funcionen."
+
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Partitionmanager permet examinar i gestionar les particions i l'estructura del disc"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start             "Instal·lador de la imatge EndeavourOS ARM"
+_tr_add2 ins_arm_starttip          "Comença la instal·lació de l'edició EndeavourOS ARM"
 
