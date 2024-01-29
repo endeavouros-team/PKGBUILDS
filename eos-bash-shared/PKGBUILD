@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=24.6
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -20,8 +20,7 @@ depends=(
 )
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
-    # "wgetpaste-eos: needed by eos-sendlog"   # no more supported?
-    "gnu-netcat: one of the pastebins for eos-sendlog"
+    "gnu-netcat: one of the pastebins (termbin) for eos-sendlog"
     "neofetch: for additional DE detection"
     "kde-gtk-config: to remove gtk related yad warnings"
     "libnotify: for eos-reboot-required2"
@@ -35,9 +34,6 @@ backup=(
   etc/eos-script-lib-yad.conf
   etc/eos-sendlog.conf
 )
-#url=https://github.com/endeavouros-team/PKGBUILDS/$pkgname
-#url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-#_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 url=https://github.com/endeavouros-team/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/$pkgname/main
@@ -58,18 +54,11 @@ source=(
   $_url/su-c_wrapper
   $_url/eos-run-cmd-with-su
   $_url/eos-wallpaper-set
-  $_url/eos-update                        # "better" than UpdateInTerminal
+  $_url/eos-update
   $_url/eos-update.desktop
   $_url/eos-update.completion
   $_url/eos-update-extras
-#  $_url/eos-update-after
   $_url/eos-waiting-indicator
-
-#  $_url/UpdateInTerminal
-#  $_url/UpdateInTerminal.desktop
-#  $_url/eos-pkginfo
-#  $_url/eos-pkginfo.completion
-#  $_url/eos-pkg-changelog
 
   $_url/eos-reboot-required2
   $_url/eos-reboot-required3
@@ -82,7 +71,6 @@ source=(
   $_url/eos-sendlog.conf
   $_url/eos-kbd-set
   $_url/eos-download-wallpapers
-  $_url/eos-send-gpuinfo
   $_url/eos-pacdiff
   $_url/eos-pacdiff.conf
   $_url/pkg-name-components
@@ -125,7 +113,6 @@ sha512sums=('2a90394fb941dd3514f6838845b466aa39d2c0a4f7048b1fd3f421767a6cf67d8c1
             'f2fa1a132e3971562cfc6463c4773043eacde6bc1ee521d7f330764d3ae0897c8bd8545c801e320954ebca9fc7ea59ba32b0ad93aae96a0652e2f0383c8198f7'
             '457da2c9ffd9cf619cb230c7cb58eca9eef72d11e850e42870f7d5de0654d1aa7f58e91842056199bd48c7b06aeea248abf42735c387ca8d176d0778c7ab69d8'
             '77eba34090f4327caa01e584153bf7f319c7957f959917ffc26032aa06a2f6fde20a556324a099945f28bfa19cf37e68d9bc8fa67614fdc7563c27412e87d953'
-            'd2580800f06fb513c79501581d3c3cfcc51e0215a553819df1e659860f76448cc845d0606ba3694bc36510db227a07edd3008b8b38a66564bb2fe46879ca90a6'
             'b422922e395bf7575a8a788aecab788f808d061d7279322564be8964c4059d76ebd95f280fa3205fd35a4594978cda608e94d594ba15c3bee54c8c19efa5da35'
             '9c7f26a0d95b8eb8e6eeed3a072083f7fb18b2c77a0c4dcf4bbadb0a642dba3b1686cdd7daeda4f57b6dacba0aa35e91effc62e7dd92ad7b8c3241d8995737aa'
             'b4301af1a68c731992d4dc3bfd33895921e20f3e8c3ace23b2fe2d180e53b6979f61bb7cdedc46a9a9c635659c4c226d9dfb0f7cc7b18f8a0cd486bf25e9b735'
@@ -166,10 +153,8 @@ package() {
   install -Dm755 su-c_wrapper                   $bin/su-c_wrapper
   install -Dm755 eos-run-cmd-with-su            $bin/eos-run-cmd-with-su
   install -Dm755 eos-wallpaper-set              $bin/eos-wallpaper-set
-#  install -Dm755 UpdateInTerminal               $bin/UpdateInTerminal
   install -Dm755 eos-update                     $bin/eos-update
   install -Dm755 eos-update-extras              $bin/eos-update-extras
-#  install -Dm755 eos-update-after               $bin/eos-update-after
   install -Dm755 eos-waiting-indicator          $bin/eos-waiting-indicator
   install -Dm755 eos-download-wallpapers        $bin/eos-download-wallpapers
   install -Dm755 eos-pacdiff                    $bin/eos-pacdiff
@@ -183,20 +168,9 @@ package() {
   install -Dm755 eos-reboot-required2           $bin/eos-reboot-required2
   install -Dm755 eos-reboot-required3           $bin/eos-reboot-required3
   install -Dm644 eos-reboot-required.hook       $hooks/eos-reboot-required.hook
-
   install -Dm644 eos-reboot-required.timer      $srv/eos-reboot-required.timer
   install -Dm644 eos-reboot-required.service    $srv/eos-reboot-required.service
 
   install -Dm644 eos-update.desktop             $pkgdir/usr/share/applications/eos-update.desktop
-  
-# install -Dm755 eos-pkg-changelog              $bin/eos-pkg-changelog
-# install -Dm755 eos-send-gpuinfo               $bin/eos-send-gpuinfo
-
-#  install -Dm644 UpdateInTerminal.desktop       $pkgdir/usr/share/applications/UpdateInTerminal.desktop
-
   install -Dm644 eos-update.completion          $pkgdir/usr/share/bash-completion/completions/eos-update
-
-#  install -Dm755 eos-pkginfo                    $bin/eos-pkginfo
-#  install -Dm644 eos-pkginfo.completion         $pkgdir/usr/share/bash-completion/completions/eos-pkginfo
-#  ln -s /usr/bin/eos-pkginfo                    $bin/eos-pkginfo-aur
 }
