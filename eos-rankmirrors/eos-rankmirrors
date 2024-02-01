@@ -58,7 +58,6 @@ DeleteTmpFiles() {
         rm -f "${delete_at_end[@]}"
     fi
 }
-export -f DeleteTmpFiles
 
 RemoveFromDelList() {
     if [ ${#delete_at_end[@]} -gt 0 ] ; then
@@ -568,6 +567,16 @@ Main()
     local -r LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing"
 
+    # Don't do anything time consuming before dumping options.
+    case "$1" in
+        --dump-options)     DumpOptions ;;
+        --dump-options=all) DumpOptions --all ;;
+    esac
+
+    local -r progname="${0##*/}"
+    local -r pkgname=endeavouros-mirrorlist
+    local -r mlfolder=/etc/pacman.d
+
     local -r RED=$'\e[0;91m'         # starts this foreground text color
     local -r GREEN=$'\e[0;92m'
     local -r YELLOW=$'\e[0;93m'
@@ -575,14 +584,6 @@ Main()
     local -r MAGENTA=$'\e[0;95m'
     local -r RESET=$'\e[0m'          # back to normal colors
 
-    case "$1" in
-        --dump-options) DumpOptions ;;
-        --dump-options=all) DumpOptions --all ;;
-    esac
-
-    local -r progname="${0##*/}"
-    local -r pkgname=endeavouros-mirrorlist
-    local -r mlfolder=/etc/pacman.d
     local eos=$mlfolder/$pkgname
     local new=""
     local latest_ml=""
@@ -602,6 +603,9 @@ Main()
     local added_mirror=""
     local internal_testing=no
     local test_all=no
+
+    export -f DeleteTmpFiles
+    trap "sleep 0.1 ; DeleteTmpFiles" EXIT    # do this *after* DumpOptions to make bash completion faster
 
     if [ ! -r "$eos" ] ; then                 # this test is not really needed...
         DIE "no local $eos found, please install package '$pkgname'."
@@ -649,7 +653,5 @@ Main()
 
     DeleteTmpFiles
 }
-
-trap "sleep 0.2 ; DeleteTmpFiles" EXIT
 
 Main "$@"
