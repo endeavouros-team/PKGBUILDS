@@ -59,6 +59,7 @@ Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 
 ## Ukraine
 Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
+Server = https://endeavouros.ip-connect.info/repo/$repo/$arch
 
 ## United States
 Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
