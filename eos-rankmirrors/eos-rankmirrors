@@ -190,7 +190,7 @@ GetUpdateNumberAndTime() {
                     WarningAbout "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    WarningAbout "$mirror" "Update level is $nr/$reference_level, some packages may be outdated."
+                    WarningAbout "$mirror" "Update level is $nr/$reference_level, some [endeavouros] packages may be outdated if this mirror is in use."
                 fi
             fi
             result="$nr $time"
@@ -368,6 +368,8 @@ SimpleRank() {
 
     # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
 
+    RemoveUserAddedFromList "$pref"
+
     if [ -n "$preferred_mirrors" ] ; then
         UserAddedMirrors "$preferred_mirrors"
     fi
@@ -380,6 +382,29 @@ SimpleRank() {
 
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+}
+
+RemoveUserAddedFromList() {
+    local -r prefs="$1"
+    local pref
+    local item
+    local tmp=()
+    local found=no
+
+    if [ "$prefs" ] ; then
+        for item in "${result[@]}" ; do
+            for pref in $prefs ; do
+                case "$item" in
+                    *"$pref"*) found=yes
+                               [ "$internal_testing" = yes ] && INFO "Dropping duplicate:  $(echo "$item" | awk '{print $1}')"
+                               continue 2
+                               ;;
+                esac
+            done
+            tmp+=("$item")
+        done
+    fi
+    [ "$found" = "yes" ] && result=("${tmp[@]}")
 }
 
 UserAddedMirrors() {
