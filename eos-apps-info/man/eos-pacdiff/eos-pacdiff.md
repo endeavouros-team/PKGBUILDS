@@ -36,7 +36,7 @@ See also **Configuration** below.
 
 ## Configuration
 
-File `/etc/pacdiff.conf` can contain the following (bash) variables, including their default values:
+File `/etc/eos-pacdiff.conf` can contain the following (bash) variables, including their default values:
 
 ```
 BACKUP_OVERWRITE=no
