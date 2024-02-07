@@ -4,6 +4,11 @@ Main() {
     local conf=/etc/eos-rankmirrors.conf
     source $conf || return
 
+    case "$EOS_RANK_WHEN_MIRRORLIST_CHANGES" in
+        yes | "") ;;
+        no  | *) return ;;
+    esac
+
     local timeout="$EOS_AUTORANK_TIMEOUT"
     [ -n "$timeout" ] || timeout=30
 
