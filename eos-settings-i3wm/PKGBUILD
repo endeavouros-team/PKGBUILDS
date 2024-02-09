@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-i3wm-setup
 pkgname=eos-settings-i3wm
-pkgver=1.8
+pkgver=1.9
 pkgrel=1
 pkgdesc="pre user creation skel setup for i3-wm under EndeavourOS"
 arch=("any")
@@ -11,7 +11,7 @@ license=("GPL")
 conflics=("endeavouros-skel-xfce4" "endeavouros-skel-default" "endeavouros-skel-i3wm")
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('3c3453743d73498a35999a07a61ee9721b1e7d07de6b82b39e5c49678f62570f')
+sha256sums=('fe251d66ba6ae6cff6f32f0ce27e405eddb88b3824fbcc0d4483df90d8fbdc60')
 
 package() {
     cd "$_pkgname-$pkgver"
