@@ -5,16 +5,16 @@ pkgname=calamares-git
 _reponame=calamares
 release_name=$pkgname
 pkgver=.
-pkgrel=2
+pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
-makedepends=('git' 'cmake' 'extra-cmake-modules' 'kpmcore' 'boost' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
 conflicts=('calamares_current')
 depends=( 'qt5-svg' 'qt5-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons5' 'kconfig5' 'ki18n5' 'kservice5' \
-'kwidgetsaddons5' 'kpmcore' 'squashfs-tools' 'rsync' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
-'gptfdisk' 'hwinfo' 'kparts5' 'polkit-qt5' 'python' 'solid5' 'qt5-tools' 'boost-libs' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
+'kwidgetsaddons5' 'kpmcore' 'squashfs-tools' 'rsync' 'pybind11' 'cryptsetup' 'qt5-xmlpatterns' 'doxygen' 'dmidecode' \
+'gptfdisk' 'hwinfo' 'kparts5' 'polkit-qt5' 'python' 'solid5' 'qt5-tools' 'libpwquality' 'ckbcomp' 'qt5-quickcontrols2' )
 provides=("calamares")
 options=(!strip !emptydirs)
 source=("git+https://github.com/endeavouros-team/$_reponame.git#branch=calamares")
