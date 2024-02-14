@@ -27,7 +27,7 @@ Main()
     local fieldsep=$'\x0c'   # form feed!
     local rawupdates
 
-    rawupdates=$(checkupdates)
+    rawupdates=$(checkupdates --nocolor)
     retcode=$?
 
     case "$retcode" in
