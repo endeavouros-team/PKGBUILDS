@@ -38,6 +38,9 @@ Server = https://endeavour.remi.lu/repo/$repo/$arch
 Server = https://mirror.albony.xyz/endeavouros/repo/$repo/$arch
 Server = https://mirrors.nxtgen.com/endeavouros-mirror/repo/$repo/$arch
 
+## Iran
+Server = https://mirror.nimatarlani.com/endeavouros/repo/$repo/$arch
+
 ## Moldova
 Server = https://md.mirrors.hacktegic.com/endeavouros/repo/$repo/$arch
 
