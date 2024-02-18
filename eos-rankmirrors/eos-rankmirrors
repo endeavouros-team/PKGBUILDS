@@ -190,7 +190,8 @@ GetUpdateNumberAndTime() {
                     WarningAbout "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    WarningAbout "$mirror" "Update level is $nr/$reference_level, some [endeavouros] packages may be outdated if this mirror is in use."
+                    WarningAbout "$mirror" \
+                                 "Update level is $nr/$reference_level, some [endeavouros] packages may be outdated if this mirror is in use."
                 fi
             fi
             result="$nr $time"
@@ -245,7 +246,8 @@ CheckMirrorlist() {
         local file="$1"
         if grep "^#[ ]*Server = " "$file" ; then
             RemoveFromDelList "$latest_ml"
-            DIE "endeavouros-mirrorlist (see file $file) has one or more mirrors commented out!" 1    # 1 = level of BASH_LINENO array (which starts from 0)
+            DIE "endeavouros-mirrorlist (see file $file) has one or more mirrors commented out!" 1
+                 # 1 = level of BASH_LINENO array (which starts from 0)
         fi
     fi
 }
@@ -255,7 +257,8 @@ FetchLatestMirrorlist() {
 
     if [ "$use_local_mirrorlist" = "yes" ] ; then
         # Use file /etc/pacman.d/endeavouros-mirrorlist. Remove potential ranking results first.
-        sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' /etc/pacman.d/endeavouros-mirrorlist  > $latest_ml
+        sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' \
+            /etc/pacman.d/endeavouros-mirrorlist  > $latest_ml
         CheckMirrorlist "$latest_ml"
         return
     fi
@@ -275,7 +278,8 @@ FetchLatestMirrorlist() {
     fi
     # package not in cache or installed package version is not the same as in cache
     local code=0
-    local url="$(eos-github2gitlab --keep-master "https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname")"
+    local url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname/$pkgname"
+    url="$(eos-github2gitlab --keep-master "$url")"
     INFO "fetching $url ..."
     curl --fail -Lsm $timeout -o $latest_ml $url || code=$?
     case "$code" in
@@ -334,37 +338,27 @@ SimpleRank() {
     INFO "ranking EndeavourOS mirrors, please wait ..."
     RankPerAge
 
-    echo2 ""
+    local result_orig=("${result[@]}")      # copy the info if the displaying order below changes...
 
-    # show the original list (mirrors commented out)
+    ShowActualRankingResult                 # changes "${result[@]}"
+
     if [ "$mirrorlist_only" = "no" ] ; then
-        sed 's|^Server = |#Server = |' $latest_ml.orig
-
-        # show the results of ranking (in comments)
-        printf "\n# Results of mirror ranking at (UTC) %s:\n" "$(date -u "+%x %X")"
-        printf "# The following fields are shown for each mirror:\n"
-        printf "#   mirror:          The mirror address\n"
-        printf "#   update-level:    Ordinal number of the latest update (larger is newer)\n"
-        printf "#   fetch-time:      Measures the speed of the mirror (smaller is faster)\n"
-        printf "#\n"
-        while true ; do
-            echo "mirror update-level fetch-time"
-            echo "~~~~~~ ~~~~~~~~~~~~ ~~~~~~~~~~"
-            ShowArray "${result[@]}"
-            break
-        done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
+        # Show optional info that is not disabled.
+        [ $show_ranking_info  = yes ] && ShowRankingInfo "${result_orig[@]}"
+        [ $show_original_list = yes ] && ShowOriginalMirrorlist
     fi
 
-    # This is the actual ranked result.
+    SeparatorLine
+}
 
-    echo ""
-    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+ShowActualRankingResult() {
+    SeparatorLine
     echo "# EndeavourOS mirrorlist, ranked by $progname at $(date +%x\ %X)."
     if [ -n "$preferred_mirrors" ] || [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
         echo "# Preferred mirrors: ${preferred_mirrors//\|/ } ${ALWAYS_FIRST_EOS_MIRRORS//\|/ }"
     fi
     [ -n "$ignored_mirrors" ]   && echo "# Ignored mirrors: ${ignored_mirrors//\|/ }"
-    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    SeparatorLine
 
     # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
 
@@ -375,13 +369,41 @@ SimpleRank() {
     fi
 
     if [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
-        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"    # Example: ALWAYS_FIRST_EOS_MIRRORS='tuna|moson|umu'
+        UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"  # Example: ALWAYS_FIRST_EOS_MIRRORS='tuna|moson|umu'
     fi
 
     INFO "Results of ranking EndeavourOS mirrors:\n" "==> Info: "
 
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
+}
+
+ShowRankingInfo() {
+    # show the result of ranking (in comments)
+    echo ""
+    SeparatorLine
+    printf "# Mirror ranking info at (UTC) %s:\n" "$(date -u "+%x %X")"
+    printf "# The following fields are shown for each mirror:\n"
+    printf "#   mirror:          The mirror address\n"
+    printf "#   update-level:    Ordinal number of the latest update (larger is newer)\n"
+    printf "#   fetch-time:      Measures the speed of the mirror (smaller is faster)\n"
+    printf "#\n"
+    while true ; do
+        echo "mirror update-level fetch-time"
+        echo "~~~~~~ ~~~~~~~~~~~~ ~~~~~~~~~~"
+        ShowArray "$@"
+        break
+    done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
+}
+
+SeparatorLine() {
     echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+}
+
+ShowOriginalMirrorlist() {
+    echo ""
+    SeparatorLine
+    echo -e "\n### Original mirrorlist before ranking:\n"
+    sed 's|^Server = |#Server = |' $latest_ml.orig         # comment mirrors out
 }
 
 RemoveUserAddedFromList() {
@@ -411,7 +433,7 @@ UserAddedMirrors() {
     local mirrors="$1"    # a list of strings separated by '|' (pipe) chars
     local mirror m
 
-    echo "# user added mirrors >>>"
+    echo "# User added mirrors >>>"
 
     for m in ${mirrors//\|/ } ; do
         mirror="$(grep "^[ ]*Server[ ]*=[ ]*" "$latest_ml.orig" | grep "$m")"
@@ -421,7 +443,7 @@ UserAddedMirrors() {
         fi
     done
     echo2 ""
-    echo "# user added mirrors <<<"
+    echo "# User added mirrors <<<"
 }
 
 WriteSystemMirrorlist() {
@@ -504,6 +526,14 @@ Options:
              Example:
                  eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
 
+  --show-orig-list
+             Add the original mirror list into /etc/pacman.d/endeavouros-mirrorlist.
+             Supported values: "yes" (default) or "no".
+
+  --show-rank-info
+             Show the ranking data in /etc/pacman.d/endeavouros-mirrorlist.
+             Supported values: "yes" (default) or "no".
+
   --sort <value>
              Primary key for sorting the mirrors.
              Supported key values:
@@ -534,7 +564,8 @@ EOF
 Options() {
     local opts
 
-    opts=$(getopt -o=$SHORT_OPTIONS --longoptions $LONG_OPTIONS,$LONG_OPTIONS_INTERNAL --name "$progname" -- "$@") || DIE "getopt detected unsupported option, will not continue."
+    opts=$(getopt -o=$SHORT_OPTIONS --longoptions $LONG_OPTIONS,$LONG_OPTIONS_INTERNAL --name "$progname" -- "$@") \
+        || DIE "getopt detected unsupported option, will not continue."
 
     eval set -- "$opts"
 
@@ -558,6 +589,8 @@ Options() {
             --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
+            --show-rank-info)           show_ranking_info="$2"; shift ;;
+            --show-orig-list)           show_original_list="$2"; shift ;;
             --test-all | -a)            save=no
                                         test_all=yes
                                         EOS_IGNORED_MIRRORS=()
@@ -589,8 +622,9 @@ Check-mirror_verbosity() {
 Main()
 {
     local -r SHORT_OPTIONS="ahnt:"
-    local -r LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:,use-local-mirrorlist"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing"
+    local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
+    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:"
 
     # Don't do anything time consuming before dumping options.
     case "$1" in
@@ -617,7 +651,7 @@ Main()
     local sort_default=age                    # age or rate
     local save=yes
     local hook_rank=no
-    local -r ranked_suffix=".pacnew"          # was: ".ranked"  !!!
+    local -r ranked_suffix=".pacnew"
     local ignored_mirrors=""
     local preferred_mirrors=""
     local reference_level=""
@@ -625,6 +659,8 @@ Main()
     local mirror_verbosity=""
     local use_local_mirrorlist=no
     local mirrorlist_only=no                  # 'no' provides rather verbose output, 'yes' provides only the essential list
+    local show_ranking_info=yes               # used only if $mirrorlist_only == yes
+    local show_original_list=yes              # used only if $mirrorlist_only == yes
     local added_mirror=""
     local internal_testing=no
     local test_all=no

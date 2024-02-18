@@ -45,6 +45,8 @@ _eos-rankmirrors_() {
         --timeout | -t)        COMPREPLY=($(compgen -P "$cur" -W "{0..9}")); compopt -o nospace; compopt -o nosort ;;
         --ignore | --prefer)   COMPREPLY=($(compgen -P "'" -S "'" -W "$(_eos-rankmirrors_GetMirrors)" -- "$cur")) ;;
         --mirror-verbosity)    COMPREPLY=($(compgen -W "all code show none" -- "$cur")) ;;
+        --show-rank-info | --show-orig-list)
+            COMPREPLY=($(compgen -W "yes no" -- "$cur")) ;;
         *)
                                case "$cur" in                     # Handle all top-level parameters.
                                    -* | "")
