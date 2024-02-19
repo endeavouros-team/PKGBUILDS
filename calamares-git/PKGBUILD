@@ -40,14 +40,9 @@ prepare() {
 
 build() {
     cmake -B build -S "${srcdir}/calamares" \
-    -DWEBVIEW_FORCE_WEBKIT=OFF \
     -DWITH_QT6=ON \
-    -DWITH_PYTHONQT=OFF \
-    -DWITH_KF5DBus=OFF \
-    -DWITH_APPSTREAM=OFF \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_INSTALL_LIBDIR=/usr/lib \
-    -DBoost_NO_BOOST_CMAKE=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DINSTALL_CONFIG=OFF \
     -DSKIP_MODULES="dracut \
