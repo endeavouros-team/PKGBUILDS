@@ -3,7 +3,8 @@
 
 pkgname=calamares-git
 _reponame=calamares
-release_name=$pkgname
+release_name=Gemini
+#release_name=$pkgname
 pkgver=11469.97ea0e6e0
 pkgrel=1
 pkgdesc="Calamares installer for EndeavourOS - Development version"
