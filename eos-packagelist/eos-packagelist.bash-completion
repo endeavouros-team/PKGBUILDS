@@ -4,8 +4,18 @@ _eos-packagelist_complete() {
     local IFS=$'\n'         # handles spaces in names!
     COMPREPLY=($(compgen -W "$1" -- "$cur"))
     [[ $COMPREPLY == *= ]] && compopt -o nospace
-    compopt -o filenames    # handles spaces in names!
     compopt -o nosort
+
+    # quote the selectable items but not flags
+    local item ix
+    local -r count=${#COMPREPLY[@]}
+    for ((ix=0; ix < count; ix++)) ; do
+        item="${COMPREPLY[$ix]}"
+        case "$item" in
+            -*) ;;
+            *) COMPREPLY[$ix]="'$item'" ;;
+        esac
+    done
 }
 
 _eos-packagelist_() 
