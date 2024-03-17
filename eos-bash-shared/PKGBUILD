@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=24.10
+pkgver=24.11
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -49,6 +49,7 @@ source=(
   $_url/ksetwallpaper.py
   $_url/ChangeDisplayResolution
   $_url/device-info
+  $_url/device-info.completion
   $_url/eos-connection-checker
   $_url/paccache-service-manager
   $_url/su-c_wrapper
@@ -92,7 +93,8 @@ sha512sums=('02dbe882396824d95bb417847571e08c79c31d0f6c27ffd39323ab0f54997aeb6aa
             'a67976cb1aab264585a671c9f773bce6a033b66acdfeaac34a62f61818fabb176cb3437b9a5e42f62e6b24c2b8d9bfec850eea4d3c8f8d56804a4d43495187ed'
             'e5f57f2800602b0f45e7875811a099ba2588e0d19486dd9bf47fa71013cd7eac1add3de924689188943002ef29bea2950cb3816a19c4a3e011833914d936f64d'
             'b8681cfe3be1882dfcabbc19bc5e86e12edc46e149704a91205dc00ca8d67add84477c7c6f2f7f11997fa01cdd7443aca56ec306712737cd9c60ede90b5ce3b9'
-            '4113f7329cc8611f9585bf6ac2baa3bc86f4c18c52e87c5ef516a301ee9f6a56c9da031328c15cbf5c284f49193b0703e07a043acdbe7d6279f8c5fd44dd62f7'
+            'ebe8e88bad18f88255827d2a757e58d0c1bc88ce4e11380a08889fcba16552f63549fb67876d3c5c161ec7479944d0fac2aa6a89f22a5e918c68c6e4ed980501'
+            'fca8d4defc3ba95e2a989d3252aeee34be19954c29bd262ae6d6f5468ed658e0f4c215fa592164bd373f73fd1b450f7df0a4bc14899a8803cdae5a75b82c721e'
             '7d7eeebe48ff31f8b478c60b695f3c0de78a8f1d6dec3e0015b0405d58b1d1230286819d43d488263f6db65303bd14377a44d76b64ddf597da1f214b5741bd8c'
             '2c7389589a0c817b7f153399eb7c9719e29e18b536d4483736998c7fc7861d273b01e4ed1c8d5dd47d0f274f53fffa1b7378c6b6e787f7320c6a961f92489427'
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
@@ -126,51 +128,18 @@ sha512sums=('02dbe882396824d95bb417847571e08c79c31d0f6c27ffd39323ab0f54997aeb6aa
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
 package() {
-  local hooks=$pkgdir/usr/share/libalpm/hooks
-  local bin=$pkgdir/usr/bin
-  local srv=$pkgdir/usr/lib/systemd/system
+  local file src
 
-  install -Dm644 eos-script-lib-yad             $pkgdir/usr/share/endeavouros/scripts/eos-script-lib-yad
-  install -Dm755 ksetwallpaper.py               $pkgdir/usr/share/endeavouros/scripts/ksetwallpaper.py
-  install -Dm644 eos-script-lib-yad.conf        $pkgdir/etc/eos-script-lib-yad.conf
-  install -Dm644 eos-sendlog.conf               $pkgdir/etc/eos-sendlog.conf
-  install -Dm644 eos-pacdiff.conf               $pkgdir/etc/eos-pacdiff.conf
-
-  install -Dm755 curl-exit-code-to-string       $bin/curl-exit-code-to-string
-  install -Dm755 show-location-info             $bin/show-location-info
-  install -Dm755 eos-FindAppIcon                $bin/eos-FindAppIcon
-  install -Dm755 eos-sendlog                    $bin/eos-sendlog
-  install -Dm755 eos-sendlog-helper             $bin/eos-sendlog-helper
-  install -Dm755 eos-kbd-set                    $bin/eos-kbd-set
-  install -Dm755 RunInTerminal                  $bin/RunInTerminal
-  install -Dm755 RunInTerminalOpt               $bin/RunInTerminalOpt
-  install -Dm755 RunInTerminalEx                $bin/RunInTerminalEx
-  install -Dm755 eos-sleep-counter              $bin/eos-sleep-counter
-  install -Dm755 ChangeDisplayResolution        $bin/ChangeDisplayResolution
-  install -Dm755 device-info                    $bin/device-info
-  install -Dm755 eos-connection-checker         $bin/eos-connection-checker
-  install -Dm755 paccache-service-manager       $bin/paccache-service-manager
-  install -Dm755 su-c_wrapper                   $bin/su-c_wrapper
-  install -Dm755 eos-run-cmd-with-su            $bin/eos-run-cmd-with-su
-  install -Dm755 eos-wallpaper-set              $bin/eos-wallpaper-set
-  install -Dm755 eos-update                     $bin/eos-update
-  install -Dm755 eos-update-extras              $bin/eos-update-extras
-  install -Dm755 eos-waiting-indicator          $bin/eos-waiting-indicator
-  install -Dm755 eos-download-wallpapers        $bin/eos-download-wallpapers
-  install -Dm755 eos-pacdiff                    $bin/eos-pacdiff
-  install -Dm755 pkg-name-components            $bin/pkg-name-components
-  install -Dm755 eos-kernel-nvidia-update-check $bin/eos-kernel-nvidia-update-check
-  install -Dm755 eos-shifttime                  $bin/eos-shifttime
-  install -Dm755 eos-github2gitlab              $bin/eos-github2gitlab
-  install -Dm755 eos-select-file-server         $bin/eos-select-file-server
-  install -Dm755 grub-colour-chooser            $bin/grub-colour-chooser
-
-  install -Dm755 eos-reboot-required2           $bin/eos-reboot-required2
-  install -Dm755 eos-reboot-required3           $bin/eos-reboot-required3
-  install -Dm644 eos-reboot-required.hook       $hooks/eos-reboot-required.hook
-  install -Dm644 eos-reboot-required.timer      $srv/eos-reboot-required.timer
-  install -Dm644 eos-reboot-required.service    $srv/eos-reboot-required.service
-
-  install -Dm644 eos-update.desktop             $pkgdir/usr/share/applications/eos-update.desktop
-  install -Dm644 eos-update.completion          $pkgdir/usr/share/bash-completion/completions/eos-update
+  for src in "${source[@]}" ; do
+      file="${src##*/}"
+      case "$file" in
+          eos-script-lib-yad | ksetwallpaper.py)    install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
+          *.conf)                                   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+          *.desktop)                                install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
+          *.completion)                             install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
+          *.hook)                                   install -Dm644 "$file"   "$pkgdir/usr/share/libalpm/hooks/$file" ;;
+          *.timer | *.service)                      install -Dm644 "$file"   "$pkgdir/usr/lib/systemd/system/$file" ;;
+          *)                                        install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
+      esac
+  done
 }
