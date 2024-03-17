@@ -26,18 +26,12 @@ DIE()  { MsgForce Error: "$@" ; exit 1 ; }
 
 IsInstalled() {
     local pkg="$1"
-    case "$(echo "$all_installed_packages" | grep "^$pkg$")" in
-        "") return 1 ;;  # not installed
-        *)  return 0 ;;  # is installed
-    esac
+    echo "$all_installed_packages" | grep "^$pkg$" >/dev/null
 }
 
 IsRepoPkg() {
     local pkg="$1"
-    case "$(echo "$repopkgs" | grep "^$pkg$")" in
-        "") return 1 ;;
-        *)  return 0 ;;
-    esac
+    echo "$repopkgs" | grep "^$pkg$" >/dev/null
 }
 
 PkgInstall() {
@@ -56,7 +50,83 @@ PkgRemove() {
     done
 }
 
+CheckUnsupportedKernels() {
+    local unsupported_kernels="$(expac -Qs %n linux headers | grep -P 'rt-|hardened-|zen-' | sed 's|-headers||')"
+    [ "$unsupported_kernels" ] && Warn "unsupported kernels installed: $unsupported_kernels"
+}
+
+AdjustPkgsAboutDkms() {
+    # check if dkms or non-dkms packages need to be installed/removed
+    local pkg ix ic=${#install[@]} rc=${#remove[@]}
+    local adjusted=()
+
+    case "$dkms" in
+        no)
+            # This far all was done in favor of dkms packages. Now change dkms stuff to non-dkms.
+
+            for ((ix=0; ix<ic; ix++)) ; do
+                pkg="${install[$ix]}"
+                case "$pkg" in
+                    nvidia-dkms)
+                        # Info "Changing $pkg to nvidia and nvidia-lts"
+                        adjusted+=(nvidia nvidia-lts)    # no need to check installed kernels?
+                        CheckUnsupportedKernels
+                        ;;
+                    nvidia-open-dkms)
+                        # Info "Changing $pkg to nvidia-open"
+                        adjusted+=(nvidia-open)
+                        CheckUnsupportedKernels
+                        ;;
+                    bbswitch-dkms)
+                        # Info "Changing $pkg to bbswitch"
+                        adjusted+=(bbswitch)
+                        ;;
+                    nvidia-beta-dkms)
+                        DIE "AUR package $pkg not supported"
+                        ;;
+                    *)
+                        adjusted+=("$pkg")
+                        ;;
+                esac
+            done
+            if [ ${#adjusted[@]} -gt 0 ] ; then
+                install=("${adjusted[@]}")
+            fi
+
+            adjusted=()
+
+            for ((ix=0; ix<rc; ix++)) ; do
+                pkg="${remove[$ix]}"
+                case "$pkg" in
+                    nvidia-dkms)
+                        # Info "Changing $pkg to nvidia and nvidia-lts"
+                        adjusted+=(nvidia nvidia-lts)    # no need to check installed kernels?
+                        # CheckUnsupportedKernels
+                        ;;
+                    nvidia-open-dkms)
+                        # Info "Changing $pkg to nvidia-open"
+                        adjusted+=(nvidia-open)
+                        # CheckUnsupportedKernels
+                        ;;
+                    bbswitch-dkms)
+                        # Info "Changing $pkg to bbswitch"
+                        adjusted+=(bbswitch)
+                        ;;
+                    *)
+                        adjusted+=("$pkg")
+                        ;;
+                esac
+            done
+            if [ ${#adjusted[@]} -gt 0 ] ; then
+                remove=("${adjusted[@]}")
+            fi
+            ;;
+    esac
+}
+
 KeepsAndRemoves() {
+    AdjustPkgsAboutDkms
+
     # remove pr_nvidia[] except install[]
 
     local rp kp
@@ -284,7 +354,7 @@ Options() {
     local opts
     local sopts="bfhnopqtv"
     local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries"
-    lopts+=",nouveau,open,prime,quiet,series:,test,version,id:"
+    lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -295,6 +365,8 @@ Options() {
 
     while true ; do
         case "$1" in
+            --no-dkms)          dkms=no ;;
+
             -b | --bumblebee)   mode=bumblebee ;;
             -n | --nouveau)     mode=nouveau ;;
             -p | --prime)       mode=prime ;;
@@ -350,10 +422,11 @@ Options:
   -v, --version           Show version of this software.
   --32                    Install also support for 32-bit apps.
   --conf                  Create also file $conf_file (might be needed on some older systems).
+  --no-dkms               Install only non-dkms packages (e.g. 'nvidia' instead of 'nvidia-dkms').
   --drivers               Show supported NVIDIA driver series number for your card.
   --listseries            List Nvidia driver versions supported by $progname.
   --ignore                Ignore all errors (useful for testing only).
-  --series                (Advanced) Use the given Nvidia driver version (for testing).
+  --series=X              (Advanced) Use the given Nvidia driver version X (for testing).
   --listopts              List options supported by $progname.
   --legacyrepo            (*1) Adds a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
 
@@ -361,8 +434,9 @@ Options:
      Instead, 'yay' can be used for installing legacy Nvidia drivers from the AUR.
 
 Notes:
-  1. Package nvidia-dkms will be selected for install if none of options
+  1. By default, dkms packages are favored and will be selected for install if none of the options
        --bumblebee
+       --no-dkms
        --nouveau
        --open
      is used.
@@ -555,6 +629,7 @@ Main()
     local bit32=no
     local ignore_errors=no
     local series=""
+    local dkms=yes                                          # yes or no
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local PROGVERSION=""
     local pr_nvidia=()
