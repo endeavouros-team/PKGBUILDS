@@ -9,7 +9,7 @@ optdepends=('konsole' 'gnome-terminal' 'xfce4-terminal' 'xterm' 'alacritty' 'lxt
 makedepends=('git' 'cmake' 'qt6-tools')
 backup=(etc/eos-quickstart.conf)
 source=(https://github.com/endeavouros-team/eos-quickstart/archive/refs/tags/${pkgver}.tar.gz)
-sha256sums=('039ab9bbf92871fe04b9912e517ec28db3a6934ba69050fe06d69d5eb09cadc2')
+sha256sums=('c68841ff998bb83b2f7422607a21fbf1cb34541c247eb7499c5fbff5112daf28')
 
 build() {
     cd "$srcdir/$pkgname-$pkgver"
