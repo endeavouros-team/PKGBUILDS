@@ -3,12 +3,11 @@
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
 pkgver=24.5.1
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
     systemd eos-bash-shared eos-translations
-    eos-quickstart
     eos-qogir-icons
 )
 optdepends=(
@@ -18,6 +17,7 @@ optdepends=(
   'meld: alternative app for pacdiff to use'
   'diffuse: alternative app for pacdiff to use'
   'vim: alternative app for pacdiff to use'
+  'eos-quickstart: quick start with installing apps'
 )
 
 # url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
