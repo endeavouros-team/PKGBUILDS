@@ -2,7 +2,7 @@
 # Contributor: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-plasma
-pkgver=1.6
+pkgver=1.7
 pkgrel=1
 pkgdesc="Plasma settings and theme for EndeavourOS"
 arch=('any')
@@ -10,7 +10,7 @@ url="https://github.com/endeavouros-team/$pkgname"
 license=('GPL3')
 depends=('plasma-workspace' 'endeavouros-theming')
 source=("$pkgname-$pkgver.tar.gz::$url//archive/refs/tags/$pkgver.tar.gz")
-sha256sums=('6fe393a2b7077435f4e9980d1443ad2d172ea3eeeb1ab6cecb64a4e273ed84ca')
+sha256sums=('dad9cc7a33c5a34ba391955ee7700c05ea2aa9eb6f1f6bb3e496ab360d0ed77b')
 
 package() {
 	cp -r "${srcdir}/${pkgname}-${pkgver}"/{usr,etc} "${pkgdir}/."
