@@ -12,5 +12,5 @@ Date | Description
 2021-Apr-07 | Initial implementation.
 
 ## See also
-[upstream yad package](https://archlinux.org/packages/community/x86_64/yad)<br>
+[upstream yad package](https://archlinux.org/packages/extra/x86_64/yad)<br>
 [yad source code](https://github.com/v1cont/yad)
