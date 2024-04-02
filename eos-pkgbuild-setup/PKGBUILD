@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 pkgdesc="Environment setup and tools for building EOS packages."
 pkgver=2024    # new numbering! Previous was: 2022.12.25
-pkgrel=13
+pkgrel=14
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/$pkgname"
@@ -25,6 +25,7 @@ source=(
     $_url/add-release-assets.completion
     $_url/archive-sync-to-remote
     $_url/assets.make
+    $_url/assets.make.completion
     $_url/delete-release-assets
     $_url/download-release-assets
     $_url/eos-mirrorcheck.conf
@@ -42,7 +43,8 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
             '3950692edc327196375f11bb31363333bb767918f92cb32037704d4e74ebb8772e5e4c24397db9c8973e65e01eb1f82b53c4f55268789679ec4d3e017371c0cb'
-            '1168f3e819c6f3599fb7abf0f8171acef9a1a09ef603f691718d2acf0867f0bf35b08a33710f84c55643c54283a41ea17be1cdeaa045234a229470e5d920885c'
+            'ea755c4503870e78d440b29991efa1fb8c5210d60b5cbe510c8b371aa1329b8be566bc4d83f0d84e7c4e783e5347b616e0b5fcf5853bc144473167b6408a8867'
+            '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
             '2be041304f33d20e54b0d843e1905d393ab4552367b435039989ad94dab64a230f0cf288b00213e60f2bc69e4b36a6cb6894522ac79add56d8eff86c6852c11c'
@@ -56,13 +58,40 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7')
 
 package() {
+    if true ; then
+
+    local src file
+
+    echo "${pkgver}-$pkgrel" > "$pkgname.version"
+
+    for src in "${source[@]}" ; do
+        file="${src##*/}"
+        case "$file" in
+            PackageFunc)               install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
+            *.completion)              install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
+            *.conf | *.version)        install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+            local-general-setup)       install -Dm755 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
+            githubcheck | mirrorcheck) install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
+            *)                         install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
+        esac
+    done
+
+    # Make some symlinks. Here they help with the *tag* for the assets.
+    for file in delete-release-assets download-release-assets release-asset-names ; do
+        ln -s add-release-assets   "$pkgdir/usr/share/bash-completion/completions/$file"
+    done
+
+    else
+
+    ln -s add-release-assets                     "$_bash_completion/delete-release-assets"       helps with the tag
+    ln -s add-release-assets                     "$_bash_completion/release-asset-names"         helps with the tag
+    ln -s add-release-assets                     "$_bash_completion/download-release-assets"     helps with the tag
+
     local -r _scripts="$pkgdir/usr/share/endeavouros/scripts"
     local -r _usr_bin="$pkgdir/usr/bin"
     local -r _usr_local_bin="$pkgdir/usr/local/bin"
     local -r _etc="$pkgdir/etc"
     local -r _bash_completion="$pkgdir/usr/share/bash-completion/completions"
-
-    echo "VERSION=${pkgver}-$pkgrel" > "$pkgname.version"
 
     install -Dm644 "$pkgname.version"          "$_scripts/$pkgname.version"
     install -Dm644 PackageFunc                 "$_scripts/PackageFunc"
@@ -84,10 +113,10 @@ package() {
     install -Dm644 eos-pkgbuild-setup.conf     "$_etc/eos-pkgbuild-setup.conf"
     install -Dm644 eos-pkgbuild-setup-general.conf "$_etc/eos-pkgbuild-setup-general.conf"
 
-    # common completions
+     common completions
+    install -Dm644 assets.make.completion        "$_bash_completion/$pkgname"
     install -Dm644 mirrorcheck.completion        "$_bash_completion/mirrorcheck"
     install -Dm644 add-release-assets.completion "$_bash_completion/add-release-assets"
-    ln -s add-release-assets                     "$_bash_completion/delete-release-assets"      # helps with the tag
-    ln -s add-release-assets                     "$_bash_completion/release-asset-names"        # helps with the tag
-    ln -s add-release-assets                     "$_bash_completion/download-release-assets"    # helps with the tag
+
+    fi
 }
