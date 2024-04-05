@@ -2,12 +2,13 @@
 
 pkgname=nvidia-hook
 pkgver=1.5
-pkgrel=1
+pkgrel=2
 pkgdesc='pacman hook for nvidia'
 arch=('any')
 license=('GPL3')
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
+depends=(expac)
 
 source=(
   $_url/eos-nvidia-fix
