@@ -33,12 +33,6 @@ export -f eos_yad_DIE
 export -f eos_yad_WARN
 #######################################################################
 
-AssignIconVariables_in_eos_bash_shared                                  # get common icons
-
-ICO_UPDATE_AVAILABLE=$(eos_icon_path apps software-update-available)    # app specific icons
-
-# ICO_UPDATE_AVAILABLE=/usr/share/icons/Qogir/scalable/apps/software-update-available.svg
-
 eos_un_log() {
     local date="$(/usr/bin/date '+%x %X')"
     echo ""       >> $EOS_UPDATE_NOTIFIER_LOG
@@ -397,8 +391,6 @@ Main2() {
 
     [ -n "$AurUpdaterProg" ] || AurUpdaterProg=yay
 
-    [ -r $EOS_UPDATE_NOTIFIER_CONF ] && source $EOS_UPDATE_NOTIFIER_CONF
-
     CheckTimeoutVal UN_NotifyTimeout
     CheckTimeoutVal UN_NotifyTrayTimeout
 
@@ -739,6 +731,16 @@ Main()
     export EOS_UPDATE_NOTIFIER_LOG=$(mktemp /tmp/$progname.log.XXXXXXXX)
 
     DevLog "main loop starting"
+
+    [ -r $EOS_UPDATE_NOTIFIER_CONF ] && source $EOS_UPDATE_NOTIFIER_CONF
+
+    AssignIconVariables_in_eos_bash_shared                                  # get common icons
+
+    # ICO_UPDATE_AVAILABLE=$(eos_icon_path apps software-update-available)    # app specific icons
+    case "$UpdateNotifyIcon" in
+        /*) ICO_UPDATE_AVAILABLE="$UpdateNotifyIcon" ;;                        # ICO_UPDATE_AVAILABLE=/usr/share/icons/Qogir/scalable/apps/software-update-available.svg
+        *)  ICO_UPDATE_AVAILABLE=$(eos_icon_path apps "$UpdateNotifyIcon") ;;
+    esac
 
     for arg in "$@" ; do
         case "$arg" in
