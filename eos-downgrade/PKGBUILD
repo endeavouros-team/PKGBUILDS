@@ -1,9 +1,9 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-downgrade
-pkgdesc="Downwgrade EndeavourOS packages (currently alpha quality)."
+pkgdesc="Downgrade EndeavourOS packages (currently beta quality)."
 pkgver=0.4
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
