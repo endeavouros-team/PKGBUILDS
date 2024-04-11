@@ -2,7 +2,7 @@
 
 pkgname=eos-hooks
 pkgver=1.15
-pkgrel=1
+pkgrel=2
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
 license=('GPL3')
@@ -17,10 +17,6 @@ source=(
   $_url/${pkgname}.hook
   $_url/${pkgname}-runner
 )
-#source+=(  # Planned to be removed near the end of year 2023:
-#  $_url/eos-repo-before-arch-repos
-#  $_url/eos-repo-before-arch-repos.hook
-#)
 
 sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c494256e872cacd3c5ebe08d4f73bc96517c52d227808c5bcfbf89284094c72'
             '20568a779c4ec34e9a79559a125efb1a85aacde8474df4ab9c5f766b6eb7a6b5848c049387f78306ad844e7571cf8a22afc89e6aab18c47b5be419e3d0e4e2e7'
@@ -36,8 +32,4 @@ package() {
   install -Dm644 ${pkgname}.hook           $hooks/${pkgname}.hook
 
   install -Dm755 ${pkgname}-runner         $bin/${pkgname}-runner
-
-  # Planned to be removed near the end of year 2023:
-  #install -Dm755 eos-repo-before-arch-repos      $pkgdir/usr/bin/eos-repo-before-arch-repos
-  #install -Dm644 eos-repo-before-arch-repos.hook $pkgdir/usr/share/libalpm/hooks/eos-repo-before-arch-repos.hook
 }
