@@ -223,7 +223,7 @@ Update_common() {
         [ "$ShowArchNewsPage" = "yes" ] && OpenWebPage https://archlinux.org/news
         local retvalue=0
         local tmpfile=$(mktemp)
-        eos-kernel-nvidia-update-check $(echo "$updates" | tail -n +3 | awk '{print $1}') 2> $tmpfile || {
+        eos-kernel-nvidia-update-check --no-color $(echo "$updates" | tail -n +3 | awk '{print $1}') 2> $tmpfile || {
             cat $tmpfile | eos_yad_problem "Warning" --text="Update conflict detected. Do you want to continue (not recommended)?" \
                                            --width=800 --height=300 \
                                            --button=' Continue!$ICO_OPERATION_TEST!Ignore this warning and continue':2
