@@ -12,7 +12,7 @@ arch=('any')
 url="https://github.com/endeavouros-team/calamares"
 license=('GPL3')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
-conflicts=('calamares_current')
+conflicts=('calamares')
 depends=( 'qt6-svg' 'qt6-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
 'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'pybind11' 'cryptsetup' 'doxygen' 'dmidecode' \
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt6' 'python' 'solid' 'qt6-tools' 'libpwquality' 'ckbcomp' 'qt6-declarative' )
