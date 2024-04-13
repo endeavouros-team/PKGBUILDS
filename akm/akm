@@ -2,9 +2,8 @@
 
 Line2()   { echo "$@" >&2 ; }
 Printf2() { printf "$@" >&2 ; }
+Verbose2() { [ $quiet = no ] && Line2 "$@"; }
 
-# use monospace (non-proportional) fonts!
-#FormatVersion()     { printf "%s<tt>  </tt>" "$1" ; }
 FormatVersion()     { printf "%s%s  " "$1" "$2" ; }
 FormatName()        { FormatVersion "$1" ; }
 
@@ -54,7 +53,7 @@ Installed() {
         linux*) ;;
         *) DIE "Internal error, cannot determine the running kernel." ;;
     esac
-    local running=$(expac -Q %v $kernel)     # $(pacman -Q $kernel | awk '{print $2}')
+    local running=$(expac -Q %v $kernel)
     local ind1 ind2
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. The currently running kernel is in <i>italics</i>. A <b>bolded</b> string means the latest K.o. version.":LBL "")
     for xx in "${kernels[@]}" ; do
@@ -75,28 +74,31 @@ Installed() {
     done
 }
 
-StableVersion() {
-    local pkg="$1"
-    local repo=""
+StableVersions() {
+    local pkg pkgs=()
 
-    # prevent usage of the '*-testing' repos:
-    case "$pkg" in
-        linux | linux-headers | linux-lts | linux-lts-headers)
-            pkg="core/$pkg" ;;
-        linux-zen | linux-zen-headers | linux-hardened | linux-hardened-headers | linux-rt | linux-rt-headers | linux-rt-lts | linux-rt-lts-headers)
-            pkg="extra/$pkg" ;;
-    esac
-    expac -S %v "$pkg"
+    for pkg in "${kernels[@]}" ; do
+        # prevent usage of the '*-testing' repos:
+        case "$pkg" in
+            linux | linux-headers | linux-lts | linux-lts-headers)
+                pkgs=("core/$pkg") ;;
+            linux-zen | linux-zen-headers | linux-hardened | linux-hardened-headers | linux-rt | linux-rt-headers | linux-rt-lts | linux-rt-lts-headers)
+                pkgs=("extra/$pkg") ;;
+        esac
+    done
+    readarray -t versions <<< $(expac -S %v "${pkgs[@]}")
 }
 
 Stable() {
-    local version xx in_use=""
+    local version in_use=""
     if [ "$FUNCNAME" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the stable repos$in_use":LBL "")
-    for xx in "${kernels[@]}" ; do
-        version="$(StableVersion "$xx")"
+    local versions=() ix=0
+    StableVersions
+    for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
+        version="${versions[$ix]}"
         cmd+=(--field="${smallBegin}$(FormatVersion "$version")${smallEnd}":LBL "")
     done
 }
@@ -114,14 +116,18 @@ TestingVersion() {
     fi
 }
 
+UNAVAILABLE() { DIE "$1 is currently unavailable${2}!" ; }
+
 Testing() {
     local in_use=""
     if [ "$FUNCNAME" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
     local URL="https://archlinux.org/packages/?repo=Core-Testing&q=linux+kernel+and+modules"
-    local testinginfo="$(/usr/bin/curl -s $URL_timeout $URL)"
+    local testinginfo
     local version xx
+
+    testinginfo="$(/usr/bin/curl --fail -Ls $URL_timeout $URL)" || UNAVAILABLE "${URL%%/packages*}"
 
     [ -n "$testinginfo" ] || DIE "Fetching info from https://archlinux.org failed!"
 
@@ -219,8 +225,6 @@ CommonStuff() {
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
     AssignIconVariables_in_eos_bash_shared
-
-    curl --silent --connect-timeout 8 https://archlinux.org >/dev/null || DIE "Sorry, archlinux site is unavailable!"
 }
 
 AkmConfig() {
@@ -233,12 +237,15 @@ AkmConfig() {
         [ -n "$AKM_WINDOW_WIDTH" ]          && akm_window_width=$AKM_WINDOW_WIDTH
         [ -n "$AKM_PREFER_SMALL_WINDOW" ]   && small_font=$AKM_PREFER_SMALL_WINDOW
 
-        Line2 "==> Config file $conf read."
+        Options "$@"
+        Verbose2 "==> Config file $conf read."
+    else
+        Options "$@"
     fi
 }
 
 DIE() {
-    eos_yad --form --width=400 --title="AKM failure" --image=$ICO_ERROR --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="AKM message" --image=$ICO_ERROR --text="$1" --button=yad-quit
     exit 1
 }
 
@@ -262,8 +269,10 @@ Options() {
     for arg in "$@" ; do
         case "$arg" in
             --connect-header) connect_header_with_kernel=yes ;;
+            --no-progress) progress=no ;;
             --scroll) scroll=yes ;;
             --small) small_font=yes ;;
+            -q | --quiet) quiet=yes ;;
             -h | --help)
                 cat <<EOF >&2
 Usage: $progname [options]
@@ -271,6 +280,8 @@ options:
     --connect-header      Make kernel and header package go together at install or uninstall.
     --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
     --small               Make the akm window smaller, meant for helping with small displays at 1366x768 resolution.
+    --quiet | -q          Be less verbose.
+    --no-progress         Don't show the progress window.
     --help | -h           This help.
 EOF
                 exit 0
@@ -305,7 +316,7 @@ AvailableKernelsAndHeaders() {
 
     # Get kernel names from header names and display them all
     for header in $headers ; do
-        kernel=$(echo "$header" | sed 's|-headers$||')
+        kernel=${header%-headers}
         echo "$kernel $header"
     done
 
@@ -323,53 +334,16 @@ Changelog() {
 }
 export -f Changelog
 
-FindNewRepoLineNumber() {
-    local linenr="$(grep -n '^# An example of ' /etc/pacman.conf | cut -d':' -f1)"
-    if [ -n "$linenr" ] ; then
-        ((linenr = linenr - 1))
-    else
-        linenr="$(grep -n '^\[endeavouros\]' /etc/pacman.conf | cut -d':' -f1)"
-        if [ -n "$linenr" ] ; then
-            ((linenr = linenr + 3))
-        else
-            linenr=1
-        fi
-    fi
-    echo "$linenr"
-}
-
-PacmanConfEditor() {
-    local linenr="$1"
-    local editor="$(EosSudoEditor)"
-    local ed1="${editor%% *}"
-
-    case "$ed1" in
-        emacs|vim|nano|rnano | /usr/bin/emacs|/usr/bin/vim|/usr/bin/nano|/usr/bin/rnano)
-            echo "$editor +$linenr"
-            ;;
-        *)
-            echo "$editor"
-            ;;
-    esac
-}
-
-ShowTimePoint() {    # just debugging stuff
-    case "$1" in
-        "") printf "%s: "    "${BASH_LINENO[0]}" >&2 ;;
-        *)  printf "%s (after %s): " "${BASH_LINENO[0]}" "$1" >&2 ;;
-    esac
-    date +%S.%N >&2
-}
-
 RepoType() {
-    grep "^\[core-testing\]$" /etc/pacman.conf >/dev/null && echo "Testing" || echo "Stable"   # tests only one of the testing repos...
+    pacman-conf --repo-list | grep "\-testing$" >/dev/null && echo "Testing" || echo "Stable"
 }
 
 Main() {
     local progname="${0##*/}"
+    local quiet=no
 
     CommonStuff                   # fetches common bash definitions
-    _bg_or_bashdb Main2 "$@"
+    Main2 "$@"
 }
 
 Main2() {
@@ -385,26 +359,17 @@ Main2() {
     local smallEnd=""
     local nrofkernelitems                  # 8 with only upstream kernels
     local RepoType=$(RepoType)
+    local progress=yes
 
-    AkmConfig
-    Options "$@"
+    AkmConfig "$@"
 
     if [ "$small_font" = "yes" ] ; then
         smallBegin="<small>"
         smallEnd="</small>"
     fi
 
-    Line2 "==> Info: detecting available kernel packages."
+    Verbose2 "==> Info: detecting available kernel packages."
     kernels=( $(AvailableKernelsAndHeaders) )
-
-    #kernels=(
-    #    linux             linux-headers
-    #    linux-lts         linux-lts-headers
-    #    linux-zen         linux-zen-headers
-    #    linux-hardened    linux-hardened-headers
-    #    linux-rt          linux-rt-headers
-    #    linux-rt-lts      linux-rt-lts-headers
-    #)
 
     local functions=(  # order is important!
         Choose
@@ -418,8 +383,6 @@ Main2() {
 
     nrofkernelitems=${#kernels[@]}
     [ $nrofkernelitems -gt 8 ] && scroll=yes
-
-    # Line2 "connect_header_with_kernel = $connect_header_with_kernel"
 
     local URL_timeout="--max-time 30"                      # used for all curl calls here
 
@@ -454,18 +417,8 @@ Main2() {
     fi
     t1+="Your currently used repo (Stable or Testing) is printed in italics (see also /etc/pacman.conf).\n"
     t1+="Marking <b>$na</b> means: info not available.\n\n"
-    if [ "$connect_header_with_kernel" = "yes" ] ; then
-        :
-        # t1+="\nYou have configured the header to install/uninstall along with the kernel.\n"
-        # t1+="If a chosen kernel setting below contradicts its header setting, the kernel setting is used for header, too.\n"
-    else
-        :
-        # t1+="\nYou have configured the header and kernel to install/uninstall separately (default behavior).\n"
-    fi
     t1+="See file <tt>/etc/akm.conf</tt> for configuration details.\n"
     t1+="$smallEnd"
-    local linenr="$(FindNewRepoLineNumber)"
-    # local editor="$(PacmanConfEditor $linenr)"
 
     local cmd=(
         eos_yad
@@ -475,7 +428,6 @@ Main2() {
         --text="$t1"
         --image=$ICO_UPDATE
         --button=" ${smallBegin}Changelog${smallEnd}!applications-development!Show latest changes of this program":"Changelog"
-        # --button=" Edit /etc/pacman.conf!!Add or remove repositories in /etc/pacman.conf":"RunInTerminalEx $EOS_ROOTER '$editor /etc/pacman.conf'"
         --button=" ${smallBegin}Help${smallEnd}!help-contents!Helps to use $progname":"Manual"
         --button=" ${smallBegin}Cancel${smallEnd}!gtk-cancel!Change nothing":1
         --button=" ${smallBegin}Execute${smallEnd}!system-run!Make your changes":0
@@ -497,29 +449,22 @@ Main2() {
     local cmdfile="$(mktemp $HOME/.cache/akm.tmp.XXXXX)"    # will gather the whole value of 'cmd' into this file (used due to the progress window)
 
     if [ -z "$kernelorg" ] ; then
-        kernelorg="$(/usr/bin/curl -s $URL_timeout $URL)"    
+        local errcode=0
+        kernelorg="$(/usr/bin/curl --fail -Ls $URL_timeout $URL)" || errcode=$?
+        case $errcode in
+            0) ;;
+            *) eos-connection-checker || DIE "Network access required.\nPlease check the internet connection." && UNAVAILABLE "$URL" ;;
+        esac
         test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
     fi
 
-    {
-        local func1
-        for func1 in "${functions[@]}" ; do
-            $func1 || DIE "Function '$func1' failed.\n"     # run each function to add stuff to the '$cmd'
-
-            val="$(( ix < count ? ix*100/count : 99 ))"     # progress window stuff
-            ((ix++))
-            printf "#%s\n%s\n" "$func1" "$val"
-        done
-        printf "%s\n" "${cmd[@]}" > "$cmdfile"              # now print the gathered value of 'cmd' into $cmdfile
-        printf "#===> Done.\n100\n"                         # stop the progress window
-    } | "${progress_cmd[@]}"
-
-    readarray -t cmd <<< $(cat "$cmdfile")                  # now get the full 'cmd' from the file
-    rm -f "$cmdfile"
+    RunWithProgressOrNot
     
     local installed install=() uninstall=() pkg partner result result1="" retval
+
     result="$("${cmd[@]}")"
     retval=$?
+
     [ $retval -ne 0 ] && return
     test -z "$result" && return
 
@@ -590,12 +535,6 @@ Main2() {
     test -n "$uninstall" && cmd+=($pacman -Rsn ${uninstall[*]} ";")
     test -n "$install"   && cmd+=($pacman -S ${install[*]} ";")
 
-    if [ 0 -eq 1 ] ; then
-        Line2 "uninstall = ${uninstall[*]}"
-        Line2 "install   = ${install[*]}"
-        return
-    fi
-
     if [ -n "$cmd" ] ; then
         case "$pacman" in
             yay | paru | /usr/bin/yay | /usr/bin/paru)
@@ -606,6 +545,33 @@ Main2() {
                 ;;
         esac
     fi
+}
+
+RunWithProgressOrNot() {
+    local func1
+
+    case "$progress" in
+        no)
+            for func1 in "${functions[@]}" ; do
+                $func1 || DIE "Function '$func1' failed.\n"     # run each function to add stuff to the '$cmd'
+            done
+            ;;
+        yes)
+            {
+                for func1 in "${functions[@]}" ; do
+                    $func1 || DIE "Function '$func1' failed.\n"     # run each function to add stuff to the '$cmd'
+                    val="$(( ix < count ? ix*100/count : 99 ))"     # progress window stuff
+                    ((ix++))
+                    printf "#%s\n%s\n" "$func1" "$val"
+                done
+                printf "%s\n" "${cmd[@]}" > "$cmdfile"              # now print the gathered value of 'cmd' into $cmdfile
+                printf "#===> Done.\n100\n"                         # stop the progress window
+            } | "${progress_cmd[@]}"
+
+            readarray -t cmd <<< $(cat "$cmdfile")                  # now get the full 'cmd' from the file
+            rm -f "$cmdfile"
+            ;;
+    esac
 }
 
 Main "$@"
