@@ -308,7 +308,7 @@ ForeignPkgInfo() {
 NativePkgInfo() {
     if [ -x /usr/bin/expac ] ; then
         # expac is much faster
-        expac -Q "%n$separator%v$separator%d" | Columnize
+        expac -Q "%n$separator%v" | Columnize
     else
         local data
         readarray -t data <<< $(LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
