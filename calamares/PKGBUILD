@@ -3,8 +3,8 @@
 # Calamares installer (fork) configured for EndeavourOS
 
 pkgname=calamares
-pkgver=24.04.1.1
-pkgrel=2
+pkgver=24.04.1.2
+pkgrel=1
 release_name="Gemini"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('a4e1add830b46b05763f81e629d14262d36790f2c2f77cca9aeed75893c33d32')
+sha256sums=('6edfba67f826c71db47a34087160aff5e288a2990b80f9dabf397ef52eb31ab7')
 
 prepare() {
     # Update branding.desc with the proper values
