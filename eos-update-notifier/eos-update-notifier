@@ -2,16 +2,6 @@
 #
 # EOS update notifier for the current user.
 #
-# The package includes the following files:
-#     eos-update-notifier             (this file)
-#     eos-update-notifier.conf        (configuration file)
-#     eos-update-notifier.desktop     (initializes the systemd service for the current user)
-#     eos-update-notifier.service     (systemd service)
-#     eos-update-notifier.timer       (systemd timer)
-#     /tmp/eos-update-notifier.log.*  (temporary log file, re-created at every invocation)
-#     arch-news-for-you               (show Arch news relevant for you)
-#     eos-arch-news                   (show Arch news; showing is based on date only)
-#
 
 #######################################################################
 EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
@@ -188,17 +178,6 @@ GetUpdateCount() {
     fi
 }
 
-OpenWebPage() {
-    local app
-    for app in /bin/kde-open /bin/xdg-open /bin/exo-open ; do
-        if [ -x $app ] ; then
-            $app "$1"
-            return 0
-        fi
-    done
-    eos_yad_DIE "sorry, cannot open web page '$1'"
-}
-
 Update_common() {
     # Check upstream updates first.
 
@@ -220,21 +199,22 @@ Update_common() {
     GetUpdateCount
 
     if [ -n "$updates" ] ; then
-        [ "$ShowArchNewsPage" = "yes" ] && OpenWebPage https://archlinux.org/news
-        local retvalue=0
-        local tmpfile=$(mktemp)
-        eos-kernel-nvidia-update-check --no-color $(echo "$updates" | tail -n +3 | awk '{print $1}') 2> $tmpfile || {
-            cat $tmpfile | eos_yad_problem "Warning" --text="Update conflict detected. Do you want to continue (not recommended)?" \
-                                           --width=800 --height=300 \
-                                           --button=' Continue!$ICO_OPERATION_TEST!Ignore this warning and continue':2
-            retvalue=$?
-            case "$retvalue" in
-                0) retvalue=1 ;;    # eos_yad_problem returns 0 when quitting!
-                *) retvalue=0 ;;    # the above code returns 2 when continuing
-            esac
-        }
-        rm -f $tmpfile
-        [ $retvalue -ne 0 ] && exit 1
+        if lsmod | grep -w ^nvidia >/dev/null ; then
+            local retvalue=0
+            local tmpfile=$(mktemp)
+            eos-kernel-nvidia-update-check --no-color $(echo "$updates" | tail -n +3 | awk '{print $1}') 2> $tmpfile || {
+                cat $tmpfile | eos_yad_problem "Warning" --text="Update conflict detected. Do you want to continue (not recommended)?" \
+                                               --width=800 --height=300 \
+                                               --button=' Continue!$ICO_OPERATION_TEST!Ignore this warning and continue':2
+                retvalue=$?
+                case "$retvalue" in
+                    0) retvalue=1 ;;    # eos_yad_problem returns 0 when quitting!
+                    *) retvalue=0 ;;    # the above code returns 2 when continuing
+                esac
+            }
+            rm -f $tmpfile
+            [ $retvalue -ne 0 ] && exit 1
+        fi
 
         if [ $update_focused -eq 0 ] ; then
             SystemLockActive b || return
@@ -322,40 +302,6 @@ Update_common() {
     fi
 }
 
-CheckArchNews() {
-    if [ "$AllowNewsCheckWhileUpdating" = "no" ] ; then
-        test -e $system_lockfile && return
-    fi
-
-    test -n "$CheckArchNewsForYou" || CheckArchNewsForYou=yes
-    test -n "$ArchNewsProg"        || ArchNewsProg=arch-news-for-you          # original default
-
-    if [ "$CheckArchNewsForYou" = "yes" ] ; then
-        local tmpdays=hide
-        case "$ArchNewsProg" in
-            eos-arch-news)
-                # eos-arch-news does not (yet) use $newsdays ...
-                tmpdays="--save"
-                ;;
-            arch-news-for-you)
-                if [ "$newsdays" -gt 0 ] ; then
-                    tmpdays="$newsdays"
-                fi
-                ;;
-            *)
-                log2 "Warning: configuration problem with variable 'ArchNewsProg'. Please check file '$EOS_UPDATE_NOTIFIER_CONF'."
-                ;;
-        esac
-        if [ "$tmpdays" != "hide" ] ; then
-            if [ "$verbosity" = "high" ] ; then
-                $ArchNewsProg $tmpdays
-            else
-                $ArchNewsProg $tmpdays 2>/dev/null
-            fi
-        fi
-    fi
-}
-
 SystemLockActive() {
     if [ -e $system_lockfile ] ; then
         debug "Sorry, another program is currently using pacman databases."
@@ -378,8 +324,9 @@ CheckTimeoutVal() {
 
 Main2() {
     local CheckAurUpdates=yes
-    local CheckArchNewsForYou=yes
-    local ArchNewsProg=eos-arch-news
+    # local CheckArchNewsForYou=yes
+    # local ArchNewsProg=eos-arch-news
+    # local ShowArchNewsPage=no
     local UN_NotifyTimeout=30s
     local UN_NotifyTrayTimeout=30s
     local SyncAfterUpdate=no
@@ -395,10 +342,6 @@ Main2() {
     CheckTimeoutVal UN_NotifyTrayTimeout
 
     # Config file values should be OK.
-
-    if [ "$pkgsonly" = "no" ] ; then
-        CheckArchNews
-    fi
 
     # check package manager lock
     SystemLockActive a || return
@@ -656,11 +599,6 @@ Options:
                 Default: $iwt.
    -nw=X        Max time (seconds) to show the "No updates available" window.
                 Default: $no_updates__indicator_wait_time.
-   -news=X      Show the 'Arch latest news for you' within the last X days.
-                If X is 0, then no news are displayed.
-                Default: X is $newsdays.
-                Note: this has effect only if configuration ArchNewsProg is
-                'arch-news-for-you'.
    -q           Be quieter with dialogs.
    --changelog  Show the changelog of this package.
 EOF
