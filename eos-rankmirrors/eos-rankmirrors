@@ -480,7 +480,7 @@ DumpOptions() {
 
     case "$1" in
         --all)
-            local internal_options=${LONG_INTERNAL_OPTIONS//:/}    # remove all :
+            local internal_options=${LONG_OPTIONS_INTERNAL//:/}    # remove all :
             internal_options="--${internal_options//,/ --}"        # commas to spaces and add -- to each name
             echo $user_longs $user_shorts $internal_options
             ;;
