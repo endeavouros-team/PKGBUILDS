@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=24.16.6
+pkgver=24.16.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -27,6 +27,7 @@ optdepends=(
     "webkit2gtk-4.1: for eos-pacdiff to show message windows implemented with yad"
     "yay: alternative for AUR updates in eos-update"
     "paru: alternative for AUR updates in eos-update"
+    "arch-audit: for showing only packages that have already been fixed"
 )
 
 backup=(
@@ -101,7 +102,7 @@ sha512sums=('02dbe882396824d95bb417847571e08c79c31d0f6c27ffd39323ab0f54997aeb6aa
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             'fb2f72de84b2af84c56972ff527351717cca68f3dc06d6ea32da93d395751c6c47501e758d2c4ebf5c4c47e304ffd7369bf6efa228c29fd2b87f5b1d4eb419cc'
-            '74828f2e3a36343b8302a08290196f1af586ca499d71853b62f1703d2e1d0b322d61abd809dded0638da357a4c175845352e7a0d3625e7bd96aa804d8f62acc8'
+            'f3c63f068f8c5744acc3076fa0731cf32a35962f36ebfc023aec421e177f79464f255616b44185acd02e8a2a41d333b66c959bc0f272dbca2ba69670e6f68ee8'
             '89c34c867b33dce39a165fc37eb51309aeda20b2a42830c77fe7a772fdcc6796c281b264ec6dcc71e82e0f4109e2c3004fd74c5c205a5a14292f829895c54661'
             'e8703f8bee02b58160db9432b6629731285c3259d71885b4cc0511e90f12f1b57f975a3572c7a51e066a82f41b0e01d7f325047d85f1b15eb916db6fc7056f8e'
             '4306cb8353897051404f0d5628955aef620047781361327fa0f9e7ded1260df2985b39de1fc48739c1e9f70a0cec57b304154eca672668c178bb6c4596ca5249'
