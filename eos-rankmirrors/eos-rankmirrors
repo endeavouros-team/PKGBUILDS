@@ -353,7 +353,7 @@ SimpleRank() {
 
 ShowActualRankingResult() {
     SeparatorLine
-    echo "# EndeavourOS mirrorlist, ranked by $progname at $(date +%x\ %X)."
+    echo "# EndeavourOS mirrorlist, $rank_signature at $(date +%x\ %X)."
     if [ -n "$preferred_mirrors" ] || [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
         echo "# Preferred mirrors: ${preferred_mirrors//\|/ } ${ALWAYS_FIRST_EOS_MIRRORS//\|/ }"
     fi
@@ -449,26 +449,28 @@ UserAddedMirrors() {
 WriteSystemMirrorlist() {
     local eos="$1"
     local new="$2"
-    local bak="$eos.$(date +%Y.%m.%d-%H.%M.%S)"
-    local eosranked="$eos$ranked_suffix"
+    local bak="$eos.bak"
+    local eosranked="${eos}.pacnew"
     local cmd=""
-    local success=yes
 
-    echo2 ""
-    if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$hook_rank" = "no" ] ; then
-        notif_printf2 "Moving old EndeavourOS mirrorlist to %s.\n" "$bak"
-        notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
-        $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
-        [ -r "$bak" ] || success=no    # probably password failure
+    if ! diff "$latest_ml.orig" "$new" >/dev/null ; then
+        echo2 ""
+        if [ "$EOS_AUTO_MIRROR_RANKING" = "yes" ] || [ "$hook_rank" = "no" ] ; then
+            # saving new list to /etc/pacman.d/endeavour-mirrorlist
+            notif_printf2 "Moving old EndeavourOS mirrorlist to %s.\n" "$bak"
+            notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
+            $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+            [ -r "$new" ] && notif_printf2 "Failed.\n"    # probably password failure
+        else
+            # saving new list to /etc/pacman.d/endeavour-mirrorlist.pacnew
+            notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
+            $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
+            [ -r "$new" ] && notif_printf2 "Failed.\n"    # probably password failure
+        fi
     else
-        notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
-        $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
-        [ -r "$new" ] && success=no    # probably password failure
+        INFO "The new EndeavourOS mirrorlist file ($new) was not ranked, not saving it."
+        return
     fi
-    case "$success" in
-        yes) notif_printf2 "New mirrorlist saved.\n" ;;
-        no)  notif_printf2 "New mirrorlist not saved.\n" ;;
-    esac
 }
 
 DumpOptions() {
@@ -632,16 +634,17 @@ Main()
         --dump-options=all) DumpOptions --all ;;
     esac
 
-    local -r progname="${0##*/}"
+    local -r progname=eos-rankmirrors      # "${0##*/}"
     local -r pkgname=endeavouros-mirrorlist
     local -r mlfolder=/etc/pacman.d
+    local -r rank_signature="ranked by $progname"   # enables checking $rank_signature
 
-    local -r RED=$'\e[0;91m'         # starts this foreground text color
+    local -r RED=$'\e[0;91m'                        # starts this foreground text color
     local -r GREEN=$'\e[0;92m'
     local -r YELLOW=$'\e[0;93m'
     local -r BLUE=$'\e[0;94m'
     local -r MAGENTA=$'\e[0;95m'
-    local -r RESET=$'\e[0m'          # back to normal colors
+    local -r RESET=$'\e[0m'                         # back to normal colors
 
     local eos=$mlfolder/$pkgname
     local new=""
@@ -651,7 +654,6 @@ Main()
     local sort_default=age                    # age or rate
     local save=yes
     local hook_rank=no
-    local -r ranked_suffix=".pacnew"
     local ignored_mirrors=""
     local preferred_mirrors=""
     local reference_level=""

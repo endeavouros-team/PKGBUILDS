@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=24.4.2
+pkgver=24.4.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -54,7 +54,7 @@ package() {
 #  install -Dm755 arch-news-for-you             $pkgdir/usr/bin/arch-news-for-you
   install -Dm755 eos-arch-news                 $pkgdir/usr/bin/eos-arch-news
   install -Dm755 checkupdatesext               $pkgdir/usr/bin/checkupdatesext
-  install -Dm644 $pkgname.desktop              $pkgdir/etc/xdg/autostart/$pkgname.desktop
+#  install -Dm644 $pkgname.desktop              $pkgdir/etc/xdg/autostart/$pkgname.desktop
 
   install -Dm644 $pkgname.timer                $pkgdir/etc/skel/.config/systemd/user/$pkgname.timer
   install -Dm644 $pkgname.service              $pkgdir/etc/skel/.config/systemd/user/$pkgname.service
