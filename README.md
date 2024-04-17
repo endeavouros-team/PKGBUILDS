@@ -26,4 +26,5 @@ example version: **22.03.1.1**
 
 **1** - The current iteration of the package
 
+Not used for the ISO release names!
 ---
