@@ -307,8 +307,8 @@ _tr_add2 after_install_r8168         "Problème de réseau filaire $_question Ba
 _tr_add2 after_install_r8168_tip     "Basculer entre les pilotes r8168 et r8169 (puis redémarrer)"
 
 # 08-octobre-2021
-_tr_add2 daily_assist_DEinfo         "Information"                                         # assume prefix "DE:", e.g.: "Xfce: information"
-_tr_add2 daily_assist_DEinfo_tip     "Plus d'informations sur cet environnement de bureau/gestionnaire de fen"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
+_tr_add2 daily_assist_DEinfo         "Informations"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo_tip     "Plus d'informations sur ce gestionnaire de fenêtres/bureau"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 16-fevrier-2022
 _tr_add2 add_more_apps_qs            "Choisir des applications populaires à installer"                      # runs eos-quickstart
@@ -319,8 +319,8 @@ _tr_add2 ins_blue_notes              "Notes sur le Bluetooth"
 _tr_add2 ins_blue_notes_tip          "Notes sur la configuration du Bluetooth"
 
 # 27-mars-2022
-_tr_add2 after_install_fw            "Infos sur le pare-feu"
-_tr_add2 after_install_fwtip         "Infos sur le pare-feu par défaut"
+_tr_add2 after_install_fw            "Infos du pare-feu"
+_tr_add2 after_install_fwtip         "Informations sur le pare-feu par défaut"
 
 # 30-mars-2022
 _tr_add2 ins_custom                  "Personnaliser le processus d'installation"
@@ -340,12 +340,12 @@ _tr_add2 ins_cust_text3              "Cette fonction est surtout utile pour les 
 _tr_add2 ins_no_connection           "Note : aucune connexion internet n'est disponible, certains boutons sont cachés ou ne fonctionnent pas."
 
 # 21-aout-2023
-_tr_add2 cal_info5              "\nAprès l'installation mettre à jour le système est recommandé\n\n"
-_tr_add2 cal_info6              "\nAprès l'instalaltion, le système est à jour.\n\n"
+_tr_add2 cal_info5              "\nAprès l'installation, il est recommandé de mettre à jour le système\n\n"
+_tr_add2 cal_info6              "\nAprès l'installation, le système est à jour.\n\n"
 
 # 25-aout-2023
-_tr_add2 ins_pmtip2                  "Partitionmanager permet l'examen et la gestion des partitionsd du disque et la structure"
+_tr_add2 ins_pmtip2                  "Partitionmanager permet l'examen et la gestion de la structure et des partitions du disque"
 
 # 16-sept-2023
-_tr_add2 ins_arm_start             "Image installateur EndeavourOS ARM"
-_tr_add2 ins_arm_starttip          "Démarre l'installation de l'édition EndeavourOS ARM"
+_tr_add2 ins_arm_start             "Installateur d'Image EndeavourOS ARM"
+_tr_add2 ins_arm_starttip          "Commencer l'installation de l'édition EndeavourOS ARM"
