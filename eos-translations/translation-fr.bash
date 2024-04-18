@@ -69,10 +69,10 @@ _tr_add2 after_install_cdm       "Gestionnaire Sessions"
 _tr_add2 after_install_cdmtip    "Utiliser un gestionnaire de session graphique différent"
 
 _tr_add2 after_install_ew        "Fond d'écran EOS par défaut"
-_tr_add2 after_install_ewtip     "Remplacer le fond d'écran du bureau par celui d'EndeavourOS par défaut"
+_tr_add2 after_install_ewtip     "Réinitialiser au fond d'écran par défaut"
 
 
-_tr_add2 after_install_pm        "Gestion Paquets"
+_tr_add2 after_install_pm        "Gestion des paquets"
 _tr_add2 after_install_pmtip     "Comment gérer les paquets avec pacman"
 
 _tr_add2 after_install_ay        "AUR $_and yay $_exclamation"
@@ -91,7 +91,7 @@ _tr_add2 after_install_ft        "Forum"
 _tr_add2 after_install_fttip     "Aidez-nous à vous aider$_exclamation"
 
 
-_tr_add2 general_info_text       "Suivez votre guide sur le site EndeavourOS $_exclamation"
+_tr_add2 general_info_text       "Trouvez votre chemin sur le site EndeavourOS $_exclamation"
 
 _tr_add2 general_info_ws         "Site internet"
 
@@ -107,8 +107,8 @@ _tr_add2 general_info_fotip      "Demandez, commentez et discutez sur notre foru
 _tr_add2 general_info_do         "Faire un don"
 _tr_add2 general_info_dotip      "Aidez-nous à maintenir le fonctionnement d'EndeavourOS"
 
-_tr_add2 general_info_ab         "À propos de"
-_tr_add2 general_info_abtip      "Plus d'info au sujet de cette application"
+_tr_add2 general_info_ab         "À propos de $PRETTY_PROGNAME"
+_tr_add2 general_info_abtip      "Plus d'informations sur cette application"
 
 
 _tr_add2 add_more_apps_text      "Installer des applications populaires"
@@ -217,33 +217,33 @@ _tr_add2 after_install_pclean       "Configuration nettoyage paquets"
 _tr_add2 after_install_pcleantip    "Configure le service de nettoyage du cache des paquets"
 
 # 04-juillet-2020:
-_tr_add2 nb_tab_OwnCommands         "Commandes personnelles"
+_tr_add2 nb_tab_OwnCommands         "Commandes Personnelles"
 _tr_add2 nb_tab_owncmds_text        "Commandes personnelles ajoutées"
 
 # 08-juillet-2020:
-_tr_add2 nb_tab_owncmdstip          "Aide pour l'ajout de commandes personnelles"
+_tr_add2 nb_tab_owncmdstip          "Aide à l'ajout de Commandes Personnelles"
 
 _tr_add2 add_more_apps_akm          "Gestionnaire noyaux"
 _tr_add2 add_more_apps_akmtip       "Un petit gestionnaire de noyaux linux et une source d'informations"
 
 # 15-juillet-2020:
-_tr_add2 butt_owncmds_help        "Tutoriel : Commandes personnelles"
+_tr_add2 butt_owncmds_help        "Tutoriel : Commandes Personnelles"
 
 # 05-août-2020:
-_tr_add2 butt_owncmds_dnd         "Commandes personnelles tirer${_and}glisser"
-_tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer les items pour les nouveaux boutons"
+_tr_add2 butt_owncmds_dnd         "Glisser-déposer de Commandes Personnelles"
+_tr_add2 butt_owncmds_dnd_help    "Montre une fenêtre où déposer des éléments pour de nouveaux boutons"
 
 # 03-septembre-2020:
 _tr_add2 ins_reso                 "Changer résolution affichage"
 _tr_add2 ins_resotip              "Changer la résolution d'affichage maintenant"
 
 # 08-septembre-2020:
-_tr_add2 add_more_apps_arch          "Parcourir paquets Arch"
+_tr_add2 add_more_apps_arch          "Parcourir tous les paquets Arch"
 _tr_add2 add_more_apps_aur           "Parcourir tous les paquets AUR"
 _tr_add2 add_more_apps_done1_text    "Suggestions d'applications déjà installées$_exclamation"
 _tr_add2 add_more_apps_done2_text    "ou parcourir tous les paquets d'Arch et d'AUR"
-_tr_add2 add_more_apps_done2_tip1    "Pour l'installation, utilisez 'pacman' ou 'yay'"
-_tr_add2 add_more_apps_done2_tip2    "Pour l'installation, utilisez 'yay'"
+_tr_add2 add_more_apps_done2_tip1    "Pour installer, utilisez 'pacman' ou 'yay'"
+_tr_add2 add_more_apps_done2_tip2    "Pour installer, utilisez 'yay'"
 
 # 11-septembre-2020:
 _tr_add2 after_install_ew2      "Choisir un des fonds d'écran EOS"
@@ -303,7 +303,7 @@ _tr_add2 after_install_vbox1         "Activer outils invités VirtualBox"
 _tr_add2 after_install_vbox2         "Pour activer les outils invités de VirtualBox, selectionner l'onglet <b>Post-Installation</b> et cliquer sur le bouton"
 
 # 17-juin-2021 / 14-déc-2021
-_tr_add2 after_install_r8168         "Réseau filaire issue$_question  Basculer pilote r8168 et r8169 $_exclamation"
+_tr_add2 after_install_r8168         "Problème de réseau filaire $_question Basculez les pilote r8168 et r8169 $_exclamation"
 _tr_add2 after_install_r8168_tip     "Basculer entre les pilotes r8168 et r8169 (puis redémarrer)"
 
 # 08-octobre-2021
@@ -311,7 +311,7 @@ _tr_add2 daily_assist_DEinfo         "Information"                              
 _tr_add2 daily_assist_DEinfo_tip     "Plus d'informations sur cet environnement de bureau/gestionnaire de fen"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 16-fevrier-2022
-_tr_add2 add_more_apps_qs            "Choisir applications populaires à installer"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qs            "Choisir des applications populaires à installer"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Choisissez des applications populaires et installez-les"
 
 # 21-mars-2022
