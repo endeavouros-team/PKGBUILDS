@@ -354,7 +354,7 @@ _tr_add2 ins_arm_start               "EndeavourOS ARM Image Installer"
 _tr_add2 ins_arm_starttip            "Start installing the EndeavourOS ARM edition"
 
 # 2024-Apr-18
-_tr_add2 ins_conn_issue_title        "What next${_question}"
+_tr_add2 ins_conn_issue_title        "What next?"                                                                   # NOTE: '?' works in a yad title!
 _tr_add2 ins_conn_issue_text         "No internet connection found (maybe wifi is not ready${_question})"
 _tr_add2 ins_conn_issue_nm1          "Network manager"
 _tr_add2 ins_conn_issue_nm2          "Starts the network manager"

@@ -354,7 +354,7 @@ _tr_add2 ins_arm_start             "Asenna EndeavourOS ARM"
 _tr_add2 ins_arm_starttip          "Aloita EndeavourOS ARM:n asennus"
 
 # 2024-Apr-18
-_tr_add2 ins_conn_issue_title        "Miten jatketaan${_question}"
+_tr_add2 ins_conn_issue_title        "Miten jatketaan?"                                                                   # NOTE: '?' works in a yad title!
 _tr_add2 ins_conn_issue_text         "Internet-yhteyttä ei löytynyt (ehkä wifi ei ole vielä valmis${_question})"
 _tr_add2 ins_conn_issue_nm1          "Verkon hallintaohjelma"
 _tr_add2 ins_conn_issue_nm2          "Käynnistää verkon hallintaohjelman"
