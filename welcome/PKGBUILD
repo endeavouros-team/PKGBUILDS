@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=24.5.4
+pkgver=24.5.5
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -39,7 +39,7 @@ source=(
   $_url/eos-install-mode-run-calamares
   $_url/arm-eos-welcome-installer
 )
-sha512sums=('465ed1345b50e6d124b0e49ada6798458b8d06ed235943db8bde713bbe5860426622f65a6d3090d4716e00525b2ef95f36e8a2d969384fbcfadf685080f87ef9'
+sha512sums=('0cb8ea495e34857aca1a2110a52a5e4f992bb80e74b62611daca9bc34add3fe853176dbc8b4569e6ccee11a93367e7c767aa50f9858eb3427071e2b46f074686'
             'eb53ad0147ca8b13afc12589c2849227c590990538fcf08a1245b8ae224b6c1b547eec61b72c20314c67ab8c50068b0219d430b94079a932bfeb4824c7a1f1ba'
             '36dcdd5db1d86b88a87c4e48b718b0986107980fc289dd8dd643a365508255a81680d197442dfe6933bbb8b06e2ccc7d7b55bf28ce1a925cdfd0278c6fee2c7f'
             '5ca4b7108573a980d9d4011c5afde4f459abe8e36f5b6bc846368dcc48cfa2e672133f074fdeac4282835fa5b87f7afb2cd9dc3e985b4d2e8f574ac239c90ba2'
