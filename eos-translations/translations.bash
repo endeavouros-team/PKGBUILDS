@@ -256,15 +256,17 @@ _init_translations() {
 
         for trfile in "${trlist[@]}" ; do
             if [ -r "$trfile" ] ; then
-                #echo "$trfile" >&2
                 export SELECTED_EOS_LANGUAGE="$lang"
                 source "$trfile"
                 selected=1
-                if [ "$tr_prefer" = "manual" ] ; then
+
+                # silencing warnings no more needed
+                if false && [ "$tr_prefer" = "manual" ] ; then
                     case "$lang" in
                         "de") silent_lang_warnings=yes ;;   # de is not fully translated yet...
                     esac
                 fi
+
                 break
             fi
         done
