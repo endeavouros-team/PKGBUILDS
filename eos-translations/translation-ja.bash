@@ -331,9 +331,9 @@ _tr_add2 daily_assist_anews          "Arch の最新ニュース"
 _tr_add2 daily_assist_anewstip       "Arch の最新ニュースをブラウザに表示"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "重要なお知らせがあります "
-_tr_add2 nb_nofify_user2             "次のボタンをクリックしてください: "                        # Software News
-_tr_add2 nb_nofify_user3             "（このウィンドウの左下にボタンはあります）"
+_tr_add2 nb_notify_user1             "重要なお知らせがあります "
+_tr_add2 nb_notify_user2             "次のボタンをクリックしてください: "                        # Software News
+_tr_add2 nb_notify_user3             "（このウィンドウの左下にボタンはあります）"
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "インストール カスタマイズ ファイルを取得します (上級者向け)"

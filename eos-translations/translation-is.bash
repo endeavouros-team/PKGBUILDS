@@ -331,6 +331,6 @@ _tr_add2 daily_assist_anews          "Nýjustu Arch fréttirnar"
 _tr_add2 daily_assist_anewstip       "Sýna nýjustu Arch fréttirnar í vafra"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Það eru mikilvægar upplýsingar á"
-_tr_add2 nb_nofify_user2             "Vinsamlegast ýttu á"                                  # Software News
-_tr_add2 nb_nofify_user3             "hnappinn í neðra vinstra horninu á þessum glugga."
+_tr_add2 nb_notify_user1             "Það eru mikilvægar upplýsingar á"
+_tr_add2 nb_notify_user2             "Vinsamlegast ýttu á"                                  # Software News
+_tr_add2 nb_notify_user3             "hnappinn í neðra vinstra horninu á þessum glugga."

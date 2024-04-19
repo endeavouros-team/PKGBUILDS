@@ -333,9 +333,9 @@ _tr_add2 daily_assist_anews          "Viimeisimmät Arch-uutiset"
 _tr_add2 daily_assist_anewstip       "Viimeisimmät Arch-uutiset selaimessa"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Tärkeitä uutisia saatavilla päivämäärällä"       # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "Klikkaa nappia"                                  # Software News
-_tr_add2 nb_nofify_user3             "tämän ikkunan vasemmassa alalaidassa."
+_tr_add2 nb_notify_user1             "Tärkeitä uutisia saatavilla päivämäärällä"       # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "Klikkaa nappia"                                  # Software News
+_tr_add2 nb_notify_user3             "tämän ikkunan vasemmassa alalaidassa."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Hae asennuksen muokkaustiedostosi (tehokäyttäjille)"

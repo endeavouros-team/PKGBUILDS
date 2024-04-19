@@ -301,9 +301,9 @@ _tr_add2 daily_assist_anews          "جدیدترین اخبار آرچ"
 _tr_add2 daily_assist_anewstip       "جدیدترین اخبار آرچ را در یک مرورگر نمایش می‌دهد"
 
 
-_tr_add2 nb_nofify_user1             "اخبار مهمی در این تاریخ اعلان شده‌اند:"                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "لطفا روی این گزینه کلیک کنید:"                                  # Software News
-_tr_add2 nb_nofify_user3             "دکمه گوشه پایین سمت چپ این پنجره."
+_tr_add2 nb_notify_user1             "اخبار مهمی در این تاریخ اعلان شده‌اند:"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "لطفا روی این گزینه کلیک کنید:"                                  # Software News
+_tr_add2 nb_notify_user3             "دکمه گوشه پایین سمت چپ این پنجره."
 
 _tr_add2 ins_customized              "فراخوانی پرونده‌های شخصی‌سازی شما (پیشرفته)"
 _tr_add2 ins_cust_text               "آدرس URL فایل user_commands.bash شخصی‌سازی‌شده‌تان را قرار دهید"

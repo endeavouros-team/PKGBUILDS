@@ -334,9 +334,9 @@ _tr_add2 daily_assist_anews          "Últimas noticias Arc"
 _tr_add2 daily_assist_anewstip       "Mostra as mais recentes noticias sobre Arc no navegador"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Há importantes noticias no"
-_tr_add2 nb_nofify_user2             "Por favor, clique no"                                  # Software News
-_tr_add2 nb_nofify_user3             "botão no canto inferior esquerdo dessa janela."
+_tr_add2 nb_notify_user1             "Há importantes noticias no"
+_tr_add2 nb_notify_user2             "Por favor, clique no"                                  # Software News
+_tr_add2 nb_notify_user3             "botão no canto inferior esquerdo dessa janela."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Obter seu arquivo de customização de instalação (avançado)"

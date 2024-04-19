@@ -333,9 +333,9 @@ _tr_add2 daily_assist_anews          "Новости Arch"
 _tr_add2 daily_assist_anewstip       "Покажет последние новости Arch в браузере"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Имеются важные новости"
-_tr_add2 nb_nofify_user2             "Нажмите кнопку"                                  # Новости о программном обеспечении
-_tr_add2 nb_nofify_user3             "в левом нижнем углу этого окна."
+_tr_add2 nb_notify_user1             "Имеются важные новости"
+_tr_add2 nb_notify_user2             "Нажмите кнопку"                                  # Новости о программном обеспечении
+_tr_add2 nb_notify_user3             "в левом нижнем углу этого окна."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Извлеките файл настройки установки (дополнительно)"

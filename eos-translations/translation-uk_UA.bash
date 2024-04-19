@@ -331,9 +331,9 @@ _tr_add2 daily_assist_anews          "Останні новини Arch"
 _tr_add2 daily_assist_anewstip       "Показує останні новини Arch у браузері"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Тут важливі новини"                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "Будь ласка натисніть"                                  # Software News
-_tr_add2 nb_nofify_user3             "кнопку у нижньому лівому кутку вікна."
+_tr_add2 nb_notify_user1             "Тут важливі новини"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "Будь ласка натисніть"                                  # Software News
+_tr_add2 nb_notify_user3             "кнопку у нижньому лівому кутку вікна."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Викласти свій виправлений файл встановлення (розширений)"

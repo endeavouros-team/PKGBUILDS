@@ -331,6 +331,6 @@ _tr_add2 daily_assist_anews          "Najnovije novosti o Arch-u"
 _tr_add2 daily_assist_anewstip       "Prikaži najnovije novosoti o Arch-u u browser-u"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Bitne novosti pri"
-_tr_add2 nb_nofify_user2             "Molim kliknite na"                                  # Software News
-_tr_add2 nb_nofify_user3             "dugme u levom donjem uglu ovog prozora."
+_tr_add2 nb_notify_user1             "Bitne novosti pri"
+_tr_add2 nb_notify_user2             "Molim kliknite na"                                  # Software News
+_tr_add2 nb_notify_user3             "dugme u levom donjem uglu ovog prozora."

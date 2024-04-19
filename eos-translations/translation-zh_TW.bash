@@ -331,9 +331,9 @@ _tr_add2 daily_assist_anews          "最新 Arch 新聞"
 _tr_add2 daily_assist_anewstip       "在瀏覽器中顯示最新 Arch 新聞"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "於下列時間有重要消息："                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "請按位於本視窗左下角的"                                  # Software News
-_tr_add2 nb_nofify_user3             "按鈕。"
+_tr_add2 nb_notify_user1             "於下列時間有重要消息："                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "請按位於本視窗左下角的"                                  # Software News
+_tr_add2 nb_notify_user3             "按鈕。"
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "取得您的安裝個人化檔案（進階）"

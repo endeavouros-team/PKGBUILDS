@@ -336,9 +336,9 @@ _tr_add2 daily_assist_anewstip       "Zeigt Neuigkeiten über Arch Linux im Brow
 
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Wichtige Neuigkeiten"
-_tr_add2 nb_nofify_user2             "Bitte klicke auf die"                                  # Software News
-_tr_add2 nb_nofify_user3             "Schaltfläche, links unten im Fenster."
+_tr_add2 nb_notify_user1             "Wichtige Neuigkeiten"
+_tr_add2 nb_notify_user2             "Bitte klicke auf die"                                  # Software News
+_tr_add2 nb_notify_user3             "Schaltfläche, links unten im Fenster."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Lade eine Konfigurations Datei (anspruchsvoll)"

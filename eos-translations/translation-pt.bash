@@ -333,9 +333,9 @@ _tr_add2 daily_assist_anews          "Últimas notícias do Arch"
 _tr_add2 daily_assist_anewstip       "Mostra as últimas notícias do Arch num navegador"
 
 # 2022-Sep-25
-_tr_add2 nb_nofify_user1             "Há notícias importantes em"                       # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "Clique no botão"                                  # Software News
-_tr_add2 nb_nofify_user3             "no canto inferior esquerdo desta janela."
+_tr_add2 nb_notify_user1             "Há notícias importantes em"                       # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "Clique no botão"                                  # Software News
+_tr_add2 nb_notify_user3             "no canto inferior esquerdo desta janela."
 
 # 2023-Feb-20
 _tr_add2 ins_customized              "Obter o ficheiro de personalização da instalação (avançado)"
