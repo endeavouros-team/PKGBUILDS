@@ -330,6 +330,11 @@ _tr_add2 ins_custom_tip              "Comment personnaliser le processus d'insta
 _tr_add2 daily_assist_anews          "Dernières nouvelles Arch"
 _tr_add2 daily_assist_anewstip       "Montre les dernières nouvelles d'Arch dans un navigateur"
 
+# 25-septembre-2022
+_tr_add2 nb_nofify_user1             "Il y a des nouvelles importantes à"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_nofify_user2             "Veuillez cliquer le bouton"                                  # Software News
+_tr_add2 nb_nofify_user3             "dans le coin en bas à gauche de cette fenêtre."
+
 # 20-fevrier-2023
 _tr_add2 ins_customized              "Récupérer le fichier de personnalisation de l'installation (avancé)"
 _tr_add2 ins_cust_text               "Donnez l'URL de votre fichier user_commands.bash personnalisé"
