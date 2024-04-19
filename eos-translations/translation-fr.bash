@@ -331,9 +331,9 @@ _tr_add2 daily_assist_anews          "Dernières nouvelles Arch"
 _tr_add2 daily_assist_anewstip       "Montre les dernières nouvelles d'Arch dans un navigateur"
 
 # 25-septembre-2022
-_tr_add2 nb_nofify_user1             "Il y a des nouvelles importantes à"                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_nofify_user2             "Veuillez cliquer le bouton"                                  # Software News
-_tr_add2 nb_nofify_user3             "dans le coin en bas à gauche de cette fenêtre."
+_tr_add2 nb_notify_user1             "Il y a des nouvelles importantes à"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "Veuillez cliquer le bouton"                                  # Software News
+_tr_add2 nb_notify_user3             "dans le coin en bas à gauche de cette fenêtre."
 
 # 20-fevrier-2023
 _tr_add2 ins_customized              "Récupérer le fichier de personnalisation de l'installation (avancé)"
@@ -351,6 +351,16 @@ _tr_add2 cal_info6              "\nAprès l'installation, le système est à jou
 # 25-aout-2023
 _tr_add2 ins_pmtip2                  "Partitionmanager permet l'examen et la gestion de la structure et des partitions du disque"
 
-# 16-sept-2023
+# 16-septembre-2023
 _tr_add2 ins_arm_start             "Installateur d'Image EndeavourOS ARM"
 _tr_add2 ins_arm_starttip          "Commencer l'installation de l'édition EndeavourOS ARM"
+
+# 18-avril-2024
+_tr_add2 ins_conn_issue_title        "Et ensuite ?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_text         "Aucune connexion internet trouvée (le wifi n'est peut-être pas prêt ${_question})"
+_tr_add2 ins_conn_issue_nm1          "Gestionnaire de réseau"
+_tr_add2 ins_conn_issue_nm2          "Lance le gestionnaire de réseau"
+_tr_add2 ins_conn_issue_oi1          "Installation hors-ligne"
+_tr_add2 ins_conn_issue_oi2          "Installe KDE sans connexion internet (mise à jour système recommandée après l'installation)"
+_tr_add2 ins_conn_issue_ex1          "Sortir"
+_tr_add2 ins_conn_issue_ex2          "Quitter ce programme"
