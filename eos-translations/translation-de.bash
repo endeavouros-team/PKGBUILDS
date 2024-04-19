@@ -356,6 +356,15 @@ _tr_add2 ins_pmtip2                  "Der Partitionmanager ermöglicht das Unter
 _tr_add2 ins_arm_start             "EndeavourOS ARM Image Installationsprogramm"
 _tr_add2 ins_arm_starttip          "Installation der EndeavourOS ARM Variante"
 
+# 2024-Apr-18
+_tr_add2 ins_conn_issue_title      "Was nun?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_text      "Es besteht keine  Internetverbindung (WLAN ist eventuell nicht bereit${_question})"
+_tr_add2 ins_conn_issue_nm1      "Netzwerk Manager"
+_tr_add2 ins_conn_issue_nm2      "Startet den Netzwerk Manager"
+_tr_add2 ins_conn_issue_oi1      "Offline Installation"
+_tr_add2 ins_conn_issue_oi2      "Installiert KDE ohne Internetverbindung (Systemaktualisierung nach der Installation empfohlen)"
+_tr_add2 ins_conn_issue_ex1      "Beenden"
+_tr_add2 ins_conn_issue_ex2      "Das Programm beenden"
 
 
 
