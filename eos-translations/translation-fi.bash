@@ -363,3 +363,7 @@ _tr_add2 ins_conn_issue_oi2          "Asentaa KDE:n ilman internet-yhteyttä (su
 _tr_add2 ins_conn_issue_ex1          "Lopeta"
 _tr_add2 ins_conn_issue_ex2          "Lopeta tämä ohjelma"
 
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "Käynnistetään calamares"
+_tr_add2 ins_please_wait             "Odota hetki..."
+

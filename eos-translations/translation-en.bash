@@ -363,3 +363,7 @@ _tr_add2 ins_conn_issue_oi2          "Installs KDE without internet connection (
 _tr_add2 ins_conn_issue_ex1          "Exit"
 _tr_add2 ins_conn_issue_ex2          "Quit this program"
 
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "Starting calamares"
+_tr_add2 ins_please_wait             "Please wait..."
+
