@@ -284,3 +284,12 @@ _tr_add2 ins_arm_start             "EndeavourOS ARM Avbild installationsprogram"
 _tr_add2 ins_arm_starttip          "Starta installationen av EndeavourOS ARM-utgåvan"
 
 _tr_add2 ins_pmtip2                  "Partitionshanterare tillåter att undersöka och hantera diskpartitioner och struktur"
+
+_tr_add2 ins_conn_issue_title        "Vad härnäst?"                                                                   # NOTERA: '?' fungerar i yad titel!
+_tr_add2 ins_conn_issue_text         "Ingen internetanslutning hittades (kanske wifi inte är redo${_question})"
+_tr_add2 ins_conn_issue_nm1          "Nätverkshanteraren"
+_tr_add2 ins_conn_issue_nm2          "Startar nätverkshanteraren"
+_tr_add2 ins_conn_issue_oi1          "Offline installation"
+_tr_add2 ins_conn_issue_oi2          "Installerar KDE utan en internetanslutning (systemuppdatering rekommenderas efter installation)"
+_tr_add2 ins_conn_issue_ex1          "Avsluta"
+_tr_add2 ins_conn_issue_ex2          "Avsluta detta program"
