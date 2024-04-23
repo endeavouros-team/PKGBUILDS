@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=endeavouros-theming
-pkgver=23.11.2.1
+pkgver=24.04.1.2
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
@@ -10,7 +10,7 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('605ef03f74bcfdfefe0c8b673aa78c13bc7ff133f5be90696d8ec2c6116cab33092c4dfdefb628a22f3ea08b33744a0b8b6146bfe849293a35d71771e5d19075')
+sha512sums=('52ff9dcb0fb7238cc28b30df8b8e3eb2f0896ac56230bacb2fcd25a3c7ad931bb6c596e2b3245155b087a59837bb24906a9f18f701a505e8636d045ecda9e481')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -21,7 +21,7 @@ package() {
   install -Dm644 endeavouros-dark.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
   install -Dm644 endeavouros-logo-text.svg -t "${pkgdir}/usr/share/pixmaps"
   install -Dm644 endeavouros-logo-text-dark.svg -t "${pkgdir}/usr/share/pixmaps"
-  
+
   if [ "${CARCH}" = "aarch64" ]; then
     install -Dm644 backgrounds/endeavouros-arm-wallpaper.png "${pkgdir}/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"
   else
