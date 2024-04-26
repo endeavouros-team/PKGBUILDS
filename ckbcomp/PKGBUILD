@@ -11,9 +11,10 @@ _ckbcomp_preparations() {
     url="$site/installer-team/console-setup"
 
     local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
-    local dl="$site$(echo "$data" | grep '"nofollow" download' | grep \.tar\.gz | head -n1 | sed -e 's|.* href="||' -e 's|".*||')"
+    local line="$(echo "$data" | grep -E -m1 "/console-setup-[0-9\.]+\.tar\.gz")"
+    local dl="$site$(echo "$line" | sed -E 's|.*href="([^"]+)".*|\1|')"
 
-    pkgver=$(echo "$dl" | sed -E 's|.*/([0-9\.]+)/.*|\1|')
+    pkgver="$(echo "$line" | sed -E 's|.*/console-setup-([0-9\.]+)\.tar\.gz.*|\1|')"
     source=("$dl")
 }
 _ckbcomp_preparations
@@ -26,7 +27,7 @@ arch=(any)
 license=('GPL2')
 depends=('perl')
 
-sha512sums=('946a0a064c39dad6fbcee3613f4b537b2e571decaabd7e81439c1f11f74e3e982f233ec543003ca613929476b9376a13a442eb6e6df8ac980904e413fe582f14')
+sha512sums=('419cd3d09a10e36586c325d939b80e6e096963890e88294635599a9122e7964a420dccaa9c682574cb73b816fafe893e97f8f56ad100b8e0e2a073730542f5c8')
 
 package() {
     local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
