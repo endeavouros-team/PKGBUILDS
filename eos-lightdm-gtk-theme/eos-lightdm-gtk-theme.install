@@ -1,0 +1,11 @@
+pre_remove() {
+	echo "removing the lightdm and greeter configurations for EndeavourOS"
+}
+
+post_remove() {
+	echo "You need to reconfigure the Arch-Way after the removal of this package"
+	echo "drop-in /etc/lightdm/lightdm.conf.d/ removed!"
+	echo "keep in mind to setup /etc/lightdm/lightdm.conf for the greeter you want to use"
+	echo "read here: https://wiki.archlinux.org/title/LightDM#Greeter"
+	echo "if not LightDM will fail to start!"
+}
