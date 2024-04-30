@@ -367,6 +367,10 @@ _tr_add2 ins_conn_issue_ex1      "Beenden"
 _tr_add2 ins_conn_issue_ex2      "Das Programm beenden"
 
 
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "Calamares startet"
+_tr_add2 ins_please_wait             "Es geht gleich weiter..."
+
 
 
 
