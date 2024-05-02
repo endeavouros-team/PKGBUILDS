@@ -24,7 +24,7 @@ Os_release() {
     local home=https://endeavouros.com
     local doc=https://discovery.endeavouros.com
     local support=https://forum.endeavouros.com
-    local bugs=https://forum.endeavouros.com/c/arch-based-related-questions/bug-reports
+    local bugs=https://forum.endeavouros.com/c/general-system/endeavouros-installation
     local privacy=https://endeavouros.com/privacy-policy-2
 
     sed -i $file \
