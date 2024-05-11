@@ -425,7 +425,7 @@ Main()
     FindInstallLog
 
     # commands to be logged
-    local -r cmd_inxi="inxi -Fxxc0z"
+    local -r cmd_inxi="inxi -a -c0 -F -r -t -xxx -y1 -z"
     local -r cmd_journal0="journalctl -b -0"
     local -r cmd_journal1="journalctl -b -1"
     local -r cmd_journal2="journalctl -b -2"
