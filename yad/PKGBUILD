@@ -8,6 +8,7 @@ _yad-eos_prepare() {
     local orig_name=yad
     local apply_patch=yes      # yes = apply patch, no = do not apply patch
     local change_name=no       # always: no !!
+    local pkgrel_sub=.2        # additional change number for pkgrel
 
     local curdir="$PWD"
     local tmpdir=$(mktemp -d)
@@ -42,7 +43,7 @@ _yad-eos_prepare() {
     if [ "$apply_patch" = "yes" ] ; then
         # update pkgrel because of this patch
         source+=($url/yad-github-issue-107.patch)
-        pkgrel="$pkgrel".1
+        pkgrel="$pkgrel$pkgrel_sub"
 
         # Take care of conflicting packages:
         conflicts=($orig_name ${orig_name}-git)
