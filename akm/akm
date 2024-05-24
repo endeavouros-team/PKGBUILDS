@@ -81,9 +81,11 @@ StableVersions() {
         # prevent usage of the '*-testing' repos:
         case "$pkg" in
             linux | linux-headers | linux-lts | linux-lts-headers)
-                pkgs=("core/$pkg") ;;
+                pkgs+=("core/$pkg") ;;
             linux-zen | linux-zen-headers | linux-hardened | linux-hardened-headers | linux-rt | linux-rt-headers | linux-rt-lts | linux-rt-lts-headers)
-                pkgs=("extra/$pkg") ;;
+                pkgs+=("extra/$pkg") ;;
+            core/linux* | extra/linux*)
+                pkgs+=("$pkg") ;;
         esac
     done
     readarray -t versions <<< $(expac -S %v "${pkgs[@]}")
