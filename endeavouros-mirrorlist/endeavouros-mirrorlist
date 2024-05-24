@@ -52,7 +52,7 @@ Server = https://mirrors.urbanwave.co.za/endeavouros/repo/$repo/$arch
 Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 
 ## Sweden
-Server = https://ftp.acc.umu.se/mirror/endeavouros/repo/$repo/$arch
+Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
 
 ## Taiwan
 Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
