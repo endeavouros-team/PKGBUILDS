@@ -12,9 +12,9 @@ _ckbcomp_preparations() {
 
     local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
     local line="$(echo "$data" | grep -E -m1 "/console-setup-[0-9\.]+\.tar\.gz")"
-    local dl="$site$(echo "$line" | sed -E 's|.*href="([^"]+)".*|\1|')"
+    local dl="$site$(echo "$line" | sed -E -e 's|(.*\.tar\.gz).*|\1|' -e 's|.+(/installer.+)|\1|')"
 
-    pkgver="$(echo "$line" | sed -E 's|.*/console-setup-([0-9\.]+)\.tar\.gz.*|\1|')"
+    pkgver="$(echo "$dl" | sed -E 's|.*/console-setup-([0-9\.]+)\.tar\.gz.*|\1|')"
     source=("$dl")
 }
 _ckbcomp_preparations
@@ -26,8 +26,10 @@ pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or
 arch=(any)
 license=('GPL2')
 depends=('perl')
+# conflicts=(ckbcomp-bin)
 
-sha512sums=('419cd3d09a10e36586c325d939b80e6e096963890e88294635599a9122e7964a420dccaa9c682574cb73b816fafe893e97f8f56ad100b8e0e2a073730542f5c8')
+# sha512sums=('419cd3d09a10e36586c325d939b80e6e096963890e88294635599a9122e7964a420dccaa9c682574cb73b816fafe893e97f8f56ad100b8e0e2a073730542f5c8')
+sha512sums=('5884cc072c48341d57c936390c6ea9ac943a372952d1616e8dd22183878c6a8176964a13d12050db407d2ed62169abd93b31c7e557a1bcff89b08f2fcd8c223b')
 
 package() {
     local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
