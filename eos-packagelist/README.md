@@ -7,10 +7,10 @@ positional arguments:
 
   profile      The name of the profile you want to see packages for
 
-example: `eos-packagelist "BSPWM Edition"`
+example: `eos-packagelist "KDE-Desktop"`
 
 or to save the list:
-`eos-packagelist "BSPWM Edition" >> awesome-packages.list`
+`eos-packagelist "KDE-Desktop" >> kde-packages.list`
   
 
 options:
@@ -22,4 +22,4 @@ options:
   `--install`    Install the packages on the list using pacman instead of just listing them
 
 example:
-`eos-packagelist --install "BSPWM Edition"`
+`eos-packagelist --install "KDE-Desktop"`
