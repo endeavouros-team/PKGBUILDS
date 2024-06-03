@@ -95,22 +95,15 @@ if __name__ == '__main__':
                                      )
     parser.add_argument('profile', type=str, nargs='*', help='The name of the profile you want to see packages for')
     parser.add_argument('--list', action="store_true", help='Lists the available options')
-    parser.add_argument('--arch', type=str, help='Only include packages available on ARM')
     parser.add_argument('--install', action="store_true",
                         help='Install the packages on the list using pacman instead of just listing them')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
     # Condition to choose ARM or x64_64
-    if (args.arch and args.arch != "x86_64") or (not args.arch and platform.machine() != "x86_64"):
-        url_netinstall = "https://raw.githubusercontent.com/endeavouros-arm/calamares-image/main/configs/calamares/modules" \
-              "/netinstall.yaml"
-        url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-arm/calamares-image/main/configs/calamares/modules" \
-              "/packagechooser_ce.conf"
-    else:
-        url_netinstall = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
-              "/netinstall.yaml"
-        url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
-              "/packagechooser.conf"
+    url_netinstall = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
+                     "/netinstall.yaml"
+    url_pkgchooser = "https://raw.githubusercontent.com/endeavouros-team/calamares/calamares/data/eos/modules" \
+                     "/packagechooser.conf"
 
     # Get the data from the internet and parse it
     netinstall_packages = []
