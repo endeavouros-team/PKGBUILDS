@@ -161,8 +161,8 @@ _tr_add2 issues_no               "Non sono stati rilevati problemi importanti ne
 _tr_add2 cal_noavail            "Non disponibile: "        # programma di installazione
 _tr_add2 cal_warn               "Attenzione"
 _tr_add2 cal_info1              "Questo è un rilascio di sviluppo della comunità.\n\n"                                   # i caratteri speciali sono necesari!
-_tr_add2 cal_info2              "<b>Offline</b>: questo metodo fornisce il desktop %%s.\nNon è richiesta una connessione a Internet.\n\n"
-_tr_add2 cal_info3              "<b>Online</b>: questo metodo ti permette di scegliere il tuo desktop.\nÉ richiesta una connessione a Internet.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b>: questo metodo fornisce il desktop %%s.\nNon è richiesta una connessione a internet.\n\n"
+_tr_add2 cal_info3              "<b>Online</b>: questo metodo ti permette di scegliere il tuo desktop.\nÉ richiesta una connessione a internet.\n\n"
 _tr_add2 cal_info4              "Nota: Questo rilascio è ancora in fase di sviluppo, per favore aiutaci a renderlo stabile segnalando i bug che riscontri.\n"
 _tr_add2 cal_info5              "\nSi consiglia di aggiornare il sistema dopo l'installazione.\n\n"
 _tr_add2 cal_info6              "\nDopo l'installazione il sistema sarà già aggiornato.\n\n"
@@ -344,7 +344,7 @@ _tr_add2 ins_cust_text2              "Il file scaricato sostituirà ~/user_comma
 _tr_add2 ins_cust_text3              "Questo è particolarmente utile per l'installazione <b>online</b>"
 
 # 29-Mar-2023
-_tr_add2 ins_no_connection           "Nota: nessuna connessione a Internet disponibile, alcuni pulsanti sono nascosti o non funzionano."
+_tr_add2 ins_no_connection           "Nota: nessuna connessione a internet disponibile, alcuni pulsanti sono nascosti o non funzionano."
 
 # 25-Ago-2023
 _tr_add2 ins_pmtip2                  "Il gestore delle partizioni di KDE consente di esaminare e gestire le partizioni e la struttura del disco"
@@ -352,4 +352,18 @@ _tr_add2 ins_pmtip2                  "Il gestore delle partizioni di KDE consent
 # 16-Set-2023
 _tr_add2 ins_arm_start             "Scarica e installa l'immagine di EndeavourOS per ARM"
 _tr_add2 ins_arm_starttip          "Avvia l'installazione di EndeavourOS per ARM"
+
+# 18-Apr-2024
+_tr_add2 ins_conn_issue_title        "Cosa fare?"                                                                   # NOTA: '?' funziona nei titoli di yad!
+_tr_add2 ins_conn_issue_text         "Non sono state trovate connessioni a internet (forse il wifi non è pronto${_question})"
+_tr_add2 ins_conn_issue_nm1          "Network manager"
+_tr_add2 ins_conn_issue_nm2          "Avvia il network manager"
+_tr_add2 ins_conn_issue_oi1          "Installazione offline"
+_tr_add2 ins_conn_issue_oi2          "Installa KDE senza una connessione a internet (si consiglia di aggiornare il sistema dopo l'installazione)"
+_tr_add2 ins_conn_issue_ex1          "Esci"
+_tr_add2 ins_conn_issue_ex2          "Chiudi questo programma"
+
+# 20-Apr-2024
+_tr_add2 ins_start_calamares         "Avvio di calamares"
+_tr_add2 ins_please_wait             "Per favore, attendi..."
 
