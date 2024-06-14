@@ -35,9 +35,6 @@ Server = https://endeavour.remi.lu/repo/$repo/$arch
 Server = https://mirror.albony.xyz/endeavouros/repo/$repo/$arch
 Server = https://mirrors.nxtgen.com/endeavouros-mirror/repo/$repo/$arch
 
-## Iran
-Server = https://mirror.nimatarlani.com/endeavouros/repo/$repo/$arch
-
 ## Japan
 Server = https://www.miraa.jp/endeavouros/repo/$repo/$arch
 
