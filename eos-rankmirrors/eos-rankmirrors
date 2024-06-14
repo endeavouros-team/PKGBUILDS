@@ -181,6 +181,11 @@ GetUpdateNumberAndTime() {
             nr="$(head -n1 "$tmpfile")"
             rm -f "$tmpfile"
 
+	    if [ "${nr//[0-9]/}" ] ; then   # check that $nr is a number!
+		WarningAbout "$mirror" "Unrecognized data returned by this mirror."
+		return
+	    fi
+
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
