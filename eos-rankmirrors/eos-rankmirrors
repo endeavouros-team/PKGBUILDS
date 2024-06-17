@@ -209,9 +209,9 @@ GetUpdateNumberAndTime() {
             case "$mirror_verbosity" in
                 all | code | show)
                     case "$retcode" in
-                        28) msg+=("Connection failed after $timeout seconds.") ;;
-                        7)  msg+=("Connection failed. The mirror may be temporarily or permanently offline.") ;;
-                        *)  msg+=("Connection failed.") ;;
+                        28) msg+=("Connection to this mirror failed after $timeout seconds.") ;;
+                      # 7)  msg+=("Connection to this mirror failed. The mirror may be temporarily or permanently offline.") ;;
+                        *)  msg+=("Connection to this mirror failed.") ;;
                     esac
                     case "$mirror_verbosity" in
                         all)
@@ -441,11 +441,22 @@ UserAddedMirrors() {
     echo "# User added mirrors >>>"
 
     for m in ${mirrors//\|/ } ; do
-        mirror="$(grep "^[ ]*Server[ ]*=[ ]*" "$latest_ml.orig" | grep "$m")"
-        if [ -n "$mirror" ] ; then
-            INFO "User added: $mirror"
-            echo "$mirror"
-        fi
+        case "$m" in
+            Server=*)
+                # Server=<full-mirror-name> is another supported syntax for user added preferred mirrors.
+                # Note1: white spaces are not allowed.
+                # Note2: these mirrors will not be ranked.
+                INFO "User added: ${m//=/ = }"
+                echo "${m//=/ = }"
+                ;;
+            *)
+                mirror="$(grep "^[ ]*Server[ ]*=[ ]*" "$latest_ml.orig" | grep "$m")"
+                if [ -n "$mirror" ] ; then
+                    INFO "User added: $mirror"
+                    echo "$mirror"
+                fi
+                ;;
+        esac
     done
     echo2 ""
     echo "# User added mirrors <<<"
