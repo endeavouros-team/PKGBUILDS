@@ -732,7 +732,7 @@ Main() {
         --testing) internal_testing=yes ;;
     esac
     local progname=reflector-simple
-    local VERSION_INFO="added by PKGBUILD"
+    local VERSION_INFO=$(expac %v $progname)
     local ARCH_SITE=https://www.archlinux.org
     local free_params_file="$HOME/.config/reflector-simple-free-params.txt"
 
