@@ -20,6 +20,9 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 Server = https://mirrors.jlu.edu.cn/endeavouros/repo/$repo/$arch
 Server = https://mirror.sjtu.edu.cn/endeavouros/repo/$repo/$arch
 
+## Denmark
+Server = https://mirrors.c0urier.net/linux/endeavouros/repo/$repo/$arch
+
 ## Germany
 Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
 Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
