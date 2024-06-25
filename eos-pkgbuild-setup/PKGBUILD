@@ -3,9 +3,10 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-pkgbuild-setup
+_main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=2024    # new numbering! Previous was: 2022.12.25
-pkgrel=19
+pkgver=24.6    # new numbering! Previous was: 2022.12.25   # likely needs pacman -Syuu
+pkgrel=2
 arch=(any)
 license=(GPL2)
 url="https://github.com/endeavouros-team/$pkgname"
@@ -13,8 +14,8 @@ _url="https://raw.githubusercontent.com/endeavouros-team/$pkgname/main"
 depends=(git hub yay curl xdg-utils meld)
 backup=(
     etc/eos-mirrorcheck.conf
-    etc/eos-pkgbuild-setup.conf
-    etc/eos-pkgbuild-setup-general.conf
+    etc/${_main_appname}.conf
+    etc/${_main_appname}-general.conf
 )
 source=(
     # git+https://github.com/endeavouros-team/eos-pkgbuild-setup.git
@@ -24,19 +25,19 @@ source=(
     $_url/add-release-assets
     $_url/add-release-assets.completion
     $_url/archive-sync-to-remote
-    $_url/assets.make
-    $_url/assets.make.completion
+    $_url/${_main_appname}
+    $_url/${_main_appname}.completion
     $_url/delete-release-assets
     $_url/download-release-assets
     $_url/eos-mirrorcheck.conf
-    $_url/eos-pkgbuild-setup.conf
-    $_url/eos-pkgbuild-setup-general.conf
+    $_url/${_main_appname}.conf
+    $_url/${_main_appname}-general.conf
     $_url/githubcheck
     $_url/GitUpdate
     $_url/local-general-setup
     $_url/mirrorcheck
     $_url/mirrorcheck.completion
-    $_url/pacman-for-assets.make
+    $_url/pacman-for-${_main_appname}
     $_url/release-asset-names
 )
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
@@ -44,12 +45,12 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
             '3950692edc327196375f11bb31363333bb767918f92cb32037704d4e74ebb8772e5e4c24397db9c8973e65e01eb1f82b53c4f55268789679ec4d3e017371c0cb'
-            'ff1f272584b8ca23804e0cbf01497649b9e26ce5b8dcd7c768e11528f6b54af85e2315884a499de5ee0a4fcad4306010297a04318f8a6795013a08624f11678d'
+            'da0423753130db0e61a29b0d71cb7c1974b547fe726bdbd9f01f52a40dd3160aa011468be9a6e294267efc050b4ee275fb452871a9d156597f55068a7e72c0a4'
             '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
             '39d170f9194acca6389b871180e394c61168d1e2c48ab32d35a2d83960d24b7564e9bcdb671e725ed058739c49f86f0d82f86e24648e5f08d55d1dbe782e73e0'
-            '93d064a6e922d798f7d45e4a769d079631e6750c3947b184dc54929c56e46480579f80523c15753e045715dfd6d12e16a72387be4eaf5328565964a9d8199034'
+            'f2f3e513ba97ac79b4ff8566bd4400c57ac898c3e7f9097fbf4e4f5a8b79140b38b8ae6dbe58f74c70fe89a26549844025f3d5dfe53d301d985ba6d3ffb15621'
             '46a4123eee031144508d713cf63b44cdd9e5ec1609948e8e2257e0cf2247589bc793ab5b933a0922a5e73f274b38d64f7a5fcd58ffcb7924524675da8ae98898'
             'f477134bb69d5ea6885bd8e84a2189ecf190c7800264862dbd7b3461a6b3a455b792881ee651a87fa565bfc7048fb155ed0d3d4901f775d059c5554ea84f753e'
             '0b2d8d171a341c9c79b00c4f3c0529e58a9bb2bfb98a65a0fd50433d61284e657b0ca865db25d070c5bebd4f1f70f17225e1eb8a6799249d3ae77e4dc5ec5861'
@@ -60,18 +61,17 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7')
 
 package() {
-    if true ; then
-
     local src file
 
-    echo "${pkgver}-$pkgrel" > "$pkgname.version"
+    # echo "${pkgver}-$pkgrel" > "$pkgname.version"
 
     for src in "${source[@]}" ; do
         file="${src##*/}"
         case "$file" in
             PackageFunc)               install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
             *.completion)              install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
-            *.conf | *.version)        install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+            *.conf)                    install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+            # *.version)                 install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             local-general-setup)       install -Dm755 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
             githubcheck | mirrorcheck) install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
             *)                         install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
@@ -82,43 +82,4 @@ package() {
     for file in delete-release-assets download-release-assets release-asset-names ; do
         ln -s add-release-assets   "$pkgdir/usr/share/bash-completion/completions/$file"
     done
-
-    else
-
-    ln -s add-release-assets                     "$_bash_completion/delete-release-assets"       helps with the tag
-    ln -s add-release-assets                     "$_bash_completion/release-asset-names"         helps with the tag
-    ln -s add-release-assets                     "$_bash_completion/download-release-assets"     helps with the tag
-
-    local -r _scripts="$pkgdir/usr/share/endeavouros/scripts"
-    local -r _usr_bin="$pkgdir/usr/bin"
-    local -r _usr_local_bin="$pkgdir/usr/local/bin"
-    local -r _etc="$pkgdir/etc"
-    local -r _bash_completion="$pkgdir/usr/share/bash-completion/completions"
-
-    install -Dm644 "$pkgname.version"          "$_scripts/$pkgname.version"
-    install -Dm644 PackageFunc                 "$_scripts/PackageFunc"
-    install -Dm755 local-general-setup         "$_scripts/local-general-setup"
-
-    install -Dm755 "$pkgname"                  "$_usr_bin/$pkgname"
-    install -Dm755 archive-sync-to-remote      "$_usr_bin/archive-sync-to-remote"
-    install -Dm755 assets.make                 "$_usr_bin/assets.make"
-    install -Dm755 add-release-assets          "$_usr_bin/add-release-assets"
-    install -Dm755 delete-release-assets       "$_usr_bin/delete-release-assets"
-    install -Dm755 download-release-assets     "$_usr_bin/download-release-assets"
-    install -Dm755 release-asset-names         "$_usr_bin/release-asset-names"
-    install -Dm755 pacman-for-assets.make      "$_usr_bin/pacman-for-assets.make"
-
-    install -Dm755 githubcheck                 "$_usr_local_bin/githubcheck"
-    install -Dm755 mirrorcheck                 "$_usr_local_bin/mirrorcheck"
-
-    install -Dm644 eos-mirrorcheck.conf        "$_etc/eos-mirrorcheck.conf"
-    install -Dm644 eos-pkgbuild-setup.conf     "$_etc/eos-pkgbuild-setup.conf"
-    install -Dm644 eos-pkgbuild-setup-general.conf "$_etc/eos-pkgbuild-setup-general.conf"
-
-     common completions
-    install -Dm644 assets.make.completion        "$_bash_completion/$pkgname"
-    install -Dm644 mirrorcheck.completion        "$_bash_completion/mirrorcheck"
-    install -Dm644 add-release-assets.completion "$_bash_completion/add-release-assets"
-
-    fi
 }
