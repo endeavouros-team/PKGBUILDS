@@ -10,7 +10,8 @@ popd()  { builtin popd  "$@" >/dev/null ; }
 
 MakePicSmaller() {
     local picfile="$1"
-    /usr/bin/convert "$picfile" -depth 3 "$picfile"
+    # /usr/bin/convert "$picfile" -depth 3 "$picfile"
+    /bin/magick "$picfile" -depth 3 "$picfile"
 }
 
 Md2html() {
