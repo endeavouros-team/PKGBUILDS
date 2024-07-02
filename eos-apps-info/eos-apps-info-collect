@@ -10,7 +10,6 @@ popd()  { builtin popd  "$@" >/dev/null ; }
 
 MakePicSmaller() {
     local picfile="$1"
-    # /usr/bin/convert "$picfile" -depth 3 "$picfile"
     /bin/magick "$picfile" -depth 3 "$picfile"
 }
 
@@ -22,10 +21,7 @@ Md2html() {
     if [ "${dir::1}" = "/" ] ; then
         pkgbuildsdir=""
     else
-        case "$app" in
-            welcome) pkgbuildsdir=../../.. ;;    # welcome src separated from PKGBUILD!
-            *)       pkgbuildsdir=../.. ;;
-        esac
+        pkgbuildsdir=../..
         [ -n "$dir" ] && dir="/$dir"
     fi
     mkdir -p $app
@@ -175,13 +171,7 @@ Main()
         fi
     done
 
-    # direct pages
-    for app in akm eos-log-tool eos-rankmirrors pahis reflector-simple
-    do
-        Md2html $app
-    done
-
-    # indirect via man folder
+    # pages in eos-apps-info/man folder
     pushd ../man
     local apps=(*)
     popd
@@ -189,26 +179,6 @@ Main()
     do
         Md2html $app $appname/man
     done
-
-    for app in checkupdatesext eos-update-notifier eos-update-notifier-configure
-    do
-        Md2html $app eos-update-notifier/man
-    done
-
-    Md2html mirrorlist-rank-info   reflector-simple/man
-
-    #for app in nvidia-driver-supported-branches ; do
-    #    Md2html $app nvidia-installer-common/man         # does not exist?
-    #done
-
-    # Md2html nvidia-installer-dkms  nvidia-installer-dkms/man
-    Md2html welcome                welcome/man
-
-    # man page to html: no more needed...
-    #for app in #downgrade #yad # yay polybar inxi
-    #do
-    #    Man2html $app
-    #done
 
     # update the tar.gz archive
     cd ..
