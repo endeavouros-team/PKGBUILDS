@@ -333,7 +333,7 @@ _tr_add2 daily_assist_anews          "Darreres notícies sobre l'Arch"
 _tr_add2 daily_assist_anewstip       "Mostra les darreres notícies de l'Arch en un navegador."
 
 # 2022-Sep-25
-_tr_add2 nb_notify_user1             "Hi ha notícies importants a"
+_tr_add2 nb_notify_user1             "Hi ha notícies importants:"
 _tr_add2 nb_notify_user2             "Si us plau, cliqueu al botó"                                  # Software News
 _tr_add2 nb_notify_user3             "del cantó de baix a l'esquerra d'aquesta finestra."
 
