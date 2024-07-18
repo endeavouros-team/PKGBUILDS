@@ -198,8 +198,9 @@ _config_country() {
 GetListToken() {
     local -n __lista__=$1
     local -n __token__=$2
-    __token__="$(echo "$__lista__" | cut -d ',' -f 1)"
-    __lista__="$(echo "$__lista__" | sed 's|^[^,]*[,]*||')"
+    __token__=${__lista__%%,*}              # first token
+    __lista__=${__lista__#$__token__}       # remove first token from list
+    __lista__=${__lista__#,}                # remove first , from list
 }
 
 Destructor() {
@@ -208,6 +209,82 @@ Destructor() {
 
 # Conf limitations:
 # - nothing known!
+
+Usage() {
+    if true ; then
+    cat <<EOF
+Usage: $progname [options]
+Options:
+    Limited number of reflector options.
+EOF
+    else
+    cat <<-EOF
+        Usage: $progname [options]
+        Options:
+            Limited number of reflector options.
+EOF
+    fi
+    exit $1
+}
+
+HandleOptions() {
+    local opts
+    local lopts="age:,country:,country-exclude:,help,latest:,number:,protocol:,sort:,threads:"
+    local sopts="a:c:hl:n:p:"
+
+    opts="$(/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || Usage 1
+    eval set -- "$opts"
+
+    local list xx yy opt=""
+
+    while true ; do
+        case "$1" in
+            --)                shift; break ;;
+            -h | --help)       Usage 0 ;;
+            -a | --age)        conf_age="$2"; shift ;;
+            -c | --country)    # list or single value: "GB,FR,DE" or "GB"
+                               list="$(ChangeNamesToCodes "$2")"
+                               shift
+                               while [ "$list" ] ; do
+                                   GetListToken list yy
+                                   _config_country "$yy"
+                               done
+                               ;;
+            $country_exclude)  case "$2" in                                # extension
+                                   [a-zA-Z][a-zA-Z])
+                                       xx=${2^^}
+                                       yy="$(CodeToCountry "$2")"
+                                       # xx="$(echo "$2" | tr "[:lower:]" "[:upper:]")"
+                                       [ "$yy" ] || DIE "Unrecognized country code '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                                       ;;
+                                   [A-Z][a-z]*)
+                                       xx="$(FixCountryName "$2")"
+                                       yy="$(CountryToCode "$xx")"
+                                       [ -n "$yy" ] || DIE "Unrecognized country name '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                                       ;;
+                                   *)
+                                       DIE "Unrecognized country '$2' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
+                                       ;;
+                               esac
+                               shift
+                               conf_dropped_countries+=("$xx")
+                               conf_dropped_countries+=("$yy")
+                               ;;
+            -l | --latest)     [ "$use_number_instead_of_latest" = "yes" ] || conf_number="$2"; shift ;;
+            -n | --number)     [ "$use_number_instead_of_latest" = "yes" ] && conf_number="$2"; shift ;;
+            -p | --protocol)   list="$2"
+                               shift
+                               while [ -n "$list" ] ; do
+                                   GetListToken list yy
+                                   conf_protocol+=("$yy")
+                               done
+                               ;;
+            --sort)            conf_sort="$2"; shift ;;
+            --threads)         threads="$2"; shift ;;
+        esac
+        shift
+    done
+}
 
 _get_reflector_x_configs() {
     # Read reflector options from $REFLECTOR_X_CONF,
@@ -231,65 +308,7 @@ _get_reflector_x_configs() {
             -e "s|\([, \t]\)$name,|\1$code,|gI"
     done
 
-    local xx list yy opt=""
-    for xx in $(cat $tmpconf) ; do
-        # split single letter option from its value
-        case "$xx" in
-            -p?* | -c?* | -a?* | -n?*)
-                opt="${xx::2}"
-                xx="${xx:2}"
-                ;;
-            $country_exclude=*)
-                opt="$country_exclude"
-                xx="${xx#*=}"
-                ;;
-        esac
-
-        case "$opt" in
-            --sort)            conf_sort="$xx" ;;
-            -a | --age)        conf_age="$xx" ;;
-            -n | --number)     [ "$use_number_instead_of_latest" = "yes" ] && conf_number="$xx" ;;
-            -l | --latest)     [ "$use_number_instead_of_latest" = "yes" ] || conf_number="$xx" ;;
-            -p | --protocol)
-                list="$xx"
-                while [ -n "$list" ] ; do
-                    GetListToken list yy
-                    conf_protocol+=("$yy")
-                done
-                ;;
-            $country_exclude)                                  # extension
-                case "$xx" in
-                    [a-zA-Z][a-zA-Z])
-                        yy="$(CodeToCountry "$xx")"
-                        [ -n "$yy" ] || DIE "Unrecognized country code '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
-                        xx="$(echo "$xx" | tr "[:lower:]" "[:upper:]")"
-                        conf_dropped_countries+=("$xx")
-                        conf_dropped_countries+=("$yy")
-                        ;;
-                    [A-Z][a-z]*)
-                        xx="$(FixCountryName "$xx")"
-                        yy="$(CountryToCode "$xx")"
-                        [ -n "$yy" ] || DIE "Unrecognized country name '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
-                        conf_dropped_countries+=("$xx")
-                        conf_dropped_countries+=("$yy")
-                        ;;
-                    *)
-                        DIE "Unrecognized country '$xx' with option $country_exclude in file $REFLECTOR_X_CONF, see 'reflector --list-countries'"
-                        ;;
-                esac
-                ;;
-            -c | --country)
-                # list or single value: "GB,FR,DE" or "GB"
-                xx="$(ChangeNamesToCodes "$xx")"
-                list="$xx"
-                while [ -n "$list" ] ; do
-                    GetListToken list yy
-                    _config_country "$yy"
-                done
-                ;;
-        esac
-        opt="$xx"
-    done
+    HandleOptions $(cat $tmpconf)
 
     local zz=()
     for xx in "${conf_selected_countries[@]}" ; do
@@ -404,7 +423,7 @@ AskCountriesAndOptions() {
     local ix included xx tip
     local command
     local default_age=2
-    local default_sort='age!^rate!country!score!delay'
+    local default_sort='^age!rate!country!score!delay'
     local default_number=20
     local use_saved=""
 
@@ -468,7 +487,7 @@ AskCountriesAndOptions() {
     fi
     command+=(--field="Download timeout in seconds":num 5)                         # --download-timeout
 
-    command+=(--field="Threads":num 5)                         # --threads
+    [ "$threads" ] && command+=(--field="Threads":num $threads)                    # --threads
 
     local free_params=""
     if [ -r "$free_params_file" ] ; then
@@ -556,34 +575,45 @@ BuildReflectorCommand() {
     fi
     ((ix++))
     reflector_cmd+=(--download-timeout "${reflector_info[$((ix++))]}")
-    reflector_cmd+=(--threads "${reflector_info[$((ix++))]}")
+    [ "$threads" ] && reflector_cmd+=(--threads "${reflector_info[$((ix++))]}")
 
     # add optional free parameters to the command and save free params to file
-    printf "" > "$free_params_file"
-    local prev=""
-    local item items=()
+    local free_pars=()
+    local next=""
     while true ; do
         xx="${reflector_info[$((ix++))]}"
+
+        [ "$xx" ] || break
+
+        reflector_cmd+=("$xx")
+        free_pars+=("$xx")
+
         case "$xx" in
-            "") break ;;
-            -c) prev="-c" ;;
-            *)  case "$prev" in
-                    -c)
-                        # $xx may need some adjustment
-                        readarray -t items <<< $(echo "$xx" | tr ',' '\n')
-                        for item in "${items[@]}" ; do
-                            conf_selected_countries+=("$(ToCountryName "$item")")
-                        done
-                        prev=""
-                        ;;
-                esac
+            -c | --country)
+                next="${reflector_info[$((ix++))]}"
+                reflector_cmd+=("$next")
+                free_pars+=("$next")
+                AdjustCountries
+                ;;
+            -c=* | --country=*)
+                next=${xx#*=}
+                AdjustCountries
+                ;;
+            -c*)
+                next=${xx:2}
+                AdjustCountries
                 ;;
         esac
-        reflector_cmd+=("$xx")
-        echo "$xx" >> "$free_params_file"
     done
-
-    # echo "${reflector_cmd[*]}" > /tmp/foobar
+    echo "${free_pars[@]}" > "$free_params_file"
+}
+AdjustCountries() {  # put countries in $next to $conf_selected_countries
+    local items=() item
+    readarray -t items <<< $(echo "$next" | tr ',' '\n')
+    for item in "${items[@]}" ; do
+        conf_selected_countries+=("$(ToCountryName "$item")")
+    done
+    next=""
 }
 
 ShowMirrorlistSaved() {
@@ -600,19 +630,12 @@ AddCountryNamesToMirrors() {
     local full_list=$(mktemp)
 
     Verbose "Fetching Arch mirror list..."
-    if [ 0 -eq 1 ] ; then
-        curl -Lsm 10 -o $full_list $ARCH_SITE/mirrorlist/all || {
-            WARN "cannot fetch Arch mirror list."
-            rm -f $full_list
-            return 1
-        }
-    else
-        eos-latest-arch-mirrorlist $full_list || {
-            WARN "cannot fetch Arch mirror list."
-            rm -f $full_list
-            return 1
-        }
-    fi
+    eos-latest-arch-mirrorlist $full_list || {
+        WARN "cannot fetch Arch mirror list."
+        rm -f $full_list
+        return 1
+    }
+
     Verbose "done."
 
     local selected_mirrors=$(grep "^Server = " $tmpfile | awk '{print $3}')
@@ -793,6 +816,7 @@ Main() {
     local conf_protocol=()
     local worldwide_selected=0
     local use_number_instead_of_latest="$REFLECTOR_SIMPLE_PREFER_NUMBER"  # from exported env var
+    local threads=""
     local https_selected=0
     local http_selected=0
     local rsync_selected=0
@@ -849,23 +873,7 @@ Main() {
     )
 
     Verbose "Starting ranking..."
-    "${reflector_cmd[@]}" 2>&1 > $tmpfile | tee $ranklog | {
-        local line=""
-        local max_lines="$_MAX_MIRROR_LINES_TO_SHOW"
-        local value=0
-        local line_count=-2
-        while read line ; do
-            if [[ "$line" != *"WARNING:"* ]]; then
-                ((line_count++))
-            fi
-            echo "#<tt>$line</tt>"
-            if [ "$line_count" -ge 0 ]; then
-                value=$(( line_count*100/max_lines ))
-                echo "$((  value < 100 ? value : 99  ))"
-            fi
-        done
-        echo 100
-    } | "${progress_cmd[@]}"
+    "${reflector_cmd[@]}" 2>&1 > $tmpfile | tee $ranklog | RankProgress "$_MAX_MIRROR_LINES_TO_SHOW" | "${progress_cmd[@]}"
     Verbose "done."
 
     if [ "$use_pulsating_indicator" = "yes" ] ; then
@@ -882,6 +890,24 @@ Main() {
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         Destructor
     fi
+}
+
+RankProgress() {
+    local max_lines="$1"
+    local line=""
+    local value=0
+    local line_count=-2
+    while read line ; do
+        if [[ "$line" != *"WARNING:"* ]]; then
+            ((line_count++))
+        fi
+        echo "#<tt>$line</tt>"
+        if [ "$line_count" -ge 0 ]; then
+            value=$(( line_count*100/max_lines ))
+            echo "$((  value < 100 ? value : 99  ))"
+        fi
+    done
+    echo 100
 }
 
 Main "$@"
