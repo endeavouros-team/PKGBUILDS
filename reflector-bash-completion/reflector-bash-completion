@@ -19,24 +19,43 @@ _reflector_complete_threads() {
 }
 
 _reflector_complete_countries() {
-    local folder=$HOME/.config/reflector-complete
-    local countrylist=$folder/countrylist
-    local date=$(date +%Y%V)                # updates countrylist weekly
+    local -r file=$folder/countrylist.$(/bin/date +%Y%V)     # update countrylist weekly
     local country_names
 
     mkdir -p $folder
-    if [ -r $countrylist.$date ] ; then
-        country_names="$(cat $countrylist.$date)"
+    if [ -r $file ] ; then
+        country_names="$(< $file)"
     else
-        rm -f $countrylist.*
-        country_names="$(/bin/reflector --list-countries 2>/dev/null | /bin/sed -n '/^-----/,//'p | /bin/sed -e '1d' -e 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
-        echo "$country_names" > $countrylist.$date
+        rm -f ${file%.*}.*
+        country_names=$(/bin/reflector --list-countries) || return 1
+        country_names=$(echo "$country_names" | /bin/sed -e '1,2d' -e 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')
+        echo "$country_names" > $file
     fi
 
     local IFS=$'\n'
     COMPREPLY=( $(compgen -W "$country_names" -- "$cur") )
     compopt -o nosort
     compopt -o filenames
+}
+
+_reflector_complete_mirrors() {
+    local -r file=$folder/mirrors.$date
+    mkdir -p $folder
+    if [ -r $file ] ; then
+        local mirrors=$(< $file)
+    else
+        local -r timeout=30
+        local -r url="https://archlinux.org/mirrorlist/?protocol=https&ip_version=4&use_mirror_status=on"
+        local mirrors=$(curl --fail -Lsm $timeout "$url" | grep "^#Server = " | awk '{print $NF}')
+        [ "$mirrors" ] || exit 1
+        echo "$mirrors" > $file
+    fi
+    mirrors=$(fzf -m < $file)
+
+    local IFS=$'\n'
+    COMPREPLY=( $(compgen -W "$mirrors" -- "$cur") )
+    compopt -o nosort
+    #compopt -o filenames
 }
 
 _reflector_options() {
@@ -76,6 +95,8 @@ _reflector_()
     local cur prev #words cword split
     _init_completion -s || return
 
+    local -r folder=$HOME/.config/reflector-complete
+
     # Handle options that need sub-options.
     # Each option "case" should return immediately.
 
@@ -95,7 +116,7 @@ _reflector_()
         --delay)         _reflector_complete ;;
         --save)          _filedir ;;
         --url) ;;
-        --include | -i | --exclude | -x) ;;
+        --include | -i | --exclude | -x) ;;    #_reflector_complete_mirrors ;;
 
         *)
             # Handle all top-level parameters.
