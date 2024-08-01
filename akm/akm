@@ -345,6 +345,7 @@ Main() {
     local quiet=no
 
     CommonStuff                   # fetches common bash definitions
+    eos-assert-deps $progname yad || return 1
     Main2 "$@"
 }
 
