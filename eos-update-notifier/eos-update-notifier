@@ -634,6 +634,10 @@ Main()
         return 0
     fi
 
+    AssignIconVariables_in_eos_bash_shared                                  # get common icons
+
+    yad_missing_check $progname
+
     local dev_log=no
     local dev_logfile=/tmp/$progname.dev_log
     local configdir="$HOME/.config/systemd/user"
@@ -671,8 +675,6 @@ Main()
     DevLog "main loop starting"
 
     [ -r $EOS_UPDATE_NOTIFIER_CONF ] && source $EOS_UPDATE_NOTIFIER_CONF
-
-    AssignIconVariables_in_eos_bash_shared                                  # get common icons
 
     # ICO_UPDATE_AVAILABLE=$(eos_icon_path apps software-update-available)    # app specific icons
     case "$UpdateNotifyIcon" in
