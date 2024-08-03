@@ -38,8 +38,8 @@ eos-update [options]
                           for unsupported mirrors.
                           This may be useful when one or more mirrors start failing unexpectedly.
                           Note: only x86_64 hardware is supported.
-  --check-mirrors-eos     Check files /etc/pacman.d/endeavouros-mirrorlist for unsupported mirrors.
-  --check-mirrors-arch    Check files /etc/pacman.d/mirrorlist for unsupported mirrors.
+  --check-mirrors-eos     Check file /etc/pacman.d/endeavouros-mirrorlist for unsupported mirrors.
+  --check-mirrors-arch    Check file /etc/pacman.d/mirrorlist for unsupported mirrors.
   --nvidia                Check also nvidia driver vs. kernel updates. Useful only with the Nvidia GPU.
   --clear-databases       Clears package database files.
                           Use this only if package database issues constantly make system update fail.
@@ -59,4 +59,17 @@ eos-update [options]
   --min-free-bytes        Minimum amount of free space (in bytes) that the root partition should have
                           before updating. Otherwise a warning message will be displayed.
                           Default: 1000000000
+```
+
+## Examples
+
+```
+# basic update for native packages
+eos-update
+
+# update also packages from the AUR
+eos-update --aur
+
+# check and report the validity of the configured Arch and EndeavourOS mirrors
+eos-update --check-mirrors
 ```
