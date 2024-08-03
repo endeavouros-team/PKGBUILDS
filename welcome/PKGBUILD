@@ -2,13 +2,14 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=24.7
+pkgver=24.8
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
     systemd eos-bash-shared eos-translations
     eos-qogir-icons
+    yad
 )
 optdepends=(
   'translate-shell: for generating a language translation for the User Interface'
