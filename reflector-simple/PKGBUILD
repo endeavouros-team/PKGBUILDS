@@ -2,13 +2,14 @@
 
 pkgname=reflector-simple
 pkgdesc="Simple GUI wrapper for 'reflector'."
-pkgver=2024.7.1
+pkgver=2024.8
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
   reflector
   eos-bash-shared
+  yad
 )
 optdepends=(
     'reflector-bash-completion: useful for plain reflector usage'
