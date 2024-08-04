@@ -1,19 +1,19 @@
 # bash completion for eos-packagelist        -*- shell-script -*-
 
 _eos-packagelist_complete() {
-    local IFS=$'\n'         # handles spaces in names!
+    local IFS="$newline"         # handles spaces in names!
     COMPREPLY=($(compgen -W "$1" -- "$cur"))
     [[ $COMPREPLY == *= ]] && compopt -o nospace
     compopt -o nosort
 
-    # quote the selectable items but not flags
-    local item ix
+    # quote the profiles but not flags
+    local profile ix
     local -r count=${#COMPREPLY[@]}
     for ((ix=0; ix < count; ix++)) ; do
-        item="${COMPREPLY[$ix]}"
-        case "$item" in
+        profile="${COMPREPLY[$ix]}"
+        case "$profile" in
             -*) ;;
-            *) COMPREPLY[$ix]="'$item'" ;;
+            *)  [ "${profile// /}" != "$profile" ] && COMPREPLY[$ix]="'$profile'" ;;
         esac
     done
 }
@@ -23,32 +23,29 @@ _eos-packagelist_()
     local cur prev #words cword split
     _init_completion -s || return
 
+    local -r newline=$'\n'
+
     # eos-packagelist options
     local options=(
-        --help -h --list --arch --install
+        --help -h --list --install
     )
-
-    # architectures supported by eos-packagelist
-    local architectures=(
-        x86_64 aarch64 armv7h
-    )
+    # eos-packagelist profiles
+    local -r profiles=$(< /etc/eos-packagelist.profiles)
 
     # Handle options that need sub-options.
 
     case "$prev" in
-        --arch)
-            _eos-packagelist_complete "$(printf "%s\n" "${architectures[@]}")"
-            ;;
         *)
             # Handle all top-level parameters.
+            local -r options2=$(printf "%s\n" "${options[@]}")
             case "$cur" in
                 -*)
                     # Any option.
-                    _eos-packagelist_complete "$(printf "%s\n" "${options[@]}")"
+                    _eos-packagelist_complete "$options2"
                     ;;
                 *)
                     # Non-option parameters.
-                    _eos-packagelist_complete "$(printf "%s\n" "${options[@]}"; eos-packagelist --list | sort)"
+                    _eos-packagelist_complete "$options2$newline$profiles"
                     ;;
             esac
             ;;
