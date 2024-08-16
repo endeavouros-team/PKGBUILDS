@@ -352,3 +352,17 @@ _tr_add2 ins_pmtip2                  "Менеджер разделов позв
 # 2023-Sep-16
 _tr_add2 ins_arm_start             "Установщик образа EndeavourOS ARM"
 _tr_add2 ins_arm_starttip          "Старт установки EndeavourOS ARM edition"
+
+# 2024-Apr-18
+_tr_add2 ins_conn_issue_title        "Что дальше?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_text         "Нет подключения к Интернету (не настроено подключение wifi${_question})"
+_tr_add2 ins_conn_issue_nm1          "Сетевые соединения"
+_tr_add2 ins_conn_issue_nm2          "Запустить программу NetworkManager"
+_tr_add2 ins_conn_issue_oi1          "Установка с носителя"
+_tr_add2 ins_conn_issue_oi2          "Установить KDE без подключения к Интернету (после установки следует обновить систему)"
+_tr_add2 ins_conn_issue_ex1          "Выход"
+_tr_add2 ins_conn_issue_ex2          "Выйти из программы установки"
+
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "Запуск calamares"
+_tr_add2 ins_please_wait             "Ждите..."
