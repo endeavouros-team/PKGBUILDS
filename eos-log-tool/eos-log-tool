@@ -397,7 +397,7 @@ EOF
 Main()
 {
     local -r progname=eos-log-tool
-    eos-assert-deps $progname yad || return 1
+    eos_assert_deps $progname yad || return 1
     local enable_journal=no
     local -r separator=$'\x0c'    # column separator character for usage with the 'column' app (Form Feed)
 
