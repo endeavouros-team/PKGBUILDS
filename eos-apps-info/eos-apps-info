@@ -90,7 +90,7 @@ Main()
 {
     local progname=${0##*/}
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
-    eos-assert-deps $progname yad || return 1
+    eos_assert_deps $progname yad || return 1
     # local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)
     local -r bonus_apps=($(eos-apps-info-helper --show-bonus))
 
