@@ -4,7 +4,7 @@ pkgname=pahis
 pkgdesc="Show history of package operations of one or all packages."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=0.3.4
+pkgver=24
 pkgrel=1
 
 arch=('any')
@@ -15,8 +15,8 @@ source=(
     "$_url/$pkgname"
     "$_url/$pkgname.completion"
 )
-sha512sums=('2964b910708e4f348ead17f5326256c8c3d80b0fabcf6632f5a4eadae3705b5be282637d96875e3be9aad152b8a4844a1e18a02441e4d51548c9c8196a70ea9f'
-            '74cc392d8c19e3ffc8338c99c8ded6e45eaef3c34bfe5eb39d6b0bbc6ceb23a2a7cf9df410c66ef9a88a42f3dbdd7e9db0aa12addd9622fa3d879199d147f4f6')
+sha512sums=('f0fb8a4262176fc75d326ade1693fa9ecb3c1c249eef39a50d5d883463b1a7bb1f6b9e4496ca21a4d366cfe894ae7029bb8f0580febad2dfaa46476b33199e5f'
+            'a3748d6dcef811e416b1e7dab2675f97bafde99063b6a85c1110a497d17acbdc0f6070b45c62f94c52ae97a36fcb37e012d0b5866d120e30b3c69adee0b7750d')
 
 package() {
   install -Dm755 $pkgname             $pkgdir/usr/bin/$pkgname

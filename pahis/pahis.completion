@@ -1,7 +1,7 @@
 # bash completion for pahis        -*- shell-script -*-
 
 __pahis_pkgsInPacmanLog() {
-    grep "\] \[ALPM\] [a-z]*ed " /var/log/pacman.log | awk '{print $5}'| sort | uniq
+    grep "\] \[ALPM\] [a-z]*ed " /var/log/pacman.log | awk '{print $4}'| sort -u
 }
 
 __log() {
