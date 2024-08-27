@@ -5,6 +5,7 @@ Operation = Remove
 Type = Package
 Target = nvidia
 Target = nvidia-lts
+Target = nvidia-open
 
 [Action]
 When = PostTransaction
