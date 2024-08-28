@@ -102,14 +102,13 @@ Main()
     CheckDatabaseUpdate
 
     local txt=""
-    txt+="The buttons below will show information about the apps in the EndeavourOS repository.\n"
-    txt+="Click an app button and an information window opens.\n\n"
+    txt+="Click the buttons below to see information about the apps in the EndeavourOS repository.\n"
+    txt+="If needed, scroll to see all buttons.\n"
     txt+="Note: you may need to click the <b>$update_label</b> button below to update your package database.\n\n"
-    txt+="A special selection of <i>bonus items</i> is appended!\n"
 
     local cmd=(
         eos_yad --form --title="EndeavourOS apps info" --text="$txt"
-        --columns=4 --align-buttons --image=dialog-information
+        --columns=4 --align-buttons --image=dialog-information --scroll --geometry=800x600
         --button="$update_label!!Updates package database and restarts this app":$exit_updatedb
         --buttons-layout=center
     )
