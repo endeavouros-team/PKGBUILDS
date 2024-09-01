@@ -10,7 +10,8 @@ _ckbcomp_preparations() {
 
     url="$site/installer-team/console-setup"
 
-    local data=$(curl --fail --silent --location --max-time 10 $url/-/tags)
+    local data
+    data=$(curl --fail --silent --location --max-time 60 $url/-/tags) || return 1   # this may be very slow
     local line="$(echo "$data" | grep -E -m1 "/console-setup-[0-9\.]+\.tar\.gz")"
     local dl="$site$(echo "$line" | sed -E -e 's|(.*\.tar\.gz).*|\1|' -e 's|.+(/installer.+)|\1|')"
 
