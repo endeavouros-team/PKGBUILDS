@@ -5,21 +5,7 @@
 # Ex-Maintainer:  Nissar Chababy <funilrys at outlook dot com>
 # Ex-Maintainer:  Jeroen Bollen <jbinero at gmail dot comau>
 
-_ckbcomp_preparations() {
-    local site="https://salsa.debian.org"
-
-    url="$site/installer-team/console-setup"
-
-    local data
-    data=$(curl --fail --silent --location --max-time 60 $url/-/tags) || return 1   # this may be very slow
-    local line="$(echo "$data" | grep -E -m1 "/console-setup-[0-9\.]+\.tar\.gz")"
-    local dl="$site$(echo "$line" | sed -E -e 's|(.*\.tar\.gz).*|\1|' -e 's|.+(/installer.+)|\1|')"
-
-    pkgver="$(echo "$dl" | sed -E 's|.*/console-setup-([0-9\.]+)\.tar\.gz.*|\1|')"
-    source=("$dl")
-}
-_ckbcomp_preparations
-unset -f _ckbcomp_preparations
+_ckbcomp_implementation=v2     # v1 (old, slow) or v2 (new, faster)
 
 pkgname=ckbcomp
 pkgrel=1
@@ -27,10 +13,43 @@ pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or
 arch=(any)
 license=('GPL2')
 depends=('perl')
-sha512sums=('c624b0bf0a7093adbbbac7ae6abe05387b47bc7dbd60b51e8fdf012d64970fce0d2aeb8e3a619b3cdd8a2fa9ab74175ae510e5a5b7eec5777dffe16dd90a1e4c')
+sha512sums=('e246168b909added076e98d5521348887d3b948ba4a06ab21ed9104eaefc2e63073d5130e5733fb92bc3e4af25e2222698a5edd391d04e27bf3bd14fce7a0fec')
+
+_ckbcomp_preparations() {       # Set: url, pkgver, source
+    case $_ckbcomp_implementation in
+        v1) # old implementation, slow
+            local site="https://salsa.debian.org"
+            url="$site/installer-team/console-setup"
+            local data
+            data=$(curl --fail --silent --location --max-time 60 $url/-/tags) || return 1   # this $url may be very slow
+            local line="$(echo "$data" | grep -E -m1 "/console-setup-[0-9\.]+\.tar\.gz")"
+            local dl="$site$(echo "$line" | sed -E -e 's|(.*\.tar\.gz).*|\1|' -e 's|.+(/installer.+)|\1|')"
+            pkgver="$(echo "$dl" | sed -E 's|.*/console-setup-([0-9\.]+)\.tar\.gz.*|\1|')"
+            source=("$dl")
+            ;;
+        v2) # new implementation, fast
+            local data
+            url="https://sources.debian.org/src/console-setup/"
+            data=$(curl --fail -Lsm 30 $url) || { echo "error: fetcing info failed"; return 1; }
+            pkgver="$(echo "$data" | grep -m1 "/src/console-setup/" | sed -E 's|.*/src/console-setup/([^/]+)/.*|\1|')"
+            # pkgver may include only numbers, lowercase letters, and "." "+" "~"
+            [ "${pkgver//[a-z0-9.+~]/}" ] && { echo "pkgver ($pkgver) is invalid"; return 1; }
+            source=("https://sources.debian.org/data/main/c/console-setup/$pkgver/Keyboard/ckbcomp")
+            ;;
+    esac
+}
+
+_ckbcomp_preparations
+unset -f _ckbcomp_preparations
 
 package() {
-    local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
-    install -Dm755 "${appname}-$pkgver/Keyboard/$pkgname"   "${pkgdir}/usr/bin/$pkgname"
-    rm -f "../${appname}-$pkgver.tar.gz"   # cleanup
+    case $_ckbcomp_implementation in
+        v1) local appname=$(basename "${source[0]}"  -$pkgver.tar.gz)
+            install -Dm755 "${appname}-$pkgver/Keyboard/$pkgname"   "${pkgdir}/usr/bin/$pkgname"
+            rm -f "../${appname}-$pkgver.tar.gz"   # cleanup
+            ;;
+        v2) install -Dm755 $pkgname   "${pkgdir}/usr/bin/$pkgname"
+            rm -f ../$pkgname   # cleanup
+            ;;
+    esac
 }
