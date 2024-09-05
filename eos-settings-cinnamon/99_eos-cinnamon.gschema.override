@@ -6,7 +6,7 @@ cursor-theme='Qogir'
 gtk-theme='Arc-Darker'
 
 [org.cinnamon.theme]
-name='Arc'
+name='Arc-Dark'
 
 [org.cinnamon.desktop.interface]
 icon-theme='Qogir-dark'
