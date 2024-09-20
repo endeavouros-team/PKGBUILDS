@@ -29,6 +29,7 @@ Server = https://mirror.rznet.fr/endeavouros/repo/$repo/$arch
 ## Germany
 Server = https://mirror.alpix.eu/endeavouros/repo/$repo/$arch
 Server = https://mirror.moson.org/endeavouros/repo/$repo/$arch
+Server = https://ftp.rz.tu-bs.de/pub/mirror/endeavouros/repo/$repo/$arch
 
 ## Greece
 Server = https://fosszone.csd.auth.gr/endeavouros/repo/$repo/$arch
