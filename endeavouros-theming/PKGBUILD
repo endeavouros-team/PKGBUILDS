@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=endeavouros-theming
-pkgver=24.06.2.3
+pkgver=24.06.1.1
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
@@ -10,13 +10,12 @@ url='https://www.endeavouros.com'
 license=('GPL3')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/endeavouros-theming/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('f9a4730a5469e76323e7bd146b9137ad38b114d957f7a073125a9e189800c36a3a77d43af2a55c2cc92935749e83305c3d41bd28d924d1a847747e3d3b63eab0')
+sha512sums=('ea19e7e99f57ec8eb5d61801ece49c054fccb3c3afe91e913c197d49dc693f68421e6526c7c95e46bdbfefb6b011200ebf3fd58a7d6227f24e409c06198d4757')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
 
   install -Dm644 *.png *.svg -t "${pkgdir}/usr/share/endeavouros"
-  install -Dm644 icons/* -t "${pkgdir}/usr/share/endeavouros/icons"
   install -Dm644 endeavouros.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
   install -Dm644 endeavouros-icon.png  -t "${pkgdir}/usr/share/pixmaps"
   install -Dm644 endeavouros-dark.{svg,png} -t "${pkgdir}/usr/share/pixmaps"
