@@ -4,9 +4,25 @@ Main() {
     local conf=/etc/eos-rankmirrors.conf
     source $conf || return
 
+    local pacnew=/etc/pacman.d/endeavouros-mirrorlist.pacnew
+
     case "$EOS_RANK_WHEN_MIRRORLIST_CHANGES" in
-        yes | "") ;;
-        no  | *) return ;;
+        yes | "")
+            echo "  -> configuration set to rank mirrors" >&2
+            ;;
+        no  | *)
+            echo "  -> configuration set to not rank mirrors" >&2
+            case "$EOS_KEEP_UNRANKED_LIST_BY_HOOK" in
+                yes) ;;
+                no | *)
+                    if [ -e $pacnew ] ; then
+                        echo "  -> deleting $pacnew" >&2
+                        rm -f $pacnew
+                    fi
+                    ;;
+            esac
+            return
+            ;;
     esac
 
     local timeout="$EOS_AUTORANK_TIMEOUT"
