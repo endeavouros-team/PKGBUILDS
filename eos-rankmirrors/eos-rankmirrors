@@ -211,7 +211,7 @@ GetUpdateNumberAndTime() {
                     case "$retcode" in
                         28) msg+=("Connection to this mirror failed after $timeout seconds.") ;;
                       # 7)  msg+=("Connection to this mirror failed. The mirror may be temporarily or permanently offline.") ;;
-                        *)  msg+=("Connection to this mirror failed.") ;;
+                        *)  msg+=("Connection to this mirror failed (code 60).") ;;
                     esac
                     case "$mirror_verbosity" in
                         all)
@@ -242,8 +242,8 @@ GetUpdateNumberAndTime() {
 GetReferenceUpdateLevel() {
     local refroot="https://mirror.alpix.eu/endeavouros/repo"
     local result=$(GetUpdateNumberAndTime "$refroot/state" "$refroot"/'$repo/$arch')
-    [ -n "$result" ] || exit 0
-    reference_level=$(echo "$result" | awk '{print $2}')
+
+    [ -n "$result" ] && reference_level=$(echo "$result" | awk '{print $2}')
 }
 
 CheckMirrorlist() {
