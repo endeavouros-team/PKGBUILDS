@@ -662,7 +662,7 @@ Main()
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
-    local -r show_original_list_default=yes       # yes or no
+    local -r show_original_list_default=no        # yes or no
     local -r show_ranking_info_default=yes        # yes or no
 
     # Don't do anything time consuming before dumping options.
