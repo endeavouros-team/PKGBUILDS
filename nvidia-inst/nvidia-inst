@@ -247,7 +247,9 @@ OnlyNvidia() {
 
 KernelParametersToBoot2() {
     local mode2
-    local para=nvidia-drm.modeset=1
+    local para
+    local params=(nvidia-drm.modeset=1
+                  nvidia-drm.fbdev=1)
     local file_sdboot=/etc/kernel/cmdline
     local file_grub=/etc/default/grub
 
@@ -257,14 +259,18 @@ KernelParametersToBoot2() {
     esac
     case "$mode2" in
         add)
-            if [ -z "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
-            fi
+            for para in "${params[@]}" ; do
+                if [ -z "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
+                    AddCmd "nvidia-installer-kernel-para $para $mode2"
+                fi
+            done
             ;;
         remove)
-            if [ "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                AddCmd "nvidia-installer-kernel-para nvidia-drm.modeset=1 $mode2"
-            fi
+            for para in "${params[@]}" ; do
+                if [ "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
+                    AddCmd "nvidia-installer-kernel-para $para $mode2"
+                fi
+            done
             ;;
     esac
 }
