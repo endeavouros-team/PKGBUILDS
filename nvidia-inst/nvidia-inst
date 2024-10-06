@@ -246,6 +246,7 @@ OnlyNvidia() {
 }
 
 KernelParametersToBoot2() {
+    return 0                    # 2024-Oct: drm.modeset and drm-fbdev are already included in nvidia packages
     local mode2
     local para
     local params=(nvidia-drm.modeset=1
