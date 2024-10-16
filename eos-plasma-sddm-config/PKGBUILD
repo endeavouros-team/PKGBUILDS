@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-plasma-sddm-config
-pkgver=24.10.1.1
+pkgver=22.03.1.2
 pkgrel=1
 pkgdesc='EndeavourOS Theme for SDDM for Plasma'
 arch=('any')
@@ -10,7 +10,7 @@ license=('GPL')
 depends=('sddm' 'plasma-workspace')
 makedepends=('git')
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('4bce5c80b905d4f15c9318c13ab58509b1b13cc59c6c5b138349e8410f4f2b3b')
+sha256sums=('25092479cc73157e48f89c2bdad38bd982e93581b861a6e83d600db66848639a')
 
 package() {
     cd "${pkgname}-${pkgver}"
