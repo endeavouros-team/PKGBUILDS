@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-inst
-pkgver=24.10.1
+pkgver=24.10.2
 pkgrel=1
 pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -12,16 +12,14 @@ arch=('any')
 license=('GPL2')
 replaces=(nvidia-installer-dkms nvidia-installer-db nvidia-installer-common)
 conflicts=(nvidia-installer-common)
-depends=(
-  # nvidia-installer-common
-  dkms
-)
+depends=()
 optdepends=(
   "linux-headers: for $pkgname with kernel linux"
   "linux-lts-headers: for $pkgname with kernel linux-lts"
   "linux-hardened-headers: for $pkgname with kernel linux-hardened"
   "linux-zen-headers: for $pkgname with kernel linux-zen"
   "expac: faster way for finding available package versions"
+  "dkms: for the dkms versions of Nvidia drivers"
 )
 
 source=(
@@ -30,7 +28,7 @@ source=(
   $_url/nvidia-installer-kernel-para
   $_url/nvidia-driver-supported-branches
 )
-sha512sums=('a5ab6f10ea17a92de4a343bdd83c335be4cc0e8b780157bb01e88da92c0e024343d210a9170eb050fea9ff9c052e115e82e4d3e75330516ad4fcb86fda400ec6'
+sha512sums=('69816b8c6835edc2fc8387a11cddeabffad238e6001769359a338f6b84be0d21ece71887e3584904e3086f97f746fb5a145b2a2ea07257f4e8e5a656bc9a7311'
             'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6'
             '8ee3fadd5c5c3f82d8f7c0b9273c7c970fe67486e5bcba5edae5dc7d997cd3aeb334fe8e76576b824187072c314dffcfd9cc01f2fdc46213001a6b997d720bb0'
             '429c18ecf23d56b9b996b5e48884365324b713d48cfeab09e48753cfa8afdf79516a753058f6a0b6acaaca7c6f4a690dc5816c53c5f0ad3682291f481b6e1c5d')

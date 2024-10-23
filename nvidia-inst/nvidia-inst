@@ -50,6 +50,15 @@ PkgRemove() {
     done
 }
 
+EnsureDkms() {
+    if [ $dkms_added = no ] ; then
+        if [ ! -x /bin/dkms ] ; then
+            adjusted+=(dkms)
+            dkms_added=yes
+        fi
+    fi
+}
+
 CheckUnsupportedKernels() {
     local unsupported_kernels="$(expac -Qs %n linux headers | grep -P 'rt-|hardened-|zen-' | sed 's|-headers||')"
     [ "$unsupported_kernels" ] && Warn "unsupported kernels installed: $unsupported_kernels"
@@ -101,12 +110,10 @@ AdjustPkgsAboutDkms() {
                     nvidia-dkms)
                         # Info "Changing $pkg to nvidia and nvidia-lts"
                         adjusted+=(nvidia nvidia-lts)    # no need to check installed kernels?
-                        # CheckUnsupportedKernels
                         ;;
                     nvidia-open-dkms)
                         # Info "Changing $pkg to nvidia-open"
                         adjusted+=(nvidia-open)
-                        # CheckUnsupportedKernels
                         ;;
                     bbswitch-dkms)
                         # Info "Changing $pkg to bbswitch"
@@ -119,6 +126,27 @@ AdjustPkgsAboutDkms() {
             done
             if [ ${#adjusted[@]} -gt 0 ] ; then
                 remove=("${adjusted[@]}")
+            fi
+            ;;
+        yes)
+            local dkms_added=no
+            for ((ix=0; ix<ic; ix++)) ; do
+                pkg="${install[$ix]}"
+                case "$pkg" in
+                    nvidia-dkms | nvidia-open-dkms | bbswitch-dkms)
+                        EnsureDkms
+                        adjusted+=("$pkg")
+                        ;;
+                    nvidia-beta-dkms)
+                        DIE "AUR package $pkg not supported"
+                        ;;
+                    *)
+                        adjusted+=("$pkg")
+                        ;;
+                esac
+            done
+            if [ ${#adjusted[@]} -gt 0 ] ; then
+                install=("${adjusted[@]}")
             fi
             ;;
     esac
