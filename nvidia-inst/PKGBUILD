@@ -4,8 +4,8 @@
 
 pkgname=nvidia-inst
 pkgver=24.10.2
-pkgrel=1
-pkgdesc="Script to setup nvidia drivers (dkms version) in EndeavourOS"
+pkgrel=2
+pkgdesc="Script to install/uninstall nvidia driver packages in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname
 arch=('any')
@@ -14,12 +14,12 @@ replaces=(nvidia-installer-dkms nvidia-installer-db nvidia-installer-common)
 conflicts=(nvidia-installer-common)
 depends=()
 optdepends=(
-  "linux-headers: for $pkgname with kernel linux"
-  "linux-lts-headers: for $pkgname with kernel linux-lts"
-  "linux-hardened-headers: for $pkgname with kernel linux-hardened"
-  "linux-zen-headers: for $pkgname with kernel linux-zen"
+  "linux-headers: needed by nvidia-dkms or nvidia-open-dkms"
+  "linux-lts-headers: needed by nvidia-dkms or nvidia-open-dkms"
+  "linux-hardened-headers: needed by nvidia-dkms or nvidia-open-dkms"
+  "linux-zen-headers: needed by nvidia-dkms or nvidia-open-dkms"
+  "dkms: for the dkms versions of the proprietary Nvidia drivers"
   "expac: faster way for finding available package versions"
-  "dkms: for the dkms versions of Nvidia drivers"
 )
 
 source=(
