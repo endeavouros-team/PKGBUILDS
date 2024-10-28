@@ -64,6 +64,9 @@ Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
 Server = https://endeavouros.ip-connect.info/repo/$repo/$arch
 
+## United Kingdom
+Server = https://repo.c48.uk/endeavouros/repo/$repo/$arch
+
 ## United States
 Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
 
