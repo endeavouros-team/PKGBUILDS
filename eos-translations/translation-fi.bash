@@ -56,8 +56,8 @@ _tr_add2 after_install_text   "Mitä tehdä asennuksen jälkeen$_question"
 _tr_add2 after_install_um     "Päivitä peilipalvelimet"
 _tr_add2 after_install_umtip  "Päivitä peilipalvelinten lista ennen järjestelmän päivitystä"
 
-_tr_add2 after_install_us     "Päivitä järjestelmäpaketit"
-_tr_add2 after_install_ustip  "Päivitä kaikki järjestelmän ohjelmistopaketit"
+_tr_add2 after_install_us     "Päivitä järjestelmäpaketit"                     # This definition is used by Welcome 24.11-1 and older.
+_tr_add2 after_install_ustip  "Päivitä kaikki järjestelmän ohjelmistopaketit"  # This definition is used by Welcome 24.11-1 and older.
 
 _tr_add2 after_install_dsi     "Tunnista/korjaa järjestelmäongelmia"
 _tr_add2 after_install_dsitip  "Tarkista tunnetut järjestelmäongelmat ja korjaa ne"
@@ -366,4 +366,15 @@ _tr_add2 ins_conn_issue_ex2          "Lopeta tämä ohjelma"
 # 2024-Apr-20
 _tr_add2 ins_start_calamares         "Käynnistetään calamares"
 _tr_add2 ins_please_wait             "Odota hetki..."
+
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Päivitä systeemin natiivipaketit"
+_tr_add2 after_install_usnat_tip     "Päivittää paketit pakettivarastoista, katso /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Päivitä sekä natiivit että AUR:sta haetut paketit"
+_tr_add2 after_install_usnataur_tip  "Päivittää paketit pakettivarastoista, katso /etc/pacman.conf, sekä AUR:sta"
+_tr_add2 after_install_ushlp         "Päivitä sekä natiivit että AUR:sta haetut paketit"
+_tr_add2 after_install_ushlp_tip     "Päivittää paketit pakettivarastoista, katso /etc/pacman.conf, sekä AUR:sta käyttäen AUR-apuria"
+
+_tr_add2 after_install_umartip       "Päivitä Arch-peilipalvelinten lista ennen pakettien päivitystä"
+_tr_add2 after_install_umentip       "Päivitä EndeavourOS-peilipalvelinten lista ennen pakettien päivitystä"
 

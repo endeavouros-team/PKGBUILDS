@@ -56,8 +56,8 @@ _tr_add2 after_install_text    "After install tasks"
 _tr_add2 after_install_um      "Update Mirrors"
 _tr_add2 after_install_umtip   "Update list of mirrors before system update"
 
-_tr_add2 after_install_us      "Update System"
-_tr_add2 after_install_ustip   "Update System Software"
+_tr_add2 after_install_us      "Update System"                 # This definition is used by Welcome 24.11-1 and older.
+_tr_add2 after_install_ustip   "Update System Software"        # This definition is used by Welcome 24.11-1 and older.
 
 _tr_add2 after_install_dsi     "Detect system issues"
 _tr_add2 after_install_dsitip  "Detect any potential issues on system packages or elsewhere"
@@ -366,4 +366,15 @@ _tr_add2 ins_conn_issue_ex2          "Quit this program"
 # 2024-Apr-20
 _tr_add2 ins_start_calamares         "Starting calamares"
 _tr_add2 ins_please_wait             "Please wait..."
+
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Update Native Packages"
+_tr_add2 after_install_usnat_tip     "Updates packages from repos in /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Update Native $_and AUR Packages"
+_tr_add2 after_install_usnataur_tip  "Updates packages from repos in /etc/pacman.conf and AUR"
+_tr_add2 after_install_ushlp         "Update Native $_and AUR Packages"
+_tr_add2 after_install_ushlp_tip     "Updates packages from repos in /etc/pacman.conf and AUR with an AUR helper"
+
+_tr_add2 after_install_umartip       "Update list of Arch mirrors before updating packages"
+_tr_add2 after_install_umentip       "Update list of EndeavourOS mirrors before updating packages"
 
