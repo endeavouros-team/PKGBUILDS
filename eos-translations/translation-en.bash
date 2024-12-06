@@ -383,3 +383,7 @@ _tr_add2 after_install_reisub        "REISUB information"
 _tr_add2 after_install_reisub2       "Enable REISUB"
 _tr_add2 after_install_reisubtip     "REISUB helps dealing with a system crash"
 
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "enabled"
+_tr_add2 _commonphrase_disabled      "disabled"
+

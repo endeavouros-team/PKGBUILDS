@@ -383,3 +383,7 @@ _tr_add2 after_install_reisub        "REISUB-tietoa"
 _tr_add2 after_install_reisub2       "REISUB: ota käyttöön"
 _tr_add2 after_install_reisubtip     "REISUB auttaa selviämään paremmin systeemin kaatumisesta"
 
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "otettu käyttöön"
+_tr_add2 _commonphrase_disabled      "poistettu käytöstä"
+
