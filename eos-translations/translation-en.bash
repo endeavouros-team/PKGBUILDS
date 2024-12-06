@@ -378,3 +378,8 @@ _tr_add2 after_install_ushlp_tip     "Updates packages from repos in /etc/pacman
 _tr_add2 after_install_umartip       "Update list of Arch mirrors before updating packages"
 _tr_add2 after_install_umentip       "Update list of EndeavourOS mirrors before updating packages"
 
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "REISUB information"
+_tr_add2 after_install_reisub2       "Enable REISUB"
+_tr_add2 after_install_reisubtip     "REISUB helps dealing with a system crash"
+

@@ -378,3 +378,8 @@ _tr_add2 after_install_ushlp_tip     "Päivittää paketit pakettivarastoista, k
 _tr_add2 after_install_umartip       "Päivitä Arch-peilipalvelinten lista ennen pakettien päivitystä"
 _tr_add2 after_install_umentip       "Päivitä EndeavourOS-peilipalvelinten lista ennen pakettien päivitystä"
 
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "REISUB-tietoa"
+_tr_add2 after_install_reisub2       "REISUB: ota käyttöön"
+_tr_add2 after_install_reisubtip     "REISUB auttaa selviämään paremmin systeemin kaatumisesta"
+
