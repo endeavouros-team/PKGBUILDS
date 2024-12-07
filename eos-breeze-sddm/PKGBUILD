@@ -1,0 +1,26 @@
+# Maintainer: endeavouros-team <info[at]endeavouros.com>
+
+pkgname=eos-breeze-sddm
+pkgver=1.4
+pkgrel=1
+pkgdesc="EndeavourOS SDDM theme for KDE plasma based on breeze."
+arch=('any')
+url="https://github.com/endeavouros-team/eos-breeze-sddm"
+license=('CCPL:cc-by-sa')
+depends=('sddm' 'plasma-workspace')
+conflicts=('eos-sddm-theme')
+replaces=('eos-plasma-sddm-config')
+install="${pkgname}.install"
+source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/${pkgver}.tar.gz"
+"${pkgname}.install")
+
+md5sums=('23389e01866f6a10caca9d346b5dd075'
+         '8d23e346853fc26cb98991b3dc15dcff')
+
+package() {
+  install -dm 755 ${pkgdir}/usr/share/sddm/themes
+  install -dm 755 ${pkgdir}/etc/sddm.conf.d
+  cp -r --no-preserve=ownership "${srcdir}/eos-breeze-sddm-${pkgver}/eos-breeze" "${pkgdir}/usr/share/sddm/themes/"
+  cp --no-preserve=ownership "${srcdir}/${pkgname}-${pkgver}/10-endeavouros.conf" "${pkgdir}/etc/sddm.conf.d/"
+}
+

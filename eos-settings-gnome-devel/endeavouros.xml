@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>endeavouros</name>
+    <filename>/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png</filename>
+    <filename-dark>/usr/share/endeavouros/backgrounds/endeavouros-wallpaper-dark.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#46226e</pcolor>
+    <scolor>#000000</scolor>
+  </wallpaper>
+</wallpapers>

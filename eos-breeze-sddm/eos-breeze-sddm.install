@@ -1,0 +1,8 @@
+post_install() {
+  echo "To use this theme, add the following lines to /etc/sddm.conf"
+  echo "any dropin you may use under /etc/sddm.conf.d"
+  echo "or simply use plasma settings (sddm-kcm) to choose theme for sddm"
+  echo
+  echo "[Theme]"
+  echo "Current=eos-breeze"
+}
