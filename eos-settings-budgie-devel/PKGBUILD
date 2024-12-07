@@ -7,7 +7,7 @@ pkgdesc="Budgie settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
 source=('99_endeavouros-budgie.gschema.override')
-depends=('endeavouros-theming')
+depends=('endeavouros-branding')
 sha256sums=('1f05d13650b501335fa6cc9d0870a934b31beb96e9fdf89eeb9a55fd3f91124a')
 
 package() {
