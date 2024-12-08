@@ -3,13 +3,13 @@
 pkgname=endeavouros-branding
 _srcname=Branding
 pkgver=24.12.1.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
 replaces=('endeavouros-theming')
+provides=('endeavouros-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
-makedepends=('git')
 source=("https://github.com/endeavouros-team/Branding/archive/refs/tags/${pkgver}.tar.gz")
 sha512sums=('c40c7af91f30e386a3d55ecd6833dd3250abbdee4ea16b334132ff921f4b71c3d32260bb1d33dca943f18ebe7a6f67781f3c0331c09dec1670c78c62cb607ff2')
 
@@ -42,4 +42,7 @@ package() {
   ln -s "/usr/share/pixmaps/endeavouros.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo.svg"
   ln -s "/usr/share/pixmaps/endeavouros-dark.png" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.png"
   ln -s "/usr/share/pixmaps/endeavouros-dark.svg" "${pkgdir}/usr/share/pixmaps/endeavouros-logo-dark.svg"
+
+  # cleanup
+  rm -f ../../24.12.1.3.tar.gz
 }
