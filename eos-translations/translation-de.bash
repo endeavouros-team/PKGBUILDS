@@ -371,6 +371,22 @@ _tr_add2 ins_conn_issue_ex2      "Das Programm beenden"
 _tr_add2 ins_start_calamares         "Calamares startet"
 _tr_add2 ins_please_wait             "Es geht gleich weiter..."
 
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Update Native Packages"
+_tr_add2 after_install_usnat_tip     "Updates packages from repos in /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Update Native $_and AUR Packages"
+_tr_add2 after_install_usnataur_tip  "Updates packages from repos in /etc/pacman.conf and AUR"
+_tr_add2 after_install_ushlp         "Update Native $_and AUR Packages"
+_tr_add2 after_install_ushlp_tip     "Updates packages from repos in /etc/pacman.conf and AUR with an AUR helper"
 
+_tr_add2 after_install_umartip       "Update list of Arch mirrors before updating packages"
+_tr_add2 after_install_umentip       "Update list of EndeavourOS mirrors before updating packages"
 
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "Information zu REISUB"
+_tr_add2 after_install_reisub2       "Aktiviere REISUB"
+_tr_add2 after_install_reisubtip     "REISUB hilft bei Systemabstürzen"
 
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "aktiviert"
+_tr_add2 _commonphrase_disabled      "deaktiviert"
