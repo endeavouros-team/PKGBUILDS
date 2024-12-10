@@ -387,3 +387,8 @@ _tr_add2 after_install_reisubtip     "REISUB auttaa selviämään paremmin syste
 _tr_add2 _commonphrase_enabled       "otettu käyttöön"
 _tr_add2 _commonphrase_disabled      "poistettu käytöstä"
 
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "Tietoa arch-chroot:sta"
+_tr_add2 arch_chroot_tip             "arch-chroot sallii pääsyn systeemiin esim. ongelmatilanteissa"
+_tr_add2 _commonphrase_not_found     "%%s ei saatavilla"                                                   # example usage: "file1.txt not found"
+

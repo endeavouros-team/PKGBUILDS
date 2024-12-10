@@ -387,3 +387,8 @@ _tr_add2 after_install_reisubtip     "REISUB helps dealing with a system crash"
 _tr_add2 _commonphrase_enabled       "enabled"
 _tr_add2 _commonphrase_disabled      "disabled"
 
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "arch-chroot information"
+_tr_add2 arch_chroot_tip             "arch-chroot provides a command line access to another system"
+_tr_add2 _commonphrase_not_found     "%%s not found"                                                   # example usage: "file1.txt not found"
+

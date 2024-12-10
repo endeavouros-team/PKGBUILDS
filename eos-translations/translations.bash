@@ -290,6 +290,6 @@ _init_translations() {
         done
     fi
     if [ -r $errlog ] ; then
-        echo "Info: translation issues detected, see file '$errlog'."
+        echo "Info: some translations will fall back to English, see file '$errlog'."
     fi
 }
