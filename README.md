@@ -11,7 +11,6 @@ Adding info.md to some questionable packages.
   * endeavouros-theming
   * endeavouros-mirrorlist-testing
   * endeavouros-developer-mirrorlist
-  * ckbcomp
   * b43-firmware
 
 * **9th of sept 2021:**
