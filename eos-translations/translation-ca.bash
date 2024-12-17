@@ -277,7 +277,7 @@ _tr_add2 after_install_pacdiff_tip "Gestioneu fitxers pacnew, pacorig i pacsave 
 _tr_add2 after_install_conf           "Configuració del dimoni"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Baixeu més fons de pantalla de l'EndeavourOS"
 _tr_add2 after_install_more_wall_tip  "Baixeu fons de pantalla de llegat i de la comunitat de l'EndeavourOS."
-_tr_add2 after_install_info           "informació"                           # last word on a sentence, means just any information
+_tr_add2 after_install_info           ": informació"                           # last word on a sentence, means just any information
 
 _tr_add2 butt_softnews                "Notícies de programari"
 _tr_add2 butt_softnews_tip            "Notícies importants sobre el programari de l'EndeavourOS"
@@ -309,7 +309,7 @@ _tr_add2 after_install_r8168         "Problema amb la xarxa amb fil$_question Ca
 _tr_add2 after_install_r8168_tip     "Canvia entre els controladors r8168 i r8169 (pot ser que calgui reiniciar)."           # changed 2021-Dec-14 !!
 
 # 2021-Oct-08
-_tr_add2 daily_assist_DEinfo         "informació"                                         # assume prefix "DE:", e.g.: "Xfce: information"
+_tr_add2 daily_assist_DEinfo         ": informació"                                         # assume prefix "DE:", e.g.: "Xfce: information"
 _tr_add2 daily_assist_DEinfo_tip     "més informació sobre aquest gestor d'escriptori / finestres"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
@@ -353,3 +353,41 @@ _tr_add2 ins_pmtip2                  "Partitionmanager permet examinar i gestion
 _tr_add2 ins_arm_start             "Instal·lador de la imatge EndeavourOS ARM"
 _tr_add2 ins_arm_starttip          "Comença la instal·lació de l'edició EndeavourOS ARM"
 
+# 2024-Apr-18
+_tr_add2 ins_conn_issue_title        "I ara què?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_text         "No s'ha trobat cap connexió a internet (potser la wifi no està a punt${_question})"
+_tr_add2 ins_conn_issue_nm1          "Gestor de xarxes"
+_tr_add2 ins_conn_issue_nm2          "Incia el Gestor de xarxes"
+_tr_add2 ins_conn_issue_oi1          "Instal·lació fora de línia"
+_tr_add2 ins_conn_issue_oi2          "Instal·la el KDE sense connexió a internet (es recomana actualizar el sistema després de la instal·lació)"
+_tr_add2 ins_conn_issue_ex1          "Surt"
+_tr_add2 ins_conn_issue_ex2          "Surt d'aquest programa."
+
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "S'inicia el Calamares"
+_tr_add2 ins_please_wait             "Espereu, si us plau..."
+
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Actualitza els paquets nadius"
+_tr_add2 after_install_usnat_tip     "Actualitza els paquets dels repositoris de /etc/pacman.conf."
+_tr_add2 after_install_usnataur      "Actualitza els paquets nadius i els de l'AUR"
+_tr_add2 after_install_usnataur_tip  "Actualitza els paquets dels repositoris de /etc/pacman.conf i de l'AUR."
+_tr_add2 after_install_ushlp         "Actualitza els paquets nadius i els de l'AUR"
+_tr_add2 after_install_ushlp_tip     "Actualitza els paquets dels repositoris de /etc/pacman.conf i de l'AUR amb un assistent de l'AUR."
+
+_tr_add2 after_install_umartip       "Actualitza la llista de les rèpliques de l'Arch abans d'actualitzar els paquets."
+_tr_add2 after_install_umentip       "Actualitza la llista de les rèpliques de l'EndeavourOS abans d'actualitzar els paquets."
+
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "Informació sobre REISUB"
+_tr_add2 after_install_reisub2       "Habilita REISUB"
+_tr_add2 after_install_reisubtip     "REISUB ajuda a gestionar una fallada del sistema."
+
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "habilitat"
+_tr_add2 _commonphrase_disabled      "inhabilitat"
+
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "Informació sobre arch-chroot"
+_tr_add2 arch_chroot_tip             "L'eina arch-chroot proporciona un accés de línia d'ordres a un altre sistema."
+_tr_add2 _commonphrase_not_found     "No s'ha trobat %%s."                                                   # example usage: "file1.txt not found"
