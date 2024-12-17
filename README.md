@@ -6,16 +6,20 @@ PKGBUILDS **of interest** to EndeavourOS.<br>
 The source for packages we maintain in our repository.
 
 **17th of dec 2024:**
+
 Adding info.md to some questionable packages.
 
 **9th of sept 2021:**
+
 cleaned up from unused PKGBUILDS
 Created backup branch:
 [backup-before-08-2021](https://github.com/endeavouros-team/PKGBUILDS/tree/backup-before-08-2021)
 
 --- 
 
-13-03-2022 creating new **release tags scheme** to be used for some packages like calamares and calamares config packages and others with branding or purposes that are changed for ISO release in any other matter:
+**13th March of  2022:** 
+
+creating new **release tags scheme** to be used for some packages like calamares and calamares config packages and others with branding or purposes that are changed for ISO release in any other matter:
 
 Naming convention for the tags. 
 This would only be for packages that can change as part of the release of a new ISO.
