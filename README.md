@@ -5,12 +5,16 @@
 PKGBUILDS **of interest** to EndeavourOS.<br>
 The source for packages we maintain in our repository.
 
-**17th of dec 2024:**
-
+* **17th of dec 2024:**
 Adding info.md to some questionable packages.
+  * openswap
+  * endeavouros-theming
+  * endeavouros-mirrorlist-testing
+  * endeavouros-developer-mirrorlist
+  * ckbcomp
+  * b43-firmware
 
-**9th of sept 2021:**
-
+* **9th of sept 2021:**
 cleaned up from unused PKGBUILDS
 Created backup branch:
 [backup-before-08-2021](https://github.com/endeavouros-team/PKGBUILDS/tree/backup-before-08-2021)
