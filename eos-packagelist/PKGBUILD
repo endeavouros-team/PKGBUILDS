@@ -3,7 +3,7 @@
 
 pkgname=eos-packagelist
 pkgver=2.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc="An application to gather and optionally install package lists from the EndeavourOS installer"
 arch=('any')
 license=('GPL3')
