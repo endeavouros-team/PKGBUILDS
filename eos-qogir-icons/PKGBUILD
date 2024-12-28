@@ -2,7 +2,7 @@
 # patched for EndeavourOS: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-qogir-icons
-pkgver=5
+pkgver=6
 _srcver=2023-06-05
 pkgrel=1
 pkgdesc='A colorful design icon theme for linux desktops'
