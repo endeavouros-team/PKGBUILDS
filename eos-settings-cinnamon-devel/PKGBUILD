@@ -8,6 +8,7 @@ pkgdesc="Cinnamon settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
 depends=('endeavouros-branding')
+conflicts=('eos-settings-cinnamon')
 source=('99_eos-cinnamon.gschema.override')
 sha256sums=('0ae2d25b5d06e6d062de259594b670eb972c25b653e1ecde1de41c0515663fc5')
 
