@@ -6,6 +6,7 @@ pkgrel=1
 pkgdesc="MATE settings for EndeavourOS"
 arch=('any')
 depends=('endeavouros-branding')
+conflicts=('eos-settings-mate')
 license=('GPL')
 source=('99_endeavouros-mate.gschema.override'
         'endeavouros.layout')

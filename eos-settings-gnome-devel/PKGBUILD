@@ -8,6 +8,7 @@ pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
 license=('GPL')
 depends=('endeavouros-branding')
+conflicts=('eos-settings-gnome')
 source=('99_endeavouros-gnome.gschema.override'
         '98_endeavouros-gnome-console.gschema.override'
         'endeavouros.xml'

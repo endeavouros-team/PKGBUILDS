@@ -3,11 +3,12 @@
 pkgname=eos-settings-xfce4-devel
 _pkgname=eos-settings-xfce4
 pkgver=2.3
-pkgrel=1
+pkgrel=2
 pkgdesc="XFCE4 settings for EndeavourOS"
 arch=('any')
 license=('GPL')
 depends=('endeavouros-branding')
+conflicts=('eos-settings-xfce4')
 url="https://github.com/endeavouros-team/${pkgname}"
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
