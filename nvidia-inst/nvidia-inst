@@ -388,7 +388,7 @@ ListOptions() {
 Options() {
     local opts
     local sopts="bfhnopqtv"
-    local lopts="32,bumblebee,conf,drivers,force,help,ignore,legacyrepo,listopts,listseries"
+    local lopts="32,bumblebee,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
@@ -411,7 +411,7 @@ Options() {
             -t | --test)        test=yes ;;
             --conf)             create_conf=yes ;;
             --ignore)           ignore_errors=yes ;;
-            --legacyrepo)       Setup3rdPartyRepo ;;
+            # --legacyrepo)       Setup3rdPartyRepo ;;
             --32)               bit32=yes ;;
             --series)           series="$2" ; shift ;;
             --listopts)         ListOptions "$sopts" "$lopts" ; exit 0 ;;
@@ -455,7 +455,7 @@ Options:
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
   -v, --version           Show version of this software.
-  --32                    Install also support for 32-bit apps.
+  --32                    Install also support for 32-bit apps. [multilib] in /etc/pacman.conf must be enabled.
   --conf                  Create also file $conf_file (might be needed on some older systems).
   --no-dkms               Install only non-dkms packages (e.g. 'nvidia' instead of 'nvidia-dkms').
   --drivers               Show supported NVIDIA driver series number for your card.
@@ -463,10 +463,6 @@ Options:
   --ignore                Ignore all errors (useful for testing only).
   --series=X              (Advanced) Use the given Nvidia driver version X (for testing).
   --listopts              List options supported by $progname.
-  --legacyrepo            (*1) Adds a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
-
-(*1) Option --legacyrepo is no more supported.
-     Instead, 'yay' can be used for installing legacy Nvidia drivers from the AUR.
 
 Notes:
   1. By default, dkms packages are favored and will be selected for install if none of the options
@@ -486,7 +482,11 @@ Notes:
        - https://discovery.endeavouros.com/?s=nvidia
        - https://wiki.archlinux.org/title/NVIDIA_Optimus
 
+  3. Older Nvidia GPUs may be supported only by a legacy driver found in the AUR.
+     Use command 'nvidia-inst --drivers' to see which driver version supports your GPU.
+
 EOF
+#  --legacyrepo            (*1) Adds a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
                 exit 0
                 ;;
             
@@ -496,42 +496,42 @@ EOF
     done
 }
 
-Setup3rdPartyRepo() {
-    DIE "sorry, currently $progname does not support any 3rd party repo for legacy drivers."
+# Setup3rdPartyRepo() {
+#     DIE "sorry, currently $progname does not support any 3rd party repo for legacy drivers."
 
-    if [ -z "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
-        Note "Setting up repository [kernel-lts]."
-        Note "This repo provides legacy Nvidia drivers and LTS kernels."
-        Note "More info: https://wiki.archlinux.org/title/Unofficial_user_repositories#kernel-lts"
-        Note "==> Will also update all packages (pacman -Syu) <== !!"
+#     if [ -z "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
+#         Note "Setting up repository [kernel-lts]."
+#         Note "This repo provides legacy Nvidia drivers and LTS kernels."
+#         Note "More info: https://wiki.archlinux.org/title/Unofficial_user_repositories#kernel-lts"
+#         Note "==> Will also update all packages (pacman -Syu) <== !!"
 
-        local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
+#         local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
 
-        cat $pacmanconf > "$tmpfile" 
-        cat <<EOF >> "$tmpfile"
+#         cat $pacmanconf > "$tmpfile" 
+#         cat <<EOF >> "$tmpfile"
 
-[kernel-lts]
-SigLevel = Required
-Server = https://repo.m2x.dev/current/\$repo/\$arch
-EOF
-        local cmds="cp '$tmpfile' $pacmanconf"
-        local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
-        local result="$(pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key)"
-        if [ -z "$result" ] ; then
-            cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
-            cmds+="; pacman-key --lsign-key $jonathon_key"
-            cmds+="; pacman -Syu"
-        fi
+# [kernel-lts]
+# SigLevel = Required
+# Server = https://repo.m2x.dev/current/\$repo/\$arch
+# EOF
+#         local cmds="cp '$tmpfile' $pacmanconf"
+#         local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
+#         local result="$(pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key)"
+#         if [ -z "$result" ] ; then
+#             cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
+#             cmds+="; pacman-key --lsign-key $jonathon_key"
+#             cmds+="; pacman -Syu"
+#         fi
 
-        $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
+#         $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
 
-        Info "Repository [kernel-lts] was added to $pacmanconf."
-        rm -f "$tmpfile"
-    else
-        Info "[kernel-lts] is already set up in $pacmanconf."
-    fi
-    exit 0
-}
+#         Info "Repository [kernel-lts] was added to $pacmanconf."
+#         rm -f "$tmpfile"
+#     else
+#         Info "[kernel-lts] is already set up in $pacmanconf."
+#     fi
+#     exit 0
+# }
 
 AllRemovables() {
     # Find all packages that this program may uninstall and add them to array pr_nvidia.
@@ -609,10 +609,7 @@ ProperNvidiaPackages() {
     esac
 
     if [ "$bit32" = "yes" ] ; then
-        if [ -z "$(grep "^\[multilib\]" $pacmanconf)" ] ; then
-            # cannot install 32-bit packages if [multilib] repo not active
-            DIE "To support 32-bit apps, enable the [multilib] repo in $pacmanconf."
-        fi
+        [ "$(grep "^\[multilib\]" $pacmanconf)" ] || DIE "To support 32-bit apps, enable the [multilib] repo in $pacmanconf."
     else
         p_nvidia32=""
     fi
