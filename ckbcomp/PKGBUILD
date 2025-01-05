@@ -23,25 +23,26 @@ _ckbcomp_preparations() {
 
     local -r err="echo $pkgname: error:"
     local changed=no
+    local url_pkgname="https://salsa.debian.org/installer-team/console-setup/raw/master/Keyboard/$pkgname"    # for fetching the $pkgname
+    local url_pkgver="https://sources.debian.org/src/console-setup"                                           # for finding the new $pkgver
+    local tmpfile=$(mktemp)                                                                                   # for saving the (new) $pkgname
+    local INFO
 
-    # If $pkgname is installed, check if there are changes.
+    url="$url_pkgver"
+
+    curl --fail -Lsm 30 -o$tmpfile "$url_pkgname" || exit 1
     if [ -x /bin/$pkgname ] ; then
-        url="https://salsa.debian.org/installer-team/console-setup/raw/master/Keyboard/$pkgname"
-        local tmpfile=$(mktemp)
-        curl --fail -Lsm 30 -o$tmpfile "$url" || exit 1
-        diff $tmpfile /bin/$pkgname >/dev/null || changed=yes
-        rm -f $tmpfile
+        diff $tmpfile /bin/$pkgname >/dev/null || changed=yes        # If $pkgname is installed, check if there are changes.
     fi
-    url="https://sources.debian.org/src/console-setup"
+    rm -f $tmpfile
     if [ $changed = yes ] ; then
         # $pkgname has been changed, so get the new pkgver.
         # Note: sha512sums for the new $pkgname must be changed manually.
-        local INFO
-        INFO=$(curl --fail -Lsm 30 "$url") || { $err "fetching version info failed"; exit 1; }
+        INFO=$(curl --fail -Lsm 30 "$url_pkgver") || { $err "fetching version info failed"; exit 1; }
         pkgver="$(echo "$INFO" | grep -m1 "/src/console-setup/" | sed -E 's|.*/src/console-setup/([^/]+)/.*|\1|')"
         [ "${pkgver//[a-z0-9.+~]/}" ] && { $err "sorry, pkgver ($pkgver) is invalid"; exit 1; }
     fi
-    source=("https://sources.debian.org/data/main/c/console-setup/$pkgver/Keyboard/$pkgname")
+    source=("$url_pkgname")
 }
 
 _ckbcomp_preparations
