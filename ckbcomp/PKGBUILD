@@ -23,10 +23,19 @@ _ckbcomp_preparations() {
     local -r err="echo $pkgname: error:"
     local INFO
 
+    if [ -x /bin/$pkgname ] ; then
+        url="https://salsa.debian.org/installer-team/console-setup/raw/master/Keyboard/$pkgname"
+        curl --fail -Lsm 30 -o$pkgname "$url" || exit 1
+        if diff $pkgname /bin/$pkgname >/dev/null ; then
+            echo "$pkgname: no change detected!" >&2
+            rm -f $pkgname
+            exit 1
+        fi
+    fi
     url="https://sources.debian.org/src/console-setup"
-    INFO=$(curl --fail -Lsm 30 "$url") || { $err "fetching version info failed"; return 1; }
+    INFO=$(curl --fail -Lsm 30 "$url") || { $err "fetching version info failed"; exit 1; }
     pkgver="$(echo "$INFO" | grep -m1 "/src/console-setup/" | sed -E 's|.*/src/console-setup/([^/]+)/.*|\1|')"
-    [ "${pkgver//[a-z0-9.+~]/}" ] && { $err "sorry, pkgver ($pkgver) is invalid"; return 1; }
+    [ "${pkgver//[a-z0-9.+~]/}" ] && { $err "sorry, pkgver ($pkgver) is invalid"; exit 1; }
     source=("https://sources.debian.org/data/main/c/console-setup/$pkgver/Keyboard/$pkgname")
 }
 
