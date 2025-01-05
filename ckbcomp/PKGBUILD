@@ -27,8 +27,10 @@ _ckbcomp_preparations() {
     # If $pkgname is installed, check if there are changes.
     if [ -x /bin/$pkgname ] ; then
         url="https://salsa.debian.org/installer-team/console-setup/raw/master/Keyboard/$pkgname"
-        curl --fail -Lsm 30 -o$pkgname "$url" || exit 1
-        diff $pkgname /bin/$pkgname >/dev/null || changed=yes
+        local tmpfile=$(mktemp)
+        curl --fail -Lsm 30 -o$tmpfile "$url" || exit 1
+        diff $tmpfile /bin/$pkgname >/dev/null || changed=yes
+        rm -f $tmpfile
     fi
     url="https://sources.debian.org/src/console-setup"
     if [ $changed = yes ] ; then
