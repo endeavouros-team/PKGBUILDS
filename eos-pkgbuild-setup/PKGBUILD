@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=25.1
+pkgver=25.1.1
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -15,6 +15,11 @@ depends=(git hub yay curl xdg-utils meld)
 backup=(
     etc/${_main_appname}.conf
     etc/${_main_appname}-general.conf
+
+    etc/assets.conf.endeavouros
+    etc/assets.conf.endeavouros-testing-dev
+
+    etc/changelogs.conf.endeavouros-testing-dev
 )
 source=(
     # git+https://github.com/endeavouros-team/eos-pkgbuild-setup.git
@@ -37,13 +42,18 @@ source=(
     $_url/mirrorcheck.completion
     $_url/pacman-for-${_main_appname}
     $_url/release-asset-names
+
+    $_url/assets.conf.endeavouros
+    $_url/assets.conf.endeavouros-testing-dev
+
+    $_url/changelogs.conf.endeavouros-testing-dev
 )
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
             '4eedb9af024132bf9556eefe067c3afa31f213dd219645cb82c4be532461387d8c78ec3af623fa10db8ba2803b06ceb4bda09d968529196919163a8b0c166e03'
             '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
             '3950692edc327196375f11bb31363333bb767918f92cb32037704d4e74ebb8772e5e4c24397db9c8973e65e01eb1f82b53c4f55268789679ec4d3e017371c0cb'
-            '41586f2e9a31fbf63fcad91b87889731544459830c253c7e628a1a6fd291e4fb7a727ecb9f4cadd23076d1d88d2b35457d717487d134309e6e04df06df4cf4d6'
+            '0d16e132f125f61efb3414b25c2221371c2b37c621c6bf2f5a609b1805bcd8fb43a8383bb26cbac0f1f92b2103f9339bc8c3169b1ab303662d2a588a78dbe76a'
             '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             '9178ca19d7af4b873acbea72c2e02d2b55a62df1feb2389d7172fddd7416869330b5dd710d27bac3bc8889165f09321106312e0b73399173b8554beab8d822bd'
@@ -55,7 +65,10 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '13b565df3481bcff9d4967d4256a57769ce8d8bf87c596539e696f787a1ad9422131b950f5ed1f82feee62800e3b61ad9114f34be96c635a00ccf74265c27d2f'
             'f2f97709b7af09ef19ac5f86a80e18dbfc243d2c46f8c3e82514ef4b2ef94f603ffa549acd294810970718730022c8df6f9dcefd9eb12a13bfcaded63a30c7e9'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
-            'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7')
+            'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
+            '8dc77038c47ea699bf49a0c1f96bde2b498429e620984387bafd3368276746ea54236df5e05fcdfb489c57a3dbe2ab93e275cdb18ca3cb92c0f0c64a318e5cf5'
+            '0181433ef5e9ff503d80f27f3ac5a620c51b6256d0668ba520f6be71ed748654308dba797d6394988125990f7f494832161a5165d4158dbf05186ee07807757f'
+            'ed196585ccd694ddc4f4c814a480225a9558285d062c5664d200440dcccbd1e98aa026ea9a962f3ab5e72dd1607f348868d9dd8b6d6fad6f4e996d6af96be041')
 
 package() {
     local src file
@@ -68,6 +81,8 @@ package() {
             PackageFunc)               install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
             *.completion)              install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
             *.conf)                    install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+            assets.conf.*)             install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+            changelogs.conf.*)         install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             # *.version)                 install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             local-general-setup)       install -Dm755 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
             githubcheck | mirrorcheck) install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
@@ -75,7 +90,7 @@ package() {
         esac
     done
 
-    # Make some symlinks. Here they help with the *tag* for the assets.
+    # Make some symlinks. Here they help with the github *tag* for the release assets.
     for file in delete-release-assets download-release-assets release-asset-names ; do
         ln -s add-release-assets   "$pkgdir/usr/share/bash-completion/completions/$file"
     done
