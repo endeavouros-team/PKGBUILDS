@@ -2,7 +2,7 @@
 
 pkgname=eos-settings-xfce4-devel
 _pkgname=eos-settings-xfce4
-pkgver=2.5
+pkgver=2.7
 pkgrel=1
 pkgdesc="XFCE4 settings for EndeavourOS"
 arch=('any')
@@ -12,7 +12,7 @@ conflicts=('eos-settings-xfce4')
 url="https://github.com/endeavouros-team/${pkgname}"
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('7ec493a8fc11530b5aa6619d641053b62858d8f0099ef47d90cc730018965b74')
+sha256sums=('32f53430685a9080303fd3ddcd4d1ea3bcfb21aca19a836939f4136ca81b9bb8')
 
 package() {
     cd "${_pkgname}-${pkgver}"
