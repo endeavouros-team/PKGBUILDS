@@ -18,6 +18,7 @@ _yad-eos_prepare() {
     mv yad/PKGBUILD "$curdir"/PKGBUILD.orig
     rm -rf yad
     cd "$curdir"
+    rm -rf $tmpdir
 
     if [ "$change_name" = "yes" ] ; then
         # keep the original pkgname in PKGBUILD for building a package
