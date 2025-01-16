@@ -721,6 +721,7 @@ Main()
 
     source $conf || DIE "Config file $conf does not exist!"
     ALWAYS_FIRST_EOS_MIRRORS=${ALWAYS_FIRST_EOS_MIRRORS//[,|]/ }
+    [ "$EOS_SHOW_ORIGINAL_MIRRORLIST" ] && show_original_list="$EOS_SHOW_ORIGINAL_MIRRORLIST"
 
     mirror_verbosity="$EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY"
 
