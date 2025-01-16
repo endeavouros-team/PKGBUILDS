@@ -35,7 +35,7 @@ Server = https://ftp.rz.tu-bs.de/pub/mirror/endeavouros/repo/$repo/$arch
 Server = https://fosszone.csd.auth.gr/endeavouros/repo/$repo/$arch
 
 ## India
-Server = https://mirror.albony.xyz/endeavouros/repo/$repo/$arch
+Server = https://mirror.nag.albony.in/endeavouros/repo/$repo/$arch
 Server = https://mirrors.nxtgen.com/endeavouros-mirror/repo/$repo/$arch
 
 ## Japan
