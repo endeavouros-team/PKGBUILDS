@@ -123,8 +123,6 @@ SortMirrors() {
 RankPerAge() {
     # latest_ml : in     # servers not commented!
     # result    : out
-    local repo=endeavouros
-    local arch=$(eos_GetArch)
     local mirror m m2
     local marr
     local sortopts=""
@@ -262,8 +260,7 @@ FetchLatestMirrorlist() {
 
     if [ "$use_local_mirrorlist" = "yes" ] ; then
         # Use file /etc/pacman.d/endeavouros-mirrorlist. Remove potential ranking results first.
-        sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' \
-            /etc/pacman.d/endeavouros-mirrorlist  > $latest_ml
+        sed -e '/^# Results of mirror ranking at /,$d' -e 's|^#[ ]*Server = |Server = |' $emlpath  > $latest_ml
         CheckMirrorlist "$latest_ml"
         return
     fi
@@ -512,13 +509,13 @@ DumpOptions() {
 
 Usage() {
     cat <<EOF
-$progname is meant for creating a new file that can be used as file
-/etc/pacman.d/endavouros-mirrorlist
-after ranking the mirrors.
+Purpose: $progname is meant for creating a new file that can be used as file
+             $emlpath
+         after ranking the mirrors.
 
-Note 1: The Arch mirrorlist file /etc/pacman.d/mirrorlist will not be updated with this app.
-Note 2: This app potentially creates file /etc/pacman.d/endavouros-mirrorlist.pacnew which needs to merged.
-Note 3: File $conf can contain many more settings and options, explained in the file.
+Note 1:  The Arch mirrorlist file /etc/pacman.d/mirrorlist will not be updated with this app.
+Note 2:  This app potentially creates file $emlpath.pacnew which needs to merged.
+Note 3:  File $conf can contain many more settings and options, explained in the file.
 
 Usage: $progname [options]
 
@@ -558,12 +555,12 @@ Options:
                  eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/$repo/$arch'
 
   --show-orig-list
-             Add the original mirror list into /etc/pacman.d/endeavouros-mirrorlist.
+             Add the original mirror list into $emlpath.
              Supported values: "yes" or "no".
              Default: $show_original_list_default.
 
   --show-rank-info
-             Show the ranking data in /etc/pacman.d/endeavouros-mirrorlist.
+             Show the ranking data in $emlpath.
              Supported values: "yes" or "no".
              Default: $show_ranking_info_default.
 
@@ -660,10 +657,21 @@ Main()
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return 1
+    export -f eos_GetArch
+
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
     local -r show_original_list_default=no        # yes or no
     local -r show_ranking_info_default=yes        # yes or no
+
+    local -r pkgname=endeavouros-mirrorlist
+    local -r mlfolder=/etc/pacman.d
+    local eos=$mlfolder/$pkgname
+    local -r repo=endeavouros
+    local -r arch=$(eos_GetArch)
+    local -r conf=/etc/$progname.conf
+    local -r emlpath=/etc/pacman.d/endeavouros-mirrorlist
 
     # Don't do anything time consuming before dumping options.
     local arg
@@ -675,8 +683,6 @@ Main()
         esac
     done
 
-    local -r pkgname=endeavouros-mirrorlist
-    local -r mlfolder=/etc/pacman.d
     local -r rank_signature="ranked by $progname"   # enables checking $rank_signature
 
     local -r RED=$'\e[0;91m'                        # starts this foreground text color
@@ -688,7 +694,6 @@ Main()
 
     local CMD_OPTIONS=()
 
-    local eos=$mlfolder/$pkgname
     local new=""
     local latest_ml=""
     local delete_at_end=()
@@ -714,10 +719,6 @@ Main()
         DIE "no local $eos found, please install package '$pkgname'."
     fi
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return 1
-    export -f eos_GetArch
-
-    local -r conf=/etc/$progname.conf
     source $conf || DIE "Config file $conf does not exist!"
     ALWAYS_FIRST_EOS_MIRRORS=${ALWAYS_FIRST_EOS_MIRRORS//[,|]/ }
 
