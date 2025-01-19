@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=25.1.3
+pkgver=25.1.4
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -51,8 +51,8 @@ source=(
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
             '0d84a66bc5921a41b0e753c0c6a945a67239a73103a7f1cc2d2335fee9b04229ce7680db7c8ef7d39050c6385e59435e7951293723ff84e1f1a56d442ea267f9'
-            '0b7999fca3a90404010d74c7b2396e7508ef5518a65f127e547e47fb2ba3abfd69eba35c4580a8f0f697215004f683d267cfd4b311a0585251e7982bb9533250'
-            '4bc59347888647a736390bf44c719a7ffb37055e6b68ef122d8e34bd3d8594dc4133fb34e7458a05f0d9411e4f2958d9ca4491db0e9ef72760684e54da0705aa'
+            'ef71c6df24cf1a5ef3105cadf64ba1286ceb3cc60206bcd1ae9f3936ecac5719649f019da5abcbc6dc11f8be049f73f7f127a836198b9bfb0661e5a4977aa134'
+            'c23984a25427ec21dbc7a81201fe21dd64a82bb8af9a897ad277b8f716677beea72195cf25e635854e75ec7f4bdeb5ad365f2bb832b9f3dc58db42eabc8d082f'
             '2f8245776b604df5dcaed84d4d2caedfbbf73619107e63aed19184f9d3ed177a609319cafc141df7f06a225b6b626d615c263df7f7506710ad373174cbee4d90'
             '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
@@ -66,7 +66,7 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'f2f97709b7af09ef19ac5f86a80e18dbfc243d2c46f8c3e82514ef4b2ef94f603ffa549acd294810970718730022c8df6f9dcefd9eb12a13bfcaded63a30c7e9'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
-            'ecb6361b1f340f6fa715df1e1128f21b7d01167dd2c22ba86dd9bca76c17046a3f3116011b872a743ca4b6d1dd19869dcd9b9420c94c0e86baaf41687b9a9bd0'
+            '7fe3bb2e7a9dcd2c474c6c768c584eccbeca4d2a0359f3e0f76686271580197a63efeffc939b08df6766a217102c631ee78602f788e4c13661870f028e2b05da'
             '0181433ef5e9ff503d80f27f3ac5a620c51b6256d0668ba520f6be71ed748654308dba797d6394988125990f7f494832161a5165d4158dbf05186ee07807757f'
             'ed196585ccd694ddc4f4c814a480225a9558285d062c5664d200440dcccbd1e98aa026ea9a962f3ab5e72dd1607f348868d9dd8b6d6fad6f4e996d6af96be041')
 
@@ -91,7 +91,7 @@ package() {
     done
 
     # Make some symlinks. Here they help with the github *tag* for the release assets.
-    for file in delete-release-assets download-release-assets release-asset-names ; do
+    for file in delete-release-assets download-release-assets release-asset-names archive-sync-to-remote ; do
         ln -s add-release-assets   "$pkgdir/usr/share/bash-completion/completions/$file"
     done
 }
