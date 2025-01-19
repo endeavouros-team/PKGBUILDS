@@ -3,7 +3,7 @@
 <wallpapers>
   <wallpaper deleted="false">
     <name>endeavouros</name>
-    <filename>/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png</filename>
+    <filename>/usr/share/endeavouros/backgrounds/endeavouros-wallpaper-light.png</filename>
     <filename-dark>/usr/share/endeavouros/backgrounds/endeavouros-wallpaper-dark.png</filename-dark>
     <options>zoom</options>
     <shade_type>solid</shade_type>
