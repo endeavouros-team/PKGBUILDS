@@ -1,0 +1,19 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+pkgname=eos-settings-xfce4-devel
+pkgver=2.7
+pkgrel=2
+pkgdesc="XFCE4 settings for EndeavourOS"
+arch=('any')
+license=('GPL')
+depends=('endeavouros-branding')
+conflict=("eos-settings-xfce4")
+url="https://github.com/endeavouros-team/${pkgname}"
+makedepends=("git")
+source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('32f53430685a9080303fd3ddcd4d1ea3bcfb21aca19a836939f4136ca81b9bb8')
+
+package() {
+    cd "${pkgname}-${pkgver}"
+    cp -R "etc" "${pkgdir}/"
+}
