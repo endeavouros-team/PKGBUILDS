@@ -270,7 +270,8 @@ FetchLatestMirrorlist() {
     local url
     local urls=(
         "https://mirror.alpix.eu/endeavouros/repo/endeavouros/${arch}/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst"
-        "https://https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst"
+        "https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst"
+        $(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | awk '{print $3}' | sed -e "s|\$repo|$repo|" -e "s|\$arch|$arch|" -e "s|$|/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst|")
     )
 
     pkg=$(mktemp /tmp/XXXXX.tar.zst)
