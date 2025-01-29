@@ -1,0 +1,28 @@
+#!/bin/bash
+# Maintainer: manuel (see forum.endeavouros.com)
+
+pkgname=eos-xfce-tweaks-devel
+pkgdesc="Tweak some Xfce settings."
+url="https://github.com/manuel-192/m-m/raw/master/PKGBUILDs/$pkgname"
+pkgver=25
+pkgrel=1
+arch=('any')
+license=('GPL')
+
+install=generate-xfce4-desktop-xml.install
+
+source=(
+    $url/generate-xfce4-desktop-xml
+)
+sha512sums=('df385ab5451b180b3422a7d4c850a4117b91cd94dccff5494f668e4d8739ecf98dc357747b054e1b777dfa4f3ca359f9aacd6357089ead5b0ec792268d1930aa')
+
+package() {
+    local src file
+    for src in "${source[@]}" ; do
+        file="${src##*/}"
+        case "$file" in
+            *.conf)      install -Dm644 "$file" "$pkgdir/etc/$file" ;;
+            *)           install -Dm755 "$file" "$pkgdir/usr/bin/$file" ;;
+        esac
+    done
+}

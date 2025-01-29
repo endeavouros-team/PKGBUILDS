@@ -1,0 +1,237 @@
+#!/bin/bash
+
+DIE() { echo "$progname: error: $1" >&2; exit 1; }
+
+Start() {
+    cat <<EOF  >> "$outfilepath"
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="xfce4-desktop" version="1.0">
+EOF
+}
+End() {
+    if [ $minimal = no ] ; then
+        cat <<EOF >> "$outfilepath"
+  <property name="last" type="empty">
+    <property name="window-width" type="int" value="$win_width"/>
+    <property name="window-height" type="int" value="$win_height"/>
+  </property>
+  <property name="desktop-icons" type="empty">
+    <property name="file-icons" type="empty">
+      <property name="show-home" type="bool" value="false"/>
+      <property name="show-filesystem" type="bool" value="false"/>
+      <property name="show-trash" type="bool" value="false"/>
+      <property name="show-removable" type="bool" value="false"/>
+    </property>
+  </property>
+  <property name="desktop-menu" type="empty">
+    <property name="show" type="bool" value="true"/>
+    <property name="show-icons" type="bool" value="true"/>
+  </property>
+  <property name="windowlist-menu" type="empty">
+    <property name="show-icons" type="bool" value="true"/>
+    <property name="show-workspace-names" type="bool" value="true"/>
+    <property name="show-submenus" type="bool" value="false"/>
+  </property>
+EOF
+    fi
+    cat <<EOF >> "$outfilepath"
+</channel>
+EOF
+}
+
+SessionType() {
+    # Note: $XDG_SESSION_TYPE and loginctl will not work always...
+
+    if [ "$WAYLAND_DISPLAY" ] ; then
+        echo wayland
+    elif [ "$DISPLAY" ] ; then
+        echo x11
+    else
+        echo "tty"
+    fi
+}
+
+Monitors() {
+    local -n _monitors="$1"
+
+    case "$mode" in
+        monster)
+            local mons=()
+            if [ $minimal = no ] ; then
+                mons=(0 1)
+            fi
+            mons+=(
+                {Composite,Composite-,composite,composite-}{0..4}
+                {CRT,CRT-,crt,crt-}{0..4}
+                {Display,Display-,display,display-}{0..4}
+                {DP,dp,DP-,dp-}{0..4}
+                {DVI,dvi,DVI-,dvi-}{0..4}
+                {DVI,dvi}-{i,I,d,D}{0..4} {DVI,dvi}-{1,i,I,d,D}-{0..4}
+                {DVI,dvi}-{i,I,d,D}-1-{0..4}
+                {eDP,edp,eDP-,edp-}{0..4} {eDP,edp}-1-{0..4}
+                {HDMI,hdmi,HDMI-,hdmi-}-{0..4}
+                {HDMI,hdmi}-{A,a,B,b,1,A-,a-,B-,b-,1-}{0..4}
+                {LVDS,lvds,LVDS-,lvds-}{0..4}
+                {Thunderbolt,Thunderbolt-,thunderbolt,thunderbolt-}{0..4}
+                {TV,TV-,tv,tv-}{0..4}
+                {USB,usb}-{c,C}-{0..4}
+                {VGA,vga}-{0..4} {VGA,vga}-1-{0..4} {VGA,vga}{0..4}
+                {Virtual,Virtual-,virtual,virtual-}{0..4}
+            )
+            mons="${mons[*]}"   # convert to a string
+            ;;
+        detected | tiny)
+            local mons=""
+            local grepstr="connected"
+            [ $mode = tiny ] && grepstr=" connected"
+
+            case "$(SessionType)" in
+                wayland)
+                    if [ -x /bin/wlr-randr ] ; then
+                        mons=$(echo $(/bin/wlr-randr | grep "^[A-Za-z]" | awk '{print $1}'))
+                    elif [ -x /bin/xrandr ] ; then
+                        mons=$(echo $(/bin/xrandr | grep "$grepstr" | awk '{print $1}'))
+                    else
+                        DIE "package wlr-randr or xorg-xrandr is required but not installed"
+                    fi
+                    ;;
+                x11)
+                    [ -x /bin/xrandr ] || DIE "package xorg-xrandr is required but not installed"
+                    mons=$(echo $(/bin/xrandr | grep "$grepstr" | awk '{print $1}'))
+                    ;;
+                *)
+                    DIE "monitors not found because no wayland nor x11 detected"
+                    ;;
+            esac
+            [ "$mons" ] || DIE "no monitors found!"
+            if [ $minimal = no ] ; then
+                mons="0 1 $mons"
+            fi
+            ;;
+    esac
+    mons=monitor${mons// / monitor}
+    _monitors="$mons"
+}
+
+Usage() {
+    cat <<EOF >&2
+Purpose: generate the contents of file xfce4-desktop.xml.
+Usage:   $progname [options] [outfile]
+Options: --help, -h         This help.
+         --wall=X           X = full path to the desired wallpaper file.
+         --width=X          X = window width property.
+         --height=X         X = window height property.
+         --monster, -m      Created xml file includes a large set of interface types.
+         --detected, -d     (x11) Created xml file is based on connected and disconnected interface types.
+         --tiny, -d         (x11) Created xml file is based on connected interface types.
+         --minimal          Provide much less details in the generated entries.
+Outfile: Output file X is the full path for the generated xml file. Examples:
+           /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+           \$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+         If this file is not given, the output goes to standard output.
+EOF
+    [ "$1" ] && exit $1
+}
+
+echox() { echo "$@" >> "$outfilepath"; }
+
+Main() {
+    local -r progname=${0##*/}
+    local wallpaper="/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"   # png -> avif  ??
+    local win_width="1229"
+    local win_height="1011"
+    local minimal=no
+    local monitors=""
+    local outfilepath="" outfilepath_by_user=""
+    local outfileis=""
+    local rcs=no
+    local datetime=""
+    local mode="monster"     # "monster" (=default) or "detected" or "tiny"
+
+    for arg in "$@" ; do
+        case "$arg" in
+            --wall=*)        wallpaper=${arg#*=} ;;
+            --width=*)       win_width=${arg#*=} ;;
+            --height=*)      win_height=${arg#*=} ;;
+            --help     | -h) Usage 0 ;;
+            --detected | -d) mode=detected ;;
+            --monster  | -m) mode=monster ;;
+            --tiny     | -t) mode=tiny ;;
+            --minimal)       minimal=yes ;;
+            --rcs)           rcs=yes ;;
+            -*)              DIE "unsupported option '$arg'" ;;
+            *)               outfilepath="$arg"
+                             outfilepath_by_user="$arg"
+                             ;;
+        esac
+    done
+    Monitors monitors
+
+    [ "$outfilepath" ] || {
+        outfilepath="$(mktemp)"
+        outfileis=tmp
+    }
+    outfilepath=$(realpath "$outfilepath")
+
+    local tmp
+
+    case "$outfilepath" in
+        /home/*)
+            if [ -e "$outfilepath" ] ; then
+                if [ $rcs = yes ] ; then
+                    if [ -d "${outfilepath%/*}"/RCS ] ; then
+                        if expac -Q %n rcs >/dev/null ; then
+                            pushd ${outfilepath%/*} >/dev/null
+                            echo "$progname: backup current $outfilepath_by_user" >&2
+                            if [ -e RCS/${outfilepath##*/},v ] ; then
+                                ci -l -m. ${outfilepath##*/}
+                            else
+                                ci -l -t-. ${outfilepath##*/}
+                            fi
+                            popd >/dev/null
+                        fi
+                    fi
+                else
+                    datetime=$(date +%Y%m%d-%H%M%S)
+                    echo "$progname: backup to $outfilepath.bak.$datetime" >&2
+                    mv "$outfilepath" "$outfilepath.bak.$datetime"
+                fi
+            fi
+            ;;
+    esac
+
+    [ "$outfileis" = "tmp" ] || rm -f "$outfilepath"
+
+    Start
+
+    echox '  <property name="backdrop" type="empty">'
+    echox '    <property name="screen0" type="empty">'
+    for monitor in $monitors ; do
+        echox "      <property name=\"$monitor\" type=\"empty\">"
+        for workspace in workspace{0..4} ; do
+            echox "        <property name=\"$workspace\" type=\"empty\">"
+            if [ $minimal = no ] ; then
+                echox '          <property name="color-style" type="int" value="0"/>'
+                echox '          <property name="image-style" type="int" value="5"/>'
+            fi
+            echox "          <property name=\"last-image\" type=\"string\" value=\"$wallpaper\"/>"
+            echox "        </property>"
+        done
+        echox "      </property>"
+    done
+    echox '    </property>'
+    echox '  </property>'
+
+    End
+
+    if [ "$outfileis" = "tmp" ] ; then
+        cat "$outfilepath"
+        rm -f "$outfilepath"
+        echo "$progname: file generated to standard output" >&2
+    else
+        echo "$progname: file generated to '$outfilepath_by_user'" >&2
+    fi
+}
+
+Main "$@"
