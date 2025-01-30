@@ -49,7 +49,7 @@ ltr() {                                              # puts string to stdout
     local ix="$1"
     local str="${tr_strings["Lang_${SELECTED_EOS_LANGUAGE}__$ix"]}"
     shift
-    test -n "$2" && { str+="$2"; shift; }            # remove this line some day...
+    # test -n "$2" && { str+="$2"; shift; }            # remove this line some day...
     printf -v str "$str" "$@"
     [ $? -eq 0 ] || _UserWarning "$str" "$*"
     echo "$str"

@@ -295,3 +295,27 @@ _tr_add2 ins_conn_issue_ex1          "Avsluta"
 _tr_add2 ins_conn_issue_ex2          "Avsluta detta program"
 _tr_add2 ins_start_calamares         "Startar calamares"
 _tr_add2 ins_please_wait             "Vänligen vänta..."
+
+
+_tr_add2 after_install_usnat         "Uppdatera Native paket"
+_tr_add2 after_install_usnat_tip     "Uppdatera paket från arkiv i /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Uppdatera Native $_och AUR paket"
+_tr_add2 after_install_usnataur_tip  "Uppdatera paket från arkiv i /etc/pacman.conf och AUR"
+_tr_add2 after_install_ushlp         "Uppdatera Native $_och AUR paket"
+_tr_add2 after_install_ushlp_tip     "Uppdatera paket från arkiv /etc/pacman.conf och AUR med en AUR-hjälpare"
+
+
+_tr_add2 after_install_umartip       "Uppdatera listan över Arch-speglar innan du uppdaterar paket"
+_tr_add2 after_install_umentip       "Uppdatera listan över EndeavourOS-speglar innan du uppdaterar paket"
+
+_tr_add2 after_install_reisub        "REISUB information"
+_tr_add2 after_install_reisub2       "Aktivera REISUB"
+_tr_add2 after_install_reisubtip     "REISUB hjälper till att hantera en systemkrasch"
+
+_tr_add2 _commonphrase_enabled       "aktiverat"
+_tr_add2 _commonphrase_disabled      "inaktiverad"
+
+_tr_add2 arch_chroot                 "arch-chroot information"
+_tr_add2 arch_chroot_tip             "arch-chroot ger åtkomst till ett annat system på kommandoraden"
+_tr_add2 _commonphrase_not_found     "%%s hittades inte"                                                  ##exempel användning: "fil1.txt hittades inte"
+

@@ -18,6 +18,8 @@
 #    <language>      An acronym for the language, e.g. "en" for English (check the LANG variable!).
 #    <placeholder>   A pre-defined name that identifies the place in the Welcome app where this string is used.
 #    "string"        The translated string for the Welcome app.
+#
+# Positional parameter %%s is supported inside a "string". Note that %%s is like %s in printf.
 
 # English:
 
@@ -390,5 +392,5 @@ _tr_add2 _commonphrase_disabled      "disabled"
 # 2024-Dec-10
 _tr_add2 arch_chroot                 "arch-chroot information"
 _tr_add2 arch_chroot_tip             "arch-chroot provides a command line access to another system"
-_tr_add2 _commonphrase_not_found     "%%s not found"                                                   # example usage: "file1.txt not found"
+_tr_add2 _commonphrase_not_found     "%%s not found"                                                   # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
 
