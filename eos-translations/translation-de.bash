@@ -390,3 +390,8 @@ _tr_add2 after_install_reisubtip     "REISUB hilft bei Systemabstürzen"
 # 2024-Dec-06, take 2
 _tr_add2 _commonphrase_enabled       "aktiviert"
 _tr_add2 _commonphrase_disabled      "deaktiviert"
+
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "Information über arch-chroot"
+_tr_add2 arch_chroot_tip             "arch-chroot bietet einen Befehlszeilenzugriff auf ein anderes System"
+_tr_add2 _commonphrase_not_found     "%%s nicht gefunden"                                                   # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
