@@ -257,14 +257,40 @@ CheckMirrorlist() {
 ExtractListFromPackage() {
     local -r pkg="$1"
     [ "$pkg" ] || return 1
-    INFO "extracting $pkgname package..."
+    INFO "extracting package $pkgname $latest_remote ..."
     tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
+}
+
+GetLatestRemoteVersion() {
+    local pkgname="$1"
+    local -n _latest="$2"
+
+    local lat=""
+    local data
+    local url
+    local urls=(
+        https://mirror.alpix.eu/endeavouros/repo/endeavouros/${arch}
+        https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}
+    )
+    for url in "${urls[@]}" ; do
+        data=$(curl -Lsm 60 "$url" | grep "$pkgname" | grep -v zst\.sig | sed -E -e 's|.*"([^"]+)".*|\1|')
+        if [ "$data" ] ; then
+            lat=$(pkg-name-components --real VR "$data")
+            _latest="$lat"
+            return
+        fi
+    done
+    _latest=$(expac -S %v "$pkgname")         # this might not work if pacman -Sy has not been run
 }
 
 FetchLatestMirrorlist() {
     # Grab endeavouros-mirrorlist from a mirror.
 
-    local latest_remote=$(expac -S %v $pkgname)
+    # fix $arch for the ARM repo
+    [ "$arch" != x86_64 ] && local arch=aarch64
+
+    local latest_remote=""
+    GetLatestRemoteVersion "$pkgname" latest_remote
     local pkg
     local code=0
     local url
@@ -545,7 +571,7 @@ Options:
              The <wordlist> is like in option --ignore.
              Examples:
                  eos-rankmirrors --prefer=funami,accum,moson
-                 eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/$repo/$arch'
+                 eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
 
   --show-orig-list
              Add the original mirror list into $emlpath.
