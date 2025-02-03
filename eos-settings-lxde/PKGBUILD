@@ -6,7 +6,7 @@ pkgrel=1
 pkgdesc="LXDE settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
-depends=('endeavouros-theming')
+depends=('endeavouros-branding')
 source=('org.freedesktop.Notifications.service'
         'panel'
         'desktop-items-0.conf')
