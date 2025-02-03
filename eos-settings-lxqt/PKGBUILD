@@ -2,11 +2,11 @@
 
 pkgname=eos-settings-lxqt
 pkgver=1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="LXQT settings for EndeavourOS"
 arch=('any')
 license=('GPL')
-depends=('endeavouros-theming')
+depends=('endeavouros-branding')
 source=('panel.conf'
         'settings.conf')
 sha256sums=('24b3e84062a7d137fec6d6f838f9aa2083a5a0252c7ee51253c8c06dc3b4d093'
