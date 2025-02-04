@@ -2,7 +2,8 @@
 
 [![Maintenance](https://img.shields.io/maintenance/yes/2025.svg)]()
 
-PKGBUILDS **of interest** to EndeavourOS.<br>
+# PKGBUILDS **of interest** to EndeavourOS.
+
 The source for packages we maintain in our repository.
 
 * **4th of February 2025**
