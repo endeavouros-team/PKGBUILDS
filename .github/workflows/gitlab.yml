@@ -9,8 +9,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Mirror to GitLab
-        uses: docker://joekamprad/repository-mirroring-action:latest
+      - uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url: git@gitlab.com:endeavouros-filemirror/PKGBUILDS.git
           ssh_private_key: ${{ secrets.GITLAB_SYNC }}
+          ssh_username: git
