@@ -20,10 +20,7 @@ Adding info.md to some questionable packages.
 * **9th of sept 2021:**
 cleaned up from unused PKGBUILDS
 Created backup branch:
-
-[backup-before-08-2021](https://github.com/endeavouros-team/PKGBUILDS/tree/backup-before-08-2021)
-
---- 
+  * [backup-before-08-2021](https://github.com/endeavouros-team/PKGBUILDS/tree/backup-before-08-2021)
 
 **13th March of  2022:** 
 
