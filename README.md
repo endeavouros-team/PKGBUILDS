@@ -5,6 +5,10 @@
 PKGBUILDS **of interest** to EndeavourOS.<br>
 The source for packages we maintain in our repository.
 
+* **4th of February 2025**
+  Setting package to PKGBUILD.unused
+* eos-plasma-sddm-config
+
 * **17th of dec 2024:**
 Adding info.md to some questionable packages.
   * openswap
