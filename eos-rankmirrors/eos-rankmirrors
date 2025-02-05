@@ -573,10 +573,12 @@ Options:
                  eos-rankmirrors --prefer=funami,accum,moson
                  eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
 
-  --show-orig-list
+  --show-orig-list <value>
              Add the original mirror list into $emlpath.
              Supported values: "yes" or "no".
              Default: $show_original_list_default.
+
+  -b         Same as '--show-orig-list no'.
 
   --show-rank-info
              Show the ranking data in $emlpath.
@@ -639,6 +641,7 @@ Options() {
             --list-only)                mirrorlist_only=yes ;;  # and no other output
             --show-rank-info)           show_ranking_info="$2"; shift ;;
             --show-orig-list)           show_original_list="$2"; shift ;;
+            -b)                         show_original_list=no ;;
             --test-all | -a)            save=no
                                         test_all=yes
                                         EOS_IGNORED_MIRRORS=()
@@ -669,7 +672,7 @@ Check-mirror_verbosity() {
 
 Main()
 {
-    local -r SHORT_OPTIONS="ahnt:"
+    local -r SHORT_OPTIONS="abhnt:"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
     LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:"
