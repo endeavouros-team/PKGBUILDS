@@ -367,3 +367,29 @@ _tr_add2 ins_conn_issue_ex2          "Beëindig dit programma"
 # 2024-Apr-20
 _tr_add2 ins_start_calamares         "Calamares opstarten"
 _tr_add2 ins_please_wait             "Even geduld..."
+
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Update Arch-eigen pakketten"
+_tr_add2 after_install_usnat_tip     "Updatet pakketten van de repos in /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Update Arch-eigen $_and AUR pakketten"
+_tr_add2 after_install_usnataur_tip  "Updatet pakketten van repos in /etc/pacman.conf en AUR"
+_tr_add2 after_install_ushlp         "Update Arch-eigen $_and AUR pakketten"
+_tr_add2 after_install_ushlp_tip     "Updatet pakketten van repos in /etc/pacman.conf en AUR met een AUR helper"
+
+_tr_add2 after_install_umartip       "Update lijst met Arch spiegelservers alvorens pakketten te updaten"
+_tr_add2 after_install_umentip       "Updatet lijst met EndeavourOS spiegelservers voordat de pakketten geupdatet worden"
+
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "REISUB informatie"
+_tr_add2 after_install_reisub2       "Schakel REISUB in"
+_tr_add2 after_install_reisubtip     "REISUB is handig in geval van een systeem crash"
+
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "ingeschakeld"
+_tr_add2 _commonphrase_disabled      "uitgeschakeld"
+
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "arch-chroot informatie"
+_tr_add2 arch_chroot_tip             "arch-chroot biedt toegang tot een ander systeem via een opdrachtregel"
+_tr_add2 _commonphrase_not_found     "%%s niet gevonden"                                         # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
+
