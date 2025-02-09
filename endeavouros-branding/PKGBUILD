@@ -2,7 +2,7 @@
 
 pkgname=endeavouros-branding
 _srcname=Branding
-pkgver=25.01.1.2
+pkgver=25.02.1.2
 pkgrel=1
 pkgdesc='Default EndeavourOS background images and icons'
 arch=('any')
@@ -11,7 +11,7 @@ provides=('endeavouros-theming')
 url='https://www.endeavouros.com'
 license=('GPL3')
 source=("https://github.com/endeavouros-team/Branding/archive/refs/tags/${pkgver}.tar.gz")
-sha512sums=('0ed8c270f3a4bc9d582b4f24cff23f258ff2f750e16fa95858ae1166e80f4cf3ef78cb46fb1338b632c809c2ca5ab1a471ba28339ff0a80dae66252f76b69dca')
+sha512sums=('bd45c4ef57b60ceb231c50a88cb50b1a526353fae6a9ab398302d040c1687df37f214470102859db37718350f49b61c97bdf98224b25913feae11f60ed8d1501')
 
 package() {
   cd "$srcdir/$_srcname-$pkgver"
