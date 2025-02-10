@@ -1,19 +1,16 @@
-# Maintainer: joekamprad <joekamprad at endeavouros.com> 
-# Artwork by: FLVAL --> https://github.com/FLVAL
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
 pkgname=endeavouros-xfce4-terminal-colors
-pkgver=5
+pkgver=6
 pkgrel=1
 pkgdesc="EndeavourOS colorscheme for xfce4-terminal"
 arch=('any')
 depends=('xfce4-terminal')
+makedepends=('git')
 url="https://endeavouros.com/"
 license=('GPL3')
-makedepends=('git')
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/endeavouros-team/${pkgname}/archive/${pkgver}.tar.gz")
-md5sums=('e0dedb4ebcd8113afd33be4616e67f83')
+source=("https://raw.githubusercontent.com/endeavouros-team/Branding/refs/heads/main/terminal-color-schemes/xfce4-terminal")
+sha256sums=('bdfb9b22eaefe0c6a3d86807372aa709863087e0670800b3561f52b5d150705a')
 
 package() {
-  cd "$srcdir/endeavouros-xfce4-terminal-colors-${pkgver}"
-  install -Dm 644 endeavouros.theme \
-    "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
+    install -Dm644 xfce4-terminal "$pkgdir/usr/share/xfce4/terminal/colorschemes/endeavouros.theme"
 }
