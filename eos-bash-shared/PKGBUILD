@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.2.4
+pkgver=25.2.5
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -67,6 +67,7 @@ source=(
   $_url/CalArgConv
   $_url/eos-pkg-changelog
   $_url/eos-pkg-changelog.completion
+  $_url/changelogs.conf.endeavouros
 
   $_url/eos-reboot-required2
   $_url/eos-reboot-required3
@@ -116,8 +117,9 @@ sha512sums=('eece00972c030fa06c1f3a1da4bb7fd6873af42aede8c25bbe4d799db07880ee898
             'becececaf13f76a03a6a5c30c1614cda256edb8b86bedbe9ad6b2332b8d47c6eac31a65c3dec8d9a1480b730531d1a38cbac19b7942230701c46077bba0da5f8'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '22bd14692d2cc02b4b112fa1a32bd34cea65624b3acef51d94a52d7cfee7911c55ac8b4aabf6cb21c587347470b8173fd6b23b03c531b6e89b9cc31c96db9f8a'
-            'c26ab7e3e0fc26ee47b5408fcdac1de0971b8b23c6bec903dd97dd1420436b3e5803560c743d5efb88d7a95e606d27fa59ad36fcee208282f4ef7f4b901507a5'
+            '3ce27aa546675f1d28613b8f0741c328aca33bc031916d306997e5f674eae08cb5d1263a6eb1979568b5d83789332fe7f6218f9b5f5c98577897d3f4a21f8a0b'
             '20ae7c0c3ccae22bd5b93d330b127ea84c3be3bcbe346b87d03f88bd6a0e195fd9a97fb4558ec6a1b8d28d0a28b485b443819ba08137eb9de9359969c7c14e4f'
+            'be44f7a35752ec2bb0e5d68ef5ab09901767d584b379c7b2c47135e302d220f4769e4ed5f0757d23dcac84873c2086ffbead663fcbb7336b8a449f0830cef3c7'
             '57e8bc51b634a3a509fda5365d9a472b719fa2574a894f8e8425f8bf2b8b9b209fba04bc6b2129d56825e552e7fedeef60ec4fa2071f5ea4ebaf48dee7d29037'
             '2334f264754d4276039dfa3ac7851b79a888eec60faa55f26ab0c6f1c14ac6cd7be97aa17004010392c5693ae111a3e5fbc5e71f535d0dea6f9f6a8c9beea4fe'
             '195cc83df58e1f65b43f39202fe60aecf348e843c9c1b414897dbf6577ee7ffc67b1d1ba5ca0325e501cffebd304b6eca90f1c8fd4af4dd75b94fbc7834f59f4'
@@ -132,7 +134,7 @@ sha512sums=('eece00972c030fa06c1f3a1da4bb7fd6873af42aede8c25bbe4d799db07880ee898
             '9c7f26a0d95b8eb8e6eeed3a072083f7fb18b2c77a0c4dcf4bbadb0a642dba3b1686cdd7daeda4f57b6dacba0aa35e91effc62e7dd92ad7b8c3241d8995737aa'
             'b4301af1a68c731992d4dc3bfd33895921e20f3e8c3ace23b2fe2d180e53b6979f61bb7cdedc46a9a9c635659c4c226d9dfb0f7cc7b18f8a0cd486bf25e9b735'
             '5e1e018f7794e530a11f8e61f9b431a4016f515df47ec0820da2a11bdf2f4d2e34b0ac3e71dde7a9d485aedde53b1257064e5cc17bd6bf99586d8d7ab8b93675'
-            '68f04d4c28b2f17e84004577c41f0e5d13fa6346a68d88dcaa81a182840c18a0c8f03b491d64cf029e2872b29440b0c025731cfc866fb64334891baaba69fe5c'
+            '1ca593553b87b8c2bcf5038cb1df715adefa39a0e4ad642aa2eef0d8b78c31cf458efa38de1171a1e7530254dff1a896b137501c075257bad19865102292d977'
             'a62d71bc1a750e3dc5516aefafd7e407a7d33bb9761ba21b456863cb042ff7f073375bce18426321f54e5343ac728bf117d181b9ee3e3186917b63f0b2b88b07'
             'e9eba3e7a15a179727e98325d46a75ded7dcac2dc1bad65019cd893e2f3223b00646ff9be95b913f5873b67d1106c861930176140263ccc02f47b485ab811100'
             '466138fa174b4cc0f2c2bdad7f9c8551ba17fb08ee52084ad4981ef6ae35096294444000f5705913adcca055ce07c869c5d44c2c126b0dde9ee7e6572965a61d'
@@ -148,6 +150,7 @@ package() {
       file="${src##*/}"
       case "$file" in
           eos-script-lib-yad | ksetwallpaper.py)    install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
+          changelogs.conf.endeavouros)              install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.conf)                                   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.desktop)                                install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
           *.completion)                             install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
