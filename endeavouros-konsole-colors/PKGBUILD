@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 pkgname=endeavouros-konsole-colors
 pkgver=1
-pkgrel=1
+pkgrel=2
 pkgdesc="EndeavourOS colorscheme for konsole terminal"
 arch=('any')
 depends=('konsole')
@@ -9,7 +9,7 @@ makedepends=('git')
 url="https://endeavouros.com/"
 license=('GPL3')
 source=("https://raw.githubusercontent.com/endeavouros-team/Branding/refs/heads/main/terminal-color-schemes/konsole")
-sha256sums=('84794af598b466a018657d3f10eabedf22b1430209f21d2f40e0716668a9efa8')
+sha256sums=('dfcabd0a9a8615128f9b98a60041830b509cd1fa7eff6ade93f275af41e03431')
 
 package() {
     install -Dm644 konsole "$pkgdir/usr/share/konsole/EndeavourOS.colorscheme"
