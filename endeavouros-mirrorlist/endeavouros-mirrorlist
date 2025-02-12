@@ -12,6 +12,9 @@
 ###      these mirrors or re-order them manually.
 ######################################################
 
+## Australia
+Server = https://mirror.b-interactive.com.au/endeavouros/repo/$repo/$arch
+
 ## Belgium
 Server = https://ftp.belnet.be/mirror/endeavouros/repo/$repo/$arch
 
@@ -49,6 +52,9 @@ Server = https://mirror.leitecastro.com/endeavouros/repo/$repo/$arch
 
 ## Singapore
 Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
+
+## South Africa
+Server = https://mirrors.urbanwave.co.za/endeavouros/repo/$repo/$arch
 
 ## South Korea
 Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
