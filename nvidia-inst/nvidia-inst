@@ -264,6 +264,11 @@ Prime() {
     KernelParametersToBoot2
 }
 
+SwitcherooEnable() {
+    sudo pacman -Syu --needed switcheroo-control
+    sudo systemctl enable --now switcheroo-control.service
+}
+
 OnlyNvidia() {
     if [ "$series" = "$latest_from_arch" ] ; then
         PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
@@ -389,7 +394,7 @@ Options() {
     local opts
     local sopts="bfhnopqtv"
     local lopts="32,bumblebee,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
-    lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:"
+    lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -406,6 +411,7 @@ Options() {
             -n | --nouveau)     mode=nouveau ;;
             -p | --prime)       mode=prime ;;
             -o | --open)        mode=nvidia-open ;;
+            --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
             -t | --test)        test=yes ;;
@@ -456,6 +462,7 @@ Options:
   -t, --test              Test mode. Nothing in your system will be modified.
   -v, --version           Show version of this software.
   --32                    Install also support for 32-bit apps. [multilib] in /etc/pacman.conf must be enabled.
+  --switcheroo            Install switcheroo-control and enable its service. Use this option separately.
   --conf                  Create also file $conf_file (might be needed on some older systems).
   --no-dkms               Install only non-dkms packages (e.g. 'nvidia' instead of 'nvidia-dkms').
   --drivers               Show supported NVIDIA driver series number for your card.
