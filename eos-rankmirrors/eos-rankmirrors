@@ -187,7 +187,9 @@ GetUpdateNumberAndTime() {
             if [ -n "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
-                    WarningAbout "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
+                    if [ "$mirror" != 'https://mirror.alpix.eu/endeavouros/repo/$repo/$arch' ] || [ $nr -gt $((reference_level + 1)) ] ; then
+                        WarningAbout "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
+                    fi
                     return
                 elif [ $nr -lt $too_low_limit ] ; then
                     WarningAbout "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
