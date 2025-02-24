@@ -66,7 +66,7 @@ Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
 Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 
 ## Ukraine
-Server = https://fastmirror.pp.ua/endeavouros/repo/$repo/$arch
+Server = https://distrohub.kyiv.ua/endeavouros/repo/$repo/$arch
 
 ## United Kingdom
 Server = https://repo.c48.uk/endeavouros/repo/$repo/$arch
