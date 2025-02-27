@@ -3,7 +3,7 @@
 # Calamares installer (fork) configured for EndeavourOS
 
 pkgname=calamares
-pkgver=25.02.1.4
+pkgver=25.02.1.5
 pkgrel=3
 release_name="Mercury"
 pkgdesc="Calamares installer for EndeavourOS"
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('6ab83924c3360ab31a725ad4f86735edd87235054458a6c5d2da1b417432bd26')
+sha256sums=('fe6c3087ed3caf300210ee73601f2ee1952c6ff50cb85491d29eef4c2bab4c8b')
 
 prepare() {
     # Update branding.desc with the proper values
