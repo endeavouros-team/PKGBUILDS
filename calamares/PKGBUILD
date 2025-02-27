@@ -4,7 +4,7 @@
 
 pkgname=calamares
 pkgver=25.02.1.5
-pkgrel=3
+pkgrel=1
 release_name="Mercury"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
