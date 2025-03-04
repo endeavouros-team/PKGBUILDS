@@ -18,6 +18,8 @@
 #    <language>      Un acrónimo para el idioma, por ejemplo "en" para el inglés (¡comprueba las variable LANG !).
 #    <placeholder>   Un nombre predefinido que identifica el lugar en la aplicación de bienvenida donde se utiliza esta cadena.
 #    "string"        La cadena traducida para la aplicación Welcome.
+#
+# Dentro de una "string" es posible usar parámetros posicionales con %%s. Observa que para printf %%s es como %s.
 
 # Español :
 
@@ -355,3 +357,43 @@ _tr_add2 ins_pmtip2                  "Gestor de particiones permite examinar y g
 # 2023-Sep-16
 _tr_add2 ins_arm_start             "Instalador de imagen ARM de EndeavourOS"
 _tr_add2 ins_arm_starttip          "Comenzar a instalar la edición ARM de EndeavourOS"
+
+# 2024-Abr-18
+_tr_add2 ins_conn_issue_title        "${_question_down}Qué sigue?"                                                                   # NOTA: ¡'?' funciona en un título de yad!
+_tr_add2 ins_conn_issue_text         "No hay conexión a internet (${_question_down}tal vez el wifi no está listo${_question})"
+_tr_add2 ins_conn_issue_nm1          "Administrador de red"
+_tr_add2 ins_conn_issue_nm2          "Inicia el administrador de red"
+_tr_add2 ins_conn_issue_oi1          "Instalación offline"
+_tr_add2 ins_conn_issue_oi2          "Instala KDE sin conexión a internet (se recomienda actualizar el sistema después de la instalación)"
+_tr_add2 ins_conn_issue_ex1          "Salir"
+_tr_add2 ins_conn_issue_ex2          "Cerrar este programa"
+
+# 2024-Abr-20
+_tr_add2 ins_start_calamares         "Iniciando calamares"
+_tr_add2 ins_please_wait             "Por favor, espere..."
+
+# 2024-Dic-05 (ver también: 'after_install_us' y 'after_install_ustip' arriba)
+_tr_add2 after_install_usnat         "Actualizar paquetes nativos"
+_tr_add2 after_install_usnat_tip     "Actualiza los paquetes desde los repositorios en /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Actualizar paquetes nativos ${_and} AUR"
+_tr_add2 after_install_usnataur_tip  "Actualiza los paquetes desde los repositorios en /etc/pacman.conf y AUR"
+_tr_add2 after_install_ushlp         "Actualizar paquetes nativos ${_and} AUR"
+_tr_add2 after_install_ushlp_tip     "Actualiza los paquetes desde los repositorios en /etc/pacman.conf y AUR con un asistente AUR"
+
+_tr_add2 after_install_umartip       "Actualizar lista de espejos de Arch antes de actualizar los paquetes"
+_tr_add2 after_install_umentip       "Actualizar lista de espejos de EndeavourOS antes de actualizar los paquetes"
+
+# 2024-Dic-06
+_tr_add2 after_install_reisub        "Información sobre REISUB"
+_tr_add2 after_install_reisub2       "Habilitar REISUB"
+_tr_add2 after_install_reisubtip     "REISUB ayuda a resolver un fallo del sistema"
+
+# 2024-Dic-06, toma 2
+_tr_add2 _commonphrase_enabled       "habilitado"
+_tr_add2 _commonphrase_disabled      "deshabilitado"
+
+# 2024-Dic-10
+_tr_add2 arch_chroot                 "Información sobre arch-chroot"
+_tr_add2 arch_chroot_tip             "arch-chroot proporciona acceso a otro sistema desde la línea de comandos"
+_tr_add2 _commonphrase_not_found     "No se ha encontrado %%s"                                                   # Ejemplo de uso: "$(ltr _commonphrase_not_found "file1.txt")"
+
