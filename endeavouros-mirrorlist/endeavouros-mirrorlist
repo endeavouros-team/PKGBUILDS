@@ -62,6 +62,9 @@ Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 ## Sweden
 Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
 
+## Switzerland
+Server = https://mirror.gofoss.xyz/endeavouros/repo/$repo/$arch
+
 ## Taiwan
 Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
 
