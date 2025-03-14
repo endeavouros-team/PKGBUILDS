@@ -62,13 +62,13 @@ _prepare_eos_iso_hotfix() {
         }
         local file file2 ix=0
         for file in $(/bin/ls -1 "$dir") ; do
-            file2="${hotfix_files[$ix]##*/}"
-            if [ "${file##*/}" != "$file2" ] ; then
-                echo "==> $pkgname: error: $file != ${hotfix_files[$ix]}" >&2
-                rm -rf $dir $_checkfile
-                exit 1
-            fi
-            ((ix++))
+            for file2 in "${hotfix_files[@]}" ; do
+                [ "${file}" = "${file2##*/}" ] && break
+            done
+            [ "${file}" = "${file2##*/}" ] && continue
+            echo "==> $pkgname: error: $file not found in " >&2
+            rm -rf $dir $_checkfile
+            exit 1
         done
         rm -rf "$dir"
 
