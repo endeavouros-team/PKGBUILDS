@@ -7,8 +7,8 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=25
-pkgrel=1.1
+pkgver=25.3
+pkgrel=1
 
 arch=('any')
 license=('GPL')
