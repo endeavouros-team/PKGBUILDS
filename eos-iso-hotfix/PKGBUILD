@@ -8,7 +8,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
 pkgver=25
-pkgrel=1
+pkgrel=1.1
 
 arch=('any')
 license=('GPL')
@@ -42,16 +42,33 @@ _prepare_eos_iso_hotfix() {
             $_url_module/packagechooser.conf
             $_url_module/pacstrap.conf
         )
-        local hotfix_files=()                         # this will contain the hotfix files, see below
+        local hotfix_files=(                         # this will contain the hotfix files, see below
+            $_url_hotfix/hotfix-end.bash
+            $_url_hotfix/hotfix-start.bash
+            $_url_hotfix/netinstall.yaml-cassini-R3.patch
+            $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
+            $_url_hotfix/packagechooser.conf_gemini_1.patch
+            $_url_hotfix/packagechooser.conf.patch
+            $_url_hotfix/pacstrap.conf_endeavour_neo.patch
+            $_url_hotfix/README.md
+            $_url_hotfix/settings_offline.conf.patch
+            $_url_hotfix/settings_online.conf.patch
+        )
 
         # Find the names of all the latest hotfix files.
         git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
             rm -rf $dir $_checkfile
             exit 1
         }
-        local file
+        local file file2 ix=0
         for file in $(/bin/ls -1 "$dir") ; do
-            hotfix_files+=("$_url_hotfix/$file")
+            file2="${hotfix_files[$ix]##*/}"
+            if [ "${file##*/}" != "$file2" ] ; then
+                echo "==> $pkgname: error: $file != ${hotfix_files[$ix]}" >&2
+                rm -rf $dir $_checkfile
+                exit 1
+            fi
+            ((ix++))
         done
         rm -rf "$dir"
 
