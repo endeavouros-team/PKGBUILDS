@@ -153,7 +153,7 @@ WarningAbout() {
     local id="$1"
     shift
     printf2 "${MAGENTA}==> Warning about %s:${RESET}\n" "$id"
-    [ "$1" ] && printf2 "    ${MAGENTA}%s${RESET}\n" "$@" "Continuing."
+    [ "$1" ] && printf2 "    ${MAGENTA}%s${RESET}\n" "$@" #"Continuing."
 }
 
 GetUpdateNumberAndTime() {
@@ -188,15 +188,14 @@ GetUpdateNumberAndTime() {
                 # ad hoc tests for the update level value in the state file
                 if [ $nr -gt $reference_level ] ; then
                     if [ "$mirror" != 'https://mirror.alpix.eu/endeavouros/repo/$repo/$arch' ] || [ $nr -gt $((reference_level + 1)) ] ; then
-                        WarningAbout "$mirror" "Update level $nr/$reference_level is too high (cannot be more than $reference_level)."
+                        WarningAbout "$mirror" "Update level $nr is too high (> $reference_level), ignoring this mirror."
                     fi
                     return
                 elif [ $nr -lt $too_low_limit ] ; then
-                    WarningAbout "$mirror" "Update level is $nr/$reference_level, problem with the mirror?"
+                    WarningAbout "$mirror" "Update level $nr/$reference_level is very low, ignoring this mirror."
                     return
                 elif [ $nr -lt $low_limit ] ; then
-                    WarningAbout "$mirror" \
-                                 "Update level is $nr/$reference_level, some [endeavouros] packages may be outdated if this mirror is in use."
+                    WarningAbout "$mirror" "update level $nr/$reference_level is lower than expected, will lower the ranking of this mirror."
                 fi
             fi
             result="$nr $time"
