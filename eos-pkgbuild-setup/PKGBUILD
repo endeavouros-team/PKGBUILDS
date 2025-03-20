@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=25.3.1
+pkgver=25.3.2
 pkgrel=1
 arch=(any)
 license=(GPL2)
