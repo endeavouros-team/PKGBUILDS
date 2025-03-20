@@ -355,8 +355,8 @@ GetNameAndVersion() { expac -Q '%n %v' "$1" ; }
 
 Options() {
     local opts
-    local lopts="help,enable-journal,changelog"
-    local sopts="hj"
+    local lopts="help,enable-inxi,enable-journal,changelog"
+    local sopts="hij"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -367,6 +367,9 @@ Options() {
 
     while true ; do
         case "$1" in
+            -i | --enable-inxi)
+                enable_inxi=yes
+                ;;
             -j | --enable-journal)
                 enable_journal=yes
                 ;;
@@ -381,8 +384,10 @@ Options() {
                 cat <<EOF >&2
 Usage: $progname [options]
 Options:
-  -j, --enable-journal         Enable showing journal logs. Note that some logs may be left with personal data.
-  -h, --help                   This help.
+  -i, --enable-inxi       Enable the inxi tool. It is versatile but might be quite slow with some operations.
+  -j, --enable-journal    Enable showing journal logs.
+                          Note that some journal logs *may* still contain data you'd want to hide.
+  -h, --help              This help.
 EOF
 #            --changelog        Show changelog (=git commits) of this app.
                 exit 0
@@ -399,9 +404,13 @@ Main()
     local -r progname=eos-log-tool
     eos_assert_deps $progname yad || return 1
     local enable_journal=no
+    local enable_inxi=no
+    local lspci_y=no              # is automatically selected (=yes) when inxi is not available
     local -r separator=$'\x0c'    # column separator character for usage with the 'column' app (Form Feed)
 
     Options "$@"
+
+    [ "$enable_inxi" = "no" ] && lspci_y=yes
 
     local -r FILE_OF_LOGS=$HOME/$progname.logs
     local -r FILE_OF_LOGS2="\$HOME/$progname.logs"
@@ -471,9 +480,15 @@ Main()
     fi
     FieldInfo1+=(
         "System boot-up performance statistics"                               ""         ""         "Time that running units took to initialize: $(TT "$cmd_blame")"                              "$cmd_blame"
-        "Information about the PCI devices"                                   ""         ""         "Information related to PCI devices: $(TT "$cmd_lspci")"                                      "$cmd_lspci"
+        "Information about the PCI devices"                                   "$lspci_y" ""         "Information related to PCI devices: $(TT "$cmd_lspci")"                                      "$cmd_lspci"
         "Information about the USB devices"                                   ""         ""         "Information related to USB devices: $(TT "$cmd_lsusb")"                                      "$cmd_lsusb"
-        "Information about hardware (inxi)"                                   "true"     "inxi"     "Information about hardware and software using $(TT "$cmd_inxi")"                             "$cmd_inxi"
+    )
+    if  [ "$enable_inxi" = "yes" ] ; then
+        FieldInfo1+=(
+            "Information about hardware (inxi)"                               "true"     "inxi"     "Information about hardware and software using $(TT "$cmd_inxi")"                             "$cmd_inxi"
+        )
+    fi
+    FieldInfo1+=(
         "Information about hardware (hwinfo)"                                 ""         ""         "Summary of hardware: $(TT "$cmd_hwinfo")"                                                    "$cmd_hwinfo"
         "EndeavourOS install log"                                             ""         ""         "The log about the install of EndeavourOS: $(TT "$cmd_instlog")"                              "Local_ShowEosInstallLog"
         "X session errors"                                                    ""         ""         "Lists X session errors: $(TT "$cmd_X_sess_err")"                                             "$cmd_X_sess_err"
@@ -515,12 +530,13 @@ Main()
     rm -f "$FILE_OF_LOGS"
 
     helptext+="<i><b>$(GetNameAndVersion $progname)</b></i>\n\n"
-    helptext+="Select the logs you want to save locally and optionally share to the internet. \n"
+    helptext+="Select the logs you want to save locally, and optionally share to the internet. \n"
     helptext+="Logs will will be saved to file <b>$FILE_OF_LOGS2</b>.\n"
-    helptext+="If you share, you'll receive a URL which refers to the shared page.\n"
-    helptext+="Note1: $progname tries to remove personal data from the logs. but removal is not always perfect. \n"
-    helptext+="Note2: A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>.\n\n"
+    helptext+="If you share to the internet, you'll receive a URL which refers to the shared page.\n"
+    helptext+="A list of received URLs is stored in folder <b>$DIR_OF_CONFIG2</b>.\n\n"
+    helptext+="Note: <tt>$progname</tt> tries to remove personal data from the logs, but the removal is not perfect always. \n"
     helptext+="Tip: Use option <tt>--enable-journal</tt> to see <i>journalctl</i> choices.\n"
+    helptext+="Tip: Use option <tt>--enable-inxi</tt> to see the <i>inxi</i> alternative.\n"
 
     local log_tool_cmd=(                 # the yad command
         eos_yad
