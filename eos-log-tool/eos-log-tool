@@ -525,6 +525,7 @@ Main()
     local helptext=""
     local name selected installed tip command
     local ix jx xx count=0
+    local -r tool_image=/usr/share/icons/Qogir/scalable/apps/logviewer.svg   # $ICO_QUESTION
 
     mkdir -p "$DIR_OF_CONFIG"
     rm -f "$FILE_OF_LOGS"
@@ -546,7 +547,7 @@ Main()
         --title="EndeavourOS log tools"
         --text="$helptext"
         # --width=600        # not needed?
-        --image=$ICO_QUESTION
+        --image=$tool_image
         --button="yad-cancel!!Cancel this operation":$code_cancel
         --button="yad-save!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
         --button="Share logs to the internet!$ICO_SHARE!Send the logs using <tt>eos-sendlog</tt>":$code_send_to_internet
