@@ -1,0 +1,95 @@
+# bash completion for rami        -*- shell-script -*-
+
+_rami_listselector()
+{
+    local cur="$1"
+    local list_elems_all="$2"
+
+    local realcur="${cur##*,}"
+    local prefix="${cur%$realcur}"
+    local elems word
+
+    for word in $list_elems_all
+    do
+        if ! [[ $prefix == *"$word"* ]]; then
+            elems="$word $elems"
+        fi
+    done
+    COMPREPLY=( $(compgen -P "$prefix" -W "$elems" -S ',' -- $realcur) )
+    compopt -o nospace
+}
+
+
+_rami_complete() {
+    COMPREPLY=( $(compgen -W "$1" -- "$cur") )
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    #compopt -o nosort
+}
+_rami_complete_url() {
+    COMPREPLY=( $(compgen -P "'" -W "$1" -- "$cur") )
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o nospace
+}
+
+_rami_complete_nr() {
+    COMPREPLY=( $(compgen -P "$cur" -W "{0..9}") )
+    compopt -o nospace
+    compopt -o nosort
+}
+
+_rami_complete_list() {
+    COMPREPLY=( $(compgen -P "$cur" -S"," -W "$1") )
+    compopt -o nospace
+    compopt -o nosort
+}
+
+_rami_() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    local -r app=rami
+
+    local -r completion_files=($($app --dump-completion-files))
+    local -r countrycodes="${completion_files[2]}"
+    local -r optionsfile="${completion_files[4]}"
+    local -r continents=(${completion_files[5]//,/ } )
+
+    [ -e "$optionsfile" ] || $app --update-completion-files
+
+    local options=$(< "$optionsfile")
+    case "$prev" in
+        -f | --favorite)
+            _rami_complete_url "https:// http://"
+            ;;
+        -d | --distro)
+            _rami_complete "arch"
+            ;;
+        -c | --country)
+            _rami_listselector "$cur" "$(< "$countrycodes")"
+            ;;
+        --timeout | --timeout-rank)
+            _rami_complete_nr
+            ;;
+        --ignore-countries)
+            _rami_complete_list "$(< "$countrycodes")"
+            ;;
+        --ignore-continents | --continent-given | --list-continent-countrycodes | --list-continent-countrycodes)
+            _rami_listselector "$cur" "$continents"
+            ;;
+        --list-continent-countrycodes | --list-continent-countrynames)
+            _rami_complete "${continents[*]}"
+            ;;
+        --ignore-mirrors)
+            _rami_complete "unique-list"
+            ;;
+        --verbosity)
+            _rami_complete "least less default more most"
+            ;;
+        *)
+            _rami_complete "$options"
+            ;;
+    esac
+    #  --ignore-countries)  _rami_listselector "$cur" "$(< "$countrycodes")" ;;
+}
+complete -F _rami_    rami 

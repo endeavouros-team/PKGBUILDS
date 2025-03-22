@@ -1,0 +1,58 @@
+#!/bin/bash
+
+echo2()       { echo -e "$@" >&2; }
+# printf2()     { printf  "$@" >&2; }
+DIE()         { echo2 "==> $progname: error:\n    $1" ; exit 1; }
+WARN()        { echo2 "==> $progname: warning: $1"    ; }
+SUBINFO()     { echo2 "    -> info: $1"               ; }
+
+RankOneMirror() {
+    local url="$1"                        # may contain suffix ",countryname"
+    local -r timeout_rank="$2"
+    local -r distro="$3"
+    local -r time_as_datetime="$4"
+    local -r mirror_count="$5"
+    local -r progname=${0##*/}
+
+    [ "$url" ] || DIE "no URL to test"
+
+    local countryname="${url##*,}"
+    [ "$countryname" ] && url=${url%,*}
+
+    local curl_exitcode=0
+    local syncnr
+    local time
+    local result
+
+    result=$(curl --fail -Lsm $timeout_rank -w "%{time_total}" "$url") || curl_exitcode=$?
+
+    case $curl_exitcode in
+        0)
+            time=$(  echo "$result" | tail -n1)
+            syncnr=$(echo "$result" | head -n1)
+
+	    if [ "${syncnr//[0-9]/}" ] ; then   # $syncnr must be a number!
+		WARN "unrecognized data returned by $url."
+                return 1
+	    fi
+	    if [ "${time//[0-9\.]/}" ] ; then   # $time may contain numbers and a dot!
+		WARN "unrecognized data returned by $url."
+                return 1
+	    fi
+
+            case "$distro" in
+                arch) [ "$time_as_datetime" = "yes" ] && syncnr=$(date --date="@$syncnr" "+%Y%m%d-%H%M%S") ;;
+            esac
+
+            echo "${url%/*}|$syncnr|$time|$countryname"
+            return
+            ;;
+        #[1-9])       curl_exitcode="  $curl_exitcode" ;;
+        #[1-9][0-9])  curl_exitcode=" $curl_exitcode"  ;;
+    esac
+    local msg
+    printf -v msg "curl code %3s with %s" "$curl_exitcode" "${url%/*}"
+    SUBINFO "$msg"
+}
+
+RankOneMirror "$@"

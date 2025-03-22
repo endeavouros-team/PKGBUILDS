@@ -1,0 +1,915 @@
+#!/bin/bash
+
+# TODO:
+# - long time statistics?
+# - less failure output
+
+echo2() { echo -e "$@" >&2; }
+MSG2()  {
+    local -r level="$1"
+    shift
+    declare -A verbosity_levels=(
+        [least]=1
+        [less]=2
+        [default]=3
+        [more]=4
+        [most]=5
+    )
+    local -r configured_level=${verbosity_levels[$verbosity]}
+    local -r call_level=${verbosity_levels[$level]}
+    [ $configured_level -ge $call_level ] && echo2 "$@"
+}
+
+DIEE()    { MSG2 least    "==> $progname: error:\n    $1"; exit 1; }
+DIE()     { MSG2 less     "==> $progname: error:\n    $1"; Usage 1; }
+WARN()    { MSG2 default  "==> $progname: warning: $1"; }
+MONITOR() { MSG2 default  "==> $progname: $1"; }
+INFO()    { MSG2 more     "==> $progname: info: $1" ; }
+DEBUG()   { MSG2 most     "==> $progname: debug: $1" ; }
+
+AssertNumber() { [ "${1//[0-9]/}" ] && DIE "option $2 requires a number"; }
+
+GetCurrentCountry() { cc="$(show-location-info country)"; [ "$cc" ] ; }
+
+GetContinentOfCountry() {
+    local countrycode="${1^^}"   # uppercase
+    GetContinentsData
+    local out=$(echo "$countries_continents" | grep -w "$countrycode" | awk '{print $2}')
+    echo "$out"
+}
+GetContinentsData() {
+    [ "$countries_continents" ] || countries_continents=$(location list-countries --show-continent)
+}
+ShowContinents() {
+    [ "$continents" ] || GetContinentsData
+    echo "$countries_continents" | awk '{print $NF}' | sort -u
+}
+ShowContinentsCountries() {
+    local continents="${1//,/ }"
+    local continent=""
+    local result=()
+    local result_all=()
+
+    if true ; then
+        for continent in $continents ; do
+            ShowContinentCountries "$continent" code yes
+            [ ${#result[@]} -gt 0 ] && result_all+=("${result[@]}")
+            result=()
+        done
+        echo "${result_all[*]}" | sed 's| |,|g'
+    else
+        local tmp=$(
+            for continent in $continents ; do
+                ShowContinentCountries "$continent" code result
+            done)
+        tmp=$(echo $tmp | tr ' ' '\,' | sed 's|\,\,|\,|g')
+        echo "$tmp"
+    fi
+}
+ShowContinentCountries() {
+    local continent="$1"
+    local show="$2"       # name or code
+    local var="$3"
+    if [ -x /bin/location ] ; then
+        [ "$cc" ] || GetCurrentCountry
+        GetContinentsData
+        local cont_country_codes=$(echo "$countries_continents" | grep "$continent" | awk '{print $1}')
+        local code 
+        GetCountriesData
+        case "$show" in
+            code)
+                local out
+                for code in $cont_country_codes ; do
+                    out=$(echo "$reflector_list_countries" | grep "$code" | awk '{print $(NF-1)}')
+                    if [ "$out" ] ; then
+                        if [ "${#ignored_country_codes[@]}" -gt 0 ] ; then
+                            local tmp="${ignored_country_codes[*]}"
+                            tmp="${tmp// /|}"
+                            if [ "$var" = yes ] ; then
+                                result+=($(echo "$out" | grep -Pv "$tmp"))
+                            else
+                                echo "$out" | grep -Pv "$tmp"
+                            fi
+                        else
+                            if [ "$var" = yes ] ; then
+                                result+=("$out")
+                            else
+                                echo "$out"
+                            fi
+                        fi
+                    fi
+                done
+                ;;
+            name)
+                local name
+                for code in $cont_country_codes ; do
+                    name=$(echo "$reflector_list_countries" | grep "$code" | sed -E 's|([A-Z].+[a-z]) .*|"\1"|')
+                    [ "$name" ] && echo "$name"
+                done
+                ;;
+        esac
+        return 0
+    else
+        WARN "package 'python-location' is required for this operation"
+        return 1
+    fi
+}
+ListCountryCodes() {
+    GetCountriesData
+    echo "$reflector_list_countries" | awk '{print $(NF-1)}'
+}
+ListCountryNames() {
+    GetCountriesData
+    echo "$reflector_list_countries" | sed -E 's|([A-Z].+[a-z]) .*|"\1"|'
+}
+ListCountryCodesNames() {
+    GetCountriesData
+    echo "$reflector_list_countries" | sed -E 's/([A-Z].+[a-z])[ ]+([A-Z][A-Z]) .*/\2  \1/'
+}
+GetCountriesData() {
+    [ "$reflector_list_countries" ] || UpdateCompletionFiles
+}
+ListContinentsCountries() {
+    local code_name=()
+    local countrycode continent line
+
+    GetContinentsData
+    readarray -t code_name <<< $(ListCountryCodesNames)
+
+    # gather all info and sort according to continent and country name
+    for line in "${code_name[@]}" ; do
+        countrycode=${line%% *}
+        continent=$(echo "$countries_continents" | grep ^$countrycode)
+        continent=${continent##* }
+        line=${line//  / }
+        echo "$continent $line"
+    done | sort -k1,1 -k3,3
+}
+GivenContinent() {
+    local continent1="$1"
+    local tmp1=$(ShowContinentsCountries "$continent1")
+    printf "%s\n" $all_continents | grep "^$continent1$" >/dev/null || DIEE "continent '$continent1' not found"
+    [ "$tmp1" ] || DIEE "no mirrors found in: $continent1"
+    AddCountries $tmp1
+}
+AddContinentCountries() {
+    AddCountries $(echo $(GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" code) | tr ' ' ',')
+}
+AllContinents() {
+    ranking_all_mirrors=yes
+    local tmp1=$(ShowContinentsCountries "$all_continents")
+    [ "$tmp1" ] || DIE "no mirrors found in: $all_continents"
+    AddCountries $tmp1
+}
+IgnoreContinents() {
+    local list="$1"
+    local tmp1=$(ShowContinentsCountries "$list")
+    [ "$tmp1" ] || DIE "no mirrors found in: $list"
+    IgnoreCountries ${tmp1// /,}
+}
+IgnoreCountries() {
+    if [ $prevent_ignoring_countries = no ] ; then
+        local code="$1"
+        code="${code//,/ }"
+        case "$code" in
+            %*) ignored_country_codes=(${code:1}) ;;    # leading % replaces the existing list
+            *)  ignored_country_codes+=($code) ;;       # append to the existing list
+        esac
+    fi
+}
+IgnoreMirrors() {
+    local codes="$1"
+    codes="${codes//,/ }"
+    case "$codes" in
+        %*) ignored_mirrors=(${codes:1}) ;;        # leading % replaces the existing list
+        *)  ignored_mirrors+=($codes) ;;           # append to the existing list
+    esac
+}
+AddCountries() {
+    local list="${1^^}"                     # make country codes uppercase
+    list=${list//,/ }                       # change commas to spaces
+    case "$list" in
+        %*) countries=(${list:1}) ;;        # leading % replaces the existing list
+        *)  countries+=($list) ;;           # append to the existing list
+    esac
+}
+
+GetTimeInfo() { date +%j; }
+
+UpdateCompletionFiles() {
+    local -r completion_files=($(ShowCompletionFiles))
+
+    local -r dir="${completion_files[0]}"
+    local -r timefile="${completion_files[1]}"
+    local -r countrycodes="${completion_files[2]}"
+    local -r countrynames="${completion_files[3]}"
+    local -r optionsfile="${completion_files[4]}"
+    # local -r continents=(${completion_files[5]//,/ } )
+    local -r reflector_countries_file="$dir/reflectorcountries.txt"
+    local -r now=$(GetTimeInfo)
+    local prevtime=""
+
+    [ "$dir" ] || DIE "no folder name for the completion files"
+
+    mkdir -p "$dir"
+
+    # [ -e "$timefile" ] && rm -f "$timefile" "$reflector_countries_file" "$countrycodes" "$countrynames" "$optionsfile"
+
+    reflector_list_countries=$(reflector --list-countries) || DIE "cannot get list of countries"
+    reflector_list_countries=$(echo "$reflector_list_countries" | tail -n +3)
+
+    echo "$reflector_list_countries" > "$reflector_countries_file"
+    echo "$now"                      > "$timefile"
+    ListCountryCodes                 > "$countrycodes"
+    ListCountryNames                 > "$countrynames"
+    DumpOptions                      > "$optionsfile"
+}
+
+ShowCompletionFiles() {
+    local -r dir="$HOME/.cache/$progname"
+    local -r continents=(
+        "$dir"
+        "$dir/timeinfo.txt"
+        "$dir/countrycodes.txt"
+        "$dir/countrynames.txt"
+        "$dir/optionsfile.txt"
+        "${all_continents// /,}"
+        "$dir/reflectorcountries.txt"
+    )
+    echo "${continents[@]}"
+}
+ResetCompletionFiles() {
+    local xx=($(ShowCompletionFiles))
+    local item
+
+    for item in "${xx[@]}" ; do
+        case "$item" in
+            *.txt) echo2 "rm -f $item"; rm -f "$item" ;;
+        esac
+    done
+    
+}
+
+TraverseMirrors-parallel() {
+    # MONITOR "ranking mirrors in $mode mode"
+    echo "$mirrors_with_statefiles" | parallel --bar "$progname_helper {} '$timeout_rank' '$distro' '$time_as_datetime' '$mirror_count' '$errlogfile'"
+}
+
+TraverseMirrors-sequential() {
+    # MONITOR "$mode ranking"
+    local mirror
+    local ix=1
+    local mirs
+    readarray -t mirs <<< $(echo "$mirrors_with_statefiles")
+
+    for mirror in "${mirs[@]}" ; do
+        printf "\r==> ranking %3s/$mirror_count" $((ix++)) >&2
+        $progname_helper "$mirror" "$timeout_rank" "$distro" "$time_as_datetime" "$mirror_count" "$errlogfile"
+    done
+    echo2 ""
+}
+
+DumpOptions() {
+    if [ "$LOPTS" ] ; then
+        LOPTS=${LOPTS//:/}          # remove all : chars
+        LOPTS="--${LOPTS//,/ --}"   # make all words as options with prefix "--"
+    fi
+    if [ "$SOPTS" ] ; then
+        SOPTS=${SOPTS//:/}          # remove all : chars
+        SOPTS=${SOPTS//?/ -&}       # make all letters as options with prefix "-"
+        SOPTS=${SOPTS:1}            # remove the first space
+    fi
+
+    [ "$LOPTS$SOPTS" ] && echo $LOPTS $SOPTS
+}
+
+Edit() {
+    local file="$1"
+    local editors=( exo-open xdg-open kde-open emacs kate gnome-text-editor xed mousepad )
+    local editor
+    for editor in "${editors[@]}" ; do
+        if which $editor &>/dev/null ; then
+            if [ ! -e "$file" ] ; then
+                touch "$file" || DIEE "cannot create file '$file'"
+            fi
+            $editor "$file"
+            return
+        fi
+    done
+    DIEE "no text editor found!"
+}
+
+Usage() {
+    cat <<EOF
+
+Purpose: Rank Arch mirrors and display them.
+Usage: $progname [options]
+Options:
+    --all
+    -A
+        Rank all supported mirrors on all continents.
+
+    --continent
+    -C
+        Rank all supported countries of the current continent.
+
+    --country <list>
+    -c <list>
+        Include a comma separated list of country code(s) for ranking their mirrors.
+        Codes are case insensitive.
+        Examples:
+            --country  de,gb         # adds DE and GB mirrors for ranking
+            --country %de,dk         # sets DE and DK mirrors for ranking (see Notes below)
+
+    --country-current, -t
+        Include current country to be ranked.
+
+    --edit-config
+    -e
+        Edit your configuration file.
+
+    --favorite
+    -f
+        Add a favorite mirror to be added in the beginning of the ranked mirrorlist.
+        This option can be used many times to append favorites.
+        A mirror can be added
+            - as a full path in single quotes, or
+            - in a special format 'CC:st'
+        The special 'CC:st' has components:
+            'CC' is a two-letter country code (see 'reflector --list-countries')
+            'st' is a (unique) partial string of the mirror URL
+        A special value 'none' disables favorites (useful in testing).
+        See also the examples below.
+
+    --ignore-continents <list>
+    -X <list>
+        A comma separated list of continent codes to ignore.
+
+    --ignore-countries <list>
+    -x <list>
+        A comma separated list of country codes to ignore.
+
+    --ignore-mirrors <list>
+    -i <list>
+        A comma separated list of mirrors to ignore.
+        A mirror can be a unique part of the mirror address.
+
+    --list-continent-codes
+        List all supported continent codes.
+
+    --list-continents-countries
+        List all country names with their continent codes and country codes.
+
+    --list-country-codes-names
+    -l
+        List all supported country codes and names.
+
+    --prefer-local-rank
+        If no countries nor continents are requested, prefers mirror ranking
+        only in the current country instead of all supported countries.
+        If there are no supported mirrors in the country, fall back to using
+        all supported countries.
+
+    --ranking-data
+    -r
+        Show ranking data too.
+
+    --save
+        Save the mirrorlist to $ml.
+
+    --sort <value>
+        The <value> specified what to prefer when sorting the list of mirrors.
+        Supported values:
+            age        Prefer mirrors that are most up-to-date.
+            rate       Prefer mirrors that provide answers faster.
+
+    --time
+        Show the elapsed time of the measurement.
+
+    --timeout-rank
+    -k
+        Max timeout in seconds for ranking a mirror.
+
+    -u
+        Update mirror info first.
+
+    --verbosity <value>
+        Sets the verbosity level for the displayed messages.
+        Supported values in verbosity order:
+            least      Show only fatal error messages.
+            less       Show also other error messages.
+            default    Show also warning messages (default).
+            more       Show also info messages.
+            most       Show all available messages.
+        Note: all levels may not be fully implemented.
+
+    --help
+    -h
+        This help.
+
+Configuration file $config_file2 can include all supported options in variable CONFIG_OPTIONS.
+Examples:
+    CONFIG_OPTIONS=(--continent --ranking-data)
+    CONFIG_OPTIONS=(--country DE,US --country-current --ranking-data --favorite 'DE:rwth-aachen')
+    CONFIG_OPTIONS=(--country-current)
+
+Notes:
+    - Command line option overrides the corresponding configuration file option.
+    - Leading % in the <list> value replaces the existing list (instead of adding to it).
+    - More options are available, see the source code at $(which $progname).
+EOF
+    [ "$1" ] && exit $1
+
+    #    --timeout <value>
+    #        Max timeout in seconds for other than ranking.
+}
+Options() {
+    local opts
+
+    opts="$(/bin/getopt -o=$SOPTS --longoptions $LOPTS --name "$progname" -- "$@")" || DIE "getopt error"
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --)                                     shift; break ;;
+            -h | --help)                            ;;         # already handled in OptionsPreHandle()
+            --no-config)                            ;;         # already handled in OptionsPreHandle0()
+            -I | --no-ignore-countries)             ;;         # already handled in OptionsPreHandle()
+            -l | --list-country-codes-names)        ;;         # already handled in OptionsPreHandle()
+            -e | --edit-config)                     ;;         # already handled in OptionsPreHandle()
+            --dump-options)                         ;;         # already handled in OptionsPreHandle()
+            --dump-completion-files)                ;;         # already handled in OptionsPreHandle()
+            --update-completion-files)              ;;         # already handled in OptionsPreHandle()
+            --get-time-info)                        ;;         # already handled in OptionsPreHandle()
+            --reset-completion-files)               ;;         # already handled in OptionsPreHandle()
+            --list-continent-codes)                 ;;         # already handled in OptionsPreHandle()
+            --list-country-codes)                   ;;         # already handled in OptionsPreHandle()
+            --list-country-names)                   ;;         # already handled in OptionsPreHandle()
+            --list-continent-countrycodes)          ;;         # already handled in OptionsPreHandle()
+            --list-continent-countrynames)          ;;         # already handled in OptionsPreHandle()
+            --list-current-continent-countrycodes)  ;;         # already handled in OptionsPreHandle()
+            --list-current-continent-countrynames)  ;;         # already handled in OptionsPreHandle()
+            -i | --ignore-mirrors)                  shift ;;   # already handled in OptionsPreHandle(), but must skip the next parameter
+            -A | --all)                             AllContinents ;;
+            -C | --continent)                       AddContinentCountries ;;
+            -c | --country)                         AddCountries "$2"; shift ;;                         # must be country codes!
+            --continent-given)                      GivenContinent "$2"; shift ;;
+            -d | --distro)                          distro="$2"; shift ;;
+            -x | --ignore-countries)                IgnoreCountries "$2"; shift ;;
+            -X | --ignore-continents)               IgnoreContinents "$2"; shift ;;
+            -m | --max)                             AssertNumber "$2" "$1"; max_nr_of_mirrors="$2"; shift ;;
+            -t | --country-current)                 GetCurrentCountry && countries+=($cc) ;;
+            -r | --ranking-data)                    ranking_data=yes ;;
+            --full-data)                            full_data=yes ;;
+            -f | --favorite)                        AddFavs "$2"; shift ;;
+            --prefer-local-rank)                    prefer_local_rank=yes ;;
+            --no-parallel)                          has_parallel=no ;;
+            -u)                                     update_mirrordata_first=yes ;;
+            # --timeout)                              timeout_distro="$2"; shift ;;
+            -k | --timeout-rank)                    timeout_rank="$2"; shift ;;
+
+            --save)                                 save_ml=yes ;;
+        esac
+        shift
+    done
+    ExpandFavs
+    RemoveIgnoredFromCountries
+    urls+=("$@")
+}
+
+AddFavs() {
+    if [ "$can_add_favs" = yes ] ; then
+        local -r fav="$1"
+        case "$fav" in
+            none) can_add_favs=no ;;
+            *)    favs+=(${fav//,/ }) ;;
+        esac
+    else
+        favs=()
+    fi
+}
+ExpandFavs() {
+    if [ "$favs" ] ; then
+        local informed=no
+        local full cc fav
+        local favs2=("${favs[@]}")
+
+        favs=()
+        for fav in "${favs2[@]}" ; do
+            if [ "${fav:2:1}" != ":" ] ; then                             # is fav CC:url ?
+                WARN "value '$fav' for option --favorite is invalid, should be 'CC:url'"
+                continue
+            fi
+            # [ "$informed" = yes ] || echo2 "==> Expanding option --favorite values..."
+            informed=yes
+            cc=${fav::2}
+            fav=${fav:3}
+            full="$(${progname}-status -c"$cc" | grep "$fav")"
+            if [ "$full" ] ; then
+                case $(echo "$full" | wc -l) in
+                    0) WARN "cannot expand '$fav' in '$cc'" ;;   # ??
+                    1) favs+=("$full") ;;
+                    *) WARN "'$fav' expands to more than one mirror in $cc, ignored" ;;
+                esac
+            else
+                WARN "'$fav' not found in '$cc'"
+            fi
+        done
+    fi
+}
+
+OptionsPreHandle0() {
+    if [ "$(printf "%s\n" "$@" | grep "\--no-config")" ] ; then
+        read_config=no
+    fi
+}
+
+OptionsPreHandle() {
+    # - collect limited_options array to be handled later
+    # - handle some options here for better performance (e.g. -l) or validity (e.g. -i)
+
+    local opts
+
+    opts="$(/bin/getopt -o=$SOPTS --longoptions $LOPTS --name "$progname" -- "$@")" || DIE "getopt error"
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --)                                     shift; break ;;
+            -h | --help)                            Usage 0 ;;
+            --dump-completion-files)                ShowCompletionFiles;    exit 0 ;;
+            --update-completion-files)              UpdateCompletionFiles;  exit 0 ;;
+            --get-time-info)                        GetTimeInfo;            exit 0 ;;
+            --reset-completion-files)               ResetCompletionFiles;   exit 0 ;;
+            --list-continent-codes)                 echo "$all_continents"; exit 0 ;;
+            --list-country-codes)                   ListCountryCodes;       exit 0 ;;
+            --list-country-names)                   ListCountryNames;       exit 0 ;;
+            --list-continent-countrycodes)          ShowContinentCountries "$2" code; exit ;;
+            --list-continent-countrynames)          ShowContinentCountries "$2" name; exit ;;
+            --list-current-continent-countrycodes)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" code; exit ;;
+            --list-current-continent-countrynames)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" name; exit ;;
+            --list-continents-countries)            ListContinentsCountries; exit ;;
+            -e | --edit-config)                     Edit "$config_file";    exit 0 ;;
+            --dump-completion-files)                ShowCompletionFiles;    exit 0 ;;
+            -l | --list-country-codes-names)        ListCountryCodesNames;  exit 0 ;;
+            --verbosity)                            verbosity="$2"; shift ;;
+            --sort)                                 sort_prefer="$2" ;;
+            --dump-options)                         DumpOptions;            exit 0 ;;
+            --dump-options-all)                     echo "${opts[*]}" | sed 's| --$||'; exit 0 ;;
+            -i | --ignore-mirrors)                  IgnoreMirrors "$2";     shift ;;
+            --no-config)                            ;;                                  # already handled in OptionsPreHandle0()
+            -I | --no-ignore-countries)             prevent_ignoring_countries=yes ;;
+            *) limited_options+=("$1")              ;;
+        esac
+        shift
+    done
+
+    # check some given values
+    local tmp=""
+    case "$verbosity" in
+        least|less|default|more|most) ;;
+        *) tmp="$verbosity"
+           verbosity=default
+           WARN "option '--verbosity $tmp': changing value to '$verbosity'"
+           ;;
+    esac
+    case "$sort_prefer" in
+        age|rate) ;;
+        *) tmp="$sort_prefer"
+           sort_prefer=age
+           WARN "option '--sort $tmp': changing value to '$sort_prefer'"
+           ;;
+    esac
+}
+
+RemoveIgnoredFromCountries() {
+    local code
+    local countries_orig=("${countries[@]}")
+
+    countries=()
+    for code in "${countries_orig[@]}" ; do
+        printf "%s\n" "${ignored_country_codes[@]}" | grep "^$code$" >/dev/null || countries+=("$code")
+    done
+}
+AllOrLocalMirrors() {
+    echo2 ""
+    if [ "$prefer_local_rank" = yes ] && GetCurrentCountry ; then
+        countries+=("$cc")
+        MONITOR "ranking mirrors in: $cc"
+        return
+    fi
+    MONITOR "ranking mirrors in all countries, please wait..."
+    AllContinents
+}
+
+Main() {
+    local -r progname=${0##*/}
+    local -r ml=/etc/pacman.d/mirrorlist
+    local -r comment3="### "
+    local -r comment4="#${comment3} "
+    local -r comment4i="$comment4  "
+    local verbose=yes
+    local sort_prefer=age
+
+    case "$1" in
+        --time) shift
+                if [ -x /bin/time ] ; then
+                    local tmpfile=$(mktemp)
+                    /bin/time --output=$tmpfile -p $progname "$@"
+                    echo -e "\n${comment4}Total measurement time (seconds):"
+                    sed "s|^|$comment4i|" < $tmpfile
+                    rm -f $tmpfile
+                    exit
+                else
+                    DIE "package 'time' is required for option --time"
+                fi
+                ;;
+    esac
+
+    local -r progname_helper=${progname}-helper  # ${progname%2}-helper
+    local distro=arch                             # arch (maybe later: endeavouros)
+    local urls=() url
+    local timeout_distro=30
+    local timeout_rank=20
+    local can_add_favs=yes
+    local syncfile=""
+    local mirrors
+    local time_as_datetime=no
+    local ranking_data=no
+    local ranking_all_mirrors=no        # helps tips only?
+    local full_data=no
+    local ignored_mirrors=()
+    local ignored_country_codes=()
+    local countries=()                  # contains only uppercase country codes
+    local cc=""                         # current country
+    local countries_continents=""
+    local tmp
+    local prefer_local_rank=no
+    local save_ml=no                   # not supported currently, if ever
+    local suffix=""
+    local verbosity=default
+    local reflector_list_countries=""
+    local has_parallel=yes
+    local read_config=yes
+    local update_mirrordata_first=no
+    local prevent_ignoring_countries=no       # if yes, then forget option --ignore-countries
+    local CONFIG_OPTIONS=()
+    local ecode=0
+    local -r config_file="$HOME/.config/$progname.conf"
+    local -r config_file2="~/.config/$progname.conf"
+    local -r all_continents="AF AN AS EU NA OC SA"
+    local limited_options=() args_orig=("$@")
+    local completion_files_updated=no
+    local max_nr_of_mirrors=1000
+    local favs=()
+    local time_of_ranking=$(date +%x-%X)
+
+    local SOPTS="ACc:d:ef:hi:k:m:X:x:lrtu"
+    SOPTS+="I"
+
+    local LOPTS=""
+    LOPTS+="all,continent,country:,country-current,distro:,dump-completion-files,dump-options,dump-options-all,favorite:,full-data,help"
+    LOPTS+=",list-country-codes,list-country-codes-names,list-country-names,ranking-data,list-continents-countries"
+    LOPTS+=",reset-completion-files,list-continent-countrycodes:,list-continent-countrynames:,update-completion-files"
+    LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
+    LOPTS+=",ignore-countries:,timeout-rank:,no-parallel,continent-given:,list-continent-codes,ignore-continents:" # timeout:
+    LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
+    LOPTS+=",save,sort:"
+
+    [ -x /bin/parallel ] || has_parallel=no
+
+    OptionsPreHandle0 "$@"
+    if [ $read_config = yes ] && [ -e "$config_file" ] ; then
+        INFO "reading file $config_file2"
+        source "$config_file"
+    fi
+
+    OptionsPreHandle "${CONFIG_OPTIONS[@]}" "$@"
+
+    echo2 -n "==> Processing options..."
+    Options "${limited_options[@]}"        # this may take time!
+    echo2 "done."
+
+    echo2 -n "==> Ranking..."
+    case "$distro" in
+        arch)
+            case "${#countries[@]}" in
+                0) AllOrLocalMirrors ;;
+            esac
+            syncfile=lastupdate
+            time_as_datetime=yes
+            suffix='/$repo/os/$arch'
+            local countries2="${countries[*]}"
+            local update=""
+            [ $update_mirrordata_first = yes ] && update="-u"
+            mirrors=$(${progname}-status -n -c ${countries2// /,} -t $timeout_distro $update) || exit 1
+            ;;
+        endeavouros)
+            DIE "sorry, support for EndeavourOS not yet implemented."
+            syncfile=state
+            suffix='/$repo/$arch'
+            local mirrorlist=""    # TODO: fetch endeavouros-mirrorlist !!
+            mirrors=$(grep "^Server[ \t]*=[ \t]*" "$mirrorlist" | awk '{print $NF}')
+            ;;
+        *)  DIE "sorry, distro '$distro' not supported." ;;
+    esac
+
+    SkipIgnoredMirrors
+
+    local mirror_count=0
+    local mirrors_with_statefiles=""
+    local errlogfile=/tmp/$progname.errlog
+    local mode=""
+    local ranked=""
+
+    rm -f "$errlogfile"
+
+    if [ "$mirrors" ] ; then
+        mirror_count=$(echo "$mirrors" | wc -l)
+        mirrors_with_statefiles=$(echo "$mirrors" | sed "s|/\$repo/os/\$arch|/$syncfile|")
+
+        # Now we have the final list of mirrors.
+
+        case "$has_parallel" in
+            yes)  mode=parallel ;;
+            no|*) mode=sequential ;; 
+        esac
+        result=$(TraverseMirrors-$mode)
+        mirror_count=$(echo "$result" | wc -l)                          # ranking may have dropped some mirrors!
+        case "$sort_prefer" in
+            age)  ranked=$(echo "$result" | LC_ALL=C sort -t'|' -k2rb,2 -k3V,3) ;;  # sort: age > rate
+            rate) ranked=$(echo "$result" | LC_ALL=C sort -t'|' -k3V,3 -k2rb,2) ;;  # sort: age < rate
+        esac
+    fi
+
+    case $save_ml in
+        yes)
+            if [ $mirror_count -gt 0 ] || [ "$favs" ] ; then
+                local -r timestamp=$(date +%y%m%d%H%M)
+                local -r mlt=$(mktemp /tmp/ml.XXXXX)
+                local -r bakdir=${ml%/*}/.EOS-BACKUP
+                local -r bakfile=$bakdir/${ml##*/}.$timestamp
+                ShowMirrorlistFile | tee $mlt
+                sudo bash -c "mkdir -p $bakdir; cp -a $ml $bakfile; zstd -fq -19 --rm $bakfile; cp $mlt $ml" && {
+                     echo2 "\n==> $bakfile.zst created as backup.\n==> $ml saved.\n"
+                } || {
+                    echo2 "\n==> $ml NOT saved.\n"
+                }
+                rm -f $mlt
+            fi
+            ;;
+        no) ShowMirrorlistFile
+            ;;
+    esac
+    LateTips
+
+    if [ -e "$errlogfile" ] ; then
+        echo2 "\n==> ERRLOG ($errlogfile):"
+        cat "$errlogfile" | sort -u -k5n >&2
+        # rm -f "$errlogfile"
+    fi
+}
+
+LateTips() {
+    local has_tips=no
+    [ $save_ml = no ] && \
+        ShowATip "    -> Use option --save to store the list into $ml."
+    [ $ranking_data = no ] && \
+        ShowATip "    -> Use option --ranking-data to show the details of ranking."
+    [ $ranking_all_mirrors = yes ] && \
+        ShowATip "    -> Use options --country, --ignore-continents, --ignore-countries, --ignore-mirrors, and more\n" \
+                 "      to narrow down the amount of ranked mirrors."
+    [ "$favs" ] || \
+        ShowATip "    -> Use option --favorite to make specific mirrors preferred (advanced)."
+    echo2 ""
+}
+ShowATip() {
+    if [ $has_tips = no ] ; then
+        echo2 "\n==> Tips:"
+        has_tips=yes
+    fi
+    echo2 "$@"
+}
+
+SkipIgnoredMirrors() {
+    if [ "$ignored_mirrors" ] ; then
+        local ign=${ignored_mirrors[*]}
+        ign=${ign// /|}
+        mirrors=$(echo "$mirrors" | grep -Pv "$ign")
+    fi
+}
+SeparateIgnoreMirrors() {
+    local list
+    local arg
+    while [ "$1" ] ; do
+        arg="$1"
+        case "$arg" in
+            -i | --ignore-mirrors)
+                list="$2"
+                shift
+                if [ "${list/,/}" != "$list" ] ; then
+                    for item in ${list//,/ } ; do
+                        args+=("-i" "$item")
+                    done
+                fi
+                ;;
+            -x | --ignore-countries)
+                args+=(-x "$2")
+                shift
+                ;;
+            -X | --ignore-continents)
+                args+=(-X "$2")
+                shift
+                ;;
+            *)
+                args+=("$1")
+                ;;
+        esac
+        shift
+    done
+}
+ShowCommandLine() {
+    local -r maxlen=100
+    local -r head1="${comment3}Command         : $progname"
+    local -r head2="${comment3}Command         :"
+    local line="$head1"
+    local item
+    local args=()
+    local list
+
+    SeparateIgnoreMirrors "${CONFIG_OPTIONS[@]}" "${args_orig[@]}"
+
+    for item in "${args[@]}" ; do
+        if [ $((${#line} + ${#item} + 1)) -le $maxlen ] ; then
+            line+=" $item"
+        else
+            echo "$line \\"
+            line="$head2 $item"
+        fi
+    done
+
+    echo "$line"
+    echo ""
+}
+ShowMirrorlistFile() { :
+    if [ $mirror_count = 0 ] && [ -z "$favs" ] ; then
+        return
+    fi
+    cat <<EOF
+${comment3}Ranked list of ${distro^} mirrors.
+${comment3}Rank preference : age > rate
+${comment3}Rank time       : $time_of_ranking
+${comment3}Rank mode       : $mode
+EOF
+    ShowCommandLine
+    ShowFavorites
+    ShowMirrorlist
+    ShowRankingData
+    ShowFullData
+}
+
+Columns() { column -t -s'|' ; }
+
+ShowFullData()    {
+    if [ $full_data = yes ] ; then
+        echo -e "\n${comment3}Full data:"
+        echo "$ranked"
+    fi
+}
+ShowMirrorlist()  {
+    # show ranked mirrors without user favorites
+    if [ $mirror_count -gt 0 ] ; then
+        local out=$(echo "$ranked" | head -n $max_nr_of_mirrors | Columns | awk '{print $1}' | sed -E "s|(.*)|Server = \1$suffix|")
+        if [ "$favs" ] ; then
+            # remove favs (=duplicates) from the actual mirrorlist
+            local xx
+            for xx in "${favs[@]}" ; do
+                out=$(echo "$out" | grep -v "$xx")
+            done
+        fi
+        [ "$out" ] && echo "$out"
+    fi
+}
+ShowRankingData() {
+    if [ $mirror_count -gt 0 ] && [ $ranking_data = yes ] ; then
+        echo -e "\n${comment3}Ranking data ($mirror_count mirrors):"
+        local data=$(echo "$ranked" | head -n $max_nr_of_mirrors | cat -n |
+                         sed -E 's/[ \t]+([0-9]+)[ \t]+(.*)/\2|\1/' | sed -E "s|^([^ ]+)|${comment3}\1|")
+        local -r rankheader="MIRROR|UPDATE LEVEL|FETCH TIME|COUNTRY|ORDINAL"
+        local -r rankul="${rankheader//[A-Za-z ]/\~}"
+
+        echo -e "${comment3}$rankheader\n${comment3}$rankul\n$data" | Columns
+    fi
+}
+ShowFavorites() {
+    if [ "$favs" ] ; then
+        local -r title="FAVORITE MIRRORS BY USER"
+        echo -e "\n${comment3}$title >>>"
+        for mirror in "${favs[@]}"; do
+            [ "$mirror" ] && echo "Server = $mirror"
+        done
+        echo -e "${comment3}$title <<<\n"
+    fi
+}
+
+Main  "$@"

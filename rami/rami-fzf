@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Launcher for 'rami'.
+
+SelectOne() {
+    local fzfcmd=(fzf --border --header-border=sharp --no-input #--header-first
+                  --layout=reverse --header="$(echo -e "$1")")
+    shift
+    printf "%s\n" "$@" | "${fzfcmd[@]}"
+}
+
+SelectArea() {
+    local -r value=$(SelectOne "Select the area for mirror ranking.\nKeys: Up=up, Down=down, ENTER=accept, ESC=quit" \
+                               "Current continent" \
+                               "Current country" \
+                               Everywhere)
+    case "${value,,}" in
+        "current country")   options+=(--country-current) ;;
+        "current continent") options+=(--continent) ;;
+        everywhere)          options+=(--all) ;;
+        "") exit 1 ;;
+    esac
+}
+SelectDetails() {
+    local -r value=$(SelectOne "Show detailed ranking info?" Yes No)
+    case "${value,,}" in
+        yes) options+=(--ranking-data) ;;
+        "") exit 1 ;;
+    esac
+}
+SelectSave() {
+    local -r value=$(SelectOne "Save to /etc/pacman.d/mirrorlist?" Yes No)
+    case "${value,,}" in
+        yes) options+=(--save) ;;
+        "") exit 1 ;;
+    esac
+}
+
+Main()
+{
+    local options=()
+    SelectArea
+    SelectDetails
+    SelectSave
+    /bin/rami "${options[@]}"
+}
+
+Main "$@"

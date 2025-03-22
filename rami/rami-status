@@ -1,0 +1,90 @@
+#!/bin/bash
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    Usage
+    exit 1
+}
+Usage() {
+    cat <<EOF
+Usage: $progname [options]
+Options:
+    -c <list>      Give a list of comma separated country codes.
+    -t <timeout>   Timeout in seconds for fetching the info.
+    -n             Display the country name too after a comma.
+    -u             Update mirror info first.
+    -h, --help     This help.
+EOF
+    [ "$1" ] && exit $1
+}
+
+HandleCountryCodes() {
+    country_codes=${country_codes//[,|]/ }  # replace , or | with space
+    country_codes=${country_codes^^}        # upper case
+    if [ "$country_codes" != "$(cat $file_countries 2>/dev/null)" ] ; then
+        echo "$country_codes" > $file_countries
+        update_first=yes
+    fi
+}
+
+Options() {
+    local lopts="help"
+    local sopts="c:hnt:u"
+    local opts=""
+
+    opts="$(/usr/bin/getopt -o="$sopts" --longoptions "$lopts" --name "$progname" -- "$@")" || Usage 1
+
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            -c)          country_codes="$2"; shift; HandleCountryCodes ;;
+            -h | --help) Usage 0 ;;
+            -n)          show_country_names=yes ;;
+            -t)          timeout="$2"; shift ;;
+            -u)          update_first=yes ;;
+
+            --)          shift; break ;;
+        esac
+        shift
+    done
+}
+
+Main()
+{
+    local -r progname=${0##*/}
+    local file_mirrors=$HOME/.cache/$progname.mirrors
+    local file_countries=$HOME/.cache/$progname.countries
+    local country_codes=$(cat $file_countries 2>/dev/null)
+    local timeout=30
+    local show_country_names=no
+    local update_first=no
+    local countrycode
+    local url="https://archlinux.org/mirrorlist/?protocol=https&ip_version=4&use_mirror_status=on"
+    local mirrors
+
+    Options "$@"
+
+    if [ "$country_codes" ] ; then
+        for countrycode in $country_codes ; do
+            url+="&country=$countrycode"
+        done
+    fi
+    case "$update_first" in
+        yes)
+            mirrors=$(curl --fail -Lsm $timeout "$url") || DIE "curl failed ($?)"
+            [ "$mirrors" ] || DIE "-> archlinux.org/mirrorlist failed"
+            mirrors=$(echo "$mirrors" | tail -n +7)
+            echo "$mirrors" > $file_mirrors
+            ;;
+        no)
+            mirrors=$(< $file_mirrors)
+            ;;
+    esac
+    case "$show_country_names" in
+        yes) echo "$mirrors" | sed -E ':a ; $!N ; s/## (.*)\n#Server = (.*)/\2,\1/ ; ta ; P ; D' ;;
+        no)  echo "$mirrors" | grep "^#Server = " | awk '{print $NF}' ;;
+    esac
+}
+
+Main "$@"
