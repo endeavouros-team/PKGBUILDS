@@ -132,18 +132,24 @@ GetCountriesData() {
 ListContinentsCountries() {
     local code_name=()
     local countrycode continent line
+    local -r header="Continent code|Country code|Country name"
+    local -r header_ul="$(echo "$header" | sed 's|[^|]|~|g')"
 
     GetContinentsData
     readarray -t code_name <<< $(ListCountryCodesNames)
 
     # gather all info and sort according to continent and country name
-    for line in "${code_name[@]}" ; do
-        countrycode=${line%% *}
-        continent=$(echo "$countries_continents" | grep ^$countrycode)
-        continent=${continent##* }
-        line=${line//  / }
-        echo "$continent $line"
-    done | sort -k1,1 -k3,3
+    {
+        echo "$header"
+        echo "$header_ul"
+        for line in "${code_name[@]}" ; do
+            countrycode=${line%% *}
+            continent=$(echo "$countries_continents" | grep ^$countrycode)
+            continent=${continent##* }
+            line=${line//  / }
+            echo "$continent $line"
+        done | sort -k1,1 -k3,3 | sed -E 's/^([A-Z][A-Z]) ([A-Z][A-Z]) /\1|\2|/'
+    } | column -t -s'|'
 }
 GivenContinent() {
     local continent1="$1"
