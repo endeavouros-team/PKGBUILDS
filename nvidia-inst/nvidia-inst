@@ -78,12 +78,14 @@ AdjustPkgsAboutDkms() {
                 case "$pkg" in
                     nvidia-dkms)
                         # Info "Changing $pkg to nvidia and nvidia-lts"
-                        adjusted+=(nvidia nvidia-lts)    # no need to check installed kernels?
+                        IsInstalled linux     && adjusted+=(nvidia)
+                        IsInstalled linux-lts && adjusted+=(nvidia-lts)
                         CheckUnsupportedKernels
                         ;;
                     nvidia-open-dkms)
                         # Info "Changing $pkg to nvidia-open"
-                        adjusted+=(nvidia-open)
+                        IsInstalled linux     && adjusted+=(nvidia-open)
+                        IsInstalled linux-lts && adjusted+=(nvidia-open-lts)
                         CheckUnsupportedKernels
                         ;;
                     bbswitch-dkms)
@@ -109,11 +111,13 @@ AdjustPkgsAboutDkms() {
                 case "$pkg" in
                     nvidia-dkms)
                         # Info "Changing $pkg to nvidia and nvidia-lts"
-                        adjusted+=(nvidia nvidia-lts)    # no need to check installed kernels?
+                        IsInstalled linux     && adjusted+=(nvidia)
+                        IsInstalled linux-lts && adjusted+=(nvidia-lts)
                         ;;
                     nvidia-open-dkms)
                         # Info "Changing $pkg to nvidia-open"
-                        adjusted+=(nvidia-open)
+                        IsInstalled linux     && adjusted+=(nvidia-open)
+                        IsInstalled linux-lts && adjusted+=(nvidia-open-lts)
                         ;;
                     bbswitch-dkms)
                         # Info "Changing $pkg to bbswitch"
