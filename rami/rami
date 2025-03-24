@@ -413,7 +413,7 @@ Options:
     -h
         This help.
 
-Configuration file $config_file2 can include all supported options in variable CONFIG_OPTIONS.
+Configuration file ~/${config_file#$HOME/} can include all supported options in variable CONFIG_OPTIONS.
 Examples:
     CONFIG_OPTIONS=(--continent --ranking-data)
     CONFIG_OPTIONS=(--country DE,US --country-current --ranking-data --favorite 'DE:rwth-aachen')
@@ -439,7 +439,7 @@ Options() {
         case "$1" in
             --)                                     shift; break ;;
             -h | --help)                            ;;         # already handled in OptionsPreHandle()
-            --no-config)                            ;;         # already handled in OptionsPreHandle0()
+            --no-config)                            ;;         # already handled in HasNoConfigOption()
             -I | --no-ignore-countries)             ;;         # already handled in OptionsPreHandle()
             -l | --list-country-codes-names)        ;;         # already handled in OptionsPreHandle()
             -e | --edit-config)                     ;;         # already handled in OptionsPreHandle()
@@ -524,7 +524,7 @@ ExpandFavs() {
     fi
 }
 
-OptionsPreHandle0() {
+HasNoConfigOption() {
     if [ "$(printf "%s\n" "$@" | grep "\--no-config")" ] ; then
         read_config=no
     fi
@@ -563,7 +563,7 @@ OptionsPreHandle() {
             --dump-options)                         DumpOptions;            exit 0 ;;
             --dump-options-all)                     echo "${opts[*]}" | sed 's| --$||'; exit 0 ;;
             -i | --ignore-mirrors)                  IgnoreMirrors "$2";     shift ;;
-            --no-config)                            ;;                                  # already handled in OptionsPreHandle0()
+            --no-config)                            ;;                                  # already handled in HasNoConfigOption()
             -I | --no-ignore-countries)             prevent_ignoring_countries=yes ;;
             *) limited_options+=("$1")              ;;
         esac
@@ -659,10 +659,11 @@ Main() {
     local read_config=yes
     local update_mirrordata_first=no
     local prevent_ignoring_countries=no       # if yes, then forget option --ignore-countries
-    local CONFIG_OPTIONS=()
+    local CONFIG_OPTIONS=()                   # for options
+    local CONFIG_OPTIONS_ADVANCED=()          # for advanced options
     local ecode=0
     local -r config_file="$HOME/.config/$progname.conf"
-    local -r config_file2="~/.config/$progname.conf"
+    local -r config_file_advanced="$HOME/.config/${progname}-advanced.conf"
     local -r all_continents="AF AN AS EU NA OC SA"
     local limited_options=() args_orig=("$@")
     local completion_files_updated=no
@@ -684,13 +685,19 @@ Main() {
 
     [ -x /bin/parallel ] || has_parallel=no
 
-    OptionsPreHandle0 "$@"
+    HasNoConfigOption "$@"
+
+    if [ -e "$config_file_advanced" ] ; then
+        INFO "reading file ~/${config_file_advanced#$HOME/}"
+        source "$config_file_advanced"
+    fi
+
     if [ $read_config = yes ] && [ -e "$config_file" ] ; then
-        INFO "reading file $config_file2"
+        INFO "reading file ~/${config_file#$HOME/}"
         source "$config_file"
     fi
 
-    OptionsPreHandle "${CONFIG_OPTIONS[@]}" "$@"
+    OptionsPreHandle "${CONFIG_OPTIONS_ADVANCED[@]}" "${CONFIG_OPTIONS[@]}" "$@"
 
     echo2 -n "==> Processing options..."
     Options "${limited_options[@]}"        # this may take time!
