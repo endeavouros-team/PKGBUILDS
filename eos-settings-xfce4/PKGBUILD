@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-xfce4
-pkgver=3.0
+pkgver=3.1
 pkgrel=1
 pkgdesc="XFCE4 settings for EndeavourOS"
 arch=('any')
@@ -10,7 +10,7 @@ depends=('endeavouros-branding')
 url="https://github.com/endeavouros-team/${pkgname}"
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('5a2c6b23a139d75fa627c19242a4070e4768d37a0a2a1464a2aa749aac545015')
+sha256sums=('e180317330a2813b6846775c4d41c59a7fbb430de64a283618b611d00ad00078')
 
 package() {
     cd "${pkgname}-${pkgver}"
