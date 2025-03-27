@@ -687,17 +687,17 @@ Main() {
 
     HasNoConfigOption "$@"
 
-    if [ -e "$config_file_advanced" ] ; then
-        INFO "reading file ~/${config_file_advanced#$HOME/}"
-        source "$config_file_advanced"
-    fi
-
     if [ $read_config = yes ] && [ -e "$config_file" ] ; then
         INFO "reading file ~/${config_file#$HOME/}"
         source "$config_file"
     fi
 
-    OptionsPreHandle "${CONFIG_OPTIONS_ADVANCED[@]}" "${CONFIG_OPTIONS[@]}" "$@"
+    if [ -e "$config_file_advanced" ] ; then
+        INFO "reading file ~/${config_file_advanced#$HOME/}"
+        source "$config_file_advanced"
+    fi
+
+    OptionsPreHandle "${CONFIG_OPTIONS[@]}" "${CONFIG_OPTIONS_ADVANCED[@]}" "$@"
 
     echo2 -n "==> Processing options..."
     Options "${limited_options[@]}"        # this may take time!
