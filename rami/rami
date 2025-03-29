@@ -290,15 +290,29 @@ DumpOptions() {
 }
 
 Edit() {
-    local file="$1"
+    local file files=()
     local editors=( exo-open xdg-open kde-open emacs kate gnome-text-editor xed mousepad )
     local editor
+
     for editor in "${editors[@]}" ; do
         if which $editor &>/dev/null ; then
-            if [ ! -e "$file" ] ; then
-                touch "$file" || DIEE "cannot create file '$file'"
-            fi
-            $editor "$file"
+            for file in "$@" ; do
+                if [ ! -e "$file" ] ; then
+                    [ "$file" = "$config_file_advanced" ] && continue
+                    touch "$file" || DIEE "cannot create file '$file'"
+                fi
+                files+=("$file")
+            done
+            case "$editor" in
+                xdg-open | kde-open)
+                    for file in "${files[@]}" ; do
+                        $editor "$file"
+                    done
+                    ;;
+                *)
+                    $editor "${files[@]}" 2>/dev/null &
+                    ;;
+            esac
             return
         fi
     done
@@ -555,7 +569,7 @@ OptionsPreHandle() {
             --list-current-continent-countrycodes)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" code; exit ;;
             --list-current-continent-countrynames)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" name; exit ;;
             --list-continents-countries)            ListContinentsCountries; exit ;;
-            -e | --edit-config)                     Edit "$config_file";    exit 0 ;;
+            -e | --edit-config)                     Edit "$config_file_advanced" "$config_file";    exit 0 ;;
             --dump-completion-files)                ShowCompletionFiles;    exit 0 ;;
             -l | --list-country-codes-names)        ListCountryCodesNames;  exit 0 ;;
             --verbosity)                            verbosity="$2"; shift ;;
