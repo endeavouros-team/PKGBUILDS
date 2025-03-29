@@ -66,7 +66,7 @@ EosApps2cmd() {
         eos-wallpaper-set eos-welcome grub-colour-chooser mirrorlist-rank-info
         nvidia-inst nvidia-driver-supported-branches
         paccache-service-manager
-        pahis reflector-simple RunInTerminal show-location-info su-c_wrapper
+        pahis rami reflector-simple RunInTerminal show-location-info su-c_wrapper
     )
     local app
 
