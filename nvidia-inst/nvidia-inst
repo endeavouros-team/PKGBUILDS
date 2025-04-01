@@ -284,7 +284,7 @@ OnlyNvidia() {
 
 KernelParametersToBoot2() {
     return 0                    # 2024-Oct: drm.modeset and drm-fbdev are already included in nvidia packages
-    local mode2
+    local operation
     local para
     local params=(nvidia-drm.modeset=1
                   nvidia-drm.fbdev=1)
@@ -292,21 +292,21 @@ KernelParametersToBoot2() {
     local file_grub=/etc/default/grub
 
     case "$mode" in
-        nvidia | nvidia-open | prime) mode2=add ;;
-        *)                            mode2=remove ;;
+        nvidia | prime) operation=add ;;
+        *)              operation=remove ;;
     esac
-    case "$mode2" in
+    case "$operation" in
         add)
             for para in "${params[@]}" ; do
                 if [ -z "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                    AddCmd "nvidia-installer-kernel-para $para $mode2"
+                    AddCmd "nvidia-installer-kernel-para $para $operation"
                 fi
             done
             ;;
         remove)
             for para in "${params[@]}" ; do
                 if [ "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                    AddCmd "nvidia-installer-kernel-para $para $mode2"
+                    AddCmd "nvidia-installer-kernel-para $para $operation"
                 fi
             done
             ;;
@@ -414,7 +414,7 @@ Options() {
             -b | --bumblebee)   mode=bumblebee ;;
             -n | --nouveau)     mode=nouveau ;;
             -p | --prime)       mode=prime ;;
-            -o | --open)        mode=nvidia-open ;;
+            -o | --open)        driver_source_type=open ;;
             --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
@@ -587,9 +587,9 @@ ProperNvidiaPackages() {
     case "$series" in
         $latest_from_arch)
             p_nvidia="nvidia-utils nvidia-settings"
-            case "$mode" in
-                nvidia-open) p_nvidia="nvidia-open-dkms $p_nvidia" ;;
-                nvidia | *)  p_nvidia="nvidia-dkms $p_nvidia" ;;
+            case "$driver_source_type" in
+                open) p_nvidia="nvidia-open-dkms $p_nvidia" ;;
+                *)    p_nvidia="nvidia-dkms $p_nvidia" ;;
             esac
             p_nvidia32="lib32-nvidia-utils"
             ;;
@@ -662,6 +662,7 @@ Main()
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
+    local driver_source_type="closed"                       # "closed" or "open" (closed or open source drivers)
     local bumblebee=no
     local force=no
     local nouveau=no
@@ -713,7 +714,7 @@ Main()
     [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
     Info "Running: $progname v$PROGVERSION"
     Info "Command line: $progname $*"
-    Info "Selected mode: $mode"
+    Info "Selected mode: $mode ($driver_source_type source)"
 
     if [ "$force" = "no" ] ; then
         if ! IsNvidiaCard ; then
@@ -731,7 +732,7 @@ Main()
         bumblebee) ;;
         nouveau)   Nouveau ;;
         prime)     Prime   ;;
-        nvidia | nvidia-open)    OnlyNvidia ;;
+        nvidia)    OnlyNvidia ;;
     esac
 
     KeepsAndRemoves
