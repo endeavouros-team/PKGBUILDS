@@ -342,7 +342,7 @@ CreateConfFile() {
 }
 
 IsNvidiaCard() {
-    lspci -k | grep -P 'VGA|3D|Display' | grep NVIDIA >& /dev/null
+    [ "$NvidiaData" ]
 }
 
 IsoVersion() {
@@ -419,7 +419,7 @@ Options() {
             --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
-            -t | --test)        test=yes ;;
+            -t | --test)        test=yes; Note "$NvidiaData" ;;
             --conf)             create_conf=yes ;;
             --ignore)           ignore_errors=yes ;;
             # --legacyrepo)       Setup3rdPartyRepo ;;
@@ -668,8 +668,8 @@ RecommendedDriverSourceType() {
     # - https://nouveau.freedesktop.org/wiki/CodeNames.html
     # - /usr/share/hwdata/pci.ids
 
-    # local lines=$(lspci | grep NVIDIA | grep -P 'VGA|Display|3D')
-    local lines=$(lspci -d 10de::03xx)                               # 10de = NVIDIA
+    # local lines=$(lspci -d 10de::03xx)                               # 10de = NVIDIA
+    local lines="$NvidiaData"
     if [ -z "$lines" ] ; then
         Warn "could not find Nvidia GPU in $FUNCNAME()."
         return 1
@@ -709,9 +709,11 @@ Main()
 
     local progname=${0##*/}
 
+    local -r NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
+
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
-    local driver_source_type="$(RecommendedDriverSourceType)"         # "closed" or "open" (closed or open source drivers)
+    local driver_source_type="$(RecommendedDriverSourceType "$NvidiaData")"   # "closed" or "open" (closed or open source drivers)
     local bumblebee=no
     local force=no
     local nouveau=no
