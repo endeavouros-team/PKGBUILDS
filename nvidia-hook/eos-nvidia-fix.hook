@@ -6,6 +6,7 @@ Type = Package
 Target = nvidia
 Target = nvidia-lts
 Target = nvidia-open
+Target = nvidia-open-lts
 
 [Action]
 When = PostTransaction
