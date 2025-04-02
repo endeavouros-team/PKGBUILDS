@@ -396,8 +396,8 @@ ListOptions() {
 
 Options() {
     local opts
-    local sopts="bfhnopqtv"
-    local lopts="32,bumblebee,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
+    local sopts="bcfhnopqtv"
+    local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
@@ -415,6 +415,7 @@ Options() {
             -n | --nouveau)     mode=nouveau ;;
             -p | --prime)       mode=prime ;;
             -o | --open)        driver_source_type=open ;;
+            -c | --closed)      driver_source_type=closed ;;
             --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
@@ -459,8 +460,9 @@ Options:
   -h, --help              This help.
   -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards (only very old cards).
   -f, --force             Force driver installation even if a nvidia card is not detected.
-  -n, --nouveau           Install (open source) nouveau driver instead of nvidia-dkms.
-  -o, --open              Install package nvidia-open-dkms instead of nvidia-dkms.
+  -n, --nouveau           Install (the open source) nouveau driver instead of Nvidia's driver.
+  -o, --open              Install the open source versions of Nvidia drivers (recommended for 'Turing' and later).
+  -c, --closed            Install the closed source versions of Nvidia drivers (recommended for 'Maxwell'...'Ada Lovelace').
   -p, --prime             Install also prime render offload.
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
@@ -476,14 +478,21 @@ Options:
   --listopts              List options supported by $progname.
 
 Notes:
-  1. By default, dkms packages are favored and will be selected for install if none of the options
+  1. By default, $progname detects the Nvidia GPU family and selects automatically between
+     Nvidia's open or closed source driver(s).
+     This can be prevented by using options --open or --closed.
+     Note that NVIDIA no longer actively support older than Maxwell GPUs. Thus using the nouveau driver
+     with them might be easier.
+     See also: https://wiki.archlinux.org/title/NVIDIA#Installation
+
+  2. By default, dkms packages are favored and will be selected for install if none of the options
        --bumblebee
        --no-dkms
        --nouveau
        --open
      is used.
 
-  2. If you have hybrid graphics, then you may need a tool that can switch GPUs.
+  3. If you have hybrid graphics, then you may need a tool that can switch GPUs.
      There are several popular tools in the AUR, e.g.
        - envycontrol
        - optimus-manager
@@ -493,7 +502,7 @@ Notes:
        - https://discovery.endeavouros.com/?s=nvidia
        - https://wiki.archlinux.org/title/NVIDIA_Optimus
 
-  3. Older Nvidia GPUs may be supported only by a legacy driver found in the AUR.
+  4. Older Nvidia GPUs may be supported only by a legacy driver found in the AUR.
      Use command 'nvidia-inst --drivers' to see which driver version supports your GPU.
 
 EOF
@@ -651,6 +660,39 @@ GetSeriesFromPacman() {
     echo "$pacman_version_series"
 }
 
+RecommendedDriverSourceType() {
+    # local lines=$(lspci | grep NVIDIA | grep -P 'VGA|Display|3D')
+    local lines=$(lspci -d 10de::03xx)  # see https://wiki.archlinux.org/title/NVIDIA#Installation, 10de = NVIDIA
+    if [ -z "$lines" ] ; then
+        Warn "could not find Nvidia GPU in $FUNCNAME()."
+        return 1
+    fi
+
+    # Closed source drivers recommended for these GPUs:
+    local maxwell=$(     echo "$lines" | grep " GM[12][0][04678B][GLM]* ")
+    local pascal=$(      echo "$lines" | grep " GP[1][0][24678][BGLM]* ")
+    local volta=$(       echo "$lines" | grep " GV100[GL]* ")
+    if [ "$maxwell$pascal$volta" ] ; then
+        echo "closed"
+        return 0
+    fi
+
+    # Open source drivers recommended for these GPUs:
+    local turing=$(      echo "$lines" | grep " TU[1][01][2467][BGLM]* ")
+    local ampere=$(      echo "$lines" | grep " GA[1][0][23467][BGLM]* ")
+    local ada_lovelace=$(echo "$lines" | grep " AD[1][0][234678][GLM]* ")
+    local blackwell=$(   echo "$lines" | grep " GB[12][0][023][M]* ")
+    local next=$(        echo "$lines" | grep " GN[2][2][^ ]* ")            # ???, from file /usr/share/hwdata/pci.ids
+    if [ "$turing$ampere$ada_lovelace$blackwell$next" ] ; then
+        echo "open"
+        return 0
+    fi
+
+    Warn "could not determine Nvidia GPU family in $FUNCNAME()."
+    echo "closed"   # actually: unknown !
+    return 1
+}
+
 Main()
 {
     # Support only these Nvidia series (must update these values too!).
@@ -658,11 +700,11 @@ Main()
     # - the latest from Arch
     # - two latest from the kernel-lts repo
 
-    local progname=nvidia-inst
+    local progname=${0##*/}
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
-    local driver_source_type="closed"                       # "closed" or "open" (closed or open source drivers)
+    local driver_source_type="$(RecommendedDriverSourceType)"         # "closed" or "open" (closed or open source drivers)
     local bumblebee=no
     local force=no
     local nouveau=no
