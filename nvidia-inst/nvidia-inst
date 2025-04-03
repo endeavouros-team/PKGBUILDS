@@ -398,7 +398,7 @@ Options() {
     local opts
     local sopts="bcfhnopqtv"
     local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
-    lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo"
+    lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo,show-gpu-info"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -436,6 +436,7 @@ Options() {
                 fi
                 exit 0
                 ;;
+            --show-gpu-info)    echo "$NvidiaData" ; exit 0 ;;
             --drivers)
                 nvidia-driver-supported-branches   # -a    # this option is deprecated!
                 exit 0
@@ -471,6 +472,7 @@ Options:
   --switcheroo            Install switcheroo-control and enable its service. Use this option separately.
   --conf                  Create also file $conf_file (might be needed on some older systems).
   --no-dkms               Install only non-dkms packages (e.g. 'nvidia' instead of 'nvidia-dkms').
+  --show-gpu-info         Show information about your GPU. Use this option separately.
   --drivers               Show supported NVIDIA driver series number for your card.
   --listseries            List Nvidia driver versions supported by $progname.
   --ignore                Ignore all errors (useful for testing only).
