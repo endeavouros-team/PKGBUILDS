@@ -200,7 +200,7 @@ AddCountries() {
     esac
 }
 
-GetTimeInfo() { date +%j; }
+GetTimeInfo() { date +%-j; }
 
 UpdateCompletionFiles() {
     local -r completion_files=($(ShowCompletionFiles))
@@ -212,7 +212,6 @@ UpdateCompletionFiles() {
     local -r optionsfile="${completion_files[4]}"
     # local -r continents=(${completion_files[5]//,/ } )
     local -r reflector_countries_file="$dir/reflectorcountries.txt"
-    local -r now=$(GetTimeInfo)
     local prevtime=""
 
     [ "$dir" ] || DIE "no folder name for the completion files"
@@ -229,6 +228,23 @@ UpdateCompletionFiles() {
     ListCountryCodes                 > "$countrycodes"
     ListCountryNames                 > "$countrynames"
     DumpOptions                      > "$optionsfile"
+}
+AutoUpdateCompletionFiles() {
+    local stored=$(cat "$HOME/.cache/$progname/timeinfo.txt" 2>/dev/null)
+    if [ "$stored" ] ; then
+        # old timeinfo.txt file may contain leading zeros that need removing
+        while [ "${stored::1}" = "0" ] ; do
+            stored=${stored:1}
+        done
+    else
+        stored="-$auto_update_days"
+    fi
+    local now2=$now
+    [ $now2 -lt $stored ] && ((now2+=366))
+    if [ $((now2 - stored)) -gt $auto_update_days ] ; then
+        MONITOR "periodic update of completion files."
+        UpdateCompletionFiles
+    fi
 }
 
 ShowCompletionFiles() {
@@ -413,6 +429,10 @@ Options:
     -u
         Update mirror info first.
 
+    --reset-completion-files
+        Delete the files that support completion of parameters for $progname.
+        This should help if bash completion is not working as expected.
+
     --verbosity <value>
         Sets the verbosity level for the displayed messages.
         Supported values in verbosity order:
@@ -570,12 +590,12 @@ OptionsPreHandle() {
             --list-current-continent-countrynames)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" name; exit ;;
             --list-continents-countries)            ListContinentsCountries; exit ;;
             -e | --edit-config)                     Edit "$config_file_advanced" "$config_file";    exit 0 ;;
-            --dump-completion-files)                ShowCompletionFiles;    exit 0 ;;
+            --view-mirrorlist)                      Edit $ml;               exit 0 ;;
             -l | --list-country-codes-names)        ListCountryCodesNames;  exit 0 ;;
             --verbosity)                            verbosity="$2"; shift ;;
             --sort)                                 sort_prefer="$2" ;;
             --dump-options)                         DumpOptions;            exit 0 ;;
-            --dump-options-all)                     echo "${opts[*]}" | sed 's| --$||'; exit 0 ;;
+            --dump-given-options)                   echo "${opts[*]}" | sed 's| --$||'; exit 0 ;;
             -i | --ignore-mirrors)                  IgnoreMirrors "$2";     shift ;;
             --no-config)                            ;;                                  # already handled in HasNoConfigOption()
             -I | --no-ignore-countries)             prevent_ignoring_countries=yes ;;
@@ -630,6 +650,10 @@ Main() {
     local -r comment4i="$comment4  "
     local verbose=yes
     local sort_prefer=age
+    local -r now=$(GetTimeInfo)
+    local auto_update_days=7
+
+    AutoUpdateCompletionFiles
 
     case "$1" in
         --time) shift
@@ -689,13 +713,13 @@ Main() {
     SOPTS+="I"
 
     local LOPTS=""
-    LOPTS+="all,continent,country:,country-current,distro:,dump-completion-files,dump-options,dump-options-all,favorite:,full-data,help"
+    LOPTS+="all,continent,country:,country-current,distro:,dump-completion-files,dump-options,dump-given-options,favorite:,full-data,help"
     LOPTS+=",list-country-codes,list-country-codes-names,list-country-names,ranking-data,list-continents-countries"
     LOPTS+=",reset-completion-files,list-continent-countrycodes:,list-continent-countrynames:,update-completion-files"
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
     LOPTS+=",ignore-countries:,timeout-rank:,no-parallel,continent-given:,list-continent-codes,ignore-continents:" # timeout:
     LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
-    LOPTS+=",save,sort:"
+    LOPTS+=",save,sort:,view-mirrorlist"
 
     [ -x /bin/parallel ] || has_parallel=no
 

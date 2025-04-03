@@ -19,16 +19,12 @@ _rami_listselector()
     compopt -o nospace
 }
 
-
 _rami_complete() {
-    COMPREPLY=( $(compgen -W "$1" -- "$cur") )
+    local -r list="$1"
+    local -r compopt="$2"
+    COMPREPLY=( $(compgen -W "$list" -- "$cur") )
     [[ $COMPREPLY == *= ]] && compopt -o nospace
-    #compopt -o nosort
-}
-_rami_complete_url() {
-    COMPREPLY=( $(compgen -P "'" -W "$1" -- "$cur") )
-    [[ $COMPREPLY == *= ]] && compopt -o nospace
-    compopt -o nospace
+    [ "$compopt" ] && compopt -o "$compopt"
 }
 
 _rami_complete_nr() {
@@ -50,46 +46,39 @@ _rami_()
 
     local -r app=rami
 
-    local -r completion_files=($($app --dump-completion-files))
-    local -r countrycodes="${completion_files[2]}"
-    local -r optionsfile="${completion_files[4]}"
-    local -r continents=(${completion_files[5]//,/ } )
-
-    [ -e "$optionsfile" ] || $app --update-completion-files
-
-    local options=$(< "$optionsfile")
     case "$prev" in
-        -f | --favorite)
-            _rami_complete_url "https:// http://"
+        --favorite | -f)
+            # CC:<mirror-name-part>, mirror-name-part support is not implemented
+            local -r heads="$($app --list-country-codes | sed 's|$|:|')"
+            _rami_complete "$heads" nospace
             ;;
-        -d | --distro)
+        --distro | -d)
             _rami_complete "arch"
             ;;
-        -c | --country)
-            _rami_listselector "$cur" "$(< "$countrycodes")"
+        --country | -c)
+            _rami_listselector "$cur" "$($app --list-country-codes)"
             ;;
         --timeout | --timeout-rank)
             _rami_complete_nr
             ;;
         --ignore-countries)
-            _rami_complete_list "$(< "$countrycodes")"
+            _rami_complete_list "$($app --list-country-codes)"
             ;;
-        --ignore-continents | --continent-given | --list-continent-countrycodes | --list-continent-countrycodes)
-            _rami_listselector "$cur" "$continents"
+        --ignore-continents)
+            _rami_listselector "$cur" "$($app --list-continent-codes)"
             ;;
-        --list-continent-countrycodes | --list-continent-countrynames)
-            _rami_complete "${continents[*]}"
+        --list-continent-countrycodes | --list-continent-countrynames | --continent-given)
+            _rami_complete "$($app --list-continent-codes)"
             ;;
-        --ignore-mirrors)
-            _rami_complete "unique-list"
+        --ignore-mirrors | -i)
+            _rami_complete "\'comma-separated-list-of-partial-mirror-names\'"
             ;;
         --verbosity)
             _rami_complete "least less default more most"
             ;;
         *)
-            _rami_complete "$options"
+            _rami_complete "$($app --dump-options)"
             ;;
     esac
-    #  --ignore-countries)  _rami_listselector "$cur" "$(< "$countrycodes")" ;;
 }
 complete -F _rami_    rami 
