@@ -210,7 +210,7 @@ GetUpdateNumberAndTime() {
                     case "$retcode" in
                         28) msg+=("Connection to this mirror failed after $timeout seconds.") ;;
                       # 7)  msg+=("Connection to this mirror failed. The mirror may be temporarily or permanently offline.") ;;
-                        *)  msg+=("Connection to this mirror failed (code 60).") ;;
+                        *)  msg+=("Connection to this mirror failed (curl exit code $retcode).") ;;
                     esac
                     case "$mirror_verbosity" in
                         all)
