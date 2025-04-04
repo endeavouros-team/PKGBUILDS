@@ -509,6 +509,7 @@ Options() {
             -k | --timeout-rank)                    timeout_rank="$2"; shift ;;
 
             --save)                                 save_ml=yes ;;
+            --save-no-bak)                          save_ml=yes_no-bak ;;  # "internal" option!
         esac
         shift
     done
@@ -719,7 +720,7 @@ Main() {
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
     LOPTS+=",ignore-countries:,timeout-rank:,no-parallel,continent-given:,list-continent-codes,ignore-continents:" # timeout:
     LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
-    LOPTS+=",save,sort:,view-mirrorlist"
+    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist"
 
     [ -x /bin/parallel ] || has_parallel=no
 
@@ -803,6 +804,19 @@ Main() {
                 ShowMirrorlistFile | tee $mlt
                 sudo bash -c "mkdir -p $bakdir; cp -a $ml $bakfile; zstd -fq -19 --rm $bakfile; cp $mlt $ml" && {
                      echo2 "\n==> $bakfile.zst created as backup.\n==> $ml saved.\n"
+                } || {
+                    echo2 "\n==> $ml NOT saved.\n"
+                }
+                rm -f $mlt
+            fi
+            ;;
+        yes_no-bak)
+            # do not show the list, do not backup old list
+            if [ $mirror_count -gt 0 ] || [ "$favs" ] ; then
+                local -r mlt=$(mktemp /tmp/ml.XXXXX)
+                ShowMirrorlistFile > $mlt
+                sudo bash -c "cp $mlt $ml" && {
+                     echo2 "\n==> $ml saved.\n"
                 } || {
                     echo2 "\n==> $ml NOT saved.\n"
                 }
