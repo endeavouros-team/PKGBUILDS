@@ -799,7 +799,7 @@ Main() {
             if [ $mirror_count -gt 0 ] || [ "$favs" ] ; then
                 local -r timestamp=$(date +%y%m%d%H%M)
                 local -r mlt=$(mktemp /tmp/ml.XXXXX)
-                local -r bakdir=${ml%/*}/.EOS-BACKUP
+                local -r bakdir=${ml%/*}/.EOS_BACKUPDIR
                 local -r bakfile=$bakdir/${ml##*/}.$timestamp
                 ShowMirrorlistFile | tee $mlt
                 sudo bash -c "mkdir -p $bakdir; cp -a $ml $bakfile; zstd -fq -19 --rm $bakfile; cp $mlt $ml" && {
