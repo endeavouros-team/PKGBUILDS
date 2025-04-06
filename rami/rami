@@ -786,7 +786,10 @@ Main() {
             yes)  mode=parallel ;;
             no|*) mode=sequential ;; 
         esac
-        result=$(TraverseMirrors-$mode)
+        case $save_ml in
+            yes_no-bak) result=$(TraverseMirrors-$mode 2>/dev/null) ;;
+            *)          result=$(TraverseMirrors-$mode) ;;
+        esac
         mirror_count=$(echo "$result" | wc -l)                          # ranking may have dropped some mirrors!
         case "$sort_prefer" in
             age)  ranked=$(echo "$result" | LC_ALL=C sort -t'|' -k2rb,2 -k3V,3) ;;  # sort: age > rate
