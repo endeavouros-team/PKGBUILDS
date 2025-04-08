@@ -305,6 +305,16 @@ DumpOptions() {
     [ "$LOPTS$SOPTS" ] && echo $LOPTS $SOPTS
 }
 
+ViewFile() {
+    local app
+    for app in "$PAGER" most less more ; do
+        if [ -x "/bin/${app%% *}" ] ; then
+            $app "$1"
+            return 0
+        fi
+    done
+    return 1
+}
 Edit() {
     local file files=()
     local editors=( exo-open xdg-open kde-open emacs kate gnome-text-editor xed mousepad )
@@ -339,7 +349,7 @@ Usage() {
     cat <<EOF
 
 Purpose: Rank Arch mirrors and display them.
-Usage: $progname [options]
+Usage:   $progname [options]
 Options:
     --all
     -A
@@ -361,7 +371,6 @@ Options:
         Include current country to be ranked.
 
     --edit-config
-    -e
         Edit your configuration file.
 
     --favorite
@@ -369,13 +378,19 @@ Options:
         Add a favorite mirror to be added in the beginning of the ranked mirrorlist.
         This option can be used many times to append favorites.
         A mirror can be added
-            - as a full path in single quotes, or
+            - as a full mirror URL within single quotes, or
+            - as a unique part of the full mirror URL, or
             - in a special format 'CC:st'
         The special 'CC:st' has components:
-            'CC' is a two-letter country code (see 'reflector --list-countries')
+            'CC' is a two-letter country code (see '$progname --list-continents-countries')
             'st' is a (unique) partial string of the mirror URL
         A special value 'none' disables favorites (useful in testing).
         See also the examples below.
+
+    --favsel
+    -s
+        (Advanced) Re-order your favorite mirrors (i.e. values from option --favorite).
+        This provides a more interactive way to sort mirrors.
 
     --ignore-continents <list>
     -X <list>
@@ -429,6 +444,9 @@ Options:
     -u
         Update mirror info first.
 
+    --view-mirrorlist
+        View the current contents of file $ml.
+
     --reset-completion-files
         Delete the files that support completion of parameters for $progname.
         This should help if bash completion is not working as expected.
@@ -448,10 +466,13 @@ Options:
         This help.
 
 Configuration file ~/${config_file#$HOME/} can include all supported options in variable CONFIG_OPTIONS.
-Examples:
+Examples for CONFIG_OPTIONS:
     CONFIG_OPTIONS=(--continent --ranking-data)
     CONFIG_OPTIONS=(--country DE,US --country-current --ranking-data --favorite 'DE:rwth-aachen')
     CONFIG_OPTIONS=(--country-current)
+
+Example commands:
+    $progname --country SE,GB --ranking-data --favorite 'DE:rwth-aachen,SE:accum,GB:london' --favsel)
 
 Notes:
     - Command line option overrides the corresponding configuration file option.
@@ -464,10 +485,14 @@ EOF
     #        Max timeout in seconds for other than ranking.
 }
 Options() {
+    DebugBreak
+
     local opts
 
     opts="$(/bin/getopt -o=$SOPTS --longoptions $LOPTS --name "$progname" -- "$@")" || DIE "getopt error"
     eval set -- "$opts"
+
+    local selectfavs=no
 
     while true ; do
         case "$1" in
@@ -476,7 +501,7 @@ Options() {
             --no-config)                            ;;         # already handled in HasNoConfigOption()
             -I | --no-ignore-countries)             ;;         # already handled in OptionsPreHandle()
             -l | --list-country-codes-names)        ;;         # already handled in OptionsPreHandle()
-            -e | --edit-config)                     ;;         # already handled in OptionsPreHandle()
+            --edit-config)                          ;;         # already handled in OptionsPreHandle()
             --dump-options)                         ;;         # already handled in OptionsPreHandle()
             --dump-completion-files)                ;;         # already handled in OptionsPreHandle()
             --update-completion-files)              ;;         # already handled in OptionsPreHandle()
@@ -502,6 +527,7 @@ Options() {
             -r | --ranking-data)                    ranking_data=yes ;;
             --full-data)                            full_data=yes ;;
             -f | --favorite)                        AddFavs "$2"; shift ;;
+            -s | --favsel)                          selectfavs=yes ;;
             --prefer-local-rank)                    prefer_local_rank=yes ;;
             --no-parallel)                          has_parallel=no ;;
             -u)                                     update_mirrordata_first=yes ;;
@@ -514,10 +540,24 @@ Options() {
         shift
     done
     ExpandFavs
+    SelectFavorites
     RemoveIgnoredFromCountries
     urls+=("$@")
 }
 
+SelectFavorites() { # re-order given favorites using fzf
+    if [ $selectfavs = yes ] && [ "$favs" ] ; then
+        local fzf_exitcode=0
+        local fzf=(fzf --multi --no-sort --tac --reverse)
+        fzf+=(--header="Choose the best mirrors in order. Keys: UP/DOWN/PgUp/PgDn=navigate TAB=select ENTER=accept ESC=quit:")
+        readarray -t favs <<< $(printf "%s\n" "${favs[@]}" | "${fzf[@]}")
+        fzf_exitcode=$?
+        case "$fzf_exitcode" in
+            0 | 1) ;;
+            *) DIE "fzf failed with code $fzf_exitcode" ;;
+        esac
+    fi
+}
 AddFavs() {
     if [ "$can_add_favs" = yes ] ; then
         local -r fav="$1"
@@ -590,8 +630,8 @@ OptionsPreHandle() {
             --list-current-continent-countrycodes)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" code; exit ;;
             --list-current-continent-countrynames)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" name; exit ;;
             --list-continents-countries)            ListContinentsCountries; exit ;;
-            -e | --edit-config)                     Edit "$config_file_advanced" "$config_file";    exit 0 ;;
-            --view-mirrorlist)                      Edit $ml;               exit 0 ;;
+            --edit-config)                          Edit "$config_file_advanced" "$config_file";    exit 0 ;;
+            --view-mirrorlist)                      ViewFile $ml;           exit 0 ;;
             -l | --list-country-codes-names)        ListCountryCodesNames;  exit 0 ;;
             --verbosity)                            verbosity="$2"; shift ;;
             --sort)                                 sort_prefer="$2" ;;
@@ -710,11 +750,10 @@ Main() {
     local favs=()
     local time_of_ranking=$(date +%x-%X)
 
-    local SOPTS="ACc:d:ef:hi:k:m:X:x:lrtu"
-    SOPTS+="I"
-
+    local SOPTS="ACc:d:f:hIi:k:m:X:x:lrstu"
     local LOPTS=""
-    LOPTS+="all,continent,country:,country-current,distro:,dump-completion-files,dump-options,dump-given-options,favorite:,full-data,help"
+    LOPTS+="all,continent,country:,country-current,distro:,dump-completion-files,dump-options,dump-given-options"
+    LOPTS+=",favorite:,favsel,full-data,help"
     LOPTS+=",list-country-codes,list-country-codes-names,list-country-names,ranking-data,list-continents-countries"
     LOPTS+=",reset-completion-files,list-continent-countrycodes:,list-continent-countrynames:,update-completion-files"
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
@@ -979,5 +1018,7 @@ ShowFavorites() {
         echo -e "${comment3}$title <<<\n"
     fi
 }
+
+DebugBreak() { : ; }
 
 Main  "$@"
