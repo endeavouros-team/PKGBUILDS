@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=25.4.2
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -64,7 +64,6 @@ source=(
   $_url/eos-update-extras
   $_url/eos-update-fast
   $_url/eos-waiting-indicator
-  $_url/CalArgConv
   $_url/eos-pkg-changelog
   $_url/eos-pkg-changelog.completion
   $_url/changelogs.conf.endeavouros
@@ -116,7 +115,6 @@ sha512sums=('bdf036476d3e400be30661b25ffa3f70a963a1f0d031589b5b9dc3d83e6524a6789
             '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
             '067de4d94b46f19ace0b2ae66814c12f806ce965341fc011ff44d8eceb24a1622d1e7f0112ff1dd37c3c0fb189a79402992188c45b1a3650e81e1ebc544ad78e'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
-            '22bd14692d2cc02b4b112fa1a32bd34cea65624b3acef51d94a52d7cfee7911c55ac8b4aabf6cb21c587347470b8173fd6b23b03c531b6e89b9cc31c96db9f8a'
             '04c3f6d849c46e3a2e47169e1a919e8769c15480d332c283d655e111ed66d263a851458135cd09aaf9daaa7ebb194ba28e7112dfd718757a4fc3514b97b71eb8'
             'ec018db2a2d61e46118bcd04abbab0a72313551d440e4cb52cd2b7dc8513dcd09f44aa12273f68c0855737b8a1d22c413ac4d6c51cf9f58229989703976276a1'
             '0d77014adcae714b8d20ebebf566855c3b8b1b5b9e2e1dfa62ad4a589e675c1b0e69683206bb638706e8650ae3acbf2fe7176116b86c12a40377723b80629646'
