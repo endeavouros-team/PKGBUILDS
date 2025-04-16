@@ -149,6 +149,8 @@ AdjustPkgsAboutDkms() {
                         ;;
                 esac
             done
+	    IsInstalled linux     && adjusted+=(linux-headers)
+            IsInstalled linux-lts && adjusted+=(linux-lts-headers)
             if [ ${#adjusted[@]} -gt 0 ] ; then
                 install=("${adjusted[@]}")
             fi
