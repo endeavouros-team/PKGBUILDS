@@ -57,6 +57,12 @@ EnsureDkms() {
             dkms_added=yes
         fi
     fi
+    local kernel kernels=(linux linux-lts linux-hardened linux-zen linux-rt linux-rt-lts)
+    for kernel in "${kernels[@]}" ; do
+        if IsInstalled "$kernel" ; then
+            IsInstalled "${kernel}-headers" || adjusted+=("${kernel}-headers")
+        fi
+    done
 }
 
 CheckUnsupportedKernels() {
