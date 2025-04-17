@@ -765,14 +765,15 @@ Main() {
 
     HasNoConfigOption "$@"
 
-    if [ $read_config = yes ] && [ -e "$config_file" ] ; then
-        INFO "reading file ~/${config_file#$HOME/}"
-        source "$config_file"
-    fi
-
-    if [ -e "$config_file_advanced" ] ; then
-        INFO "reading file ~/${config_file_advanced#$HOME/}"
-        source "$config_file_advanced"
+    if [ $read_config = yes ] ; then
+        if [ -e "$config_file" ] ; then
+            INFO "reading file ~/${config_file#$HOME/}"
+            source "$config_file"
+        fi
+        if [ -e "$config_file_advanced" ] ; then
+            INFO "reading file ~/${config_file_advanced#$HOME/}"
+            source "$config_file_advanced"
+        fi
     fi
 
     OptionsPreHandle "${CONFIG_OPTIONS[@]}" "${CONFIG_OPTIONS_ADVANCED[@]}" "$@"

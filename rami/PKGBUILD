@@ -5,7 +5,7 @@
 pkgname=rami
 pkgdesc="Rank Arch mirrors, prefer up-to-date mirrors"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=24.10
+pkgver=24.11
 pkgrel=1
 
 arch=('any')
@@ -30,7 +30,7 @@ source=(
     $url/${pkgname}-helper
     $url/${pkgname}-status
 )
-sha512sums=('9d4fa96ffdd8e1301b882046af38decf44c0faecd8b6fa12e5691eba30082b9004512988b215a60699600788520c7aa2e9c701fe6145e5ddd210ac976206b3a0'
+sha512sums=('0832c8ad57c0a6d07f868170af4fb0ce27553a5f3df70eb4ce7e60ed4da03c87425f2ca76e40b018d068c77a2ed2b364e8bb92563a3606d5a12d96681492c52a'
             'b33987d5a6fb273765da5b08f16cb27386fef4fbb5d2014690ff51b235ec81df52b49419d89a027091b22d2ca84683be7b5d4d891d92420169f42b2fca24a081'
             '27daa9b5d5e755b57f11b8fe12522e4cae2191d9aeaebb23a467379608a9e7ba0eb1e7abcccb5d96b6cdf8ff6706893b6bce105e038865ee04d972027f094f32'
             '9f3afc7e46574b42c57e6ac4f129b61d1165fc9da8583865bd09f1e6b54107d904dc5de5b673b402e402a69c7af5929222c7192cdf78d3db50b5c4be0f4b7de1'
