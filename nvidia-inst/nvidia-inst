@@ -469,7 +469,7 @@ Options:
   -f, --force             Force driver installation even if a nvidia card is not detected.
   -n, --nouveau           Install (the open source) nouveau driver instead of Nvidia's driver.
   -o, --open              Install the open source versions of Nvidia drivers (recommended for 'Turing' and later).
-  -c, --closed            Install the closed source versions of Nvidia drivers (recommended for 'Maxwell'...'Ada Lovelace').
+  -c, --closed            Install the closed source versions of Nvidia drivers (recommended for 'Maxwell'...'Volta').
   -p, --prime             Install also prime render offload.
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
@@ -598,15 +598,16 @@ ProperNvidiaPackages() {
     local testid="$nvidia_card_id"     # e.g. 20f3 104a
 
     if [ -z "$series" ] ; then
-        series="$($finder --hide-nvidia-inst-msgs $testid | grep ^Series | awk '{print $2}' | tr -d ':')"
+        series="$($finder --hide-nvidia-inst-msgs $testid 2>/dev/null | grep ^Series | awk '{print $2}' | tr -d ':')"
     fi
 
     case "$series" in
         $latest_from_arch)
             p_nvidia="nvidia-utils nvidia-settings"
             case "$driver_source_type" in
-                open) p_nvidia="nvidia-open-dkms $p_nvidia" ;;
-                *)    p_nvidia="nvidia-dkms $p_nvidia" ;;
+                open)            p_nvidia="nvidia-open-dkms $p_nvidia" ;;
+                closed)          p_nvidia="nvidia-dkms $p_nvidia" ;;
+                other|unknown|*) p_nvidia="" ;;
             esac
             p_nvidia32="lib32-nvidia-utils"
             ;;
@@ -647,6 +648,12 @@ SanityChecks() {
     if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
         DIE "This program must be started as a non-root user."
     fi
+    if [ $driver_source_type = open ] && [ $driver_source_type_initial = closed ] ; then
+        Warn "Option --open used, but Nvidia recommends the closed source driver!"
+    fi
+    if [ $driver_source_type = closed ] && [ $driver_source_type_initial = open ] ; then
+        Warn "Option --closed used, but Nvidia recommends the open source driver!"
+    fi
 
     #if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
     #    DIE "Sorry, package 'nvidia-installer-common' must be installed"
@@ -669,6 +676,7 @@ GetSeriesFromPacman() {
 }
 
 RecommendedDriverSourceType() {
+    # Outputs one of: open, closed, other, unknown
     # References:
     # - https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units
     # - https://us.download.nvidia.com/XFree86/Linux-x86_64/570.133.07/README/supportedchips.html
@@ -677,9 +685,10 @@ RecommendedDriverSourceType() {
     # - /usr/share/hwdata/pci.ids
 
     # local lines=$(lspci -d 10de::03xx)                               # 10de = NVIDIA
-    local lines="$NvidiaData"
+    local lines="$1"
     if [ -z "$lines" ] ; then
         Warn "could not find Nvidia GPU in $FUNCNAME()."
+        echo "unknown"
         return 1
     fi
 
@@ -696,15 +705,17 @@ RecommendedDriverSourceType() {
     local turing=$(      echo "$lines" | grep " TU[1][01][2467][BGLM]* ")
     local ampere=$(      echo "$lines" | grep " GA[1][0][23467][BFGLMS]* ")
     local ada_lovelace=$(echo "$lines" | grep " AD[1][0][234678][GLM]* ")
-    local blackwell=$(   echo "$lines" | grep " GB[12][0][023][M]* ")
+    local blackwell=$(   echo "$lines" | grep " GB[12][012][023][M]* ")
     local next=$(        echo "$lines" | grep " GN[2][2][^ ]* ")            # ???, from file /usr/share/hwdata/pci.ids
     if [ "$turing$ampere$ada_lovelace$blackwell$next" ] ; then
         echo "open"
         return 0
     fi
 
-    Warn "could not determine Nvidia GPU family in $FUNCNAME()."
-    echo "closed"   # actually: unknown !
+    local -r real_nvidia_id="$(echo "$NvidiaData" | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
+
+    Warn "could not determine Nvidia GPU family in $FUNCNAME(). Card id: $real_nvidia_id"
+    echo "other"
     return 1
 }
 
@@ -717,11 +728,12 @@ Main()
 
     local progname=${0##*/}
 
-    local -r NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
+    local NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
-    local driver_source_type="$(RecommendedDriverSourceType "$NvidiaData")"   # "closed" or "open" (closed or open source drivers)
+    local driver_source_type="$(RecommendedDriverSourceType "$NvidiaData")"  # open, closed, other, unknown
+    local driver_source_type_initial="$driver_source_type"
     local bumblebee=no
     local force=no
     local nouveau=no
@@ -771,9 +783,13 @@ Main()
     AllRemovables
 
     [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
-    Info "Running: $progname v$PROGVERSION"
+    Info "$progname version $PROGVERSION"
     Info "Command line: $progname $*"
-    Info "Selected mode: $mode ($driver_source_type source)"
+    case "$driver_source_type" in
+        open|closed) Info "Selected mode: $mode (Nvidia's $driver_source_type source)" ;;
+        other)       Info "Selected mode: $mode (GPU no more supported by Nvidia?)" ;;
+        unknown|*)   Info "Selected mode: $mode (No Nvidia GPU)" ;;
+    esac
 
     if [ "$force" = "no" ] ; then
         if ! IsNvidiaCard ; then
