@@ -425,7 +425,7 @@ Options() {
             --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
-            -t | --test)        test=yes; Note "$NvidiaData" ;;
+            -t | --test)        test=yes ;;
             --conf)             create_conf=yes ;;
             --ignore)           ignore_errors=yes ;;
             # --legacyrepo)       Setup3rdPartyRepo ;;
@@ -685,10 +685,10 @@ RecommendedDriverSourceType() {
     # - /usr/share/hwdata/pci.ids
 
     # local lines=$(lspci -d 10de::03xx)                               # 10de = NVIDIA
+
     local lines="$1"
     if [ -z "$lines" ] ; then
-        Warn "could not find Nvidia GPU in $FUNCNAME()."
-        echo "unknown"
+        driver_source_type=unknown
         return 1
     fi
 
@@ -697,7 +697,7 @@ RecommendedDriverSourceType() {
     local pascal=$(      echo "$lines" | grep " GP[1][0][024678][BGLM]* ")
     local volta=$(       echo "$lines" | grep " GV100[GL]* ")
     if [ "$maxwell$pascal$volta" ] ; then
-        echo "closed"
+        driver_source_type=closed
         return 0
     fi
 
@@ -708,14 +708,13 @@ RecommendedDriverSourceType() {
     local blackwell=$(   echo "$lines" | grep " GB[12][012][023][M]* ")
     local next=$(        echo "$lines" | grep " GN[2][2][^ ]* ")            # ???, from file /usr/share/hwdata/pci.ids
     if [ "$turing$ampere$ada_lovelace$blackwell$next" ] ; then
-        echo "open"
+        driver_source_type=open
         return 0
     fi
 
-    local -r real_nvidia_id="$(echo "$NvidiaData" | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
+    # local -r real_nvidia_id="$(echo "$NvidiaData" | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
 
-    Warn "could not determine Nvidia GPU family in $FUNCNAME(). Card id: $real_nvidia_id"
-    echo "other"
+    driver_source_type=other
     return 1
 }
 
@@ -727,12 +726,14 @@ Main()
     # - two latest from the kernel-lts repo
 
     local progname=${0##*/}
+    [[ "$*" =~ --listopts ]] && Options --listopts
 
     local NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
-    local driver_source_type="$(RecommendedDriverSourceType "$NvidiaData")"  # open, closed, other, unknown
+    local driver_source_type=""
+    RecommendedDriverSourceType "$NvidiaData"  # open, closed, other, unknown
     local driver_source_type_initial="$driver_source_type"
     local bumblebee=no
     local force=no
@@ -761,12 +762,20 @@ Main()
     local series_prev1=470
     local series_prev2=390
 
-    if grep "^\[kernel-lts\]" $pacmanconf >/dev/null ; then
-        DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
-    fi
+    #if grep "^\[kernel-lts\]" $pacmanconf >/dev/null ; then
+    #    DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
+    #fi
 
     local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
     Options "$@"
+
+    if [ $test = yes ] && [ "$NvidiaData" ] ; then
+        Note "$NvidiaData"
+    fi
+    case "$driver_source_type" in
+        other)   Warn "could not determine Nvidia GPU family in $FUNCNAME()." ;;
+        unknown) Warn "could not find Nvidia GPU in $FUNCNAME()." ;;
+    esac
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
 
