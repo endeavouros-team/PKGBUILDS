@@ -271,7 +271,6 @@ Nouveau() {
 
 Prime() {
     PkgInstall nvidia-prime $p_nvidia $p_nvidia32 nvidia-hook
-    KernelParametersToBoot2
 }
 
 SwitcherooEnable() {
@@ -285,38 +284,6 @@ OnlyNvidia() {
     else
         PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
     fi
-    KernelParametersToBoot2
-}
-
-KernelParametersToBoot2() {
-    return 0                    # 2024-Oct: drm.modeset and drm-fbdev are already included in nvidia packages
-    local operation
-    local para
-    local params=(nvidia-drm.modeset=1
-                  nvidia-drm.fbdev=1)
-    local file_sdboot=/etc/kernel/cmdline
-    local file_grub=/etc/default/grub
-
-    case "$mode" in
-        nvidia | prime) operation=add ;;
-        *)              operation=remove ;;
-    esac
-    case "$operation" in
-        add)
-            for para in "${params[@]}" ; do
-                if [ -z "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                    AddCmd "nvidia-installer-kernel-para $para $operation"
-                fi
-            done
-            ;;
-        remove)
-            for para in "${params[@]}" ; do
-                if [ "$(cat $file_sdboot $file_grub 2>/dev/null | grep "$para")" ] ; then
-                    AddCmd "nvidia-installer-kernel-para $para $operation"
-                fi
-            done
-            ;;
-    esac
 }
 
 AddConfFileLine() {
@@ -578,7 +545,7 @@ AllRemovables() {
     # Currently we support the [kernel-lts] repo which contains some older Nvidia drivers.
     # EDIT: [kernel-lts] is no more supported.
 
-    if [ 0 -eq 1 ] ; then
+    if false ; then
         # nvidia packages from AUR:
         pr_nvidia+=(
             $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$series_prev1|$series_prev2")
@@ -735,10 +702,7 @@ Main()
     local driver_source_type=""
     RecommendedDriverSourceType "$NvidiaData"  # open, closed, other, unknown
     local driver_source_type_initial="$driver_source_type"
-    local bumblebee=no
     local force=no
-    local nouveau=no
-    local prime=no
     local quiet=no
     local test=no
     local create_conf=no
@@ -772,10 +736,6 @@ Main()
     if [ $test = yes ] && [ "$NvidiaData" ] ; then
         Note "$NvidiaData"
     fi
-    case "$driver_source_type" in
-        other)   Warn "could not determine Nvidia GPU family in $FUNCNAME()." ;;
-        unknown) Warn "could not find Nvidia GPU in $FUNCNAME()." ;;
-    esac
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
 
@@ -794,18 +754,45 @@ Main()
     [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
     Info "$progname version $PROGVERSION"
     Info "Command line: $progname $*"
+
     case "$driver_source_type" in
-        open|closed) Info "Selected mode: $mode (Nvidia's $driver_source_type source)" ;;
-        other)       Info "Selected mode: $mode (GPU no more supported by Nvidia?)" ;;
-        unknown|*)   Info "Selected mode: $mode (No Nvidia GPU)" ;;
+        open|closed)
+            case "$mode" in
+                nouveau) Info "Selected mode: $mode (freedesktop.org's open source)" ;;
+                *)
+                    case "$driver_source_type" in
+                        open)   Info "Selected mode: $mode (Nvidia's open source)" ;;
+                        closed) Info "Selected mode: $mode (Nvidia's proprietary closed source)" ;;
+                    esac
+                    ;;
+            esac
+            ;;
+        other)
+            Info "Selected mode: $mode (GPU no more supported by Nvidia?)"
+            # Warn "could not determine Nvidia GPU family!"
+            case "$mode" in
+                nouveau) ;;
+                *)
+                    while true ; do
+                        read -p "==> Install xf86-video-nouveau (Y/n)? " >&2
+                        case "$REPLY" in
+                            [yY]* | "") mode=nouveau; break ;;
+                            [nN]*)      mode=other; break ;;
+                        esac
+                    done
+                    ;;
+            esac
+            ;;
+        unknown|*)
+            Warn "could not find Nvidia GPU."
+            if [ "$force" = "no" ] ; then
+                if ! IsNvidiaCard ; then
+                    [ "$ignore_errors" = "no" ] && exit 0
+                fi
+            fi
+            ;;
     esac
 
-    if [ "$force" = "no" ] ; then
-        if ! IsNvidiaCard ; then
-            echo "$progname: no Nvidia card found."
-            [ "$ignore_errors" = "no" ] && exit 0
-        fi
-    fi
 
     ProperNvidiaPackages
 
