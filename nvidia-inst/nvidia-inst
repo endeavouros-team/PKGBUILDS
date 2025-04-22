@@ -279,6 +279,7 @@ SwitcherooEnable() {
 }
 
 OnlyNvidia() {
+    [ $driver_source_type = unknown ] && return
     if [ "$series" = "$latest_from_arch" ] ; then
         PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
     else
@@ -538,7 +539,7 @@ AllRemovables() {
         xf86-video-nouveau
 
         # nvidia packages from repos:
-        $(expac -Ss %n nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-cg-|beta')
+        $(expac -Ss %n nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-toolkit|beta')
     )
 
     # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
