@@ -606,11 +606,13 @@ ProperNvidiaPackages() {
     esac
 
     if [ "$bit32" = "yes" ] ; then
-        [ "$(grep "^\[multilib\]" $pacmanconf)" ] || DIE "To support 32-bit apps, enable the [multilib] repo in $pacmanconf."
+        [ $has_multilib = yes ] || DIE "To support 32-bit apps, enable the [multilib] repo in $pacmanconf."
     else
         p_nvidia32=""
     fi
 }
+
+HasRepo() { grep "^\[$1\]" $pacmanconf >/dev/null; }
 
 SanityChecks() {
     if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
@@ -726,6 +728,8 @@ Main()
     local series_now=""      # get it later because of the speed for bash completion
     local series_prev1=470
     local series_prev2=390
+    local has_multilib=no
+    HasRepo multilib && has_multilib=yes
 
     #if grep "^\[kernel-lts\]" $pacmanconf >/dev/null ; then
     #    DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
@@ -734,6 +738,9 @@ Main()
     local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
     Options "$@"
 
+    if [ $has_multilib = yes ] && expac %n lib32-nvidia-utils >/dev/null && [ $bit32 = no ] ; then
+        bit32=yes  # assume user still wants 32-bit support...
+    fi
     if [ $test = yes ] && [ "$NvidiaData" ] ; then
         Note "$NvidiaData"
     fi
