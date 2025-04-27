@@ -373,6 +373,7 @@ Options() {
     local sopts="bcfhnopqtv"
     local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo,show-gpu-info"
+    lopts+=",no-settings"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -384,6 +385,7 @@ Options() {
     while true ; do
         case "$1" in
             --no-dkms)          dkms=no ;;
+            --no-settings)      settings_pkg=no ;;        # "internal" option, used when installing EOS
 
             -b | --bumblebee)   mode=bumblebee ;;
             -n | --nouveau)     mode=nouveau ;;
@@ -571,7 +573,8 @@ ProperNvidiaPackages() {
 
     case "$series" in
         $latest_from_arch)
-            p_nvidia="nvidia-utils nvidia-settings"
+            p_nvidia="nvidia-utils"
+            [ $settings_pkg = yes ] && p_nvidia+=" nvidia-settings"
             case "$driver_source_type" in
                 open)            p_nvidia="nvidia-open-dkms $p_nvidia" ;;
                 closed)          p_nvidia="nvidia-dkms $p_nvidia" ;;
@@ -713,6 +716,7 @@ Main()
     local ignore_errors=no
     local series=""
     local dkms=yes                                          # yes or no
+    local settings_pkg=yes
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local PROGVERSION=""
     local pr_nvidia=()
