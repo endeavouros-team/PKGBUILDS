@@ -12,6 +12,7 @@ NvidiaGpuInfo() {
     local id                     # GPU id
     local driver                 # driver package name
     local familyname             # GPU family name
+    local codename
 
     declare -A familynames=(
         [GM]=Maxwell
@@ -30,6 +31,7 @@ NvidiaGpuInfo() {
     for gpuinfo in "${familyinfo[@]}" ; do
         id=${gpuinfo: -4}
         familycode="${gpuinfo::2}"
+        codename=${gpuinfo%% *}
         case "$familycode" in
             GM|GP|GV)         driver=nvidia-dkms
                               familyname=${familynames[$familycode]}
@@ -41,7 +43,7 @@ NvidiaGpuInfo() {
                               familyname=nouveau
                               ;;
         esac
-        echo "$driver $id $familyname"
+        echo "$driver $id $familyname $codename"
     done
 }
 
