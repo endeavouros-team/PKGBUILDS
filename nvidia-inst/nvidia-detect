@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Display a line of
+#    <recommended-driver-package> <gpu-id> <gpu-family-name>
+# for each detected NVIDIA GPU.
+# Note that the recommended driver package is the dkms version which can be changed to a non-dkms version.
+
+NvidiaGpuInfo() {
+    local familyinfo=()          # array of: "family id"
+    local gpuinfo                # "family id"
+    local familycode             # 2 letters meaning the family
+    local id                     # GPU id
+    local driver                 # driver package name
+    local familyname             # GPU family name
+
+    declare -A familynames=(
+        [GM]=Maxwell
+        [GP]=Pascal
+        [GV]=Volta
+
+        [TU]=Turing
+        [GA]=Ampere
+        [AD]=Lovelace
+        [GB]=Blackwell
+        [GN]=Next            # "Next" is probably wrong...
+    )
+
+    readarray -t familyinfo <<< $(echo "$data" | sed -E 's|.* NVIDIA Corporation ([^ ]+) \[[^]]+\] \[10de:([^]]+)\] .*|\1 \2|')
+
+    for gpuinfo in "${familyinfo[@]}" ; do
+        id=${gpuinfo: -4}
+        familycode="${gpuinfo::2}"
+        case "$familycode" in
+            GM|GP|GV)         driver=nvidia-dkms
+                              familyname=${familynames[$familycode]}
+                              ;;
+            TU|GA|AD|GB|GN)   driver=nvidia-open-dkms
+                              familyname=${familynames[$familycode]}
+                              ;;
+            *)                driver=kernel-driver               # old GPU, use the nouveau driver!
+                              familyname=nouveau
+                              ;;
+        esac
+        echo "$driver $id $familyname"
+    done
+}
+
+Main() {
+    local -r data=$(lspci -vnn | grep -w NVIDIA | grep -P 'VGA|3D|Display')
+    [ "$data" ] && NvidiaGpuInfo
+}
+
+Main "$@"
