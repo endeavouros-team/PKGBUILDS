@@ -48,8 +48,9 @@ NvidiaGpuInfo() {
 }
 
 Main() {
-    sudo pacman -Sy --needed --noconfirm hwdata
+    sudo pacman -Sy --needed --noconfirm hwdata >/dev/null
     sleep 1
+
     local -r data=$(lspci -vnn | grep -w NVIDIA | grep -P 'VGA|3D|Display')
     [ "$data" ] && NvidiaGpuInfo
 }
