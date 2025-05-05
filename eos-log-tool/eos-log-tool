@@ -408,6 +408,11 @@ Main()
     local lspci_y=no              # is automatically selected (=yes) when inxi is not available
     local -r separator=$'\x0c'    # column separator character for usage with the 'column' app (Form Feed)
 
+    local installer_mode=no
+    if [ "$LOGNAME" = "liveuser" ] && [ -d /etc/calamares ] && [ -x /usr/bin/calamares ] ; then
+        installer_mode=yes
+    fi
+
     Options "$@"
 
     [ "$enable_inxi" = "no" ] && lspci_y=yes
@@ -445,7 +450,6 @@ Main()
     local -r cmd_lsusb="lsusb"
     local -r cmd_hwinfo="hwinfo --short"
     local -r cmd_X_sess_err="cat ~/.xsession-errors"
-    local -r cmd_X_events="cat /var/log/Xorg.0.log"
     local -r cmd_dm="cat /var/log/lightdm/lightdm.log"
     local -r cmd_dm_X="cat /var/log/lightdm/x-0.log"
     local -r cmd_grub="cat /boot/grub/grub.cfg"
@@ -456,6 +460,16 @@ Main()
     local -r cmd_instlog="cat $instlog"
     local -r cmd_native="pacman -Qn"
     local -r cmd_foreign="pacman -Qm"
+    local    cmd_X_events="cat /var/log/Xorg.0.log"
+
+    if [ $installer_mode = yes ] ; then
+        local -r xlogfile="$HOME/.local/share/xorg/Xorg.0.log"
+        if [ -e "$xlogfile" ] ; then
+            cmd_X_events="cat $xlogfile"
+        else
+            WarningMsg "file ${xlogfile} does not exist"
+        fi
+    fi
 
     local FieldInfo=()                                            # information for the logging commands
 
