@@ -48,8 +48,11 @@ NvidiaGpuInfo() {
 }
 
 Main() {
-    sudo pacman -Sy --needed --noconfirm hwdata >/dev/null
-    sleep 1
+    if eos-connection-checker ; then
+        # update hwdata only when an internet connection is available
+        sudo pacman -Sy --needed --noconfirm hwdata >/dev/null
+        sleep 1
+    fi
 
     local -r data=$(lspci -vnn | grep -w NVIDIA | grep -P 'VGA|3D|Display')
     [ "$data" ] && NvidiaGpuInfo
