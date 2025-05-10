@@ -344,6 +344,18 @@ Edit() {
     done
     DIEE "no text editor found!"
 }
+SudoEdit() {
+    if [ "$RAMI_EDITOR" ] ; then
+        sudo $RAMI_EDITOR "$1"
+    else
+        local app
+        for app in "${EOS_SUDO_EDITORS[@]}" ; do
+            if [ -x /bin/${app%% *} ] ; then
+                sudo $app "$1"
+            fi
+        done
+    fi
+}
 
 Usage() {
     cat <<EOF
@@ -631,8 +643,9 @@ OptionsPreHandle() {
             --list-current-continent-countrynames)  GetCurrentCountry && ShowContinentCountries "$(GetContinentOfCountry $cc)" name; exit ;;
             --list-continents-countries)            ListContinentsCountries; exit ;;
             --edit-config)                          Edit "$config_file_advanced" "$config_file";    exit 0 ;;
-            --view-mirrorlist)                      ViewFile $ml;           exit 0 ;;
-            -l | --list-country-codes-names)        ListCountryCodesNames;  exit 0 ;;
+            --edit-mirrorlist)                      SudoEdit "$ml";          exit 0 ;;
+            --view-mirrorlist)                      ViewFile "$ml";          exit 0 ;;
+            -l | --list-country-codes-names)        ListCountryCodesNames;   exit 0 ;;
             --verbosity)                            verbosity="$2"; shift ;;
             --sort)                                 sort_prefer="$2" ;;
             --dump-options)                         DumpOptions;            exit 0 ;;
@@ -693,6 +706,8 @@ Main() {
     local sort_prefer=age
     local -r now=$(GetTimeInfo)
     local auto_update_days=7
+
+    source /etc/eos-script-lib-yad.conf    # for SudoEdit()
 
     AutoUpdateCompletionFiles
 
@@ -759,7 +774,7 @@ Main() {
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
     LOPTS+=",ignore-countries:,timeout-rank:,no-parallel,continent-given:,list-continent-codes,ignore-continents:" # timeout:
     LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
-    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist"
+    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist,edit-mirrorlist"
 
     [ -x /bin/parallel ] || has_parallel=no
 
