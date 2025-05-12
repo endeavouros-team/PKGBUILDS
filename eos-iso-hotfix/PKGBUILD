@@ -7,7 +7,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=25.5.1
+pkgver=25.5.2
 pkgrel=1
 
 arch=('any')
@@ -19,8 +19,6 @@ _url_hotfix="https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/ref
 _url_script="https://raw.githubusercontent.com/endeavouros-team/calamares/refs/heads/calamares/data/eos/scripts"
 _url_module="https://raw.githubusercontent.com/endeavouros-team/calamares/refs/heads/calamares/data/eos/modules"
 
-_checkfile=/tmp/tmp.WIijsdUSkZfgj   # This file name *must* be static, i.e. cannot contain dynamic parts!
-
 _prepare_eos_iso_hotfix() {
     # This function fetches the latest hotfix files and some related calamares files.
     # Fetch hotfix files from github using 'git clone'.
@@ -29,76 +27,69 @@ _prepare_eos_iso_hotfix() {
     # If hotfixes change (e.g. need new files), this function may fail.
     # Then modify the lists of files according to changes required by the hotfixes.
 
-    if [ ! -e _$checkfile ] ; then
-        touch "$_checkfile"                           # allows the following execution only once
-        chmod go-rwx "$_checkfile"
-        local dir=$(mktemp -d)
-        chmod go-rwx $dir
+    local script_files=(                          # hotfixes may use/modify these files
+        $_url_script/chrooted_cleaner_script.sh
+    )
+    local module_files=(                          # hotfixes may use/modify these files
+        $_url_module/packagechooser.conf
+        $_url_module/pacstrap.conf
+    )
+    local hotfix_files=(                          # this will contain the hotfix files, see below
+        # $_url_hotfix/hotfix-end.bash
+        # $_url_hotfix/hotfix-start.bash
+        # $_url_hotfix/netinstall.yaml-cassini-R3.patch
+        # $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
+        # $_url_hotfix/packagechooser.conf_gemini_1.patch
+        # $_url_hotfix/packagechooser.conf.patch
+        # $_url_hotfix/pacstrap.conf_endeavour_neo.patch
+        # $_url_hotfix/README.md
+        # $_url_hotfix/settings_offline.conf.patch
+        # $_url_hotfix/settings_online.conf.patch
+    )
 
-        local script_files=(                          # hotfixes may use/modify these files
-            $_url_script/chrooted_cleaner_script.sh
-        )
-        local module_files=(                          # hotfixes may use/modify these files
-            $_url_module/packagechooser.conf
-            $_url_module/pacstrap.conf
-        )
-        local hotfix_files=(                         # this will contain the hotfix files, see below
-            $_url_hotfix/hotfix-end.bash
-            $_url_hotfix/hotfix-start.bash
-            $_url_hotfix/netinstall.yaml-cassini-R3.patch
-            $_url_hotfix/netinstall.yaml-Mercury_neo.patch
-            $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
-            $_url_hotfix/packagechooser.conf_gemini_1.patch
-            $_url_hotfix/packagechooser.conf.patch
-            $_url_hotfix/pacstrap.conf_endeavour_neo.patch
-            $_url_hotfix/README.md
-            $_url_hotfix/settings_offline.conf.patch
-            $_url_hotfix/settings_online.conf.patch
-        )
+    # Download hotfix files since these might change often.
+    local dir=$(mktemp -d)
+    chmod go-rwx $dir
+    hotfix_files=()
 
-        if false ; then
-            # Find the names of all the latest hotfix files.
-            git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
-                rm -rf $dir $_checkfile
-                exit 1
-            }
-            local file
-            for file in $(/bin/ls -1 "$dir") ; do
-                case "$file" in
-                    *.bash | *.patch) hotfix_files+=("$_url_hotfix/${file##*/}") ;;
-                esac
-            done
-        fi
-        rm -rf "$dir"
+    # Find the names of all the latest hotfix files.
+    git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
+        rm -rf $dir
+        exit 1
+    }
+    local file
+    for file in $(/bin/ls -1 "$dir") ; do
+        case "$file" in
+            *.bash | *.patch | *.md)
+                hotfix_files+=("$_url_hotfix/${file##*/}") ;;
+        esac
+    done
+    rm -rf "$dir"
 
-        source=(
-            "${hotfix_files[@]}"   # up-to-date hotfix files
-            "${script_files[@]}"   # any hotfix may change these files
-            "${module_files[@]}"   # any hotfix may change these files
-        )
-        # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
-    fi
+    source=(
+        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | sort -V)
+    )
+    # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
 }
 _prepare_eos_iso_hotfix
 
-sha512sums=('0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
-            'b2eceff43a7451eb653544080a26d84199d0cad2062e64e06782cd43b51babba0392a33d946104096ab3e12c6acb20ec39ee886347f2f9ebb87f6f0246a6ce4d'
+sha512sums=('eb621280d58a9914579412166f25676d80ec14426eba9db5529b0dbbec3b2af0154f4c659a33f0b913bb5fb55c162902679410a7f199278dfa51e561c2c0cfcf'
+            '0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
+            'ed19b7a67b99c680741712bbc771fc5f40dc73f2cc6e034f277a8699b1f56ab68fef82e8b65a8372fd43d16732c535e2b41b6147bc5b4db40638877e77aab461'
             '5dab144e787cc9649cd57addbbc542ece54ada5085dda42c9baf10201fcb406c74056969f93622d3a0d6be5ba70d053a16e299e699b21d0f64402eabf93abd6e'
-            '8a989ffa262a9295ba20e78023e9424a50677270ca20fd1853fe16448272e10fecd8091d32fc89712dc7f1d0488a005a894b7237ca654bae7807ffd7ce7d9a0a'
+            'e5d8bbe5d22e3535ce2c67c42c92328dd25f2a64559b5d6e6acc05917bf8a076a49a8781f94b53e9d1a27a410a36ff2c86efbfbbbdbd345b1d5b7fb5e0087319'
             '8e4c446dab9b31c2deeb44218629d7c82354b5433925768cb2b4c2c6279bd36f80ddcd4063d9ed5da0d55105b061e1b7a1a51da3fc9fe9433e2e387243f7739d'
             '3aa95fce738c40e4b239c35339195165261717938f0f3e2653c01610cf6da6bfa2548287d821a8bee0906e0a3a623129e1f1304c34946602de9fe46ad3e304c6'
-            'e5d8bbe5d22e3535ce2c67c42c92328dd25f2a64559b5d6e6acc05917bf8a076a49a8781f94b53e9d1a27a410a36ff2c86efbfbbbdbd345b1d5b7fb5e0087319'
             'eddfe733abd98f53e7481d147e78dec4bea5b7438ceeb967460fae63ae9390f6173d55a26fca715d0e99c15b2ddf595b780cc81ca63d2b0b1b9ec531d7b94a92'
-            '5c5115ac75ebd6a363cb817cd3ab4f0c453c321eab902b15b99427c0395192aa35eb50b4f80f49013d4326f4f6af92af04f6d269625cfa198b76de7e075cb1f5'
             '8d0176fec8dff63dd57a282bc69385d0db93d2b2656c52f95483040f1d7d071b6f7d4032273480d3729a55cf3f1db5bd45e4e616891dc2d0b150a214ecfb9890'
             '9c48e4b7d752ace0ff6c806b649b9a30cd2a89ca7d5ddad54065fa140dc8069a126bc7997b8ca40bb09645454108687ec0595a048e77a80903b97f770cebab22'
-            '23f6fc7b2966f5b7e3d8d1d29ba1aa67f88ca56006c30e8d3f8942f76b7bb7b0590ccb4cf54bb89e9e6c6d58fc9652c4147c2d8489685e55b4bfd9f4618e7777'
-            '22f30ea4c7f4509e41b3297831ac810b51167d839ff986dbba263d2f18bc29c9a0e55a39a3a76c1cd03eb7da4dc35dcd79a67a6c2ba71c16f7edd3eefea480da'
-            '0ee3ea3d2e59ca0047365eb7ea75906f2fd4ac194f553e180cd605965c0962b673a5ae3ae8c80d9af9c6e6a2278863f4e9afd0417a11da2d8fac8032aeedc4ba')
+            '03488968549cfd0d7609374568de79706b87adc0baa7b16eb701c35f8ec581672c1a5738d34d833ab1c5d8e6dd32bae3e534f37cb452623f2ee0511887815593'
+            '0ee3ea3d2e59ca0047365eb7ea75906f2fd4ac194f553e180cd605965c0962b673a5ae3ae8c80d9af9c6e6a2278863f4e9afd0417a11da2d8fac8032aeedc4ba'
+            '23f6fc7b2966f5b7e3d8d1d29ba1aa67f88ca56006c30e8d3f8942f76b7bb7b0590ccb4cf54bb89e9e6c6d58fc9652c4147c2d8489685e55b4bfd9f4618e7777')
 
 package() {
     local item src
-    local cleanups=("$_checkfile")
+    local cleanups=()
 
     for src in "${source[@]}" ; do
         item="${src##*/}"
