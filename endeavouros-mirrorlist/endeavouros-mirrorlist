@@ -65,6 +65,7 @@ Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
 
 ## Switzerland
 Server = https://mirror.gofoss.xyz/endeavouros/repo/$repo/$arch
+Server = https://pkg.adfinis-on-exoscale.ch/endeavouros/repo/$repo/$arch
 
 ## Taiwan
 Server = https://mirror.archlinux.tw/EndeavourOS/repo/$repo/$arch
