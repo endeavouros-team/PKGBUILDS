@@ -4,6 +4,8 @@
 # - long time statistics?
 # - less failure output
 
+#set -eu
+
 echo2() { echo -e "$@" >&2; }
 MSG2()  {
     local -r level="$1"
@@ -17,7 +19,7 @@ MSG2()  {
     )
     local -r configured_level=${verbosity_levels[$verbosity]}
     local -r call_level=${verbosity_levels[$level]}
-    [ $configured_level -ge $call_level ] && echo2 "$@"
+    [ $configured_level -ge $call_level ] && echo2 "$@" || true
 }
 
 DIEE()    { MSG2 least    "==> $progname: error:\n    $1"; exit 1; }
@@ -711,7 +713,7 @@ Main() {
 
     AutoUpdateCompletionFiles
 
-    case "$1" in
+    case "${1:-}" in
         --time) shift
                 if [ -x /bin/time ] ; then
                     local tmpfile=$(mktemp)
@@ -924,7 +926,7 @@ SkipIgnoredMirrors() {
 SeparateIgnoreMirrors() {
     local list
     local arg
-    while [ "$1" ] ; do
+    while [ "${1:-}" ] ; do
         arg="$1"
         case "$arg" in
             -i | --ignore-mirrors)
