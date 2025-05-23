@@ -373,7 +373,7 @@ Options() {
     local sopts="bcfhnopqtv"
     local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo,show-gpu-info"
-    lopts+=",no-settings"
+    lopts+=",no-settings,recommended-driver"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -691,6 +691,25 @@ RecommendedDriverSourceType() {
     return 1
 }
 
+ShowRecommendedDriver() {
+    # Show the recommended driver (one of: nvidia, nvidia-open, nouveau) and stop.
+    # No output means Nvidia GPU was not detected.
+
+    if eos-connection-checker ; then
+        Info "updating package 'hwdata' if needed ..."
+        sudo pacman -Sy --needed --noconfirm hwdata &> /dev/null
+        sleep 1
+    fi
+    local -r family=$(lspci -d 10de::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
+    case "$family" in
+        "")                   ;;                        # Nvidia GPU not found
+        GM*|GP*|GV*)          echo "nvidia" ;;          # Nvidia's closed source driver
+        TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;;     # Nvidia's open source driver
+        *)                    echo "nouveau" ;;         # For older Nvidia GPUs
+    esac
+    exit 0
+}
+
 Main()
 {
     # Support only these Nvidia series (must update these values too!).
@@ -699,6 +718,10 @@ Main()
     # - two latest from the kernel-lts repo
 
     local progname=${0##*/}
+    local quiet=no
+
+    [ "$1" = "--recommended-driver" ] && ShowRecommendedDriver
+
     [[ "$*" =~ --listopts ]] && Options --listopts
 
     local NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
@@ -709,7 +732,6 @@ Main()
     RecommendedDriverSourceType "$NvidiaData"  # open, closed, other, unknown
     local driver_source_type_initial="$driver_source_type"
     local force=no
-    local quiet=no
     local test=no
     local create_conf=no
     local bit32=no
