@@ -7,7 +7,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=25.5.2
+pkgver=25.5.3
 pkgrel=1
 
 arch=('any')
@@ -38,6 +38,7 @@ _prepare_eos_iso_hotfix() {
         # $_url_hotfix/hotfix-end.bash
         # $_url_hotfix/hotfix-start.bash
         # $_url_hotfix/netinstall.yaml-cassini-R3.patch
+        # $_url_hotfix/packagechooser.conf_mercury_neo.patch
         # $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
         # $_url_hotfix/packagechooser.conf_gemini_1.patch
         # $_url_hotfix/packagechooser.conf.patch
