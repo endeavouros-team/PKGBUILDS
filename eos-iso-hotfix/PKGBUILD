@@ -7,7 +7,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=25.5.3
+pkgver=25.5.4
 pkgrel=1
 
 arch=('any')
