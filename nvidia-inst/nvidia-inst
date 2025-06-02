@@ -568,7 +568,8 @@ ProperNvidiaPackages() {
     local testid="$nvidia_card_id"     # e.g. 20f3 104a
 
     if [ -z "$series" ] ; then
-        series="$($finder --hide-nvidia-inst-msgs $testid 2>/dev/null | grep ^Series | awk '{print $2}' | tr -d ':')"
+        # series="$($finder --hide-nvidia-inst-msgs $testid 2>/dev/null | grep ^Series | awk '{print $2}' | tr -d ':')"
+        series="$series_now"   # we support only what Arch repos have
     fi
 
     case "$series" in
@@ -618,9 +619,9 @@ ProperNvidiaPackages() {
 HasRepo() { grep "^\[$1\]" $pacmanconf >/dev/null; }
 
 SanityChecks() {
-    if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
-        DIE "This program must be started as a non-root user."
-    fi
+    #if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
+    #    DIE "This program must be started as a non-root user."
+    #fi
     if [ $driver_source_type = open ] && [ $driver_source_type_initial = closed ] ; then
         Warn "Option --open used, but Nvidia recommends the closed source driver!"
     fi
@@ -878,7 +879,7 @@ Main()
 
     if [ "$cmd" ] ; then
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
-        $EOS_ROOTER "$cmd" && Note "To have the changes in effect, you must reboot the computer."
+        sudo "$cmd" && Note "To have the changes in effect, you must reboot the computer."
     fi
 }
 
