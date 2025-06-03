@@ -2,6 +2,7 @@
 Type = Path
 Operation = Install
 Operation = Upgrade
+Operation = Remove
 Target = usr/lib/modules/*/vmlinuz
 Target = usr/lib/dracut/*
 Target = usr/lib/firmware/*

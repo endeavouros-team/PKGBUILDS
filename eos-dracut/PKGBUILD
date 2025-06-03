@@ -1,7 +1,7 @@
 # Originally based on the AUR package "dracut-hook" by Leonidas P. <jpegxguy>
 
 pkgname=eos-dracut
-pkgver=1.5
+pkgver=1.6
 pkgrel=1
 pkgdesc="Dracut scripts and hooks for EndeavourOS"
 url=https://endeavouros.com
@@ -22,7 +22,7 @@ source=("dracut-rebuild"
 sha256sums=('38eb43c459afb5e6fc2bcf59dc308dc06bd0ee7d95a5ba8b6d580715f461639b'
             '12a6fcd72102ad381f53d50175382c2daaf4b044be9400485a9ad8b688227911'
             '5c8bfa7855f6901ef83d35ecdbae7cb5900465b7b60185592f4487f660d0d49d'
-            '40d88d8ec9a5cf739145e236cae1ab00e336e316b116923189e5b1601a0cbb0c'
+            'bec7855f41e24a1f2fd4b75904dc746da54c402c51ea1539051314422b14ec8b'
             'e79f8e9572c5d1af6052104eac7ff956754f7a191b52b16adf12b65a38e9b4ed'
             '35ba4b4c82d5cceb6782c75f989bae36ba44ca626905b6db81908c1759eadfb0'
             '0cc0c8e6be929556a3f01af1ef0d2a4a59eff0875418eb774550a9fe7383f345'
