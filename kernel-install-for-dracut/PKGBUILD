@@ -1,5 +1,5 @@
 pkgname=kernel-install-for-dracut
-pkgver=1.12
+pkgver=1.13
 pkgrel=1
 pkgdesc='Enables systemd-boot automation using kernel-install with dracut'
 arch=(any)
@@ -10,7 +10,7 @@ conflicts=(mkinitcpio kernel-install-mkinitcpio)
 backup=(etc/kernel/install.d/50-dracut.install etc/kernel-install-for-dracut.conf)
 source=("$pkgname-$pkgver.tar.gz::$url/-/archive/$pkgver/$pkgname-$pkgver.tar.gz"
         'dracut-rebuild')
-sha256sums=('363ac29882bad74a5a2c87ad38e889254a5b272860f8d09ac23d60677d1cd9e5'
+sha256sums=('017a0b8e82448eafb07b5e9375487fd87b02d67515bbc0e680f3b08172c218f8'
             '7733d9954d1690bc0044a17d2930d9a0f7dc7412b08e7d6e139be75bb9c1f0e7')
 
 package()
