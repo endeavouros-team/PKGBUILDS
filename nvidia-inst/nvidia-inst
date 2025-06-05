@@ -898,7 +898,7 @@ Main()
 
     if [ "$cmd" ] ; then
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
-        sudo "$cmd" && Note "To have the changes in effect, you must reboot the computer."
+        sudo bash -c "$cmd" && Note "To have the changes in effect, you must reboot the computer."
     fi
 }
 
