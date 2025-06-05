@@ -266,7 +266,7 @@ Bumblebee() {
 }
 
 Nouveau() {
-    PkgInstall xf86-video-nouveau
+    PkgInstall xf86-video-nouveau vulkan-nouveau
 }
 
 Prime() {
@@ -368,12 +368,24 @@ ListOptions() {
     echo "$lopts $sopts"
 }
 
+ViewFile() {
+    local -r file="$1"
+    local app
+    local apps=(xdg-open exo-open kde-open)
+    for app in "${apps[@]}" ; do
+        if [ -x /usr/bin/$app ] ; then
+            /usr/bin/$app "$file"
+            break
+        fi
+    done
+}
+
 Options() {
     local opts
     local sopts="bcfhnopqtv"
     local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo,show-gpu-info"
-    lopts+=",no-settings,recommended-driver"
+    lopts+=",no-settings,recommended-driver,view-pci-ids"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -415,6 +427,14 @@ Options() {
             --show-gpu-info)    echo "$NvidiaData" ; exit 0 ;;
             --drivers)
                 nvidia-driver-supported-branches   # -a    # this option is deprecated!
+                exit 0
+                ;;
+            --recommended-driver)
+                ShowRecommendedDriver
+                exit 0
+                ;;
+            --view-pci-ids)                            # internal option
+                ViewFile /usr/share/hwdata/pci.ids
                 exit 0
                 ;;
             -v | --version)
@@ -539,6 +559,7 @@ AllRemovables() {
         bbswitch
         bbswitch-dkms
         xf86-video-nouveau
+        vulkan-nouveau
 
         # nvidia packages from repos:
         $(expac -Ss %n nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-toolkit|beta')
@@ -708,7 +729,6 @@ ShowRecommendedDriver() {
         TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;;     # Nvidia's open source driver
         *)                    echo "nouveau" ;;         # For older Nvidia GPUs
     esac
-    exit 0
 }
 
 Main()
@@ -721,9 +741,8 @@ Main()
     local progname=${0##*/}
     local quiet=no
 
-    [ "$1" = "--recommended-driver" ] && ShowRecommendedDriver
-
-    [[ "$*" =~ --listopts ]] && Options --listopts
+    [[ "$*" =~ --recommended-driver ]] && Options "$1"
+    [[ "$*" =~ --listopts ]]           && Options --listopts
 
     local NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
 
