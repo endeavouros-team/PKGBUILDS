@@ -724,10 +724,10 @@ ShowRecommendedDriver() {
     fi
     local -r family=$(lspci -d 10de::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
     case "$family" in
-        "")                   ;;                        # Nvidia GPU not found
-        GM*|GP*|GV*)          echo "nvidia" ;;          # Nvidia's closed source driver
-        TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;;     # Nvidia's open source driver
-        *)                    echo "nouveau" ;;         # For older Nvidia GPUs
+        "")                   ;;                             # Nvidia GPU not found
+        GM*|GP*|GV*)          echo "nvidia-dkms" ;;          # Nvidia's closed source driver
+        TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open-dkms" ;;     # Nvidia's open source driver
+        *)                    echo "nouveau" ;;              # For older Nvidia GPUs
     esac
 }
 
@@ -792,8 +792,6 @@ Main()
     fi
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
-
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
 
     SanityChecks
     local all_installed_packages="$(expac -Q %n)"
