@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.5.2
+pkgver=25.6
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,7 +21,6 @@ depends=(
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
     "gnu-netcat: one of the pastebins (termbin) for eos-sendlog"
-    "neofetch: for additional DE detection"
     "kde-gtk-config: to remove gtk related yad warnings"
     "libnotify: for eos-reboot-required2"
     "webkit2gtk-4.1: for eos-pacdiff to show message windows implemented with yad"
@@ -93,7 +92,7 @@ source=(
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
-sha512sums=('bdf036476d3e400be30661b25ffa3f70a963a1f0d031589b5b9dc3d83e6524a6789eb3f76197d29f39174c9a012b9269b4fe4b6c44ab822920ad6565589b7544'
+sha512sums=('ebb943369d1ebd3d1611174c149931225e8f7dbbd7197058d6180427c7e5d724f6b4707468000b58cf480b16261a63d9fc76339bc13373d4374d710fe57ab8ea'
             '691578a8e2b975309269acedade183bd735b8d94afe283721f852a537ca82f7c181b72a3300b5ce6d42da81a1bf3a88179dff3ab8789827e7e6d96ffd0250d99'
             'ce6ea00a8956f930408795b678d05fe5abfa1a08167438221786c9aa091ef0c63dc107896af8faa3d37dfeed47243600b16c1191040b0c76870b2b3cbfe8c9e1'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
