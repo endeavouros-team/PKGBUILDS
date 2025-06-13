@@ -34,7 +34,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "Aplikácia $PRETTY_PROGNAME je zakázaná. Ak sa má napriek tomu spustiť, použite voľbu --enable."
+_tr_add2 welcome_disabled      "Aplikácia $PRETTY_PROGNAME je zakázaná. Ak sa má napriek tomu spustiť, použite parameter --enable (ak sa má povoliť dočasne: --once )."
 
 _tr_add2 butt_later            "Uvidíme sa neskôr"
 _tr_add2 butt_latertip         "Ponechá aplikáciu $PRETTY_PROGNAME povolenú"
@@ -51,7 +51,7 @@ _tr_add2 nb_tab_AfterInstall   "Po inštalácii"
 _tr_add2 nb_tab_AddMoreApps    "Pridanie ďalších aplikácií"
 
 
-_tr_add2 after_install_text    "Úlohy po nainštalovaní"
+_tr_add2 after_install_text    "Úlohy po inštalácii"
 
 _tr_add2 after_install_um      "Aktualizovať zrkadlá"
 _tr_add2 after_install_umtip   "Vykoná aktualizáciu zoznamu zrkadiel pred aktualizáciou systému"
@@ -68,8 +68,8 @@ _tr_add2 after_install_etltip  "Zobrazí, ako dostať váš systém EndeavourOS 
 _tr_add2 after_install_cdm     "Zmeniť správcu zobrazenia"
 _tr_add2 after_install_cdmtip  "Použije iného správcu zobrazenia"
 
-_tr_add2 after_install_ew      "Východzie pozadie systému EndeavourOS"
-_tr_add2 after_install_ewtip   "Navrátiť pozadie na východzie"
+_tr_add2 after_install_ew      "Predvolené pozadie systému EndeavourOS"
+_tr_add2 after_install_ewtip   "Obnoví pozadie na predvolené"
 
 
 _tr_add2 after_install_pm      "Správa balíkov"
@@ -79,16 +79,16 @@ _tr_add2 after_install_ay      "Repozitár AUR a nástroj yay$_exclamation"
 _tr_add2 after_install_aytip   "Informácie o užívateľskom repozitári systému Arch a nástroji yay"
 
 _tr_add2 after_install_hn      "Hardvér a sieť"
-_tr_add2 after_install_hntip   "Urobte váš hardvér funkčným"
+_tr_add2 after_install_hntip   "Sfunkční váš hardvér"
 
 _tr_add2 after_install_bt      "Bluetooth"
-_tr_add2 after_install_bttip   "Rada k pripojeniu Bluetooth"
+_tr_add2 after_install_bttip   "Pokyny k rozhraniu Bluetooth"
 
 _tr_add2 after_install_nv      "Používatelia grafických kariet NVIDIA$_exclamation"
 _tr_add2 after_install_nvtip   "Použitie inštalátora grafických kariet NVIDIA"
 
-_tr_add2 after_install_ft      "Rady k fóru"
-_tr_add2 after_install_fttip   "Pomôžte nám, my pomôžeme vám!"
+_tr_add2 after_install_ft      "Rady z fóra"
+_tr_add2 after_install_fttip   "Pomôžte nám, my pomôžeme vám$_exclamation"
 
 
 _tr_add2 general_info_text     "Nájdite svoju cestu na webovej stránke systému EndeavourOS$_exclamation"
@@ -102,7 +102,7 @@ _tr_add2 general_info_ne       "Novinky"
 _tr_add2 general_info_netip    "Novinky a články"
 
 _tr_add2 general_info_fo       "Fórum"
-_tr_add2 general_info_fotip    "Pýtajte sa, komentujte a rozprávajte sa v našom priateľskom fóre!"
+_tr_add2 general_info_fotip    "Pýtajte sa, komentujte a rozprávajte sa v našom priateľskom fóre$_exclamation"
 
 _tr_add2 general_info_do       "Prispieť"
 _tr_add2 general_info_dotip    "Pomôžte nám v zachovaní chodu systému EndeavourOS"
@@ -127,7 +127,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) pre prostredie Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Na opätovné spustenie aplikácie $PRETTY_PROGNAME otvorte terminál a spustite: $PROGNAME --enable"
+_tr_add2 settings_dis_contents   "Na opätovné spustenie aplikácie $PRETTY_PROGNAME, otvorte terminál a spustite:\n<tt>   $PROGNAME --enable</tt>\nalebo\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
 _tr_add2 settings_dis_text       "Opätovné povolenie aplikácie $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Ako znovu povoliť aplikáciu $PRETTY_PROGNAME"
 _tr_add2 settings_dis_butt       "Zapamätám si"
@@ -154,31 +154,31 @@ _tr_add2 sysup_no                "Žiadne aktualizácie."
 _tr_add2 sysup_check             "Kontrolujú sa aktualizácie softvéru..."
 
 _tr_add2 issues_title            "Zisťovanie problémov s balíkmi"
-_tr_add2 issues_grub             "DÔLEŽITÉ: bude potrebné opätovné ručné vytvorenie zavádzacej ponuky."
+_tr_add2 issues_grub             "DÔLEŽITÉ: bude potrebné opätovné ručné vytvorenie ponuky zavádzača."
 _tr_add2 issues_run              "Spúšťajú sa príkazy:"
 _tr_add2 issues_no               "Neboli zistené žiadne závažné problémy so systémom."
 
-_tr_add2 cal_noavail            "Nedostupný: "        # installer program
+_tr_add2 cal_noavail            "Nedostupné: "        # installer program
 _tr_add2 cal_warn               "Upozornenie"
 _tr_add2 cal_info1              "Toto je komunitné vývojové vydanie.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "Spôsob <b>Bez pripojenia</b> vám poskytne pracovné prostredie Xfce s motívom systému EndeavourOS.\nInternetové pripojenie nie je potrebné.\n\n"
-_tr_add2 cal_info3              "Spôsob <b>S pripojením</b> vám umožní zvoliť pracovné prostredie s pôvodným čistím motívom.\nInternetové pripojenie je potrebné.\n\n"
-_tr_add2 cal_info4              "Poznámka: Na tomto vydaní sa stále pracuje. Prosím, pomôžte nám vytvoriť stabilné vydanie pomocou nahlásenia chýb.\n"
+_tr_add2 cal_info2              "Spôsob <b>Bez pripojenia</b> vám poskytne pracovné prostredie %%s.\nPripojenie k internetu nie je potrebné.\n\n"
+_tr_add2 cal_info3              "Spôsob <b>Online</b> vám umožní zvoliť si vaše pracovné prostredie.\nPripojenie k internetu je potrebné.\n\n"
+_tr_add2 cal_info4              "Prosím, berte na vedomie: Na tomto vydaní sa pracuje, prosím, pomôžte nám zvýšiť stabilitu nahlásením chýb.\n"
+_tr_add2 cal_info5              "\nPo inštalácii sa odporúča vykonať aktualizáciu systému.\n\n"
+_tr_add2 cal_info6              "\nPo inštalácii bude systém aktuálny.\n\n"
 _tr_add2 cal_choose             "Zvoľte spôsob inštalácie"
 _tr_add2 cal_method             "Spôsob"
 _tr_add2 cal_nosupport          "$PROGNAME: nepodporovaný režim: "
 _tr_add2 cal_nofile             "$PROGNAME: požadovaný súbor neexistuje: "
-_tr_add2 cal_istarted           "Inštalácia bola spustená"
-_tr_add2 cal_istopped           "Inštalácia bola dokončená"
-
+_tr_add2 cal_istarted           "Inštalácia spustená"
+_tr_add2 cal_istopped           "Inštalácia dokončená"
 _tr_add2 tail_butt              "Zavrieť toto okno"
 _tr_add2 tail_buttip            "Zavrie iba toto okno"
 
 
 _tr_add2 ins_text              "Inštaluje sa systém EndeavourOS na disk"
 _tr_add2 ins_start             "Spustiť inštalátor"
-_tr_add2 ins_starttip          "Spustí inštalátor systému EndeavourOS spolu s ladiacim terminálom"
-_tr_add2 ins_up                "Aktualizovať túto aplikáciu$_exclamation"
+_tr_add2 ins_starttip          "Spustí inštalátor systémuEndeavourOS (umožní výber spomedzi hlavných pracovných prostredí)"   # changed 2023-Jan-12_tr_add2 ins_up                "Aktualizovať túto aplikáciu$_exclamation"
 _tr_add2 ins_uptip             "Vykoná aktualizáciu tejto aplikácie a znovu ju spustí"
 _tr_add2 ins_keys              "Inicializovať kľúče aplikácie pacman"
 _tr_add2 ins_keystip           "Vykoná inicializáciu kľúčov aplikácie pacman"
@@ -311,7 +311,7 @@ _tr_add2 daily_assist_DEinfo         "informácie"                              
 _tr_add2 daily_assist_DEinfo_tip     "viac informácii o tomto desktopovom prostredí/správcovi okien"  # assume prefix "DE:", e.g.: "Xfce: more information ..."
 
 # 2022-Feb-16
-_tr_add2 add_more_apps_qs            "Vyberte si populárne aplikácie k inštalácii"                      # runs eos-quickstart
+_tr_add2 add_more_apps_qs            "Vyberte si populárne aplikácie na inštaláciu"                      # runs eos-quickstart
 _tr_add2 add_more_apps_qstip         "Vyberte si populárne aplikácie a nainštalujte ich"
 
 # 2022-Mar-21
@@ -319,14 +319,73 @@ _tr_add2 ins_blue_notes              "Poznámky k Bluetooth"
 _tr_add2 ins_blue_notes_tip          "Poznámky ohľadom nastavenia bluetooth"
 
 # 2022-Mar-27
-_tr_add2 after_install_fw            "Informácie k firewallu"
-_tr_add2 after_install_fwtip         "Informácie ohľadom východzieho firewallu"
+_tr_add2 after_install_fw            "Informácie o bráne firewall"
+_tr_add2 after_install_fwtip         "Informácie o predvolenej bráne firewall"
 
 # 2022-Mar-30
 _tr_add2 ins_custom                  "Prispôsobovanie priebehu inštalácie"
 _tr_add2 ins_custom_tip              "Ako si prispôsobiť priebeh inštalácie"
 
 # 2022-Jul-15
-_tr_add2 daily_assist_anews          "Posledné Arch novinky"
-_tr_add2 daily_assist_anewstip       "Ukáže posledné Arch novinky v prehliadači"
+_tr_add2 daily_assist_anews          "Najnovšie novinky o systéme Arch"
+_tr_add2 daily_assist_anewstip       "Zobrazí najnovšie novinky o systéme Arch v prehliadači"
 
+# 2022-Sep-25
+_tr_add2 nb_notify_user1             "Sú dostupné dôležité novinky zo dňa"                        # one (or more) dates, e.g. 2023-Feb-18
+_tr_add2 nb_notify_user2             "Prosím, kliknite na"                                  # Software News
+_tr_add2 nb_notify_user3             "tlačidlo v ľavom dolnom rohu tohto okna."
+
+# 2023-Feb-20
+_tr_add2 ins_customized              "Získať váš súbor s prispôsobeniami inštalácie (pokročilé)"
+_tr_add2 ins_cust_text               "Zadajte URL k vášmu prispôsobenému súboru user_commands.bash"
+_tr_add2 ins_cust_text2              "Získaný súbor nahradí súbor v umiestnení ~/user_commands.bash"
+_tr_add2 ins_cust_text3              "Toto je najužitočnejšie pri <b>online</b> inštalácii"
+
+# 2023-Mar-29
+_tr_add2 ins_no_connection           "Poznámka: Nie je dostupné pripojenie k internetu, niektoré tlačidlá sú skryté alebo nie sú funkčné."
+
+# 2023-Aug-25
+_tr_add2 ins_pmtip2                  "Správca oddielov umožní preskúmanie a správu oddielov a štruktúry disku"
+
+# 2023-Sep-16
+_tr_add2 ins_arm_start               "Inštalátor obrazu so systémom EndeavourOS ARM"
+_tr_add2 ins_arm_starttip            "Spustí inštaláciu systému EndeavourOS vo vydaní ARM"
+
+# 2024-Apr-18
+_tr_add2 ins_conn_issue_title        "Čo bude ďalej?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_text         "Nenašlo sa priojenie k internetu (možno sieť wifi nie je pripravená${_question})"
+_tr_add2 ins_conn_issue_nm1          "Správca siete"
+_tr_add2 ins_conn_issue_nm2          "Spustí správcu siete"
+_tr_add2 ins_conn_issue_oi1          "Inštalácia bez pripojenia"
+_tr_add2 ins_conn_issue_oi2          "Nainštaluje prostredie KDE bez pripojenia k internetu (po inštalácii sa odporúča vykonať aktualizáciu)"
+_tr_add2 ins_conn_issue_ex1          "Skončiť"
+_tr_add2 ins_conn_issue_ex2          "Ukončí tento program"
+
+# 2024-Apr-20
+_tr_add2 ins_start_calamares         "Spúšťa sa inštalátor calamares"
+_tr_add2 ins_please_wait             "Prosím, čakajte..."
+
+# 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
+_tr_add2 after_install_usnat         "Aktualizovať natívne balíky"
+_tr_add2 after_install_usnat_tip     "Aktualizuje balíky z repozitárov v súbore /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Aktualizovať natívne a AUR balíky"
+_tr_add2 after_install_usnataur_tip  "Aktualizuje balíky  repozitárov v súbore /etc/pacman.conf a AUR"
+_tr_add2 after_install_ushlp         "Aktualizovať natívne a AUR balíky"
+_tr_add2 after_install_ushlp_tip     "Aktualizuje balíky z repozitárov v súbore /etc/pacman.conf a AUR s pomocníkom AUR"
+
+_tr_add2 after_install_umartip       "Aktualizovať zoznam zrkadiel systému Arch pred aktualizáciou balíkov"
+_tr_add2 after_install_umentip       "Aktualizovať zoznam zrkadiel systému EndeavourOS pred aktualizáciou balíkov"
+
+# 2024-Dec-06
+_tr_add2 after_install_reisub        "Informácie o funkcii REISUB"
+_tr_add2 after_install_reisub2       "Povoliť funkciu REISUB"
+_tr_add2 after_install_reisubtip     "Funkcia REISUB pomáha riešiť zlyhanie systému"
+
+# 2024-Dec-06, take 2
+_tr_add2 _commonphrase_enabled       "povolené"
+_tr_add2 _commonphrase_disabled      "zakázané"
+
+# 2024-Dec-10
+_tr_add2 arch_chroot                 "Informácie o funkcii arch-chroot"
+_tr_add2 arch_chroot_tip             "Funkcia arch-chroot poskytuje prístup k inému systému prostredníctvom príkazového riadka"
+_tr_add2 _commonphrase_not_found     "Fráza %%s sa nenašla"                                                   # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
