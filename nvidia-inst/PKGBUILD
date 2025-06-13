@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-inst
-pkgver=25.6.3
+pkgver=25.6.4
 pkgrel=1
 pkgdesc="Script to install/uninstall nvidia driver packages in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -12,14 +12,13 @@ arch=('any')
 license=('GPL2')
 replaces=(nvidia-installer-dkms nvidia-installer-db nvidia-installer-common)
 conflicts=(nvidia-installer-common)
-depends=()
+depends=(expac)
 optdepends=(
   "linux-headers: needed by nvidia-dkms or nvidia-open-dkms"
   "linux-lts-headers: needed by nvidia-dkms or nvidia-open-dkms"
   "linux-hardened-headers: needed by nvidia-dkms or nvidia-open-dkms"
   "linux-zen-headers: needed by nvidia-dkms or nvidia-open-dkms"
   "dkms: for the dkms versions of the proprietary Nvidia drivers"
-  "expac: faster way for finding available package versions"
 )
 
 source=(
