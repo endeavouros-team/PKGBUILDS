@@ -374,13 +374,31 @@ SimpleRank() {
     SeparatorLine
 }
 
+ShowItems() {
+    local prompt="$1"
+    local items="$2"
+    local item
+    local maxlen=70
+    local line="$prompt"
+
+    for item in $items ; do
+        if [ $(( ${#line} + ${#item})) -gt $maxlen ] ; then
+            echo "$line"
+            line="$prompt $item"
+        else
+            line+=" $item"
+        fi
+    done
+    [ "$line" != "$prompt" ] && echo "$line"
+}
+
 ShowActualRankingResult() {
     SeparatorLine
     echo "# EndeavourOS mirrorlist, $rank_signature at $(date +%x\ %X)."
     if [ -n "$preferred_mirrors" ] || [ -n "$ALWAYS_FIRST_EOS_MIRRORS" ] ; then
-        echo "# Preferred mirrors: ${preferred_mirrors} ${ALWAYS_FIRST_EOS_MIRRORS}"
+        ShowItems "# Preferred mirrors:" "${preferred_mirrors} ${ALWAYS_FIRST_EOS_MIRRORS}"
     fi
-    [ -n "$ignored_mirrors" ]   && echo "# Ignored mirrors: ${ignored_mirrors}"
+    [ -n "$ignored_mirrors" ] && ShowItems "# Ignored mirrors:" "${ignored_mirrors}"
     SeparatorLine
 
     # Option --prefer takes precedence over variable ALWAYS_FIRST_EOS_MIRRORS when both are used.
