@@ -266,7 +266,7 @@ Bumblebee() {
 }
 
 Nouveau() {
-    PkgInstall xf86-video-nouveau vulkan-nouveau
+    PkgInstall vulkan-nouveau     # installing xf86-video-nouveau no more recommended
 }
 
 Prime() {
@@ -457,7 +457,7 @@ Options:
   -h, --help              This help.
   -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards (only very old cards).
   -f, --force             Force driver installation even if a nvidia card is not detected.
-  -n, --nouveau           Install (the open source) nouveau driver instead of Nvidia's driver.
+  -n, --nouveau           Use kernel's nouveau driver instead of Nvidia's proprietary driver.
   -o, --open              Install the open source versions of Nvidia drivers (recommended for 'Turing' and later).
   -c, --closed            Install the closed source versions of Nvidia drivers (recommended for 'Maxwell'...'Volta').
   -p, --prime             Install also prime render offload.
@@ -826,7 +826,7 @@ Main()
                 nouveau) ;;
                 *)
                     while true ; do
-                        read -p "==> Install xf86-video-nouveau (Y/n)? " >&2
+                        read -p "==> Install vulkan-nouveau (Y/n)? " >&2
                         case "$REPLY" in
                             [yY]* | "") mode=nouveau; break ;;
                             [nN]*)      mode=other; break ;;
