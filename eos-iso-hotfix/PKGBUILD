@@ -7,7 +7,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=25.5.4
+pkgver=25.6
 pkgrel=1
 
 arch=('any')
@@ -28,6 +28,7 @@ _prepare_eos_iso_hotfix() {
     # Then modify the lists of files according to changes required by the hotfixes.
 
     local script_files=(                          # hotfixes may use/modify these files
+        $_url_script/cleaner_script.sh
         $_url_script/chrooted_cleaner_script.sh
     )
     local module_files=(                          # hotfixes may use/modify these files
@@ -87,7 +88,8 @@ sha512sums=('3471e7ee769594a8317c3d5a1761c4459b832bb9e22d5c0069f8bd0f9bae27a1684
             '9c48e4b7d752ace0ff6c806b649b9a30cd2a89ca7d5ddad54065fa140dc8069a126bc7997b8ca40bb09645454108687ec0595a048e77a80903b97f770cebab22'
             '03488968549cfd0d7609374568de79706b87adc0baa7b16eb701c35f8ec581672c1a5738d34d833ab1c5d8e6dd32bae3e534f37cb452623f2ee0511887815593'
             '0ee3ea3d2e59ca0047365eb7ea75906f2fd4ac194f553e180cd605965c0962b673a5ae3ae8c80d9af9c6e6a2278863f4e9afd0417a11da2d8fac8032aeedc4ba'
-            '23f6fc7b2966f5b7e3d8d1d29ba1aa67f88ca56006c30e8d3f8942f76b7bb7b0590ccb4cf54bb89e9e6c6d58fc9652c4147c2d8489685e55b4bfd9f4618e7777')
+            'cbea75ee686139eb76d7a2c8af615c7b03913887c11a8086e27594f26085f3f2d445dc40451a3ea3213e14f95f428a3660de8f4ae5a5e983c81864b8d47ad38f'
+            '3a7499335b0dc7deafd48db8f508bb53b4104d1778a126c7095f1e1b26a920400113afe50f3641f60b7fb3eb8da144ef83abad90fcde78af2c0455fb0c343bb4')
 
 package() {
     local item src
