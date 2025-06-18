@@ -708,6 +708,7 @@ Main() {
     local sort_prefer=age
     local -r now=$(GetTimeInfo)
     local auto_update_days=7
+    local verbosity=default
 
     source /etc/eos-script-lib-yad.conf    # for SudoEdit()
 
@@ -749,7 +750,6 @@ Main() {
     local prefer_local_rank=no
     local save_ml=no                   # not supported currently, if ever
     local suffix=""
-    local verbosity=default
     local reflector_list_countries=""
     local has_parallel=yes
     local read_config=yes
