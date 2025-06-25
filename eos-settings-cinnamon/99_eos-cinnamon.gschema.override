@@ -2,11 +2,10 @@
 picture-uri='file:///usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png'
 
 [org.cinnamon.desktop.interface]
-cursor-theme='Qogir-dark'
 gtk-theme='Arc-Dark'
+icon-theme='Qogir-dark'
+cursor-theme='Qogir-dark'
 
 [org.cinnamon.theme]
 name='Arc-Dark'
 
-[org.cinnamon.desktop.interface]
-icon-theme='Qogir-dark'
