@@ -2,14 +2,14 @@
 # Co-Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-cinnamon
-pkgver=2.2
+pkgver=2.3
 pkgrel=1
 pkgdesc="Cinnamon settings for EndeavourOS"
 arch=('any')
 license=('GPL3')
 depends=('endeavouros-branding')
 source=('99_eos-cinnamon.gschema.override')
-sha256sums=('0ae2d25b5d06e6d062de259594b670eb972c25b653e1ecde1de41c0515663fc5')
+sha256sums=('60c393aa00cef78df4958c81a07bafa41e94857564c1b856cc23047b6e1bcf8f')
 
 package() {
 	install -Dm644 "${srcdir}/99_eos-cinnamon.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_eos-cinnamon.gschema.override"
