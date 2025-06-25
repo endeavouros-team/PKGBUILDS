@@ -1,2 +1,3 @@
 [org.gnome.Console]
 theme='auto'
+custom-font='Monospace 10'
