@@ -275,12 +275,12 @@ ResetCompletionFiles() {
 }
 
 TraverseMirrors-parallel() {
-    # MONITOR "ranking mirrors in $mode mode"
+    # MONITOR "ranking mirrors in $ranking_mode mode"
     echo "$mirrors_with_statefiles" | parallel --bar "$progname_helper {} '$timeout_rank' '$distro' '$time_as_datetime' '$mirror_count' '$errlogfile'"
 }
 
 TraverseMirrors-sequential() {
-    # MONITOR "$mode ranking"
+    # MONITOR "$ranking_mode ranking"
     local mirror
     local ix=1
     local mirs
@@ -442,6 +442,9 @@ Options:
     --save
         Save the mirrorlist to $ml.
 
+    --sequential
+        Rank mirrors sequentially instead of in parallel.
+
     --sort <value>
         The <value> specified what to prefer when sorting the list of mirrors.
         Supported values:
@@ -543,7 +546,7 @@ Options() {
             -f | --favorite)                        AddFavs "$2"; shift ;;
             -s | --favsel)                          selectfavs=yes ;;
             --prefer-local-rank)                    prefer_local_rank=yes ;;
-            --no-parallel)                          has_parallel=no ;;
+            --sequential | --no-parallel)           ranking_mode=sequential ;;                          # --no-parallel deprecated
             -u)                                     update_mirrordata_first=yes ;;
             # --timeout)                              timeout_distro="$2"; shift ;;
             -k | --timeout-rank)                    timeout_rank="$2"; shift ;;
@@ -751,7 +754,7 @@ Main() {
     local save_ml=no                   # not supported currently, if ever
     local suffix=""
     local reflector_list_countries=""
-    local has_parallel=yes
+    local ranking_mode=parallel               # parallel or sequential
     local read_config=yes
     local update_mirrordata_first=no
     local prevent_ignoring_countries=no       # if yes, then forget option --ignore-countries
@@ -774,11 +777,11 @@ Main() {
     LOPTS+=",list-country-codes,list-country-codes-names,list-country-names,ranking-data,list-continents-countries"
     LOPTS+=",reset-completion-files,list-continent-countrycodes:,list-continent-countrynames:,update-completion-files"
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
-    LOPTS+=",ignore-countries:,timeout-rank:,no-parallel,continent-given:,list-continent-codes,ignore-continents:" # timeout:
+    LOPTS+=",ignore-countries:,timeout-rank:,continent-given:,list-continent-codes,ignore-continents:" # timeout:
     LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
-    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist,edit-mirrorlist"
+    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist,edit-mirrorlist,sequential,no-parallel"
 
-    [ -x /bin/parallel ] || has_parallel=no
+    [ -x /bin/parallel ] || ranking_mode=sequential
 
     HasNoConfigOption "$@"
 
@@ -828,7 +831,6 @@ Main() {
     local mirror_count=0
     local mirrors_with_statefiles=""
     local errlogfile=/tmp/$progname.errlog
-    local mode=""
     local ranked=""
 
     rm -f "$errlogfile"
@@ -839,13 +841,9 @@ Main() {
 
         # Now we have the final list of mirrors.
 
-        case "$has_parallel" in
-            yes)  mode=parallel ;;
-            no|*) mode=sequential ;; 
-        esac
         case $save_ml in
-            yes_no-bak) result=$(TraverseMirrors-$mode 2>/dev/null) ;;
-            *)          result=$(TraverseMirrors-$mode) ;;
+            yes_no-bak) result=$(TraverseMirrors-$ranking_mode 2>/dev/null) ;;
+            *)          result=$(TraverseMirrors-$ranking_mode) ;;
         esac
         mirror_count=$(echo "$result" | wc -l)                          # ranking may have dropped some mirrors!
         case "$sort_prefer" in
@@ -906,6 +904,8 @@ LateTips() {
                  "      to narrow down the amount of ranked mirrors."
     [ "$favs" ] || \
         ShowATip "    -> Use option --favorite to make specific mirrors preferred (advanced)."
+    [ -x /bin/parallel ] || \
+        ShowATip "    -> Install 'parallel' to speed up mirror ranking."
     echo2 ""
 }
 ShowATip() {
@@ -984,7 +984,7 @@ ShowMirrorlistFile() { :
 ${comment3}Ranked list of ${distro^} mirrors.
 ${comment3}Rank preference : age > rate
 ${comment3}Rank time       : $time_of_ranking
-${comment3}Rank mode       : $mode
+${comment3}Rank mode       : $ranking_mode
 EOF
     ShowCommandLine
     ShowFavorites

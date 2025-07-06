@@ -5,7 +5,7 @@
 pkgname=rami
 pkgdesc="Rank Arch mirrors, prefer up-to-date mirrors"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=24.14
+pkgver=25
 pkgrel=1
 
 arch=('any')
@@ -13,11 +13,11 @@ license=('GPL')
 depends=(
     bash
     curl
-    parallel                # for parallel operations
     python-location         # for finding continent info
     reflector               # for listing available Arch mirrors
 )
 optdepends=(
+    'parallel: for parallel operations'
     'eos-bash-shared: curl exit code as string'
     'time: for option --time'
 )
@@ -30,7 +30,7 @@ source=(
     $url/${pkgname}-helper
     $url/${pkgname}-status
 )
-sha512sums=('96b17662d1b20aedad72ff97e54bd74a8d01f76105295f1f34b00a424ffa3aafbe2fb41d4b49180ff701f3b8a9f452fd8d838d2bc0cd5ef8342cf18eb6268c3a'
+sha512sums=('df54e233acf2935fbac01bb8fb034a89a77d5515507e69be09e97a5a4c731dbec14a25ad03ed12a418a6093fbc8bfebd62f70f9b8c9d5c3f690fb6353c59fc25'
             'b33987d5a6fb273765da5b08f16cb27386fef4fbb5d2014690ff51b235ec81df52b49419d89a027091b22d2ca84683be7b5d4d891d92420169f42b2fca24a081'
             '27daa9b5d5e755b57f11b8fe12522e4cae2191d9aeaebb23a467379608a9e7ba0eb1e7abcccb5d96b6cdf8ff6706893b6bce105e038865ee04d972027f094f32'
             '9f3afc7e46574b42c57e6ac4f129b61d1165fc9da8583865bd09f1e6b54107d904dc5de5b673b402e402a69c7af5929222c7192cdf78d3db50b5c4be0f4b7de1'
