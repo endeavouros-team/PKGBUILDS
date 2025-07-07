@@ -531,6 +531,7 @@ Options() {
             --list-continent-countrynames)          ;;         # already handled in OptionsPreHandle()
             --list-current-continent-countrycodes)  ;;         # already handled in OptionsPreHandle()
             --list-current-continent-countrynames)  ;;         # already handled in OptionsPreHandle()
+            --lastupdate-fix)                       ;;         # already handled in OptionsPreHandle()
             -i | --ignore-mirrors)                  shift ;;   # already handled in OptionsPreHandle(), but must skip the next parameter
             -A | --all)                             AllContinents ;;
             -C | --continent)                       AddContinentCountries ;;
@@ -658,6 +659,7 @@ OptionsPreHandle() {
             -i | --ignore-mirrors)                  IgnoreMirrors "$2";     shift ;;
             --no-config)                            ;;                                  # already handled in HasNoConfigOption()
             -I | --no-ignore-countries)             prevent_ignoring_countries=yes ;;
+            --lastupdate-fix)                       lastupdate_fix=yes ;;
             *) limited_options+=("$1")              ;;
         esac
         shift
@@ -769,6 +771,7 @@ Main() {
     local max_nr_of_mirrors=1000
     local favs=()
     local time_of_ranking=$(date +%x-%X)
+    local lastupdate_fix=no                   # ad hoc "fixing" lastupdate file of some mirrors
 
     local SOPTS="ACc:d:f:hIi:k:m:X:x:lrstu"
     local LOPTS=""
@@ -779,7 +782,7 @@ Main() {
     LOPTS+=",list-current-continent-countrycodes,list-current-continent-countrynames,get-time-info,verbosity:"
     LOPTS+=",ignore-countries:,timeout-rank:,continent-given:,list-continent-codes,ignore-continents:" # timeout:
     LOPTS+=",no-ignore-countries,no-config,ignore-mirrors:,edit-config,max:,prefer-local-rank"
-    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist,edit-mirrorlist,sequential,no-parallel"
+    LOPTS+=",save,save-no-bak,sort:,view-mirrorlist,edit-mirrorlist,sequential,no-parallel,lastupdate-fix"
 
     [ -x /bin/parallel ] || ranking_mode=sequential
 
@@ -838,6 +841,12 @@ Main() {
     if [ "$mirrors" ] ; then
         mirror_count=$(echo "$mirrors" | wc -l)
         mirrors_with_statefiles=$(echo "$mirrors" | sed "s|/\$repo/os/\$arch|/$syncfile|")
+
+        ## Certain mirrors should fix their lastsync file ...
+        if [ $lastupdate_fix = yes ] ; then
+            # Change https://mirrors.urbanwave.co.za/archlinux/lastupdate ==> url=https://mirrors.urbanwave.co.za/archlinux/lastsync
+            mirrors_with_statefiles=$(echo "$mirrors_with_statefiles" | sed 's|urbanwave.co.za/archlinux/lastupdate|urbanwave.co.za/archlinux/lastsync|')
+        fi
 
         # Now we have the final list of mirrors.
 
