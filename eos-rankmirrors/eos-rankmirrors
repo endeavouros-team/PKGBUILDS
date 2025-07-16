@@ -313,7 +313,7 @@ FetchLatestMirrorlist() {
         code=$?
         [ $code -eq 0 ] && break
     done
-    [ $code -eq 0 ] || DIE "cannot fetch EndeavourOS mirrorlist package (curl error code $code [${urls[0]}])."
+    [ $code -eq 0 ] || DIE "cannot fetch EndeavourOS mirrorlist package (curl error code $code [$url])."
     ExtractListFromPackage "$pkg" && CheckMirrorlist "$latest_ml"
 }
 
@@ -810,4 +810,8 @@ DEBUG() {
     fi
 }
 
-Main "$@"
+Main0() {
+    LANG=C Main "$@"
+}
+
+Main0 "$@"
