@@ -718,7 +718,7 @@ ShowRecommendedDriver() {
     # No output means Nvidia GPU was not detected.
 
     if eos-connection-checker ; then
-        Info "updating package 'hwdata' if needed ..."
+        # Info "updating package 'hwdata' if needed ..."
         sudo pacman -Sy --needed --noconfirm hwdata &> /dev/null
         sleep 1
     fi
