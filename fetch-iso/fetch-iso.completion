@@ -1,0 +1,24 @@
+# bash completion for fetch-iso        -*- shell-script -*-
+
+_fetch-iso_complete() {
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o nosort
+}
+
+_fetch-iso_() {
+    local cur prev words cword split
+    _init_completion -s || return
+
+    local -r app="${BASH_SOURCE[0]##*/}"     # use name from bash completion place (fetch-iso)
+
+    case "$cur" in
+        -*)
+            _fetch-iso_complete "$($app --dump-options)"
+            ;;
+        *)
+            _fetch-iso_complete "$($app --show-files) $($app --dump-options)"
+            ;;
+    esac
+} &&
+complete -F _fetch-iso_ fetch-iso

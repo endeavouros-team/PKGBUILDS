@@ -1,0 +1,289 @@
+#!/bin/bash
+
+echo2() { echo -e "$@" >&2 ; }
+DIE() {
+    echo2 "$progname: error: $1"
+    [ "$2" ] && exit "$2" || exit 1
+}
+
+GetInfoPage() {
+    # Make sure the download data is stored in a local file.
+    if [ ! -e $datafile ] ; then
+        case "$getter" in
+            curl) /bin/curl --fail -Lsm 30 -o$datafile -u "$HELLO" $URLBASE                 || DIE "failed fetching the info page '$URLBASE'." ;;
+            wget) /bin/wget -qO $datafile --user "$ACCOUNT" --password "$PASSWORD" $URLBASE || DIE "failed fetching the info page '$URLBASE'." ;;
+        esac
+        [ "$1" != "-q" ] && echo2 "==> Info about available downloads refreshed."
+    fi
+}
+
+RefreshInfo() {
+    rm -f $datafile
+    GetInfoPage "$@"
+}
+
+ShowFiles() {
+    # Show downloadable files from the fetched download page.
+    RefreshInfo "$@"
+    grep EndeavourOS[-_] $datafile | sed -E 's|.*">(En.*)</a.*|\1|'             # all downloads
+
+    echo2 "==> function $FUNCNAME()"
+}
+
+FetchIsoFile() {
+    # Fetch the given ISO file.
+    local file="$1"
+    local subdir="$2"
+    local url
+
+    case "$subdir" in
+        "") url="$URLBASE/$file" ;;
+        *)  url="$URLBASE/$subdir/$file" ;;
+    esac
+
+    local targetopt=""
+
+    [ "$TARGETDIR" ] && file="$TARGETDIR/$file" || file="$PWD/$file"
+    cleanup_files+=("$file")
+
+    echo2 "\n==> Downloading to $file ...\n"
+
+    case "$getter" in
+        curl)
+            targetopt="-o$file"
+            # targetopt+=" -m2000"
+            /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
+            [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
+            ;;
+        wget)
+            targetopt="-O$file"
+            /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
+            [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
+            ;;
+    esac
+}
+
+Usage() {
+    cat <<EOF
+
+Usage: $progname [options] [filename]
+
+Options:
+    -h, --help           This help.
+    --edit-config        Edit the config file of $progname.
+
+Tip1: Write a config file at $configfile2. It must contain variables
+      URLBASE, ACCOUNT, PASSWORD, and optionally TARGETDIR with their proper values.
+      Alternatively, variable HELLO can replace values "\$ACCOUNT:\$PASSWORD".
+      Note that the config file will be created if it does not exist,
+      and the values will be asked.
+Tip2: Without parameters a selection of downloadable files is presented (using fzf).
+Tip3: Bash command completion is supported, just press the TAB key after $progname and see.
+
+EOF
+}
+
+AskValue() {
+    local -r prompt="$1"
+    local -r varname="$2"
+    local -r defaultval="$3"
+    local value=""
+
+    read -p "$prompt : " value >&2
+    case "$value" in
+        "") value="$defaultval" ;;
+        [qQ]) exit 0 ;;
+    esac
+    [ "$value" ] || DIE "$varname needs a value!"
+    [ "${value/$HOME/}" != "$value" ] && value=${value/$HOME/\$HOME}
+    values+=("$varname=\"$value\"")
+}
+
+AskConfigValues() {
+    echo2 "Config file $configfile2 not found, creating it by asking the required values."
+    local values=()
+    local dldir="$HOME/Downloads" dl=""
+    [ -d "$dldir" ] && dl=" [${dldir/$HOME/\~}]"
+
+    AskValue "Remote base dir URL"            URLBASE   ""
+    AskValue "Remote account"                 ACCOUNT   ""
+    AskValue "Remote password"                PASSWORD  ""
+    AskValue "Local download folder$dl"       TARGETDIR "$dldir"
+    AskValue "Downloader app (wget)"          APP       "wget"
+
+    printf "%s\n" "${values[@]}" > "$configfile"
+}
+
+EditFile() {
+    local app apps=(kate gedit gnome-text-editor pluma xed emacs exo-open xdg-open kde-open)
+    for app in "${apps[@]}" ; do
+        [ -x /bin/$app ] && { $app "$@" 2>/dev/null ; return ; }
+    done
+    DIE "no app for editing a file!"
+}
+
+DumpOptions() {
+    if [ "$OPTS" ] ; then
+        local o=${OPTS//:/}                # remove every ':'
+        [ "${o::1}" = "/" ] || o="--$o"    # add leading '--' if first option is long
+        o=${o//,/ --}                      # manage long options
+        o=${o//\// -}                      # manage short options
+        echo $o
+    fi
+}
+
+Options() {
+    # "Bind" long option to its short option. This is used in DumpOptions().
+    # Short option starts with '/'.
+    local OPTS="help/h,dump-options,show-files,edit-config"                  # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
+
+    local sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
+    local lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
+    local opts
+
+    opts="$(/bin/getopt -o="$sopts" --longoptions "$lopts" --name "$progname" -- "$@")" || exit 1
+    eval set -- "$opts"
+
+    while true ; do
+        case "$1" in
+            --)               shift;                                    break  ;;
+            --dump-options)   DumpOptions;                              exit 0 ;;
+            --show-files)     ReadConfig; printf "%s\n" $(ShowFiles -q);   exit 0 ;;
+            --edit-config)    EditFile "$configfile";                   exit 0 ;;
+            -h | --help)      Usage;                                    exit 0 ;;
+        esac
+        shift
+    done
+
+    case "$1" in
+        *.iso.tar.gz | *.iso | *.iso.sha512sum)
+            echo2 "Download folder: $TARGETDIR"
+            FetchIsoFile "$1"
+            exit
+            ;;
+        *)
+            DIE "sorry, only *.iso.tar.gz files are supported." ;;
+    esac
+}
+
+ReadConfig() {
+    [ "$URLBASE" ] && return
+
+    # config file sets important values
+    [ -e "$configfile" ] || AskConfigValues
+    source "$configfile" || DIE "file $configfile2 has a problem"
+    [ "$URLBASE" ]       || DIE "URLBASE has no value in $configfile2"
+    if [ -z "$HELLO" ] ; then
+        [ "$ACCOUNT" ]   || DIE "ACCOUNT has no value in $configfile2"
+        [ "$PASSWORD" ]  || DIE "PASSWORD has no value in $configfile2"
+    fi
+    if [ "$HELLO" ] ; then
+        ACCOUNT="${HELLO%:*}"
+        PASSWORD="${HELLO#*:}"
+    elif [ "$ACCOUNT$PASSWORD" ] ; then
+        HELLO="$ACCOUNT:$PASSWORD"
+    else
+        DIE "HELLO or ACCOUNT/PASSWORD have no proper value in $configfile2"
+    fi
+    case "$APP" in
+        curl | wget) getter="$APP" ;;
+    esac
+    [ "$TARGETDIR" ] || TARGETDIR="."
+    [ -d "$TARGETDIR" ] || DIE "'$TARGETDIR' does not exist or is not a folder"
+    [ -w "$TARGETDIR" ] || DIE "cannot write to TARGETDIR ($TARGETDIR)"
+
+    case "$getter" in
+        curl | wget)
+            [ -x /bin/$getter ] || DIE "$getter not installed" ;;
+        *)
+            DIE "value '$getter' for APP in $configfile2 is not supported. Use either 'wget' or 'curl'." ;;
+    esac
+}
+
+Cleanup() {
+    [ "$cleanup_files" ] && rm -f "${cleanup_files[@]}"
+}
+
+Main() {
+    trap Cleanup SIGINT
+
+    if [ -z "$XDG_DOWNLOAD_DIR" ] && [ -e "$HOME/.config/user-dirs.dirs" ] ; then
+        source "$HOME/.config/user-dirs.dirs"
+    fi
+    local -r progname=${0##*/}
+    local -r configfile="$HOME/.config/$progname.conf"
+    local -r configfile2="${configfile/$HOME/\~}"
+    local URLBASE=""
+    local HELLO=""
+    local ACCOUNT="" PASSWORD=""
+    local APP=""
+    local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
+    local exitcode=0
+    local file
+    local datafile=/tmp/$progname.tmp   # remove this if new files should be available
+    local getter=wget                   # curl or wget
+    local cleanup_files=()
+
+    [ "$1" ] && Options "$@"
+
+    ReadConfig
+
+    local header
+    local header_lines=(
+        "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=accept, ESC=quit"
+        "Other keys:      Ctrl-E = Edit config file"
+        "                 Ctrl-H = Help"
+        "Download folder: $TARGETDIR"
+    )
+    header_lines=("" "${header_lines[@]}" "")        # add empty extra lines to separate header
+    printf -v header "%s\n" "${header_lines[@]}"
+
+    local fzf=(
+        fzf
+        --exact +i --tac --multi
+        --header="$header"
+        --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
+    )
+    local selected="" items=""
+    local subdir=""
+    while true ; do
+        # keep the names of files, drop other info
+        items=$(${progname}-show-all-info "$subdir" | "${fzf[@]}")
+        case "$?" in
+            130) exit 1 ;;   # interrupted
+        esac
+        items=$(echo "$items" | awk '{print $1}')
+
+        for selected in $items ; do
+            case "$selected" in
+                *"/") case "$selected" in
+                          "/") subdir=""
+                               ;;
+                          *)   case "$subdir" in
+                                   "") subdir="${selected%/}" ;;
+                                   *)  subdir="$subdir/${selected%/}" ;;
+                               esac
+                               ;;
+                      esac
+                      ;;
+                "")   echo2 "Nothing selected."
+                      exit 1
+                      ;;
+                *)    read -p "Download $selected or exit (D/e)? "
+                      case "$REPLY" in
+                          "" | [Yy]* | [Dd]*) FetchIsoFile "$selected" "$subdir" ;;
+                          [Ee]*)              exit ;;
+                      esac
+                      exitcode=$?
+                      [ "$selected" = "$(echo "$items" | tail -n1)" ] && exit $exitcode
+                      ;;
+            esac
+        done
+    done
+
+    # Exit code:
+    #    0       download OK
+    #    else    failure, nothing downloaded
+}
+
+Main "$@"

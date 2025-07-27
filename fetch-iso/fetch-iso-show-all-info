@@ -1,0 +1,67 @@
+#!/bin/bash
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 1
+}
+
+Main() {
+    local subdir="$1"
+    local dir=""
+    local data
+    local files=()
+    local dates=()
+    local sizes=()
+    local ix count
+    local HELLO=""
+    local URLBASE=""
+    local ACCOUNT=""
+    local PASSWORD=""
+    local APP="curl"
+
+    source $HOME/.config/fetch-iso.conf || return 1
+
+    if [ -z "$HELLO" ] ; then
+        if [ "$ACCOUNT$PASSWORD" ] ; then
+            HELLO="$ACCOUNT:$PASSWORD"
+        else
+            DIE "no account/password"
+        fi
+    fi
+
+    case "$subdir" in
+        "") dir="$URLBASE" ;;
+        *)  dir="$URLBASE/$subdir" ;;
+    esac
+
+    case "$APP" in
+        curl) data=$(/bin/curl --fail -Lsm 30 -o- -u "$HELLO" "$dir")                      || DIE "failed fetching the info page '$dir'." ;;
+        wget) data=$(/bin/wget -qO - --user "${HELLO%:*}" --password "${HELLO#*:}" "$dir") || DIE "failed fetching the info page '$dir'." ;;
+    esac
+    # data=$(echo "$data" | grep -P 'alt="\[   \]"|alt="\[DIR\]"|alt="\[PARENTDIR\]"')
+    data=$(echo "$data" | grep -P 'alt="\[   \]"|alt="\[DIR\]"')
+
+    if true ; then                            # TODO: add directory support into fetch-iso too!
+        # directories
+        local dirs=() tmp=()
+        # readarray -t tmp <<< $(echo "$data" | grep -P 'alt="\[DIR\]"|alt="\[PARENTDIR\]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+        readarray -t tmp <<< $(echo "$data" | grep 'alt="\[DIR\]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+        dirs+=("/ (site's root dir)")
+        [ "$tmp" ] && dirs+=("${tmp[@]}")
+        count=${#dirs[@]}
+        for ((ix=0; ix<count; ix++)) ; do
+            echo "${dirs[$ix]}" # >&2           # TODO: out to stdin
+        done
+    fi
+
+    # files
+    readarray -t files <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+    readarray -t dates <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcollastmod">([0-9-]+ [0-9:]+)[ ]*<.*|\1|g')
+    readarray -t sizes <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolsize">([0-9\.A-Z]+)[ ]*<.*|\1|g')
+    count=${#files[@]}
+    for ((ix=0; ix<count; ix++)) ; do
+        echo "${files[$ix]}|${dates[$ix]}|${sizes[$ix]}"
+    done | column -t -s"|" | sort -k2 -k3
+}
+
+Main "$@"

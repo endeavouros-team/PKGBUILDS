@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Maintainer: manuel at endeavouros.com
+
+pkgname=fetch-iso
+pkgdesc="A special helper tool for the EndeavourOS ISO testers"
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=25.7
+pkgrel=2
+
+arch=('any')
+license=('GPL')
+depends=(fzf)
+optdepends=(
+    'wget: alternative fetcher'
+    'curl: alternative fetcher'
+)
+source=(
+    $url/$pkgname
+    $url/$pkgname.conf
+    $url/$pkgname.completion
+    $url/$pkgname-show-all-info
+)
+sha512sums=('e8817a6216be73cb9028f0bf345e3226c161594bd6e3c54b806d4e8f0b4eaaa57c2f07617279f8785973b38b0dd62f7c2681b4f77ecaefd891bbce17ec75861e'
+            '5b2897dc51353b33446ddefdae6d312b36da825ac505418aea535eacaeef568b1f024db171668878ed499e532bc0dc654d35633a8a9fe6c77e25b43e7288cfca'
+            'd99fa711c27f4101dbe982ad69b383fe4dc4ebcb96c838155e0750d34f72a37d9586adf095963b13aa265a3cec3d211000e999da8ac1abd3076128b66d0776d6'
+            '63fd81b328df854c6d9d0164bf57b85c9a2a98c401034c3bd7e00aed699495fc33d29e41cf9383ab65cbade772134d9aef245ea961fbb9be4d42b71c235066fe')
+# backup=(etc/skel/$pkgname.conf)
+
+package() {
+    local xx name
+    for xx in "${source[@]}" ; do
+        name=$(basename "$xx")
+        case "$name" in
+            *.completion) install -Dm644 $name   $pkgdir/usr/share/bash-completion/completions/${name%.*} ;;
+            *.conf)       install -Dm644 $name   $pkgdir/etc/skel/$name ;;
+            *)            install -Dm755 $name   $pkgdir/usr/bin/$name ;;
+        esac
+    done
+}
