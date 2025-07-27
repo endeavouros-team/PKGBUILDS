@@ -188,7 +188,7 @@ ReadConfig() {
     case "$APP" in
         curl | wget) getter="$APP" ;;
     esac
-    [ "$TARGETDIR" ] || TARGETDIR="."
+    [ "$TARGETDIR" ]    || DIE "TARGETDIR has no value in $configfile2"
     [ -d "$TARGETDIR" ] || DIE "'$TARGETDIR' does not exist or is not a folder"
     [ -w "$TARGETDIR" ] || DIE "cannot write to TARGETDIR ($TARGETDIR)"
 
@@ -224,9 +224,8 @@ Main() {
     local getter=wget                   # curl or wget
     local cleanup_files=()
 
-    [ "$1" ] && Options "$@"
-
     ReadConfig
+    [ "$1" ] && Options "$@"
 
     local header
     local header_lines=(
