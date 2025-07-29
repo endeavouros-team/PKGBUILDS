@@ -21,6 +21,12 @@ MsgForce() {
 }
 Info() { Msg Info: "$@" ; }
 Note() { MsgForce Note: "$@" ; }                 # like Info() but show always
+NoteList() {
+    local arg
+    for arg in "$@" ; do
+        MsgForce "     " "$arg"
+    done
+}
 Warn() { MsgForce Warning: "$@" ; }
 DIE()  { MsgForce Error: "$@" ; exit 1 ; }
 
@@ -787,8 +793,14 @@ Main()
     if [ $has_multilib = yes ] && expac %n lib32-nvidia-utils >/dev/null && [ $bit32 = no ] ; then
         bit32=yes  # assume user still wants 32-bit support...
     fi
-    if [ $test = yes ] && [ "$NvidiaData" ] ; then
-        Note "$NvidiaData"
+
+    if [ $test = yes ] ; then
+        [ "$NvidiaData" ] && Note "$NvidiaData"
+
+        Note "Currently installed packages related to Nvidia:"
+        local ipkgs
+        readarray -t ipkgs <<< $(expac -Qs "%n %v" nvidia)
+        NoteList "${ipkgs[@]}"
     fi
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
