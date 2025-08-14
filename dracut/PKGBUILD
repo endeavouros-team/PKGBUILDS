@@ -1,52 +1,134 @@
-# Maintainer: Giancarlo Razzolini <grazzolini@archlinux.org>
+# Maintainer: dalto
+
 pkgname=dracut
-pkgver=059
+pkgver=108_eos
 pkgrel=1
+upstream_version=108
 pkgdesc="An event driven initramfs infrastructure"
 arch=('x86_64')
-url="https://dracut.wiki.kernel.org"
-license=('GPL')
-depends=('bash' 'coreutils' 'cpio' 'filesystem' 'findutils' 'grep' 'gzip'
-         'kmod' 'pkgconf' 'procps-ng' 'sed' 'systemd' 'util-linux' 'xz')
-makedepends=('asciidoc' 'bash-completion' 'git')
-optdepends=('binutils: --uefi option support'
-            'elfutils: strip binaries to reduce initramfs size'
-            'multipath-tools: dmraid dracut module support'
-            'pigz: faster gzip compression'
-            'sbsigntools: uefi_secureboot_cert/key configuration option support')
+url="https://github.com/dracut-ng/dracut-ng"
+license=('GPL-2.0-or-later')
+depends=(
+  'bash'
+  'coreutils'
+  'cpio'
+  'filesystem'
+  'findutils'
+  'gawk'
+  'grep'
+  'kmod'
+  'pkgconf'
+  'procps-ng'
+  'sed'
+  'systemd'
+  'util-linux'
+)
+makedepends=(
+  'asciidoctor'
+  'bash-completion'
+  'git'
+  'rust'
+)
+optdepends=(
+  'binutils: --uefi option support'
+  'biosdevname: BIOS network device renaming'
+  'bluez: bluetooth (keyboard)'
+  'btrfs-progs: scan for Btrfs on block devices'
+  'busybox: allows use of busybox (on your own risk)'
+  'bzip2: bzip2 compression'
+  'cifs-utils: support CIFS'
+  'connman: support for connman networking'
+  'cryptsetup: support for encrypted with LUKS filesystems'
+  'dash: allows use of dash (on your own risk)'
+  'dbus: dbus-daemon dracut module'
+  'dbus-broker: dbus-broker dracut module'
+  'dhclient: legacy networking support'
+  'dmraid: dmraid dracut module support'
+  'e2fsprogs: ext2/3/4 filesystem support'
+  'elfutils: strip binaries to reduce initramfs size'
+  'erofs-utils: support for building an erofs initramfs'
+  'f2fs-tools: fsfs filesystem support'
+  'fuse3: live on NTFS (dmsquash-live-ntfs module)'
+  'gnupg: gpg for crypto operations and smartcards'
+  'gzip: gzip compression'
+  'iproute2: legacy networking support'
+  'iputils: networking support'
+  'jq: NVMe-oF support (nvmf module)'
+  'lvm2: support Logical Volume Manager'
+  'lzop: lzop compression'
+  'mdadm: support MD devices, also known as software RAID devices'
+  'memstrack: memstrack module support'
+  'multipath-tools: multipath dracut module support'
+  'nbd: support network block devices'
+  'ndctl: NVDIMM support'
+  'networkmanager: networkmanager support'
+  'nfs-utils: support NFS'
+  'ntfs-3g: live on NTFS (dmsquash-live-ntfs module)'
+  'nvme-cli: NVMe-oF support (nvmf module)'
+  'open-iscsi: support iSCSI (iscsi module)'
+  'openssh: install ssh and scp along with config files and specified keys (ssh-client module)'
+  'pigz: faster gzip compression'
+  'plymouth: plymouth boot splash'
+  'qrencode: systemd-bsod'
+  'rng-tools: enable rngd service to help generating entropy early during boot'
+  'rsyslog: enable logging with rsyslog'
+  'sbsigntools: uefi_secureboot_cert/key configuration option support'
+  'systemd-ukify: Unified Kernel Image'
+  'squashfs-tools: support for building a squashed initramfs'
+  'tar: live tar image'
+  'tpm2-tools: tpm2 support for e.g. LUKS'
+  'xz: xz compression'
+)
 provides=('initramfs')
 backup=('etc/dracut.conf')
-source=(https://github.com/dracutdevs/dracut/archive/refs/tags/${pkgver}.tar.gz
-        dracut-systemd-253.patch
-       )
-sha512sums=('196bc8bf18703c72bffb51a7e0493719c58173ad2da7d121eb42f9a8de47e953af36d109214dc4a10b2dc2d3bd19e844f7f51c2bdec087e064ea11f75124032d'
-            'dfbef5ee06fd0f7b51bfd3571eb284272d7694754eaf232cf1a14f3b2f95a67c87098fabf6d88068ef7e235e717bec26024a3b342c5dba940b8600799cef0791')
-validpgpkeys=(
-  '7F3D64824AC0B6B8009E50504BC0896FB5693595' # Harald Hoyer <harald@redhat.com>
+source=(
+  "${pkgname}-${upstream_version}::git+${url}#tag=${upstream_version}"
+  1562.patch
+)
+sha256sums=('3a719e83f1cb32f1c49135c92cb831f20da0dab05b101c834c1856ae3b3b3081'
+            'a88fb4bac0eecb0b7cbcdd2204773ab3f12a2ed91ad0b31f3cbaca2c55b7e647')
+
+_backports=(
+)
+
+_reverts=(
 )
 
 prepare() {
-  cd "$srcdir/${pkgname}-${pkgver}"
+  cd "${pkgname}-${upstream_version}"
 
-  patch -Np1 < ../dracut-systemd-253.patch
+  # Revert setting hostonly-cmdline=no by default since this is likely to get reverted in 109
+  # It won't impact many EOS users but we don't want to flip-flop this for those that use it
+  patch -Np1 -i ../1562.patch
+
+  # return if not a git repository
+  if ! git status >/dev/null 2>&1; then
+    return
+  fi
+
+  local _c _l
+  for _c in "${_backports[@]}"; do
+    if [[ "${_c}" == *..* ]]; then _l='--reverse'; else _l='--max-count=1'; fi
+    git log --oneline "${_l}" "${_c}"
+    git cherry-pick --mainline 1 --no-commit "${_c}"
+  done
+  for _c in "${_reverts[@]}"; do
+    if [[ "${_c}" == *..* ]]; then _l='--reverse'; else _l='--max-count=1'; fi
+    git log --oneline "${_l}" "${_c}"
+    git revert --mainline 1 --no-commit "${_c}"
+  done
 }
 
 build() {
-  local prefix=/usr sysconfdir=/etc
-  
-  cd "$srcdir/${pkgname}-${pkgver}"
+  cd "${pkgname}-${upstream_version}"
+  ./configure  \
+    --sysconfdir=/etc
 
-  ./configure \
-    --sysconfdir=${sysconfdir} \
-    --prefix=${prefix} \
-    --libdir=${prefix}/lib \
-    --systemdsystemunitdir=${prefix}/lib/systemd/system \
-    --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion)
   make
 }
 
 package() {
-  cd "$srcdir/${pkgname}-${pkgver}"
+  cd "${pkgname}-${upstream_version}"
 
   DESTDIR="$pkgdir" make install
 }
