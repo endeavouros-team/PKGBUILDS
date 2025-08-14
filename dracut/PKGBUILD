@@ -83,12 +83,13 @@ provides=('initramfs')
 backup=('etc/dracut.conf')
 source=(
   "${pkgname}-${upstream_version}::git+${url}#tag=${upstream_version}"
-  1562.patch
 )
-sha256sums=('3a719e83f1cb32f1c49135c92cb831f20da0dab05b101c834c1856ae3b3b3081'
-            'a88fb4bac0eecb0b7cbcdd2204773ab3f12a2ed91ad0b31f3cbaca2c55b7e647')
+sha256sums=('3a719e83f1cb32f1c49135c92cb831f20da0dab05b101c834c1856ae3b3b3081')
 
 _backports=(
+  # Revert setting hostonly-cmdline=no by default since it is reverted for 109
+  # It won't impact many EOS users but we don't want to flip-flop this for those that use it
+  'f0086c2f629365bdca8df76364747f7eb9799b59'
 )
 
 _reverts=(
@@ -96,10 +97,6 @@ _reverts=(
 
 prepare() {
   cd "${pkgname}-${upstream_version}"
-
-  # Revert setting hostonly-cmdline=no by default since this is likely to get reverted in 109
-  # It won't impact many EOS users but we don't want to flip-flop this for those that use it
-  patch -Np1 -i ../1562.patch
 
   # return if not a git repository
   if ! git status >/dev/null 2>&1; then
@@ -109,12 +106,10 @@ prepare() {
   local _c _l
   for _c in "${_backports[@]}"; do
     if [[ "${_c}" == *..* ]]; then _l='--reverse'; else _l='--max-count=1'; fi
-    git log --oneline "${_l}" "${_c}"
     git cherry-pick --mainline 1 --no-commit "${_c}"
   done
   for _c in "${_reverts[@]}"; do
     if [[ "${_c}" == *..* ]]; then _l='--reverse'; else _l='--max-count=1'; fi
-    git log --oneline "${_l}" "${_c}"
     git revert --mainline 1 --no-commit "${_c}"
   done
 }
