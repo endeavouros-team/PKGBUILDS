@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=25.8.2
+pkgver=25.8.3
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -42,6 +42,7 @@ source=(
     $_url/mirrorcheck.completion
     $_url/pacman-for-${_main_appname}
     $_url/release-asset-names
+    $_url/is-aur-available
 
     $_url/assets.conf.endeavouros
     $_url/assets.conf.endeavouros-testing-dev
@@ -53,7 +54,7 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             '0d84a66bc5921a41b0e753c0c6a945a67239a73103a7f1cc2d2335fee9b04229ce7680db7c8ef7d39050c6385e59435e7951293723ff84e1f1a56d442ea267f9'
             'ef71c6df24cf1a5ef3105cadf64ba1286ceb3cc60206bcd1ae9f3936ecac5719649f019da5abcbc6dc11f8be049f73f7f127a836198b9bfb0661e5a4977aa134'
             'a747477f43026e507528dbaca181476337ad78a9159f5af40f15cbc303f054056395216b57bb98c61ba05c17e04583810cd95da3af67880b890367013878c7aa'
-            '8576ace3deb7980cd13782ea35b3a14478127d587d86ecc9bbc2ded16376f1630dbbf3acdf149465b24077f4b109858325f3080e0e98ec2f38864cb8a1f080df'
+            '11b4c78b176fd22f1ffc6682e857e6c1820a62310c717e1b43c395a37fa13025f29a3d881e71f8127f7f35b6abd806996170fc5f7941f8ffd6a7dadc11e7abb5'
             '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             'ddcad78a929e39520bccc09b5e4d0d0ee93756063cc2dd21842c7109752521db2c8e9c3440d56021136dfa16e44054407ab30dcbe22a38876349434bf445feb6'
@@ -66,8 +67,9 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'f2f97709b7af09ef19ac5f86a80e18dbfc243d2c46f8c3e82514ef4b2ef94f603ffa549acd294810970718730022c8df6f9dcefd9eb12a13bfcaded63a30c7e9'
             '57fe6b53b43148cc3aa87b65abd9017d532aef516db0be2b9fee1314f2dcacaee833daade2326bf724bcd439847cc4e7c5fcdd93759db3fd16f569b5f73f80ef'
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
-            'ef03e1e080107a35b3ab6d14a70f84df4149ece0365f5ebbac20f5d49ee45ce4a9febe2ab3e122dffa67552c6b3b669c46bee93261617eb856fe441c77b37119'
-            'd05e2189a4348dc4501719d213a3ed87783cb7ced646cd55e30c3e69ec152f06bac8a8618ef380cb1578eb108ea18ab05bdb424e8fe9bb01bf95d63721bcdc23'
+            'c1ad0ec95bbd5d5acd9e3ab7fe6e407006bb74bf02f1b3e39ae6f1d5cf450a2930ee91323706b35eeded9e1dfee27c6ec3ebdb6cc875edc1d494bda67aba783d'
+            'e653a49d3a2f51db655c8259053d0ec43a572e4885c71fb682a8985bd76b11213293fadc8b1008293ff4cea2a195567426c70c5d0dcc92a3d194a4025560a871'
+            '754569a51dd8adc63158059bb762a50faf8124cd799aaa739dcfc50c90ee3ddf87dd32d130e84b72b19030368edd523c43c16bbbcb50c350dc8eca666fc4df5c'
             'ed196585ccd694ddc4f4c814a480225a9558285d062c5664d200440dcccbd1e98aa026ea9a962f3ab5e72dd1607f348868d9dd8b6d6fad6f4e996d6af96be041')
 
 package() {
@@ -85,7 +87,9 @@ package() {
             changelogs.conf.*)         install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             # *.version)                 install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             local-general-setup)       install -Dm755 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
-            githubcheck | mirrorcheck) install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
+            githubcheck)               install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
+            mirrorcheck)               install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
+            is-aur-available)          install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
             *)                         install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
         esac
     done
