@@ -127,6 +127,38 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) para Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
+# 2025-Aug-13 
+
+_tr_add2 after_install_umartip       "Atualiza a lista de mirrors do Arch antes de atualizar pacotes"
+_tr_add2 after_install_umentip       "Atualiza a lista de mirrors do EndeavourOS antes de atualizar pacotes"
+_tr_add2 after_install_usnat         "Atualizar pacotes nativos"
+_tr_add2 after_install_usnat_tip     "Atualiza pacotes dos repos em /etc/pacman.conf"
+_tr_add2 after_install_usnataur      "Atualizar pacotes nativos e do AUR"
+_tr_add2 after_install_usnataur_tip  "Atualiza pacotes dos repos em /etc/pacman.conf e do AUR"
+_tr_add2 after_install_ushlp         "Atualizar pacotes (Nativo e AUR)"
+_tr_add2 after_install_ushlp_tip     "Atualiza pacotes dos repos em /etc/pacman.conf e do AUR usando um helper"
+_tr_add2 ins_pmtip2                  "O Partition Manager permite examinar e gerenciar partições e estruturas de disco"
+_tr_add2 ins_arm_start               "Instalador de Imagem ARM do EndeavourOS"
+_tr_add2 ins_arm_starttip            "Iniciar a instalação da edição ARM do EndeavourOS"
+_tr_add2 ins_conn_issue_title        "O que fazer?"
+_tr_add2 ins_conn_issue_text         "Nenhuma conexão com a internet encontrada (talvez o Wi-Fi não esteja pronto${_question})"
+_tr_add2 ins_conn_issue_nm1          "Gerenciador de rede"
+_tr_add2 ins_conn_issue_nm2          "Inicia o gerenciador de rede"
+_tr_add2 ins_conn_issue_oi1          "Instalação offline"
+_tr_add2 ins_conn_issue_oi2          "Instala o KDE sem conexão com a internet (recomenda-se atualizar o sistema após a instalação)"
+_tr_add2 ins_conn_issue_ex1          "Sair"
+_tr_add2 ins_conn_issue_ex2          "Sair deste aplicativo"
+_tr_add2 ins_start_calamares         "Iniciando o Calamares"
+_tr_add2 ins_please_wait             "Por favor, aguarde..."
+_tr_add2 after_install_reisub        "Informações sobre REISUB"
+_tr_add2 after_install_reisub2       "Ativar REISUB"
+_tr_add2 after_install_reisubtip     "O REISUB ajuda a lidar com um travamento do sistema"
+_tr_add2 _commonphrase_enabled       "ativado"
+_tr_add2 _commonphrase_disabled      "desativado"
+_tr_add2 arch_chroot                 "Informações sobre arch-chroot"
+_tr_add2 arch_chroot_tip             "O arch-chroot fornece acesso via linha de comando a outro sistema"
+_tr_add2 _commonphrase_not_found     "%%s não encontrado"
+
 _tr_add2 settings_dis_contents   "Para executar o $PRETTY_PROGNAME outra vez, abra um terminal e execute:\n<tt>   $PROGNAME --enable</tt>\n" # slightly changed 2021-Dec-21
 _tr_add2 settings_dis_text       "Reativar o $PRETTY_PROGNAME:"
 _tr_add2 settings_dis_title      "Como voltar a ativar o $PRETTY_PROGNAME"
@@ -299,7 +331,7 @@ _tr_add2 after_install_itab_tip      "Define a aba que o Welcome mostra ao inici
 
 # 2021-Jun-08
 _tr_add2 daily_assist_apps           "Categorias de programas"
-_tr_add2 daily_assist_apps_tip       "Programas ordenedos por categoria"
+_tr_add2 daily_assist_apps_tip       "Programas ordenados por categoria"
 
 _tr_add2 after_install_vbox1         "Ativar utilidades VirtualBox Guest"
 _tr_add2 after_install_vbox2         "Para ativar as utilidades VirtualBox Guest, selecione a aba <b>ApósInstalação</b> e clique no botão"
@@ -315,7 +347,7 @@ _tr_add2 daily_assist_DEinfo_tip     "Mais informação sobre este Ambiente de D
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Escolha programas populares para instalar"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "Escolha programas populares e isntale eles"
+_tr_add2 add_more_apps_qstip         "Escolha programas populares e instale eles"
 
 # 2022-Mar-21
 _tr_add2 ins_blue_notes              "Notas sobre bluetooth"
