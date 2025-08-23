@@ -1,68 +1,42 @@
 #!/bin/bash
 
-# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+# Maintainer: The EndeavourOS team (endeavouros.com)
 
 # Latest yad release with a patch (if needed).
 
 _yad-eos_prepare() {
-    local orig_name=yad
-    local apply_patch=yes      # yes = apply patch, no = do not apply patch
-    local change_name=no       # always: no !!
-    local pkgrel_sub=.1        # additional change number for pkgrel
-
     local curdir="$PWD"
-    local tmpdir=$(mktemp -d)
-    chmod go-rwx $tmpdir
-    cd $tmpdir
-    yay -G yad > /dev/null || exit 1
-    mv yad/PKGBUILD "$curdir"/PKGBUILD.orig
-    rm -rf yad
-    cd "$curdir"
-    rm -rf $tmpdir
+    local suffix=_eos
 
-    if [ "$change_name" = "yes" ] ; then
-        # keep the original pkgname in PKGBUILD for building a package
-        sed -i PKGBUILD.orig -e 's|${pkgname}|'$orig_name'|'
-    fi
+    rm -rf /tmp/yad
 
-    # patch the dialog height issue, see https://sourceforge.net/p/yad-dialog/tickets/322/#6f2d
-    if [ "$apply_patch" = "yes" ] ; then
-        sed -i PKGBUILD.orig -e '/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i ../../yad-github-issue-107.patch\n'
-    fi
+    pushd /tmp >/dev/null || exit 1
+    yay -G yad >/dev/null || exit 1
 
-    source PKGBUILD.orig
-    rm -f PKGBUILD.orig
+    pushd yad >/dev/null
+    sed -i PKGBUILD -e "/autoreconf -ivf/i \  # patch for the dialog height issue\n  patch -u src/main.c -i '$curdir'/yad-github-issue-107.patch\n"
 
-    if [ "$change_name" = "yes" ] ; then
-        # now change to the new pkgname
-        pkgname=${orig_name}-eos
+    local pkgver_orig="$(grep ^pkgver= PKGBUILD | cut -d'=' -f2)"
+    sed -E -i PKGBUILD -e "s|^([ ]*cd[ ]+\"[^-]+-).*|\1$pkgver_orig\"|"
 
-        # Use our web page
-        url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
-    fi
+    source PKGBUILD
 
-    if [ "$apply_patch" = "yes" ] ; then
-        # update pkgrel because of this patch
-        source+=($url/yad-github-issue-107.patch)
-        pkgrel="$pkgrel$pkgrel_sub"
+    source+=($url/yad-github-issue-107.patch)    # add the patch file to 'source'
+    pkgver+="$suffix"                            # update pkgver because of this patch
+    conflicts=(yad yad-git)
+    provides=(yad)
+    replaces=(yad-eos)                           # Former patched yad package was called 'yad-eos'.
+    arch+=('aarch64' 'armv7h')                   # Add architectures
 
-        # Take care of conflicting packages:
-        conflicts=($orig_name ${orig_name}-git)
-        provides=($orig_name)
-    fi
+    popd >/dev/null
+    popd >/dev/null
+}
 
-    # Previously the patched yad package was called 'yad-eos', so if yad-eos is installed, replace it.
-    replaces=(yad-eos)
-
-    # Add architectures
-    arch+=('aarch64' 'armv7h')
+_yad-eos_prepare
+unset -f _yad-eos_prepare
 
 sha256sums=('dde047a915cd8d3892c32b6ba031876f5cda673e01882c99613f043867c88133'
             '9af007ad9472afc9fa24e753b30ce7b91cf2e73a37a0074a64ae01979010b30f')
 sha512sums=('c2949846d9d6c34bc0c8f482a5b30fb978865308bcafe656694d8eb1bb903e9af76f9d3cdd748ecb0dac389e1a0204a15b10ab29b99262cdeffc44ed16ce902e'
             '058d6b762e14dee5a81e23199e0a70634e496994f3de456ed0cc3ed827c2de669e2a6e66f284c54323d6f8d7a5efcd758259657ac48da154a956812b5119d827')
-}
-
-_yad-eos_prepare
-unset -f _yad-eos_prepare
 
