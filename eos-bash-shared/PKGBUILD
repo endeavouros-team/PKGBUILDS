@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.8
+pkgver=25.9
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -93,7 +93,7 @@ source=(
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
 
-sha512sums=('6a3df2e50641bbfba844ad458a0ce34aec2372c107f5768c35e122dd5de8e8c716e1f15943d13c0d525a932f63be3985d1db5c9a359a17db1404b44fe5c2bd72'
+sha512sums=('a784b87868b85e37ebe91e05b78ef296a00f50b0bcd22c0fdb058b9274bca90a20e588fec6011edde4a890ebd6a078f16cada651ef5debb5586516c308d37f5c'
             '691578a8e2b975309269acedade183bd735b8d94afe283721f852a537ca82f7c181b72a3300b5ce6d42da81a1bf3a88179dff3ab8789827e7e6d96ffd0250d99'
             'ce6ea00a8956f930408795b678d05fe5abfa1a08167438221786c9aa091ef0c63dc107896af8faa3d37dfeed47243600b16c1191040b0c76870b2b3cbfe8c9e1'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
