@@ -6,34 +6,35 @@
 # TODO:
 #   - option to test timeouts from small to larger
 
-echo2()   { echo -e  "$@" >&2 ; }
-printf2() { printf "$@" >&2 ; }
+source /etc/eos-color.conf
+
+echo2()   { echo -e "$@" >&2 ; }
+printf2() { printf  "$@" >&2 ; }
 
 notif_echo2()   { printf2 "==> " ; echo2   "$@" ; }
 notif_printf2() { printf2 "==> " ; printf2 "$@" ; }
 
-Red()     { echo2 "$RED""$@""$RESET" ; }
-Blue()    { echo2 "$BLUE""$@""$RESET" ; }
-Magenta() { echo2 "$MAGENTA""$@""$RESET" ; }
-Green()   { echo2 "$GREEN""$@""$RESET" ; }
+InfoColor()    { eos-color info 2;    echo2 "$@"; eos-color reset 2; }
+ErrorColor()   { eos-color error 2;   echo2 "$@"; eos-color reset 2; }
+WarningColor() { eos-color warning 2; echo2 "$@"; eos-color reset 2; }
 
 WARN() {
     local msg="$1"
-    Magenta "==> $progname: warning: $msg"
+    WarningColor "==> $progname: warning: $msg"
 }
 INFO() {
     local msg="$1"
     local prefix="$2"
     case "$prefix" in
-        "") Blue "==> $progname: info: $msg" ;;
-        *)  Blue "$prefix$msg" ;;
+        "") InfoColor "==> $progname: info: $msg" ;;
+        *)  InfoColor "$prefix$msg" ;;
     esac
 }
 ERROR() {
     local metadata="$1"
     local realdata="$2"
-    Red "==> $progname: error: $metadata"
-    [ "$realdata" ] && Red "    $realdata"
+    ErrorColor "==> $progname: error: $metadata"
+    [ "$realdata" ] && ErrorColor "    $realdata"
 }
 
 DIE() {
@@ -150,8 +151,10 @@ RankPerAge() {
 WarningAbout() {
     local id="$1"
     shift
-    printf2 "${MAGENTA}==> Warning about %s:${RESET}\n" "$id"
-    [ "$1" ] && printf2 "    ${MAGENTA}%s${RESET}\n" "$@" #"Continuing."
+    local color=$(eos-color warning)
+    local reset=$(eos-color)
+    printf2 "$color==> Warning about %s:$reset\n" "$id"
+    [ "$1" ] && printf2 "    $color%s$reset\n" "$@" #"Continuing."
 }
 
 GetUpdateNumberAndTime() {
@@ -424,6 +427,7 @@ ShowActualRankingResult() {
 
 ShowRankingInfo() {
     # show the result of ranking (in comments)
+    [ $save = no ] && eos-color info
     echo ""
     SeparatorLine
     printf "# Mirror ranking info at (UTC) %s:\n" "$(date -u "+%x %X")"
@@ -438,6 +442,7 @@ ShowRankingInfo() {
         ShowArray "$@"
         break
     done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
+    [ $save = no ] && eos-color
 }
 
 SeparatorLine() {
@@ -733,13 +738,6 @@ Main()
     done
 
     local -r rank_signature="ranked by $progname"   # enables checking $rank_signature
-
-    local -r RED=$'\e[0;91m'                        # starts this foreground text color
-    local -r GREEN=$'\e[0;92m'
-    local -r YELLOW=$'\e[0;93m'
-    local -r BLUE=$'\e[0;94m'
-    local -r MAGENTA=$'\e[0;95m'
-    local -r RESET=$'\e[0m'                         # back to normal colors
 
     local CMD_OPTIONS=()
 
