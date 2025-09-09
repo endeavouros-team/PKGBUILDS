@@ -5,7 +5,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.9.3
+pkgver=25.9.4
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -90,6 +90,8 @@ source=(
   $_url/eos-sleep-counter
   $_url/show-location-info
   $_url/show-location-info.completion
+  $_url/eos-color
+  $_url/eos-color.conf
   $_url/eos-shifttime                # Thanks, @freebird54!
   $_url/grub-colour-chooser          # Thanks, @Kresimir!
 )
@@ -140,6 +142,8 @@ sha512sums=('a784b87868b85e37ebe91e05b78ef296a00f50b0bcd22c0fdb058b9274bca90a20e
             '466138fa174b4cc0f2c2bdad7f9c8551ba17fb08ee52084ad4981ef6ae35096294444000f5705913adcca055ce07c869c5d44c2c126b0dde9ee7e6572965a61d'
             'fde9e8595c21eedf5ff69e6bdbc881dfba1d45c23500332c39074d97e0999b39044a200f4da65f800a6c380520406ad2f3a4b2e7db2fcc608787e2a7e10a8d61'
             '4cfe8139e22b76e4363111472672600c2a7882b0729caf030580ade2a5514ff3d02f09ef62a69956394ae4961eb667908d2f2114b2dd7c20398777d85765c0b1'
+            'fe664742d7048b42c380c0e49df7fed30334ab61dd9aa4b610346656709e85f73a0c2b3948346f53fe3cb36dbf0009667b9361dc42eb4b12b47a4a25d3b70915'
+            '615f7a950acb386032fc52b0480655ac92903b5088569f948a2c34cfd4173ea91ffe9331c07da1f5e04f86948787e5031ee3a7dbfe3e54df4242cc6a8d2d4b8b'
             '16363f5bf8e560ec9862fb1113a8b881b2d29809e6aa553b638467168d0eccf22ead405621ca0b9d72972d69eb829618871b8374c239b6f786ea99f6706e88b6'
             'aa9e2400c53fd16668222991efa2a059a3f0ecfcb98d2210d0b8cb3546cf8d6ad2ab408793c27d8297d536605147b056bd1015533ef9de7629dda33d1aaefe8e')
 
