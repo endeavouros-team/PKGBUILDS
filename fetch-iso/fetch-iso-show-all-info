@@ -1,11 +1,14 @@
 #!/bin/bash
 
 DIE() {
-    echo "$progname: error: $1" >&2
-    exit 1
+    eos-color error 2
+    echo -e "==> Error [$progname]:\n    $1" >&2
+    eos-color reset 2
+    [ "$2" ] && exit $2 || exit 1
 }
 
 Main() {
+    local -r progname=${0##*/}
     local subdir="$1"
     local dir=""
     local data
@@ -25,7 +28,7 @@ Main() {
         if [ "$ACCOUNT$PASSWORD" ] ; then
             HELLO="$ACCOUNT:$PASSWORD"
         else
-            DIE "no account/password"
+            DIE "No account/password"
         fi
     fi
 
@@ -35,8 +38,8 @@ Main() {
     esac
 
     case "$APP" in
-        curl) data=$(/bin/curl --fail -Lsm 30 -o- -u "$HELLO" "$dir")                      || DIE "failed fetching the info page '$dir'." ;;
-        wget) data=$(/bin/wget -qO - --user "${HELLO%:*}" --password "${HELLO#*:}" "$dir") || DIE "failed fetching the info page '$dir'." ;;
+        curl) data=$(/bin/curl --fail -Lsm 30 -o- -u "$HELLO" "$dir")                      || DIE "Failed fetching the info page '$dir'." "$?" ;;
+        wget) data=$(/bin/wget -qO - --user "${HELLO%:*}" --password "${HELLO#*:}" "$dir") || DIE "Failed fetching the info page '$dir'." "$?" ;;
     esac
     # data=$(echo "$data" | grep -P 'alt="\[   \]"|alt="\[DIR\]"|alt="\[PARENTDIR\]"')
     data=$(echo "$data" | grep -P 'alt="\[   \]"|alt="\[DIR\]"')

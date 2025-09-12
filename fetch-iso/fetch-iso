@@ -1,8 +1,15 @@
 #!/bin/bash
 
+source /etc/eos-color.conf
+
 echo2() { echo -e "$@" >&2 ; }
+errorline() {
+    eos-color error 2
+    echo2 "$@"
+    eos-color reset 2
+}
 DIE() {
-    echo2 "$progname: error: $1"
+    errorline "==> Error [$progname]:\n    $1"
     [ "$2" ] && exit "$2" || exit 1
 }
 
@@ -247,10 +254,21 @@ Main() {
     local subdir=""
     while true ; do
         # keep the names of files, drop other info
-        items=$(${progname}-show-all-info "$subdir" | "${fzf[@]}")
-        case "$?" in
+        items=$(${progname}-show-all-info "$subdir") || exitcode=$?
+        case "$exitcode" in
+            0) ;;
             130) exit 1 ;;   # interrupted
+            *)
+                local string="$(curl-exit-code-to-string "$exitcode" "$APP")"
+                if [ "$string" ] ; then
+                    DIE "$APP: '$string'"
+                else
+                    DIE "Failed connecting to $URLBASE ($APP exit code $exitcode)."
+                fi
+                ;;
         esac
+        items=$(echo "$items" | "${fzf[@]}")
+        [ "$items" ] || exit 0                        # nothing selected
         items=$(echo "$items" | awk '{print $1}')
 
         for selected in $items ; do
