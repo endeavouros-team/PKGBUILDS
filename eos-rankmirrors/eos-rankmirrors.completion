@@ -41,6 +41,7 @@ _eos-rankmirrors_() {
     # Each option "case" should return immediately.
 
     case "$prev" in
+        --colors)              COMPREPLY=($(compgen -W "yes no" -- "$cur")) ;;
         --sort)                COMPREPLY=($(compgen -W "age rate" -- "$cur")) ;;
         --timeout | -t)        COMPREPLY=($(compgen -P "$cur" -W "{0..9}")); compopt -o nospace; compopt -o nosort ;;
         --ignore | --prefer)   COMPREPLY=($(compgen -P "'" -S "'" -W "$(_eos-rankmirrors_GetMirrors)" -- "$cur")) ;;

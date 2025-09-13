@@ -14,9 +14,11 @@ printf2() { printf  "$@" >&2 ; }
 notif_echo2()   { printf2 "==> " ; echo2   "$@" ; }
 notif_printf2() { printf2 "==> " ; printf2 "$@" ; }
 
-InfoColor()    { eos-color info 2;    echo2 "$@"; eos-color reset 2; }
-ErrorColor()   { eos-color error 2;   echo2 "$@"; eos-color reset 2; }
-WarningColor() { eos-color warning 2; echo2 "$@"; eos-color reset 2; }
+UseColor() { [ $use_colors = yes ] && eos-color "$@" 2 ; }
+
+InfoColor()    { UseColor info    ; echo2 "$@"; UseColor reset ; }
+ErrorColor()   { UseColor error   ; echo2 "$@"; UseColor reset ; }
+WarningColor() { UseColor warning ; echo2 "$@"; UseColor reset ; }
 
 WARN() {
     local msg="$1"
@@ -151,10 +153,10 @@ RankPerAge() {
 WarningAbout() {
     local id="$1"
     shift
-    local color=$(eos-color warning)
-    local reset=$(eos-color)
-    printf2 "$color==> Warning about %s:$reset\n" "$id"
-    [ "$1" ] && printf2 "    $color%s$reset\n" "$@" #"Continuing."
+    UseColor warning
+    printf2 "==> Warning about %s:\n" "$id"
+    [ "$1" ] && printf2 "    %s\n" "$@" #"Continuing."
+    UseColor reset
 }
 
 GetUpdateNumberAndTime() {
@@ -427,7 +429,7 @@ ShowActualRankingResult() {
 
 ShowRankingInfo() {
     # show the result of ranking (in comments)
-    [ $save = no ] && eos-color info
+    [ $save = no ] && UseColor info
     echo ""
     SeparatorLine
     printf "# Mirror ranking info at (UTC) %s:\n" "$(date -u "+%x %X")"
@@ -442,7 +444,7 @@ ShowRankingInfo() {
         ShowArray "$@"
         break
     done | /usr/bin/column -t | /usr/bin/sed 's|^|# |'
-    [ $save = no ] && eos-color
+    [ $save = no ] && UseColor reset
 }
 
 SeparatorLine() {
@@ -677,6 +679,13 @@ Options() {
                                         ignored_mirrors=""
                                         [ $timeout -lt $timeout_default ] && timeout=$timeout_default
                                         ;;
+            --colors)                   use_colors="$2"
+                                        shift
+                                        case "$use_colors" in
+                                            yes | no) ;;
+                                            *) use_colors=yes ;;
+                                        esac
+                                        ;;
             --)                         shift; break ;;
         esac
         shift
@@ -704,7 +713,7 @@ Main()
     local -r SHORT_OPTIONS="abhnt:"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing,debug"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
-    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:"
+    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:"
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
@@ -712,6 +721,7 @@ Main()
     export -f eos_GetArch
 
     local debugging=no
+    local use_colors=yes
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
