@@ -14,7 +14,7 @@ install="${pkgname}.install"
 source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/${pkgver}.tar.gz"
 "${pkgname}.install")
 
-md5sums=('64de0086b3f07fa4955a818e6b648ff5'
+md5sums=('fb5d83cdad40f4662b13acd1dd65295c'
          '8d23e346853fc26cb98991b3dc15dcff')
 
 package() {
