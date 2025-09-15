@@ -6,7 +6,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=25.9.11
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -156,7 +156,6 @@ package() {
           eos-script-lib-yad | ksetwallpaper.py)    install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/scripts/$file" ;;
           changelogs.conf.endeavouros)              install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.conf)                                   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
-          eos-update-other.bash)                    install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.desktop)                                install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
           *.completion)                             install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
           *.hook)                                   install -Dm644 "$file"   "$pkgdir/usr/share/libalpm/hooks/$file" ;;
