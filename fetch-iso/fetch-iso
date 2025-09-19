@@ -78,6 +78,8 @@ Usage: $progname [options] [filename]
 Options:
     -h, --help           This help.
     --edit-config        Edit the config file of $progname.
+    --curl               Use curl as the helper app.
+    --wget               Use wget as the helper app.
 
 Tip1: Write a config file at $configfile2. It must contain variables
       URLBASE, ACCOUNT, PASSWORD, and optionally TARGETDIR with their proper values.
@@ -142,7 +144,7 @@ DumpOptions() {
 Options() {
     # "Bind" long option to its short option. This is used in DumpOptions().
     # Short option starts with '/'.
-    local OPTS="help/h,dump-options,show-files,edit-config"                  # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
+    local OPTS="help/h,dump-options,show-files,edit-config,curl/c,wget/w"                  # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
 
     local sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
     local lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
@@ -153,16 +155,19 @@ Options() {
 
     while true ; do
         case "$1" in
-            --)               shift;                                    break  ;;
-            --dump-options)   DumpOptions;                              exit 0 ;;
-            --show-files)     ReadConfig; printf "%s\n" $(ShowFiles -q);   exit 0 ;;
-            --edit-config)    EditFile "$configfile";                   exit 0 ;;
-            -h | --help)      Usage;                                    exit 0 ;;
+            --)               shift;                                      break  ;;
+            --dump-options)   DumpOptions;                                exit 0 ;;
+            --show-files)     ReadConfig; printf "%s\n" $(ShowFiles -q);  exit 0 ;;
+            --edit-config)    EditFile "$configfile";                     exit 0 ;;
+            --curl | -c)      getter=curl                                        ;;
+            --wget | -w)      getter=wget                                        ;;
+            -h | --help)      Usage;                                      exit 0 ;;
         esac
         shift
     done
 
     case "$1" in
+        "") ;;
         *.iso.tar.gz | *.iso | *.iso.sha512sum)
             echo2 "Download folder: $TARGETDIR"
             FetchIsoFile "$1"
@@ -240,6 +245,7 @@ Main() {
         "Other keys:      Ctrl-E = Edit config file"
         "                 Ctrl-H = Help"
         "Download folder: $TARGETDIR"
+        "AUR helper:      $getter"
     )
     header_lines=("" "${header_lines[@]}" "")        # add empty extra lines to separate header
     printf -v header "%s\n" "${header_lines[@]}"
