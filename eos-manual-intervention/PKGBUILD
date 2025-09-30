@@ -1,0 +1,21 @@
+#!/bin/bash
+# Maintainer: manuel (see forum.endeavouros.com)
+
+pkgname=eos-manual-intervention
+pkgdesc="Manual interventions manager."
+url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
+pkgver=25
+pkgrel=1
+arch=('any')
+license=('GPL')
+
+source=(
+    $url/$pkgname
+    $url/$pkgname.interventions
+)
+sha512sums=('c49e3f0565dd77d14b20c96bd596d0e865400ac97f22d683b028ecc84c525e389299cc078702ed0c1002dbe1070638c57f8279676e47c97786bfe4133ba7fac6'
+            '0fef446baaeb47273289dee93a4d0d03deb8229adb5a3d6e3a2abb67ce584e1e41f4fa4ea69c1a631c75b099e610c3a0ca5b864f870afca824ca1452b63be711')
+
+package() {
+    install -Dm755 "$pkgname" "$pkgdir/usr/bin/$pkgname"
+}

@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# Manager for manual interventions.
+
+echo2() { echo -e "$@" >&2; }
+WARN()  { echo2 "==> $progname: warning: $1"; }
+DIE()   { echo2 "==> $progname: error: $1"; exit 1; }
+
+RUN() {
+    echo2 "   ->" "$@"
+    if "$@" ; then
+        return 0
+    else
+        DIE "'$*' failed."
+        exit 1
+    fi
+}
+
+MarkOk() {
+    echo2 "  ==> marking '$1' as handled"
+    echo "$1" >> "$handled_fixes"
+}
+IsOk() { grep "^$1$" "$handled_fixes" &>/dev/null; }
+
+FetchInterventionsFile() {
+    local -r pname=eos-manual-intervention
+    local -r fname=$pname.interventions
+    local -r github="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pname/$fname"
+    local -r gitlab="https://gitlab.com/endeavouros-filemirror/PKGBUILDS/raw/master/$pname/$fname"
+
+    if [ ! -d "$dir" ] ; then
+        mkdir -p "$dir" || DIE "cannot create folder '${dir/$HOME/\~}'"
+    fi
+
+    wget -qO "$mifile" "$github" || wget -qO "$mifile" "$gitlab"
+
+    if [ $(stat -c %s "$mifile") -gt 0 ] ; then
+        source "$mifile"
+    else
+        DIE "failed to download ${mifile/$HOME/\~} from github/gitlab"
+    fi
+}
+
+RunInterventionsIfNeeded() {
+    local count=${#MI_func_names[@]}
+    local ix mifunc descr
+
+    for ((ix=0; ix < count; ix+=2)) ; do
+        mifunc="${MI_func_names[$ix]}"
+        descr="${MI_func_names[$((ix+1))]}"
+        if IsOk "$mifunc" ; then
+            echo2 "$mifunc:\talready OK"
+        else
+            echo2 "$mifunc: $descr"
+            if $mifunc ; then
+                MarkOk "$mifunc"
+            else
+                return 1
+            fi
+        fi
+    done
+}
+
+NewsPage() {
+    local bb
+    for bb in exo-open kde-open xdg-open firefox ; do
+        if [ -x /bin/$bb ] ; then
+            /bin/$bb https://archlinux.org/news &
+            break
+        fi
+    done
+    [ "$1" ] && exit $1
+}
+
+CheckPacmanConf() {
+    local -r conf=/etc/pacman.conf
+    local lines="$(grep -n "^[ \t]*IgnorePkg[ \t]*=[ \t]*[a-zA-Z0-9]" $conf)"
+    if [ "$lines" ] ; then
+        cat <<EOF >&2
+
+==> $progname: warning:
+==> File $conf contains IgnorePkg line(s).
+    This *may* affect manual interventions because partial upgrades are not supported.
+EOF
+        readarray -t lines <<< $(echo "$lines")
+        printf "      %s\n" "${lines[@]}" >&2
+        echo2 ""
+
+        local reply=""
+        read -p "==> Do you want to continue [yes/NO]? " reply >&2
+        case "$reply" in
+            [yY]*) ;;
+            *) exit 0 ;;
+        esac
+    fi
+}
+
+Cleanup() {
+    rm -f "$mifile"
+}
+
+Help() {
+    cat <<EOF >&2
+Purpose: Execute and manage essential manual interventions.
+Usage:   $progname [options]
+Options: -h, --help            This help.
+         -n, --show-arch-news  Show the Arch news page in a browser.
+EOF
+    [ "$1" ] && exit $1
+}
+
+Options() {
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            -h | --help)           Help 0 ;;
+            -n | --show-arch-news) NewsPage 0 ;;
+        esac
+    done
+}
+
+Main() {
+    local -r progname=${0##*/}
+    local -r dir="$HOME/.config/$progname"
+    local -r mifile="$dir/$progname.interventions"
+    local -r handled_fixes="$dir/$progname.handled"
+    local MI_func_names=()
+
+    Options "$@"
+    CheckPacmanConf
+    FetchInterventionsFile
+    RunInterventionsIfNeeded
+    Cleanup
+}
+
+Main "$@"

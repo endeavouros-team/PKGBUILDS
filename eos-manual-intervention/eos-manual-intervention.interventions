@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Implemented manual interventions.
+
+# Add each intervention function name and description
+# into this array variable:
+MI_func_names=(
+    MI_20250621 "linux-firmware"
+    MI_20250620 "x11 plasma session"
+)
+
+# Available helper functions:
+#   RUN     Shows and executes a command.
+#   WARN    Shows a warning message.
+
+# Manual Intervention (MI) functions below.
+# They *should* return 0 on success and 1 on failure.
+
+MI_20250620() {
+    local -r pkg=plasma-x11-session
+    if [ -e /usr/share/wayland-sessions/plasma.desktop ] ; then
+        if [ -e /usr/share/xsessions/plasmax11.desktop ] ; then
+            echo "  ==> $pkg already OK" >&2
+        else
+            local reply=""
+            while true ; do
+                read -sn1 -p "Do you want to support plasma x11 sessions (y/n)? " reply >&2
+                case "$reply" in
+                    [yY]) RUN sudo pacman -Syu $pkg && return 0 || return 1 ;;
+                    [nN]) return 0 ;;
+                    *)    echo "Please give 'y' or 'n'." >&2 ;;
+                esac
+            done
+        fi
+    fi
+}
+
+MI_20250621() {
+    local -r pkg=linux-firmware
+    local -r curver="$(expac %v $pkg)"
+    local -r newver=20250613.12fe085f-5
+    if [ "$curver" ] ; then
+        if [ $(vercmp $curver $newver) -lt 0 ] ; then
+            RUN sudo pacman -Rsn $pkg || return 1
+            RUN sudo pacman -Syu $pkg || return 1
+        else
+            echo "  ==> $pkg already OK" >&2
+        fi
+        return 0
+    else
+        WARN "$pkg is not installed"
+        return 1
+    fi
+}
