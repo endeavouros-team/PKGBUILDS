@@ -4,7 +4,7 @@
 pkgname=eos-manual-intervention
 pkgdesc="Manual interventions manager."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=25
+pkgver=0.25
 pkgrel=1
 arch=('any')
 license=('GPL')
