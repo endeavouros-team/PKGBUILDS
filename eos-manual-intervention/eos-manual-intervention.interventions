@@ -1,20 +1,37 @@
 #!/bin/bash
 
 # Implemented manual interventions.
+#
+# The interventions below are structured as follows:
+# 1) MI_* are function that implement the actual fixes.
+# 2) MI_func_names is an array of the names of the intervention functions.
+#
+# In addition take into account machine hardware:
 
-# Add each intervention function name and description
-# into this array variable:
-MI_func_names=(
-    MI_20250621 "linux-firmware"
-    MI_20250620 "x11 plasma session"
-)
-
-# Available helper functions:
-#   RUN     Shows and executes a command.
-#   WARN    Shows a warning message.
+case "$(uname -m)" in
+    x86_64)
+        # Intel & AMD systems
+        MI_func_names=(
+            MI_20250621 "linux-firmware"
+            MI_20250620 "x11 plasma session"
+        )
+        ;;
+    a*)
+        # ARM systems
+        # TODO: check which interventions are needed in ARM systems
+        MI_func_names=(
+            # MI_20250621 "linux-firmware"
+            # MI_20250620 "x11 plasma session"
+        )
+        ;;
+esac
 
 # Manual Intervention (MI) functions below.
 # They *should* return 0 on success and 1 on failure.
+#
+# MI functions *may* use these additional helper functions:
+#   RUN     Shows and executes a command.
+#   WARN    Shows a warning message.
 
 MI_20250620() {
     local -r pkg=plasma-x11-session
