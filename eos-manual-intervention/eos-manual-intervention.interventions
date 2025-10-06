@@ -6,7 +6,12 @@
 # 1) MI_* are function that implement the actual fixes.
 # 2) MI_func_names is an array of the names of the intervention functions.
 #
-# In addition take into account machine hardware:
+# In addition take into account machine hardware.
+#
+# Note that MI_func_names array consist of pairs as follows:
+#     function_name  "short description of the function"
+# If either pair component is missing, parsing this array will fail.
+# And the "description" must be surrounded by quotes.
 
 case "$(uname -m)" in
     x86_64)

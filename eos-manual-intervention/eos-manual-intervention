@@ -45,6 +45,16 @@ RunInterventionsIfNeeded() {
     local count=${#MI_func_names[@]}
     local ix mifunc descr
 
+    if [ $only_show_count = yes ] ; then
+        echo "$((count/2))"
+        return 0
+    fi
+
+    if [ $count -eq 0 ] ; then
+        echo2 "==> No manual interventions available."
+        return 0
+    fi
+
     for ((ix=0; ix < count; ix+=2)) ; do
         mifunc="${MI_func_names[$ix]}"
         descr="${MI_func_names[$((ix+1))]}"
@@ -105,6 +115,7 @@ Purpose: Execute and manage essential manual interventions.
 Usage:   $progname [options]
 Options: -h, --help            This help.
          -n, --show-arch-news  Show the Arch news page in a browser.
+         --count               Only show the number of available interventions, don't run them.
 EOF
     [ "$1" ] && exit $1
 }
@@ -115,6 +126,7 @@ Options() {
         case "$arg" in
             -h | --help)           Help 0 ;;
             -n | --show-arch-news) NewsPage 0 ;;
+            --count)               only_show_count=yes ;;
         esac
     done
 }
@@ -125,6 +137,7 @@ Main() {
     local -r mifile="$dir/$progname.interventions"
     local -r handled_fixes="$dir/$progname.handled"
     local MI_func_names=()
+    local only_show_count=no
 
     Options "$@"
     CheckPacmanConf
