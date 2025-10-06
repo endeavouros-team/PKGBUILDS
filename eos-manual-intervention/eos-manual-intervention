@@ -25,8 +25,8 @@ IsOk() { grep "^$1$" "$handled_fixes" &>/dev/null; }
 FetchInterventionsFile() {
     local -r pname=eos-manual-intervention
     local -r fname=$pname.interventions
-    local -r github="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pname/$fname"
-    local -r gitlab="https://gitlab.com/endeavouros-filemirror/PKGBUILDS/raw/master/$pname/$fname"
+    local -r github=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pname/$fname
+    local -r gitlab=https://gitlab.com/endeavouros-filemirror/PKGBUILDS/raw/master/$pname/$fname
 
     if [ ! -d "$dir" ] ; then
         mkdir -p "$dir" || DIE "cannot create folder '${dir/$HOME/\~}'"

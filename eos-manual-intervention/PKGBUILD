@@ -4,7 +4,7 @@
 pkgname=eos-manual-intervention
 pkgdesc="Manual interventions manager."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=0.25.1
+pkgver=0.25.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -13,7 +13,7 @@ source=(
     $url/$pkgname
     $url/$pkgname.interventions
 )
-sha512sums=('c49e3f0565dd77d14b20c96bd596d0e865400ac97f22d683b028ecc84c525e389299cc078702ed0c1002dbe1070638c57f8279676e47c97786bfe4133ba7fac6'
+sha512sums=('fffb016b60c3e79b09f9d33c7f46319ad09a36f9867572cf0b790343e2f94969e5a44badcd1213e65530807f4a5dba4489009aa5293edbe10cd51ab2378c4b4e'
             '38117bbb16f4221220ce80286c8f829fbad5643f082504cd2d01963f39255613f5a23505f2fa0f6249fa6c78e2c659add92f0a127a9a2cec8814ebbc6742d2f8')
 
 package() {
