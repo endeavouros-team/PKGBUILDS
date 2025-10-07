@@ -394,3 +394,6 @@ _tr_add2 arch_chroot                 "arch-chroot information"
 _tr_add2 arch_chroot_tip             "arch-chroot provides a command line access to another system"
 _tr_add2 _commonphrase_not_found     "%%s not found"                                                   # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
 
+# 2025-Oct-05
+_tr_add2 after_install_mani          "Manual interventions"
+_tr_add2 after_install_manitip       "Execute essential manual interventions (i.e. necessary fixes, see https://archlinux.org/news)"

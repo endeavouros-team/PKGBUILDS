@@ -392,3 +392,6 @@ _tr_add2 arch_chroot                 "Tietoa arch-chroot:sta"
 _tr_add2 arch_chroot_tip             "arch-chroot sallii pääsyn systeemiin esim. ongelmatilanteissa"
 _tr_add2 _commonphrase_not_found     "%%s ei saatavilla"                                                   # example usage: "file1.txt not found"
 
+# 2025-Oct-05
+_tr_add2 after_install_mani          "Manuaaliset interventiot"
+_tr_add2 after_install_manitip       "Suorita ns. manuaaliset interventiot (eli tärkeät korjaukset, katso https://archlinux.org/news)"
