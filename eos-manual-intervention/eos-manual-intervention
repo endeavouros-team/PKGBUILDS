@@ -44,15 +44,22 @@ FetchInterventionsFile() {
 RunInterventionsIfNeeded() {
     local count=${#MI_func_names[@]}
     local ix mifunc descr
+    local ret=2
+    local updated=no
+
+    # ret:
+    #      0 = intervention handled and system updated ==> all is OK
+    #      1 = error occurred
+    #      2 = intervention marked as OK but system might not be updated
 
     if [ $only_show_count = yes ] ; then
         echo "$((count/2))"
-        return 0
+        return 2
     fi
 
     if [ $count -eq 0 ] ; then
         echo2 "==> No manual interventions available."
-        return 0
+        return 2
     fi
 
     for ((ix=0; ix < count; ix+=2)) ; do
@@ -62,13 +69,22 @@ RunInterventionsIfNeeded() {
             echo2 "$mifunc:\talready OK"
         else
             echo2 "$mifunc: $descr"
-            if $mifunc ; then
-                MarkOk "$mifunc"
-            else
-                return 1
-            fi
+            $mifunc
+            ret=$?
+            case "$ret" in
+                0) MarkOk "$mifunc"; updated=yes ;;
+                2) MarkOk "$mifunc" ;;
+                1) break ;;
+            esac
         fi
     done
+
+    Cleanup
+
+    case "$ret" in
+        0|2) [ $updated = yes ] && ret=0 ;;
+    esac
+    return $ret
 }
 
 NewsPage() {
@@ -143,7 +159,6 @@ Main() {
     CheckPacmanConf
     FetchInterventionsFile
     RunInterventionsIfNeeded
-    Cleanup
 }
 
 Main "$@"
