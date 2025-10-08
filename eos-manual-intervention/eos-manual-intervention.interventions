@@ -25,8 +25,8 @@ case "$(uname -m)" in
         # ARM systems
         # TODO: check which interventions are needed in ARM systems
         MI_func_names=(
-            # MI_20250621 "linux-firmware"
-            # MI_20250620 "x11 plasma session"
+            MI_20250621 "linux-firmware"
+            MI_20250620 "x11 plasma session"
         )
         ;;
 esac
