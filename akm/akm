@@ -88,7 +88,7 @@ StableVersions() {
                 pkgs+=("$pkg") ;;
         esac
     done
-    readarray -t versions <<< $(expac -S %v "${pkgs[@]}")
+    readarray -t versions < <(expac -S %v "${pkgs[@]}")
 }
 
 Stable() {
@@ -158,7 +158,7 @@ KernelOrg() {
     local version versions xx count=${#kernels[@]}
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Kernel category at kernel.org":LBL "")
     for xx in "${org_kernels[@]}" ; do
-        readarray -t versions <<< "$(KernelOrgVersion "$xx")"
+        readarray -t versions < <(KernelOrgVersion "$xx")
         for version in "${versions[@]}" ; do
             cmd+=(--field="${smallBegin}$(FormatName "$xx")${smallEnd}":LBL "")
             ((count--))
@@ -172,7 +172,7 @@ KOVersion() {
     local stableversion="$(KernelOrgVersion stable)"
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Latest version announced at kernel.org":LBL "")
     for xx in "${org_kernels[@]}" ; do
-        readarray -t versions <<< "$(KernelOrgVersion "$xx")"
+        readarray -t versions < <(KernelOrgVersion "$xx")
         case "$xx" in
             stable|longterm)
                 for version in "${versions[@]}" ; do
@@ -198,7 +198,7 @@ IsLatestKO() {
     installed_version="$(echo "$installed_version" | sed -e 's|-.*||' -e 's|\.[a-z].*||')"   # skip Arch suffixes
 
     for type in stable longterm ; do
-        readarray -t versions <<< "$(KernelOrgVersion "$type" 100)"
+        readarray -t versions < <(KernelOrgVersion "$type" 100)
         for version in "${versions[@]}" ; do
             if [ "$installed_version" = "$version" ] ; then
                 return 0
@@ -571,7 +571,7 @@ RunWithProgressOrNot() {
                 printf "#===> Done.\n100\n"                         # stop the progress window
             } | "${progress_cmd[@]}"
 
-            readarray -t cmd <<< $(cat "$cmdfile")                  # now get the full 'cmd' from the file
+            readarray -t cmd < <(cat "$cmdfile")                  # now get the full 'cmd' from the file
             rm -f "$cmdfile"
             ;;
     esac
