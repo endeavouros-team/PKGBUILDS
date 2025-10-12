@@ -108,7 +108,7 @@ CheckPacmanConf() {
 ==> File $conf contains IgnorePkg line(s).
     This *may* affect manual interventions because partial upgrades are not supported.
 EOF
-        readarray -t lines <<< $(echo "$lines")
+        readarray -t lines < <(echo "$lines")
         printf "      %s\n" "${lines[@]}" >&2
         echo2 ""
 
