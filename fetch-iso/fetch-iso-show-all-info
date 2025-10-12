@@ -47,8 +47,7 @@ Main() {
     if true ; then                            # TODO: add directory support into fetch-iso too!
         # directories
         local dirs=() tmp=()
-        # readarray -t tmp <<< $(echo "$data" | grep -P 'alt="\[DIR\]"|alt="\[PARENTDIR\]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
-        readarray -t tmp <<< $(echo "$data" | grep 'alt="\[DIR\]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+        readarray -t tmp < <(echo "$data" | grep 'alt="\[DIR\]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
         dirs+=("/ (site's root dir)")
         [ "$tmp" ] && dirs+=("${tmp[@]}")
         count=${#dirs[@]}
@@ -58,9 +57,9 @@ Main() {
     fi
 
     # files
-    readarray -t files <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
-    readarray -t dates <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcollastmod">([0-9-]+ [0-9:]+)[ ]*<.*|\1|g')
-    readarray -t sizes <<< $(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolsize">([0-9\.A-Z]+)[ ]*<.*|\1|g')
+    readarray -t files < <(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+    readarray -t dates < <(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcollastmod">([0-9-]+ [0-9:]+)[ ]*<.*|\1|g')
+    readarray -t sizes < <(echo "$data" | grep 'alt="\[   \]"' | sed -E 's|.*"indexcolsize">([0-9\.A-Z]+)[ ]*<.*|\1|g')
     count=${#files[@]}
     for ((ix=0; ix<count; ix++)) ; do
         echo "${files[$ix]}|${dates[$ix]}|${sizes[$ix]}"
