@@ -138,7 +138,7 @@ ListContinentsCountries() {
     local -r header_ul="$(echo "$header" | sed 's|[^|]|~|g')"
 
     GetContinentsData
-    readarray -t code_name <<< $(ListCountryCodesNames)
+    readarray -t code_name < <(ListCountryCodesNames)
 
     # gather all info and sort according to continent and country name
     {
@@ -284,7 +284,7 @@ TraverseMirrors-sequential() {
     local mirror
     local ix=1
     local mirs
-    readarray -t mirs <<< $(echo "$mirrors_with_statefiles")
+    readarray -t mirs < <(echo "$mirrors_with_statefiles")
 
     for mirror in "${mirs[@]}" ; do
         printf "\r==> ranking %3s/$mirror_count" $((ix++)) >&2
@@ -568,7 +568,7 @@ SelectFavorites() { # re-order given favorites using fzf
         local fzf_exitcode=0
         local fzf=(fzf --multi --no-sort --tac --reverse)
         fzf+=(--header="Choose the best mirrors in order. Keys: UP/DOWN/PgUp/PgDn=navigate TAB=select ENTER=accept ESC=quit:")
-        readarray -t favs <<< $(printf "%s\n" "${favs[@]}" | "${fzf[@]}")
+        readarray -t favs < <(printf "%s\n" "${favs[@]}" | "${fzf[@]}")
         fzf_exitcode=$?
         case "$fzf_exitcode" in
             0 | 1) ;;
