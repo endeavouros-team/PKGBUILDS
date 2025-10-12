@@ -302,7 +302,7 @@ Columnize() { column -t -s "$separator" ; }
 
 ForeignPkgInfo() {
     local data
-    readarray -t data <<< $(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
+    readarray -t data < <(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
     PrintPkgData
 }
 NativePkgInfo() {
@@ -311,7 +311,7 @@ NativePkgInfo() {
         expac -Q "%n$separator%v" | Columnize
     else
         local data
-        readarray -t data <<< $(LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
+        readarray -t data < <(LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
         PrintPkgData
     fi
 }
