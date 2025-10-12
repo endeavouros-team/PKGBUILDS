@@ -89,7 +89,7 @@ SortMirrors() {
     local lastm=""
     local lastix ix
 
-    readarray -t marr <<< $(grep "^Server = " $latest_ml)
+    readarray -t marr < <(grep "^Server = " $latest_ml)
 
     [ "$added_mirror" ] && marr+=("Server = $added_mirror")        # for test-ranking a mirror
 
@@ -141,7 +141,7 @@ RankPerAge() {
             ;;
     esac
 
-    readarray -t result <<< $(SortMirrors "$latest_ml" "$sortopts")
+    readarray -t result < <(SortMirrors "$latest_ml" "$sortopts")
 
     if [ ${#result[@]} -le 1 ] ; then
         local msg="no mirrors found!"
