@@ -582,7 +582,7 @@ AllRemovables() {
         )
     fi
 
-    readarray -t pr_nvidia <<< $(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
+    readarray -t pr_nvidia < <(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
 }
 
 ProperNvidiaPackages() {
@@ -799,7 +799,7 @@ Main()
 
         Note "Currently installed packages related to Nvidia:"
         local ipkgs
-        readarray -t ipkgs <<< $(expac -Qs "%n %v" nvidia)
+        readarray -t ipkgs < <(expac -Qs "%n %v" nvidia)
         NoteList "${ipkgs[@]}"
     fi
 

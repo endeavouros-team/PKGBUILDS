@@ -26,7 +26,7 @@ NvidiaGpuInfo() {
         [GN]=Next            # "Next" is probably wrong...
     )
 
-    readarray -t familyinfo <<< $(echo "$data" | sed -E 's|.* NVIDIA Corporation ([^ ]+) \[[^]]+\] \[10de:([^]]+)\] .*|\1 \2|')
+    readarray -t familyinfo < <(echo "$data" | sed -E 's|.* NVIDIA Corporation ([^ ]+) \[[^]]+\] \[10de:([^]]+)\] .*|\1 \2|')
 
     for gpuinfo in "${familyinfo[@]}" ; do
         id=${gpuinfo: -4}
