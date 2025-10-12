@@ -609,7 +609,7 @@ BuildReflectorCommand() {
 }
 AdjustCountries() {  # put countries in $next to $conf_selected_countries
     local items=() item
-    readarray -t items <<< $(echo "$next" | tr ',' '\n')
+    readarray -t items < <(echo "$next" | tr ',' '\n')
     for item in "${items[@]}" ; do
         conf_selected_countries+=("$(ToCountryName "$item")")
     done
@@ -832,8 +832,8 @@ Main() {
 
     # Find countries with supported mirrors.
 
-    readarray -t countrynames <<< "$(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')"
-    readarray -t countrycodes <<< "$(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')"
+    readarray -t countrynames < <(echo "$REFLECTOR_COUNTRIES" | sed 's|^\(.*[a-z]\)[ ]*[A-Z][A-Z].*$|\1|')
+    readarray -t countrycodes < <(echo "$REFLECTOR_COUNTRIES" | awk '{print $(NF-1)}')
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
         tmpconf=$(mktemp)
