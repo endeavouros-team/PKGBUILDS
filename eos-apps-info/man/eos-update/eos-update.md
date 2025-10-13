@@ -24,6 +24,13 @@ and optionally
   - /etc/pacman-d/mirrorlist
   - /etc/pacman.d/endeavouros-mirrorlist
 
+Tip: run `eos-update --help` to see info about the latest options.<br>
+
+See more tips at
+[github](https://github.com/endeavouros-team/eos-bash-shared/blob/main/eos-update-tips.md)
+or
+[gitlab](https://gitlab.com/endeavouros-filemirror/eos-bash-shared/blob/main/eos-update-tips.md).
+
 ## Synopsis
 
 ```
