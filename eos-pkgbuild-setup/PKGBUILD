@@ -5,7 +5,7 @@
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=25.10.4
+pkgver=25.10.5
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -72,7 +72,7 @@ sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bd
             'e0de969acbc2f79acad4b45093ecceb349f40315433bc2c9a607a48c8ff68a5957a9a8810197ec2db0e6a10219a47030f49e73d280bbb92443eec3479e238db7'
             'c1ad0ec95bbd5d5acd9e3ab7fe6e407006bb74bf02f1b3e39ae6f1d5cf450a2930ee91323706b35eeded9e1dfee27c6ec3ebdb6cc875edc1d494bda67aba783d'
             'f6a6bb8171a88ad09594e7e31cfc38477cdd52bf8f6e4b5a38eba742e394d148dd54145bfdfe71d13d83e1f880766bb3bf4b2ce267b1d1c012df14e892024c3f'
-            'd3633508bbf750a71f096fed662c5657fc9f42d13393f4c9660081b5769b905d9640fd7fe669235d6556a5c9ba979ceee567266945a149c86abdd8cf47067718'
+            '37f3b9469e66fbecc55c1b42d22d31ebbbd9734128b079e45d96bb46dc118fc920151892a9573cc21b9d4ab5c6f8daea27ad583deedbdc9f449362e54c22f26d'
             '754569a51dd8adc63158059bb762a50faf8124cd799aaa739dcfc50c90ee3ddf87dd32d130e84b72b19030368edd523c43c16bbbcb50c350dc8eca666fc4df5c'
             'ed196585ccd694ddc4f4c814a480225a9558285d062c5664d200440dcccbd1e98aa026ea9a962f3ab5e72dd1607f348868d9dd8b6d6fad6f4e996d6af96be041')
 
