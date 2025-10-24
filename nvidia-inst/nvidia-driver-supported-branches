@@ -5,10 +5,8 @@
 echo2()   { echo   "$@" >&2 ; }
 printf2() { printf "$@" >&2 ; }
 
-DIE() {
-    echo2 "$progname: error: $1"
-    exit 1
-}
+DIE()  { echo2 "==> $progname: error: $1"; exit 1; }
+INFO() { echo2 "==> $progname: info: $1"; }
 
 FilterIds() {
     # supports series 390 and later
@@ -28,13 +26,18 @@ GetNvidiaIds() {
         $sid1) ids="$(echo "$ids_all" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
         $sid2) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid2.xx\"*/,/.*\"legacy_$sid3.xx\".*/p" | FilterIds)" ;;
         $sid3) ids="$(echo "$ids_all" | sed -n "/.*\"legacy_$sid3.xx\"*/,/.*\"legacy_$sidX.xx\".*/p" | FilterIds)" ;;
-
-        $beta_series) ids="$(echo "$ids_beta" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
-
-        *) DIE "unsupported series '$series'" ;;
     esac
+    if [ -z "$ids" ] && [ $include_beta = yes ] ; then
+        case "$series" in
+            $beta_series) ids="$(echo "$ids_beta" | sed -n '1,/.*Below are the legacy GPUs that are no longer supported.*/p' | FilterIds)" ;;
+        esac
+    fi
+    if [ "$ids" ] ; then
+        echo "$ids"
+        return
+    fi
 
-    echo "$ids"
+    DIE "unsupported series '$series'"
 }
 
 ShowDriversForId() {
@@ -44,19 +47,24 @@ ShowDriversForId() {
     local ver
     local true_series=""   # found from the Nvidia website
     local ids_all
-    local ids_beta
     local found=no
     local exit_code=0
     local -r url_of_ids="$(UrlOfIds "$pacman_pkgver")"
-    local -r url_of_beta_ids="$(UrlOfIds "$beta_pkgver")"
+
+    if [ $include_beta = yes ] ; then
+        local ids_beta
+        local -r url_of_beta_ids="$(UrlOfIds "$beta_pkgver")"
+    fi
 
     ids_all="$(curl --fail -Lsm $curl_timeout -o- "$url_of_ids")"
     exit_code=$?
 
     [ -n "$ids_all" ] || DIE "Nvidia id data not available from '$url_of_ids'! Curl exit code $exit_code."
 
-    ids_beta="$(curl --fail -Lsm $curl_timeout -o- "$url_of_beta_ids")"
-    [ -n "$ids_beta" ] || DIE "Nvidia id data not available from '$url_of_beta_ids'! Curl exit code $exit_code."
+    if [ $include_beta = yes ] ; then
+        ids_beta="$(curl --fail -Lsm $curl_timeout -o- "$url_of_beta_ids")"
+        [ -n "$ids_beta" ] || DIE "Nvidia id data not available from '$url_of_beta_ids'! Curl exit code $exit_code."
+    fi
 
     for ver in "${nvidia_versions[@]}" ; do
         true_series="${ver%%.*}"
@@ -66,8 +74,10 @@ ShowDriversForId() {
         ids="$(GetNvidiaIds "$true_series")"
         if [ -n "$(echo "$ids" | grep "$id")" ] ; then
             printf "\nSeries %s: supported (nvidia.com: %s)\n\n" "$true_series" "$ver"     # DO NOT CHANGE THIS LINE! Other apps use it.
-            if [ "$ver" = "$beta_pkgver" ] && [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
-                printf2 "NOTE: $beta_pkg $ver is an AUR package. To install it, use command:\n   yay -S $beta_pkg\n"
+            if [ $include_beta = yes ] ; then
+                if [ "$ver" = "$beta_pkgver" ] && [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
+                    printf2 "NOTE: $beta_pkg $ver is an AUR package. To install it, use command:\n   yay -S $beta_pkg\n"
+                fi
             fi
             case "$true_series" in
                 ${series_ids[1]} | ${series_ids[2]} | 470 | 390)
@@ -111,8 +121,10 @@ GetNvidiaVersions() {
             esac
         done
     done
-    if [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
-        nvidia_versions+=("$beta_pkgver")
+    if [ $include_beta = yes ] ; then
+        if [ "$beta_pkgver" != "$pacman_pkgver" ] ; then
+            nvidia_versions+=("$beta_pkgver")
+        fi
     fi
 }
 
@@ -133,31 +145,43 @@ GetPacmanVersion() {
     } | head -n1   # in case multiple repos have it, take the first
 }
 
+HasAurSupport() {
+    local aur_timeout=10
+    curl -Lsm $aur_timeout https://aur.archlinux.org/packages >/dev/null
+}
+
 Options() {
     local opts
 
-    opts="$(/usr/bin/getopt -o=hajt: --longoptions help,all,test,timeout:,hide-nvidia-inst-msgs --name "$progname" -- "$@")" || {
-        Options -h
-        return 1
-    }
-
+    opts="$(/usr/bin/getopt -o=habjt: --longoptions help,all,beta,test,timeout:,hide-nvidia-inst-msgs --name "$progname" -- "$@")" || Help 1
     eval set -- "$opts"
 
     while true ; do
         case "$1" in
-            -a | --all) echo2 "Info: option '$1' recognized but is no more used." ;; # all=yes ;;
-            -j | --test) testing=yes ;;
-            -t | --timeout) curl_timeout="$2" ;;
-            --hide-nvidia-inst-msgs)
-                # Do not show messages related to program nvidia-inst.
-                hide_nvidia_inst_msgs=yes
-                ;;
+            -b | --beta)             include_beta=yes ;;
+            -a | --all)              echo2 "Info: option '$1' recognized but is no more used." ;; # all=yes ;;
+            -j | --test)             testing=yes ;;
+            -t | --timeout)          curl_timeout="$2" ;;
+            --hide-nvidia-inst-msgs) hide_nvidia_inst_msgs=yes ;;               # Do not show messages related to program nvidia-inst.
+            -h | --help)             Help 0 ;;
+            --) shift ; break ;;
+        esac
+        shift
+    done
 
-            -h | --help)
-                cat <<EOF >&2
+    nvidia_id="$1"
+    case "$nvidia_id" in
+        [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) nvidia_id=${nvidia_id,,} ;;
+        "") ;;
+        *) DIE "given card id '$nvidia_id' is invalid, must contain only hexadecimal numbers (0-9 a-f A-F)" ;;
+    esac
+}
 
-$progname finds the latest Nvidia driver series info that supports
-your Nvidia graphics card. This information should help in installing the proper Nvidia driver.
+Help() {
+    cat <<EOF >&2
+
+$progname finds info about the latest Nvidia driver series that supports
+your Nvidia GPU. This information should help in installing the proper Nvidia driver.
 
 Usage: $progname [options] [parameters]
 
@@ -166,6 +190,7 @@ Options:
                     Default: $curl_timeout_default
   -a, --all         (Show status for all available driver branches.)
                     NOTE: this option does nothing due to implementation change.
+  -b, --beta        (Experimental) Include beta packages in the check if AUR is available.
 
   -h, --help        This help.
 
@@ -180,21 +205,7 @@ Tip: the "card_id" value can be found with command:
 
 See also: $starting_url
 EOF
-                exit 0
-                ;;
-            
-            --) shift ; break ;;
-        esac
-        shift
-    done
-
-    nvidia_id="$1"
-
-    case "$nvidia_id" in
-        "") ;;
-        [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) nvidia_id=${nvidia_id,,} ;;
-        *) DIE "given card id '$nvidia_id' is invalid, must contain only hexadecimal numbers (0-9 a-f A-F)" ;;
-    esac
+    [ "$1" ] && exit $1
 }
 
 Main() {
@@ -208,19 +219,28 @@ Main() {
     local nvidia_id=""
     local nvidia_versions=()
     local hide_nvidia_inst_msgs=no
-    local -r beta_pkg=nvidia-beta-dkms
+    local beta_pkg=nvidia-beta-dkms
+    local include_beta=no               # check also beta package from the AUR if "yes"; "no" does not check beta
 
     Options "$@"
 
+    if [ $include_beta = yes ] ; then
+        HasAurSupport || { include_beta=no; INFO "sorry, AUR is not currently available, cannot include beta packages"; }
+    fi
+
     local -r pacman_version=$(GetPacmanVersion "$infopkg")
-    local -r pacman_pkgver=$(echo "$pacman_version" | sed 's|-[0-9.]*$||')
+    local -r pacman_pkgver=${pacman_version%-*}   # $(echo "$pacman_version" | sed 's|-[0-9.]*$||')
     local -r pacman_version_series=${pacman_pkgver%%.*}
 
-    local -r beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
-    local -r beta_series=${beta_pkgver%%.*}
-
     [ -n "$pacman_pkgver" ] || DIE "cannot determine the version of the latest available package $infopkg"
-    [ -n "$beta_pkgver" ]   || DIE "cannot determine the version of the latest available package $beta_pkg"
+
+    if [ $include_beta = yes ] ; then
+        local beta_pkgver=$(LANG=C /bin/yay -Si $beta_pkg | grep -w "^Version" | awk '{print $NF}')
+        beta_pkgver=${beta_pkgver%-*}
+        # local beta_pkgver=$(yay -Ss $beta_pkg | grep "aur/${beta_pkg}" | awk '{print $2}' | sed 's|-[0-9.]*$||')
+        local -r beta_series=${beta_pkgver%%.*}
+        [ -n "$beta_pkgver" ]   || DIE "cannot determine the version of the latest available package $beta_pkg"
+    fi
 
     local series_ids=(
         $pacman_version_series        # latest provided by Arch
