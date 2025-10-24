@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
 pkgname=eos-hooks
-pkgver=1.16
+pkgver=1.16.1
 pkgrel=1
 pkgdesc='EndeavourOS pacman hooks'
 arch=('any')
@@ -12,7 +12,7 @@ _url=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgnam
 depends=()
 
 source=(
-  $_url/eos-os-release.hook
+  $_url/25-eos-os-release.hook
   $_url/eos-lsb-release.hook
   $_url/${pkgname}.hook
   $_url/${pkgname}-runner
@@ -24,12 +24,12 @@ sha512sums=('d315c86c3f18278883161798b1f8ec891d20efb0bf2ada4dbf406a30767506807c4
             '87ffb0a69c78db08d87c39a80709c8acb09d502397f88151d63a61d68ceb5d906d0db633e4857cf658cfe1a42859856c96e4d356710019001656a8c7733456dc')
 
 package() {
-  local hooks=$pkgdir/usr/share/libalpm/hooks
-  local bin=$pkgdir/usr/bin
-
-  install -Dm644 eos-lsb-release.hook      $hooks/eos-lsb-release.hook
-  install -Dm644 eos-os-release.hook       $hooks/eos-os-release.hook
-  install -Dm644 ${pkgname}.hook           $hooks/${pkgname}.hook
-
-  install -Dm755 ${pkgname}-runner         $bin/${pkgname}-runner
+  local item
+  for item in "${source[@]}" ; do
+      item=${item##*/}
+      case "$item" in
+          *.hook)  install -Dm644 $item   $pkgdir/usr/share/libalpm/hooks/$item ;;
+          *)       install -Dm755 $item   $pkgdir/usr/bin/$item ;;
+      esac
+  done
 }
