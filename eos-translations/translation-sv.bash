@@ -319,3 +319,6 @@ _tr_add2 arch_chroot                 "arch-chroot information"
 _tr_add2 arch_chroot_tip             "arch-chroot ger åtkomst till ett annat system på kommandoraden"
 _tr_add2 _commonphrase_not_found     "%%s hittades inte"                                                  ##exempel användning: "fil1.txt hittades inte"
 
+
+_tr_add2 after_install_mani          "Manuella ingrepp"
+_tr_add2 after_install_manitip       "Utför viktiga manuella åtgärder (dvs. nödvändiga korrigeringar, se https://archlinux.org/news)"
