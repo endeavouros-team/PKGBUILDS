@@ -102,22 +102,15 @@ SortMirrors() {
     [ "$lastm" ] || return 1   # no mirrors!
 
     if [ ${#marr[@]} -gt 0 ] ; then
+        local mirrors_to_rank=()
         for mirror in "${marr[@]}" ; do
-            m=$(echo "$mirror" | awk '{print $3}')                    # mirror value (with variables)
-            verbose "$m"
-            m2=$(echo "$m" | sed 's|/$repo/$arch$||')                 # mirror url (without variables)
-            if ! GetUpdateNumberAndTime "$m2/state" "$m"              # update number from "state" and its fetch time
-            then
-                ((rank_errs++))
-            fi
-            if [ "$mirror" = "$lastm" ] ; then
-                if [ $rank_errs -ne 0 ] ; then
-                    local secs=5
-                    # notif_printf2 "Sleeping $secs seconds...\n"
-                    sleep $secs                                       # some mirrors failed, sleep a few seconds to show it
-                fi
-            fi
-        done | LC_ALL=C sort -g $sortopts
+            m=$(echo "$mirror" | awk '{print $3}')                            # mirror value (with variables)
+            m2=$(echo "$m" | sed 's|/$repo/$arch$||')                         # mirror url (without variables)
+            verbose "$m2"
+            mirrors_to_rank+=("$m2")
+        done
+
+        RankMirrors_$rankingmode
     fi
 }
 
@@ -131,17 +124,14 @@ RankPerAge() {
     local sort_age="-k2r,2 -k3,3"
 
     case "$sort" in
-        rate | fastest | speed)
-            sortopts="$sort_rate" ;;
-        age | latest)
-            sortopts="$sort_age" ;;
-        *)
-            WARN "value '$sort' of option --sort is unsupported, using 'age'."
-            sortopts="$sort_age"
-            ;;
+        rate | fastest | speed) sortopts="$sort_rate" ;;
+        age | latest)           sortopts="$sort_age" ;;
+        *)                      WARN "value '$sort' of option --sort is unsupported, using 'age'."
+                                sortopts="$sort_age"
+                                ;;
     esac
 
-    readarray -t result < <(SortMirrors "$latest_ml" "$sortopts")
+    readarray -t result < <(SortMirrors "$latest_ml" | LC_ALL=C sort -g $sortopts)
 
     if [ ${#result[@]} -le 1 ] ; then
         local msg="no mirrors found!"
@@ -150,100 +140,32 @@ RankPerAge() {
     fi
 }
 
-WarningAbout() {
-    local id="$1"
-    shift
-    UseColor warning
-    printf2 "==> Warning about %s:\n" "$id"
-    [ "$1" ] && printf2 "    %s\n" "$@" #"Continuing."
-    UseColor reset
+RankMirrors_parallel() {
+    printf "%s\n" "${mirrors_to_rank[@]}" | parallel --bar "eos-rankmirrors-helper {} $timeout $reference_level"
 }
 
-GetUpdateNumberAndTime() {
-    local url="$1"
-    local mirror="$2"
-    local tmpfile="$HOME/.eos-rank-state.123456"
-    local result=0
-    local retcode=0
-    local time
-    local nr
-    local low_limit=999999           # still acceptable value (use a very high initial number!)
-    local too_low_limit=999999       # fails when below this
-
-    if [ "$reference_level" ] ; then
-        low_limit=$((reference_level - 2))
-        too_low_limit=$((reference_level - 10))
-    fi
-
-    time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url" -o"$tmpfile")
-    retcode=$?
-    case "$retcode" in
-        0)
-            nr="$(head -n1 "$tmpfile")"
-            rm -f "$tmpfile"
-
-	    if [ "${nr//[0-9]/}" ] ; then   # check that $nr is a number!
-		WarningAbout "$mirror" "Unrecognized data returned by this mirror."
-		return
-	    fi
-
-            if [ "$reference_level" ] ; then
-                # ad hoc tests for the update level value in the state file
-                if [ $nr -gt $reference_level ] ; then
-                    if [ "$mirror" != 'https://mirror.alpix.eu/endeavouros/repo/$repo/$arch' ] || [ $nr -gt $((reference_level + 1)) ] ; then
-                        WarningAbout "$mirror" "Update level $nr is too high (> $reference_level), ignoring this mirror."
-                    fi
-                    return
-                elif [ $nr -lt $too_low_limit ] ; then
-                    WarningAbout "$mirror" "Update level $nr/$reference_level is very low, ignoring this mirror."
-                    return
-                elif [ $nr -lt $low_limit ] ; then
-                    WarningAbout "$mirror" "update level $nr/$reference_level is lower than expected, will lower the ranking of this mirror."
-                fi
+RankMirrors_sequential() {
+    for mirror in "${marr[@]}" ; do
+        m=$(echo "$mirror" | awk '{print $3}')                            # mirror value (with variables)
+        m2=$(echo "$m" | sed 's|/$repo/$arch$||')                         # mirror url (without variables)
+        verbose "$m"
+        if ! eos-rankmirrors-helper "$m2" "$timeout" "$reference_level"   # update number from the "state" file and its fetch time
+        then
+            ((rank_errs++))
+        fi
+        if [ "$mirror" = "$lastm" ] ; then
+            if [ $rank_errs -ne 0 ] ; then
+                local secs=5
+                # notif_printf2 "Sleeping $secs seconds...\n"
+                sleep $secs                                              # some mirrors failed, sleep a few seconds to show it
             fi
-            result="$nr $time"
-            echo "$mirror $result"      # "mirror nr time"
-            ;;
-        *)
-            local curl_msg=""
-            local msg=()
-            local add_code=no
-            case "$mirror_verbosity" in
-                all | code | show)
-                    case "$retcode" in
-                        28) msg+=("Connection to this mirror failed after $timeout seconds.") ;;
-                      # 7)  msg+=("Connection to this mirror failed. The mirror may be temporarily or permanently offline.") ;;
-                        *)  msg+=("Connection to this mirror failed (curl exit code $retcode).") ;;
-                    esac
-                    case "$mirror_verbosity" in
-                        all)
-                            curl_msg="$(curl-exit-code-to-string $retcode)"
-                            if [ "$curl_msg" ] ; then
-                                msg+=("--> (curl exit code $retcode: $curl_msg)")
-                            else
-                                add_code=yes
-                            fi
-                            ;;
-                        code)
-                            add_code=yes
-                            ;;
-                    esac
-                    [ "$add_code" = "yes" ] && msg+=("--> (curl exit code $retcode.)")
-
-                    WarningAbout "$mirror" "${msg[@]}"
-                    ;;
-                none)
-                    ;;
-            esac
-            rm -f "$tmpfile"
-            return $retcode
-            ;;
-    esac
+        fi
+    done
 }
 
 GetReferenceUpdateLevel() {
     local refroot="https://mirror.alpix.eu/endeavouros/repo"
-    local result=$(GetUpdateNumberAndTime "$refroot/state" "$refroot"/'$repo/$arch')
+    local result=$(eos-rankmirrors-helper "$refroot" $timeout "")
 
     [ "$result" ] && reference_level=$(echo "$result" | awk '{print $2}')
 }
@@ -347,6 +269,7 @@ SimpleRank() {
     local pref="$preferred_mirrors $ALWAYS_FIRST_EOS_MIRRORS"
     if [ "$pref" != " " ] ; then
         pref=${pref//[,|]/ }
+        [ "${pref: -1}" = " " ] && pref="${pref:: -1}"
         INFO "preferring mirrors: $pref"
     fi
 
@@ -556,8 +479,22 @@ DumpOptions() {
     exit 0
 }
 
+GetPager() {
+    if [ "$PAGER" ] ; then
+        echo "$PAGER"
+    elif [ -x /bin/less ] ; then
+        echo "/bin/less -RF"
+    elif [ -x /bin/most ] ; then
+        echo "/bin/most"
+    else
+        echo "/bin/more"
+    fi
+}
+
 Usage() {
-    cat <<EOF
+    local pager=$(GetPager)
+
+    cat <<EOF | $pager
 Purpose: $progname is meant for creating a new file that can be used as file
              $emlpath
          after ranking the mirrors.
@@ -602,6 +539,15 @@ Options:
              Examples:
                  eos-rankmirrors --prefer=funami,accum,moson
                  eos-rankmirrors --prefer='https://endeavour.remi.lu/repo/\$repo/\$arch'
+
+  --parallel, -p
+             Rank mirrors in parallel (default).
+             This should be much faster than using --sequential
+             especially if option --ignore is not used.
+
+  --sequential, -s
+             Rank mirrors in a sequential manner.
+             This usually is much slower than using --parallel.
 
   --show-orig-list <value>
              Add the original mirror list into $emlpath.
@@ -670,6 +616,8 @@ Options() {
             --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
+            --parallel | -p)            rankingmode=parallel ;;
+            --sequential | -s)          rankingmode=sequential ;;
             --show-rank-info)           show_ranking_info="$2"; shift ;;
             --show-orig-list)           show_original_list="$2"; shift ;;
             -b)                         show_original_list=no ;;
@@ -710,10 +658,10 @@ Check-mirror_verbosity() {
 
 Main()
 {
-    local -r SHORT_OPTIONS="abhnt:"
+    local -r SHORT_OPTIONS="abhnpst:"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing,debug"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
-    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:"
+    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential"
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
@@ -722,6 +670,7 @@ Main()
 
     local debugging=no
     local use_colors=yes
+    local rankingmode=parallel                    # parallel or sequential
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds

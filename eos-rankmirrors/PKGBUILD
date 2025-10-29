@@ -1,7 +1,7 @@
 # Maintainer: EndeavourOS <info@endeavouros.com>
 
 pkgname=eos-rankmirrors
-pkgver=25.10
+pkgver=25.10.1
 pkgrel=1
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
@@ -11,34 +11,37 @@ url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgnam
 
 license=(GPL3)
 depends=(eos-bash-shared)
-options=(!strip !emptydirs)
+# options=(!strip !emptydirs)
 backup=(etc/$pkgname.conf)
 
 source=(
   $url/$pkgname
-  $url/$pkgname.completion
   $url/${pkgname}-from-hook
-  $url/${pkgname}.hook
-  $url/${pkgname}.conf
-  $url/${pkgname}.disabled
+  $url/${pkgname}-helper
+
+  $url/$pkgname.completion
+  $url/$pkgname.conf
+  $url/$pkgname.disabled
+  $url/$pkgname.hook
 )
-sha512sums=('f7a7313c7ff532a28b2e55a27a9d5435ed44fa61a977726b176e62cc5a7bc4486fcb8dbe20c7eee0000a51b1bf99f70d23ba247597362121eb0634a908bac537'
-            '0bbb39f7b192d0d1e26e5bd05ff8f15fedd1370cb766a178f40bf476899b546a97a1c297aa670418eba35d750f9d2fef618034220fade49743aa5763a7ade6ec'
+sha512sums=('913a77ac769f76784597d13c1802a73f6640b8e1af69d6009877566098c9d89b77fef491f90e650fcf1a37486ce17f47321b46aa405a829da7b00fffe12eeaeb'
             'fc3113a20559ec58ffff2cacae8069ce5c83ad826f0054488315d024cb874a92ae9240fe4630bd9da647ee2cbf0e93dd22259190c703f26d21bf0b8481686a4c'
-            'f01f6267f624992febfec29c76f2de1c503693086ade5783e2b9cbef359f5155bf6df520ff06299193c842aef2a05cac5078977ee0dabf55cff66f44aec6e44a'
+            'bb59109a98a1e39c43e88e9aec3a3c606c5e0dd52cdbfc96ab5b6ba6268a414f2a0dbe60d6e241abb1bcebbb5638ba69eb7986cb27dee8e766f173b8c40574b3'
+            '0bbb39f7b192d0d1e26e5bd05ff8f15fedd1370cb766a178f40bf476899b546a97a1c297aa670418eba35d750f9d2fef618034220fade49743aa5763a7ade6ec'
             'f6f6e06edbeb9828f66bdf27596d4db86eeae774546b5c978816a2a1d2e3d6d066d47dc1a001c7c98058154c02405e6926b03611d73b369d62241f50e005aad5'
-            '06b77d1109fec45071dd2a3c1be07c225a5735961bd2818d0ccea608fef6e85bf4ae71d821427aa766d5b1934195282c1964965df7bd49602316b3bab6bf9824')
+            '06b77d1109fec45071dd2a3c1be07c225a5735961bd2818d0ccea608fef6e85bf4ae71d821427aa766d5b1934195282c1964965df7bd49602316b3bab6bf9824'
+            'f01f6267f624992febfec29c76f2de1c503693086ade5783e2b9cbef359f5155bf6df520ff06299193c842aef2a05cac5078977ee0dabf55cff66f44aec6e44a')
 
 package() {
-  local hooks=$pkgdir/usr/share/libalpm/hooks
-
-  install -Dm644 ${pkgname}.hook      $hooks/${pkgname}.hook
-
-  install -Dm644 ${pkgname}.conf      $pkgdir/etc/${pkgname}.conf
-  install -Dm644 ${pkgname}.disabled  $pkgdir/etc/${pkgname}.disabled
-
-  install -Dm755 $pkgname             $pkgdir/usr/bin/$pkgname
-  install -Dm755 ${pkgname}-from-hook $pkgdir/usr/bin/${pkgname}-from-hook
-
-  install -Dm644 $pkgname.completion  $pkgdir/usr/share/bash-completion/completions/$pkgname
+    local file
+    for file in "${source[@]}" ; do
+        file=${file##*/}
+        case "$file" in
+            *.completion)    install -Dm644 $file  $pkgdir/usr/share/bash-completion/completions/${file%.completion} ;;
+            *.conf)          install -Dm644 $file  $pkgdir/etc/$file ;;
+            *.disabled)      install -Dm644 $file  $pkgdir/etc/$file ;;
+            *.hook)          install -Dm644 $file  $pkgdir/usr/share/libalpm/hooks/$file ;;
+            *)               install -Dm755 $file  $pkgdir/usr/bin/$file ;;
+        esac
+    done
 }
