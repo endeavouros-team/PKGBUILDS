@@ -2,7 +2,7 @@
 
 pkgname=eos-rankmirrors
 pkgver=25.10.1
-pkgrel=1
+pkgrel=2
 pkgdesc="EndeavourOS mirror ranking tool"
 arch=('any')
 
@@ -10,7 +10,7 @@ arch=('any')
 url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 license=(GPL3)
-depends=(eos-bash-shared)
+depends=(eos-bash-shared parallel)
 # options=(!strip !emptydirs)
 backup=(etc/$pkgname.conf)
 
