@@ -1,19 +1,18 @@
 #!/bin/bash
 
-echo2()       { echo -e "$@" >&2; }
-printf2()     { printf  "$@" >&2; }
-
 WarningAbout() {
-    local item="$1"
-    shift
-    echo2 "==> Warning about $item:\n"
-    [ "$1" ] && printf2 "    %s\n" "$@"
+    source /etc/eos-color.conf
+    eos-color warning 2
+    printf "==> Warning about %s (curl code %s):\n" "$mirror" "$curl_exitcode" >&2
+    [ "$1" ] && printf "    %s\n" "$@" >&2
+    eos-color reset 2
 }
 
 RankOneMirror() {
     local url="$1"                      # mirror url without /state or /$repo/$arch
-    local timeout="$2"
-    local reference_level="$3"          # optional
+    local timeout="$2"                  # timeout for fetching a file from the mirror
+    local mirror_verbosity="$3"
+    local reference_level="$4"          # if empty then caller must be is fetching the reference_level !
     local mirror="$url"'/$repo/$arch'   # mirror url with /$repo/$arch
     local curl_exitcode
     local time                          # time spent in fetching a file
@@ -30,11 +29,11 @@ RankOneMirror() {
             time=$(              echo "$time" | tail -n1)
 
 	    if [ "${update_level//[0-9]/}" ] ; then   # check that $update_level is a number
-		WarningAbout "$mirror" "Unrecognized data returned by this mirror."
+		WarningAbout "Unrecognized data returned by this mirror."
                 return 1
 	    fi
 	    if [ "${time//[0-9\.]/}" ] ; then   # check that $time is a decimal number
-		WarningAbout "$mirror" "Unrecognized data returned by this mirror."
+		WarningAbout "Unrecognized data returned by this mirror."
                 return 1
 	    fi
 
@@ -45,14 +44,14 @@ RankOneMirror() {
                     local too_low_limit=$((reference_level - 10))            # probably fails when below this
                     if [ $update_level -gt $reference_level ] ; then
                         if [ "$mirror" != 'https://mirror.alpix.eu/endeavouros/repo/$repo/$arch' ] || [ $update_level -gt $((reference_level + 1)) ] ; then
-                            WarningAbout "$mirror" "Update level $update_level is too high (> $reference_level), ignoring this mirror."
+                            WarningAbout "Update level $update_level is too high (> $reference_level), ignoring this mirror."
                         fi
                         return 1
                     elif [ $update_level -lt $too_low_limit ] ; then
-                        WarningAbout "$mirror" "Update level $update_level/$reference_level is very low, ignoring this mirror."
+                        WarningAbout "Update level $update_level/$reference_level is very low, ignoring this mirror."
                         return 1
                     elif [ $update_level -lt $low_limit ] ; then
-                        WarningAbout "$mirror" "update level $update_level/$reference_level is lower than expected, will lower the ranking of this mirror."
+                        WarningAbout "update level $update_level/$reference_level is lower than expected, will lower the ranking of this mirror."
                     fi
                 fi
             fi
@@ -65,9 +64,9 @@ RankOneMirror() {
             case "$mirror_verbosity" in
                 all | code | show)
                     case "$curl_exitcode" in
-                        28) msg+=("Connection to this mirror failed after $timeout seconds.") ;;
-                      # 7)  msg+=("Connection to this mirror failed. The mirror may be temporarily or permanently offline.") ;;
-                        *)  msg+=("Connection to this mirror failed (curl exit code $curl_exitcode).") ;;
+                        28) msg+=("Mirror timed out after $timeout seconds.") ;;
+                        7)  msg+=("Failed to connect, the mirror may be currently offline.") ;;
+                        *)  msg+=("Could not fetch the test file.") ;;
                     esac
                     case "$mirror_verbosity" in
                         all)
@@ -84,7 +83,7 @@ RankOneMirror() {
                     esac
                     [ "$add_code" = "yes" ] && msg+=("--> (curl exit code $curl_exitcode.)")
 
-                    WarningAbout "$mirror" "${msg[@]}"
+                    WarningAbout "${msg[@]}"
                     ;;
                 none)
                     ;;

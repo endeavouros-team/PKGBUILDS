@@ -81,9 +81,8 @@ ShowArray() {
     done
 }
 
-SortMirrors() {
+RankMirrors() {
     local latest_ml="$1"
-    local sortopts="$2"
     local marr mirror m m2
     local rank_errs=0
     local lastm=""
@@ -105,7 +104,7 @@ SortMirrors() {
         local mirrors_to_rank=()
         for mirror in "${marr[@]}" ; do
             m=$(echo "$mirror" | awk '{print $3}')                            # mirror value (with variables)
-            m2=$(echo "$m" | sed 's|/$repo/$arch$||')                         # mirror url (without variables)
+            m2=${m/\/\$repo\/\$arch/}
             verbose "$m2"
             mirrors_to_rank+=("$m2")
         done
@@ -131,7 +130,7 @@ RankPerAge() {
                                 ;;
     esac
 
-    readarray -t result < <(SortMirrors "$latest_ml" | LC_ALL=C sort -g $sortopts)
+    readarray -t result < <(RankMirrors "$latest_ml" | LC_ALL=C sort -g $sortopts)
 
     if [ ${#result[@]} -le 1 ] ; then
         local msg="no mirrors found!"
@@ -141,15 +140,14 @@ RankPerAge() {
 }
 
 RankMirrors_parallel() {
-    printf "%s\n" "${mirrors_to_rank[@]}" | parallel --bar "eos-rankmirrors-helper {} $timeout $reference_level"
+    local parallel_opts=""   #"--bar"
+    printf "%s\n" "${mirrors_to_rank[@]}" | parallel $parallel_opts "eos-rankmirrors-helper {} $timeout $mirror_verbosity $reference_level"
 }
 
 RankMirrors_sequential() {
-    for mirror in "${marr[@]}" ; do
-        m=$(echo "$mirror" | awk '{print $3}')                            # mirror value (with variables)
-        m2=$(echo "$m" | sed 's|/$repo/$arch$||')                         # mirror url (without variables)
-        verbose "$m"
-        if ! eos-rankmirrors-helper "$m2" "$timeout" "$reference_level"   # update number from the "state" file and its fetch time
+    for m2 in "${mirrors_to_rank[@]}" ; do
+        verbose "$m2"
+        if ! eos-rankmirrors-helper "$m2" "$timeout" "$mirror_verbosity" "$reference_level"   # update number from the "state" file and its fetch time
         then
             ((rank_errs++))
         fi
@@ -165,7 +163,7 @@ RankMirrors_sequential() {
 
 GetReferenceUpdateLevel() {
     local refroot="https://mirror.alpix.eu/endeavouros/repo"
-    local result=$(eos-rankmirrors-helper "$refroot" $timeout "")
+    local result=$(eos-rankmirrors-helper "$refroot" $timeout "$mirror_verbosity" "")
 
     [ "$result" ] && reference_level=$(echo "$result" | awk '{print $2}')
 }
@@ -345,7 +343,7 @@ ShowActualRankingResult() {
         UserAddedMirrors "$ALWAYS_FIRST_EOS_MIRRORS"  # Example: ALWAYS_FIRST_EOS_MIRRORS='tuna|moson|umu'
     fi
 
-    INFO "Results of ranking EndeavourOS mirrors:\n" "==> Info: "
+    # show the results of ranking EndeavourOS mirrors
 
     ShowArray "${result[@]}" | /usr/bin/awk '{print $1}' | /usr/bin/sed 's|^|Server = |'
 }
@@ -482,13 +480,16 @@ DumpOptions() {
 GetPager() {
     if [ "$PAGER" ] ; then
         echo "$PAGER"
-    elif [ -x /bin/less ] ; then
-        echo "/bin/less -RF"
-    elif [ -x /bin/most ] ; then
-        echo "/bin/most"
-    else
-        echo "/bin/more"
+        return
     fi
+    local pager_apps=("less -RF" bat most more cat)
+    local app
+    for app in "${pager_apps[@]}" ; do
+        if [ -x /bin/${app%% *} ] ; then
+            echo "/bin/$app"
+            return
+        fi
+    done
 }
 
 Usage() {
@@ -752,11 +753,13 @@ Main()
     new=$(/usr/bin/mktemp) ; delete_at_end+=("$new")
 
     SimpleRank > $new || DIE "ranking failed."
-    [ "$hook_rank" = "no" ] && cat $new
 
     [ "$(grep "^Server = " $new)" ] || DIE "ranking failed, no mirrors found!"
-
-    [ "$save" = "yes" ] && WriteSystemMirrorlist "$eos" "$new"
+    if [ "$hook_rank" = "no" ] ; then
+        local pager=$(GetPager)
+        $pager $new                                                               # show the ranked list
+    fi
+    [ "$save" = "yes" ] && WriteSystemMirrorlist "$eos" "$new"                    # save ranked list to endeavouros-mirrorlist
 
     DeleteTmpFiles
 }
