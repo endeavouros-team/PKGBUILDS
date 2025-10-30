@@ -756,8 +756,12 @@ Main()
 
     [ "$(grep "^Server = " $new)" ] || DIE "ranking failed, no mirrors found!"
     if [ "$hook_rank" = "no" ] ; then
-        local pager=$(GetPager)
-        $pager $new                                                               # show the ranked list
+        if [ $save = yes ] ; then
+            cat $new
+        else
+            local pager=$(GetPager)
+            $pager $new                                                               # show the ranked list
+        fi
     fi
     [ "$save" = "yes" ] && WriteSystemMirrorlist "$eos" "$new"                    # save ranked list to endeavouros-mirrorlist
 
