@@ -478,12 +478,14 @@ DumpOptions() {
 }
 
 GetPager() {
-    if [ "$PAGER" ] ; then
-        echo "$PAGER"
-        return
-    fi
-    local pager_apps=("less -RF" bat most more cat)
     local app
+    for app in "$EOS_RANKMIRRORS_PAGER" "$PAGER" ; do
+        if [ "$app" ] ; then
+            echo "$app"
+            return
+        fi
+    done
+    local pager_apps=("less -RF" bat most more cat)
     for app in "${pager_apps[@]}" ; do
         if [ -x /bin/${app%% *} ] ; then
             echo "/bin/$app"
@@ -580,6 +582,10 @@ Options:
   --verbose
              Show more detailed output.
 
+  --pager
+             Use a pager app for showing the ranked mirrorlist.
+             This works when not saving the mirrorlist.
+
 Advanced options:
   --list-only
              Save only the mirrorlist without the ranking statistics.
@@ -617,6 +623,7 @@ Options() {
             --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
+            --pager)                    use_pager=yes ;;
             --parallel | -p)            rankingmode=parallel ;;
             --sequential | -s)          rankingmode=sequential ;;
             --show-rank-info)           show_ranking_info="$2"; shift ;;
@@ -662,7 +669,7 @@ Main()
     local -r SHORT_OPTIONS="abhnpst:"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing,debug"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
-    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential"
+    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential,pager"
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
@@ -672,6 +679,7 @@ Main()
     local debugging=no
     local use_colors=yes
     local rankingmode=parallel                    # parallel or sequential
+    local use_pager=no
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
@@ -755,12 +763,14 @@ Main()
     SimpleRank > $new || DIE "ranking failed."
 
     [ "$(grep "^Server = " $new)" ] || DIE "ranking failed, no mirrors found!"
+
     if [ "$hook_rank" = "no" ] ; then
-        if [ $save = yes ] ; then
+        # show the ranked list
+        if [ $save = yes ] || [ $use_pager = no ] ; then
             cat $new
         else
             local pager=$(GetPager)
-            $pager $new                                                               # show the ranked list
+            $pager $new
         fi
     fi
     [ "$save" = "yes" ] && WriteSystemMirrorlist "$eos" "$new"                    # save ranked list to endeavouros-mirrorlist
