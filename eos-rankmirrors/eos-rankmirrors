@@ -477,7 +477,25 @@ DumpOptions() {
     exit 0
 }
 
+NanoViewer() {
+    local file="$1"
+    local cmd="$nano_pager"
+    if [ "$file" ] ; then
+        if [ -r "$file" ] ; then
+            cat "$file" | $cmd
+        else
+            echo "==> file $file not found" >&2
+        fi
+    else
+        $cmd
+    fi
+}
+
 GetPager() {
+    if [ $use_pager = no ] ; then
+        echo "cat"
+        return
+    fi
     local app
     for app in "$EOS_RANKMIRRORS_PAGER" "$PAGER" ; do
         if [ "$app" ] ; then
@@ -485,7 +503,7 @@ GetPager() {
             return
         fi
     done
-    local pager_apps=("less -RF" bat most more cat)
+    local pager_apps=("$less_pager" bat most more cat)
     for app in "${pager_apps[@]}" ; do
         if [ -x /bin/${app%% *} ] ; then
             echo "/bin/$app"
@@ -495,8 +513,6 @@ GetPager() {
 }
 
 Usage() {
-    local pager=$(GetPager)
-
     cat <<EOF | $pager
 Purpose: $progname is meant for creating a new file that can be used as file
              $emlpath
@@ -584,7 +600,15 @@ Options:
 
   --pager
              Use a pager app for showing the ranked mirrorlist.
+             The app will be selected from a list of popular pagers,
+             or via variables EOS_RANKMIRRORS_PAGER (see $conf) or PAGER.
              This works when not saving the mirrorlist.
+
+  --pager-less
+             Same as --pager but uses "less" as the pager.
+
+  --pager-nano
+             Same as --pager but uses "nano" as the pager.
 
 Advanced options:
   --list-only
@@ -623,7 +647,9 @@ Options() {
             --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
-            --pager)                    use_pager=yes ;;
+            --pager)                    use_pager=yes: pager=$(GetPager) ;;
+            --pager-nano)               use_pager=yes; pager=NanoViewer ;;
+            --pager-less)               use_pager=yes; pager="$less_pager" ;;
             --parallel | -p)            rankingmode=parallel ;;
             --sequential | -s)          rankingmode=sequential ;;
             --show-rank-info)           show_ranking_info="$2"; shift ;;
@@ -669,7 +695,8 @@ Main()
     local -r SHORT_OPTIONS="abhnpst:"
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing,debug"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
-    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential,pager"
+    LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential"
+    LONG_OPTIONS+=",pager,pager-nano,pager-less"
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
@@ -679,7 +706,10 @@ Main()
     local debugging=no
     local use_colors=yes
     local rankingmode=parallel                    # parallel or sequential
+    local -r less_pager="less -RF"
+    local -r nano_pager="nano +1 --view -"
     local use_pager=no
+    local pager="$(GetPager)"
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
@@ -700,8 +730,7 @@ Main()
     for arg in "$@" ; do
         case "$arg" in
             --help | -h)        Usage; exit 0 ;;
-            --dump-options)     DumpOptions ;;
-            --dump-options=all) DumpOptions --all ;;
+            --dump-options|--dump-options=all|--pager|--pager-nano|--pager-less) Options "$arg" ;;
         esac
     done
 
@@ -769,7 +798,6 @@ Main()
         if [ $save = yes ] || [ $use_pager = no ] ; then
             cat $new
         else
-            local pager=$(GetPager)
             $pager $new
         fi
     fi
