@@ -759,9 +759,7 @@ Main()
     export -f DeleteTmpFiles
     trap "sleep 0.1 ; DeleteTmpFiles" EXIT    # do this *after* DumpOptions to make bash completion faster
 
-    if [ ! -r "$eos" ] ; then                 # this test is not really needed...
-        DIE "no local $eos found, please install package '$pkgname'."
-    fi
+    [ -e "$eos" ] || sudo touch "$eos"
 
     source $conf || DIE "Config file $conf does not exist!"
     ALWAYS_FIRST_EOS_MIRRORS=${ALWAYS_FIRST_EOS_MIRRORS//[,|]/ }
