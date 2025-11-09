@@ -648,7 +648,7 @@ Options() {
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
             --pager)                    use_pager=yes: pager=$(GetPager) ;;
-            --pager-nano)               use_pager=yes; pager=NanoViewer ;;
+            --pager-nano)               use_pager=yes; pager=nano-pager ;;
             --pager-less)               use_pager=yes; pager="$less_pager" ;;
             --parallel | -p)            rankingmode=parallel ;;
             --sequential | -s)          rankingmode=sequential ;;
