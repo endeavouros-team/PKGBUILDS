@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=eos-update
+Comment=Update system packages in a terminal window
+Comment[fi]=Päivitä järjestelmä pääteikkunassa
+Exec=bash -c "echo '==> eos-update --aur'; eos-update --aur; eos-sleep-counter 60"
+Terminal=true
+Icon=endeavouros-icon
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=System

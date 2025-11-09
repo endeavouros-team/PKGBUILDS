@@ -1,0 +1,267 @@
+#!/bin/bash
+
+# Arch and EndeavourOS update checks using mainly lastupdate and state files.
+# Assumption: the lastupdate file on a mirror is NOT abused by making it equal to lastsync.
+# Exit code is similar to 'checkupdates'.
+
+Operate() {
+    opts=$(/bin/getopt -o=$sopts --longoptions=$lopts --name $progname -- "$@") || Usage $EXIT_ERROR
+    eval set -- "$opts"
+    while true ; do
+        case "$1" in
+            -a | --arch)
+                op="-a"
+                os=Arch
+                ml=mirrorlist
+                file=lastupdate
+                MainNext $op
+                ret_arch=$?
+                ;;
+            -e | --endeavouros)
+                op="-e"
+                os=EndeavourOS
+                ml=endeavouros-mirrorlist
+                file=state
+                MainNext $op
+                ret_eos=$?
+                ;;
+            -y | --aur)
+                op="-y"
+                ShowResult "yay -Qua" "-"
+                if yay -Qua >/dev/null ; then
+                    ret_aur=$EXIT_UPDATES_YES
+                    Verbose "AUR updates available.\n"
+                else
+                    Verbose "No AUR updates.\n"
+                fi
+                ;;
+            -h | --help) Usage $EXIT_UPDATES_NO ;;
+            --verbose) ;;                             # already handled
+            --reset-history | -r) ;;                  # already handled
+            --disable-failed-mirror) ;;               # already handled
+            --) break ;;
+            *) Usage $EXIT_ERROR ;;
+        esac
+        shift
+    done
+    [ "$op" ] || DIE "operation(s) missing"
+}
+
+Main() {
+    local progname=${0##*/}
+    local os
+    local ml
+    local file
+    local verbose=0
+    local reset_history=no
+    local op=""
+    local -r EXIT_UPDATES_YES=0
+    local -r EXIT_ERROR=1
+    local -r EXIT_UPDATES_NO=2
+    local ret_arch=$EXIT_UPDATES_NO
+    local ret_eos=$EXIT_UPDATES_NO
+    local ret_aur=$EXIT_UPDATES_NO
+    local disable_failed_mirror=no
+
+    [ "$1" ] || Usage $EXIT_ERROR
+
+    # Better handle option --verbose before other options.
+    # Option --verbose can be given more than once to give more info (but max 2 times for any effect).
+    for arg in "$@" ; do
+        case "$arg" in
+            --verbose)               ((verbose++)) ;;
+            --reset-history | -r)    reset_history=yes ;;
+            --disable-failed-mirror) disable_failed_mirror=yes ;;
+        esac
+    done
+
+    local lopts=verbose,arch,endeavouros,aur,help,reset-history,disable-failed-mirror
+    local sopts=aeyhr
+    local opts
+    local out=""
+
+    Operate "$@"
+    echo "$out" | column -t -o" " -s'|'
+
+    if [ $ret_arch -eq $EXIT_UPDATES_YES ] || [ $ret_eos -eq $EXIT_UPDATES_YES ] || [ $ret_aur -eq $EXIT_UPDATES_YES ]
+    then
+        return $EXIT_UPDATES_YES
+    else
+        return $EXIT_UPDATES_NO
+    fi
+}
+
+Usage() {
+    cat <<EOF >&2
+Usage: $progname [options] {operations}
+Options:
+    -h, --help           This help.
+    --verbose            More verbose output.
+Operations:
+    -a, --arch           Check Arch package updates.
+    -e, --endeavouros    Check EndeavourOS package updates.
+    -y, --aur            Check AUR package updates.
+
+EOF
+    [ "$1" ] && exit "$1"
+}
+
+GetEosPart()  { grep -w "^Server" /etc/pacman.d/endeavouros-mirrorlist | grep -m1 $1 | sed 's|^Server = \(http.*\)/$repo/$arch|\1|'    ; }
+GetArchPart() {
+    grep -w "^Server" /etc/pacman.d/mirrorlist | grep -m1 $1 | sed 's|^Server = \(http.*\)/$repo/os/$arch|\1|'
+}
+
+DisableMirror() {
+    local mirror="$1"
+    local mlfile="/etc/pacman.d/$ml"
+    Warning "==> commenting out failed mirror"
+    sudo sed -i "$mlfile" -e "s|^\(Server[ ]*=[ ]*$mirror\)|#### \1|"
+}
+
+GetUrlFromMirrorsFile() {
+    local count="$1"
+    [ "$count" ] || count=1
+    url=$(grep -m$count "^Server = " /etc/pacman.d/$ml | tail -n1)
+    [ "$url" ] || DIE "/etc/pacman.d/$ml has no mirrors configured!"
+    url=${url#*= }
+}
+
+DiscoverUrlAndData() {
+    local ix=0
+    local url_orig=""
+    local exitcode=0
+
+    while true ; do
+        (( ix++ ))
+        case "$os" in
+            EndeavourOS)
+                GetUrlFromMirrorsFile $ix
+                url=${url%\$repo/\$arch}$file
+                ;;
+            Arch)
+                GetUrlFromMirrorsFile $ix
+                url_orig="$url"
+                url=${url%\$repo/os/\$arch}$file
+                ;;
+        esac
+
+        case "$url" in
+            http*) ;;
+            *) DIE "$FUNCNAME: getting proper $os URL failed" ;;
+        esac
+
+        data=$(curl --fail -Lsm 10 -o- "$url") || exitcode=$?
+        if [ $exitcode -ne 0 ] ; then
+            Warning " -> fetching $url failed ([curl $exitcode]: $(curl-exit-code-to-string $exitcode))"
+            [ "$disable_failed_mirror" = yes ] && DisableMirror "$url_orig"
+            exitcode=0
+            continue
+        fi
+        [ "$data" ]                            || { echo2 " -> no data from $url"; continue; }
+        [ "${data//[0-9]*/}" ]                 && { echo2 " -> $url data corrupt"; continue; }       # data must be numbers only
+        echo2 " -> fetching $url: OK"
+        return
+    done
+    DIE "fetching data from $os mirrors failed"
+}
+
+MainNext() {
+    declare -A renamedos=(
+        [EndeavourOS]=x
+        [Arch]=y
+    )
+    declare -A renamedfile=(
+        [state]=X
+        [lastupdate]=X
+    )
+    local -r savedir="$HOME/.config"    # ~/.cache may change at reboot
+    local -r lastupdate_saved="$savedir/uc-${renamedos[$os]}-${renamedfile[$file]}"
+    local -r lastupdate="${lastupdate_saved}_new"
+    local lastupdate_val="" old_val=""
+    local url=""
+    local data
+
+    DiscoverUrlAndData
+
+    [ -e "$lastupdate" ] && old_val=$(head -n1 "$lastupdate")
+    echo "$data" | head -n1 > "$lastupdate"
+    lastupdate_val=$(head -n1 "$lastupdate")
+    case "$os" in
+        Arch)
+            # convert time from epoch to human
+            lastupdate_val=$(date --date @"$lastupdate_val" +%Y%m%d-%H%M%S)
+            [ "$old_val" ] && old_val=$(date --date @"$old_val" +%Y%m%d-%H%M%S)
+            ;;
+        EndeavourOS) ;;
+    esac
+
+    ShowResult "$url" "$lastupdate_val" "$old_val"
+
+    local ret=$EXIT_UPDATES_NO     # by default, don't expect updates
+
+    [ $reset_history = yes ] && rm -f "$lastupdate_saved"
+
+    if [ -f "$lastupdate_saved" ] ; then
+        diff "$lastupdate" "$lastupdate_saved" >/dev/null
+        if [ $? -eq 0 ] ; then   # && [ -e $right_after_boot_file ] ; then
+            Verbose "no updates\n"
+            rm -f "$lastupdate"
+        else
+            # touch $right_after_boot_file
+
+            Verbose "updates are possible\n"  # ... if any of the updates is locally installed!
+            case "$os" in
+                Arch)
+                    Verbosex "    %-30s: %s\n" "$lastupdate"       "$(date --date="@$(head -n1 "$lastupdate")")"
+                    Verbosex "    %-30s: %s\n" "$lastupdate_saved" "$(date --date="@$(head -n1 "$lastupdate_saved")")"
+                    ;;
+            esac
+
+            ret=$EXIT_UPDATES_YES
+            rm -f "$lastupdate_saved".*                              # delete old update indicators
+            # mv "$lastupdate_saved" "$lastupdate_saved".old        || DIE "saving old update indicator failed."
+            mv "$lastupdate"       "$lastupdate_saved"            || DIE "saving new update indicator failed."
+        fi
+    else
+        ret=$EXIT_UPDATES_YES       # First time here? Then guess there are updates.
+        mv "$lastupdate" "$lastupdate_saved" || DIE "saving first update indicator failed."
+        Verbose "${os} updates may be available.\n"
+    fi
+    return $ret
+}
+
+Verbose()  {
+    if [ $verbose -ge 1 ] ; then
+        local v
+        printf -v v "$@"
+        out+="$v"
+    fi
+}
+Verbosex() {
+    if [ $verbose -ge 2 ] ; then
+        local v
+        printf -v v "$@"
+        out+="$v"
+    fi
+}
+
+ShowResult() {
+    if [ "$3" ] ; then
+        Verbose "%-s|($3 -> $2)|:|" "$1"
+    else
+        Verbose "%-s|($2)|:|" "$1"
+    fi
+}
+
+echo2() { echo "$@" >&2 ; }
+DIE() {
+    printf "%s: error: %s\n\n" "$progname" "$1" >&2
+    Usage $EXIT_ERROR
+}
+Warning() {
+    eos-color warning 2
+    echo2 "$1"
+    eos-color reset 2
+}
+
+Main "$@"

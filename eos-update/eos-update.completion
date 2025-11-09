@@ -1,0 +1,22 @@
+# bash completion for eos-update        -*- shell-script -*-
+
+_eos-update_complete() {
+    COMPREPLY=( $(compgen -W "$1" -- "$cur") )
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+}
+
+_eos-update_() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    case "$prev" in
+        --colors)           _eos-update_complete "yes no" ;;
+        --cache-limit | -l) _eos-update_complete "{1..5}" ;;
+        --min-free-bytes)   _eos-update_complete "{1..9}" ;;
+        --helper)           _eos-update_complete "yay paru pacman" ;;
+        --edit-mirrorlist)  _eos-update_complete "arch endeavouros" ;;
+        *)                  _eos-update_complete "$(eos-update --dump-options)" ;;
+    esac
+}
+complete -F _eos-update_    eos-update

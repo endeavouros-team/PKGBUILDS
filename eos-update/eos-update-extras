@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# This program is meant to be executed between 'pacman -Sy' and 'pacman -Su' like:
+#    pacman -Sy && "this program" && pacman -Su
+# Useful when special handling for certain update(s) are needed.
+
+echo2() { echo "$@" >&2 ; }
+WARN()  { echo2 "==> $progname: warning: $1" ; }
+
+Parameters() {
+    local arg
+    local update_first=()   # these will be updated before others
+
+    while [ -n "$1" ] ; do
+        arg="$1"
+        case "$arg" in
+            --descriptions)
+                eos-update-descriptions --title "descriptions" --header no $updates
+                ;;
+            --nvidia)
+                eos-kernel-nvidia-update-check $updates || WARN "'Nvidia & kernel' check failed."
+                ;;
+            --keyrings | --keyring)
+                for arg in archlinux-keyring endeavouros-keyring ; do
+                    echo "$updates" | grep "^$arg$" >/dev/null && update_first+=("$arg")
+                done
+                ;;
+            *)
+                WARN "parameter '$arg' ignored."
+                ;;
+        esac
+        shift
+    done
+
+    # Update certain packages before others.
+
+    [ ${#update_first[@]} -ne 0 ] && sudo pacman -S --noconfirm "${update_first[@]}"
+    return 0
+}
+
+Main() {
+    local progname=${0##*/}
+    local updates=$(pacman -Quq)      # available native updates
+
+    [ "$updates" = "" ] && return
+
+    Parameters "$@"
+}
+
+Main "$@"

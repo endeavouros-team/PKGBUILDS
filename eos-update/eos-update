@@ -1,0 +1,661 @@
+#!/bin/bash
+
+# Package updater for EndeavourOS and Arch.
+# Handles db lock file, keyrings, syncing, and optionally AUR with given AUR helper.
+
+echo2()   { echo -e "$@" >&2 ; }
+printf2() { printf "$@" >&2 ; }
+
+WARN()    { echo2warning "==> $progname: warning: $1"; }
+DIE()     { echo2error   "==> $progname: error: $1"; exit 1;  }
+
+UseColor() { [ $use_colors = yes ] && eos-color "$@" 2 ; }
+
+echo2error()   { UseColor error;   echo2 "$@"; UseColor reset ; }
+echo2info()    { UseColor info;    echo2 "$@"; UseColor reset ; }
+echo2warning() { UseColor warning; echo2 "$@"; UseColor reset ; }
+echo2tip()     { UseColor tip;     echo2 "$@"; UseColor reset ; }
+
+SetHelper() {
+    for helper in "$@" "$EOS_AUR_HELPER" "$EOS_AUR_HELPER_OTHER" yay paru pacman ; do
+        which "${helper%% *}" &>/dev/null && return 0
+    done
+    WARN "AUR helper not found"
+    helper=pacman
+}
+
+Cmd() {                           # Show a command, run it, and exit on issues.
+    echo2 "==>" "$@"
+    "$@" || DIE "'$*' failed."
+}
+
+MirrorCheckResult() {
+    local ml="$1"
+    local ret=0
+
+    echo2 "==> $ml contains:"
+    echo2 "    available mirrors:   ${#supported[@]}"
+    echo2 "    unavailable mirrors: ${#unsupported[@]}"
+    [ ${#unsupported[@]} -gt 0 ] && printf "%s\n" "${unsupported[@]}" | sed 's|^[0-9]*:|      -> Server = |' >&2
+
+    if [ ${#unsupported[@]} -eq 0 ] && [ ${#supported[@]} -gt 0 ] ; then     # create the return code, 0=success, 1=fail
+        return 0
+    else
+        if [ ${#unsupported[@]} -gt 0 ] ; then
+            EditMirrorlist $ml "${unsupported[0]%%:*}"   # second parameter is the line number
+        else
+            EditMirrorlist $ml
+        fi
+        return 1
+    fi
+}
+
+Hardware-x86_64() { [ $(eos_GetArch) = x86_64 ] || DIE "sorry, this implementation supports only x86_64 environment"; }
+
+CheckYourArchMirrorlist() {
+    Hardware-x86_64
+    local url="https://archlinux.org/mirrorlist/?use_mirror_status=on"
+    local lm
+    local all_working_mirrors
+    local local_mirrors
+    local supported=()
+    local unsupported=()
+
+    # get working mirrors from the Arch mirrorlist page
+    all_working_mirrors=$(curl --fail -Lsm 30 "$url") || DIE "failed to fetch available mirrors (curl code $?)"
+    [ "$all_working_mirrors" ] || DIE "-> archlinux.org/mirrorlist failed"
+    readarray -t all_working_mirrors < <(echo "$all_working_mirrors" | tail -n +7 | grep "^#Server = " | awk '{print $NF}')
+
+    # get mirrors from local mirrorlist
+    readarray -t local_mirrors < <(grep -n "^[ \t]*Server[ \t]*=[ \t]*" $aml | sed 's|[ \t]*Server[ \t]*=[ \t]*||')
+
+    for lm in "${local_mirrors[@]}" ; do
+        if printf "%s\n" "${all_working_mirrors[@]}" | grep "${lm#*:}" >/dev/null ; then
+            supported+=("${lm#*:}")
+        else
+            unsupported+=("$lm")   # includes the line number: "nr:https://..."
+        fi
+    done
+    MirrorCheckResult $aml
+}
+
+CheckYourEndeavourosMirrorlist() {
+    Hardware-x86_64
+    local -r mirrors=(  # for downloading the latest endeavouros-mirrorlist package
+        https://mirror.alpix.eu/endeavouros/repo/endeavouros/x86_64     # Germany
+        https://mirror.moson.org/endeavouros/repo/endeavouros/x86_64    # Germany
+        https://mirrors.gigenet.com/endeavouros/repo/endeavouros/x86_64 # United States
+    )
+    local url data
+    local -r tmpfile=/tmp/eos-ml.p
+    local good_mirrors local_mirrors
+    local lm
+    local unsupported=() supported=()
+
+    # local continent=""
+    # [ -x /bin/location ] && continent="$(/bin/location list-countries --show-continent | awk '{print $2}')"
+    # case "$continent" in
+    #     NA) mirrors=("${mirrors_NA[@]}" "${mirrors_EU[@]}") ;;
+    #     *)  mirrors=("${mirrors_EU[@]}" "${mirrors_NA[@]}") ;;
+    # esac
+
+    for url in "${mirrors[@]}" ; do
+        data=$(curl -Lsm 30 -o- $url)
+        if [ $? -eq 0 ] && [ "$data" ] ; then
+            data=$(echo "$data" | grep "endeavouros-mirrorlist.*\.sig")   # the line that contains the pkg file name
+            data=${data#*\"}                                              # skip prefix
+            data=${data%%\.sig*}                                          # skip suffix
+            if [ "$data" ] ; then
+                unsupported=()
+                supported=()
+
+                url+="/$data"
+                curl -Lsm 30 -o$tmpfile $url
+
+                good_mirrors=$(tar xvf $tmpfile ${eml:1} -O 2>/dev/null | grep "^Server = " | sed 's|^Server = ||')
+                rm -f $tmpfile
+                local_mirrors=$(grep -n "^[ \t]*Server[ \t]*=[ \t]*" $eml | sed 's|[ \t]*Server[ \t]*=[ \t]*||')
+
+                for lm in $local_mirrors ; do
+                    if [ "$(echo "$good_mirrors" | grep "${lm#*:}")" ] ; then
+                        supported+=(${lm#*:})
+                    else
+                        unsupported+=($lm)  # includes the line number: "nr:https://..."
+                    fi
+                done
+                MirrorCheckResult $eml
+                return
+            fi
+            
+        fi
+    done
+    [ "$data" ] || DIE "sorry, cannot fetch the latest EndeavourOS mirrorlist data"
+}
+
+EditMirrorlist() {
+    local list="$1"      # arch, endeavouros, or the full path of the mirrorlist
+    local linenr="$2"    # for the editor; may be empty
+    local editor=/usr/bin/rnano
+    [ -x $editor ] || { WARN "package 'nano' is required for editing $list"; return 1; }
+
+    case "$list" in
+        arch | $aml)        list="$aml" ;;
+        endeavouros | $eml) list="$eml" ;;
+        "") DIE "supported mirrorlists: arch, endeavouros" ;;
+    esac
+    if [ "$linenr" ] ; then
+        if [ -z "${linenr//[0-9]/}" ] ; then
+            linenr="+$linenr"
+        else
+            WARN "detected line number '$linenr' in $list is flawed!"
+            linenr=""
+        fi
+    fi
+    RunInTerminal "echo '==> Editing $list with $editor:'; sudo $editor $linenr $list"
+}
+
+ResetKeyrings() {
+    Cmd sudo mv /etc/pacman.d/gnupg /root/pacman-key.bak.$(date +%Y%m%d-%H%M).by.$progname
+    Cmd sudo pacman-key --init
+    Cmd sudo pacman-key --populate archlinux endeavouros
+    Cmd sudo pacman -Syy --noconfirm archlinux-keyring endeavouros-keyring
+    Cmd sudo pacman -Syu
+    echo2 "Keyrings reset."
+    exit 0
+}
+
+ClearDatabases() {
+    Cmd sudo rm -r /var/lib/pacman/sync
+    echo2 "Package databases cleared."
+    exit 0
+}
+CheckPackageDatabases() {
+    local -r dir=/var/lib/pacman/sync
+    local -r out="$(file $dir/*.{db,files} | grep -Pv "(gzip|Zstandard|XZ) compressed data")"
+    if [ "$out" ] ; then
+        echo2error "$out"
+        echo2 "==> one or more files $dir/*.{db,files} corrupted.\n    '$progname --clear-databases' may fix it."
+        exit 1
+    fi
+    echo2 "==> package database: success, compressed data as expected."
+    exit 0
+}
+
+CheckReposPacmanConf() {
+    local problem_repos=(   # these should be removed
+        community
+        community-testing
+        testing
+        testing-debug
+        staging
+        staging-debug
+    )
+    local needed_repos=(    # these should always be included for EndeavourOS
+        endeavouros
+        core
+        extra
+    )
+    local toberemoved=() tobeadded=()
+    local -r file=$pacmanconf
+    local stop=no
+
+    for item in "${problem_repos[@]}" ; do
+        [ "$(grep "^\[$item\]" $file)" ] && toberemoved+=("[$item]")
+    done
+    for item in "${needed_repos[@]}" ; do
+        [ "$(grep "^\[$item\]" $file)" ] || tobeadded+=("[$item]")
+    done
+    if [ "$tobeadded" ] ; then
+        echo2error "==> $progname: error: the following repo definitions must be added to $file:"
+        printf2  "    %s\n" "${tobeadded[@]}"
+        stop=yes
+    fi
+    if [ "$toberemoved" ] ; then
+        echo2error "==> $progname: error: the following repo definitions must be removed from $file:"
+        printf2  "    %s\n" "${toberemoved[@]}"
+        stop=yes
+    fi
+    [ $stop = yes ] && exit 1
+}
+
+FaillockCheck() {
+    if [ $faillockcheck = yes ] ; then
+        if [ $(LANG=C faillock --user $LOGNAME | grep -EA1 "^When[ ]+Type[ ]+Source" | wc -l) -gt 1 ] ; then
+            sleep 1
+            read -p "Info: elevating privileges is locked, press ENTER to unlock, or Ctrl-C to quit: " >&2
+            case "$?" in
+                0) faillock --user $LOGNAME --reset ; sleep 2 ;;
+                *) exit 0 ;;
+            esac
+        fi
+    fi
+}
+
+PacCache() {
+    case "$paccache_limit" in
+        1|2|3|4|5)
+            echo2info "==> paccache -rk$paccache_limit"
+            sudo /usr/bin/paccache --verbose -rk$paccache_limit      # sudo not really required here but it takes one unnecessary output line away
+
+            local usage=$(/bin/du -hd1 /var/cache/pacman/pkg/)
+            local amount=$(echo "$usage" | awk '{print $1}')
+            local folder=$(echo "$usage" | awk '{print $2}')
+            UseColor info
+            printf2 "==> Disk space used in the package cache: %s [%s]\n" "$amount" "$folder"
+            UseColor reset
+            ;;
+    esac
+}
+
+ResetPacmanConf() {
+    local -r pacmanconf_url="https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-ISO/refs/heads/main/airootfs/etc/pacman.conf"
+    local -r tmpfile=$(mktemp)
+    wget -qO $tmpfile "$pacmanconf_url" || DIE "cannot fetch $pacmanconf_url"
+    local -r time=$(date +%Y%m%d-%H%M%S)
+    sudo mkdir -p /etc/.EOS_BACKUPDIR
+    sudo mv $pacmanconf /etc/.EOS_BACKUPDIR/${pacmanconf##*/}.$time
+    sudo gzip "/etc/.EOS_BACKUPDIR/${pacmanconf##*/}.$time"
+    sudo cp $tmpfile $pacmanconf
+    rm -f $tmpfile
+}
+
+SingleOptions() {
+    local ret=0
+    while [ "$1" ] ; do
+        case "$1" in
+            # --system-checks)                     SystemValidityChecks_warn ;;  # does not exit without a problem
+
+            --reset-pacmanconf)                  ResetPacmanConf
+                                                 exit 0
+                                                 ;;
+            --check-mirrors)                     CheckYourEndeavourosMirrorlist || ((ret++))
+                                                 CheckYourArchMirrorlist        || ((ret++))
+                                                 exit $ret
+                                                 ;;
+            --check-mirrors-arch)                CheckYourArchMirrorlist || ((ret++))
+                                                 exit $ret
+                                                 ;;
+            --check-mirrors-eos)                 CheckYourEndeavourosMirrorlist || ((ret++))
+                                                 exit $ret
+                                                 ;;
+            --edit-mirrorlist)                   EditMirrorlist "$2"
+                                                 exit 0
+                                                 ;;
+            --show-only-fixed)                   which arch-audit >/dev/null && arch-audit -u
+                                                 exit
+                                                 ;;
+            --show-upstream-news)                local br=$(eos_select_browser)
+                                                 [ "$br" ] && $br https://archlinux.org/news
+                                                 exit
+                                                 ;;
+            --dump-options)                      lopts="${lopts//:/}"
+                                                 lopts="--${lopts//,/ --}"
+                                                 sopts="${sopts//:/}"
+                                                 sopts="$(echo "$sopts" | sed -E 's|([a-z])| -\1|g')"
+                                                 echo $lopts $sopts
+                                                 exit 0
+                                                 ;;
+            -h | --help)                         Usage 0 ;;
+        esac
+        shift
+    done
+}
+
+Options() {
+    local tmp
+
+    tmp="$(LANG=C /usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@" 2>&1)" || {
+        # First, fix a getopt bug about missing argument for short options.
+        tmp="$(echo "$tmp" | head -n1)"
+        case "$tmp" in
+            "$progname: option requires an argument -- '"[a-z]"'")
+                tmp=$(echo "$tmp" | sed -E "s|.*'([a-z])'.*|\1|")
+                tmp="$progname: option '-$tmp' requires an argument"
+                ;;
+        esac
+        echo2error  "$tmp\n"
+        if false ; then
+            UseColor warning
+            Usage
+            UseColor reset
+        else
+            echo2tip "==> more info with command: $progname --help"
+        fi
+        exit 1
+    }
+    eval set -- "$tmp"
+
+    local ret=0
+    while true ; do
+        case "$1" in
+            --reset-pacmanconf | --check-mirrors | --check-mirrors-arch | --check-mirrors-eos | --edit-mirrorlist | --show-only-fixed | --show-upstream-news | --dump-options | -h | --help)
+                : # already handled in SingleOptions
+                ;;
+            # --system-checks)                     ;;                # already handled in SingleOptions
+            --fast)                              eufast=yes ;;
+            --nvidia)                            nvidia=yes ;;
+            --no-keyring)                        keyring=no ;;
+            --descriptions | -d)                 descriptions=yes ;;
+            --faillock-check)                    faillockcheck=yes ;;
+            --no-sync)                           sync=":" ;;
+            --keyrings-reset)                    ResetKeyrings ;;
+            --clear-databases)                   ClearDatabases ;;
+            --check-databases)                   CheckPackageDatabases ;;
+            --run-mode)                          mode="$2"; shift ;;
+            --min-free-bytes)                    min_free_bytes="$2" ; shift ;;
+            --helper)                            SetHelper "$2" ; shift ;;
+            --aur)                               SetHelper; eufast_opt+=" $1" ;;
+            --paru | --yay | --pacman)           SetHelper "${1/--/}" ;;
+	    --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
+            --cache-limit | -l)                  paccache_limit="$2"
+                                                 case "$paccache_limit" in
+                                                     1|2|3|4|5) ;;
+                                                     *) DIE "value '$paccache_limit' for option $1 is not supported; use numbers 1 to 5" ;;
+                                                 esac
+                                                 shift
+                                                 ;;
+            --other-updates)                     other_updates=yes ;;
+            --colors)                            use_colors="$2"
+                                                 case "$use_colors" in
+                                                     yes | no) ;;
+                                                     *) DIE "value '$use_colors' for option $1 is not supported; use 'yes' or 'no'" ;;
+                                                 esac
+                                                 shift
+                                                 ;;
+            
+            --) shift ; break ;;
+        esac
+        shift
+    done
+}
+
+Usage() {
+    cat <<EOF >&2
+$progname is a package updater for EndeavourOS and Arch.
+
+$progname is implemented as a wrapper around commands pacman and optionally yay/paru.
+Essentially runs commands 'pacman -Syu' and optionally 'yay -Sua' or 'paru -Sua'.
+
+$progname includes (by default) special help in the following situations:
+- A dangling pacman db lock file (/var/lib/pacman/db.lck).
+- Disk space availability for updates (with a configurable minimum space).
+- Keyring package updating before updating other packages.
+- Running the 'sync' command after update.
+
+Optional help:
+- Can clear package databases in case of constant problems with them.
+- Can reset keyrings in case of constant problems with them.
+- Can check the validity of the locally configured lists of mirrors.
+- Updates AUR packages (with option --helper, see Usage below).
+- Ad hoc check for Nvidia GPU driver vs. kernel updates (non-dkms only).
+
+Usage: $progname [options]
+Options:
+  --help, -h              This help.
+  --check-mirrors         Check files $eml and $aml
+                          for unsupported mirrors.
+                          This may be useful when one or more mirrors start failing unexpectedly.
+                          Note: only x86_64 hardware is supported.
+  --check-mirrors-eos     Check file $eml for unsupported mirrors.
+  --check-mirrors-arch    Check file $aml for unsupported mirrors.
+  --edit-mirrorlist <val> Edit chosen mirrorlist file. Supported values: arch, endeavouros. No default.
+  --reset-pacmanconf      Replace your current $pacmanconf with the EndeavourOS original.
+                          Note: do this only if you need to restore the original file.
+  --fast                  Do a *fast check* for updates in order to reduce the amount of network traffic.
+                          Note that the fast check
+                             * applies to only updates on EndeavourOS and Arch repos, and optionally on AUR
+                             * in special cases may not detect available updates; if so, run
+                               $progname without option --fast
+  --descriptions, -d      Show the descriptions of the packages to be updated. Note: AUR not supported.
+  --nvidia                Check also nvidia driver vs. kernel updates. Useful only with the Nvidia GPU.
+  --check-databases       Check for the package database being corrupted or not.
+  --clear-databases       Clears package database files.
+                          Use this only if package database issues constantly make system update fail.
+  --keyrings-reset        Resets Arch and EndeavourOS keyrings.
+                          Use this only if keyring issues constantly make system update fail.
+  --no-keyring            Do not try to update keyrings first.
+  --no-sync               Do not run 'sync' after update.
+  --run-mode <val>        Specifies the mode how the updating commands will be executed.
+                          Supported values:
+                             plain   Use current privileges. Uses 'sudo' for commands that need it.
+                                     If $progname was executed as root, mode changes from plain to login.
+                             root    Use elevated privileges. Impersonate $LOGNAME for the AUR helper.
+                             login   Use elevated privileges. Login as $LOGNAME for the AUR helper.
+                          Default: plain.
+  --show-only-fixed       Show only packages that have already been fixed (runs: arch-audit -u) and exit.
+  --show-upstream-news    Show the news page of the upstream site and exit.
+  --pacdiff		  Run eos-pacdiff in the end of $progname. See also EOS_UPDATE_PACDIFFER
+  			  in file /etc/eos-script-lib-yad.conf.
+  --cache-limit, -l <val> Runs 'paccache -rk <val>' after updates. Limits the size of the package cache.
+                          Supported numbers for <val>: 1..5.
+  --colors <val>          Enable or disable using additional colors in output. By default they are enabled.
+                          Supported values: "yes" or "no".
+  --helper <val>          AUR helper name. Supported values: yay, paru, pacman.
+                          Default: pacman
+                          Other AUR helpers supporting option -Sua like yay should work as well.
+  --paru                  Same as --helper=paru.
+  --yay                   Same as --helper=yay.
+  --aur                   Uses the AUR helper configured in /etc/eos-script-lib-yad.conf.
+  --pacman                Same as --helper=pacman. Default. (Note: pacman does not support AUR directly).
+  --min-free-bytes <val>  Minimum amount of free space (in bytes) that the root partition should have
+                          before updating. Otherwise a warning message will be displayed.
+                          Default: $min_free_bytes
+  --other-updates         Enable support for *user-defined* other updates (e.g. 'flatpak update').
+
+Tip: create an alias in file ~/.bashrc for $progname to have the options you need, for example:
+
+     # Enable Nvidia update check, disable sync execution, use paru for AUR updates.
+     alias $progname='$progname --nvidia --no-sync --paru'
+
+EOF
+#  --system-checks         After some checks may give recommendations for your system, but changes nothing.
+    [ "$1" ] && exit $1
+}
+
+DiskSpace() {
+    local available=$(findmnt / -nbo avail)
+    local min=$min_free_bytes
+
+    if [ $available -lt $min ] ; then
+        {
+            WARN "your root partition (/) has only $available bytes of free space."
+            if [ $(du -b -d0 /var/cache/pacman/pkg | awk '{print $1}') -gt $min ] ; then
+                printf "\nFor example, cleaning up the package cache may help.\n"
+                printf "Command 'sudo paccache -rk1' would do this:"
+                paccache -dk1
+                printf "Command 'sudo paccache -ruk0' would do this:"
+                paccache -duk0
+                echo ""
+            fi
+        } >&2
+    fi
+}
+
+Cleanup() {
+    [ "$cmdfile" ] && rm -f -- "$cmdfile"
+}
+
+SystemValidityChecks_error() {
+    local files_required=("$pacmanconf" "$aml" "$eml")
+    local file
+    for file in "${files_required[@]}" ; do
+        [ -e "$file" ]                   || DIE "file '$file' is missing!"
+        [ $(stat -c %s "$file") -gt 0 ]  || DIE "file '$file' is empty!"
+        [ -r "$file" ]                   || DIE "file '$file' is not readable!"
+    done
+    CheckReposPacmanConf
+}
+
+# SystemValidityChecks_warn() {
+#     local NATIVES_TO_AUR=()
+#     local NATIVES_REMOVED=()
+#     local file=/etc/eos-update-removed.conf
+#     local pkg
+
+#     if [ -e "$file" ] ; then
+#         source "$file"
+#         for pkg in "${NATIVES_TO_AUR[@]}" ; do
+#             if pacman -Qq "$pkg" &> /dev/null ; then
+#                 WARN "package '$pkg' was moved from repos to AUR. Consider removing it from this system."
+#             fi
+#         done
+#         for pkg in "${NATIVES_REMOVED[@]}" ; do
+#             if pacman -Qq "$pkg" &> /dev/null ; then
+#                 WARN "package '$pkg' was removed from repos. Consider removing it from this system."
+#             fi
+#         done
+#     fi
+# }
+
+Main() {
+    local progname="${0##*/}"
+    local cmdfile=""
+    local -r pacmanconf=/etc/pacman.conf
+    local -r eml=/etc/pacman.d/endeavouros-mirrorlist
+    local -r aml=/etc/pacman.d/mirrorlist
+
+    local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
+
+    local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
+    lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
+    lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:"
+    # lopts+=",system-checks"
+    local sopts="dhl:"
+
+    local use_colors=yes
+    local helper="pacman"
+    local lock=/var/lib/pacman/db.lck
+    local rmopt=f
+    local mode=plain
+    local pacdiffer=""                            # default = "" because pacdiff can change critical files
+    local -r pacdiffer_cmd_default="eos-pacdiff --quiet"
+    local subopts=()
+    local afteropts=()
+    local keyring=yes                             # user may disable keyring check with --no-keyring
+    local nvidia=no                               # user may enable Nvidia check with --nvidia
+    local descriptions=no                         # user may enable showing descriptions of the package updates
+    local faillockcheck=no
+    local other_updates=no                        # user can add update commands for other sources
+    local nvidia_opt=""
+    local sync="sync"
+    local eufast=no
+    local eufast_opt="--arch --endeavouros"
+    local paccache_limit=""
+
+    SystemValidityChecks_error
+
+    trap Cleanup EXIT
+
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
+    source /usr/share/endeavouros/scripts/translations.bash || exit 1
+    
+    SingleOptions "$@"
+
+    _init_translations
+    
+    Options "$@"
+
+    if [ $eufast = yes ] ; then
+        eos-update-fast $eufast_opt
+        case "$?" in
+            2) echo2 "$(ltr sysup_no)" ; exit ;;
+        esac
+    fi
+
+    if [ $EUID -eq 0 ] && [ $mode = plain ] ; then    # mode can change based on current privileges
+        mode=login
+    fi
+
+    [ "$EOS_UPDATE_PACDIFFER" ] && pacdiffer="$EOS_UPDATE_PACDIFFER"
+
+    [ $descriptions  = yes ] && subopts+=(--descriptions)
+    [ $nvidia  = yes ] && subopts+=(--nvidia)
+    [ $keyring = yes ] && subopts+=(--keyrings)
+
+    echo2tip "$progname: package updater with additional features"
+
+    DiskSpace
+
+    if [ -e $lock ] && sudo fuser $lock &>/dev/null ; then
+        echo2error "==> File $lock is in use.\n    Check if another process is still managing packages."
+        exit 1
+        # DIE "file $lock is in use. Check if another process is still managing packages."
+        rmopt=i
+    fi
+
+    case "$helper" in
+	pacman)
+            echo2info "Updating native apps..."
+            CreateCmds
+	    ;;
+	*)
+            echo2info "Updating native and AUR apps..."
+            CreateCmds "$helper -Sua"
+	    ;;
+    esac
+    chmod u+x,go-rwx "$cmdfile"
+    FaillockCheck
+
+    case "$mode" in
+        plain)         "$cmdfile" ;;
+        login | root)  sudo "$cmdfile" ;;       # $EOS_ROOTER "$cmdfile" ;;
+        *)             DIE "unsupported value for option --run-mode" ;;
+    esac
+
+    PacCache
+
+    # support for user-defined other updates
+    if [ $other_updates = yes ] ; then
+        local otherUpdatesFile=/usr/bin/eos-update-other.bash
+        if [ -e $otherUpdatesFile ] ; then
+            bash $otherUpdatesFile
+        else
+            WARN "script $otherUpdatesFile does not exist"
+        fi
+    fi
+
+    Cleanup
+}
+
+CreateCmds() {
+    local helper2="$1"
+    [ "$helper2" ] || helper2="true"
+
+    cmdfile=$(mktemp "$HOME/.$progname.helper.XXX")
+
+    cat <<EOF > "$cmdfile"
+#!/bin/bash
+
+eos_update_as_user() {
+    sudo rm -$rmopt $lock                 || return
+    if [ ! -e $lock ] ; then
+        sudo pacman -Sy                   || return
+        ${progname}-extras ${subopts[*]}  || return
+        sudo pacman -Su                   || return
+        $helper2                          || return             # Note: 'paru' returns 1 on error, but 'yay' does not!
+        $pacdiffer
+        $sync
+    fi
+}
+eos_update_as_root() {
+    local -r so="$1"
+    rm -$rmopt $lock                        || return
+    if [ ! -e $lock ] ; then
+        pacman -Sy                          || return
+        ${progname}-extras ${subopts[*]}    || return
+        pacman -Su                          || return
+        /bin/sudo $so --user $LOGNAME $helper2  || return
+        $pacdiffer
+        $sync
+    fi
+}
+case "$mode" in
+    plain) eos_update_as_user ;;
+    root)  eos_update_as_root ;;
+    login) eos_update_as_root --login ;;
+esac
+EOF
+}
+
+Main "$@"

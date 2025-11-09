@@ -1,0 +1,144 @@
+#!/bin/bash
+
+DIE() {
+    echo "$progname: error: $1" >&2
+    exit 0
+}
+
+BannerLine() {
+    local -r str="$1"
+    [ "$separator" = "yes" ] || return
+    [ -n "$str" ] || return
+    local maxlength="$(stty size | awk '{print $NF}')"      # "$COLUMNS"
+
+    case "$maxlength" in
+        "") maxlength=$maxlen
+            ;;
+        *)  ((maxlength-=2))
+            [ $maxlength -lt $maxlen ] && maxlength=$maxlen
+            ;;
+    esac
+    case "$title" in
+        "") printf "%0.s$str" $(seq $maxlength) ;;
+        *)
+            # ===== title =====
+            # left        right
+            local titlelen=${#title}
+            local leftlen=$(((maxlength - titlelen)/2))    # leftlen == rightlen
+            printf "%0.s$str" $(seq $leftlen)
+            echo -n " $title "
+            printf "%0.s$str" $(seq $leftlen)
+            ;;
+    esac
+    echo ""
+}
+
+CheckValueYesNo() {
+    local -r variable="$1"
+    local -r option="$2"
+    case "$variable" in
+        yes | no) ;;
+        *) DIE "option $option has an unsupported value '$variable' (only 'yes' or 'no' supported)" ;;
+    esac
+}
+
+AsPlainUserIfElevated() {
+    local cmd=""
+
+    if [ $(id -u) -eq 0 ] ; then
+        # is elevated user
+        case "$SUDO_USER" in
+            "") cmd="/bin/runuser -u $LOGNAME -- $*" ;;     # is root
+            *)  cmd="/bin/sudo -u $SUDO_USER $*" ;;         # is sudo
+        esac
+    else
+        # is non-elevated user
+        cmd="$*"
+    fi
+    $cmd
+}
+
+Usage() {
+    cat <<EOF
+Usage: $progname [options] [package-names]
+
+Options:
+    -h, --help         This help.
+    --title[=*]        Adds the given title to the banner line surrounding update descriptions.
+    --header[=*]       Specfies if a header is shown for the updates (yes or no).
+    --separator[=*]    Specified if the banner lines will be displayed or not (yes or no).
+    --include-version  Includes the latest package versions.
+    -S                 Includes the repo of the package.
+    -Q                 Use local database.
+
+Package names are optional, and can be used for avoiding to fetch the updates separately.
+
+EOF
+}
+
+Main() {
+    local -r progname=${0##*/}
+    local title=""
+    local header=yes
+    local separator=yes
+    local pkgnames=()
+    local source="-Q"
+    local repo=""
+    local ver=""
+    local has_version=no
+    local helper=yay                # helper = one of: yay, paru, pacman
+    local SEP=$'\e'
+
+    [ -x /bin/"$helper" ] || helper=paru
+    [ -x /bin/"$helper" ] || helper=pacman
+    [ -x /bin/"$helper" ] || DIE "none of the required package managers installed!"
+
+    while [ "$1" ] ; do
+        case "$1" in
+            -h | --help)          Usage; return 0 ;;
+            --title=*)            title="${1#*=}" ;;
+            --title)              title="$2" ; shift ;;
+            --header=*)           header="${1#*=}" ;;
+            --header)             header="$2" ; shift ;;
+            --separator=*)        separator="${1#*=}" ;;
+            --separator)          separator="$2" ; shift ;;
+            -S | --include-repo)  source="-S"; repo="%r/" ;;
+            -Q)                   source="-Q"; repo="" ;;
+            --include-version)    source="-S"; ver="%v$SEP" ;;
+            -*)                   DIE "unsupported option '$1'" ;;
+            *)                    pkgnames+=("$1") ;;                        # packages as parameters
+        esac
+        shift
+    done
+    CheckValueYesNo "$header"    "--header"
+    CheckValueYesNo "$separator" "--separator"
+
+    if [ ${#pkgnames} -eq 0 ] ; then
+        readarray -t pkgnames < <(AsPlainUserIfElevated $helper -Quq)       # assumes 'pacman -Sy' was just executed
+        [ ${#pkgnames} -eq 0 ] && return
+    fi
+
+    local out=""
+    local data=""
+
+    data=$(expac $source "$repo%n${SEP}$ver%d" "${pkgnames[@]}" | sort)
+
+    if [ "$header" = "yes" ] ; then
+        case "$has_version" in
+            yes) local -r hd="Name${SEP}Latest${SEP}Description" ;;
+            no)  local -r hd="Name${SEP}Description" ;;
+        esac
+        local -r ul="${hd//[a-zA-Z ]/\~}"            # underline matching the header text
+        out=$(printf '%s\n%s\n%s\n' "$hd" "$ul" "$data")
+    else
+        out=$(printf "%s\n" "$data")
+    fi
+    out=$(echo "$out" | /bin/column -t -s"${SEP}")
+    local -r maxlen=$(echo "$out" | wc -L)
+
+    BannerLine '='
+    echo "$out"
+    BannerLine '='
+}
+
+Main "$@"
