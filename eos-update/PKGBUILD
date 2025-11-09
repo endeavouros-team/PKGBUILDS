@@ -31,7 +31,6 @@ source=(
   $_url/eos-update-extras
   $_url/eos-update-fast
   $_url/eos-update-other.bash
-  $_url/eos-update-removed.conf
 )
 
 sha512sums=('939710923c24d47f82a82d3a90cb9353c2850146baa0aa6ff2be311cf91c4ef4e06f66e2c42b9e95e66b65ef7314ee016f050e0acfc42f89552e349e4b55e5b2'
@@ -40,8 +39,7 @@ sha512sums=('939710923c24d47f82a82d3a90cb9353c2850146baa0aa6ff2be311cf91c4ef4e06
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
             '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
             '25d45e2698f4cfc46ba4f1b68053180a9292997eda7d8dbf15ab5370e9f8504634a37732076bdebfb5b7b1f109e8325a0662768cf8858f777fde8885559f7767'
-            '6b7c6c4e133c487809d26aff5aeaf0a1e4208dcf2e5c6565d70a68d81fc921e4e325fbaaf47ed788417cd0374c6148d65379bf4de90b2a0c4c48c3b46a06c201'
-            '822218631bfdc00355b5ab4518fc1dd136e48f97bdb26e234a51509848243bc1f1ce0e720ff9d53bf9a43fb905fdd59d5e8b5bf5852f19fa06dcd7b3c33a5537')
+            '6b7c6c4e133c487809d26aff5aeaf0a1e4208dcf2e5c6565d70a68d81fc921e4e325fbaaf47ed788417cd0374c6148d65379bf4de90b2a0c4c48c3b46a06c201')
 
 package() {
   local file src
@@ -49,10 +47,9 @@ package() {
   for src in "${source[@]}" ; do
       file="${src##*/}"
       case "$file" in
-          *.conf)                                   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
-          *.desktop)                                install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
-          *.completion)                             install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
-          *)                                        install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
+          *.desktop)             install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
+          *.completion)          install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
+          *)                     install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done
 }
