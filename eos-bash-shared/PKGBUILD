@@ -2,21 +2,23 @@
 
 # Disabled eos-pkginfo for now.
 # Disabled eos-pkg-changelog for now.
+# Moved eos-update files to a separate package.
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.10.5
+pkgver=25.11
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
-  bash
-  eos-translations
-  expac                 # for many EOS apps
-  dbus-python           # for ksetwallpaper.py
-  endeavouros-theming   # for eos-wallpaper-set
-  xdg-utils             # for eos-sendlog
-  #yad                   # provides support for graphical dialogs
+    bash
+    eos-translations
+    eos-update            # backwards compatibility, to be removed from this depends array later
+    expac                 # for many EOS apps
+    dbus-python           # for ksetwallpaper.py
+    endeavouros-theming   # for eos-wallpaper-set
+    xdg-utils             # for eos-sendlog
+    #yad                   # provides support for graphical dialogs
 )
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
@@ -24,8 +26,6 @@ optdepends=(
     "kde-gtk-config: to remove gtk related yad warnings"
     "libnotify: for eos-reboot-required2"
     "webkit2gtk-4.1: for eos-pacdiff to show message windows implemented with yad"
-    "yay: alternative for AUR updates in eos-update"
-    "paru: alternative for AUR updates in eos-update"
     "arch-audit: for showing only packages that have already been fixed"
     "yad: needed for some EOS apps"
     "unzip: for eos-download-wallpapers"
@@ -60,13 +60,6 @@ source=(
   $_url/su-c_wrapper
   $_url/eos-run-cmd-with-su
   $_url/eos-wallpaper-set
-  $_url/eos-update
-  $_url/eos-update.desktop
-  $_url/eos-update.completion
-  $_url/eos-update-descriptions
-  $_url/eos-update-extras
-  $_url/eos-update-fast
-  $_url/eos-update-other.bash
   $_url/eos-waiting-indicator
   $_url/eos-pkg-changelog
   $_url/eos-pkg-changelog.completion
@@ -114,13 +107,6 @@ sha512sums=('f7ff37175abbf2b885911ded34449bba17e3a3ef74a117e15c51824a220524faecc
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
             '9b78acdbca7d42b167a78a77565a4d87d88c74f74d7130a22eebd3b6579c653589020d97ffbfe311a0976c2e7deb33fe128e045d5967833bb6eb426a5d5c1385'
-            'adb41b9b06f6ce460876c65ed780c49c838b2759ea1358fbf826b9cd2fca335e62af8d8f8ec0711b4ef51ef2ea6d58cb373ded35295133ee1d9426dd9e02151b'
-            'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
-            '2e318929230800e4c75c7793811f856fc9cbaeadbadebb51ba852a10a2450dee1db1ee1071cee82bedc465f5f32646f395616f003bbb0e612270a43cd31a37f9'
-            'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
-            '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
-            '25d45e2698f4cfc46ba4f1b68053180a9292997eda7d8dbf15ab5370e9f8504634a37732076bdebfb5b7b1f109e8325a0662768cf8858f777fde8885559f7767'
-            '6b7c6c4e133c487809d26aff5aeaf0a1e4208dcf2e5c6565d70a68d81fc921e4e325fbaaf47ed788417cd0374c6148d65379bf4de90b2a0c4c48c3b46a06c201'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '04c3f6d849c46e3a2e47169e1a919e8769c15480d332c283d655e111ed66d263a851458135cd09aaf9daaa7ebb194ba28e7112dfd718757a4fc3514b97b71eb8'
             'ec018db2a2d61e46118bcd04abbab0a72313551d440e4cb52cd2b7dc8513dcd09f44aa12273f68c0855737b8a1d22c413ac4d6c51cf9f58229989703976276a1'
