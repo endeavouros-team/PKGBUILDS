@@ -1,0 +1,10 @@
+[Unit]
+Description=Notify about reboot on special conditions.
+
+[Service]
+Type=oneshot
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/eos-reboot-required3
+
+[Install]
+WantedBy=eos-reboot-required.timer
