@@ -655,7 +655,7 @@ Options() {
             --show-rank-info)           show_ranking_info="$2"; shift ;;
             --show-orig-list)           show_original_list="$2"; shift ;;
             -b)                         show_original_list=no ;;
-            --test-all | -a)            save=no
+            --test-all | -a)            #save=no
                                         test_all=yes
                                         EOS_IGNORED_MIRRORS=()
                                         ignored_mirrors=""
