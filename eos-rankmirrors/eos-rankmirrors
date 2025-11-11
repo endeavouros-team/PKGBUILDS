@@ -655,11 +655,13 @@ Options() {
             --show-rank-info)           show_ranking_info="$2"; shift ;;
             --show-orig-list)           show_original_list="$2"; shift ;;
             -b)                         show_original_list=no ;;
-            --test-all | -a)            #save=no
+            --test-all | -a)            # Internal testing option to test all mirrors.
+                                        # save=no
+                                        # [ $timeout -lt $timeout_default ] && timeout=$timeout_default
                                         test_all=yes
                                         EOS_IGNORED_MIRRORS=()
                                         ignored_mirrors=""
-                                        [ $timeout -lt $timeout_default ] && timeout=$timeout_default
+                                        show_original_list=no
                                         ;;
             --colors)                   use_colors="$2"
                                         shift
@@ -672,6 +674,7 @@ Options() {
         esac
         shift
     done
+    [ "$test_all" = "no" ] && source /etc/$progname.disabled
 }
 
 Check-mirror_verbosity() {
@@ -782,8 +785,6 @@ Main()
     GetReferenceUpdateLevel
 
     Options "${CMD_OPTIONS[@]}" "$@"
-
-    [ "$test_all" = "no" ] && source /etc/$progname.disabled
 
     new=$(/usr/bin/mktemp) ; delete_at_end+=("$new")
 
