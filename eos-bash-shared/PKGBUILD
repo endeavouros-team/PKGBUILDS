@@ -6,7 +6,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=25.11
+pkgver=25.11.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -67,13 +67,6 @@ source=(
   $_url/changelogs.conf.endeavouros
   $_url/nano-pager
 
-  $_url/eos-reboot-required2
-  $_url/eos-reboot-required3
-  # $_url/eos-reboot-required.conf
-  $_url/eos-reboot-required.hook
-  $_url/eos-reboot-required.timer
-  $_url/eos-reboot-required.service
-
   $_url/eos-sendlog
   $_url/eos-sendlog-helper
   $_url/eos-sendlog.conf
@@ -86,6 +79,7 @@ source=(
   $_url/eos-github2gitlab
   $_url/eos-select-file-server
   $_url/curl-exit-code-to-string
+  $_url/exit-code-to-string.completion
   $_url/eos-sleep-counter
   $_url/show-location-info
   $_url/show-location-info.completion
@@ -115,11 +109,6 @@ sha512sums=('7a6353e21ba932321ce7ebba8d9379ed4ff8525994a23d4aac1c778806de6a5d812
             'ec018db2a2d61e46118bcd04abbab0a72313551d440e4cb52cd2b7dc8513dcd09f44aa12273f68c0855737b8a1d22c413ac4d6c51cf9f58229989703976276a1'
             '0d77014adcae714b8d20ebebf566855c3b8b1b5b9e2e1dfa62ad4a589e675c1b0e69683206bb638706e8650ae3acbf2fe7176116b86c12a40377723b80629646'
             '68877d5f4052d16b96fccbd87e8d8d8e92fdd6bf1ae54c52da86a8e7ba189d69a5df47f5b9c6f8de585c5c4479b40164266a53a6385c4b25259911eed5a86bdd'
-            '57e8bc51b634a3a509fda5365d9a472b719fa2574a894f8e8425f8bf2b8b9b209fba04bc6b2129d56825e552e7fedeef60ec4fa2071f5ea4ebaf48dee7d29037'
-            '38ccd746d1b3bad19bc7f4132e7b6193704dac4432a5ef15019bd8e619a01304155d235a307f2784095a59606a8278eebac18b5eb11bf2b344f955d42762f4bf'
-            '195cc83df58e1f65b43f39202fe60aecf348e843c9c1b414897dbf6577ee7ffc67b1d1ba5ca0325e501cffebd304b6eca90f1c8fd4af4dd75b94fbc7834f59f4'
-            'b26a06683f6ab8039df3befe93140a72c9e750f9c6a1e5e9b9f653a776a3ef9ab61e14a8485c53022e5959dd17eb94d8fd0be6f81a5e6a0aef95701f0100817a'
-            '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f'
             '1f6f0cdcd48e74b19ad530823e08b54fa16ce3b82cc156aff05c966726cccde9496a93006c7583941e77361b5b704d6ccf4187955313ff260386ff53f11f0139'
             'fccc2bb9e63c6323b52ae284f805ce4be5bafb9f880c06b884cbf7385d63dbf335111ea504d770c3d72ed76095557ce8487e1b825acee0ab6f7d9560ddfdc83d'
             'f2fa1a132e3971562cfc6463c4773043eacde6bc1ee521d7f330764d3ae0897c8bd8545c801e320954ebca9fc7ea59ba32b0ad93aae96a0652e2f0383c8198f7'
@@ -132,6 +121,7 @@ sha512sums=('7a6353e21ba932321ce7ebba8d9379ed4ff8525994a23d4aac1c778806de6a5d812
             '1ca593553b87b8c2bcf5038cb1df715adefa39a0e4ad642aa2eef0d8b78c31cf458efa38de1171a1e7530254dff1a896b137501c075257bad19865102292d977'
             'a62d71bc1a750e3dc5516aefafd7e407a7d33bb9761ba21b456863cb042ff7f073375bce18426321f54e5343ac728bf117d181b9ee3e3186917b63f0b2b88b07'
             '13761887087422cf561ce298f54f2969460e50ee63696e4a6a8cd0f11d1fb8c16ddc5541dea32a9cbbf4f8c1ed6125e9fd151efe780186f524b5edbb79604989'
+            '31fd9e5907244baa5490046c36a353e0c26a9965c7aae1abd5108dc7633ec99a69f09bc20cf462915cd14e3e4550e6bb9fd80f6eb8dc6744a865605d88c2a9b6'
             '466138fa174b4cc0f2c2bdad7f9c8551ba17fb08ee52084ad4981ef6ae35096294444000f5705913adcca055ce07c869c5d44c2c126b0dde9ee7e6572965a61d'
             'fde9e8595c21eedf5ff69e6bdbc881dfba1d45c23500332c39074d97e0999b39044a200f4da65f800a6c380520406ad2f3a4b2e7db2fcc608787e2a7e10a8d61'
             '4cfe8139e22b76e4363111472672600c2a7882b0729caf030580ade2a5514ff3d02f09ef62a69956394ae4961eb667908d2f2114b2dd7c20398777d85765c0b1'
