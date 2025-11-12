@@ -13,12 +13,13 @@ license=('GPL')
 depends=(
     bash
     eos-translations
-    eos-update            # backwards compatibility, to be removed from this depends array later
-    expac                 # for many EOS apps
-    dbus-python           # for ksetwallpaper.py
-    endeavouros-theming   # for eos-wallpaper-set
-    xdg-utils             # for eos-sendlog
-    #yad                   # provides support for graphical dialogs
+    eos-update              # backwards compatibility, to be removed from this depends array later
+    eos-reboot-recommended  # backwards compatibility, to be removed from this depends array later
+    expac                   # for many EOS apps
+    dbus-python             # for ksetwallpaper.py
+    endeavouros-theming     # for eos-wallpaper-set
+    xdg-utils               # for eos-sendlog
+    # yad                   # provides support for graphical dialogs
 )
 optdepends=(
     "xorg-xrandr: for eos-wallpaper-set (on Xfce) and ChangeDisplayResolution"
