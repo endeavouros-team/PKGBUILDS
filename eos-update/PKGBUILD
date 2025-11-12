@@ -2,7 +2,7 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=25.11
+pkgver=25.11.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,7 +17,7 @@ optdepends=(
     "arch-audit: for showing only packages that have already been fixed"
 )
 
-backup=()
+backup=(etc/eos-update-other.bash)
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/refs/heads/master/$pkgname"
@@ -30,10 +30,10 @@ source=(
   $_url/eos-update-descriptions
   $_url/eos-update-extras
   $_url/eos-update-fast
-  $_url/eos-update-other.bash
+  $_url/eos-update-other.bash    # "config" for additional update tools
 )
 
-sha512sums=('939710923c24d47f82a82d3a90cb9353c2850146baa0aa6ff2be311cf91c4ef4e06f66e2c42b9e95e66b65ef7314ee016f050e0acfc42f89552e349e4b55e5b2'
+sha512sums=('27422e2e6f20b97cd9a43805acb7e82c8e53010eeafd7a0340cb0ec7cb1d52e2bfda74fdf603214239df02d957dc2108a37de5cdb5a94aa5a93b370cbf4f9ca7'
             'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             '2e318929230800e4c75c7793811f856fc9cbaeadbadebb51ba852a10a2450dee1db1ee1071cee82bedc465f5f32646f395616f003bbb0e612270a43cd31a37f9'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
@@ -49,6 +49,7 @@ package() {
       case "$file" in
           *.desktop)             install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
           *.completion)          install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
+          *.bash)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *)                     install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done

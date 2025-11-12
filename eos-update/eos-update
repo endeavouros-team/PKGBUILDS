@@ -607,7 +607,7 @@ Main() {
 
     # support for user-defined other updates
     if [ $other_updates = yes ] ; then
-        local otherUpdatesFile=/usr/bin/eos-update-other.bash
+        local otherUpdatesFile=/etc/eos-update-other.bash
         if [ -e $otherUpdatesFile ] ; then
             bash $otherUpdatesFile
         else
