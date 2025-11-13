@@ -141,6 +141,45 @@ DumpOptions() {
     fi
 }
 
+CheckTheSum() {
+    if [ "$(/bin/ls "$TARGETDIR"/*.iso.sha512sum)" ] ; then
+        sha512sum_check
+    fi
+}
+
+sha512sum_check() {
+    pushd "$TARGETDIR" >/dev/null
+    local ret=0                                     # $ret will contain "exit code"
+    local tailname=".iso.sha512sum"                 # checksum file name should end with this string
+    local checksumfile=(*$tailname)    # may be more than one file
+    local csfile
+
+    case "$checksumfile" in
+        "*"$tailname)
+            echo2 "checksum file not found"
+            ret=2
+            ;;
+        *$tailname)
+            readarray -t checksumfile <<< $(printf "%s\n" "${checksumfile[@]}" | fzf -m)
+            for csfile in "${checksumfile[@]}" ; do
+                printf "==> sha512sum -c %s ... " "$csfile"
+                if sha512sum -c "$csfile" &> /dev/null ; then
+                    echo OK
+                else
+                    echo FAIL
+                    ret=1
+                fi
+            done
+            ;;
+        *)
+            echo2 "file '$checksumfile' not supported"
+            ret=3
+            ;;
+    esac
+    popd >/dev/null
+    return $ret
+}
+
 Options() {
     # "Bind" long option to its short option. This is used in DumpOptions().
     # Short option starts with '/'.
@@ -241,11 +280,12 @@ Main() {
 
     local header
     local header_lines=(
-        "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=accept, ESC=quit"
-        "Other keys:      Ctrl-E = Edit config file"
-        "                 Ctrl-H = Help"
-        "Download folder: $TARGETDIR"
-        "AUR helper:      $getter"
+        "Navigation keys:  Up/Down/PgUp/PgDn; TAB=Select, ENTER=accept, ESC=quit"
+        "Other keys:       Ctrl-E = Edit config file"
+        "                  Ctrl-H = Help"
+        "Download folder:  $TARGETDIR"
+        "Config file:      $configfile2"
+        "Fetching app:     $getter"
     )
     header_lines=("" "${header_lines[@]}" "")        # add empty extra lines to separate header
     printf -v header "%s\n" "${header_lines[@]}"
@@ -298,7 +338,10 @@ Main() {
                           [Ee]*)              exit ;;
                       esac
                       exitcode=$?
-                      [ "$selected" = "$(echo "$items" | tail -n1)" ] && exit $exitcode
+                      if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
+                          CheckTheSum
+                          exit $exitcode
+                      fi
                       ;;
             esac
         done
