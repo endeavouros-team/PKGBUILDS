@@ -395,3 +395,7 @@ _tr_add2 _commonphrase_disabled      "deaktiviert"
 _tr_add2 arch_chroot                 "Information über arch-chroot"
 _tr_add2 arch_chroot_tip             "arch-chroot bietet einen Befehlszeilenzugriff auf ein anderes System"
 _tr_add2 _commonphrase_not_found     "%%s nicht gefunden"                                                   # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
+
+# 2025-Oct-05
+_tr_add2 after_install_mani          "Manuelle Eingriffe"
+_tr_add2 after_install_manitip       "Führen Sie wichtige manuelle Eingriffe durch (für aktuelle notwendige Korrekturen, siehe: https://archlinux.org/news)"
