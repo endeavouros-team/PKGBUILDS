@@ -512,6 +512,19 @@ GetPager() {
     done
 }
 
+EditConfig() {
+    local editor opts=""
+    for editor in "${EOS_SUDO_EDITORS[@]}" ; do
+        if which "${editor%% *}" &>/dev/null ; then
+            case "${editor%% *}" in
+                nano | rnano) opts="--modernbindings"
+            esac
+            break
+        fi
+    done
+    sudo $editor $opts "$conf"
+}
+
 Usage() {
     cat <<EOF | $pager
 Purpose: $progname is meant for creating a new file that can be used as file
@@ -548,6 +561,9 @@ Options:
 
   --no-save, -n
              Don't save the generated mirrorlist.
+
+  --edit-config
+             Edit $conf.
 
   --prefer <wordlist>
              List of preferred mirrors, in the given order.
@@ -638,6 +654,7 @@ Options() {
             --debug)                    debugging=yes ;;
 
             # all user options
+            --edit-config)              EditConfig; exit 0 ;;
             --sort)                     sort="$2" ; shift ;;
             --ignore)                   [ "$ignored_mirrors" ]   && ignored_mirrors+=" ${2//[,|]/ }"   || ignored_mirrors="${2//[,|]/ }" ; shift ;;
             --prefer)                   [ "$preferred_mirrors" ] && preferred_mirrors+=" ${2//[,|]/ }" || preferred_mirrors="${2//[,|]/ }" ; shift ;;
@@ -699,7 +716,7 @@ Main()
     local -r LONG_OPTIONS_INTERNAL="dump-options::,hook-rank,list-only,mirror-add:,internal-testing,debug"
     local    LONG_OPTIONS="verbose,help,no-save,test-all,timeout:,sort:,ignore:,prefer:,mirror-verbosity:"
     LONG_OPTIONS+=",use-local-mirrorlist,show-rank-info:,show-orig-list:,colors:,parallel,sequential"
-    LONG_OPTIONS+=",pager,pager-nano,pager-less"
+    LONG_OPTIONS+=",pager,pager-nano,pager-less,edit-config"
 
     local -r progname=${0##*/}         # eos-rankmirrors
 
