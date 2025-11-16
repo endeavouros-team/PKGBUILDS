@@ -717,8 +717,6 @@ Main() {
 
     source /etc/eos-script-lib-yad.conf    # for SudoEdit()
 
-    AutoUpdateCompletionFiles
-
     case "${1:-}" in
         --time) shift
                 if [ -x /bin/time ] ; then
@@ -800,6 +798,7 @@ Main() {
     fi
 
     OptionsPreHandle "${CONFIG_OPTIONS[@]}" "${CONFIG_OPTIONS_ADVANCED[@]}" "$@"
+    AutoUpdateCompletionFiles
 
     echo2 -n "==> Processing options..."
     Options "${limited_options[@]}"        # this may take time!
