@@ -3,9 +3,9 @@
 # Contributor: Manuel Barrio Linares <mbarriolinares at gmail dot com>
 
 _pkgname=qogir-icon-theme
-pkgname=eos-${_pkgname}
+pkgname=eos-qogir-icons
 pkgver=2025.02.15
-pkgrel=2
+pkgrel=3
 pkgdesc='A colorful design icon theme for linux desktops'
 arch=('any')
 url='https://github.com/vinceliuice/Qogir-icon-theme'
