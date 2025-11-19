@@ -1,10 +1,11 @@
 # Original Maintainer: Aitor Alonso <contact: https://aalonso.eu>
 # patched for EndeavourOS: EndeavourOS <info@endeavouros.com>
+# Contributor: Manuel Barrio Linares <mbarriolinares at gmail dot com>
 
-pkgname=eos-qogir-icons
-pkgver=6
-_srcver=2023-06-05
-pkgrel=1
+_pkgname=qogir-icon-theme
+pkgname=eos-${_pkgname}
+pkgver=2025.02.15
+pkgrel=2
 pkgdesc='A colorful design icon theme for linux desktops'
 arch=('any')
 url='https://github.com/vinceliuice/Qogir-icon-theme'
@@ -15,23 +16,27 @@ optdepends=()
 provides=('qogir-icon-theme')
 conflicts=('qogir-icon-theme' 'qogir-icon-theme-git')
 options=('!strip')
-source=("https://github.com/vinceliuice/Qogir-icon-theme/archive/refs/tags/${_srcver}.tar.gz"
-	"install.patch"
-	"start-here-symbolic.svg"
-	"logout-purple.svg")
-sha256sums=('618768d3592238f0d11379b4a0261434c332bb63c30d3ea85ea26f80bf199043'
-            'c2ac10ce2f0f6bd1260e6580e3dfba3b2eb9b857f20bafabb5f86aa76faa51e0'
+source=(
+    "git+https://github.com/vinceliuice/Qogir-icon-theme.git#commit=c633057ba0d27a504b3255144071c9691ed0264a"
+    "install.patch"
+    "start-here-symbolic.svg"
+    "logout-purple.svg"
+)
+sha256sums=('6d56457b0cc31e3fd0fda0cadf0ba1a7eb2ce5b800a4d46ec63d675525720803'
+            '9a4970ed3042d98b1992304d75d9dcd8bbb48490709e5ce955fea4a0223b353f'
             '863cd90e8971b7c594a37a2025c12fd0cc8627a184829c755b584f6d65c7db92'
             '1bdbae5b47dd14fd937cb59b1119501f21b48f7bdb6f34bbd3fa6617c0a4716b')
 
 prepare() {
-    patch -u "Qogir-icon-theme-$_srcver/install.sh" -i install.patch
-    cp start-here-symbolic.svg "Qogir-icon-theme-$_srcver/src/symbolic/status/start-here-symbolic.svg"
-    cp logout-purple.svg       "Qogir-icon-theme-$_srcver/src/scalable/apps/system-log-out.svg"
+    cd Qogir-icon-theme
+
+    patch -u "install.sh" -i "${srcdir}/install.patch"
+    cp "${srcdir}/start-here-symbolic.svg" "src/symbolic/status/start-here-symbolic.svg"
+    cp "${srcdir}/logout-purple.svg" "src/scalable/apps/system-log-out.svg"
 }
 
 package() {
-  cd Qogir-icon-theme-$_srcver
-  mkdir -p "${pkgdir}/usr/share/icons"
-  ./install.sh -d "${pkgdir}/usr/share/icons"
+    cd Qogir-icon-theme
+    install -d "${pkgdir}/usr/share/icons"
+    ./install.sh -d "${pkgdir}/usr/share/icons"
 }

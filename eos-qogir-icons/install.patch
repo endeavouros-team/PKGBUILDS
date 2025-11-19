@@ -1,11 +1,13 @@
---- install.sh1	2023-05-19 15:06:47.359559927 +0200
-+++ install.sh2	2023-05-19 15:07:21.856606763 +0200
-@@ -13,7 +13,7 @@
- SRC_DIR=$(cd "$(dirname "${0}")" && pwd)
+diff --git a/install.sh b/install.sh
+index 6382f31a..791b8a71 100755
+--- a/install.sh
++++ b/install.sh
+@@ -15,7 +15,7 @@ CURSORS_SRC_DIR="$SRC_DIR/src/cursors/src"
+ INDEX="$CURSORS_SRC_DIR/cursorSVG"
  
  THEME_NAME=Qogir
--THEME_VARIANTS=('' '-manjaro' '-ubuntu')
+-THEME_VARIANTS=('' '-Manjaro' '-Ubuntu')
 +THEME_VARIANTS=('')
- COLOR_VARIANTS=('' '-dark')
+ COLOR_VARIANTS=('' '-Light' '-Dark')
  
  usage() {
