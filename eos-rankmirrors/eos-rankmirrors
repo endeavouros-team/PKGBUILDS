@@ -436,6 +436,7 @@ WriteSystemMirrorlist() {
     local bak="$eos.bak"
     local eosranked="${eos}.pacnew"
     local cmd=""
+    local -r eos_rooter="sudo bash -c"
 
     if ! diff "$latest_ml.orig" "$new" >/dev/null ; then
         echo2 ""
@@ -443,12 +444,12 @@ WriteSystemMirrorlist() {
             # saving new list to /etc/pacman.d/endeavour-mirrorlist
             notif_printf2 "Moving old EndeavourOS mirrorlist to %s.\n" "$bak"
             notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eos"
-            $EOS_ROOTER "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
+            $eos_rooter "mv $eos $bak ; mv $new $eos ; chown root:root $eos ; chmod 0644 $eos"
             [ -r "$new" ] && notif_printf2 "Failed.\n"    # probably password failure
         else
             # saving new list to /etc/pacman.d/endeavour-mirrorlist.pacnew
             notif_printf2 "Writing new ranked EndeavourOS mirrorlist to %s.\n" "$eosranked"
-            $EOS_ROOTER "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
+            $eos_rooter "mv $new $eosranked ; chown root:root $eosranked ; chmod 0644 $eosranked"
             [ -r "$new" ] && notif_printf2 "Failed.\n"    # probably password failure
         fi
     else
@@ -491,30 +492,19 @@ NanoViewer() {
     fi
 }
 
-GetPager() {
+LocalGetPager() {
     if [ $use_pager = no ] ; then
         echo "cat"
-        return
+    elif [ "$EOS_RANKMIRRORS_PAGER" ] ; then
+        echo "$EOS_RANKMIRRORS_PAGER"
+    else
+        GetPager         # from /usr/share/endeavouros/scripts/eos-script-lib-yad
     fi
-    local app
-    for app in "$EOS_RANKMIRRORS_PAGER" "$PAGER" ; do
-        if [ "$app" ] ; then
-            echo "$app"
-            return
-        fi
-    done
-    local pager_apps=("$less_pager" bat most more cat)
-    for app in "${pager_apps[@]}" ; do
-        if [ -x /bin/${app%% *} ] ; then
-            echo "/bin/$app"
-            return
-        fi
-    done
 }
 
 EditConfig() {
     local editor opts=""
-    for editor in "${EOS_SUDO_EDITORS[@]}" ; do
+    for editor in "${EOS_RANKMIRRORS_EDITOR[@]}" "${EOS_SUDO_EDITORS[@]}" ; do
         if which "${editor%% *}" &>/dev/null ; then
             case "${editor%% *}" in
                 nano | rnano) opts="--modernbindings"
@@ -664,7 +654,7 @@ Options() {
             --mirror-verbosity)         mirror_verbosity="$2" ; shift ; Check-mirror_verbosity option ;;
             --no-save | -n)             save=no ;;
             --list-only)                mirrorlist_only=yes ;;  # and no other output
-            --pager)                    use_pager=yes: pager=$(GetPager) ;;
+            --pager)                    use_pager=yes: pager=$(LocalGetPager) ;;
             --pager-nano)               use_pager=yes; pager=nano-pager ;;
             --pager-less)               use_pager=yes; pager="$less_pager" ;;
             --parallel | -p)            rankingmode=parallel ;;
@@ -729,7 +719,7 @@ Main()
     local -r less_pager="less -RF"
     local -r nano_pager="nano +1 --view -"
     local use_pager=no
-    local pager="$(GetPager)"
+    local pager="$(LocalGetPager)"
 
     local -r sort_default=age                     # age or rate
     local -r timeout_default=30                   # in seconds
@@ -747,6 +737,13 @@ Main()
 
     # Don't do anything time consuming before dumping options.
     local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            --pager)                    use_pager=yes: pager=$(LocalGetPager) ;;
+            --pager-nano)               use_pager=yes; pager=nano-pager ;;
+            --pager-less)               use_pager=yes; pager="$less_pager" ;;
+        esac
+    done
     for arg in "$@" ; do
         case "$arg" in
             --help | -h)        Usage; exit 0 ;;
