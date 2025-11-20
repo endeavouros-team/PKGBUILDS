@@ -5,6 +5,8 @@
 Lsb_release() {
     local file=/etc/lsb-release
 
+    [ $in_current_folder = yes ] && SkipPath file
+
     if [ -z "$(grep "^DISTRIB_CODENAME=" $file)" ] ; then
         # add missing DISTRIB_CODENAME=
         echo "DISTRIB_CODENAME=${quote}rolling${quote}" >> $file
@@ -19,6 +21,11 @@ Lsb_release() {
 Os_release() {
     local file=/usr/lib/os-release
     local eosfile=/usr/lib/endeavouros-release
+
+    if [ $in_current_folder = yes ] ; then
+        SkipPath file
+        SkipPath eosfile
+    fi
 
     # Get URLs from the EndeavourOS web site!
     local home=https://endeavouros.com
@@ -52,18 +59,36 @@ Os_release() {
 }
 
 Issues() {
-    sed -i 's|Arch|EndeavourOS|g' /etc/issue /usr/share/factory/etc/issue
+    local file1=/etc/issue
+    local file2=/usr/share/factory/etc/issue
+    if [ $in_current_folder = yes ] ; then
+        SkipPath file1
+        SkipPath file2
+    fi
+    sed -i 's|Arch|EndeavourOS|g' $file1 $file2
+}
+
+SkipPath() {
+    local -n _filepath="$1"
+    _filepath="${_filepath##*/}"
 }
 
 Main()
 {
-    local hookname="$1"
+    local hookname="$1"                  # "os-release", "lsb-release", "issue", ""
+    local in_current_folder="$2"         # optional, "yes" or "no" (default: no)
     local quote="'"
     quote='\"'
+
+    case "$in_current_folder" in
+        yes) ;;                          # change branding for files in current folder
+        *) in_current_folder=no ;;       # change branding for files in system folders
+    esac
 
     case "$hookname" in
         os-release)  Os_release ;;
         lsb-release) Lsb_release ;;
+        issue)       Issues ;;
         "")          Os_release
                      Lsb_release
                      Issues
