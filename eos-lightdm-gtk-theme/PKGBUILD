@@ -1,8 +1,8 @@
-# Maintainer : Sravan Pannala <sradjoker@endeavouros.com>
-# Contributor : EndeavourOS <info@endeavouros.com>
+# Maintainer : Sravan Pannala <sradjoker at endeavouros.com>
+# Contributor : EndeavourOS <info at endeavouros.com>
 
 pkgname=eos-lightdm-gtk-theme
-pkgver=2.2
+pkgver=2.3
 pkgrel=1
 pkgdesc='EndeavourOS theme for lightdm-gtk-greeter'
 arch=('any')
@@ -12,7 +12,7 @@ depends=('lightdm' 'lightdm-gtk-greeter')
 optdepends=('eos-qogir-icons' 'arc-gtk-theme-eos')
 source=('lightdm-gtk-greeter.conf' '10-eos-gtk.conf' 'eos-lightdm-gtk-theme.install')
 install=$pkgname.install
-sha512sums=('7aefc4861155a48fe367c22129ad674ff264f9f4f5bcad5dcb6571b8be22741136c13e39aed1e18ffc14b38d6481e3a00024aada9febffec53e2dda8615e739b'
+sha512sums=('2bfc0c89f4cd7aeb50a9c6fb5acb2ba2874303f65419086f4e3e6ff3efbb4ed48049010a3e2b6ae23517ea38fb673145795da8e87ad37109cd9f0a90d9d9a6cf'
             '03e82b0f586a28105d025b98eb33d8d958d0a2084b9965d019942aa02e94b476fbfef7be75eb8a5cf88e15acc194ac8b32c243c121a09bfa7778fe4f2881ebeb'
             '334063f1ea763468873e0ca00fb45037dc6f8b46dc9c6caf0136fdbe747d04fae09ec9c9b1270fd6f5caac0bf0cae98b8c4b676010ae07513e53c1915280f4fa')
 

@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-mate
-pkgver=1.3
+pkgver=1.4
 pkgrel=1
 pkgdesc="MATE settings for EndeavourOS"
 arch=('any')
@@ -9,7 +9,7 @@ depends=('endeavouros-branding')
 license=('GPL')
 source=('99_endeavouros-mate.gschema.override'
         'endeavouros.layout')
-sha256sums=('3951d6330d26d8af359f5d6911da2c4273e402132795103c780ce9baca9bfceb'
+sha256sums=('30949e715ef6d516ae8b14f935e537ab524ddccb9873bf4c08e68c8cb80cc89e'
             '65ff5ef067ce69804afbff708e2956c64ed5bb83e4c03af577d85fea88013d3a')
 
 package() {

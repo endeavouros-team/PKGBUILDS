@@ -1,9 +1,9 @@
 [org.gnome.desktop.interface:Budgie]
-cursor-theme='Qogir-dark'
+cursor-theme='Qogir-Dark'
 document-font-name='Noto Sans 10'
 font-name='Noto Sans 10'
 gtk-theme='Arc-Dark'
-icon-theme='Qogir-dark'
+icon-theme='Qogir-Dark'
 monospace-font-name='Monospace 10'
 	
 [com.solus-project.icon-tasklist]

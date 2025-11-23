@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-gnome
-pkgver=2.7
+pkgver=2.8
 pkgrel=1
 pkgdesc="GNOME settings for EndeavourOS"
 arch=('any')
@@ -11,7 +11,7 @@ source=('99_endeavouros-gnome.gschema.override'
         '98_endeavouros-gnome-console.gschema.override'
         'endeavouros.xml'
         'zz_endeavouros.org.gnome.login-screen.gschema.override')
-sha256sums=('96658a327011bbae5372ca3f5d603daab2afdc1875e21b501edf1c3c846f3563'
+sha256sums=('1c050ad273cad523de06a87f8f66602d8b3ef12259fb5929a74dd1880c03b988'
             '9e57d74c8c974e81b2484378a30d609fade2212632a1ce7ebe43316f033ce450'
             '436eda4e783c1c3d1fd886a0abb46f5b2939d0ee093da373bffd2402cea4fc88'
             '58d65a816997c15b5c61cf04586a8faeda076d12c94fc426ee9c2f642f1e5e2e')
