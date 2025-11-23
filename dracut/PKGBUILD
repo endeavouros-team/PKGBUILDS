@@ -1,9 +1,9 @@
 # Maintainer: dalto
 
 pkgname=dracut
-pkgver=108_eos
+pkgver=109_eos
 pkgrel=1
-upstream_version=108
+upstream_version=109
 pkgdesc="An event driven initramfs infrastructure"
 arch=('x86_64')
 url="https://github.com/dracut-ng/dracut-ng"
@@ -84,12 +84,9 @@ backup=('etc/dracut.conf')
 source=(
   "${pkgname}-${upstream_version}::git+${url}#tag=${upstream_version}"
 )
-sha256sums=('3a719e83f1cb32f1c49135c92cb831f20da0dab05b101c834c1856ae3b3b3081')
+sha256sums=('b778e033f4fdce6521cc58ba67d74a1b7bbbdf6b72b75699e6cbe320f18ad1e9')
 
 _backports=(
-  # Revert setting hostonly-cmdline=no by default since it is reverted for 109
-  # It won't impact many EOS users but we don't want to flip-flop this for those that use it
-  'f0086c2f629365bdca8df76364747f7eb9799b59'
 )
 
 _reverts=(
