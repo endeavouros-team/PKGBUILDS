@@ -13,8 +13,6 @@ sha256sums=('30949e715ef6d516ae8b14f935e537ab524ddccb9873bf4c08e68c8cb80cc89e'
             '65ff5ef067ce69804afbff708e2956c64ed5bb83e4c03af577d85fea88013d3a')
 
 package() {
-    PREFIX=/etc/skel
-    cd "$_pkgname"
     install -Dm755 "${srcdir}/99_endeavouros-mate.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_endeavouros-mate.gschema.override"
     install -Dm755 "${srcdir}/endeavouros.layout" "${pkgdir}/usr/share/mate-panel/layouts/endeavouros.layout"
 }
