@@ -12,6 +12,11 @@ DIE() {
     errorline "==> Error [$progname]:\n    $1"
     [ "$2" ] && exit "$2" || exit 1
 }
+INFO() {
+    eos-color info 2
+    echo2 "==> Info [$progname]:\n    $1"
+    eos-color reset 2
+}
 
 GetInfoPage() {
     # Make sure the download data is stored in a local file.
@@ -42,32 +47,34 @@ FetchIsoFile() {
     local file="$1"
     local subdir="$2"
     local url
-
-    case "$subdir" in
-        "") url="$URLBASE/$file" ;;
-        *)  url="$URLBASE/$subdir/$file" ;;
-    esac
-
     local targetopt=""
 
-    [ "$TARGETDIR" ] && file="$TARGETDIR/$file" || file="$PWD/$file"
     cleanup_files+=("$file")
+    if printf "%s\n" "${items[@]}" | grep "$file".sha512sum >/dev/null; then
+        cleanup_files=("$file".sha512sum "${cleanup_files[@]}")
+    fi
 
-    echo2 "\n==> Downloading to $file ...\n"
-
-    case "$getter" in
-        curl)
-            targetopt="-o$file"
-            # targetopt+=" -m2000"
-            /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
-            [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
-            ;;
-        wget)
-            targetopt="-O$file"
-            /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
-            [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
-            ;;
-    esac
+    for file in "${cleanup_files[@]}" ; do
+        case "$subdir" in
+            "") url="$URLBASE/$file" ;;
+            *)  url="$URLBASE/$subdir/$file" ;;
+        esac
+        [ "$TARGETDIR" ] && file="$TARGETDIR/$file" || file="$PWD/$file"
+        echo2 "\n==> Downloading to $file ...\n"
+        case "$getter" in
+            curl)
+                targetopt="-o$file"
+                # targetopt+=" -m2000"
+                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
+                ;;
+            wget)
+                targetopt="-O$file"
+                /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
+                ;;
+        esac
+    done
 }
 
 Usage() {
@@ -142,41 +149,22 @@ DumpOptions() {
 }
 
 CheckTheSum() {
-    if [ "$(/bin/ls "$TARGETDIR"/*.iso.sha512sum)" ] ; then
-        sha512sum_check
-    fi
-}
-
-sha512sum_check() {
-    pushd "$TARGETDIR" >/dev/null
+    local checksumfile="$TARGETDIR/$selected.sha512sum"
     local ret=0                                     # $ret will contain "exit code"
-    local tailname=".iso.sha512sum"                 # checksum file name should end with this string
-    local checksumfile=(*$tailname)    # may be more than one file
-    local csfile
-
-    case "$checksumfile" in
-        "*"$tailname)
-            echo2 "checksum file not found"
-            ret=2
-            ;;
-        *$tailname)
-            readarray -t checksumfile <<< $(printf "%s\n" "${checksumfile[@]}" | fzf -m)
-            for csfile in "${checksumfile[@]}" ; do
-                printf "==> sha512sum -c %s ... " "$csfile"
-                if sha512sum -c "$csfile" &> /dev/null ; then
-                    echo OK
-                else
-                    echo FAIL
-                    ret=1
-                fi
-            done
-            ;;
-        *)
-            echo2 "file '$checksumfile' not supported"
-            ret=3
-            ;;
-    esac
-    popd >/dev/null
+    if [ -e "$checksumfile" ] ; then
+        pushd "$TARGETDIR" >/dev/null
+        printf "==> sha512sum -c %s ... " "$checksumfile"
+        if sha512sum -c "$checksumfile" &> /dev/null ; then
+            echo OK
+        else
+            echo FAIL
+            ret=1
+        fi
+        popd >/dev/null
+    else
+        INFO "no checksum file $checksumfile --> not verifying the ISO."
+        ret=2
+    fi
     return $ret
 }
 
@@ -274,6 +262,7 @@ Main() {
     local datafile=/tmp/$progname.tmp   # remove this if new files should be available
     local getter=wget                   # curl or wget
     local cleanup_files=()
+    local sumfile=""
 
     ReadConfig
     [ "$1" ] && Options "$@"
@@ -296,7 +285,7 @@ Main() {
         --header="$header"
         --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
     )
-    local selected="" items=""
+    local selected="" items="" items_orig=""
     local subdir=""
     while true ; do
         # keep the names of files, drop other info
@@ -313,9 +302,16 @@ Main() {
                 fi
                 ;;
         esac
-        items=$(echo "$items" | "${fzf[@]}")
+        readarray -t items < <(echo "$items" | awk '{print $1}' | sort)
+        if [ ${#items[@]} -eq 2 ] ; then
+            # remove file.sha512sum if file and file.sha512sum both exist
+            if [ "${items[0]}.sha512sum" = "${items[1]}" ] ; then
+                sumfile="${items[1]}"
+                items=("${items[0]}")
+            fi
+        fi
+        items=$(printf "%s\n" "${items[@]}" | "${fzf[@]}")
         [ "$items" ] || exit 0                        # nothing selected
-        items=$(echo "$items" | awk '{print $1}')
 
         for selected in $items ; do
             case "$selected" in
