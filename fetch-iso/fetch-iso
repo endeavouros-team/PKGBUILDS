@@ -2,7 +2,9 @@
 
 source /etc/eos-color.conf
 
-echo2() { echo -e "$@" >&2 ; }
+echo2()   { echo -e "$@" >&2 ; }
+printf2() { printf  "$@" >&2 ; }
+
 errorline() {
     eos-color error 2
     echo2 "$@"
@@ -48,11 +50,21 @@ FetchIsoFile() {
     local subdir="$2"
     local url
     local targetopt=""
+    local msg_head="Download"
+    local msg_middle=""
+    local msg_tail="Exit now"
 
     cleanup_files+=("$file")
-    if printf "%s\n" "${items[@]}" | grep "$file".sha512sum >/dev/null; then
+    if printf "%s\n" "${items_orig[@]}" | grep "$file".sha512sum >/dev/null; then
         cleanup_files=("$file".sha512sum "${cleanup_files[@]}")
+        msg_middle="[$file and its .sha512sum]"
+    else
+        msg_middle="[$file]"
     fi
+
+    case "$(echo -e "$msg_head $msg_middle\n$msg_tail" | fzf)" in
+        "" | Exit*) exit 0 ;;
+    esac
 
     for file in "${cleanup_files[@]}" ; do
         case "$subdir" in
@@ -285,7 +297,7 @@ Main() {
         --header="$header"
         --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
     )
-    local selected="" items="" items_orig=""
+    local selected="" items="" items_orig=()
     local subdir=""
     while true ; do
         # keep the names of files, drop other info
@@ -303,13 +315,7 @@ Main() {
                 ;;
         esac
         readarray -t items < <(echo "$items" | awk '{print $1}' | sort)
-        if [ ${#items[@]} -eq 2 ] ; then
-            # remove file.sha512sum if file and file.sha512sum both exist
-            if [ "${items[0]}.sha512sum" = "${items[1]}" ] ; then
-                sumfile="${items[1]}"
-                items=("${items[0]}")
-            fi
-        fi
+        items_orig=("${items[@]}")
         items=$(printf "%s\n" "${items[@]}" | "${fzf[@]}")
         [ "$items" ] || exit 0                        # nothing selected
 
@@ -328,11 +334,7 @@ Main() {
                 "")   echo2 "Nothing selected."
                       exit 1
                       ;;
-                *)    read -p "Download $selected or exit (D/e)? "
-                      case "$REPLY" in
-                          "" | [Yy]* | [Dd]*) FetchIsoFile "$selected" "$subdir" ;;
-                          [Ee]*)              exit ;;
-                      esac
+                *)    FetchIsoFile "$selected" "$subdir"
                       exitcode=$?
                       if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
                           CheckTheSum
