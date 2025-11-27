@@ -64,6 +64,7 @@ Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 
 ## Sweden
 Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
+Server = https://mirror.retropc.se/endeavouros/repo/$repo/$arch
 
 ## Switzerland
 Server = https://mirror.gofoss.xyz/endeavouros/repo/$repo/$arch
@@ -80,4 +81,7 @@ Server = https://repo.c48.uk/endeavouros/repo/$repo/$arch
 
 ## United States
 Server = https://mirrors.gigenet.com/endeavouros/repo/$repo/$arch
+
+## Vietnam
+Server = https://mirror.meowsmp.net/endeavouros/repo/$repo/$arch
 
