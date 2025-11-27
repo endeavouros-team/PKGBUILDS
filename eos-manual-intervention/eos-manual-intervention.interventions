@@ -19,6 +19,7 @@ case "$(uname -m)" in
         MI_func_names=(
             MI_20250621 "linux-firmware"
             MI_20250620 "x11 plasma session"
+            MI_20251127e "maliit-keyboard"
         )
         ;;
     a*)
@@ -27,6 +28,7 @@ case "$(uname -m)" in
         MI_func_names=(
             MI_20250621 "linux-firmware"
             MI_20250620 "x11 plasma session"
+            MI_20251127e "maliit-keyboard"
         )
         ;;
 esac
@@ -40,6 +42,23 @@ esac
 # MI functions *may* use these additional helper functions:
 #   RUN     Shows and executes a command.
 #   WARN    Shows a warning message.
+
+MI_20251127e() {
+    local pkg_from=maliit-keyboard
+    local pkg_to=plasma-keyboard
+    case "$XDG_CURRENT_DESKTOP" in
+        KDE)
+            if pacman -Qq $pkg_from &>/dev/null ; then
+                RUN sudo pacman -R   $pkg_from || return 1
+                RUN sudo pacman -Syu $pkg_to   || return 1
+                return 0
+            else
+                echo "  ==> $pkg_from already OK" >&2
+            fi
+            ;;
+    esac
+    return 2
+}
 
 MI_20250620() {
     local -r pkg=plasma-x11-session
