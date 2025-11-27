@@ -3,9 +3,9 @@
 # Calamares installer (fork) configured for EndeavourOS
 
 pkgname=calamares
-pkgver=25.02.2.1
-pkgrel=5
-release_name="Mercury-Neo"
+pkgver=25.11.1.9
+pkgrel=1
+release_name="Ganymede"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('fe1e3af18eaecac2fe9dbbc4cfd254d058c3e64ac887f193b3a1b8748f04503f')
+sha256sums=('beea580678ea2411a4b9f31884cbcbca6711907ca28ce7d2dacdf5a1cca03b2a')
 
 prepare() {
     # Update branding.desc with the proper values
@@ -44,7 +44,7 @@ build() {
     dummycpp dummyprocess dummypython dummypythonqt \
     finishedq initcpio keyboardq license localeq notesqml oemid \
     openrcdmcryptcfg plymouthcfg plasmalnf services-openrc \
-    summaryq tracking usersq webview welcomeq"
+    summaryq tracking webview welcomeq"
     export DESTDIR="$srcdir/build"
     make -C build
 }
