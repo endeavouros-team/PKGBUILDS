@@ -32,7 +32,12 @@ FetchInterventionsFile() {
         mkdir -p "$dir" || DIE "cannot create folder '${dir/$HOME/\~}'"
     fi
 
-   wget -qO "$mifile" "$github" || wget -qO "$mifile" "$gitlab"
+    local dlok=yes tim=20
+    wget -T$tim -qO "$mifile" "$github" || wget -T$tim -qO "$mifile" "$gitlab" || dlok=no
+    if [ $dlok = no ] && [ -f "/etc/$fname" ] ; then
+        WARN "failed to download $fname\n    from github/gitlab, use it from /etc instead."
+        cp "/etc/$fname" "$mifile"
+    fi
 
     if [ -e "$mifile" ] && [ $(stat -c %s "$mifile") -gt 0 ] ; then
         source "$mifile"
