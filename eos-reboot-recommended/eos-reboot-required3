@@ -58,7 +58,7 @@ Wait_before_notifying() {
     source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return
     WaitLoop $REBOOT_MAX_TOTAL_WAIT  # max seconds to wait before notifying about recommended reboot
 
-    touch /tmp/reboot-recommended
+    [ -d /tmp ] && touch /tmp/reboot-recommended
 
     DoNotify "Reboot recommended!" "Reboot is recommended due to the upgrade of core system package(s)."
     systemctl disable --now eos-reboot-required.timer
