@@ -801,6 +801,8 @@ Main()
         local ipkgs
         readarray -t ipkgs < <(expac -Qs "%n %v" nvidia)
         NoteList "${ipkgs[@]}"
+        Note "inxi -Gza"
+        inxi -Gza >&2
     fi
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
