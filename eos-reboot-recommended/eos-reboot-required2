@@ -13,11 +13,9 @@ IsRunningKernel() {
 
 DoNotify() {
     local logfile=/var/log/reboot-recommendation-trigger.log
-    echo "[$(/bin/date "+%x %X")] Reboot recommendation triggered by updating package: $target" > $logfile
+    echo "[$(/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" > $logfile
     chmod o-rwx $logfile
     systemctl enable --now eos-reboot-required.timer 2>/dev/null
-    sleep 1
-    exit 0
 }
 
 Main() {
@@ -32,53 +30,43 @@ Main() {
     local targets=$(cat)  # list of updated package names from the hook (stdin)
     local target
     local running_kernel=""
+    local list_of_targets=()
 
     # do not notify if the updated package is not in use
     for target in $targets ; do
         case "$target" in
-            linux | linux-lts | linux-zen | linux-hardened | linux-rt | linux-rt-lts | linux-lts?? | linux-lts???)
-                # Note: only official and older LTS kernels are checked.
-                if IsRunningKernel "$target" ; then
-                    DoNotify
-                fi
+            linux | linux-lts | linux-zen | linux-hardened | linux-rt | linux-rt-lts)
+                # Note: only official kernels are checked.
+                IsRunningKernel "$target" && list_of_targets+=("$target")
                 ;;
             nvidia)
-                if IsRunningKernel linux ; then
-                    DoNotify
-                fi
+                IsRunningKernel linux && list_of_targets+=("$target")
                 ;;
             nvidia-lts)
-                if IsRunningKernel linux-lts ; then
-                    DoNotify
-                fi
+                IsRunningKernel linux-lts && list_of_targets+=("$target")
                 ;;
             amd-ucode)
-                if [ "$(device-info --cpu)" = "AuthenticAMD" ] ; then
-                    DoNotify
-                fi
+                [ "$(device-info --cpu)" = "AuthenticAMD" ] && list_of_targets+=("$target")
                 ;;
             intel-ucode)
-                if [ "$(device-info --cpu)" = "GenuineIntel" ] ; then
-                    DoNotify
-                fi
+                [ "$(device-info --cpu)" = "GenuineIntel" ] && list_of_targets+=("$target")
                 ;;
             btrfs-progs)
                 # Notify only if btrfs is in use
-                if [ -n "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] ; then
-                    DoNotify
-                fi
+                [ "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] && list_of_targets+=("$target")
                 ;;
             wayland | egl-wayland)
                 case "$XDG_SESSION_TYPE" in
                     x11) ;;
-                    *) DoNotify ;;
+                    *) list_of_targets+=("$target") ;;
                 esac
                 ;;
             *)
-                DoNotify
+                list_of_targets+=("$target")
                 ;;
         esac
     done
+    [ "$list_of_targets" ] && DoNotify
 }
 
 Main "$@"

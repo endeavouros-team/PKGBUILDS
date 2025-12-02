@@ -20,24 +20,18 @@ DoNotify() {
 }
 
 WaitLoop() {
-    local seconds_left=$1
-    local -r sleeptime=1
-    local has_notified=no
+    local seconds_left="$1"
+    local sleeptime="$2"
+    local -r lockfile=/var/lib/pacman/db.lck
+    local -r tmp=/tmp/tmp.sdoij87SA5hX
+    rm -f $tmp
 
-    while [ -e $lockfile ] ; do
+    while true ; do
         sleep $sleeptime
-        ((seconds_left-=sleeptime))
-        if [ $seconds_left -gt 0 ] ; then
-            if [ $has_notified = no ] && [ $seconds_left -lt $((REBOOT_MAX_TOTAL_WAIT - REBOOT_WAIT_DIFF)) ] ; then
-                DoNotify "Waiting to notify about reboot..." "Waiting at most $REBOOT_MAX_TOTAL_WAIT seconds to notify about reboot."
-                has_notified=yes
-            fi
+        ((seconds_left -= sleeptime))
+        if [ $seconds_left -gt 0 ] && [ -e $lockfile ] && sudo fuser $lockfile &> /dev/null && ps -C pacman,yay,paru &> /dev/null ; then
+            echo "$FUNCNAME: $(date): waiting ..." >> $tmp
         else
-            if [ -e $lockfile ] ; then
-                local msg="The wait for 'Reboot recommended' notification was interrupted after $REBOOT_MAX_TOTAL_WAIT seconds."
-                msg+="\n$lockfile still exists, please do not reboot before making sure all related processes have finished."
-                DoNotify "NOTE: please wait until all related processes have finished!" "$msg"
-            fi
             break
         fi
     done
@@ -48,15 +42,14 @@ Wait_before_notifying() {
     # Do this by detecting when the $lockfile disappears, but do not wait more
     # than $REBOOT_MAX_TOTAL_WAIT seconds.
 
-    local -r lockfile=/var/lib/pacman/db.lck
     local -r conffile=/etc/eos-reboot-required.conf
-    local REBOOT_MAX_TOTAL_WAIT=120          # can be configured in $conffile
-    local REBOOT_WAIT_DIFF=3                 # can be configured in $conffile
+    local REBOOT_MAX_TOTAL_WAIT=300          # can be configured in $conffile
+    local REBOOT_WAIT_DIFF=4                 # can be configured in $conffile
 
     [ -e $conffile ] && source $conffile
     systemctl disable --now eos-reboot-required.timer
     source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return
-    WaitLoop $REBOOT_MAX_TOTAL_WAIT  # max seconds to wait before notifying about recommended reboot
+    WaitLoop $REBOOT_MAX_TOTAL_WAIT $REBOOT_WAIT_DIFF  # max seconds to wait before notifying about recommended reboot
 
     [ -d /tmp ] && touch /tmp/reboot-recommended
 
