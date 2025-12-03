@@ -31,7 +31,7 @@ done
 for file in "/etc/X11/Xkbmap" "$HOME/.Xkbmap"; do
     if [ -f "$file" ]; then
         echo "Loading keymap: $file"
-        setxkbmap `cat "$file"`
+        setxkbmap $(cat "$file")
         XKB_IN_USE=yes
     fi
 done
