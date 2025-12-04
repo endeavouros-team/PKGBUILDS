@@ -898,7 +898,7 @@ RankProgress() {
     local line=""
     local value=0
     local line_count=-2
-    while read line ; do
+    while read -r line ; do
         if [[ "$line" != *"WARNING:"* ]]; then
             ((line_count++))
         fi
