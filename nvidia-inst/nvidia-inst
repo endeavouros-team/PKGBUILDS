@@ -840,7 +840,7 @@ Main()
                 nouveau) ;;
                 *)
                     while true ; do
-                        read -p "==> Install vulkan-nouveau (Y/n)? " >&2
+                        read -r -p "==> Install vulkan-nouveau (Y/n)? " >&2
                         case "$REPLY" in
                             [yY]* | "") mode=nouveau; break ;;
                             [nN]*)      mode=other; break ;;
