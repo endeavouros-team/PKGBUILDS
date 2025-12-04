@@ -57,24 +57,6 @@ AddAppButton() {
 }
 
 EosApps2cmd() {
-    local -r apps=(
-        akm ChangeDisplayResolution
-        # checkupdatesext
-        curl-exit-code-to-string
-        eos-apps-info eos-connection-checker
-        eos-downgrade eos-download-wallpapers
-        eos-log-tool
-        eos-manual-intervention
-        eos-pacdiff eos-packagelist eos-quickstart eos-rankmirrors eos-sendlog eos-shifttime
-        eos-update
-        # eos-update-notifier eos-update-notifier-configure
-        eos-wallpaper-set eos-welcome grub-colour-chooser
-        # mirrorlist-rank-info
-        nvidia-inst
-        # nvidia-driver-supported-branches
-        paccache-service-manager
-        pahis rami reflector-simple RunInTerminal show-location-info su-c_wrapper
-    )
     local app
 
     for app in "${apps[@]}" ; do
@@ -96,9 +78,34 @@ BonusApps2cmd() {
 Main()
 {
     local progname=${0##*/}
+    # local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)
+    local -r apps=(
+        akm ChangeDisplayResolution
+        # checkupdatesext
+        curl-exit-code-to-string
+        eos-apps-info eos-connection-checker
+        eos-downgrade eos-download-wallpapers
+        eos-log-tool
+        eos-manual-intervention
+        eos-pacdiff eos-packagelist eos-quickstart eos-rankmirrors eos-sendlog eos-shifttime
+        eos-update
+        # eos-update-notifier eos-update-notifier-configure
+        eos-wallpaper-set eos-welcome grub-colour-chooser
+        # mirrorlist-rank-info
+        nvidia-inst
+        # nvidia-driver-supported-branches
+        paccache-service-manager
+        pahis rami reflector-simple RunInTerminal show-location-info su-c_wrapper
+    )
+    local arg
+    for arg in "$@" ; do
+        case "$arg" in
+            --show-apps) echo "${apps[*]}"; exit ;;
+        esac
+    done
+
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
     eos_assert_deps $progname yad || return 1
-    # local -r bonus_apps=(downgrade grub inxi linux linux-lts nvidia paru rate-mirrors virtualbox worm yad yay)
     local -r bonus_apps=($(eos-apps-info-helper --show-bonus))
 
     # yad command exit codes (don't use even numbers)
