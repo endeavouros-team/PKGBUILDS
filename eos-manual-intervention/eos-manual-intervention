@@ -2,18 +2,21 @@
 
 # Manager for manual interventions.
 
+# Exit code:
+#    0   Success (i.e. execution detected no error).
+#   >0   Unspecified failure, see the code below.
+
 echo2() { echo -e "$@" >&2; }
 WARN()  { echo2 "==> $progname: warning: $1"; }
 DIE()   { echo2 "==> $progname: error: $1"; exit 1; }
 
 RUN() {
-    echo2 "   ->" "$@"
-    if "$@" ; then
-        return 0
-    else
-        DIE "'$*' failed."
-        exit 1
-    fi
+    local reply=""
+    # echo2 "   ->" "$@"
+    read -p "==> Run '$*' (Y/n)? " reply >&2
+    case "$reply" in
+        "" | [yY]*) "$@" || DIE "'$*' failed." ;;
+    esac
 }
 
 MarkOk() {
@@ -23,26 +26,31 @@ MarkOk() {
 IsOk() { grep "^$1$" "$handled_fixes" &>/dev/null; }
 
 FetchInterventionsFile() {
-    local -r pname=eos-manual-intervention
-    local -r fname=$pname.interventions
-    local -r github=https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pname/$fname
-    local -r gitlab=https://gitlab.com/endeavouros-filemirror/PKGBUILDS/raw/master/$pname/$fname
+    local -r dirname="$progname"
+    local -r filename="${interventions_file##*/}"
+    local -r github="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$dirname/$filename"
+    local -r gitlab="https://gitlab.com/endeavouros-filemirror/PKGBUILDS/raw/master/$dirname/$filename"
 
-    if [ ! -d "$dir" ] ; then
-        mkdir -p "$dir" || DIE "cannot create folder '${dir/$HOME/\~}'"
+    if [ ! -d "$interventions_dir" ] ; then
+        mkdir -p "$interventions_dir" || DIE "cannot create folder '${interventions_dir/$HOME/\~}'"
     fi
 
-    local dlok=yes tim=20
-    wget -T$tim -qO "$mifile" "$github" || wget -T$tim -qO "$mifile" "$gitlab" || dlok=no
-    if [ $dlok = no ] && [ -f "/etc/$fname" ] ; then
-        WARN "failed to download $fname\n    from github/gitlab, use it from /etc instead."
-        cp "/etc/$fname" "$mifile"
-    fi
-
-    if [ -e "$mifile" ] && [ $(stat -c %s "$mifile") -gt 0 ] ; then
-        source "$mifile"
+    if [ $use_local_ifile = yes ] ; then
+        cp "/etc/$filename" "$interventions_file"
     else
-        DIE "failed to download ${mifile/$HOME/\~} from github/gitlab"
+        # fetch the interventions file from github/gitlab
+        local dlok=yes tim=20
+        wget -T$tim -qO "$interventions_file" "$github" || wget -T$tim -qO "$interventions_file" "$gitlab" || dlok=no
+        if [ $dlok = no ] ; then
+            WARN "failed to download $filename\n    from github/gitlab, use it from /etc instead."
+            cp "/etc/$filename" "$interventions_file"    # /etc/$filename should exist always
+        fi
+    fi
+
+    if [ -e "$interventions_file" ] && [ $(stat -c %s "$interventions_file") -gt 0 ] ; then
+        source "$interventions_file"
+    else
+        DIE "file ${interventions_file/$HOME/\~} has no contents!"
     fi
 }
 
@@ -55,7 +63,6 @@ RunInterventionsIfNeeded() {
     # ret:
     #      0 = intervention handled and system updated ==> all is OK
     #      1 = error occurred
-    #      2 = intervention marked as OK but system might not be updated
 
     if [ $only_show_count = yes ] ; then
         echo "$((count/2))"
@@ -100,7 +107,6 @@ NewsPage() {
             break
         fi
     done
-    [ "$1" ] && exit $1
 }
 
 CheckPacmanConf() {
@@ -127,7 +133,7 @@ EOF
 }
 
 Cleanup() {
-    rm -f "$mifile"
+    rm -f "$interventions_file"
 }
 
 Help() {
@@ -138,32 +144,36 @@ Options: -h, --help            This help.
          -n, --show-arch-news  Show the Arch news page in a browser.
          --count               Only show the number of available interventions, don't run them.
 EOF
-    [ "$1" ] && exit $1
 }
 
 Options() {
     local arg
     for arg in "$@" ; do
         case "$arg" in
-            -h | --help)           Help 0 ;;
-            -n | --show-arch-news) NewsPage 0 ;;
+            -h | --help)           Help; exit 0 ;;
+            -n | --show-arch-news) NewsPage; exit 0 ;;
             --count)               only_show_count=yes ;;
+            -t | --test)           use_local_ifile=yes ;;   # for internal testing
+            -*)                    WARN "unsupported option $arg, see $progname --help" ;;
+            *)                     WARN "unsupported parameter '$arg', see $progname --help" ;;
         esac
     done
 }
 
 Main() {
     local -r progname=${0##*/}
-    local -r dir="$HOME/.config/$progname"
-    local -r mifile="$dir/$progname.interventions"
-    local -r handled_fixes="$dir/$progname.handled"
+    local -r interventions_dir="$HOME/.cache/$progname"
+    local -r interventions_file="$interventions_dir/$progname.interventions"
+    local -r handled_fixes="$interventions_dir/$progname.handled"
     local MI_func_names=()
     local only_show_count=no
+    local use_local_ifile=no
 
     Options "$@"
     CheckPacmanConf
     FetchInterventionsFile
     RunInterventionsIfNeeded
+    return 0
 }
 
 Main "$@"
