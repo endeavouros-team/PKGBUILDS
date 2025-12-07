@@ -237,7 +237,7 @@ PacCache() {
             echo2info "==> paccache -rk$paccache_limit"
             sudo /usr/bin/paccache --verbose -rk$paccache_limit      # sudo not really required here but it takes one unnecessary output line away
 
-            local usage=$(/bin/du -hd1 /var/cache/pacman/pkg/)
+            local usage=$(/bin/du -hd1 "$pkg_cache_dir")
             local amount=$(echo "$usage" | awk '{print $1}')
             local folder=$(echo "$usage" | awk '{print $2}')
             UseColor info
@@ -459,7 +459,7 @@ DiskSpace() {
     if [ $available -lt $min ] ; then
         {
             WARN "your root partition (/) has only $available bytes of free space."
-            if [ $(du -b -d0 /var/cache/pacman/pkg | awk '{print $1}') -gt $min ] ; then
+            if [ $(du -b -d0 "$pkg_cache_dir" | awk '{print $1}') -gt $min ] ; then
                 printf "\nFor example, cleaning up the package cache may help.\n"
                 printf "Command 'sudo paccache -rk1' would do this:"
                 paccache -dk1
@@ -507,12 +507,25 @@ SystemValidityChecks_error() {
 #     fi
 # }
 
+GetCacheDir() {
+    local pconfcachedir=$(grep "^[ ]*CacheDir[ ]*=" /etc/pacman.conf)
+    
+    if [ "$pconfcachedir" ] ; then
+        pconfcachedir=$(echo "$pconfcachedir" | sed -E 's|^[ ]*CacheDir[ ]*=[ ]*(.*)|\1|')
+        echo "$pconfcachedir"
+    else
+        echo /var/cache/pacman/pkg/
+    fi
+}
+
 Main() {
     local progname="${0##*/}"
     local cmdfile=""
     local -r pacmanconf=/etc/pacman.conf
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
+
+    local pkg_cache_dir=$(GetCacheDir)
 
     local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
 
