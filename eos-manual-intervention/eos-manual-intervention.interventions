@@ -75,7 +75,7 @@ MI_20250621() {
     local -r newver=20250613.12fe085f-5
     if [ "$curver" ] ; then
         if [ $(vercmp $curver $newver) -lt 0 ] ; then
-            RUN sudo pacman -Rsn $pkg || return 1
+            RUN sudo pacman -Rdd $pkg || return 1
             RUN sudo pacman -Syu $pkg || return 1
         else
             echo2 "  ==> $pkg already OK"
