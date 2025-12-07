@@ -7,7 +7,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=25.12
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -17,7 +17,7 @@ depends=(
     eos-reboot-recommended  # backwards compatibility, to be removed from this depends array later
     expac                   # for many EOS apps
     dbus-python             # for ksetwallpaper.py
-    endeavouros-theming     # for eos-wallpaper-set
+    endeavouros-branding    # for eos-wallpaper-set
     xdg-utils               # for eos-sendlog
     # yad                   # provides support for graphical dialogs
 )
