@@ -110,25 +110,25 @@ NewsPage() {
 }
 
 CheckPacmanConf() {
-    local -r conf=/etc/pacman.conf
-    local lines="$(grep -n "^[ \t]*IgnorePkg[ \t]*=[ \t]*[a-zA-Z0-9]" $conf)"
+    local lines="$(grep -n "^[ \t]*IgnorePkg[ \t]*=[ \t]*[a-zA-Z0-9]" $pacmanconf)"
     if [ "$lines" ] ; then
         cat <<EOF >&2
 
 ==> $progname: warning:
-==> File $conf contains IgnorePkg line(s).
-    This *may* affect manual interventions because partial upgrades are not supported.
+        File $pacmanconf contains IgnorePkg line(s).
+        This *may* affect manual interventions because partial upgrades are not supported.
 EOF
-        readarray -t lines < <(echo "$lines")
-        printf "      %s\n" "${lines[@]}" >&2
-        echo2 ""
-
-        local reply=""
-        read -p "==> Do you want to continue [yes/NO]? " reply >&2
-        case "$reply" in
-            [yY]*) ;;
-            *) exit 0 ;;
-        esac
+        if [ $ask_ignorepkg = yes ] ; then
+            readarray -t lines < <(echo "$lines")
+            printf "      %s\n" "${lines[@]}" >&2
+            echo2 ""
+            local reply=""
+            read -p "==> Do you want to continue [yes/NO]? " reply >&2
+            case "$reply" in
+                [yY]*) ;;
+                *) exit 0 ;;
+            esac
+        fi
     fi
 }
 
@@ -141,6 +141,7 @@ Help() {
 Purpose: Execute and manage essential manual interventions.
 Usage:   $progname [options]
 Options: -h, --help            This help.
+         --ask-ignorepkg       If 'IgnorePkg' is used in $pacmanconf, ask user whether to proceed.
          -n, --show-arch-news  Show the Arch news page in a browser.
          --count               Only show the number of available interventions, don't run them.
 EOF
@@ -152,6 +153,7 @@ Options() {
         case "$arg" in
             -h | --help)           Help; exit 0 ;;
             -n | --show-arch-news) NewsPage; exit 0 ;;
+            --ask-ignorepkg)       ask_ignorepkg=yes ;;
             --count)               only_show_count=yes ;;
             -t | --test)           use_local_ifile=yes ;;   # for internal testing
             -*)                    WARN "unsupported option $arg, see $progname --help" ;;
@@ -165,6 +167,8 @@ Main() {
     local -r interventions_dir="$HOME/.cache/$progname"
     local -r interventions_file="$interventions_dir/$progname.interventions"
     local -r handled_fixes="$interventions_dir/$progname.handled"
+    local -r pacmanconf=/etc/pacman.conf
+    local ask_ignorepkg=no
     local MI_func_names=()
     local only_show_count=no
     local use_local_ifile=no
@@ -173,6 +177,7 @@ Main() {
     CheckPacmanConf
     FetchInterventionsFile
     RunInterventionsIfNeeded
+    echo "" >&2
     return 0
 }
 
