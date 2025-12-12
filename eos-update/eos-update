@@ -259,6 +259,17 @@ ResetPacmanConf() {
     rm -f $tmpfile
 }
 
+RankWithUserCommand() {
+    if [ -x $rank_command_file ] ; then
+        $rank_command_file
+    elif [ -r $rank_command_file ] && [[ "$(file $rank_command_file)" =~ "Bourne-Again shell script" ]] ; then
+        bash $rank_command_file
+    else
+        [ -e $rank_command_file ] || DIE "$rank_command_file does not exist"
+        WARN "unable to execute bash script $rank_command_file"
+    fi
+}
+
 SingleOptions() {
     local ret=0
     while [ "$1" ] ; do
@@ -267,6 +278,9 @@ SingleOptions() {
 
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
+                                                 ;;
+            --rank-mirrors)                      RankWithUserCommand
+                                                 exit
                                                  ;;
             --check-mirrors)                     CheckYourEndeavourosMirrorlist || ((ret++))
                                                  CheckYourArchMirrorlist        || ((ret++))
@@ -334,6 +348,7 @@ Options() {
             # --system-checks)                     ;;                # already handled in SingleOptions
             --fast)                              eufast=yes ;;
             --nvidia)                            nvidia=yes ;;
+            --rank-mirrors)                      ;;
             --no-keyring)                        keyring=no ;;
             --descriptions | -d)                 descriptions=yes ;;
             --faillock-check)                    faillockcheck=yes ;;
@@ -392,6 +407,14 @@ Optional help:
 Usage: $progname [options]
 Options:
   --help, -h              This help.
+  --rank-mirrors          Executes user-written bash script $rank_command_file which may contain
+                          ranking commands for both Arch and EndeavourOS mirrors, and exits.
+                          Example commands:
+                              reflector -phttps -c "your-country-spec" | sudo tee $aml
+                              eos-rankmirrors --timeout 4
+                          See 'reflector --list-countries' to see supported country codes and names
+                          for "your-country-spec".
+    
   --check-mirrors         Check files $eml and $aml
                           for unsupported mirrors.
                           This may be useful when one or more mirrors start failing unexpectedly.
@@ -524,6 +547,7 @@ Main() {
     local -r pacmanconf=/etc/pacman.conf
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
+    local -r rank_command_file=/bin/eos-update-rank-mirrors
 
     local pkg_cache_dir=$(GetCacheDir)
 
@@ -532,7 +556,7 @@ Main() {
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
-    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors"
     # lopts+=",system-checks"
     local sopts="dhl:"
 
