@@ -237,7 +237,7 @@ PacCache() {
             echo2info "==> paccache -rk$paccache_limit"
             sudo /usr/bin/paccache --verbose -rk$paccache_limit      # sudo not really required here but it takes one unnecessary output line away
 
-            local usage=$(/bin/du -hd1 "$pkg_cache_dir")
+            local usage=$(/bin/du -hd1 --exclude="*/download-[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]" "$pkg_cache_dir")   # pacman 7.1.0.r7.gb9f7d4a-1 started creating subfolders named 'download-*'
             local amount=$(echo "$usage" | awk '{print $1}')
             local folder=$(echo "$usage" | awk '{print $2}')
             UseColor info
