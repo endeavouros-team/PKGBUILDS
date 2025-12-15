@@ -234,15 +234,25 @@ FaillockCheck() {
 PacCache() {
     case "$paccache_limit" in
         1|2|3|4|5)
+            # pacman 7.1.0.r7.gb9f7d4a-1 started creating subfolders named 'download-*', so remove them
+            local leftover_dirs=()
+            readarray -t leftover_dirs < <(/bin/sudo /bin/find "${pkg_cache_dir%/}" -type d -empty -name 'download-*')
+            if [ "$leftover_dirs" ] ; then
+                UseColor warning 2
+                echo2 "==> Removing empty folders created by pacman:"
+                # printf2 "    %s\n" "${leftover_dirs[@]}"
+                /bin/ls -ld "${leftover_dirs[@]}" | sed 's|^|    |'
+                sudo rmdir "${leftover_dirs[@]}"
+                UseColor reset 2
+            fi
+
             echo2info "==> paccache -rk$paccache_limit"
             sudo /usr/bin/paccache --verbose -rk$paccache_limit      # sudo not really required here but it takes one unnecessary output line away
 
-            local usage=$(/bin/du -hd1 --exclude="*/download-[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]" "$pkg_cache_dir")   # pacman 7.1.0.r7.gb9f7d4a-1 started creating subfolders named 'download-*'
-            local amount=$(echo "$usage" | awk '{print $1}')
-            local folder=$(echo "$usage" | awk '{print $2}')
-            UseColor info
-            printf2 "==> Disk space used in the package cache: %s [%s]\n" "$amount" "$folder"
-            UseColor reset
+            local amount=$(/bin/du -hd1 "$pkg_cache_dir" | awk '{print $1}')
+            UseColor info 2
+            printf2 "==> Disk space used in the package cache: %s [%s]\n" "$amount" "${pkg_cache_dir%/}"
+            UseColor reset 2
             ;;
     esac
 }
@@ -589,6 +599,7 @@ Main() {
     
     SingleOptions "$@"
 
+    DebugBreak
     _init_translations
     
     Options "$@"
@@ -694,5 +705,7 @@ case "$mode" in
 esac
 EOF
 }
+
+DebugBreak() { : ; }
 
 Main "$@"
