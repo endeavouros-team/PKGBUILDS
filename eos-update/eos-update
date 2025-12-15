@@ -240,7 +240,6 @@ PacCache() {
             if [ "$leftover_dirs" ] ; then
                 UseColor warning 2
                 echo2 "==> Removing empty folders created by pacman:"
-                # printf2 "    %s\n" "${leftover_dirs[@]}"
                 /bin/ls -ld "${leftover_dirs[@]}" | sed 's|^|    |'
                 sudo rmdir "${leftover_dirs[@]}"
                 UseColor reset 2
