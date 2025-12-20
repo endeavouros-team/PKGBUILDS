@@ -12,7 +12,7 @@ pkgdesc="Compile a XKB keyboard description to a keymap suitable for loadkeys or
 arch=(any)
 license=('GPL2')
 depends=('perl')
-sha512sums=('e246168b909added076e98d5521348887d3b948ba4a06ab21ed9104eaefc2e63073d5130e5733fb92bc3e4af25e2222698a5edd391d04e27bf3bd14fce7a0fec')
+sha512sums=('0fe1c80d7eef65880a1e3e74f792b2806183ebca3d569db9745f76b5ac213f3f23424237957429f3fb1c1dfb255424544d8c0d996b91fa7e912bca8df9f7f5c3')
 
 _DIENOW() {
     echo "${FUNCNAME[1]}: $pkgname: error: $1" >&2
