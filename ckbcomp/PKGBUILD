@@ -14,6 +14,11 @@ license=('GPL2')
 depends=('perl')
 sha512sums=('e246168b909added076e98d5521348887d3b948ba4a06ab21ed9104eaefc2e63073d5130e5733fb92bc3e4af25e2222698a5edd391d04e27bf3bd14fce7a0fec')
 
+_DIENOW() {
+    echo "${FUNCNAME[1]}: $pkgname: error: $1" >&2
+    exit 1
+}
+
 _ckbcomp_preparations() {
     # Fetch 'ckbcomp' from the latest sources.
     # Out: url, pkgver, source
@@ -21,7 +26,6 @@ _ckbcomp_preparations() {
     # - salsa.debian.org seems slower...
     # - pkgver may include only numbers, lowercase letters, and "." "+" "~"
 
-    local -r err="echo $pkgname: error:"
     local changed=no
     local url_pkgname="https://salsa.debian.org/installer-team/console-setup/raw/master/Keyboard/$pkgname"    # for fetching the $pkgname
     local url_pkgver="https://sources.debian.org/src/console-setup"                                           # for finding the new $pkgver
@@ -38,15 +42,16 @@ _ckbcomp_preparations() {
     if [ $changed = yes ] ; then
         # $pkgname has been changed, so get the new pkgver.
         # Note: sha512sums for the new $pkgname must be changed manually.
-        INFO=$(curl --fail -Lsm 30 "$url_pkgver") || { $err "fetching version info failed"; exit 1; }
-        pkgver="$(echo "$INFO" | grep -m1 "/src/console-setup/" | sed -E 's|.*/src/console-setup/([^/]+)/.*|\1|')"
-        [ "${pkgver//[a-z0-9.+~]/}" ] && { $err "sorry, pkgver ($pkgver) is invalid"; exit 1; }
+        INFO=$(curl --fail -Lsm 30 "$url_pkgver") || _DIENOW "fetching version info failed"
+        pkgver="$(echo "$INFO" | grep -wm1 'version ' | sed -E 's|.*/>([^<]+).*|\1|')"
+        [ "${pkgver//[a-z0-9.+~]/}" ] && _DIENOW "sorry, pkgver ($pkgver) is invalid"
     fi
     source=("$url_pkgname")
 }
 
 _ckbcomp_preparations
 unset -f _ckbcomp_preparations
+unset -f _DIENOW
 
 package() {
     install -Dm755 $pkgname   "${pkgdir}/usr/bin/$pkgname"
