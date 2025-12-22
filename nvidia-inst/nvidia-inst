@@ -20,15 +20,15 @@ MsgForce() {
     quiet="$quiet_old"
 }
 Info() { Msg Info: "$@" ; }
-Note() { MsgForce Note: "$@" ; }                 # like Info() but show always
+Note() { eos-color tip 2; MsgForce Note: "$@"; eos-color reset 2; }                 # like Info() but show always
 NoteList() {
     local arg
     for arg in "$@" ; do
         MsgForce "     " "$arg"
     done
 }
-Warn() { MsgForce Warning: "$@" ; }
-DIE()  { MsgForce Error: "$@" ; exit 1 ; }
+Warn() { eos-color warning 2; MsgForce Warning: "$@"; eos-color reset 2; }
+DIE()  { eos-color error 2; MsgForce Error: "$@"; eos-color reset 2; exit 1 ; }
 
 IsInstalled() {
     local pkg="$1"
@@ -76,6 +76,11 @@ CheckUnsupportedKernels() {
     [ "$unsupported_kernels" ] && Warn "unsupported kernels installed: $unsupported_kernels"
 }
 
+DIE_AUR() {
+    local pkg="$1"
+    DIE "$pkg: AUR packages not supported"
+}
+
 AdjustPkgsAboutDkms() {
     # check if dkms or non-dkms packages need to be installed/removed
     local pkg ix ic=${#install[@]} rc=${#remove[@]}
@@ -88,12 +93,6 @@ AdjustPkgsAboutDkms() {
             for ((ix=0; ix<ic; ix++)) ; do
                 pkg="${install[$ix]}"
                 case "$pkg" in
-                    nvidia-dkms)
-                        # Info "Changing $pkg to nvidia and nvidia-lts"
-                        IsInstalled linux     && adjusted+=(nvidia)
-                        IsInstalled linux-lts && adjusted+=(nvidia-lts)
-                        CheckUnsupportedKernels
-                        ;;
                     nvidia-open-dkms)
                         # Info "Changing $pkg to nvidia-open"
                         IsInstalled linux     && adjusted+=(nvidia-open)
@@ -105,7 +104,7 @@ AdjustPkgsAboutDkms() {
                         adjusted+=(bbswitch)
                         ;;
                     nvidia-beta-dkms)
-                        DIE "AUR package $pkg not supported"
+                        DIE_AUR "$pkg"
                         ;;
                     *)
                         adjusted+=("$pkg")
@@ -121,11 +120,6 @@ AdjustPkgsAboutDkms() {
             for ((ix=0; ix<rc; ix++)) ; do
                 pkg="${remove[$ix]}"
                 case "$pkg" in
-                    nvidia-dkms)
-                        # Info "Changing $pkg to nvidia and nvidia-lts"
-                        IsInstalled linux     && adjusted+=(nvidia)
-                        IsInstalled linux-lts && adjusted+=(nvidia-lts)
-                        ;;
                     nvidia-open-dkms)
                         # Info "Changing $pkg to nvidia-open"
                         IsInstalled linux     && adjusted+=(nvidia-open)
@@ -149,12 +143,12 @@ AdjustPkgsAboutDkms() {
             for ((ix=0; ix<ic; ix++)) ; do
                 pkg="${install[$ix]}"
                 case "$pkg" in
-                    nvidia-dkms | nvidia-open-dkms | bbswitch-dkms)
+                    nvidia-open-dkms | bbswitch-dkms)
                         EnsureDkms
                         adjusted+=("$pkg")
                         ;;
                     nvidia-beta-dkms)
-                        DIE "AUR package $pkg not supported"
+                        DIE "$pkg: AUR packages not supported"
                         ;;
                     *)
                         adjusted+=("$pkg")
@@ -184,6 +178,9 @@ KeepsAndRemoves() {
                     [ "$rp" = "$kp" ] && break
                 done
                 if [ "$rp" != "$kp" ] ; then
+                    if [ "$aur_driver" ] && [ "$rp" = "$aur_driver" ] && [ $quiet = no ] ; then
+                        [ $remove_nothing = no ] && Warn "removing $rp, but it should work with your GPU."
+                    fi
                     PkgRemove "$rp"
                 fi
             fi
@@ -196,6 +193,8 @@ KeepsAndRemoves() {
     for kp in "${tmp[@]}" ; do
         if ! IsInstalled "$kp" ; then
             install+=("$kp")
+        else
+            Note "Package $kp is set for install but it is installed already."
         fi
     done
 
@@ -280,8 +279,21 @@ Prime() {
 }
 
 SwitcherooEnable() {
-    sudo pacman -Syu --needed switcheroo-control
-    sudo systemctl enable --now switcheroo-control.service
+    [ $quiet = yes ] && return
+    local cmds=(
+        "sudo pacman -Syu --needed switcheroo-control"
+        "sudo systemctl enable --now switcheroo-control.service"
+    )
+    local cmd has_header=no
+    for cmd in "${cmds[@]}" ; do
+        if [ $test = no ] ; then
+            $cmd
+        else
+            [ $has_header = no ] && echo2 "$commands_to_run_string:"
+            has_header=yes
+            echo2 "    $cmd"
+        fi
+    done
 }
 
 OnlyNvidia() {
@@ -388,10 +400,10 @@ ViewFile() {
 
 Options() {
     local opts
-    local sopts="bcfhnopqtv"
-    local lopts="32,bumblebee,closed,conf,drivers,force,help,ignore,listopts,listseries"   # ,legacyrepo
+    local sopts="bfhnopqtv"
+    local lopts="32,bumblebee,conf,force,help,ignore,listopts,listseries"   # ,legacyrepo
     lopts+=",no-dkms,nouveau,open,prime,quiet,series:,test,version,id:,switcheroo,show-gpu-info"
-    lopts+=",no-settings,recommended-driver,view-pci-ids"
+    lopts+=",no-settings,recommended-driver,view-pci-ids,no-hwdata-update,remove-nothing"
 
     opts="$(/usr/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || {
         Options -h
@@ -409,32 +421,21 @@ Options() {
             -n | --nouveau)     mode=nouveau ;;
             -p | --prime)       mode=prime ;;
             -o | --open)        driver_source_type=open ;;
-            -c | --closed)      driver_source_type=closed ;;
             --switcheroo)       SwitcherooEnable; exit 0 ;;
             -f | --force)       force=yes ;;
             -q | --quiet)       quiet=yes ;;
             -t | --test)        test=yes ;;
             --conf)             create_conf=yes ;;
             --ignore)           ignore_errors=yes ;;
-            # --legacyrepo)       Setup3rdPartyRepo ;;
             --32)               bit32=yes ;;
             --series)           series="$2" ; shift ;;
             --listopts)         ListOptions "$sopts" "$lopts" ; exit 0 ;;
             --listseries)
                 [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
-                if false ; then
-                    echo "$series_now $series_prev1 $series_prev2"
-                else
-                    echo "$series_now"
-                    # echo2 "(Note: $series_prev1, $series_prev2 are not supported currently.)"
-                fi
+                echo "$series_now"
                 exit 0
                 ;;
             --show-gpu-info)    echo "$NvidiaData" ; exit 0 ;;
-            --drivers)
-                nvidia-driver-supported-branches   # -a    # this option is deprecated!
-                exit 0
-                ;;
             --recommended-driver)
                 ShowRecommendedDriver
                 exit 0
@@ -452,6 +453,11 @@ Options() {
                 nvidia_card_id="$2"
                 shift
                 ;;
+            --remove-nothing)
+                remove_nothing=yes
+                ;;
+            --no-hwdata-update)  # handled in Main
+                ;;
             -h | --help)
                 cat <<EOF >&2
 
@@ -461,56 +467,47 @@ Usage: $progname [options]
 
 Options:
   -h, --help              This help.
-  -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards (only very old cards).
-  -f, --force             Force driver installation even if a nvidia card is not detected.
+  -b, --bumblebee         Install bumblebee and Nvidia drivers for optimus cards (only very old GPUs).
+  -f, --force             Force driver installation even if no Nvidia GPU is detected.
   -n, --nouveau           Use kernel's nouveau driver instead of Nvidia's proprietary driver.
-  -o, --open              Install the open source versions of Nvidia drivers (recommended for 'Turing' and later).
-  -c, --closed            Install the closed source versions of Nvidia drivers (recommended for 'Maxwell'...'Volta').
-  -p, --prime             Install also prime render offload.
+  -o, --open              Install the Nvidia driver (default for the 'Turing' family and newer GPUs).
+  -p, --prime             Install also prime render offload support.
   -q, --quiet             Suppress log messages.
   -t, --test              Test mode. Nothing in your system will be modified.
   -v, --version           Show version of this software.
-  --32                    Install also support for 32-bit apps. [multilib] in /etc/pacman.conf must be enabled.
+  --32                    Add support for 32-bit apps. Repository [multilib] in $pacmanconf must be enabled.
   --switcheroo            Install switcheroo-control and enable its service. Use this option separately.
   --conf                  Create also file $conf_file (might be needed on some older systems).
-  --no-dkms               Install only non-dkms packages (e.g. 'nvidia' instead of 'nvidia-dkms').
+  --no-dkms               Install only non-dkms packages (e.g. 'nvidia-open' instead of 'nvidia-open-dkms').
   --show-gpu-info         Show information about your GPU. Use this option separately.
-  --drivers               Show supported NVIDIA driver series number for your card.
   --listseries            List Nvidia driver versions supported by $progname.
   --ignore                Ignore all errors (useful for testing only).
   --series=X              (Advanced) Use the given Nvidia driver version X (for testing).
+  --remove-nothing        (Advanced) Do not remove any existing package (for testing).
   --listopts              List options supported by $progname.
 
 Notes:
-  1. By default, $progname detects the Nvidia GPU family and selects automatically between
-     Nvidia's open or closed source driver(s).
-     This can be prevented by using options --open or --closed.
-     Note that NVIDIA no longer actively support older than Maxwell GPUs. Thus using the nouveau driver
-     with them might be easier.
+   * By default, $progname detects the Nvidia GPU family and selects automatically between
+     Nvidia's open source driver, or the nouveau kernel driver.
+   * NVIDIA no longer actively supports older than Turing family GPUs. Thus using
+     the nouveau driver (or a driver from the AUR) with them may provide a solution.
      See also: https://wiki.archlinux.org/title/NVIDIA#Installation
-
-  2. By default, dkms packages are favored and will be selected for install if none of the options
-       --bumblebee
-       --no-dkms
-       --nouveau
-       --open
+   * By default, dkms packages are preferred and will be selected for install if none of options
+          --no-dkms
+          --nouveau
+          --bumblebee
      is used.
-
-  3. If you have hybrid graphics, then you may need a tool that can switch GPUs.
+   * If you have more than one GPU in the system, then you may need a tool to choose the GPUs to use.
      There are several popular tools in the AUR, e.g.
-       - envycontrol
-       - optimus-manager
-       - supergfxctl
-     just to mention a few.
+          - envycontrol
+          - optimus-manager
+          - supergfxctl
+     to mention a few.
      See also:
-       - https://discovery.endeavouros.com/?s=nvidia
-       - https://wiki.archlinux.org/title/NVIDIA_Optimus
-
-  4. Older Nvidia GPUs may be supported only by a legacy driver found in the AUR.
-     Use command 'nvidia-inst --drivers' to see which driver version supports your GPU.
+          - https://discovery.endeavouros.com/?s=nvidia
+          - https://wiki.archlinux.org/title/NVIDIA_Optimus
 
 EOF
-#  --legacyrepo            (*1) Adds a third party repository for legacy ($series_prev1 and $series_prev2 series) Nvidia drivers.
                 exit 0
                 ;;
             
@@ -519,43 +516,6 @@ EOF
         shift
     done
 }
-
-# Setup3rdPartyRepo() {
-#     DIE "sorry, currently $progname does not support any 3rd party repo for legacy drivers."
-
-#     if [ -z "$(grep "^\[kernel-lts\]" $pacmanconf )" ] ; then
-#         Note "Setting up repository [kernel-lts]."
-#         Note "This repo provides legacy Nvidia drivers and LTS kernels."
-#         Note "More info: https://wiki.archlinux.org/title/Unofficial_user_repositories#kernel-lts"
-#         Note "==> Will also update all packages (pacman -Syu) <== !!"
-
-#         local tmpfile="$(mktemp $HOME/.$progname.XXXXX)"
-
-#         cat $pacmanconf > "$tmpfile" 
-#         cat <<EOF >> "$tmpfile"
-
-# [kernel-lts]
-# SigLevel = Required
-# Server = https://repo.m2x.dev/current/\$repo/\$arch
-# EOF
-#         local cmds="cp '$tmpfile' $pacmanconf"
-#         local jonathon_key="76C6E477042BFE985CC220BD9C08A255442FAFF0"
-#         local result="$(pacman-key --list-keys 2>/dev/null | grep -w $jonathon_key)"
-#         if [ -z "$result" ] ; then
-#             cmds+="; pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys $jonathon_key"
-#             cmds+="; pacman-key --lsign-key $jonathon_key"
-#             cmds+="; pacman -Syu"
-#         fi
-
-#         $EOS_ROOTER "$cmds" || DIE "Setting up repository [kernel-lts] failed."
-
-#         Info "Repository [kernel-lts] was added to $pacmanconf."
-#         rm -f "$tmpfile"
-#     else
-#         Info "[kernel-lts] is already set up in $pacmanconf."
-#     fi
-#     exit 0
-# }
 
 AllRemovables() {
     # Find all packages that this program may uninstall and add them to array pr_nvidia.
@@ -566,23 +526,16 @@ AllRemovables() {
         bbswitch-dkms
         xf86-video-nouveau
         vulkan-nouveau
+        lib32-vulkan-nouveau
 
         # nvidia packages from repos:
         $(expac -Ss %n nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -Pv 'nvidia-inst|-toolkit|beta')
+
+        # old nvidia packages that no more exist
+        nvidia-dkms nvidia nvidia-lts
     )
 
-    # Note: older Nvidia drivers must come from a configured repo, not from the AUR,
-    # Currently we support the [kernel-lts] repo which contains some older Nvidia drivers.
-    # EDIT: [kernel-lts] is no more supported.
-
-    if false ; then
-        # nvidia packages from AUR:
-        pr_nvidia+=(
-            $(yay -Ssqa nvidia | grep -P '^nvidia|^lib32-nvidia' | grep -P "$series_prev1|$series_prev2")
-        )
-    fi
-
-    readarray -t pr_nvidia < <(printf "%s\n" "${pr_nvidia[@]}" | sort | uniq)
+    readarray -t pr_nvidia < <(printf "%s\n" "${pr_nvidia[@]}" | sort -u)
 }
 
 ProperNvidiaPackages() {
@@ -591,48 +544,20 @@ ProperNvidiaPackages() {
     # - p_nvidia32
     # because older nvidia drivers may be needed.
 
-    local finder=nvidia-driver-supported-branches
-    local testid="$nvidia_card_id"     # e.g. 20f3 104a
-
-    if [ -z "$series" ] ; then
-        # series="$($finder --hide-nvidia-inst-msgs $testid 2>/dev/null | grep ^Series | awk '{print $2}' | tr -d ':')"
-        series="$series_now"   # we support only what Arch repos have
-    fi
+    [ -z "$series" ] && series="$series_now"   # we support only what Arch repos have
 
     case "$series" in
         $latest_from_arch)
-            p_nvidia="nvidia-utils"
-            [ $settings_pkg = yes ] && p_nvidia+=" nvidia-settings"
             case "$driver_source_type" in
-                open)            p_nvidia="nvidia-open-dkms $p_nvidia" ;;
-                closed)          p_nvidia="nvidia-dkms $p_nvidia" ;;
-                other|unknown|*) p_nvidia="" ;;
+                open)           p_nvidia="nvidia-open-dkms $p_nvidia"
+                                p_nvidia32="lib32-nvidia-utils"
+                                ;;
+                nouveau)        p_nvidia="vulkan-nouveau"
+                                p_nvidia32="lib32-vulkan-nouveau"
+                                ;;
+                *)              DIE "Nvidia GPU not detected!" ;;
             esac
-            p_nvidia32="lib32-nvidia-utils"
-            ;;
-        $series_prev1 | $series_prev2)
-            p_nvidia="nvidia-${series}xx-dkms nvidia-${series}xx-utils nvidia-${series}xx-settings" # no hook!?
-            p_nvidia32="lib32-nvidia-${series}xx-utils"
-            ;;
-        *)
-            case "$mode" in
-                nouveau) ;;
-                *)
-                    local beta_pkg=nvidia-beta-dkms
-                    local beta_pkgver=$(yay -Ss $beta_pkg | grep ^aur/ | awk '{print $2}' | sed 's|-[0-9.]*$||')
-                    local beta_series=${beta_pkgver%%.*}
-
-                    case "$series" in
-                        $beta_series)
-                            local msg="your card is supported by an AUR package $beta_pkg,\nbut $progname does not "
-                            msg+="support beta packages.\nYou can install $beta_pkg (and related packages) manually."
-                            DIE "$msg"
-                            ;;
-                        "") DIE "$finder could not fetch card ids from Nvidia." ;;
-                        *)  DIE "Sorry, Nvidia series '$series' is not supported by $progname" ;;
-                    esac
-                    ;;
-            esac
+            [ $settings_pkg = yes ] && p_nvidia+=" nvidia-settings"
             ;;
     esac
 
@@ -645,29 +570,37 @@ ProperNvidiaPackages() {
 
 HasRepo() { grep "^\[$1\]" $pacmanconf >/dev/null; }
 
+YesOrNo() {
+    local question="$1"           # the question to ask
+    local default="$2"            # the default answer, either N or Y (or lower case the same)
+    local options=""              # for showing the accepted answer
+
+    case "$default" in
+        [Nn]) options="(N/y)" ;;
+        [Yy]) options="(Y/n)" ;;
+    esac
+
+    while true ; do
+        read -p "$question ${options}? " reply >&2
+        [ "$reply" ] || reply="$default"
+        case "$reply" in
+            [Nn]) exit 0 ;;
+            [Yy]) break ;;
+        esac
+    done
+}
+
 SanityChecks() {
-    #if [ "$(whoami)" = "root" ] || [ $(id -u) -eq 0 ] ; then
-    #    DIE "This program must be started as a non-root user."
-    #fi
-    if [ $driver_source_type = open ] && [ $driver_source_type_initial = closed ] ; then
-        Warn "Option --open used, but Nvidia recommends the closed source driver!"
+    local reply
+
+    if [ $driver_source_type = open ] && [ $driver_source_type_initial = nouveau ] ; then
+        Warn "Option --open used, but nvidia-open fails to support this GPU!"
+        YesOrNo "Do you really want to proceed" N
     fi
-    if [ $driver_source_type = closed ] && [ $driver_source_type_initial = open ] ; then
-        Warn "Option --closed used, but Nvidia recommends the open source driver!"
+    if [ $driver_source_type = nouveau ] && [ $driver_source_type_initial = open ] ; then
+        Warn "Selected to use nouveau, but package nvidia-open supports this GPU!"
+        YesOrNo "Do you want to proceed" Y
     fi
-
-    #if [ ! -x /usr/bin/nvidia-driver-supported-branches ] ; then
-    #    DIE "Sorry, package 'nvidia-installer-common' must be installed"
-    #fi
-
-    #if [ ! -x /usr/bin/nvidia-installer-kernel-para ] ; then
-    #    DIE "Sorry, package 'nvidia-installer-common' version 3.3.12-1 or newer must be installed"
-    #fi
-
-    #local dversion=$(pacman -Q nvidia-installer-dkms | awk '{print $2}')
-    #if [ $(vercmp $dversion 3.3.12-1) -lt 0 ] ; then
-    #    DIE "Sorry, package 'nvidia-installer-dkms' version must be 3.3.12-1 or newer"
-    #fi
 }
 
 GetSeriesFromPacman() {
@@ -677,7 +610,7 @@ GetSeriesFromPacman() {
 }
 
 RecommendedDriverSourceType() {
-    # Outputs one of: open, closed, other, unknown
+    # Outputs one of: open, nouveau, unknown
     # References:
     # - https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units
     # - https://us.download.nvidia.com/XFree86/Linux-x86_64/570.133.07/README/supportedchips.html
@@ -689,20 +622,22 @@ RecommendedDriverSourceType() {
 
     local lines="$1"
     if [ -z "$lines" ] ; then
-        driver_source_type=unknown
+        driver_source_type=unknown     # Nvidia GPU not detected
         return 1
     fi
 
-    # Closed source drivers recommended for these GPUs:
-    local maxwell=$(     echo "$lines" | grep " GM[12][0][04678B][BGLM]* ")
-    local pascal=$(      echo "$lines" | grep " GP[1][0][024678][BGLM]* ")
-    local volta=$(       echo "$lines" | grep " GV100[GL]* ")
+    # Nvidia's "closed source" drivers recommended for these GPUs:
+    local maxwell=$(echo "$lines" | grep " GM[12][0][04678B][BGLM]* ")
+    local pascal=$( echo "$lines" | grep " GP[1][0][024678][BGLM]* ")
+    local volta=$(  echo "$lines" | grep " GV100[GL]* ")
     if [ "$maxwell$pascal$volta" ] ; then
-        driver_source_type=closed
+        driver_source_type=nouveau
+        aur_driver=nvidia-580xx-dkms
+        IsInstalled $aur_driver || Note "Package $aur_driver from the AUR should support this GPU."
         return 0
     fi
 
-    # Open source drivers recommended for these GPUs:
+    # Nvidia's open source drivers recommended for these GPUs:
     local turing=$(      echo "$lines" | grep " TU[1][01][2467][BGLM]* ")
     local ampere=$(      echo "$lines" | grep " GA[1][0][23467][BFGLMS]* ")
     local ada_lovelace=$(echo "$lines" | grep " AD[1][0][234678][GLM]* ")
@@ -713,27 +648,25 @@ RecommendedDriverSourceType() {
         return 0
     fi
 
-    # local -r real_nvidia_id="$(echo "$NvidiaData" | grep "\[10de:" | sed 's|.*\[10de:\([0-9a-f]*\).*|\1|')"
-
-    driver_source_type=other
-    return 1
+    # all other Nvidia GPUs
+    driver_source_type=nouveau
+    return 0
 }
 
 ShowRecommendedDriver() {
     # Show the recommended driver (one of: nvidia, nvidia-open, nouveau) and stop.
     # No output means Nvidia GPU was not detected.
+    # Note: this function is used by the ISO installer.
 
-    if eos-connection-checker ; then
-        # Info "updating package 'hwdata' if needed ..."
-        sudo pacman -Sy --needed --noconfirm hwdata &> /dev/null
+    if [ $hwdata_update = yes ] ; then
         sleep 1
+        eos-connection-checker && sudo pacman -Sy --needed --noconfirm hwdata &> /dev/null
     fi
-    local -r family=$(lspci -d 10de::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
+    local family=$(lspci -d 10de::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
     case "$family" in
-        "")                   ;;                             # Nvidia GPU not found
-        GM*|GP*|GV*)          echo "nvidia" ;;               # Nvidia's closed source driver
-        TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;;          # Nvidia's open source driver
-        *)                    echo "nouveau" ;;              # For older Nvidia GPUs
+        TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;; # Nvidia's open source driver.
+        GM*|GP*|GV*|*)        echo "nouveau" ;;     # For older Nvidia GPUs.
+        "")                   ;;                    # Nvidia GPU not found.
     esac
 }
 
@@ -746,16 +679,28 @@ Main()
 
     local progname=${0##*/}
     local quiet=no
+    local arg
+    local hwdata_update=yes
 
-    [[ "$*" =~ --recommended-driver ]] && Options "$1"
-    [[ "$*" =~ --listopts ]]           && Options --listopts
+    # quick check for special options
+    for arg in "$@" ; do
+        case "$arg" in
+            --no-hwdata-update)   hwdata_update=no ;;    # useful with option --recommended-driver
+            --recommended-driver) Options "$arg" ;;      # for the ISO installer
+            --listopts)           Options "$arg" ;;      # for bash completion
+        esac
+    done
+
+    local all_installed_packages="$(expac -Q %n)"
 
     local NvidiaData="$(lspci -vnn | grep NVIDIA | grep -P 'VGA|3D|Display')"
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
+    local aur_driver=""      # might recommend this (if has value)
     local driver_source_type=""
-    RecommendedDriverSourceType "$NvidiaData"  # open, closed, other, unknown
+    DebugBreak
+    RecommendedDriverSourceType "$NvidiaData"  # open, nouveau, unknown
     local driver_source_type_initial="$driver_source_type"
     local force=no
     local test=no
@@ -772,49 +717,50 @@ Main()
     local p_nvidia32=""
     local install=()
     local remove=()
+    local remove_nothing=no
     local aurs=()            # collect needed AUR packages in this array
     local cmd=""
     local nvidia_card_id=""  # for option --id to test any card id
     local -r commands_to_run_string="COMMANDS TO RUN"
 
     local series_now=""      # get it later because of the speed for bash completion
-    local series_prev1=470
-    local series_prev2=390
+    local series_prev1=470-not-supported
+    local series_prev2=390-not-supported
     local has_multilib=no
     HasRepo multilib && has_multilib=yes
 
-    #if grep "^\[kernel-lts\]" $pacmanconf >/dev/null ; then
-    #    DIE "unsupported repository [kernel-lts] detected in /etc/pacman.conf, please remove it."
-    #fi
+    local -r latest_arch_version_full=$(expac -S %v nvidia-open-dkms)
 
-    local -r latest_arch_version_full=$(expac -S %v nvidia-dkms)
+    DebugBreak
+
     Options "$@"
 
-    if [ $has_multilib = yes ] && expac %n lib32-nvidia-utils >/dev/null && [ $bit32 = no ] ; then
+    if [ $has_multilib = yes ] && [ $bit32 = no ] && IsInstalled lib32-nvidia-utils ; then
         bit32=yes  # assume user still wants 32-bit support...
     fi
 
-    if [ $test = yes ] ; then
-        [ "$NvidiaData" ] && Note "$NvidiaData"
+    if [ $test = yes ] && [ $quiet = no ] ; then
+        [ "$NvidiaData" ] && Info "$NvidiaData"
 
-        Note "Currently installed packages related to Nvidia:"
+        Info "Currently installed packages related to Nvidia:"
         local ipkgs
         readarray -t ipkgs < <(expac -Qs "%n %v" nvidia)
         NoteList "${ipkgs[@]}"
-        Note "inxi -Gza"
+        Info "inxi -Gza"
         inxi -Gza >&2
     fi
 
     [ "$series_now" ] || series_now=$(GetSeriesFromPacman)
 
+    DebugBreak
     SanityChecks
-    local all_installed_packages="$(expac -Q %n)"
 
     local -r latest_from_arch=$(echo "$latest_arch_version_full" | cut -d '.' -f1)
     if [ "$latest_from_arch" != "$series_now" ] ; then
         Warn "Series $series_now is no more the latest in Arch but $latest_from_arch is. Results may not be accurate."
     fi
 
+    DebugBreak
     AllRemovables
 
     [ "$PROGVERSION" ] || PROGVERSION=$(expac -Q %v "$progname")
@@ -822,34 +768,21 @@ Main()
     Info "Command line: $progname $*"
 
     case "$driver_source_type" in
-        open|closed)
+        open)
             case "$mode" in
                 nouveau) Info "Selected mode: $mode (freedesktop.org's open source)" ;;
-                *)
-                    case "$driver_source_type" in
-                        open)   Info "Selected mode: $mode (Nvidia's open source)" ;;
-                        closed) Info "Selected mode: $mode (Nvidia's proprietary closed source)" ;;
-                    esac
-                    ;;
+                *)       Info "Selected mode: $mode (Nvidia's open source)" ;;
             esac
             ;;
-        other)
-            Info "Selected mode: $mode (GPU no more supported by Nvidia?)"
-            # Warn "could not determine Nvidia GPU family!"
-            case "$mode" in
-                nouveau) ;;
-                *)
-                    while true ; do
-                        read -p "==> Install vulkan-nouveau (Y/n)? " >&2
-                        case "$REPLY" in
-                            [yY]* | "") mode=nouveau; break ;;
-                            [nN]*)      mode=other; break ;;
-                        esac
-                    done
-                    ;;
-            esac
+        nouveau)
+            if [ $mode != nouveau ] ; then
+                mode=nouveau
+                Info "Mode changed to: $mode"
+            else
+                Info "Selected mode: $mode"
+            fi
             ;;
-        unknown|*)
+        *)
             Warn "could not find Nvidia GPU."
             if [ "$force" = "no" ] ; then
                 if ! IsNvidiaCard ; then
@@ -859,7 +792,7 @@ Main()
             ;;
     esac
 
-
+    DebugBreak
     ProperNvidiaPackages
 
     # Now all packages in various situations are known.
@@ -872,6 +805,7 @@ Main()
         nvidia)    OnlyNvidia ;;
     esac
 
+    DebugBreak
     KeepsAndRemoves
     CreateConfFile
 
@@ -883,6 +817,7 @@ Main()
             cmd="pacman -Syuq --noconfirm --noprogressbar --needed ${install[*]}; $cmd"
         fi
     fi
+    [ $remove_nothing = yes ] && remove=()
     if [ ${#remove[@]} -gt 0 ] ; then
         Info "Removing packages: ${remove[*]}"
         cmd="pacman -Rs --noconfirm --noprogressbar --nodeps ${remove[*]}; $cmd"
@@ -909,9 +844,12 @@ Main()
     # If AUR packages are involved, the sudo/root password needs to be given twice!
 
     if [ "$cmd" ] ; then
+        DebugBreak
         printf "\n==> NOTE: running the commands may take several minutes...\n\n"
         sudo bash -c "$cmd" && Note "To have the changes in effect, you must reboot the computer."
     fi
 }
+
+DebugBreak() { : ; }
 
 Main "$@"
