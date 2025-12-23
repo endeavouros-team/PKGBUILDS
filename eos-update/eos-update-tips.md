@@ -61,7 +61,7 @@ run `eos-update` without option `--fast`.
 `eos-update --nvidia`
 
 This will check that the updates of the kernel (`linux` or `linux-lts`)
-and the Nvidia driver (`nvidia` or `nvidia-lts`) are in proper sync.
+and the *non-dkms* Nvidia driver are in proper sync.
 A warning is displayed if not.
 
 This warning means it is better not to update until
