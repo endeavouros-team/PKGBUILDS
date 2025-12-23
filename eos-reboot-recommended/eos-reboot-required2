@@ -39,10 +39,10 @@ Main() {
                 # Note: only official kernels are checked.
                 IsRunningKernel "$target" && list_of_targets+=("$target")
                 ;;
-            nvidia)
+            nvidia-open)
                 IsRunningKernel linux && list_of_targets+=("$target")
                 ;;
-            nvidia-lts)
+            nvidia-open-lts)
                 IsRunningKernel linux-lts && list_of_targets+=("$target")
                 ;;
             amd-ucode)
