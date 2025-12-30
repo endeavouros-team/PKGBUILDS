@@ -182,7 +182,7 @@ NEAR_COUNTRIES = {
     "YE": ['OM', 'SA'],
     "ZA": ['BW', 'LS', 'MZ', 'NA', 'SZ', 'ZW'],
     "ZM": ['AO', 'BW', 'CD', 'MW', 'MZ', 'NA', 'TZ', 'ZW'],
-    "ZW": ['BW', 'MZ', 'ZA', 'ZM'],
+    "ZW": ['BW', 'MZ', 'ZA', 'ZM']
 }
 
 
@@ -208,17 +208,21 @@ def main():
 
     args = parser.parse_args()
 
-    search_country = args.country
+    # Strip whitespaces and uppercase input
+    search_country = args.country.strip().upper()
+
     recursion_depth = args.recursion
     if recursion_depth > 12:
         sys.exit("Recursion should be less than or equal 12! You doing something stupid here.")
 
-
     result = set(NEAR_COUNTRIES.get(search_country,[]))
-    for i in range(1, recursion_depth, 1):
+    for i in range(1, recursion_depth):
         n_c = list(result)
         for country in n_c:
             result.update(NEAR_COUNTRIES.get(country,[]))
+
+    # Remove search country from result
+    result.discard(search_country)
 
     list_result = list(result)
     list_result.sort()
