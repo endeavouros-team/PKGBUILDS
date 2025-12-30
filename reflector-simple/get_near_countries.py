@@ -213,11 +213,12 @@ def main():
     if recursion_depth > 12:
         sys.exit("Recursion should be less than or equal 12! You doing something stupid here.")
 
-    result = set(NEAR_COUNTRIES[search_country])
+
+    result = set(NEAR_COUNTRIES.get(search_country,[]))
     for i in range(1, recursion_depth, 1):
         n_c = list(result)
         for country in n_c:
-            result.update(NEAR_COUNTRIES[country])
+            result.update(NEAR_COUNTRIES.get(country,[]))
 
     list_result = list(result)
     list_result.sort()
