@@ -1,0 +1,18 @@
+# Maintainer : Evan James <dalto@endeavouros.com>
+
+pkgname=eos-hwtool
+pkgver=1.0
+pkgrel=1
+pkgdesc="The EndeavourOS hardware management tool is used to manage VM and GPU drivers"
+arch=('any')
+license=('GPL3')
+depends=('python')
+optdepends=('sudo')
+source=(
+    eos-hwtool
+)
+sha256sums=('ff35be50a59698e6a95fef4ec5702697f56c3a8bc2ba9dd57d25426d4b3c7636')
+package() {
+
+    install -Dm0755 "$srcdir/eos-hwtool"       "$pkgdir/usr/bin/eos-hwtool"
+}
