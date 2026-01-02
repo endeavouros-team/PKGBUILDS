@@ -16,7 +16,7 @@ find_token() {
 }
 
 [[ -f /etc/kernel-install-for-dracut.conf ]] && source /etc/kernel-install-for-dracut.conf
-ESP=$(bootctl --print-esp-path)
+ESP=$(bootctl --print-boot-path)
 TOKEN=$(find_token)
 while read -r pkgbase; do
     kernelversion=$(basename "${pkgbase%/pkgbase}")
