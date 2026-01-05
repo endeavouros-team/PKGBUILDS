@@ -1,0 +1,48 @@
+# bash completion for eos-hwtool        -*- shell-script -*-
+
+_eos_hwtool_complete() {
+    local IFS=$'\n'         # for handling spaces in names
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o filenames
+    compopt -o nosort
+}
+
+_make_as_lines() {
+    printf "%s\n" "$@"
+}
+
+_eos_hwtool_list_opts()   {
+    local opts=( --help -h
+                 --list
+                 --free
+                 --no32
+                 --recommended
+                 --install-recommended
+                 --install
+                 --repair
+                 --remove
+               )
+    _make_as_lines "${opts[@]}"
+}
+_eos_hwtool_profiles() {
+    _make_as_lines $(eos-hwtool --list | grep "^[^A-Z]" | sed 's|^\t||')
+}
+
+_eos_hwtool_() 
+{
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    # Handle options that need sub-data.
+    case "$prev" in
+        --install | --repair | --remove)
+            _eos_hwtool_complete "$(_eos_hwtool_profiles)"
+            ;;
+        *)
+            # Handle all top-level parameters.
+            _eos_hwtool_complete "$(_eos_hwtool_list_opts)"
+            ;;
+    esac
+} &&
+complete -F _eos_hwtool_ eos-hwtool
