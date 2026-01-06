@@ -618,38 +618,30 @@ RecommendedDriverSourceType() {
     # - https://nouveau.freedesktop.org/wiki/CodeNames.html
     # - /usr/share/hwdata/pci.ids
 
-    # local lines=$(lspci -d 10de::03xx)                               # 10de = NVIDIA
+    local family=$(lspci -d $NVIDIA::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
 
-    local lines="$1"
-    if [ -z "$lines" ] ; then
-        driver_source_type=unknown     # Nvidia GPU not detected
-        return 1
-    fi
-
-    # Nvidia's "closed source" drivers recommended for these GPUs:
-    local maxwell=$(echo "$lines" | grep " GM[12][0][04678B][BGLM]* ")
-    local pascal=$( echo "$lines" | grep " GP[1][0][024678][BGLM]* ")
-    local volta=$(  echo "$lines" | grep " GV100[GL]* ")
-    if [ "$maxwell$pascal$volta" ] ; then
-        driver_source_type=nouveau
-        aur_driver=nvidia-580xx-dkms
-        IsInstalled $aur_driver || Note "Package $aur_driver from the AUR should support this GPU."
-        return 0
-    fi
-
-    # Nvidia's open source drivers recommended for these GPUs:
-    local turing=$(      echo "$lines" | grep " TU[1][01][2467][BGLM]* ")
-    local ampere=$(      echo "$lines" | grep " GA[1][0][23467][BFGLMS]* ")
-    local ada_lovelace=$(echo "$lines" | grep " AD[1][0][234678][GLM]* ")
-    local blackwell=$(   echo "$lines" | grep " GB[12][012][023][M]* ")
-    local next=$(        echo "$lines" | grep " GN[2][2][^ ]* ")            # ???, from file /usr/share/hwdata/pci.ids
-    if [ "$turing$ampere$ada_lovelace$blackwell$next" ] ; then
-        driver_source_type=open
-        return 0
-    fi
-
-    # all other Nvidia GPUs
-    driver_source_type=nouveau
+    case "$family" in
+        "")
+            # Nvidia GPU not detected
+            driver_source_type=unknown
+            return 1
+            ;;
+        TU*|GA*|AD*|GB*|GN*)
+            # Turing, Ampere, Ada Lovelace, Blackwell.
+            # (GN=? is from file /usr/share/hwdata/pci.ids.)
+            driver_source_type=open
+            ;;
+        GM*|GP*|GV*)
+            # Maxwell, Pascal and Volta
+            driver_source_type=nouveau
+            aur_driver=nvidia-580xx-dkms
+            IsInstalled $aur_driver || Note "Package $aur_driver from the AUR should support this GPU."
+            ;;
+        *)
+            # Older than Maxwell.
+            driver_source_type=nouveau
+            ;;
+    esac
     return 0
 }
 
@@ -662,7 +654,7 @@ ShowRecommendedDriver() {
         sleep 1
         eos-connection-checker && sudo pacman -Sy --needed --noconfirm hwdata &> /dev/null
     fi
-    local family=$(lspci -d 10de::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
+    local family=$(lspci -d $NVIDIA::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
     case "$family" in
         TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;; # Nvidia's open source driver.
         GM*|GP*|GV*|*)        echo "nouveau" ;;     # For older Nvidia GPUs.
@@ -677,7 +669,8 @@ Main()
     # - the latest from Arch
     # - two latest from the kernel-lts repo
 
-    local progname=${0##*/}
+    local -r progname=${0##*/}
+    local -r NVIDIA=10de
     local quiet=no
     local arg
     local hwdata_update=yes
@@ -697,10 +690,10 @@ Main()
 
     local pacmanconf=/etc/pacman.conf
     local mode="nvidia"
-    local aur_driver=""      # might recommend this (if has value)
-    local driver_source_type=""
+    local aur_driver=""                                           # might recommend this (if has value)
+    local driver_source_type=""                                   # open, nouveau, unknown
     DebugBreak
-    RecommendedDriverSourceType "$NvidiaData"  # open, nouveau, unknown
+    RecommendedDriverSourceType
     local driver_source_type_initial="$driver_source_type"
     local force=no
     local test=no
@@ -708,7 +701,7 @@ Main()
     local bit32=no
     local ignore_errors=no
     local series=""
-    local dkms=yes                                          # yes or no
+    local dkms=yes                                                # yes or no
     local settings_pkg=yes
     local conf_file=/etc/X11/xorg.conf.d/20-nvidia.conf
     local PROGVERSION=""
@@ -718,12 +711,12 @@ Main()
     local install=()
     local remove=()
     local remove_nothing=no
-    local aurs=()            # collect needed AUR packages in this array
+    local aurs=()                                                 # collect needed AUR packages in this array
     local cmd=""
-    local nvidia_card_id=""  # for option --id to test any card id
+    local nvidia_card_id=""                                       # for option --id to test any card id
     local -r commands_to_run_string="COMMANDS TO RUN"
 
-    local series_now=""      # get it later because of the speed for bash completion
+    local series_now=""                                           # get it later because of the speed for bash completion
     local series_prev1=470-not-supported
     local series_prev2=390-not-supported
     local has_multilib=no
@@ -776,8 +769,9 @@ Main()
             ;;
         nouveau)
             if [ $mode != nouveau ] ; then
+                local -r wanted_mode=$mode
                 mode=nouveau
-                Info "Mode changed to: $mode"
+                Info "Mode changed from '$wanted_mode' to '$mode'"
             else
                 Info "Selected mode: $mode"
             fi

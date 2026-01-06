@@ -3,7 +3,7 @@
 # Contributor: joekamprad <joekamprad@endeavouros.com>
 
 pkgname=nvidia-inst
-pkgver=25.12
+pkgver=26
 pkgrel=1
 pkgdesc="Script to install/uninstall nvidia driver packages in EndeavourOS"
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -27,7 +27,7 @@ source=(
   # $_url/nvidia-installer-kernel-para
   $_url/nvidia-driver-supported-branches
 )
-sha512sums=('53b75415af3e39d76ab0178d4e748058bb97a3d8681039d70b6d355ab06d2f2c4668620b91da730c9cfc941c7fc6e4a8387b0d3db220d198f223ba8bb5e4e2f6'
+sha512sums=('1ad5c9712781c3a17a2a5b8a722d3660ef909acaf74da3d677ad2904eca0dbead8bc53de31cf7b71ab2f5b0b16e585e34ebdc5376df009b93aa9677550d3673a'
             'b8857ff98870ac8cff78e31c660bde3b7308752ee4e6547682340866ee59f5801f09ede41e490380a40926536f47259f5d347fd59e8e2ffa67a8cb57f07c44e6'
             '1c065a3ae7ffb5daee6a73aae9b586326a8cb7b164b644626aaf64efb65593846b54e1f63469561c47a28cca2dc646efd51adfbc04504a697effcd860df6ef4c')
 
