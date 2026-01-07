@@ -1,0 +1,29 @@
+# Maintainer : manuel at endeavouros.com
+
+pkgname=iso-create-ml
+pkgver=0.26
+pkgrel=1
+pkgdesc="Create a mirrorlist for the ISO"
+arch=('any')
+license=('GPL3')
+depends=(eos-bash-shared parallel curl reflector)
+source=(
+    create-ml
+    rankmirrors-arch
+    arch-countries.conf
+    arch-mirrors-active.conf
+)
+sha256sums=('27910b75f6b278ee44fc041a1070f047746c562b3b61d6e08124fcb5cd6fe8f2'
+            '7036b26376843a63d3be7a5d472992c67979a1efcd7789c0316a8f4ca00324cf'
+            '5776615fa666b708161de831f334469c003bdb81fc95afa4ad26faa8f7675f56'
+            'e1667b8149b9b6462ecd0e9998a0f556accec78262b3eccd327cb2e0003b1dc5')
+package() {
+    local src
+    for src in "${source[@]}" ; do
+        src=${src##*/}
+        case "$src" in
+            *.conf) install -Dm644 "$srcdir/$src"        "$pkgdir/etc/$src" ;;
+            *)      install -Dm755 "$srcdir/$src"        "$pkgdir/usr/bin/$src" ;;
+        esac
+    done
+}
