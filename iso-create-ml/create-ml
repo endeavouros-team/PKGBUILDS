@@ -178,7 +178,6 @@ Options: --help, -h                   This help.
          --nolocal                    Do not include mirrors from the current country.
          --offline                    Don't use internet even if a connection is available.
          --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
-         --update                     Update support data files that will be stored for the ISO.
          --nosave                     Do not save mirrorlist to $target.
          --verbose, -v                Show more ranking details.
          --http                       Include mirrors with http://
@@ -190,6 +189,7 @@ Options: --help, -h                   This help.
          --user-countries             Use file $user_fav_countries to give country codes.
                                       It can contain a list of codes separated by white spaces.
          --fake-country=*             Set a fake current country code (advanced).
+         --update-supports            Update support data files that will be stored for the ISO (advanced).
 
 Notes:   * Mirrors with https:// are included by default.
          * Country codes are two-letter codes from command 'reflector --list-countries'.
