@@ -2,7 +2,7 @@
 # Earlier maintainers: Portergos Linux <portergoslinux@gmail.com>
 
 pkgname=endeavouros-mirrorlist
-pkgver=25.11.1
+pkgver=26
 pkgrel=1
 pkgdesc="EndeavourOS mirrorlist"
 arch=('any')
@@ -17,7 +17,7 @@ conflicts_aarch64=(endeavouros-arm-mirrorlist)
 conflicts_armv7h=(endeavouros-arm-mirrorlist)
 
 source=($_url/$pkgname)
-sha512sums=('201b6393e3b62fcd2df41114fbff4f6e9e97948af9a1488a5a85426d0802004a206f883b2baa653245cc06039a153abd0d6b0775926dc429abac1ece1b008697')
+sha512sums=('da3ec478d6c6e20f0b8e4ae8251c2d2f6b0c2f2f526c3b0662393e605a73cdb957b6540c8fcc3b567e67a337e5e08caa3c7b330a8de96a2cd6f81df6eef76828')
 
 package() {
  install -Dm644 "$srcdir/$pkgname" "$pkgdir/etc/pacman.d/$pkgname"
