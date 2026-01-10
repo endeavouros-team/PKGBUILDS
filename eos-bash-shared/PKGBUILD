@@ -7,7 +7,7 @@
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
 pkgver=25.12.3
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -33,6 +33,7 @@ optdepends=(
     "feh: used by eos-wallpaper-set on some desktops"
     "pcmanfm: used by eos-wallpaper-set on LXDE"
     "pcmanfm-qt: used by eos-wallpaper-set on LXQt"
+    "kimageformats: for supporting .avif wallpapers with Plasma"
     "nano: for nano-pager"
 )
 
