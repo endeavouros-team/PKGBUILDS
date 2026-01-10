@@ -35,12 +35,14 @@ FetchMirrors() {
 FetchCountries() {
     local info codes=() countries=()
 
-    info=$(/bin/reflector --list-countries 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/'d)
+    info=$(/bin/reflector --list-countries 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/d')
     if [ -z "$info" ] ; then
         WARN "could not update '$dbfile'"
         return 1
     fi
+    # shellcheck disable=SC2207
     codes=(WW $(echo "$info" | sed -E 's|(.*[a-z])[ ]+([A-Z][A-Z])[ ]+[0-9]+|\2|'))
+    # shellcheck disable=SC1090,SC2046
     readarray -t countries <<< $(echo "Worldwide"; echo "$info" | sed -E 's|(.*[a-z])[ ]+([A-Z][A-Z])[ ]+[0-9]+|\1|')
 
     local code country ix count=${#codes[*]}
@@ -129,7 +131,6 @@ DumpOptions() {
         o=${o//$sep/ -}                       # manage short options
         echo "$o"
     fi
-    exit 0
 }
 
 Parameters() {
@@ -141,7 +142,7 @@ Parameters() {
     while [ "$1" ] ; do
         case "$1" in
             --)                  shift; break ;;
-            --offline)           has_internet_connection=no ;;
+            # --offline)           has_internet_connection=no ;;
             --fake-country)      tmp="$2"
                                  shift
                                  if [ "$tmp" ] ; then
@@ -158,10 +159,8 @@ Parameters() {
             --nolocal)           local_country_wanted=no ;;
             --http | --rsync)    protocols+=("${1:2}") ;;
             --sequential)        parallel=no ;;
-            --update-supports)   rm -f "$mirrordata" "$dbfile" ;;
             --save)              save=yes; target=$target_def ;;
             --savefile)          save=yes; target="$2"; shift ;;
-            --dump-options)      DumpOptions ;;
             -v | --verbose)      verbose=yes ;;
             -r | --recommended-countries)
                 # Adding recommended countries for ranking.
@@ -178,12 +177,12 @@ Parameters() {
                 esac
                 ;;
             -h | --help)
+#         --offline                    Don't use internet when a connection is not available.
                 cat <<EOF >&2
 Usage:   $progname [options] [country-code [...]]
 
 Options: --help, -h                   This help.
          --nolocal                    Do not include mirrors from the current country.
-         --offline                    Don't use internet if a connection is not available.
          --save                       Save mirrorlist to $target_def (see also option --savefile).
          --savefile=*                 File path to save the mirrorlist.
          --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
@@ -202,6 +201,11 @@ Notes:   * Only https:// mirrors are included by default.
          * Country codes are the two-letter codes listed by command 'reflector --list-countries'.
          * Use option --save to change the existing $target_def.
          * Use option --recommended-countries to rank mirrors from the recommended countries.
+         * If available, internet connection is used for:
+               1) fetching a list of active mirrors from the Arch web site
+               2) fetching country code and name mappings from the Arch web site
+               3) ranking mirrors
+           Without a connection the ranking result is very likely suboptimal.
 EOF
                 exit 0
                 ;;
@@ -214,11 +218,12 @@ EOF
     done
 }
 
+Header() {
+    echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
+    echo -e "### Command: $progname ${orig_args[*]}\n"
+}
+
 Main2() {
-    declare -A reflector_countries
-
-    source "$dbfile"
-
     local tmplist mirrorlist
     tmplist=$(mktemp)                           # collect mirrors that user wanted here
     mirrorlist=$(mktemp)
@@ -247,16 +252,18 @@ Main2() {
 
         echo2 "==> Ranking mirrors."
         {
-            echo -e "### Mirror list generated at $(date "+%Y-%m-%d %X")"
-            echo -e "### Command: $progname ${orig_args[*]}\n"
+            Header
+            # shellcheck disable=SC2016
             rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|'
         } > "$mirrorlist"
         echo2 "==> Mirrors ranked."
     else
+        local msg_not_ranked="NOTE: this mirrorlist was NOT ranked due to unavailable internet connection."
+        local msg_not_ranked2="We strongly recommend to rank it soon."
         {
-            echo -e "### Mirror list generated at $(date "+%Y-%m-%d %X")"
-            echo -e "### Command: $progname $*"
-            echo -e "### Note: this mirrorlist was NOT ranked during install. We strongly recommend to rank it soon.\n"
+            Header
+            echo -e "### $msg_not_ranked"
+            echo -e "### $msg_not_ranked2\n"
         } > "$mirrorlist"
         cat "$tmplist" >> "$mirrorlist"
     fi
@@ -277,10 +284,14 @@ Main2() {
                 sudo cp "$mirrorlist" "$target"
             fi
         fi
+        if [ $has_internet_connection = no ] ; then
+            echo2 "==> $msg_not_ranked"
+            echo2 "==> $msg_not_ranked2"
+        fi
     else
         echo2 ""
         cat "$mirrorlist" >&2
-        echo2 "\n==> $target NOT updated because option --save was not used."
+        echo2 "\n==> Tip: use option --save to update $target."
     fi
     Cleanup
 }
@@ -290,8 +301,8 @@ Main() {
 
     local -r sep="|"
     local lopts sopts
-    local OPTS="help${sep}h,http,nolocal,save,savefile:,offline,recommended-countries${sep}r,rsync,sequential"
-    OPTS+=",update-supports,user-countries,fake-country:,verbose${sep}v,dump-options"
+    local OPTS="help${sep}h,http,nolocal,save,savefile:,recommended-countries${sep}r,rsync,sequential" # offline
+    OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs"  # update-supports
     lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
     sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
 
@@ -304,7 +315,6 @@ Main() {
     local country_code=""
     local local_country_wanted=yes                                       # include local country in the mirrorlist or not?
     local verbose=no
-    local updated_supports=no
     local save=no
     local parallel=yes                                                   # ranking mirrors in pararallel or not?
     local protocols=(https)                                              # list of supported protocols
@@ -313,28 +323,42 @@ Main() {
     local cleanup_files=()
     local orig_args=("$@")
 
+    declare -A reflector_countries
+
+    GetCountriesFile
+    # shellcheck disable=SC1090
+    source "$dbfile"
+    if [[ "$*" =~ "--dump-ccs" ]] ; then
+        # shellcheck disable=SC2046
+        echo $(printf "%s\n" "${!reflector_countries[@]}" | sort)
+        exit 0
+    fi
+    if [[ "$*" =~ "--dump-options" ]] ; then
+        DumpOptions
+        exit 0
+    fi
+    GetMirrorsFile
+
     eos-connection-checker || has_internet_connection=no
 
     [ $has_internet_connection = yes ] && country_code="$(show-location-info --tolower country)"
 
     # handle some special options here
-    local args=() arg arg2 ix tmp=("$@")
+    local args=() arg ix tmp=("$@")
     for ((ix=0; ix < ${#tmp[@]}; ix++)) ; do
         arg="${tmp[$ix]}"
         case "$arg" in
-            --update-supports)             rm -f "$mirrordata" "$dbfile"; GetSupportFiles; exit 0 ;;   # just update the support files
             --fake-country)                Parameters "$arg" "${tmp[$((ix+1))]}"; ((ix++)) ;;
             --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
             --user-countries)              Parameters "$arg" ;;
             --testing)                     ;;                             # --testing is not a real option for users...
+            --update-supports)             ;;
+            --dump-options | --dump-ccs)   ;;
             *)                             args+=("$arg") ;;
         esac
     done
 
-    GetSupportFiles
-    
     Parameters "${args[@]}"
-
     Main2
 }
 
@@ -342,7 +366,7 @@ IsOnIso() {
     [ "$LOGNAME" = liveuser ] && [ -d /home/liveuser ] && [ -d /etc/calamares ]
 }
 
-GetSupportFiles() {
+GetMirrorsFile() {
     if [ ! -e "$mirrordata" ] ; then
         if FetchMirrors ; then
             IsOnIso && cleanup_files+=("$mirrordata")
@@ -350,6 +374,8 @@ GetSupportFiles() {
             mirrordata="/etc/${mirrordata##*/}"
         fi
     fi
+}
+GetCountriesFile() {
     if [ ! -e "$dbfile" ] ; then
         if FetchCountries ; then
             IsOnIso && cleanup_files+=("$dbfile")

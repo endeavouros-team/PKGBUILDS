@@ -1,7 +1,7 @@
 # Maintainer : manuel at endeavouros.com
 
 pkgname=iso-create-ml
-pkgver=0.26.3
+pkgver=0.26.4
 pkgrel=1
 pkgdesc="Create a mirrorlist for the ISO"
 arch=('any')
@@ -9,11 +9,13 @@ license=('GPL3')
 depends=(eos-bash-shared parallel curl reflector)
 source=(
     create-ml
+    create-ml.bash-completion
     rankmirrors-arch
     arch-countries.conf
     arch-mirrors-active.conf
 )
-sha256sums=('432b2dc8a1f60059c1258098e30f704aa6b42d85b35533e4bd4c4fabdcf17497'
+sha256sums=('33a4de294ca7be78aebf0a52dfec12b8e954b9ab7f3e448e0cd17e1319b8e68e'
+            '4af79c7128c1566e26951ad97e468fc5ef62588c6b76fdd8036982cdc7bc5086'
             '7036b26376843a63d3be7a5d472992c67979a1efcd7789c0316a8f4ca00324cf'
             '5776615fa666b708161de831f334469c003bdb81fc95afa4ad26faa8f7675f56'
             'e28f8a73bd7f62f2695778ec369d9a52b6f950437c52acb2978dc88d8f3299ed')
@@ -25,8 +27,9 @@ package() {
     for src in "${source[@]}" ; do
         src=${src##*/}
         case "$src" in
-            *.conf) install -Dm644 "$srcdir/$src"        "$pkgdir/etc/$src" ;;
-            *)      install -Dm755 "$srcdir/$src"        "$pkgdir/usr/bin/$src" ;;
+            *.bash-completion) install -Dm644 "$src"  "$pkgdir/usr/share/bash-completion/completions/${src%.bash-completion}" ;;
+            *.conf)            install -Dm644 "$src"  "$pkgdir/etc/$src" ;;
+            *)                 install -Dm755 "$src"  "$pkgdir/usr/bin/$src" ;;
         esac
     done
 }

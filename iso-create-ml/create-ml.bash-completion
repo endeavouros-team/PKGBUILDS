@@ -1,0 +1,36 @@
+# bash completion for create-ml        -*- shell-script -*-
+
+_create_ml_complete() {
+    local IFS=$'\n'         # handles spaces in names!
+    COMPREPLY=($(compgen -W "$1" -- "$cur"))
+    [[ $COMPREPLY == *= ]] && compopt -o nospace
+    compopt -o filenames    # handles spaces in names!
+    compopt -o nosort
+}
+
+_create_ml_make_as_lines() {
+    printf "%s\n" "$@"
+}
+
+_create_ml_list_opts()   { _create_ml_make_as_lines $(create-ml --dump-options) ; }
+_create_ml_list_ccs()    { _create_ml_make_as_lines $(create-ml --dump-ccs) ; }
+_create_ml_list_all()    { _create_ml_list_opts; _create_ml_list_ccs; }
+
+_create_ml_() {
+    local cur prev #words cword split
+    _init_completion -s || return
+
+    case "$prev" in
+        # Handle options that need sub-options.
+        --savefile)      _filedir ;;
+        --fake-country)  _create_ml_complete "$(_create_ml_list_ccs)" ;;
+        *)
+            # Handle all top-level parameters.
+            case "$cur" in
+               -*) _create_ml_complete "$(_create_ml_list_opts)" ;;
+               *)  _create_ml_complete "$(_create_ml_list_all)" ;;
+            esac
+            ;;
+    esac
+} &&
+complete -F _create_ml_ create-ml
