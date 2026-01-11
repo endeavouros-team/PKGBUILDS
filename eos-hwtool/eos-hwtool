@@ -107,7 +107,7 @@ class ProfileData:
             'dracut_config': ''},
         Profile.nvidia_open: {
             'packages': {"nvidia-open-dkms", "nvidia-utils", "egl-wayland", "nvidia-settings", "opencl-nvidia",
-                         "libva-nvidia-driver"},
+                         "libva-nvidia-driver", "libxnvctrl"},
             'packages32': {"lib32-nvidia-utils", "lib32-opencl-nvidia"},
             'services': {},
             'dracut_config': 'force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "'},
@@ -543,6 +543,22 @@ def do_purge(arg_list, device_list):
 
     remove_packages(list(package_set), arg_list.iso)
 
+
+def do_check_nvidia(arg_list, device_list):
+    profile_set = set()
+    for device in device_list:
+        for profile in device["profiles"]:
+            profile_set.add(profile)
+
+    # If we are installing on the ISO
+    if Profile.nvidia_open in profile_set and Profile.nvidia_legacy not in profile_set:
+        print("nvidia-open")
+    elif Profile.nvidia_legacy in profile_set:
+        print("nouveau")
+    else:
+        print("none")
+
+
 if __name__ == '__main__':
     # Set up the available command line arguments
     parser = argparse.ArgumentParser(description='The EndeavourOS hardware management tool is used to manage VM and GPU '
@@ -553,6 +569,8 @@ if __name__ == '__main__':
     parser.add_argument('--free', action="store_true", help='Exclude proprietary drivers(Currently only nvidia-open')
     parser.add_argument('--no32', action="store_true", help='Exclude 32-bit libraries')
     parser.add_argument('--recommended', action="store_true", help='Show the recommended profiles for each device')
+    parser.add_argument('--check-nvidia', action="store_true",
+                        help='Determine if the nvidia-open drivers should be loaded on the ISO')
     parser.add_argument('--install-recommended', action="store_true",
                         help='Install or repair the selected profile')
     parser.add_argument('--install', '--repair', type=str, nargs='*', action="append", metavar='Profile',
@@ -581,6 +599,10 @@ if __name__ == '__main__':
 
         devices = get_device_info(gpu_info)
 
+    if args.check_nvidia:
+        do_check_nvidia(args, devices)
+        sys.exit(0)
+
     if args.list or args.recommended:
         for device_item in devices:
             print(f'Device: {device_item["name"]}')
@@ -588,7 +610,7 @@ if __name__ == '__main__':
             for profile_item in device_item["profiles"]:
                 print(f'\t{profile_item.name}')
 
-        exit(0)
+        sys.exit(0)
 
     # Operations below this point require root privileges
     if os.getuid() != 0:

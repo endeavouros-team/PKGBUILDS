@@ -1,0 +1,345 @@
+#!/usr/bin/bash
+#####
+# This file is a slightly modified version of 'rankmirrors' in package 'pacman-contrib'.
+# No guarantees whatsoever.
+# 2026-Jan-04 manuel at endeavouros.com
+#####
+#
+# rankmirrors - Read a list of mirrors from a file and rank them by speed
+#
+# Copyright (c) 2009 Matthew Bruenig <matthewbruenig@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# traps interrupt key to spit out pre-interrupt info
+trap finaloutput INT
+
+declare -r myname=${0##*/}    #'rankmirrors'
+declare -r myver='1.13.1'
+
+prefer_what=age    # age or speed
+case "$prefer_what" in
+    speed) sort_direction="-k2V,2 -k1rb,1" ;;
+    age|*) sort_direction="-k1rb,1 -k2V,2" ;;
+esac
+
+usage() {
+	cat <<EOF
+${myname} v${myver}
+
+Rank pacman mirrors by their connection and opening speed. Pacman mirror files
+are located in /etc/pacman.d/. It can also rank one mirror if the URL is
+provided.
+
+Usage: ${myname} [options] <mirrorfile | url>
+
+Options:
+  -h, --help            display this help message and exit
+  -n <num>              number of servers to output, 0 for all
+  -m, --max-time <num>  specify a ranking operation timeout, can be decimal
+                        number
+  -p, --parallel        run tests in parallel for all servers (may be
+                        inaccurate, depends on GNU parallel)
+  -r, --repo            specify a repository name instead of guessing
+  -t, --times           only output mirrors and their response times
+  -u, --url             test a specific URL
+  -v, --verbose         be verbose in output
+  -w, --working-only    only output mirrors that respond within the timeout
+  -V, --version         display version information and exit
+EOF
+	exit 0
+}
+
+version() {
+	cat <<EOF
+${myname} v${myver}
+Copyright (c) 2009 Matthew Bruenig <matthewbruenig@gmail.com>.
+
+This is free software; see the source for copying conditions.
+There is NO WARRANTY, to the extent permitted by law.
+EOF
+	exit 0
+}
+
+err() {
+	echo "$1" >&2
+	exit 1
+}
+
+# gettime fetchurl (e.g gettime https://foo.com/core/os/i686/core.db.tar.gz)
+# returns the fetching time, or timeout, or unreachable
+gettime_orig() {
+	IFS=' ' read -ra output <<< "$(curl -s -m "$MAX_TIME" -w "%{time_total} %{http_code}" "$1" -o/dev/null)"
+	(( $? == 28 )) && { echo timeout; return 1; }
+	(( output[1] >= 400 || ! output[1] )) && { echo unreachable; return 1; }
+	echo "${output[0]}"
+	return 0
+}
+gettime_o2() {
+    local url="$1"
+    local output=() result
+    local curl_exitcode=0
+    result=$(curl --fail -s -m "$MAX_TIME" -w "%{time_total} %{http_code}" "$url" -o/dev/null) || curl_exitcode=$?
+    IFS=' ' read -ra output <<< "$(echo "$result")"
+    case "$curl_exitcode" in
+        0)  result="${output[0]}"
+            if [ "$result" ] && [ -z "${result//[0-9.]/}" ] ; then
+                echo "$result"
+                return 0
+            else
+                local my_exitcode=1
+                printf "==> $myname/$FUNCNAME exit code %3s: %s\n" $my_exitcode "$url" >&2
+                return 1
+            fi
+            ;;
+        *)  printf "==> curl code %3s from: %s\n" $curl_exitcode "$url" >&2; return 1 ;;
+    esac
+}
+gettime() {
+    local url="$1"
+    local result curl_exitcode=0 time syncnr
+
+    result=$(curl --fail -Lsm $MAX_TIME -w "%{time_total}" "$url") || curl_exitcode=$?
+    case $curl_exitcode in
+        0)
+            syncnr=$(echo "$result" | head -n1)    # tells when mirror was synced (bigger is better)
+            time=$(  echo "$result" | tail -n1)    # tells the "speed" of the mirror (smaller is better)
+            echo "$syncnr $time"
+            return 0
+            ;;
+        *)
+            printf "==> curl code %3s from: %s\n" $curl_exitcode "$url" >&2
+            return 1
+            ;;
+    esac
+}
+
+# getfetchurl serverurl (e.g. getturl https://foo.com/core/os/i686)
+# if $repo is in the line, then assumes core
+# if $arch is in the line, then assumes $(uname -m)
+# returns a fetchurl (e.g. https://foo.com/core/os/i686/core.db.tar.gz)
+ARCH="$(uname -m)"
+getfetchurl() {
+	local strippedurl="${1%/}"
+
+	# shellcheck disable=SC2016
+	local fetchurl="${strippedurl/\$repo\/os\/\$arch/lastupdate}"
+	echo "$fetchurl"
+	return
+
+	# shellcheck disable=SC2016
+	local replacedurl="${strippedurl//'$arch'/$ARCH}"
+	if [[ ! $TARGETREPO ]]; then
+		# shellcheck disable=SC2016
+		replacedurl="${replacedurl//'$repo'/core}"
+		local tmp="${replacedurl%/*}"
+		tmp="${tmp%/*}"
+
+		local reponame="${tmp##*/}"
+	else
+		# shellcheck disable=SC2016
+		replacedurl="${replacedurl//'$repo'/$TARGETREPO}"
+		local reponame="$TARGETREPO"
+	fi
+
+	if [[ -z $reponame || $reponame = "$replacedurl" ]]; then
+		echo "fail"
+	else
+		local fetchurl="${replacedurl}/$reponame.db"
+		echo "$fetchurl"
+	fi
+}
+
+# This exists to remove the need for a separate interrupt function
+finaloutput() {
+	local -a timesarray=()
+	if [[ -f "$tmpfile" ]]; then
+		readarray -t timesarray <"$tmpfile"
+		rm "$tmpfile"
+	fi
+	IFS=$'\n' read -r -d '' -a sortedarray < \
+		<(printf '%s\n' "${timesarray[@]}" | LC_COLLATE=C sort $sort_direction)
+
+	# Final output for mirrorfile
+	numiterator="0"
+	if [[ $TIMESONLY ]]; then
+		echo
+		echo " Servers sorted by time (seconds):"
+		for line in "${sortedarray[@]}"; do
+			echo "${line#* } : ${line% *}"
+			((numiterator++))
+			(( NUM && numiterator >= NUM )) && break
+		done
+	else
+		for line in "${sortedarray[@]}"; do
+			echo "Server = ${line#* * }"
+			((numiterator++))
+			(( NUM && numiterator >= NUM )) && break
+		done
+	fi
+	exit 0
+}
+
+# Argument parsing
+[[ $1 ]] || usage
+while [[ $1 ]]; do
+	if [[ ${1:0:2} = -- ]]; then
+		case "${1:2}" in
+			help) usage ;;
+			max-time)
+				[[ $2 ]] || err "Must specify number.";
+				MAX_TIME="$2"
+				shift 2 ;;
+			parallel) PARALLEL=1; shift ;;
+			repo)
+				[[ $2 ]] || err "Must specify repository name.";
+				TARGETREPO="$2";
+				shift 2 ;;
+			times) TIMESONLY=1; shift ;;
+			url)
+				CHECKURL=1;
+				[[ $2 ]] || err "Must specify URL.";
+				URL="$2";
+				shift 2 ;;
+			verbose) VERBOSE=1; shift ;;
+			version) version ;;
+			working-only) WORKING_ONLY=1; shift ;;
+			*) err "'$1' is an invalid argument." ;;
+		esac
+	elif [[ ${1:0:1} = - ]]; then
+
+		if [[ ! ${1:1:1} ]]; then
+			[[ -t 0 ]] && err "Stdin is empty."
+			while read -r value; do
+				linearray+=( "$value" )
+			done
+			STDIN=1
+			shift
+		else
+			snum=1
+			for ((i=1; i<${#1}; i++)); do
+				case ${1:$i:1} in
+					h) usage ;;
+					m)
+						[[ $2 ]] || err "Must specify number.";
+						MAX_TIME="$2"
+						snum=2 ;;
+					n)
+						[[ $2 ]] || err "Must specify number.";
+						NUM="$2";
+						snum=2 ;;
+					p) PARALLEL=1 ;;
+					r)
+						[[ $2 ]] || err "Must specify repository name.";
+						TARGETREPO="$2";
+						snum=2 ;;
+					t) TIMESONLY=1 ;;
+					u)
+						CHECKURL=1;
+						[[ $2 ]] || err "Must specify URL.";
+						URL="$2";
+						snum=2 ;;
+					v) VERBOSE=1 ;;
+					V) version ;;
+					w) WORKING_ONLY=1 ;;
+					*) err "'$1' is an invalid argument." ;;
+				esac
+			done
+			shift $snum
+		fi
+	elif [[ -f $1 ]]; then
+		FILE="1"
+		while read -r value; do
+			linearray+=( "$value" )
+		done < "$1"
+		[[ ${linearray[*]} ]] || err "File is empty."
+		shift
+	else
+		err "'$1' does not exist."
+	fi
+done
+
+# Some sanity checks
+[[ $NUM ]] || NUM=0
+[[ $MAX_TIME ]] || MAX_TIME=10
+[[ $FILE && $CHECKURL ]] && err "Cannot specify a URL and mirrorfile."
+[[ $FILE || $CHECKURL || $STDIN ]] || err "Must specify URL, mirrorfile, or stdin."
+[[ $PARALLEL ]] && ! command -v parallel >/dev/null 2>&1 && err "GNU parallel is not installed."
+
+# Single URL handling
+if [[ $CHECKURL ]]; then
+	url="$(getfetchurl "$URL")"
+	[[ $url = fail ]] && err "URL '$URL' is malformed."
+	[[ $VERBOSE ]] && echo "Testing $url..."
+	time=$(gettime "$url")
+	echo "$URL : $time"
+	exit 0
+fi
+
+# Get URL results from mirrorfile, fill up the array, and so on
+if [[ $TIMESONLY ]]; then
+	echo "Querying servers. This may take some time..."
+elif [[ $FILE ]]; then
+	: # echo "### Server list generated by ${myname} at $(date +%Y-%m-%d)"
+fi
+
+get_url_time() {
+	server=$1
+	url="$(getfetchurl "$server")"
+	[[ $url = fail ]] && err "URL '$server' is malformed."
+	if time=$(gettime "$url") ; then #|| ! [[ $WORKING_ONLY ]]; then
+		echo "$time $server" >>"$tmpfile"
+	fi
+
+	# Output
+        # local sep=" ... "
+        local sep="|"
+	if [[ $VERBOSE && $TIMESONLY ]]; then
+		echo "$server$sep$time"
+	elif [[ $VERBOSE ]]; then
+		echo "# $server$sep$time"
+	elif [[ $TIMESONLY ]]; then
+		echo -n "   *"
+	fi
+}
+
+tmpfile=$(mktemp)
+if [[ $PARALLEL ]]; then
+	servers=()
+	# Exports for GNU parallel
+	export MAX_TIME ARCH TARGETREPO VERBOSE TIMESONLY WORKING_ONLY tmpfile
+	export -f getfetchurl gettime get_url_time
+fi
+
+for line in "${linearray[@]}"; do
+	if [[ $line =~ ^[[:space:]]*# ]]; then
+		[[ $TIMESONLY ]] || echo "$line"
+	elif [[ $line =~ ^[[:space:]]*Server ]]; then
+
+		# Getting values and times and such
+		server="${line#*= }"
+		server="${server%%#*}"
+		server="${server/\$repo\/os\/\$arch/lastupdate}"
+
+		if [[ $PARALLEL ]]; then
+			servers+=("$server")
+		else
+			get_url_time "$server"
+		fi
+	fi
+done #| column -t -s'|'
+if [[ $PARALLEL ]]; then
+	parallel get_url_time ::: "${servers[@]}" | column -t -s'|' #| sed 's|/lastupdate|/$repo/os/$arch|'
+fi
+finaloutput

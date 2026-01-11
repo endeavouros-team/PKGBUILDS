@@ -656,9 +656,9 @@ ShowRecommendedDriver() {
     fi
     local family=$(lspci -d $NVIDIA::03xx | sed -E 's|.* NVIDIA Corporation ([^ ]+) .*|\1|')
     case "$family" in
+        "")                   ;;                    # Nvidia GPU not found.
         TU*|GA*|AD*|GB*|GN*)  echo "nvidia-open" ;; # Nvidia's open source driver.
         GM*|GP*|GV*|*)        echo "nouveau" ;;     # For older Nvidia GPUs.
-        "")                   ;;                    # Nvidia GPU not found.
     esac
 }
 
