@@ -107,7 +107,7 @@ class ProfileData:
             'dracut_config': ''},
         Profile.nvidia_open: {
             'packages': {"nvidia-open-dkms", "nvidia-utils", "egl-wayland", "nvidia-settings", "opencl-nvidia",
-                         "libva-nvidia-driver"},
+                         "libva-nvidia-driver", "libxnvctrl"},
             'packages32': {"lib32-nvidia-utils", "lib32-opencl-nvidia"},
             'services': {},
             'dracut_config': 'force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "'},
