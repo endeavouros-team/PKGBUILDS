@@ -2,7 +2,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=25.12.2
+pkgver=26
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -50,7 +50,7 @@ sha512sums=('9206abb66c0baec18fca15b932e9dbb8b71f1c910e5f9692b5e1c1f43228d0541e3
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
             '9f0cd5edabf93439656046c60dc6a29f439a9d8b7afab8ec03b9470321ba98fc53b927944e2f68b5b152c150cca76913490eaab4256a5699da5960f860d81e81'
             '42e5aeb0ea71e2d77fd6ad741a48bf3927a20a2a71c48d68aafbe462b32755bf3e40ac2d0a54471a15b0c6242cdbbc332fd095822609827b69c75371fb4109e0'
-            '79bdace9a4ee8c1769ed0b822372b687b9098295d185388f26c37a4cdebc1d74a3d02919cb5868b219edced61ad5592d5dca92d0bc67879c4dc1e1398182ff15'
+            '5ec757d9267efa1161a003e7e87eb7045c44c2036afe0232359c5b957a6620074c931e7d3af1ecfbed70b51d7b92eee18e1ed4b7b4b77c66600d3f20413405cb'
             'cbc39b4806cbfc6a81ddad7cc174d3850f82699c46c949a3ac9855f3c63f6cd6e91102ca357dc4176c7edcb02682e10b0175a95adcede81ec23a7ee84ab231aa')
 package() {
     local -r eosdir=usr/share/endeavouros/scripts
