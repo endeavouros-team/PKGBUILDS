@@ -6,13 +6,14 @@ DIE()    { Cleanup; echo2 "==> $progname: error: $1"; exit 1; }
 ASSERT() { "$@" || DIE "'$*' failed."; }
 
 FetchMirrors() {
+    [ $has_internet_connection = no ] && return 1
     local -r active_mirrors_url=https://archlinux.org/mirrorlist/all     # mirrors active at the time listed in the file, both https and http
     local -r url=$active_mirrors_url/
     local -r file=$mirrordata
     local -r fetched=$file.tmp
     local operation=update
 
-    if curl -Lsm 15 -o"$fetched" "$url" ; then
+    if curl -Lsm $TIMEOUT_ACTIVE_MIRRORS -o"$fetched" "$url" ; then
         if [ -e "$file" ] ; then
             ASSERT rm -f "$file".bak
             ASSERT mv "$file" "$file".bak
@@ -33,9 +34,16 @@ FetchMirrors() {
 }
 
 FetchCountries() {
+    [ $has_internet_connection = no ] && return 1
     local info codes=() countries=()
+    local reflector_command=(
+        /bin/reflector
+        --list-countries
+        --connection-timeout=$TIMEOUT_REFLECTOR_CONNECTION
+        --download-timeout=$TIMEOUT_REFLECTOR_DOWNLOAD
+    )
 
-    info=$(/bin/reflector --list-countries 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/d')
+    info=$("${reflector_command[@]}" 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/d')
     if [ -z "$info" ] ; then
         WARN "could not update '$dbfile'"
         return 1
@@ -142,7 +150,6 @@ Parameters() {
     while [ "$1" ] ; do
         case "$1" in
             --)                  shift; break ;;
-            # --offline)           has_internet_connection=no ;;
             --fake-country)      tmp="$2"
                                  shift
                                  if [ "$tmp" ] ; then
@@ -177,12 +184,12 @@ Parameters() {
                 esac
                 ;;
             -h | --help)
-#         --offline                    Don't use internet when a connection is not available.
                 cat <<EOF >&2
 Usage:   $progname [options] [country-code [...]]
 
 Options: --help, -h                   This help.
          --nolocal                    Do not include mirrors from the current country.
+         --offline                    Don't use internet even when a connection is available.
          --save                       Save mirrorlist to $target_def (see also option --savefile).
          --savefile=*                 File path to save the mirrorlist.
          --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
@@ -201,7 +208,7 @@ Notes:   * Only https:// mirrors are included by default.
          * Country codes are the two-letter codes listed by command 'reflector --list-countries'.
          * Use option --save to change the existing $target_def.
          * Use option --recommended-countries to rank mirrors from the recommended countries.
-         * If available, internet connection is used for:
+         * If available and option --offline is not used, internet connection is used for:
                1) fetching a list of active mirrors from the Arch web site
                2) fetching country code and name mappings from the Arch web site
                3) ranking mirrors
@@ -298,10 +305,11 @@ Main2() {
 
 Main() {
     local -r progname=${0##*/}
+    local -r configfile=/etc/$progname.conf
 
     local -r sep="|"
     local lopts sopts
-    local OPTS="help${sep}h,http,nolocal,save,savefile:,recommended-countries${sep}r,rsync,sequential" # offline
+    local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,recommended-countries${sep}r,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs"  # update-supports
     lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
     sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
@@ -323,6 +331,13 @@ Main() {
     local cleanup_files=()
     local orig_args=("$@")
 
+    source "$configfile" || DIE "file '$configfile' not found"
+
+    [[ "$*" =~ "--offline" ]] && has_internet_connection=no
+    if [ has_internet_connection = yes ] ; then
+        eos-connection-checker || has_internet_connection=no
+    fi
+
     declare -A reflector_countries
 
     GetCountriesFile
@@ -338,10 +353,7 @@ Main() {
         exit 0
     fi
     GetMirrorsFile
-
-    eos-connection-checker || has_internet_connection=no
-
-    [ $has_internet_connection = yes ] && country_code="$(show-location-info --tolower country)"
+    GetCountryCode
 
     # handle some special options here
     local args=() arg ix tmp=("$@")
@@ -351,6 +363,7 @@ Main() {
             --fake-country)                Parameters "$arg" "${tmp[$((ix+1))]}"; ((ix++)) ;;
             --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
             --user-countries)              Parameters "$arg" ;;
+            --offline)                     ;;
             --testing)                     ;;                             # --testing is not a real option for users...
             --update-supports)             ;;
             --dump-options | --dump-ccs)   ;;
@@ -360,6 +373,19 @@ Main() {
 
     Parameters "${args[@]}"
     Main2
+}
+
+GetCountryCode() {
+    [ $has_internet_connection = no ] && return 1
+    local code
+    code=$(show-location-info country 2>/dev/null)
+    if [ $? = 0 ] && [ "$code" ] ; then
+        country_code="${code,,}"
+        return 0
+    else
+        WARN "fetching the current country code failed."
+        return 1
+    fi
 }
 
 IsOnIso() {
