@@ -331,18 +331,17 @@ Main() {
     local cleanup_files=()
     local orig_args=("$@")
     local args=()
+    local has_countries_option=no
+    declare -A reflector_countries
 
     source "$configfile" || DIE "file '$configfile' not found"
 
     if [[ "$*" =~ "--offline" ]] ; then
         has_internet_connection=no
-        args+=(-r)                    # we need some countries here...
     fi
-    if [ has_internet_connection = yes ] ; then
+    if [ $has_internet_connection = yes ] ; then
         eos-connection-checker || has_internet_connection=no
     fi
-
-    declare -A reflector_countries
 
     GetCountriesFile
     # shellcheck disable=SC1090
@@ -364,18 +363,28 @@ Main() {
     for ((ix=0; ix < ${#orig_args[@]}; ix++)) ; do
         arg="${orig_args[$ix]}"
         case "$arg" in
+            # handle these options only here:
             --fake-country)                Parameters "$arg" "${orig_args[$((ix+1))]}"; ((ix++)) ;;
             --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
             --user-countries)              Parameters "$arg" ;;
+
+            # these options already handled:
             --offline)                     ;;
             --testing)                     ;;                             # --testing is not a real option for users...
             --update-supports)             ;;
             --dump-options | --dump-ccs)   ;;
+
+            # these options will be handled in Parameters:
+            -r | --recommended-countries)  args+=("$arg"); has_countries_option=yes ;;
             *)                             args+=("$arg") ;;
         esac
     done
 
     Parameters "${args[@]}"
+    if [ ${#countries_given[@]} = 0 ] && [ -z "$country_code" ] ; then
+        [ $has_countries_option = no ] && Parameters -r                    # we need some countries here...
+    fi
+
     Main2
 }
 
