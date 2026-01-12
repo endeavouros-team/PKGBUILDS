@@ -5,7 +5,7 @@
 pkgname=fetch-iso
 pkgdesc="A special helper tool for the EndeavourOS ISO testers"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=25.11.2
+pkgver=26
 pkgrel=1
 
 arch=('any')
@@ -21,7 +21,7 @@ source=(
     $url/$pkgname.completion
     $url/$pkgname-show-all-info
 )
-sha512sums=('5f255151d2ac1ad51da3465cbc5f61637f5239e9f5937c527815814651b59c976b49a51834197e332b5154386efb627d47755c44f43161254908c04fb0839ad7'
+sha512sums=('15743ba8bf83901946d793826b40ac3f51b6cbb5a97e269782841e1c3074f7112a78440c0abd5372274531439384996055842abd0a0d4ede3d94a7f5ca389623'
             '5b2897dc51353b33446ddefdae6d312b36da825ac505418aea535eacaeef568b1f024db171668878ed499e532bc0dc654d35633a8a9fe6c77e25b43e7288cfca'
             'd99fa711c27f4101dbe982ad69b383fe4dc4ebcb96c838155e0750d34f72a37d9586adf095963b13aa265a3cec3d211000e999da8ac1abd3076128b66d0776d6'
             '8a910e558e460e48e3c2d50bf8d3f1ccd17f4c8fee564e867105937c21806d3e62733611f01effbd8cdcfdf2e03b5852cfe470b21625df518fcbf04cadd9cf9f')
