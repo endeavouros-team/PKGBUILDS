@@ -330,10 +330,14 @@ Main() {
     local countries_handled=()
     local cleanup_files=()
     local orig_args=("$@")
+    local args=()
 
     source "$configfile" || DIE "file '$configfile' not found"
 
-    [[ "$*" =~ "--offline" ]] && has_internet_connection=no
+    if [[ "$*" =~ "--offline" ]] ; then
+        has_internet_connection=no
+        args+=(-r)                    # we need some countries here...
+    fi
     if [ has_internet_connection = yes ] ; then
         eos-connection-checker || has_internet_connection=no
     fi
@@ -356,11 +360,11 @@ Main() {
     GetCountryCode
 
     # handle some special options here
-    local args=() arg ix tmp=("$@")
-    for ((ix=0; ix < ${#tmp[@]}; ix++)) ; do
-        arg="${tmp[$ix]}"
+    local arg ix
+    for ((ix=0; ix < ${#orig_args[@]}; ix++)) ; do
+        arg="${orig_args[$ix]}"
         case "$arg" in
-            --fake-country)                Parameters "$arg" "${tmp[$((ix+1))]}"; ((ix++)) ;;
+            --fake-country)                Parameters "$arg" "${orig_args[$((ix+1))]}"; ((ix++)) ;;
             --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
             --user-countries)              Parameters "$arg" ;;
             --offline)                     ;;
