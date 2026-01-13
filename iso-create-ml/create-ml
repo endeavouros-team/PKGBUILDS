@@ -402,25 +402,21 @@ GetCountryCode() {
 }
 
 IsOnIso() {
-    [ "$LOGNAME" = liveuser ] && [ -d /home/liveuser ] && [ -d /etc/calamares ]
+    [ "$LOGNAME" = liveuser ] && [ -d /home/$LOGNAME ] && [ -d /etc/calamares ]
 }
 
 GetMirrorsFile() {
-    if [ ! -e "$mirrordata" ] ; then
-        if FetchMirrors ; then
-            IsOnIso && cleanup_files+=("$mirrordata")
-        else
-            mirrordata="/etc/${mirrordata##*/}"
-        fi
+    if FetchMirrors ; then
+        IsOnIso && cleanup_files+=("$mirrordata")
+    else
+        mirrordata="/etc/${mirrordata##*/}"
     fi
 }
 GetCountriesFile() {
-    if [ ! -e "$dbfile" ] ; then
-        if FetchCountries ; then
-            IsOnIso && cleanup_files+=("$dbfile")
-        else
-            dbfile="/etc/${dbfile##*/}"
-        fi
+    if FetchCountries ; then
+        IsOnIso && cleanup_files+=("$dbfile")
+    else
+        dbfile="/etc/${dbfile##*/}"
     fi
 }
 
