@@ -194,7 +194,10 @@ KeepsAndRemoves() {
         if ! IsInstalled "$kp" ; then
             install+=("$kp")
         else
-            Note "Package $kp is set for install but it is installed already."
+            # Special note for certain packages since they are from the AUR. Note: the only AUR support in nvidia-inst currently!
+            case "$kp" in
+                $aur_driver | ${aur_driver%-dkms}-utils) Note "Package $kp is set for install but it is installed already." ;;
+            esac
         fi
     done
 
@@ -297,8 +300,11 @@ SwitcherooEnable() {
 }
 
 OnlyNvidia() {
+    DebugBreak
     [ $driver_source_type = unknown ] && return
-    if [ "$series" = "$latest_from_arch" ] ; then
+    if [ $driver_source_type = nouveau ] && [ "$aur_driver" ] && IsInstalled $aur_driver ; then
+        PkgInstall $aur_driver ${aur_driver%-dkms}-utils
+    elif [ "$series" = "$latest_from_arch" ] ; then
         PkgInstall $p_nvidia $p_nvidia32 nvidia-hook
     else
         PkgInstall $p_nvidia $p_nvidia32 # nvidia-hook
@@ -551,13 +557,13 @@ ProperNvidiaPackages() {
             case "$driver_source_type" in
                 open)           p_nvidia="nvidia-open-dkms $p_nvidia"
                                 p_nvidia32="lib32-nvidia-utils"
+                                [ $settings_pkg = yes ] && p_nvidia+=" nvidia-settings"
                                 ;;
                 nouveau)        p_nvidia="vulkan-nouveau"
                                 p_nvidia32="lib32-vulkan-nouveau"
                                 ;;
                 *)              DIE "Nvidia GPU not detected!" ;;
             esac
-            [ $settings_pkg = yes ] && p_nvidia+=" nvidia-settings"
             ;;
     esac
 
@@ -768,13 +774,20 @@ Main()
             esac
             ;;
         nouveau)
-            if [ $mode != nouveau ] ; then
-                local -r wanted_mode=$mode
-                mode=nouveau
-                Info "Mode changed from '$wanted_mode' to '$mode'"
-            else
-                Info "Selected mode: $mode"
-            fi
+            case "$mode" in
+                nouveau) Info "Selected mode: $mode"
+                         ;;
+                *)       if [ "$aur_driver" ] && IsInstalled "$aur_driver" ; then
+                             # keep the existing AUR driver (updates should be handled by yay etc.)
+                             Info "Selected mode: $mode"
+                         else
+                             # we don't actively support AUR drivers
+                             local -r wanted_mode=$mode
+                             mode=nouveau
+                             Info "Mode changed from '$wanted_mode' to '$mode'"
+                         fi
+                         ;;
+            esac
             ;;
         *)
             Warn "could not find Nvidia GPU."

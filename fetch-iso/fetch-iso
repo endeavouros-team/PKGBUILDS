@@ -12,7 +12,12 @@ errorline() {
 }
 DIE() {
     errorline "==> Error [$progname]:\n    $1"
+    [ "$die2" ] && EditConfigFile "$configfile"
     [ "$2" ] && exit "$2" || exit 1
+}
+DIE2() {
+    die2=foo
+    DIE "$@"
 }
 INFO() {
     eos-color info 2
@@ -149,6 +154,10 @@ EditFile() {
     done
     DIE "no app for editing a file!"
 }
+EditConfigFile() {
+    INFO "Editing file $configfile." 
+    EditFile "$configfile"
+}
 
 DumpOptions() {
     if [ "$OPTS" ] ; then
@@ -197,7 +206,7 @@ Options() {
             --)               shift;                                      break  ;;
             --dump-options)   DumpOptions;                                exit 0 ;;
             --show-files)     ReadConfig; printf "%s\n" $(ShowFiles -q);  exit 0 ;;
-            --edit-config)    EditFile "$configfile";                     exit 0 ;;
+            --edit-config)    EditConfigFile;                             exit 0 ;;
             --curl | -c)      getter=curl                                        ;;
             --wget | -w)      getter=wget                                        ;;
             -h | --help)      Usage;                                      exit 0 ;;
@@ -223,10 +232,10 @@ ReadConfig() {
     # config file sets important values
     [ -e "$configfile" ] || AskConfigValues
     source "$configfile" || DIE "file $configfile2 has a problem"
-    [ "$URLBASE" ]       || DIE "URLBASE has no value in $configfile2"
+    [ "$URLBASE" ]       || DIE2 "URLBASE has no value in $configfile2"
     if [ -z "$HELLO" ] ; then
-        [ "$ACCOUNT" ]   || DIE "ACCOUNT has no value in $configfile2"
-        [ "$PASSWORD" ]  || DIE "PASSWORD has no value in $configfile2"
+        [ "$ACCOUNT" ]   || DIE2 "ACCOUNT has no value in $configfile2"
+        [ "$PASSWORD" ]  || DIE2 "PASSWORD has no value in $configfile2"
     fi
     if [ "$HELLO" ] ; then
         ACCOUNT="${HELLO%:*}"
@@ -234,20 +243,20 @@ ReadConfig() {
     elif [ "$ACCOUNT$PASSWORD" ] ; then
         HELLO="$ACCOUNT:$PASSWORD"
     else
-        DIE "HELLO or ACCOUNT/PASSWORD have no proper value in $configfile2"
+        DIE2 "HELLO or ACCOUNT/PASSWORD have no proper value in $configfile2"
     fi
     case "$APP" in
         curl | wget) getter="$APP" ;;
     esac
-    [ "$TARGETDIR" ]    || DIE "TARGETDIR has no value in $configfile2"
-    [ -d "$TARGETDIR" ] || DIE "'$TARGETDIR' does not exist or is not a folder"
+    [ "$TARGETDIR" ]    || DIE2 "TARGETDIR has no value in $configfile2"
+    [ -d "$TARGETDIR" ] || DIE2 "'$TARGETDIR' does not exist or is not a folder"
     [ -w "$TARGETDIR" ] || DIE "cannot write to TARGETDIR ($TARGETDIR)"
 
     case "$getter" in
         curl | wget)
             [ -x /bin/$getter ] || DIE "$getter not installed" ;;
         *)
-            DIE "value '$getter' for APP in $configfile2 is not supported. Use either 'wget' or 'curl'." ;;
+            DIE2 "value '$getter' for APP in $configfile2 is not supported. Use either 'wget' or 'curl'." ;;
     esac
 }
 
@@ -256,28 +265,29 @@ Cleanup() {
 }
 
 Main() {
+    local -r progname=${0##*/}
     trap Cleanup SIGINT
+    local die2=""
+    local -r configfile="$HOME/.config/$progname.conf"
+    local -r configfile2="${configfile/$HOME/\~}"
 
     if [ -z "$XDG_DOWNLOAD_DIR" ] && [ -e "$HOME/.config/user-dirs.dirs" ] ; then
         source "$HOME/.config/user-dirs.dirs"
     fi
-    local -r progname=${0##*/}
-    local -r configfile="$HOME/.config/$progname.conf"
-    local -r configfile2="${configfile/$HOME/\~}"
     local URLBASE=""
     local HELLO=""
     local ACCOUNT="" PASSWORD=""
     local APP=""
-    local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
     local exitcode=0
     local file
     local datafile=/tmp/$progname.tmp   # remove this if new files should be available
     local getter=wget                   # curl or wget
     local cleanup_files=()
     local sumfile=""
+    local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
 
-    ReadConfig
     [ "$1" ] && Options "$@"
+    ReadConfig
 
     local header
     local header_lines=(
