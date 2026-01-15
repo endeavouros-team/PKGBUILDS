@@ -3,7 +3,9 @@
 echo2()  { echo -e "$@" >&2; }
 WARN()   { echo2 "==> $progname: warning: $1"; }
 DIE()    { Cleanup; echo2 "==> $progname: error: $1"; exit 1; }
-ASSERT() { "$@" || DIE "'$*' failed."; }
+
+ASSERT_DIE()  { "$@" || DIE "'$*' failed."; }
+ASSERT_WARN() { "$@" && return 0; WARN "'$*' failed."; return 1; }
 
 FetchMirrors() {
     [ $has_internet_connection = no ] && return 1
@@ -15,12 +17,12 @@ FetchMirrors() {
 
     if curl -Lsm $TIMEOUT_ACTIVE_MIRRORS -o"$fetched" "$url" ; then
         if [ -e "$file" ] ; then
-            ASSERT rm -f "$file".bak
-            ASSERT mv "$file" "$file".bak
+            ASSERT_WARN rm -f "$file".bak      || return 1
+            ASSERT_WARN mv "$file" "$file".bak || return 1
         else
             operation=create
         fi
-        ASSERT mv "$fetched" "$file"
+        ASSERT_WARN mv "$fetched" "$file"      || return 1
         echo2 "==> ${operation}d $file."
     else
         rm -f "$fetched"
@@ -141,93 +143,22 @@ DumpOptions() {
     fi
 }
 
-Parameters() {
-    local opts tmp
-
-    opts="$(/bin/getopt -o="$sopts" --longoptions "$lopts" --name "$progname" -- "$@")" || exit 1
-    eval set -- "$opts"
-
-    while [ "$1" ] ; do
-        case "$1" in
-            --)                  shift; break ;;
-            --fake-country)      tmp="$2"
-                                 shift
-                                 if [ "$tmp" ] ; then
-                                     # validate given fake country code
-                                     tmp=${tmp,,}
-                                     case "$tmp" in
-                                         [a-z][a-z]) country_code="$tmp" ;;
-                                         *)          echo "==> Country code '$tmp' not recognized. See 'reflector --list-countries'." >&2 ;;
-                                     esac
-                                 fi
-                                 ;;
-            --user-countries)    UserCountriesFromFile ;;
-
-            --nolocal)           local_country_wanted=no ;;
-            --http | --rsync)    protocols+=("${1:2}") ;;
-            --sequential)        parallel=no ;;
-            --save)              save=yes; target=$target_def ;;
-            --savefile)          save=yes; target="$2"; shift ;;
-            -v | --verbose)      verbose=yes ;;
-            -r | --recommended-countries)
-                # Adding recommended countries for ranking.
-                # Note that the current country will be added later if user wants it and has Arch mirrors.
-                case "$country_code" in
-                    de|us|cn)    ;;
-                    ca)          countries_given+=(us) ;;
-                    au)          countries_given+=(ww) ;;
-                    br|cl|co|mx) countries_given+=(ww us); protocols+=(http) ;;
-                    fi)          countries_given+=(ww se) ;;
-                    al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)
-                                 countries_given+=(ww de fr) ;;
-                    *)           countries_given+=(ww de us); protocols+=(http) ;;
-                esac
-                ;;
-            -h | --help)
-                cat <<EOF >&2
-Usage:   $progname [options] [country-code [...]]
-
-Options: --help, -h                   This help.
-         --nolocal                    Do not include mirrors from the current country.
-         --offline                    Don't use internet even when a connection is available.
-         --save                       Save mirrorlist to $target_def (see also option --savefile).
-         --savefile=*                 File path to save the mirrorlist.
-         --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
-         --verbose, -v                Show more ranking details.
-         --http                       Include the http:// mirrors.
-         --rsync                      Include the rsync:// mirrors.
-         --recommended-countries, -r  Use recommended countries instead of giving a list of country codes.
-                                      If this does not generate a reasonable mirrorlist
-                                      (e.g. in offline mode), then give one or more country codes
-                                      as pararameters or use option --user-countries.
-         --user-countries             Use file $user_fav_countries to give country codes.
-                                      It can contain a list of codes separated by white spaces.
-         --fake-country=*             Set a fake current country code (advanced).
-
-Notes:   * Only https:// mirrors are included by default.
-         * Country codes are the two-letter codes listed by command 'reflector --list-countries'.
-         * Use option --save to change the existing $target_def.
-         * Use option --recommended-countries to rank mirrors from the recommended countries.
-         * If available and option --offline is not used, internet connection is used for:
-               1) fetching a list of active mirrors from the Arch web site
-               2) fetching country code and name mappings from the Arch web site
-               3) ranking mirrors
-           Without a connection the ranking result is very likely suboptimal.
-EOF
-                exit 0
-                ;;
-        esac
-        shift
-    done
-    while [ "$1" ] ; do
-        countries_given+=("${1,,}")
-        shift
-    done
-}
-
 Header() {
     echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
-    echo -e "### Command: $progname ${orig_args[*]}\n"
+    echo -n "### Command: $progname"
+    if [ "${orig_args[0]}" ] ; then
+        printf " '%s'" "${orig_args[@]}"
+    fi
+    echo -e "\n"
+
+    if [ "$prefslist" ] ; then
+        echo -e "####### >>>> Mirrors by user preference"
+        for item in $prefslist ; do
+            item=$(grep "$item" $mirrordata | awk '{print $NF}')
+            echo "Server = $item"
+        done
+        echo -e "####### <<<< Mirrors by user preference\n"
+    fi
 }
 
 Main2() {
@@ -239,7 +170,7 @@ Main2() {
     cleanup_files+=("$tmplist" "$mirrorlist")
 
     # if user wanted, add the current country into $tmplist
-    if [ $local_country_wanted = yes ] && [ $has_internet_connection = yes ] ; then
+    if [ $local_country_wanted = yes ] ; then   # && [ $has_internet_connection = yes ] ; then
         AddCountry "$country_code"
     fi
 
@@ -248,7 +179,7 @@ Main2() {
     for cc in "${countries_given[@]}" ; do
         case "$cc" in
             [a-z][a-z]) AddCountry "$cc" ;;
-            *)          DIE "'$cc' not supported" ;;
+            *)          WARN "country code '$cc' is not supported" ;;
         esac
     done
 
@@ -261,7 +192,7 @@ Main2() {
         {
             Header
             # shellcheck disable=SC2016
-            rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|'
+            create-ml-rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|'
         } > "$mirrorlist"
         echo2 "==> Mirrors ranked."
     else
@@ -303,93 +234,188 @@ Main2() {
     Cleanup
 }
 
+AddRecommendedCountries() {
+    # Adding recommended countries for ranking.
+    # Note that the current country will be added later if user wants it and has Arch mirrors.
+    case "$country_code" in
+        de|us|cn)
+            : ;;
+        ca)
+            countries_given+=(us) ;;
+        au)
+            countries_given+=(ww) ;;
+        br|cl|co|mx)
+            countries_given+=(ww us); protocols+=(http) ;;
+        'fi')
+            countries_given+=(ww se) ;;
+        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)
+            countries_given+=(ww de fr) ;;
+        *)
+            countries_given+=(ww de us); protocols+=(http) ;;
+    esac
+}
+
+DumpCCs() {
+    # shellcheck disable=SC1090
+    source "$dbfile"                                               # gets array reflector_countries
+    # shellcheck disable=SC2046
+    echo $(printf "%s\n" "${!reflector_countries[@]}" | sort)
+}
+
+Parameters() {
+    local lopts sopts
+    lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
+    sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
+
+    local opts
+
+    opts="$(/bin/getopt -o="$sopts" --longoptions "$lopts" --name "$progname" -- "$@")" || exit 1
+    eval set -- "$opts"
+
+    while [ "$1" ] ; do
+        case "$1" in
+            --)                  shift; break ;;
+
+            --user-countries)    UserCountriesFromFile ;;
+            --fake-country)      fake_country="$2"; shift ;;
+            --offline)           has_internet_connection=no ;;
+            --nolocal)           local_country_wanted=no ;;
+            --http | --rsync)    protocols+=("${1:2}") ;;
+            --sequential)        parallel=no ;;
+            --save)              save=yes; target=$target_def ;;
+            --savefile)          save=yes; target="$2"; shift ;;
+            -v | --verbose)      verbose=yes ;;
+            --no-recommended-countries) use_recommended_countries=no ;;
+            --dump-options)      DumpOptions; exit 0 ;;
+            --dump-ccs)          DumpCCs; exit 0 ;;
+            --update-supports)   update_supports=yes ;;
+            --prefs)             prefslist="$2"; shift ;;   # list: mirror urls space separates, use 'single quotes'
+            -h | --help)
+                cat <<EOF >&2
+Usage:   $progname [options] [country-code [...]]
+
+Options: --help, -h                   This help.
+         --nolocal                    Do not include mirrors from the current country.
+         --offline                    Don't use internet even when a connection is available.
+         --save                       Save mirrorlist to $target_def (see also option --savefile).
+         --savefile=*                 File path to save the mirrorlist.
+         --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
+         --verbose, -v                Show more ranking details.
+         --http                       Include the http:// mirrors.
+         --rsync                      Include the rsync:// mirrors.
+         --no-recommended-countries   Don't use recommended countries.
+                                      Instead give one or more country codes
+                                      as pararameters or use option --user-countries.
+         --user-countries             Use file $user_fav_countries to give country codes.
+                                      It can contain a list of codes separated by white spaces.
+         --fake-country=*             Set a fake current country code (advanced).
+
+Notes:   * Only https:// mirrors are included by default.
+         * Country codes are the two-letter codes listed by command 'reflector --list-countries'.
+         * Use option --save to change the existing $target_def.
+         * Use option --no-recommended-countries to rank mirrors without adding recommended countries.
+         * If available and option --offline is not used, internet connection is used for:
+               1) fetching a list of active mirrors from the Arch web site
+               2) fetching country code and name mappings from the Arch web site
+               3) ranking mirrors
+           Without a connection the ranking result is very likely suboptimal.
+EOF
+                exit 0
+                ;;
+        esac
+        shift
+    done
+
+    while [ "$1" ] ; do
+        countries_given+=("${1,,}")
+        shift
+    done
+}
+
 Main() {
     local -r progname=${0##*/}
+    local -r pkgname=iso-create-ml
     local -r configfile=/etc/$progname.conf
 
     local -r sep="|"
-    local lopts sopts
     local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,recommended-countries${sep}r,rsync,sequential"
-    OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs"  # update-supports
-    lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
-    sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
+          OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local -r target_def=/etc/pacman.d/mirrorlist
     local target=$target_def
-    local mirrordata="arch-mirrors-active.conf"                          # support file: active Arch mirrors in various countries
-    local dbfile="arch-countries.conf"                                   # support file: mappings between country-code and country-name
+    local mirrordata="${progname}-active-mirrors-arch.conf"                # support file: active Arch mirrors in various countries
+    local dbfile="${progname}-country-mapping-arch.conf"                   # support file: mappings between country-code and country-name
     local has_internet_connection=yes
     local country_code=""
-    local local_country_wanted=yes                                       # include local country in the mirrorlist or not?
+    local fake_country=""
+    local local_country_wanted=yes                                         # include local country in the mirrorlist or not?
     local verbose=no
     local save=no
-    local parallel=yes                                                   # ranking mirrors in pararallel or not?
-    local protocols=(https)                                              # list of supported protocols
-    local countries_given=()                                             # list of user given countries which have mirrors to include
+    local parallel=yes                                                     # ranking mirrors in pararallel or not?
+    local protocols=(https)                                                # list of supported protocols
+    local countries_given=()                                               # list of user given countries which have mirrors to include
     local countries_handled=()
     local cleanup_files=()
     local orig_args=("$@")
     local args=()
     local has_countries_option=no
+    local use_recommended_countries=yes
     declare -A reflector_countries
+    local update_supports=no
+    # Default timeouts in seconds:
+    local TIMEOUT_ACTIVE_MIRRORS=8                                 # for fetching the list of active mirrors
+    local TIMEOUT_REFLECTOR_CONNECTION=5                           # --connection-timeout in reflector
+    local TIMEOUT_REFLECTOR_DOWNLOAD=5                             # --download-timeout in reflector
+    local TIMEOUT_COUNTRY_CODE=5                                   # for fetching the current country code (not used!)
+    local prefslist=""
 
-    source "$configfile" || DIE "file '$configfile' not found"
+    Parameters "$@"
 
-    if [[ "$*" =~ "--offline" ]] ; then
-        has_internet_connection=no
-    fi
     if [ $has_internet_connection = yes ] ; then
-        eos-connection-checker || has_internet_connection=no
+        eos-connection-checker || has_internet_connection=no       # make sure if we are online or offline
     fi
 
-    GetCountriesFile
-    # shellcheck disable=SC1090
-    source "$dbfile"
-    if [[ "$*" =~ "--dump-ccs" ]] ; then
-        # shellcheck disable=SC2046
-        echo $(printf "%s\n" "${!reflector_countries[@]}" | sort)
-        exit 0
+    if ! source "$configfile" ; then
+        [ $has_internet_connection = yes ] && WARN "file '$configfile' not found, using default timeout values"
     fi
-    if [[ "$*" =~ "--dump-options" ]] ; then
-        DumpOptions
-        exit 0
+
+    GetCountryMappings                                             # creates reflector_countries
+    GetMirrorsFile                                                 # creates a list of all active mirrors
+
+    if [ $update_supports = yes ] ; then
+        echo2 "==> support files updated."
+        exit 0                              # we're done here
     fi
-    GetMirrorsFile
+
+    # # handle some special options here
+    # local arg ix
+    # for ((ix=0; ix < ${#orig_args[@]}; ix++)) ; do
+    #     arg="${orig_args[$ix]}"
+    #     case "$arg" in
+    #         # handle these options only here:
+    #         --fake-country)                Parameters "$arg" "${orig_args[$((ix+1))]}"; ((ix++)) ;;
+    #         --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
+    #         --user-countries)              Parameters "$arg" ;;
+    #         # these options already handled and no more needed:
+    #         --offline | --update-supports | --dump-options | --dump-ccs) ;;
+    #         # these options will be handled in Parameters:
+    #         -r | --recommended-countries)  args+=("$arg"); has_countries_option=yes ;;
+    #         *)                             args+=("$arg") ;;
+    #     esac
+    # done
+
     GetCountryCode
 
-    # handle some special options here
-    local arg ix
-    for ((ix=0; ix < ${#orig_args[@]}; ix++)) ; do
-        arg="${orig_args[$ix]}"
-        case "$arg" in
-            # handle these options only here:
-            --fake-country)                Parameters "$arg" "${orig_args[$((ix+1))]}"; ((ix++)) ;;
-            --fake-country=*)              Parameters "--fake-country" "${arg#*=}" ;;
-            --user-countries)              Parameters "$arg" ;;
-
-            # these options already handled:
-            --offline)                     ;;
-            --testing)                     ;;                             # --testing is not a real option for users...
-            --update-supports)             ;;
-            --dump-options | --dump-ccs)   ;;
-
-            # these options will be handled in Parameters:
-            -r | --recommended-countries)  args+=("$arg"); has_countries_option=yes ;;
-            *)                             args+=("$arg") ;;
-        esac
-    done
-
-    Parameters "${args[@]}"
-    if [ ${#countries_given[@]} = 0 ] && [ -z "$country_code" ] ; then
-        [ $has_countries_option = no ] && Parameters -r                    # we need some countries here...
-    fi
+    AddRecommendedCountries   # TODO !!!
 
     Main2
 }
 
 GetCountryCode() {
-    [ $has_internet_connection = no ] && return 1
+    [ "$fake_country" ] && { country_code="$fake_country"; return 0; }      # has fake country, use it
+    [ $has_internet_connection = no ] && { country_code=ww; return 1; }     # cannot determine, so use ww
+
     local code
     code=$(show-location-info country 2>/dev/null)
     if [ $? = 0 ] && [ "$code" ] ; then
@@ -397,27 +423,30 @@ GetCountryCode() {
         return 0
     else
         WARN "fetching the current country code failed."
+        country_code=ww
         return 1
     fi
 }
 
-IsOnIso() {
-    [ "$LOGNAME" = liveuser ] && [ -d /home/$LOGNAME ] && [ -d /etc/calamares ]
+NeedsCleanupOfSupportFiles() {
+    [ -z "$(grep "^pkgname=$pkgname$" PKGBUILD 2>/dev/null)" ]   # using, not developing
 }
 
 GetMirrorsFile() {
     if FetchMirrors ; then
-        IsOnIso && cleanup_files+=("$mirrordata")
+        NeedsCleanupOfSupportFiles && cleanup_files+=("$mirrordata")
     else
         mirrordata="/etc/${mirrordata##*/}"
     fi
 }
-GetCountriesFile() {
+GetCountryMappings() {
     if FetchCountries ; then
-        IsOnIso && cleanup_files+=("$dbfile")
+        NeedsCleanupOfSupportFiles && cleanup_files+=("$dbfile")
     else
         dbfile="/etc/${dbfile##*/}"
     fi
+    # shellcheck disable=SC1090
+    source "$dbfile"                                               # gets array country mappings into reflector_countries
 }
 
 Main "$@"

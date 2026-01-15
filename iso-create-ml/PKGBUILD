@@ -1,7 +1,7 @@
 # Maintainer : manuel at endeavouros.com
 
 pkgname=iso-create-ml
-pkgver=0.26.8
+pkgver=0.26.9
 pkgrel=1
 pkgdesc="Create a mirrorlist for the ISO"
 arch=('any')
@@ -10,21 +10,31 @@ depends=(eos-bash-shared parallel curl reflector)
 source=(
     create-ml
     create-ml.bash-completion
+    create-ml-rankmirrors-arch
     create-ml.conf
-    rankmirrors-arch
-    arch-countries.conf
-    arch-mirrors-active.conf
+    create-ml-country-mapping-arch.conf
+    create-ml-active-mirrors-arch.conf
 )
-sha256sums=('ac34c320839f220fbb9a61dce9a4d5ac009dc1e03682613386e98100faf2269e'
+sha256sums=('1227d467568126a665f5e7ddce26840dc7ac2fe89fe947c458d22c2ae2231db8'
             '4af79c7128c1566e26951ad97e468fc5ef62588c6b76fdd8036982cdc7bc5086'
-            '6eceb8e997fb784f7205abf83a782d3ee09ef410b3b9ff26f51fe6f41af933e6'
             '7036b26376843a63d3be7a5d472992c67979a1efcd7789c0316a8f4ca00324cf'
+            '05fde2683a4cb5c801462405418fd0bd299a6b40cc451cf3754268e20131edb1'
             '5776615fa666b708161de831f334469c003bdb81fc95afa4ad26faa8f7675f56'
-            'ee49d43cd0fe6bc1d8293fed5e812f5e214326782727fd64cc5ee45c1af6007d')
-package() {
-    # Before releasing this package run command:
-    #     create-ml --update-supports
+            '8bb2ec13aff5fed79f0f47c08f4279a74183e850889ee9e05ad07e8b7bb2c9fa')
 
+prepare() {
+    local _program=${source[0]}
+    cat <<EOF >&2
+
+####################################################################################
+NOTE: run $_program --update-supports to update the support files (create-ml-*.conf)
+      *before* creating/releasing this package!
+####################################################################################
+
+EOF
+}
+
+package() {
     local src
     for src in "${source[@]}" ; do
         src=${src##*/}
