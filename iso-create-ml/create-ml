@@ -11,7 +11,7 @@ FetchMirrors() {
     [ $has_internet_connection = no ] && return 1
     local -r active_mirrors_url=https://archlinux.org/mirrorlist/all     # mirrors active at the time listed in the file, both https and http
     local -r url=$active_mirrors_url/
-    local -r file=$mirrordata
+    local -r file="$mirrordata"
     local -r fetched=$file.tmp
     local operation=update
 
@@ -24,11 +24,11 @@ FetchMirrors() {
         fi
         ASSERT_WARN mv "$fetched" "$file"      || return 1
         echo2 "==> ${operation}d $file."
+        rm -f "$file".bak
     else
         rm -f "$fetched"
         if [ ! -e "$file" ] ; then
-            operation=create
-            WARN "could not update '$file'."
+            WARN "could not $operation '$file'."
             return 1
         fi
     fi
@@ -144,6 +144,7 @@ DumpOptions() {
 }
 
 Header() {
+    echo -e "### Program: $progname version $(expac %v $pkgname)"
     echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
     echo -n "### Command: $progname"
     if [ "${orig_args[0]}" ] ; then
