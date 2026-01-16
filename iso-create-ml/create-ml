@@ -239,20 +239,14 @@ AddRecommendedCountries() {
     # Adding recommended countries for ranking.
     # Note that the current country will be added later if user wants it and has Arch mirrors.
     case "$country_code" in
-        de|us|cn)
-            : ;;
-        ca)
-            countries_given+=(us) ;;
-        au)
-            countries_given+=(ww) ;;
-        br|cl|co|mx)
-            countries_given+=(ww us); protocols+=(http) ;;
-        'fi')
-            countries_given+=(ww se) ;;
-        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)
-            countries_given+=(ww de fr) ;;
-        *)
-            countries_given+=(ww de us); protocols+=(http) ;;
+        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  countries_given+=(ww de fr) ;;
+        'fi')                                                countries_given+=(ww se) ;;
+        de|us)                                               ;;
+        cn|ru)                                               protocols+=(http) ;;
+        ca)                                                  countries_given+=(us) ;;
+        au)                                                  countries_given+=(ww) ;;
+        br|cl|co|mx)                                         countries_given+=(ww us); protocols+=(http) ;;
+        *)                                                   countries_given+=(ww de us); protocols+=(http) ;;
     esac
 }
 
