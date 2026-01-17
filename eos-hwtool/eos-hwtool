@@ -55,6 +55,8 @@ class GPU:
                                 info["vendor_id"] = parts[1]
                             case "Driver":
                                 info["driver"] = str_parts[1].strip()
+                            case "Module":
+                                info["module"] = str_parts[1].strip()
 
                 if in_slot:
                     # Unless there were no devices, there should be one device that needs to be added to the list
@@ -373,7 +375,17 @@ def get_device_info(input_gpu_info):
         device = dict()
         device["name"] = gpu_device["vendor_name"] + " - " + gpu_device["device_name"]
         device["profiles"] = set()
-        match gpu_device["driver"]:
+
+        # The best match is the driver but if that is not available, try to match using the module name
+        if "driver" in gpu_device:
+            match_string = gpu_device["driver"]
+        elif "module" in gpu_device:
+            match_string = gpu_device["module"]
+        else:
+            match_string = "none"
+
+
+        match match_string:
             case "amdgpu":
                 device["profiles"].add(Profile.amd_amdgpu)
             case "radeon":
@@ -582,7 +594,7 @@ if __name__ == '__main__':
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
 
     # We use only_recommended to limit the profile selection in various places to only the best profile for the card
-    only_recommended = args.recommended or args.install_recommended or args.purge
+    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia
 
     # First we check if we are in a VM
     devices = get_vm()
