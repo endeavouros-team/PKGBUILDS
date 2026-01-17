@@ -124,13 +124,19 @@ UserCountriesFromFile() {
             item2="$item"
             item=${item,,}
             case "$item" in
-                [a-z][a-z]) printf "%s\n" "${countries_given[@]}" | grep "^$item$" >/dev/null || countries_given+=("$item") ;;
+                [a-z][a-z]) printf "%s\n" "${additional_mirror_countries[@]}" | grep "^$item$" >/dev/null || additional_mirror_countries+=("$item") ;;
                 *)          WARN "$user_fav_countries: country code '$item2' ignored" ;;
             esac
         done
     else
         WARN "cannot read file '$user_fav_countries'"
     fi
+}
+UserCountriesFromCommand() {
+    local list="$1" cc                  # list items can separated by spaces ( ), commas (,), or pipes (|)
+    for cc in ${list//[,|]/ } ; do
+        additional_mirror_countries+=("${cc,,}")
+    done
 }
 
 DumpOptions() {
@@ -177,7 +183,7 @@ Main2() {
 
     # add user given countries into $tmplist
     local cc
-    for cc in "${countries_given[@]}" ; do
+    for cc in "${additional_mirror_countries[@]}" ; do
         case "$cc" in
             [a-z][a-z]) AddCountry "$cc" ;;
             *)          WARN "country code '$cc' is not supported" ;;
@@ -238,19 +244,21 @@ Main2() {
 AddRecommendedCountries() {
     # Adding recommended countries for ranking.
     # Note that the current country will be added later if user wants it and has Arch mirrors.
+    # In offline mode we fall back to the last branch of the case..esac below because the $current_country
+    # is unknown.
     case "$country_code" in
-        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  countries_given+=(ww de fr) ;;
-        'fi')                                                countries_given+=(ww se) ;;
+        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  additional_mirror_countries+=(ww de fr) ;;
+        'fi')                                                additional_mirror_countries+=(ww se) ;;
         de|us)                                               ;;
         cn|ru)                                               protocols+=(http) ;;
-        ca)                                                  countries_given+=(us) ;;
-        au)                                                  countries_given+=(ww) ;;
-        br|cl|co|mx)                                         countries_given+=(ww us); protocols+=(http) ;;
-        tw)                                                  countries_given+=(ww sg kr) ;;
-        kr)                                                  countries_given+=(ww sg tw) ;;
-        sg)                                                  countries_given+=(ww kr tw) ;;
-        'in')                                                countries_given+=(ww de us) ;;
-        *)                                                   countries_given+=(ww de us); protocols+=(http) ;;
+        ca)                                                  additional_mirror_countries+=(us) ;;
+        au)                                                  additional_mirror_countries+=(ww) ;;
+        br|cl|co|mx)                                         additional_mirror_countries+=(ww us); protocols+=(http) ;;
+        tw)                                                  additional_mirror_countries+=(ww sg kr) ;;
+        kr)                                                  additional_mirror_countries+=(ww sg tw) ;;
+        sg)                                                  additional_mirror_countries+=(ww kr tw) ;;
+        'in')                                                additional_mirror_countries+=(ww de us) ;;
+        *)                                                   additional_mirror_countries+=(ww de us); protocols+=(http) ;;
     esac
 }
 
@@ -276,6 +284,7 @@ Parameters() {
             --)                  shift; break ;;
 
             --user-countries)    UserCountriesFromFile ;;
+            -c | --countries)    UserCountriesFromCommand "$2"; shift ;;
             --fake-country)      fake_country="$2"; shift ;;
             --offline)           has_internet_connection=no ;;
             --nolocal)           local_country_wanted=no ;;
@@ -291,26 +300,31 @@ Parameters() {
             --prefs)             prefslist="$2"; shift ;;   # list: mirror urls space separates, use 'single quotes'
             -h | --help)
                 cat <<EOF >&2
-Usage:   $progname [options] [country-code [...]]
+Usage:   $progname [options]
 
 Options: --help, -h                   This help.
          --nolocal                    Do not include mirrors from the current country.
          --offline                    Don't use internet even when a connection is available.
          --save                       Save mirrorlist to $target_def (see also option --savefile).
-         --savefile=*                 File path to save the mirrorlist.
          --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
          --verbose, -v                Show more ranking details.
          --http                       Include the http:// mirrors.
-         --rsync                      Include the rsync:// mirrors.
-         --no-recommended-countries   Don't use recommended countries.
-                                      Instead give one or more country codes
-                                      as pararameters or use option --user-countries.
+         --countries, -c              Give a list of country codes that will be used as additional mirror countries.
+                                      The list items can be separated by commas or spaces.
+                                      Examples:
+                                           -c ca,fr,tw
+                                           -c 'ca fr tw'    # note: quotes required here
          --user-countries             Use file $user_fav_countries to give country codes.
-                                      It can contain a list of codes separated by white spaces.
+                                      It can contain a list of country codes separated by white spaces.
+         --no-recommended-countries   Don't use recommended countries.
+                                      Instead you may give one or more country codes
+                                      with option --countries or option --user-countries.
          --fake-country=*             Set a fake current country code (advanced).
+         --savefile=*                 File path to save the mirrorlist (advanced).
 
-Notes:   * Only https:// mirrors are included by default.
-         * Country codes are the two-letter codes listed by command 'reflector --list-countries'.
+Notes:   * Country codes are the two-letter codes as listed by command 'reflector --list-countries'.
+           Note: a special code 'ww' can be used too. It is a compact list of 'Worldwide' mirrors.
+         * By default only https:// mirrors are included.
          * Use option --save to change the existing $target_def.
          * Use option --no-recommended-countries to rank mirrors without adding recommended countries.
          * If available and option --offline is not used, internet connection is used for:
@@ -319,14 +333,10 @@ Notes:   * Only https:// mirrors are included by default.
                3) ranking mirrors
            Without a connection the ranking result is very likely suboptimal.
 EOF
+#         --rsync                      Include the rsync:// mirrors (experimental, not fully implemented).
                 exit 0
                 ;;
         esac
-        shift
-    done
-
-    while [ "$1" ] ; do
-        countries_given+=("${1,,}")
         shift
     done
 }
@@ -337,7 +347,7 @@ Main() {
     local -r configfile=/etc/$progname.conf
 
     local -r sep="|"
-    local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,recommended-countries${sep}r,rsync,sequential"
+    local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
           OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
@@ -353,7 +363,7 @@ Main() {
     local save=no
     local parallel=yes                                                     # ranking mirrors in pararallel or not?
     local protocols=(https)                                                # list of supported protocols
-    local countries_given=()                                               # list of user given countries which have mirrors to include
+    local additional_mirror_countries=()                                   # list of user given countries which have mirrors to include
     local countries_handled=()
     local cleanup_files=()
     local orig_args=("$@")
