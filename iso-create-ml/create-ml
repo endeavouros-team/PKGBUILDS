@@ -246,6 +246,10 @@ AddRecommendedCountries() {
         ca)                                                  countries_given+=(us) ;;
         au)                                                  countries_given+=(ww) ;;
         br|cl|co|mx)                                         countries_given+=(ww us); protocols+=(http) ;;
+        tw)                                                  countries_given+=(ww sg kr) ;;
+        kr)                                                  countries_given+=(ww sg tw) ;;
+        sg)                                                  countries_given+=(ww kr tw) ;;
+        'in')                                                countries_given+=(ww de us) ;;
         *)                                                   countries_given+=(ww de us); protocols+=(http) ;;
     esac
 }
