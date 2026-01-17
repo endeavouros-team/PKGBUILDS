@@ -279,12 +279,54 @@ RankWithUserCommand() {
     fi
 }
 
+YourFavPkgs() {
+    echo2info "==> Handling your favorite packages."
+
+    local favsfile=/etc/${progname}-favorites.conf     # alternatively an url?
+    if [ ! -r "$favsfile" ] ; then
+        echo2warning "sorry, file '$favfile' is not readable"
+        exit 1
+    fi
+
+    source "$favsfile"
+    local cmd=""
+    if [ "$FAVORITES_UNINSTALL" ] ; then
+        local to_uninstall=$(/bin/expac %n "${FAVORITES_UNINSTALL[@]}")
+        if [ "$to_uninstall" ] ; then
+            cmd="sudo pacman -R $to_uninstall"
+            echo2info "==> Running command: $cmd"
+            $cmd
+        else
+            echo2info "==> Nothing to uninstall."
+        fi
+    else
+        echo2warning "==> FAVORITES_UNINSTALL is empty in $favsfile"
+    fi
+    if [ "$FAVORITES_INSTALL" ] ; then
+        local already_installed=$(/bin/expac %n "${FAVORITES_INSTALL[@]}")
+        local to_install=$(printf "%s\n" "${FAVORITES_INSTALL[@]}" | grep -vf <(printf "%s\n" "${already_installed[@]}"))
+        if [ "$to_install" ] ; then
+            cmd="sudo pacman -Syu --needed $to_install"
+            echo2info "==> Running command: $cmd"
+            $cmd
+        else
+            echo2info "==> Nothing to install."
+        fi
+    else
+        echo2warning "==> FAVORITES_INSTALL is empty in $favsfile"
+    fi
+    exit 0
+}
+
 SingleOptions() {
     local ret=0
     while [ "$1" ] ; do
         case "$1" in
             # --system-checks)                     SystemValidityChecks_warn ;;  # does not exit without a problem
 
+            --fav-pkgs)                          YourFavPkgs     # can install your favorite packages
+                                                 exit 0
+                                                 ;;
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
                                                  ;;
@@ -356,6 +398,7 @@ Options() {
                 ;;
             # --system-checks)                     ;;                # already handled in SingleOptions
             --fast)                              eufast=yes ;;
+            --fav-pkgs)                          YourFavPkgs; exit 0 ;;   # can install your favorite packages
             --nvidia)                            nvidia=yes ;;
             --rank-mirrors)                      ;;
             --no-keyring)                        keyring=no ;;
@@ -480,6 +523,7 @@ Tip: create an alias in file ~/.bashrc for $progname to have the options you nee
      alias $progname='$progname --nvidia --no-sync --paru'
 
 EOF
+#  --fav-pkgs              Uses a config file where you manage favorite packages defined by you.
 #  --system-checks         After some checks may give recommendations for your system, but changes nothing.
     [ "$1" ] && exit $1
 }
@@ -565,7 +609,7 @@ Main() {
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
-    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs"
     # lopts+=",system-checks"
     local sopts="dhl:"
 
