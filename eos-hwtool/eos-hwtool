@@ -18,6 +18,7 @@ class Profile(Enum):
     vm_virtualbox = "Virtual Box"
     vm_qemu = "QEMU"
     nvidia_open = "NVIDIA nvidia-open"
+    nvidia_580xx = "NVIDIA nvidia 580.xx"
     nvidia_legacy = "NVIDIA nouveau"
     amd_amdgpu = "AMD amdgpu"
     amd_legacy = "AMD legacy"
@@ -96,7 +97,7 @@ class ProfileData:
         Profile.vm_vmware: {
             'packages': {"mesa", "open-vm-tools", "xf86-input-vmmouse", "gtkmm3", "vulkan-swrast"},
             'packages32': {"lib32-mesa"},
-            'services': {'vmtoolsd.service'},
+            'services': {'vmtoolsd.service', 'vmware-vmblock-fuse.service'},
             'dracut_config': ''},
         Profile.vm_virtualbox: {
             'packages': {"mesa", "virtualbox-guest-utils", "vulkan-swrast"},
@@ -114,6 +115,11 @@ class ProfileData:
             'packages32': {"lib32-nvidia-utils", "lib32-opencl-nvidia"},
             'services': {},
             'dracut_config': 'force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "'},
+        Profile.nvidia_580xx: {
+            'packages': {"mesa", "vulkan-nouveau"},
+            'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
+            'services': {},
+            'dracut_config': 'force_drivers+=" nouveau "'},
         Profile.nvidia_legacy: {
             'packages': {"mesa", "vulkan-nouveau"},
             'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
@@ -270,19 +276,21 @@ def remove_dracut_conf(profile):
         return False
 
 
-def is_modern_nvidia(device_info):
+def get_nvidia_profile(device_info):
     """
-    Detects if the nvidia device is a modern device that uses nvidia-open
+    Finds the optimal profile for the specified device
 
-    :return: True if it is a modern device and false otherwise
+    :return: A profile ENUM
     """
     family = re.match("[A-Z]*", device_info["device_name"].strip(), flags=re.IGNORECASE).group()
 
     # Anything Turing though Broadwell is modern
     if family in {"TU", "GA", "AD", "GB"}:
-        return True
-
-    return False
+        return Profile.nvidia_open
+    elif family in {"Gm", "GP"}:
+        return Profile.nvidia_580xx
+    else:
+        return Profile.nvidia_legacy
 
 
 def get_file_list(package_list, package_directory):
@@ -444,9 +452,11 @@ def get_device_info(input_gpu_info):
             case "radeon":
                 device["profiles"].add(Profile.amd_legacy)
             case "nouveau" | "nvidia":
-                if is_modern_nvidia(gpu_device):
+
+                nvidia_profile = get_nvidia_profile(gpu_device)
+                if nvidia_profile in (Profile.nvidia_open, Profile.nvidia_580xx):
                     if not args.free:
-                        device["profiles"].add(Profile.nvidia_open)
+                        device["profiles"].add(nvidia_profile)
 
                     if args.free or not only_recommended:
                         device["profiles"].add(Profile.nvidia_legacy)
@@ -616,10 +626,12 @@ def do_check_nvidia(arg_list, device_list):
             profile_set.add(profile)
 
     # If we are installing on the ISO
-    if Profile.nvidia_open in profile_set and Profile.nvidia_legacy not in profile_set:
-        print("nvidia-open")
-    elif Profile.nvidia_legacy in profile_set:
+    if Profile.nvidia_legacy in profile_set:
         print("nouveau")
+    elif Profile.nvidia_580xx in profile_set:
+        print("nvidia-580xx")
+    elif Profile.nvidia_open in profile_set:
+        print("nvidia-open")
     else:
         print("none")
 
