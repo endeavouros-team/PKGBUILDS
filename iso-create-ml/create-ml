@@ -23,12 +23,12 @@ FetchMirrors() {
             operation=create
         fi
         ASSERT_WARN mv "$fetched" "$file"      || return 1
-        echo2 "==> ${operation}d $file."
+        echo2 "==> ${operation}d $(realpath "$file")."
         rm -f "$file".bak
     else
         rm -f "$fetched"
         if [ ! -e "$file" ] ; then
-            WARN "could not $operation '$file'."
+            WARN "could not $operation '$(realpath "$file")'."
             return 1
         fi
     fi
@@ -65,7 +65,7 @@ FetchCountries() {
         echo "    [${code,,}]='$country'" >> "$dbfile"
     done
     echo ")" >> "$dbfile"
-    echo2 "==> created $dbfile."
+    echo2 "==> created $(realpath "$dbfile")."
     return 0
 }
 

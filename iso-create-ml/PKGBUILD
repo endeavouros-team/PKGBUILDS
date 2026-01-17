@@ -1,7 +1,7 @@
 # Maintainer : manuel at endeavouros.com
 
 pkgname=iso-create-ml
-pkgver=0.26.14
+pkgver=0.26.15
 pkgrel=1
 pkgdesc="Create a mirrorlist for the ISO"
 arch=('any')
@@ -15,7 +15,7 @@ source=(
     create-ml-country-mapping-arch.conf
     create-ml-active-mirrors-arch.conf
 )
-sha256sums=('c925f404d7d96a9420d38f28fc78411107e784382f9206f96d1e1d52ce51d131'
+sha256sums=('5a4532b402c25c2ce79df464e49c133e80eed9cc8014ce9a48dcf181a64d50e9'
             '4af79c7128c1566e26951ad97e468fc5ef62588c6b76fdd8036982cdc7bc5086'
             '7036b26376843a63d3be7a5d472992c67979a1efcd7789c0316a8f4ca00324cf'
             '05fde2683a4cb5c801462405418fd0bd299a6b40cc451cf3754268e20131edb1'
@@ -23,12 +23,17 @@ sha256sums=('c925f404d7d96a9420d38f28fc78411107e784382f9206f96d1e1d52ce51d131'
             '3ecb997bf3e804822e37ba2f345e2d896d1870c366fb7f2ad66659d900b2b8c8')
 
 _prepare_iso_create_ml() {
-    local _markerfile=/tmp/IpJD89lkjMNB3BaY
+    local _markerfile=/tmp/tmp.IpJD89lkjMNB3BaY
     [ -r $_markerfile ] && return 0
     touch $_markerfile
 
     local _program=${source[0]}
-    $_program --update-supports
+    local _cmd="$_program --update-supports"
+    if pgrep assets.make >/dev/null ; then
+        $_cmd 2>/dev/null
+    else
+        $_cmd
+    fi
     return 0
 }
 _prepare_iso_create_ml
