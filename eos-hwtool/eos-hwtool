@@ -8,6 +8,7 @@ import argparse
 from enum import Enum
 from os import write
 from pathlib import Path, PurePath, PurePosixPath
+from natsort import natsorted
 
 
 class Profile(Enum):
@@ -284,17 +285,69 @@ def is_modern_nvidia(device_info):
     return False
 
 
-def install_packages(package_list, is_iso):
+def get_file_list(package_list, package_directory):
     """
-    Uses pacman to install the listed packages
+    Get the files names for the packages specified by package_list at the location specified by package_directory
 
     :param package_list: A list of strings containing package names
+    :param package_directory: A filesystem path which holds pacman package files
+    :return: A list of package files or None
+    """
+    package_re = re.compile(
+        r"""^
+        (?P<name>.+)          # package name (greedy)
+        -
+        (?P<version>[^-]+)    # version (no dashes)
+        -
+        (?P<release>[^-]+)    # release (no dashes)
+        -
+        (?P<arch>[^.]+)       # arch up to the first dot
+        \.pkg\.tar\.[^.]+$    # .pkg.tar.<ext>
+        """,
+        re.X,
+    )
+
+    path = Path(package_directory)
+    if not dir:
+        print(f"ERROR: Invalid directory {package_directory}", file=sys.stderr)
+        return None
+
+    file_list = list()
+    for package in package_list:
+        dir_list = natsorted(path.glob(package+"-*"), reverse=True)
+        for filename in dir_list:
+            match = package_re.match(filename.name)
+            if match and match.group("name") == package:
+                file_list.append(filename.name)
+                break
+
+    return file_list
+
+
+def install_packages(package_list, is_iso, package_directory):
+    """
+    Uses pacman to install the listed packages. If package_directory is not empty, packages will be installed from
+    this directory instead of the repos.
+
+    :param package_list: A list of strings containing package names
+    :param is_iso: Boolean, when true, use --noconfirm since we are running from the iso
+    :param package_directory: A filesystem path which holds pacman package files
     :return: True on success
     """
-    if is_iso:
-        command = ["pacman", "--needed", "--noconfirm", "-S"] + package_list
+    if package_directory:
+        # We are installing from a directory
+        filename_list = get_file_list(package_list, package_directory)
+        if filename_list:
+            #command = ["pacman", "--noconfirm", "-U"] + filename_list
+            command = ["pacman", "-U"] + filename_list
+        else:
+            return False
     else:
-        command = ["pacman", "--needed", "-Syu"] + package_list
+        # We are installing from the repos
+        if is_iso:
+            command = ["pacman", "--needed", "--noconfirm", "-S"] + package_list
+        else:
+            command = ["pacman", "--needed", "-Syu"] + package_list
 
     try:
         result = subprocess.run(command)
@@ -450,7 +503,7 @@ def do_install(arg_list, device_list):
             for package in packages:
                 package_set.add(package)
 
-    is_packages_installed = install_packages(list(package_set), arg_list.iso)
+    is_packages_installed = install_packages(list(package_set), arg_list.iso, arg_list.packagedir)
 
     # If packages were installed, we can enable services, create the dracut profiles and then regenerate the initramfs
     if is_packages_installed:
@@ -587,10 +640,11 @@ if __name__ == '__main__':
                         help='Install or repair the selected profile')
     parser.add_argument('--install', '--repair', type=str, nargs='*', action="append", metavar='Profile',
                         help='Install or repair the selected profile')
-    parser.add_argument('--remove', type=str, nargs='*', action="append",  metavar='Profile',
+    parser.add_argument('--remove', type=str, nargs='*', action="append", metavar='Profile',
                         help='Remove the selected profile')
     parser.add_argument('--purge', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--iso', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--packagedir', type=str, metavar='Path', help=argparse.SUPPRESS)
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
 
     # We use only_recommended to limit the profile selection in various places to only the best profile for the card
