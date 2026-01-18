@@ -287,7 +287,7 @@ def get_nvidia_profile(device_info):
     # Anything Turing though Broadwell is modern
     if family in {"TU", "GA", "AD", "GB"}:
         return Profile.nvidia_open
-    elif family in {"Gm", "GP"}:
+    elif family in {"GM", "GP"}:
         return Profile.nvidia_580xx
     else:
         return Profile.nvidia_legacy
