@@ -1,18 +1,18 @@
 # Maintainer : Evan James <dalto@endeavouros.com>
 
 pkgname=eos-hwtool
-pkgver=1.2
-pkgrel=2
+pkgver=1.3
+pkgrel=1
 pkgdesc="The EndeavourOS hardware management tool is used to manage VM and GPU drivers"
 arch=('any')
 license=('GPL3')
-depends=('python')
+depends=('python' 'python-natsort')
 optdepends=('sudo')
 source=(
     eos-hwtool
     eos-hwtool.bash-completion
 )
-sha256sums=('e6ef535f6477c8c6def5993da49a28d7d7e0c34b23fa48b78034733f86b3866a'
+sha256sums=('7227182760568858e6f55b7dffd7c15459cb133756f8c9a148cf9d7b93e57c72'
             '9836580e53c9f9d7b5d0560a685e6f4e7a367bbf3d6691b8ae7adb22fb0e3015')
 package() {
 
