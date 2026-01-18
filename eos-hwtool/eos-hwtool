@@ -619,6 +619,20 @@ def do_purge(arg_list, device_list):
     remove_packages(list(package_set), arg_list.iso)
 
 
+def do_enable_services(device_list):
+    """
+    Enabled services for the recommended profiles.  Used by the ISO
+
+    :param device_list: A list of the profiles to be considered for each GPU device
+    :return: N/A
+    """
+
+    # First get the list of packages we want to keep
+    for device in device_list:
+        if "profiles" in device and device["profiles"]:
+            manage_services(device["profiles"].pop(), "enable")
+
+
 def do_check_nvidia(arg_list, device_list):
     profile_set = set()
     for device in device_list:
@@ -656,11 +670,12 @@ if __name__ == '__main__':
                         help='Remove the selected profile')
     parser.add_argument('--purge', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--iso', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--enable-services', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--packagedir', type=str, metavar='Path', help=argparse.SUPPRESS)
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
 
     # We use only_recommended to limit the profile selection in various places to only the best profile for the card
-    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia
+    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia or args.enable_services
 
     # First we check if we are in a VM
     devices = get_vm()
@@ -697,12 +712,19 @@ if __name__ == '__main__':
 
     if args.install or args.install_recommended:
         do_install(args, devices)
+        sys.exit(0)
 
     if args.remove:
         do_remove(args)
+        sys.exit(0)
 
     if args.purge:
         do_purge(args, devices)
+        sys.exit(0)
+
+    if args.enable_services:
+        do_enable_services(devices)
+        sys.exit(0)
 
     sys.exit(0)
 
