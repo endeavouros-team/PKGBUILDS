@@ -583,17 +583,6 @@ SystemValidityChecks_error() {
 #     fi
 # }
 
-GetCacheDir() {
-    local pconfcachedir=$(grep "^[ ]*CacheDir[ ]*=" /etc/pacman.conf)
-    
-    if [ "$pconfcachedir" ] ; then
-        pconfcachedir=$(echo "$pconfcachedir" | sed -E 's|^[ ]*CacheDir[ ]*=[ ]*(.*)|\1|')
-        echo "$pconfcachedir"
-    else
-        echo /var/cache/pacman/pkg/
-    fi
-}
-
 Main() {
     local progname="${0##*/}"
     local cmdfile=""
@@ -601,9 +590,6 @@ Main() {
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
     local -r rank_command_file=/bin/eos-update-rank-mirrors
-
-    local pkg_cache_dir=$(GetCacheDir)
-
     local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
 
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
@@ -653,6 +639,8 @@ Main() {
             2) echo2 "$(ltr sysup_no)" ; exit ;;
         esac
     fi
+
+    local pkg_cache_dir=$(GetCacheDir)
 
     if [ $EUID -eq 0 ] && [ $mode = plain ] ; then    # mode can change based on current privileges
         mode=login
