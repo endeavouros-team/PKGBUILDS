@@ -360,6 +360,7 @@ SingleOptions() {
                                                  echo $lopts $sopts
                                                  exit 0
                                                  ;;
+            --other-updates)                     other_updates=yes ;;   # does not exit and it is OK
             -h | --help)                         Usage 0 ;;
         esac
         shift
@@ -413,7 +414,7 @@ Options() {
             --helper)                            SetHelper "$2" ; shift ;;
             --aur)                               SetHelper; eufast_opt+=" $1" ;;
             --paru | --yay | --pacman)           SetHelper "${1/--/}" ;;
-	    --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
+            --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
             --cache-limit | -l)                  paccache_limit="$2"
                                                  case "$paccache_limit" in
                                                      1|2|3|4|5) ;;
@@ -421,7 +422,7 @@ Options() {
                                                  esac
                                                  shift
                                                  ;;
-            --other-updates)                     other_updates=yes ;;
+            --other-updates)                     ;; # other_updates=yes ;;
             --colors)                            use_colors="$2"
                                                  case "$use_colors" in
                                                      yes | no) ;;
@@ -516,6 +517,8 @@ Options:
                           before updating. Otherwise a warning message will be displayed.
                           Default: $min_free_bytes
   --other-updates         Enable support for *user-defined* other updates (e.g. 'flatpak update').
+                          Note that user-defined commands can be performed in the beginning and end
+                          of execution of eos-update, see $otherUpdatesFile.
 
 Tip: create an alias in file ~/.bashrc for $progname to have the options you need, for example:
 
@@ -583,6 +586,13 @@ SystemValidityChecks_error() {
 #     fi
 # }
 
+RunUserCommands() {
+    if [ $other_updates = yes ] ; then
+        local -r when="$1"
+        [ -r $otherUpdatesFile ] && bash $otherUpdatesFile $when
+    fi
+}
+
 Main() {
     local progname="${0##*/}"
     local cmdfile=""
@@ -590,6 +600,7 @@ Main() {
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
     local -r rank_command_file=/bin/eos-update-rank-mirrors
+    local -r otherUpdatesFile=/etc/eos-update-other.bash
     local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
 
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
@@ -627,6 +638,8 @@ Main() {
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
     
     SingleOptions "$@"
+
+    RunUserCommands beginning
 
     DebugBreak
     _init_translations
@@ -686,13 +699,13 @@ Main() {
 
     # support for user-defined other updates
     if [ $other_updates = yes ] ; then
-        local otherUpdatesFile=/etc/eos-update-other.bash
-        if [ -e $otherUpdatesFile ] ; then
+        if [ -r $otherUpdatesFile ] ; then
             bash $otherUpdatesFile
         else
             WARN "script $otherUpdatesFile does not exist"
         fi
     fi
+    RunUserCommands end
 
     Cleanup
 }
