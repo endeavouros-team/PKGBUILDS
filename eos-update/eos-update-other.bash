@@ -11,13 +11,20 @@ Main() {
             ## HERE: Add your commands to be executed in the end of eos-update.
             ## Example idea: updates with flatpak or other tools.
             ;;
+        *)
+            DeprecatedOldCompatibility	    ## You may remove or comment out this line.
+            ;;
     esac
+}
 
-    ## You may comment out this tip:
-    _ColorLines info "Tip: you may add other update commands into ${0}."
-
-    ## HERE: Add your other update commands (e.g. for 'flatpak') here!
-    ## Note: This is deprecated, use the 'end)' branch of the 'case..esac' above instead.
+DeprecatedOldCompatibility() {
+    ## This fallback branch is only for backwords compatibility and will be deleted at a later time.
+    local marker=/tmp/tmp.I2301msiEBoRW
+    if [ ! -r $marker ] ; then
+	mkdir -p $marker
+	chmod go-rwx $marker
+	_ColorLines info "Tip: you may add other update commands into ${0}."
+    fi
 }
 
 _ColorLines() {

@@ -589,7 +589,11 @@ SystemValidityChecks_error() {
 RunUserCommands() {
     if [ $other_updates = yes ] ; then
         local -r when="$1"
-        [ -r $otherUpdatesFile ] && bash $otherUpdatesFile $when
+        if [ -r $otherUpdatesFile ] ; then
+            bash $otherUpdatesFile $when
+        else
+            [ $((runusercommands_warning_count++)) -eq 0 ] && WARN "script $otherUpdatesFile does not exist"
+        fi
     fi
 }
 
@@ -629,6 +633,7 @@ Main() {
     local eufast=no
     local eufast_opt="--arch --endeavouros"
     local paccache_limit=""
+    local runusercommands_warning_count=0         # limit warnings to 1 from RunUserCommands
 
     SystemValidityChecks_error
 
@@ -698,13 +703,7 @@ Main() {
     PacCache
 
     # support for user-defined other updates
-    if [ $other_updates = yes ] ; then
-        if [ -r $otherUpdatesFile ] ; then
-            bash $otherUpdatesFile
-        else
-            WARN "script $otherUpdatesFile does not exist"
-        fi
-    fi
+    RunUserCommands              # deprecated, only for backwords compatibility
     RunUserCommands end
 
     Cleanup
