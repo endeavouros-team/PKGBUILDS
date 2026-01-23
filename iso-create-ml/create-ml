@@ -358,7 +358,8 @@ EOF
 Main() {
     local -r progname=${0##*/}
     local -r pkgname=iso-create-ml
-    local -r configfile=/etc/$progname.conf
+    local -r configfile="/etc/$progname.conf"
+    local -r recommended_countries="/etc/${progname}-recommended-cc.conf"
 
     local -r sep="|"
     local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
@@ -431,6 +432,7 @@ Main() {
 
     GetCountryCode
 
+    [ -r "$recommended_countries" ] && source "$recommended_countries"
     AddRecommendedCountries
 
     Main2
