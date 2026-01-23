@@ -6,8 +6,7 @@ import sys
 import re
 import argparse
 from enum import Enum
-from os import write
-from pathlib import Path, PurePath, PurePosixPath
+from pathlib import Path, PurePosixPath
 from natsort import natsorted
 
 
@@ -143,9 +142,13 @@ class ProfileData:
     }
 
     @staticmethod
-    def get_packages(profile, no32):
+    def get_packages(profile, no32, is_iso):
         if profile in ProfileData.data:
             packages = ProfileData.data[profile]["packages"]
+            if is_iso and "nvidia-open-dkms" in packages:
+                packages.replace("nvidia-open-dkms", "nvidia-open")
+                if is_installed('linux-lts'):
+                    packages.add('nvidia-open-lts')
             if not no32:
                 packages = packages.union(ProfileData.data[profile]["packages32"])
             return packages
@@ -211,7 +214,7 @@ def manage_services(profile, action):
 
     if services:
         for service in services:
-            base_command = ['systemctl', action]
+            base_command = ['systemctl', action, '--now']
             print(f'INFO: Enabling {service}')
             try:
                 result = subprocess.run(base_command + [service])
@@ -390,6 +393,7 @@ def remove_packages(package_list, is_iso):
     """
     Uses pacman to remove the listed packages
 
+    :param is_iso: Boolean, True when the `--iso` argument is passed
     :param package_list: A list of strings containing package names
     :return: True on success
     """
@@ -507,7 +511,7 @@ def do_install(arg_list, device_list):
                 profile_set.add(profile)
 
     for profile in profile_set:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
         if packages:
             for package in packages:
@@ -527,7 +531,7 @@ def do_install(arg_list, device_list):
         try:
             if is_dracut_conf_created:
                 if Path('/usr/bin/dracut-rebuild').is_file():
-                    result = subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
+                    subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
                 else:
                     print('Warning: Cannot rebuild initramfs, please rebuild manually', file=sys.stderr)
         except subprocess.CalledProcessError:
@@ -559,7 +563,7 @@ def do_remove(arg_list):
             profile_list.append(profile)
 
     for profile in profile_list:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
         if packages:
             for package in packages:
@@ -580,7 +584,7 @@ def do_remove(arg_list):
         try:
             if is_dracut_conf_removed:
                 if Path('/usr/bin/dracut-rebuild').is_file():
-                    result = subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
+                    subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
                 else:
                     print('Warning: Cannot rebuild initramfs, please rebuild manually', file=sys.stderr)
         except subprocess.CalledProcessError:
@@ -603,14 +607,14 @@ def do_purge(arg_list, device_list):
     # First get the list of packages we want to keep
     for device in device_list:
         for profile in device["profiles"]:
-            packages = ProfileData.get_packages(profile, arg_list.no32)
+            packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
             if packages:
                 for package in packages:
                     package_set_keep.add(package)
 
     for profile in Profile:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
         if packages:
             for package in packages:
                 if package not in package_set_keep:
@@ -633,7 +637,7 @@ def do_enable_services(device_list):
             manage_services(device["profiles"].pop(), "enable")
 
 
-def do_check_nvidia(arg_list, device_list):
+def do_check_nvidia(device_list):
     profile_set = set()
     for device in device_list:
         for profile in device["profiles"]:
@@ -693,7 +697,7 @@ if __name__ == '__main__':
         devices = get_device_info(gpu_info)
 
     if args.check_nvidia:
-        do_check_nvidia(args, devices)
+        do_check_nvidia(devices)
         sys.exit(0)
 
     if args.list or args.recommended:
