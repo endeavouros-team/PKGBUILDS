@@ -511,13 +511,19 @@ def do_install(arg_list, device_list):
                 profile_set.add(profile)
 
     for profile in profile_set:
+        # If this is an nvidia only install, skip everything except the proprietary nvidia drivers
+        if arg_list.nvidia_only and profile not in (Profile.nvidia_open, Profile.nvidia_580xx):
+            continue
+
         packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
         if packages:
             for package in packages:
                 package_set.add(package)
 
-    is_packages_installed = install_packages(list(package_set), arg_list.iso, arg_list.packagedir)
+    is_packages_installed = False
+    if package_set:
+        is_packages_installed = install_packages(list(package_set), arg_list.iso, arg_list.packagedir)
 
     # If packages were installed, we can enable services, create the dracut profiles and then regenerate the initramfs
     if is_packages_installed:
@@ -674,6 +680,7 @@ if __name__ == '__main__':
                         help='Remove the selected profile')
     parser.add_argument('--purge', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--iso', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--nvidia-only', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--enable-services', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--packagedir', type=str, metavar='Path', help=argparse.SUPPRESS)
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
