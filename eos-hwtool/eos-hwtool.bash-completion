@@ -5,7 +5,6 @@ _eos_hwtool_complete() {
     COMPREPLY=($(compgen -W "$1" -- "$cur"))
     [[ $COMPREPLY == *= ]] && compopt -o nospace
     compopt -o filenames
-    compopt -o nosort
 }
 
 _make_as_lines() {
@@ -13,16 +12,12 @@ _make_as_lines() {
 }
 
 _eos_hwtool_list_opts()   {
-    local opts=( --help -h
-                 --list
-                 --free
-                 --no32
-                 --recommended
-                 --install-recommended
-                 --install
-                 --repair
-                 --remove
-               )
+    # extract all options from the output of command: eos-hwtool --help
+    local opts2=$(eos-hwtool --help | grep "^  -")
+    local opts=(
+        $(echo "$opts2" | awk '{print $1}' | sed 's|,$||')            # first option on the line
+        $(echo "$opts2" | awk '{print $2}' | grep '\-' 2>/dev/null)   # second option on the line
+    )
     _make_as_lines "${opts[@]}"
 }
 _eos_hwtool_profiles() {

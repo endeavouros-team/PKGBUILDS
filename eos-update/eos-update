@@ -279,12 +279,54 @@ RankWithUserCommand() {
     fi
 }
 
+YourFavPkgs() {
+    echo2info "==> Handling your favorite packages."
+
+    local favsfile=/etc/${progname}-favorites.conf     # alternatively an url?
+    if [ ! -r "$favsfile" ] ; then
+        echo2warning "sorry, file '$favfile' is not readable"
+        exit 1
+    fi
+
+    source "$favsfile"
+    local cmd=""
+    if [ "$FAVORITES_UNINSTALL" ] ; then
+        local to_uninstall=$(/bin/expac %n "${FAVORITES_UNINSTALL[@]}")
+        if [ "$to_uninstall" ] ; then
+            cmd="sudo pacman -R $to_uninstall"
+            echo2info "==> Running command: $cmd"
+            $cmd
+        else
+            echo2info "==> Nothing to uninstall."
+        fi
+    else
+        echo2warning "==> FAVORITES_UNINSTALL is empty in $favsfile"
+    fi
+    if [ "$FAVORITES_INSTALL" ] ; then
+        local already_installed=$(/bin/expac %n "${FAVORITES_INSTALL[@]}")
+        local to_install=$(printf "%s\n" "${FAVORITES_INSTALL[@]}" | grep -vf <(printf "%s\n" "${already_installed[@]}"))
+        if [ "$to_install" ] ; then
+            cmd="sudo pacman -Syu --needed $to_install"
+            echo2info "==> Running command: $cmd"
+            $cmd
+        else
+            echo2info "==> Nothing to install."
+        fi
+    else
+        echo2warning "==> FAVORITES_INSTALL is empty in $favsfile"
+    fi
+    exit 0
+}
+
 SingleOptions() {
     local ret=0
     while [ "$1" ] ; do
         case "$1" in
             # --system-checks)                     SystemValidityChecks_warn ;;  # does not exit without a problem
 
+            --fav-pkgs)                          YourFavPkgs     # can install your favorite packages
+                                                 exit 0
+                                                 ;;
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
                                                  ;;
@@ -318,6 +360,7 @@ SingleOptions() {
                                                  echo $lopts $sopts
                                                  exit 0
                                                  ;;
+            --other-updates)                     other_updates=yes ;;   # does not exit and it is OK
             -h | --help)                         Usage 0 ;;
         esac
         shift
@@ -356,6 +399,7 @@ Options() {
                 ;;
             # --system-checks)                     ;;                # already handled in SingleOptions
             --fast)                              eufast=yes ;;
+            --fav-pkgs)                          YourFavPkgs; exit 0 ;;   # can install your favorite packages
             --nvidia)                            nvidia=yes ;;
             --rank-mirrors)                      ;;
             --no-keyring)                        keyring=no ;;
@@ -370,7 +414,7 @@ Options() {
             --helper)                            SetHelper "$2" ; shift ;;
             --aur)                               SetHelper; eufast_opt+=" $1" ;;
             --paru | --yay | --pacman)           SetHelper "${1/--/}" ;;
-	    --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
+            --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
             --cache-limit | -l)                  paccache_limit="$2"
                                                  case "$paccache_limit" in
                                                      1|2|3|4|5) ;;
@@ -378,7 +422,7 @@ Options() {
                                                  esac
                                                  shift
                                                  ;;
-            --other-updates)                     other_updates=yes ;;
+            --other-updates)                     ;; # other_updates=yes ;;
             --colors)                            use_colors="$2"
                                                  case "$use_colors" in
                                                      yes | no) ;;
@@ -473,6 +517,8 @@ Options:
                           before updating. Otherwise a warning message will be displayed.
                           Default: $min_free_bytes
   --other-updates         Enable support for *user-defined* other updates (e.g. 'flatpak update').
+                          Note that user-defined commands can be performed in the beginning and end
+                          of execution of eos-update, see $otherUpdatesFile.
 
 Tip: create an alias in file ~/.bashrc for $progname to have the options you need, for example:
 
@@ -480,6 +526,7 @@ Tip: create an alias in file ~/.bashrc for $progname to have the options you nee
      alias $progname='$progname --nvidia --no-sync --paru'
 
 EOF
+#  --fav-pkgs              Uses a config file where you manage favorite packages defined by you.
 #  --system-checks         After some checks may give recommendations for your system, but changes nothing.
     [ "$1" ] && exit $1
 }
@@ -539,14 +586,14 @@ SystemValidityChecks_error() {
 #     fi
 # }
 
-GetCacheDir() {
-    local pconfcachedir=$(grep "^[ ]*CacheDir[ ]*=" /etc/pacman.conf)
-    
-    if [ "$pconfcachedir" ] ; then
-        pconfcachedir=$(echo "$pconfcachedir" | sed -E 's|^[ ]*CacheDir[ ]*=[ ]*(.*)|\1|')
-        echo "$pconfcachedir"
-    else
-        echo /var/cache/pacman/pkg/
+RunUserCommands() {
+    if [ $other_updates = yes ] ; then
+        local -r when="$1"
+        if [ -r $otherUpdatesFile ] ; then
+            bash $otherUpdatesFile $when
+        else
+            [ $((runusercommands_warning_count++)) -eq 0 ] && WARN "script $otherUpdatesFile does not exist"
+        fi
     fi
 }
 
@@ -557,15 +604,13 @@ Main() {
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
     local -r rank_command_file=/bin/eos-update-rank-mirrors
-
-    local pkg_cache_dir=$(GetCacheDir)
-
+    local -r otherUpdatesFile=/etc/eos-update-other.bash
     local min_free_bytes=$((1000 * 1000 * 1000))  # default: 1 GB
 
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
-    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs"
     # lopts+=",system-checks"
     local sopts="dhl:"
 
@@ -588,6 +633,7 @@ Main() {
     local eufast=no
     local eufast_opt="--arch --endeavouros"
     local paccache_limit=""
+    local runusercommands_warning_count=0         # limit warnings to 1 from RunUserCommands
 
     SystemValidityChecks_error
 
@@ -597,6 +643,8 @@ Main() {
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
     
     SingleOptions "$@"
+
+    RunUserCommands beginning
 
     DebugBreak
     _init_translations
@@ -609,6 +657,8 @@ Main() {
             2) echo2 "$(ltr sysup_no)" ; exit ;;
         esac
     fi
+
+    local pkg_cache_dir=$(GetCacheDir)
 
     if [ $EUID -eq 0 ] && [ $mode = plain ] ; then    # mode can change based on current privileges
         mode=login
@@ -653,14 +703,8 @@ Main() {
     PacCache
 
     # support for user-defined other updates
-    if [ $other_updates = yes ] ; then
-        local otherUpdatesFile=/etc/eos-update-other.bash
-        if [ -e $otherUpdatesFile ] ; then
-            bash $otherUpdatesFile
-        else
-            WARN "script $otherUpdatesFile does not exist"
-        fi
-    fi
+    RunUserCommands              # deprecated, only for backwords compatibility
+    RunUserCommands end
 
     Cleanup
 }

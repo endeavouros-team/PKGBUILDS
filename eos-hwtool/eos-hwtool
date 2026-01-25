@@ -6,8 +6,8 @@ import sys
 import re
 import argparse
 from enum import Enum
-from os import write
-from pathlib import Path, PurePath, PurePosixPath
+from pathlib import Path, PurePosixPath
+from natsort import natsorted
 
 
 class Profile(Enum):
@@ -17,6 +17,7 @@ class Profile(Enum):
     vm_virtualbox = "Virtual Box"
     vm_qemu = "QEMU"
     nvidia_open = "NVIDIA nvidia-open"
+    nvidia_580xx = "NVIDIA nvidia 580.xx"
     nvidia_legacy = "NVIDIA nouveau"
     amd_amdgpu = "AMD amdgpu"
     amd_legacy = "AMD legacy"
@@ -55,6 +56,8 @@ class GPU:
                                 info["vendor_id"] = parts[1]
                             case "Driver":
                                 info["driver"] = str_parts[1].strip()
+                            case "Module":
+                                info["module"] = str_parts[1].strip()
 
                 if in_slot:
                     # Unless there were no devices, there should be one device that needs to be added to the list
@@ -93,7 +96,7 @@ class ProfileData:
         Profile.vm_vmware: {
             'packages': {"mesa", "open-vm-tools", "xf86-input-vmmouse", "gtkmm3", "vulkan-swrast"},
             'packages32': {"lib32-mesa"},
-            'services': {'vmtoolsd.service'},
+            'services': {'vmtoolsd.service', 'vmware-vmblock-fuse.service'},
             'dracut_config': ''},
         Profile.vm_virtualbox: {
             'packages': {"mesa", "virtualbox-guest-utils", "vulkan-swrast"},
@@ -111,6 +114,11 @@ class ProfileData:
             'packages32': {"lib32-nvidia-utils", "lib32-opencl-nvidia"},
             'services': {},
             'dracut_config': 'force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "'},
+        Profile.nvidia_580xx: {
+            'packages': {"mesa", "vulkan-nouveau"},
+            'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
+            'services': {},
+            'dracut_config': 'force_drivers+=" nouveau "'},
         Profile.nvidia_legacy: {
             'packages': {"mesa", "vulkan-nouveau"},
             'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
@@ -134,9 +142,13 @@ class ProfileData:
     }
 
     @staticmethod
-    def get_packages(profile, no32):
+    def get_packages(profile, no32, is_iso):
         if profile in ProfileData.data:
             packages = ProfileData.data[profile]["packages"]
+            if is_iso and "nvidia-open-dkms" in packages:
+                packages.replace("nvidia-open-dkms", "nvidia-open")
+                if is_installed('linux-lts'):
+                    packages.add('nvidia-open-lts')
             if not no32:
                 packages = packages.union(ProfileData.data[profile]["packages32"])
             return packages
@@ -202,7 +214,7 @@ def manage_services(profile, action):
 
     if services:
         for service in services:
-            base_command = ['systemctl', action]
+            base_command = ['systemctl', action, '--now']
             print(f'INFO: Enabling {service}')
             try:
                 result = subprocess.run(base_command + [service])
@@ -267,32 +279,86 @@ def remove_dracut_conf(profile):
         return False
 
 
-def is_modern_nvidia(device_info):
+def get_nvidia_profile(device_info):
     """
-    Detects if the nvidia device is a modern device that uses nvidia-open
+    Finds the optimal profile for the specified device
 
-    :return: True if it is a modern device and false otherwise
+    :return: A profile ENUM
     """
     family = re.match("[A-Z]*", device_info["device_name"].strip(), flags=re.IGNORECASE).group()
 
     # Anything Turing though Broadwell is modern
     if family in {"TU", "GA", "AD", "GB"}:
-        return True
+        return Profile.nvidia_open
+    elif family in {"GM", "GP"}:
+        return Profile.nvidia_580xx
+    else:
+        return Profile.nvidia_legacy
 
-    return False
 
-
-def install_packages(package_list, is_iso):
+def get_file_list(package_list, package_directory):
     """
-    Uses pacman to install the listed packages
+    Get the files names for the packages specified by package_list at the location specified by package_directory
 
     :param package_list: A list of strings containing package names
+    :param package_directory: A filesystem path which holds pacman package files
+    :return: A list of package files or None
+    """
+    package_re = re.compile(
+        r"""^
+        (?P<name>.+)          # package name (greedy)
+        -
+        (?P<version>[^-]+)    # version (no dashes)
+        -
+        (?P<release>[^-]+)    # release (no dashes)
+        -
+        (?P<arch>[^.]+)       # arch up to the first dot
+        \.pkg\.tar\.[^.]+$    # .pkg.tar.<ext>
+        """,
+        re.X,
+    )
+
+    path = Path(package_directory)
+    if not dir:
+        print(f"ERROR: Invalid directory {package_directory}", file=sys.stderr)
+        return None
+
+    file_list = list()
+    for package in package_list:
+        dir_list = natsorted(path.glob(package+"-*"), reverse=True)
+        for filename in dir_list:
+            match = package_re.match(filename.name)
+            if match and match.group("name") == package:
+                file_list.append(filename.name)
+                break
+
+    return file_list
+
+
+def install_packages(package_list, is_iso, package_directory):
+    """
+    Uses pacman to install the listed packages. If package_directory is not empty, packages will be installed from
+    this directory instead of the repos.
+
+    :param package_list: A list of strings containing package names
+    :param is_iso: Boolean, when true, use --noconfirm since we are running from the iso
+    :param package_directory: A filesystem path which holds pacman package files
     :return: True on success
     """
-    if is_iso:
-        command = ["pacman", "--needed", "--noconfirm", "-S"] + package_list
+    if package_directory:
+        # We are installing from a directory
+        filename_list = get_file_list(package_list, package_directory)
+        if filename_list:
+            #command = ["pacman", "--noconfirm", "-U"] + filename_list
+            command = ["pacman", "-U"] + filename_list
+        else:
+            return False
     else:
-        command = ["pacman", "--needed", "-Syu"] + package_list
+        # We are installing from the repos
+        if is_iso:
+            command = ["pacman", "--needed", "--noconfirm", "-S"] + package_list
+        else:
+            command = ["pacman", "--needed", "-Syu"] + package_list
 
     try:
         result = subprocess.run(command)
@@ -327,6 +393,7 @@ def remove_packages(package_list, is_iso):
     """
     Uses pacman to remove the listed packages
 
+    :param is_iso: Boolean, True when the `--iso` argument is passed
     :param package_list: A list of strings containing package names
     :return: True on success
     """
@@ -373,15 +440,27 @@ def get_device_info(input_gpu_info):
         device = dict()
         device["name"] = gpu_device["vendor_name"] + " - " + gpu_device["device_name"]
         device["profiles"] = set()
-        match gpu_device["driver"]:
+
+        # The best match is the driver but if that is not available, try to match using the module name
+        if "driver" in gpu_device:
+            match_string = gpu_device["driver"]
+        elif "module" in gpu_device:
+            match_string = gpu_device["module"]
+        else:
+            match_string = "none"
+
+
+        match match_string:
             case "amdgpu":
                 device["profiles"].add(Profile.amd_amdgpu)
             case "radeon":
                 device["profiles"].add(Profile.amd_legacy)
             case "nouveau" | "nvidia":
-                if is_modern_nvidia(gpu_device):
+
+                nvidia_profile = get_nvidia_profile(gpu_device)
+                if nvidia_profile in (Profile.nvidia_open, Profile.nvidia_580xx):
                     if not args.free:
-                        device["profiles"].add(Profile.nvidia_open)
+                        device["profiles"].add(nvidia_profile)
 
                     if args.free or not only_recommended:
                         device["profiles"].add(Profile.nvidia_legacy)
@@ -432,13 +511,19 @@ def do_install(arg_list, device_list):
                 profile_set.add(profile)
 
     for profile in profile_set:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        # If this is an nvidia only install, skip everything except the proprietary nvidia drivers
+        if arg_list.nvidia_only and profile not in (Profile.nvidia_open, Profile.nvidia_580xx):
+            continue
+
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
         if packages:
             for package in packages:
                 package_set.add(package)
 
-    is_packages_installed = install_packages(list(package_set), arg_list.iso)
+    is_packages_installed = False
+    if package_set:
+        is_packages_installed = install_packages(list(package_set), arg_list.iso, arg_list.packagedir)
 
     # If packages were installed, we can enable services, create the dracut profiles and then regenerate the initramfs
     if is_packages_installed:
@@ -452,7 +537,7 @@ def do_install(arg_list, device_list):
         try:
             if is_dracut_conf_created:
                 if Path('/usr/bin/dracut-rebuild').is_file():
-                    result = subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
+                    subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
                 else:
                     print('Warning: Cannot rebuild initramfs, please rebuild manually', file=sys.stderr)
         except subprocess.CalledProcessError:
@@ -484,7 +569,7 @@ def do_remove(arg_list):
             profile_list.append(profile)
 
     for profile in profile_list:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
         if packages:
             for package in packages:
@@ -505,7 +590,7 @@ def do_remove(arg_list):
         try:
             if is_dracut_conf_removed:
                 if Path('/usr/bin/dracut-rebuild').is_file():
-                    result = subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
+                    subprocess.run(["dracut-rebuild"], capture_output=False, text=True)
                 else:
                     print('Warning: Cannot rebuild initramfs, please rebuild manually', file=sys.stderr)
         except subprocess.CalledProcessError:
@@ -528,14 +613,14 @@ def do_purge(arg_list, device_list):
     # First get the list of packages we want to keep
     for device in device_list:
         for profile in device["profiles"]:
-            packages = ProfileData.get_packages(profile, arg_list.no32)
+            packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
 
             if packages:
                 for package in packages:
                     package_set_keep.add(package)
 
     for profile in Profile:
-        packages = ProfileData.get_packages(profile, arg_list.no32)
+        packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
         if packages:
             for package in packages:
                 if package not in package_set_keep:
@@ -544,17 +629,33 @@ def do_purge(arg_list, device_list):
     remove_packages(list(package_set), arg_list.iso)
 
 
-def do_check_nvidia(arg_list, device_list):
+def do_enable_services(device_list):
+    """
+    Enabled services for the recommended profiles.  Used by the ISO
+
+    :param device_list: A list of the profiles to be considered for each GPU device
+    :return: N/A
+    """
+
+    # First get the list of packages we want to keep
+    for device in device_list:
+        if "profiles" in device and device["profiles"]:
+            manage_services(device["profiles"].pop(), "enable")
+
+
+def do_check_nvidia(device_list):
     profile_set = set()
     for device in device_list:
         for profile in device["profiles"]:
             profile_set.add(profile)
 
     # If we are installing on the ISO
-    if Profile.nvidia_open in profile_set and Profile.nvidia_legacy not in profile_set:
-        print("nvidia-open")
-    elif Profile.nvidia_legacy in profile_set:
+    if Profile.nvidia_legacy in profile_set:
         print("nouveau")
+    elif Profile.nvidia_580xx in profile_set:
+        print("nvidia-580xx")
+    elif Profile.nvidia_open in profile_set:
+        print("nvidia-open")
     else:
         print("none")
 
@@ -575,14 +676,17 @@ if __name__ == '__main__':
                         help='Install or repair the selected profile')
     parser.add_argument('--install', '--repair', type=str, nargs='*', action="append", metavar='Profile',
                         help='Install or repair the selected profile')
-    parser.add_argument('--remove', type=str, nargs='*', action="append",  metavar='Profile',
+    parser.add_argument('--remove', type=str, nargs='*', action="append", metavar='Profile',
                         help='Remove the selected profile')
     parser.add_argument('--purge', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--iso', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--nvidia-only', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--enable-services', action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument('--packagedir', type=str, metavar='Path', help=argparse.SUPPRESS)
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
 
     # We use only_recommended to limit the profile selection in various places to only the best profile for the card
-    only_recommended = args.recommended or args.install_recommended or args.purge
+    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia or args.enable_services
 
     # First we check if we are in a VM
     devices = get_vm()
@@ -600,7 +704,7 @@ if __name__ == '__main__':
         devices = get_device_info(gpu_info)
 
     if args.check_nvidia:
-        do_check_nvidia(args, devices)
+        do_check_nvidia(devices)
         sys.exit(0)
 
     if args.list or args.recommended:
@@ -619,12 +723,19 @@ if __name__ == '__main__':
 
     if args.install or args.install_recommended:
         do_install(args, devices)
+        sys.exit(0)
 
     if args.remove:
         do_remove(args)
+        sys.exit(0)
 
     if args.purge:
         do_purge(args, devices)
+        sys.exit(0)
+
+    if args.enable_services:
+        do_enable_services(devices)
+        sys.exit(0)
 
     sys.exit(0)
 

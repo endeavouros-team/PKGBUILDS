@@ -12,7 +12,7 @@ Some more or less obvious notes:
 
 `eos-update --help`
 
-There are many more options available than explained here.
+There are many more options available than explained here.<br> And the help output is the most up-to-date documentation.
 
 ## Update AUR packages too
 
@@ -20,13 +20,26 @@ There are many more options available than explained here.
 
 This assumes either `yay` or `paru` is installed.
 
-## Update other packages (e.g. flatpak)
+## User defined updates (e.g. flatpak) and other commands
 
-Edit file `/bin/eos-update-other.bash` and add proper commands to update *other* than native or AUR packages.
-Then run `eos-update` with option `--other-updates`, and your commands will be executed after native (and optionally AUR) updates.<br>
+Option `--other-updates` gives user the opportunity to expand what `eos-update` does.<br>
+Edit file `/etc/eos-update-other.bash` and add proper commands to update *other* than native or AUR packages.
+Then run `eos-update` with option `--other-updates`, and your commands will be executed after native (and optionally AUR) updates.
+
+Note that the template file `/etc/eos-update-other.bash` supports `eos-update` to call other apps in both phases:
+- ***beginning***
+- ***end***
+
+Then, in between those two phases, `eos-update` does what it normally would do.
+
+For example, you could (in the ***beginning***) update mirrors and later (in the ***end***) call
+`pacman -Fy` to update the database of the package contents.
+
 Example:
+```
+eos-update --aur --other-updates
+```
 
-`eos-update --aur --other-updates`
 
 ## Unlock locked privilege elevation
 
@@ -107,4 +120,4 @@ alias u='eos-update --fast --descriptions'           # "fast" update check; also
 alias u='eos-update --fast --descriptions --nvidia'  # the same when Nvidia GPU is installed
 alias u='eos-update --cache-limit 1'                 # limits the growth of the package cache
 ```
-Note that option `--nvidia` works even if the system has *no* Nvidia GPU.
+Note that option `--nvidia` does nothing if the system has *no* Nvidia GPU.

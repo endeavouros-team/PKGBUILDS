@@ -399,7 +399,7 @@ Main2() {
     local km="*"
 
     t1+="$smallBegin"
-    t1+="Here's information about currently installed and available Linux kernels.\n"
+    t1+="Here's information about <i>currently available</i> Linux kernels that are or can be installed.\n"
     t1+="Install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n\n"
     t1+="<i>Please make sure the system is fully updated when starting <b>$progname</b></i>.\n"
     t1+="\n"
