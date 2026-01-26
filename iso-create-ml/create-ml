@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo2()  { echo -e "$@" >&2; }
-WARN()   { echo2 "==> $progname: warning: $1"; }
-DIE()    { Cleanup; echo2 "==> $progname: error: $1"; exit 1; }
+WARN()   { eos-color warning 2; echo2 "==> $progname: warning: $1"; eos-color reset 2; }
+DIE()    { Cleanup; eos-color error 2; echo2 "==> $progname: error: $1"; eos-color reset 2; exit 1; }
 
 ASSERT_DIE()  { "$@" || DIE "'$*' failed."; }
 ASSERT_WARN() { "$@" && return 0; WARN "'$*' failed."; return 1; }
@@ -158,27 +158,22 @@ Header() {
     echo -e "\n"
 
     if [ "$prefslist" ] ; then
-        if [ $issue_test = yes ] ; then
-            IssueTest "Test if prefslist includes failed mirrors."
-            ranked_out=$(echo "$ranked_out" | grep -v arch.niranjan)
-        fi
-        local out
-        out=$(
-            for item in $prefslist ; do
-                if [ "$ranked_out" ] ; then
-                    item=$(echo "$ranked_out" | grep "$item" | awk '{print $NF}')
-                    [ "$item" ] || continue
-                else
-                    item=$(grep "$item" $mirrordata | awk '{print $NF}')
+        echo -e "####### Mirrors by user preference >>>>"
+        local tmp
+        for item in $prefslist ; do
+            if [ "$ranked_out" ] ; then
+                tmp=$(echo "$ranked_out" | grep "$item" | awk '{print $NF}')
+                if [ -z "$tmp" ] ; then
+                    WARN "--prefs arguments: no match for '$item' within ranked mirrors"
+                    continue
                 fi
-                echo "Server = $item"
-            done
-           )
-        if [ "$out" ] ; then
-            echo -e "####### Mirrors by user preference >>>>"
-            echo "$out"
-            echo -e "####### Mirrors by user preference <<<<\n"
-        fi
+                item="$tmp"
+            else
+                item=$(grep "$item" $mirrordata | awk '{print $NF}')
+            fi
+            echo "Server = $item"
+        done
+        echo -e "####### Mirrors by user preference <<<<\n"
     fi
 }
 
@@ -310,7 +305,7 @@ Parameters() {
             --dump-options)      DumpOptions; exit 0 ;;
             --dump-ccs)          DumpCCs; exit 0 ;;
             --update-supports)   update_supports=yes ;;
-            --prefs)             prefslist="$2"; shift ;;   # list: mirror urls space separates, use 'single quotes'
+            --prefs)             prefslist="$2"; shift ;;   # list: mirror regexps, space separated, use 'single quotes'
             --issue-test)        issue_test=yes ;;          # for internal testing about potential problems
             -h | --help)
                 cat <<EOF >&2
@@ -335,6 +330,8 @@ Options: --help, -h                   This help.
                                       with option --countries or option --user-countries.
          --fake-country=*             Set a fake current country code (advanced).
          --savefile=*                 File path to save the mirrorlist (advanced).
+         --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
+                                      Use single quotes around the list. Separate items by a space.
 
 Notes:   * Country codes are the two-letter codes as listed by command 'reflector --list-countries'.
            Note: a special code 'ww' can be used too. It is a compact list of 'Worldwide' mirrors.
