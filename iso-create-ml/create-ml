@@ -279,8 +279,8 @@ DumpCCs() {
 
 Parameters() {
     local lopts sopts
-    lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
-    sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
+    lopts="$(echo "$OPTS" | sed -E "s|(${sep}[a-zA-Z][:]*)||g")"
+    sopts="$(echo "$OPTS" | sed -E "s|[^$sep]*$sep([a-zA-Z][:]*)[^$sep]*|\1|g")"
 
     local opts
 
@@ -358,7 +358,7 @@ Main() {
     local -r configfile="/etc/$progname.conf"
     local -r recommended_countries="/etc/${progname}-recommended-cc.conf"
 
-    local -r sep="|"
+    local -r sep="&"
     local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
           OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
 
