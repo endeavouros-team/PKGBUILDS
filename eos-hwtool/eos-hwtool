@@ -146,7 +146,8 @@ class ProfileData:
         if profile in ProfileData.data:
             packages = ProfileData.data[profile]["packages"]
             if is_iso and "nvidia-open-dkms" in packages:
-                packages.replace("nvidia-open-dkms", "nvidia-open")
+                packages.remove("nvidia-open-dkms")
+                packages.add("nvidia-open")
                 if is_installed('linux-lts'):
                     packages.add('nvidia-open-lts')
             if not no32:
