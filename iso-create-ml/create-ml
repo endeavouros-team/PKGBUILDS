@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo2()  { echo -e "$@" >&2; }
+INFO()   { eos-color info 2; echo2 "==> $progname: info: $1"; eos-color reset 2; }
 WARN()   { eos-color warning 2; echo2 "==> $progname: warning: $1"; eos-color reset 2; }
 DIE()    { Cleanup; eos-color error 2; echo2 "==> $progname: error: $1"; eos-color reset 2; exit 1; }
 
@@ -307,6 +308,7 @@ Parameters() {
             --update-supports)   update_supports=yes ;;
             --prefs)             prefslist="$2"; shift ;;   # list: mirror regexps, space separated, use 'single quotes'
             --issue-test)        issue_test=yes ;;          # for internal testing about potential problems
+            --use-saved-cc)      use_saved_cc=yes ;;
             -h | --help)
                 cat <<EOF >&2
 Usage:   $progname [options]
@@ -329,6 +331,8 @@ Options: --help, -h                   This help.
                                       Instead you may give one or more country codes
                                       with option --countries or option --user-countries.
          --fake-country=*             Set a fake current country code (advanced).
+         --use-saved-cc               The detected local country code is saved to a file $stored_country_file.
+                                      This option allows using it when local country detection fails (advanced).
          --savefile=*                 File path to save the mirrorlist (advanced).
          --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
                                       Use single quotes around the list. Separate items by a space.
@@ -357,10 +361,13 @@ Main() {
     local -r pkgname=iso-create-ml
     local -r configfile="/etc/$progname.conf"
     local -r recommended_countries="/etc/${progname}-recommended-cc.conf"
+    local -r stored_country_file="/etc/${progname}-saved-cc.conf"
 
     local -r sep="&"
-    local OPTS="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
-          OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
+    local OPTS=""
+    OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
+    OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
+    OPTS+=",use-saved-cc"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local -r target_def=/etc/pacman.d/mirrorlist
@@ -382,6 +389,7 @@ Main() {
     local args=()
     local has_countries_option=no
     local use_recommended_countries=yes
+    local use_saved_cc=no
     declare -A reflector_countries
     local update_supports=no
     # Default timeouts in seconds:
@@ -435,16 +443,33 @@ Main() {
     Main2
 }
 
+SaveCountryCode() {
+    local cc="$1"
+    local tmpfile=/tmp/fd983hlkHL
+    echo "$cc" > $tmpfile
+    sudo cp "$tmpfile" "$stored_country_file"
+    rm -f "$tmpfile"
+}
 GetCountryCode() {
     [ "$fake_country" ] && { country_code="$fake_country"; return 0; }      # has fake country, use it
-    [ $has_internet_connection = no ] && { country_code=ww; return 1; }     # cannot determine, so use ww
+    if [ $has_internet_connection = no ] ; then
+        country_code=ww
+        return 1     # cannot determine, so use ww
+    fi
 
     local code
     code=$(show-location-info country 2>/dev/null)
     if [ $? = 0 ] && [ "$code" ] ; then
         country_code="${code,,}"
+        SaveCountryCode "$country_code"
         return 0
     else
+        local -r country_stored="$(cat "$stored_country_file" 2>/dev/null)"
+        if [ $use_saved_cc = yes ] && [ "$country_stored" ] ; then
+            INFO "using the previously saved country code '$country_stored'"
+            country_code="$country_stored"
+            return 1
+        fi
         WARN "fetching the current country code failed."
         country_code=ww
         return 1
