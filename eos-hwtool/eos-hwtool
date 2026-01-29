@@ -330,7 +330,7 @@ def get_file_list(package_list, package_directory):
         for filename in dir_list:
             match = package_re.match(filename.name)
             if match and match.group("name") == package:
-                file_list.append(filename.name)
+                file_list.append(package_directory + '/' + filename.name)
                 break
 
     return file_list
@@ -350,8 +350,7 @@ def install_packages(package_list, is_iso, package_directory):
         # We are installing from a directory
         filename_list = get_file_list(package_list, package_directory)
         if filename_list:
-            #command = ["pacman", "--noconfirm", "-U"] + filename_list
-            command = ["pacman", "-U"] + filename_list
+            command = ["pacman", "--noconfirm", "-U"] + filename_list
         else:
             return False
     else:
