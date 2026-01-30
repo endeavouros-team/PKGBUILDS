@@ -6,7 +6,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=26
+pkgver=26.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -35,6 +35,7 @@ optdepends=(
     "pcmanfm-qt: used by eos-wallpaper-set on LXQt"
     "kimageformats: for supporting .avif wallpapers with Plasma"
     "nano: for nano-pager"
+    "swaybg: for Xfce/wayland and sway"
 )
 
 backup=(
@@ -105,7 +106,7 @@ sha512sums=('3d7e2a41acd3244dd0e9e339799efe99464659cbd9a267718a8a79f787feaf8393d
             'b6d465123c60748e704b7501da91e3a93047caf31510d73c06579db1f87034f566c10ccb3d2d1d68ecf53b7ed936054e810ea343baf8a53b6a3a14d89ec68f7f'
             'd8186b24a0e2165bee6b2193c42ca0ee1094cc35501138cd183595dba2df8bcc3574b49d922d5a37a9e5049365ce65cbbb241c84218de44442f78f355fe6190d'
             'db585c1ec4c73defe333b37b42c11c704a1e4ca33b56263430d7080025a31072b0f444848743719dacaefc3612aa8d5487d0d9cc0dfa6c8d0b0634132e742b85'
-            '2358c72b5b451964dfcb2d48233596f1d49f093d455f77b21dc59bbaf29b90208bbd51250b3155a0166103ee22187b24cb7bea78a5678ab6ef63716c62a66fda'
+            'f292a0f6f39a0a9512ad1a7eaff54131b696129503519fe8f75696412ed9965b429cfb0dee5177812cadde550682e8de22a73b61c0ce01de0a47cae49a1928b3'
             '0410cd0635f2cab8a3d6ba0ecdc49bc72b0b8f7a454064a01bc1348409ffb5ae8f5c572e6c5659ba9e16062ad56c28ef87a4a784b4cb648c60aa0484f9ad2675'
             '04c3f6d849c46e3a2e47169e1a919e8769c15480d332c283d655e111ed66d263a851458135cd09aaf9daaa7ebb194ba28e7112dfd718757a4fc3514b97b71eb8'
             'ec018db2a2d61e46118bcd04abbab0a72313551d440e4cb52cd2b7dc8513dcd09f44aa12273f68c0855737b8a1d22c413ac4d6c51cf9f58229989703976276a1'
