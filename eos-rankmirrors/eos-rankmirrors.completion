@@ -15,8 +15,11 @@ _eos-rankmirrors_GetMirrors() {
         return 0
     fi
 
+    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || exit 1
+
     local -r pkgname=endeavouros-mirrorlist
-    local -r pkg=$(ls -1 /var/cache/pacman/pkg/${pkgname}-*.zst 2>/dev/null | tail -n1)
+    local -r cachedir=$(GetCacheDir)
+    local -r pkg=$(ls -1 ${cachedir}${pkgname}-*.zst 2>/dev/null | tail -n1)
 
     if [ -n "$pkg" ] ; then
         # The package exists in the cache.
