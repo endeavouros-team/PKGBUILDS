@@ -79,7 +79,7 @@ AddLocals() {
     local tmp
     local pkg pkgname
 
-    local_filenames=$(/usr/bin/ls -1 /var/cache/pacman/pkg/${pn}-*.{zst,xz} 2>/dev/null | sed 's|^/var/cache/pacman/pkg/||')
+    local_filenames=$(/usr/bin/ls -1 ${cachedir}${pn}-*.{zst,xz} 2>/dev/null | sed "s|^$cachedir||")
 
     for pkg in $local_filenames ; do
         pkgname=$(pkg-name-components N "$pkg")     # !!!!
@@ -143,7 +143,7 @@ Main_eos() {
                ;;
         esac
         case "$filespec" in
-            "cache:"*)   filespec="/var/cache/pacman/pkg/$(   echo "$filespec" | awk '{print $2}')" ;;
+            "cache:"*)   filespec="${cachedir}$(              echo "$filespec" | awk '{print $2}')" ;;
             "latest:"*)  filespec="$latest_dl_url/$(          echo "$filespec" | awk '{print $2}')" ;;
             "archive:"*) filespec="$archive_dl_url/$(         echo "$filespec" | awk '{print $2}')" ;;
             *)
@@ -230,6 +230,7 @@ Main() {
     local eos_pkgs=$(pacman -Sl endeavouros | awk '{print $2}')
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || return 1
+    local -r cachedir=$(GetCacheDir)
 
     Options "$@"
 
