@@ -2,8 +2,8 @@
 
 pkgname=eos-downgrade
 pkgdesc="Downgrade EndeavourOS packages (currently beta quality)."
-pkgver=0.4
-pkgrel=2
+pkgver=0.26
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -20,7 +20,7 @@ source=(
     $_url/$pkgname
 )
 
-sha512sums=('fd504514cbefeb1fc441603706ba9b92488a8054b382754ba7d326b8c453722295b151a2bc9ce2298d43681b2f394b138333ea01e50d3d0e861d3c290cafc7ce')
+sha512sums=('a2795f69fe9f8bbe5b14d1ee5189a68cbd3186027d91116e6edcc3b2373e638b0aaf3875c8c2d7c619ba8493261f51ec3fc3aa1f1cf4f842b7e675255bcdb058')
 
 package() {
   install -Dm755 $pkgname                $pkgdir/usr/bin/$pkgname
