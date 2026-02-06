@@ -21,8 +21,7 @@ DeprecatedOldCompatibility() {
     ## This fallback branch is only for backwords compatibility and will be deleted at a later time.
     local marker=/tmp/tmp.I2301msiEBoRW
     if [ ! -r $marker ] ; then
-	mkdir -p $marker
-	chmod go-rwx $marker
+	mkdir -m go-rwx -p $marker
 	_ColorLines info "Tip: you may add other update commands into ${0}."
     fi
 }
