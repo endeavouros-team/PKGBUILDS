@@ -78,35 +78,17 @@ err() {
 }
 
 # gettime fetchurl (e.g gettime https://foo.com/core/os/i686/core.db.tar.gz)
-# returns the fetching time, or timeout, or unreachable
-gettime_orig() {
-	IFS=' ' read -ra output <<< "$(curl -s -m "$MAX_TIME" -w "%{time_total} %{http_code}" "$1" -o/dev/null)"
-	(( $? == 28 )) && { echo timeout; return 1; }
-	(( output[1] >= 400 || ! output[1] )) && { echo unreachable; return 1; }
-	echo "${output[0]}"
-	return 0
-}
-gettime_o2() {
-    local url="$1"
-    local output=() result
-    local curl_exitcode=0
-    result=$(curl --fail -s -m "$MAX_TIME" -w "%{time_total} %{http_code}" "$url" -o/dev/null) || curl_exitcode=$?
-    IFS=' ' read -ra output <<< "$(echo "$result")"
-    case "$curl_exitcode" in
-        0)  result="${output[0]}"
-            if [ "$result" ] && [ -z "${result//[0-9.]/}" ] ; then
-                echo "$result"
-                return 0
-            else
-                local my_exitcode=1
-                printf "==> $myname/$FUNCNAME exit code %3s: %s\n" $my_exitcode "$url" >&2
-                return 1
-            fi
-            ;;
-        *)  printf "==> curl code %3s from: %s\n" $curl_exitcode "$url" >&2; return 1 ;;
-    esac
-}
+# echoes the fetching time, and the last update time
+# return 0 on success, 1 on failure
 gettime() {
+    eos_color2() {          # restricted version of 'eos-color', ignores $2
+        declare -A  C=( [RED]=$'\e[1;91m'   [YELLOW]=$'\e[1;93m'   [RESET]=$'\e[0m' )
+        case "$1" in
+            warning)       echo -n "${C[YELLOW]}" >&2 ;;
+            error | fail)  echo -n "${C[RED]}"    >&2 ;;
+            reset | "")    echo -n "${C[RESET]}"  >&2 ;;
+        esac
+    }
     local url="$1"
     local result curl_exitcode=0 time syncnr
 
@@ -119,7 +101,10 @@ gettime() {
             return 0
             ;;
         *)
-            printf "==> curl code %3s from: %s\n" $curl_exitcode "$url" >&2
+            eos_color2 warning
+            echo "    -> $url:" >&2
+            echo "       curl($curl_exitcode): $(curl-exit-code-to-string $curl_exitcode)" >&2
+            eos_color2 reset
             return 1
             ;;
     esac
