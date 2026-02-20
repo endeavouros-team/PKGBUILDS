@@ -452,10 +452,22 @@ AskCountriesAndOptions() {
     tip+=""
     command+=(--text="$tip")
 
+    # Get nearest countries
+    nearest_countries_codes=
+    if [ "$REFLECTOR_SIMPLE_NEAREST_COUNTRIES" = "YES" ]; then
+        nearest_countries_codes=$(get_near_countries.py -c $local_country_code)
+        echo "nearest_countries_codes: $nearest_countries_codes"
+    fi
+
+
     for ((ix=0; ix < ${#countrycodes[@]}; ix++)) ; do
         included=false
         IsInSelectedCountries "${countrynames[$ix]}" && included=true
         if [ "${countrycodes[$ix]}" = "$local_country_code" ] && (! IsDroppedCountry "$local_country_code") ; then
+            included=true
+        fi
+        # Check nearest countries if they present
+        if [[ "${nearest_countries_codes}" == *${countrycodes[$ix]}* ]] ; then
             included=true
         fi
         command+=(--field="${countrynames[$ix]}:chk" $included)
@@ -713,11 +725,13 @@ ReadToolConf() {
     local def_height=750
     local def_cols=5
     local max_cols=8
+    local def_near_coun=YES
 
     REFLECTOR_SIMPLE_WIDTH=$def_width
     REFLECTOR_SIMPLE_HEIGHT=$def_height
     REFLECTOR_SIMPLE_COLUMNS=$def_cols
     REFLECTOR_SIMPLE_COUNTRY_METHOD=default
+    REFLECTOR_SIMPLE_NEAREST_COUNTRIES=$def_near_coun
 
     if [ -r $toolconf ] ; then
         INFO "reading file $toolconf"
@@ -742,6 +756,10 @@ ReadToolConf() {
             WARN "setting value of REFLECTOR_SIMPLE_COLUMNS to $def_cols"
             REFLECTOR_SIMPLE_COLUMNS=$def_cols
         fi
+        case $REFLECTOR_SIMPLE_NEAREST_COUNTRIES in
+            (YES|NO) ;;
+            (*) WARN "$toolconf: REFLECTOR_SIMPLE_NEAREST_COUNTRIES has an invalid value, using default ($def_near_coun)"; REFLECTOR_SIMPLE_NEAREST_COUNTRIES=$def_near_coun;;
+        esac
     else
         INFO "file $toolconf not found, using defaults."
     fi
@@ -802,6 +820,7 @@ Main() {
     if [ -n "$local_country_code" ] ; then
         CCCheck "$local_country_code" >/dev/null || DIE "internal error with country code"
     fi
+
     local countrynames
     local countrycodes
     local reflector_info
