@@ -13,7 +13,7 @@ DIE()   { echo2 "==> $progname: error: $1"; exit 1; }
 RUN() {
     local reply=""
     # echo2 "   ->" "$@"
-    read -p "==> Run '$*' (Y/n)? " reply >&2
+    read -r -p "==> Run '$*' (Y/n)? " reply >&2
     case "$reply" in
         "" | [yY]*) "$@" || DIE "'$*' failed." ;;
     esac
@@ -123,7 +123,7 @@ EOF
             printf "      %s\n" "${lines[@]}" >&2
             echo2 ""
             local reply=""
-            read -p "==> Do you want to continue [yes/NO]? " reply >&2
+            read -r -p "==> Do you want to continue [yes/NO]? " reply >&2
             case "$reply" in
                 [yY]*) ;;
                 *) exit 0 ;;

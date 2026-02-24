@@ -222,7 +222,7 @@ FaillockCheck() {
     if [ $faillockcheck = yes ] ; then
         if [ $(LANG=C faillock --user $LOGNAME | grep -EA1 "^When[ ]+Type[ ]+Source" | wc -l) -gt 1 ] ; then
             sleep 1
-            read -p "Info: elevating privileges is locked, press ENTER to unlock, or Ctrl-C to quit: " >&2
+            read -r -p "Info: elevating privileges is locked, press ENTER to unlock, or Ctrl-C to quit: " >&2
             case "$?" in
                 0) faillock --user $LOGNAME --reset ; sleep 2 ;;
                 *) exit 0 ;;

@@ -141,7 +141,7 @@ _run() {
         yes) ;;
         no)  return ;;
         ask)
-            read -p "Refresh pacman keys using the fastest keyserver (y/N)? " >&2
+            read -r -p "Refresh pacman keys using the fastest keyserver (y/N)? " >&2
             case "$REPLY" in
                 "" | [nN]*) return ;;
             esac
