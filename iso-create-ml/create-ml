@@ -201,7 +201,7 @@ Main2() {
     done
 
     if [ $has_internet_connection = yes ] ; then
-        local rankmirrors_opt=()
+        local rankmirrors_opt=(--max-time $TIMEOUT_MIRROR)
         [ $verbose  = yes ] && rankmirrors_opt+=(-v)
         [ $parallel = yes ] && rankmirrors_opt+=(-p)
 
@@ -309,6 +309,7 @@ Parameters() {
             --prefs)             prefslist="$2"; shift ;;   # list: mirror regexps, space separated, use 'single quotes'
             --issue-test)        issue_test=yes ;;          # for internal testing about potential problems
             --use-saved-cc)      use_saved_cc=yes ;;
+            --timeout-mirror)    TIMEOUT_MIRROR="$2"; shift ;;
             -h | --help)
                 cat <<EOF >&2
 Usage:   $progname [options]
@@ -367,7 +368,7 @@ Main() {
     local OPTS=""
     OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
-    OPTS+=",use-saved-cc"
+    OPTS+=",use-saved-cc,timeout-mirror:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local -r target_def=/etc/pacman.d/mirrorlist
@@ -392,6 +393,7 @@ Main() {
     local use_saved_cc=no
     declare -A reflector_countries
     local update_supports=no
+    local TIMEOUT_MIRROR=10                                        # timeout for each mirror, see --timeout-mirror
     # Default timeouts in seconds:
     local TIMEOUT_ACTIVE_MIRRORS=8                                 # for fetching the list of active mirrors
     local TIMEOUT_REFLECTOR_CONNECTION=5                           # --connection-timeout in reflector
