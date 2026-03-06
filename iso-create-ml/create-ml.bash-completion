@@ -7,6 +7,10 @@ _create_ml_complete() {
     compopt -o filenames    # handles spaces in names!
     compopt -o nosort
 }
+_create_ml_complete_nr() {
+    COMPREPLY=($(compgen -P "$cur" -W "{0..9}"))
+    compopt -o nospace
+}
 
 _create_ml_make_as_lines() {
     printf "%s\n" "$@"
@@ -24,6 +28,7 @@ _create_ml_() {
         # Handle options that need sub-options.
         --savefile)      _filedir ;;
         --fake-country)  _create_ml_complete "$(_create_ml_list_ccs)" ;;
+        --timeout-mirror) _create_ml_complete_nr ;;
         *)
             # Handle all top-level parameters.
             case "$cur" in

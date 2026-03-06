@@ -335,6 +335,7 @@ Options: --help, -h                   This help.
          --use-saved-cc               The detected local country code is saved to a file $stored_country_file.
                                       This option allows using it when local country detection fails (advanced).
          --savefile=*                 File path to save the mirrorlist (advanced).
+         --timeout-mirror='seconds'   Max time to rank before timing out a mirror. Default: $timeout_mirror_def.
          --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
                                       Use single quotes around the list. Separate items by a space.
 
@@ -393,7 +394,8 @@ Main() {
     local use_saved_cc=no
     declare -A reflector_countries
     local update_supports=no
-    local TIMEOUT_MIRROR=10                                        # timeout for each mirror, see --timeout-mirror
+    local -r timeout_mirror_def=10
+    local TIMEOUT_MIRROR=$timeout_mirror_def                       # timeout for each mirror, see --timeout-mirror
     # Default timeouts in seconds:
     local TIMEOUT_ACTIVE_MIRRORS=8                                 # for fetching the list of active mirrors
     local TIMEOUT_REFLECTOR_CONNECTION=5                           # --connection-timeout in reflector
