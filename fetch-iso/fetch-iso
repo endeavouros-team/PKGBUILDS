@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /etc/eos-color.conf
+#source /etc/eos-color.conf
 
 echo2()   { echo -e "$@" >&2 ; }
 printf2() { printf  "$@" >&2 ; }
@@ -46,52 +46,7 @@ ShowFiles() {
     RefreshInfo "$@"
     grep EndeavourOS[-_] $datafile | sed -E 's|.*">(En.*)</a.*|\1|'             # all downloads
 
-    echo2 "==> function $FUNCNAME()"
-}
-
-FetchIsoFile() {
-    # Fetch the given ISO file.
-    local file="$1"
-    local subdir="$2"
-    local url
-    local targetopt=""
-    local msg_head="Download"
-    local msg_middle=""
-    local msg_tail="Exit now"
-
-    cleanup_files+=("$file")
-    if printf "%s\n" "${items_orig[@]}" | grep "$file".sha512sum >/dev/null; then
-        cleanup_files=("$file".sha512sum "${cleanup_files[@]}")
-        msg_middle="[$file and its .sha512sum]"
-    else
-        msg_middle="[$file]"
-    fi
-
-    case "$(echo -e "$msg_head $msg_middle\n$msg_tail" | fzf)" in
-        "" | Exit*) exit 0 ;;
-    esac
-
-    for file in "${cleanup_files[@]}" ; do
-        case "$subdir" in
-            "") url="$URLBASE/$file" ;;
-            *)  url="$URLBASE/$subdir/$file" ;;
-        esac
-        [ "$TARGETDIR" ] && file="$TARGETDIR/$file" || file="$PWD/$file"
-        echo2 "\n==> Downloading to $file ...\n"
-        case "$getter" in
-            curl)
-                targetopt="-o$file"
-                # targetopt+=" -m2000"
-                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
-                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
-                ;;
-            wget)
-                targetopt="-O$file"
-                /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
-                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
-                ;;
-        esac
-    done
+    #echo2 "==> function $FUNCNAME()"
 }
 
 Usage() {
@@ -100,7 +55,7 @@ Usage() {
 Usage: $progname [options] [filename]
 
 Options:
-    -h, --help           This help.
+    --help, -h           This help.
     --edit-config        Edit the config file of $progname.
     --curl               Use curl as the helper app.
     --wget               Use wget as the helper app.
@@ -169,26 +124,6 @@ DumpOptions() {
     fi
 }
 
-CheckTheSum() {
-    local checksumfile="$TARGETDIR/$selected.sha512sum"
-    local ret=0                                     # $ret will contain "exit code"
-    if [ -e "$checksumfile" ] ; then
-        pushd "$TARGETDIR" >/dev/null
-        printf "==> sha512sum -c %s ... " "$checksumfile"
-        if sha512sum -c "$checksumfile" &> /dev/null ; then
-            echo OK
-        else
-            echo FAIL
-            ret=1
-        fi
-        popd >/dev/null
-    else
-        INFO "no checksum file $checksumfile --> not verifying the ISO."
-        ret=2
-    fi
-    return $ret
-}
-
 Options() {
     # "Bind" long option to its short option. This is used in DumpOptions().
     # Short option starts with '/'.
@@ -209,7 +144,7 @@ Options() {
             --edit-config)    EditConfigFile;                             exit 0 ;;
             --curl | -c)      getter=curl                                        ;;
             --wget | -w)      getter=wget                                        ;;
-            -h | --help)      Usage;                                      exit 0 ;;
+            --help | -h)      Usage;                                      exit 0 ;;
         esac
         shift
     done
@@ -282,6 +217,8 @@ Main() {
     local file
     local datafile=/tmp/$progname.tmp   # remove this if new files should be available
     local getter=wget                   # curl or wget
+    local urls=()
+    local targets=()
     local cleanup_files=()
     local sumfile=""
     local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
@@ -291,7 +228,7 @@ Main() {
 
     local header
     local header_lines=(
-        "Navigation keys:  Up/Down/PgUp/PgDn; TAB=Select, ENTER=accept, ESC=quit"
+        "Navigation keys:  Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
         "Other keys:       Ctrl-E = Edit config file"
         "                  Ctrl-H = Help"
         "Download folder:  $TARGETDIR"
@@ -344,20 +281,99 @@ Main() {
                 "")   echo2 "Nothing selected."
                       exit 1
                       ;;
-                *)    FetchIsoFile "$selected" "$subdir"
-                      exitcode=$?
-                      if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
-                          CheckTheSum
-                          exit $exitcode
-                      fi
-                      ;;
+                *)
+                    # collect cleanup_files. urls, targets
+
+                    cleanup_files+=("$selected")
+                    case "$subdir" in
+                        "") urls+=("$URLBASE/$selected") ;;
+                        *)  urls+=("$URLBASE/$subdir/$selected") ;;
+                    esac
+                    [ "$TARGETDIR" ] && selected="$TARGETDIR/$selected" || selected="$PWD/$selected"
+                    targets+=("$selected")
+                    ;;
+                # *)    FetchIsoFile "$selected" "$subdir"
+                #       exitcode=$?
+                #       if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
+                #           CheckTheSum
+                #           exit $exitcode
+                #       fi
+                #       ;;
             esac
         done
+        if [ "$urls" ] ; then
+            FetchIsoFiles
+            CheckTheSum
+            exit 0
+        fi
+        urls=()
+        cleanup_files=()
+        targets=()
     done
 
     # Exit code:
     #    0       download OK
     #    else    failure, nothing downloaded
+}
+
+FetchIsoFiles() {
+    local target
+    local url
+    local targetopt=""
+    local ix reply
+
+    for ((ix=0; ix < ${#urls[@]}; ix++)) ; do
+        url="${urls[$ix]}"
+        target="${targets[$ix]}"
+
+        if [ -e "$target" ] ; then
+            read -p "${target} exists, download again (y/N)? " reply
+            case "$reply" in
+                "" | [Nn]*) continue ;;
+            esac
+        fi
+
+        #echo2 "\n==> Downloading to $target ...\n"
+        case "$(echo -e "Download to $target\nExit now" | fzf)" in
+            "" | Exit*) exit 0 ;;
+        esac
+
+        case "$getter" in
+            curl)
+                targetopt="-o$target"    # targetopt+=" -m2000"
+                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
+                ;;
+            wget)
+                targetopt="-O$target"
+                /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
+                ;;
+        esac
+    done
+}
+
+CheckTheSum() {
+    local checksumfile
+    local ret=0
+    checksumfile=$(printf "%s\n" "${targets[@]}" | grep "\.sha512" | fzf --header="Select checksum file")     # support only *.sha512* files
+    if [ "$checksumfile" ] ; then
+        if [ -e "$checksumfile" ] ; then
+            pushd "$TARGETDIR" >/dev/null
+            echo -n "==> sha512sum -c $checksumfile ... " 
+            if sha512sum -c "$checksumfile" >&/dev/null ; then
+                echo OK
+            else
+                echo FAIL
+                ret=1
+            fi
+            popd >/dev/null
+        else
+            INFO "no checksum file $checksumfile --> not verifying the ISO."
+            ret=2
+        fi
+    fi
+    return $ret
 }
 
 Main "$@"
