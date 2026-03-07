@@ -151,7 +151,7 @@ Options() {
 
     case "$1" in
         "") ;;
-        *.iso.tar.gz | *.iso | *.iso.sha512sum)
+        *.iso.tar.gz | *.iso | *.iso.${sumtype}*)
             echo2 "Download folder: $TARGETDIR"
             FetchIsoFile "$1"
             exit
@@ -222,6 +222,7 @@ Main() {
     local cleanup_files=()
     local sumfile=""
     local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
+    local sumtype=sha512                               # support only *.sha512* checksum files
 
     [ "$1" ] && Options "$@"
     ReadConfig
@@ -234,9 +235,9 @@ Main() {
         "Download folder:  $TARGETDIR"
         "Config file:      $configfile2"
         "Fetching app:     $getter"
+        "Tip:              Names with trailing '/' are folders, navigate to them if needed"
     )
-    header_lines=("" "${header_lines[@]}" "")        # add empty extra lines to separate header
-    printf -v header "%s\n" "${header_lines[@]}"
+    printf -v header "%s\n" "" "${header_lines[@]}" ""        # add empty extra lines to separate/hilight header
 
     local fzf=(
         fzf
@@ -353,21 +354,79 @@ FetchIsoFiles() {
     done
 }
 
+FetchIsoFile() {                      # old implementation, not tested, still works??
+    # Fetch the given ISO file.
+    local file="$1"
+    local subdir="$2"
+    local url
+    local targetopt=""
+    local msg_head="Download"
+    local msg_middle=""
+    local msg_tail="Exit now"
+
+    cleanup_files+=("$file")
+    if printf "%s\n" "${items_orig[@]}" | grep "$file".sha512sum >/dev/null; then
+        cleanup_files=("$file".sha512sum "${cleanup_files[@]}")
+        msg_middle="[$file and its .sha512sum]"
+    else
+        msg_middle="[$file]"
+    fi
+
+    case "$(echo -e "$msg_head $msg_middle\n$msg_tail" | fzf)" in
+        "" | Exit*) exit 0 ;;
+    esac
+
+    for file in "${cleanup_files[@]}" ; do
+        case "$subdir" in
+            "") url="$URLBASE/$file" ;;
+            *)  url="$URLBASE/$subdir/$file" ;;
+        esac
+        [ "$TARGETDIR" ] && file="$TARGETDIR/$file" || file="$PWD/$file"
+        echo2 "\n==> Downloading to $file ...\n"
+        case "$getter" in
+            curl)
+                targetopt="-o$file"
+                # targetopt+=" -m2000"
+                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
+                ;;
+            wget)
+                targetopt="-O$file"
+                /bin/wget -q "$targetopt" --show-progress --user "$ACCOUNT" --password "$PASSWORD" "$url" || exitcode=$?
+                [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
+                ;;
+        esac
+    done
+}
+
 CheckTheSum() {
-    local checksumfile
+    local checksumfile isofile
     local ret=0
-    checksumfile=$(printf "%s\n" "${targets[@]}" | grep "\.sha512" | fzf --header="Select checksum file")     # support only *.sha512* files
+    local header_lines=(
+        "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
+        "Select a checksum file above"
+    )
+    local header
+    printf -v header "%s\n" "" "${header_lines[@]}" ""
+    checksumfile=$(printf "%s\n" "${targets[@]}" | grep "\.$sumtype" | fzf --header="$header")
     if [ "$checksumfile" ] ; then
         if [ -e "$checksumfile" ] ; then
-            pushd "$TARGETDIR" >/dev/null
-            echo -n "==> sha512sum -c $checksumfile ... " 
-            if sha512sum -c "$checksumfile" >&/dev/null ; then
-                echo OK
+            isofile="${checksumfile%.$sumtype*}"
+            if [ -e "$isofile" ] ; then
+                pushd "$TARGETDIR" >/dev/null
+                echo -n "==> ${sumtype}sum -c $checksumfile ... "
+                if ${sumtype}sum -c "$checksumfile" >&/dev/null ; then
+                    echo OK
+                    rm -f "$checksumfile"         # we shouldn't need this file anymore
+                else
+                    echo FAIL                     # either ISO file or checksum file is invalid
+                    ret=1
+                fi
+                popd >/dev/null
             else
-                echo FAIL
-                ret=1
+                errorline "==> $isofile not found."
+                ret=2
             fi
-            popd >/dev/null
         else
             INFO "no checksum file $checksumfile --> not verifying the ISO."
             ret=2
