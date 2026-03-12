@@ -18,6 +18,9 @@ Server = https://mirror.b-interactive.com.au/endeavouros/repo/$repo/$arch
 ## Belgium
 Server = https://ftp.belnet.be/mirror/endeavouros/repo/$repo/$arch
 
+## Canada
+Server = https://mirror.allthingslinux.org/endeavouros/repo/$repo/$arch
+
 ## China
 Server = https://mirrors.tuna.tsinghua.edu.cn/endeavouros/repo/$repo/$arch
 Server = https://mirrors.jlu.edu.cn/endeavouros/repo/$repo/$arch
