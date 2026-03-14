@@ -2,7 +2,7 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.1.3
+pkgver=26.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -25,21 +25,23 @@ _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/refs/heads/ma
 
 source=(
   $_url/eos-update
-  $_url/eos-update.desktop
   $_url/eos-update.completion
+  $_url/eos-update.desktop
   $_url/eos-update-descriptions
   $_url/eos-update-extras
   $_url/eos-update-fast
+  $_url/eos-update-lib.bash
   $_url/eos-update-other.bash    # "config" for additional update tools
 )
 
-sha512sums=('7f5368f74322b2ec8839b1b74056a05cbac73b4be74404fd1a797ccfcf3f0232a9bbc1d6930be8eea6374a2d779d3be37fa570fc00e57ce41ffa6acd72bfeafa'
-            'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
+sha512sums=('d10f9793caefd35aebb3ce5c43a75dcf3e4e024e4a343ca572dad58928bf3a665156d51b460ef050c5959d14d1c7fe401f63ba78133ed41725f3f6050a7f94f0'
             '2e318929230800e4c75c7793811f856fc9cbaeadbadebb51ba852a10a2450dee1db1ee1071cee82bedc465f5f32646f395616f003bbb0e612270a43cd31a37f9'
+            'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
             '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
             '25d45e2698f4cfc46ba4f1b68053180a9292997eda7d8dbf15ab5370e9f8504634a37732076bdebfb5b7b1f109e8325a0662768cf8858f777fde8885559f7767'
-            '54d528f44fd25e2a920ecb1cee227c03ae23c082ff720bad1d8ce42ab1ccc597f2c050d139454632051d5633980bcbaf1e48f6f380b3190a83848b1a0063323d')
+            '43e3a58e511647cb95777dc6a14ac72e411cf36cb0da40a8fe51b3601fcff9e855fe7a76cc224bc073b2232994ddbad36dccff823a42e281e0c22a14980b1bdc'
+            'a54ae9b9a2f5ed05f0fa480a7d896868e8ce91161274e89c6c5fe7534f4b09161c18aba554750e6b4bb05f3f7b8ff3622965ec65410880d94a174a4fa78d9de7')
 
 package() {
   local file src

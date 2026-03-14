@@ -1,46 +1,50 @@
 #!/bin/bash
 
+## File /etc/eos-update-lib contains functions that can be used here.
+## Functions:
+##    OncePerBootSession                # parameters:  unique-id
+##    OncePerNDays                      # parameters:  unique-id number-of-days
+##    ColorLines                        # parameters:  N strings each on a separate line
+## Functions to be removed later:
+##    DeprecatedOldCompatibility
+##    _ColorLines                       # replaced by ColorLines
+#
+source /etc/eos-update-lib.bash
+
+## Function 'Main' will be called with one of the parameters
+##    beginning
+##    end
+##    ''                                 # no parameter; deprecated, use 'end' instead.
+
 Main() {
     ## Run your commands at various points in time during eos-update.
     case "$1" in
         beginning)
             ## HERE: Add your commands to be executed in the beginning of eos-update.
-            ## Example idea: ranking mirrors.
+            ##
+            ## EXAMPLE: rank mirrors once after every boot.
+            # local my_country=Netherlands
+            # if OncePerBootSession "id-983aa9587" ; then
+            #     ColorLines "Updating /etc/pacman.d/mirrorlist"
+            #     reflector -p https -c $my_country,de --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+            # fi
             ;;
         end)
             ## HERE: Add your commands to be executed in the end of eos-update.
-            ## Example idea: updates with flatpak or other tools.
+            ##
+            ## EXAMPLE: Freshen up database for 'pacman -Fl <package-name>' once a week:
+            # if OncePerNDays "id-k95i60923" 7
+            #     sudo pacman -Fy
+            # fi
+            #
+            ## EXAMPLE 2: show a multiline message.
+            # ColorLines "first line" "second line" "third line" 
             ;;
         *)
-            DeprecatedOldCompatibility	    ## You may remove or comment out this line.
+            # This is just for backwards compatibility. You may remove or comment out the following line.
+            DeprecatedOldCompatibility
             ;;
     esac
-}
-
-DeprecatedOldCompatibility() {
-    ## This fallback branch is only for backwords compatibility and will be deleted at a later time.
-    local marker=/tmp/tmp.I2301msiEBoRW
-    if [ ! -r $marker ] ; then
-	mkdir -m go-rwx -p $marker
-	_ColorLines info "Tip: you may add other update commands into ${0}."
-    fi
-}
-
-_ColorLines() {
-    ## Print a message with the given "color" (see also /bin/eos-color).
-    ## A message may include multiple lines via positional parameters.
-    ## The lines after the first will be indented, i.e. the trailing positional paramemeters ($2, $3, ...)
-    ## will become the additional lines of the message.
-
-    local -r color="$1"
-    local -r first_line="$2"
-    local -r head="==>"
-    local -r head2="${head//?/ }"
-    shift 2
-    eos-color "$color" 2
-    printf "${head}  %s\n" "$first_line" >&2
-    [ "$1" ] && printf "${head2} %s\n" "$@" >&2      # other lines of the message
-    eos-color reset 2
 }
 
 Main "$@"

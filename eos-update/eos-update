@@ -641,6 +641,8 @@ Main() {
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
+
+    echo2tip "$progname: package updater with additional features"
     
     SingleOptions "$@"
 
@@ -669,8 +671,6 @@ Main() {
     [ $descriptions  = yes ] && subopts+=(--descriptions)
     [ $nvidia  = yes ] && subopts+=(--nvidia)
     [ $keyring = yes ] && subopts+=(--keyrings)
-
-    echo2tip "$progname: package updater with additional features"
 
     DiskSpace
 
