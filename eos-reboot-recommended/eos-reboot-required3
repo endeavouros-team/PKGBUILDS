@@ -3,18 +3,33 @@
 DoNotify() {
     local -r title="$1"
     local -r msg="$2"
+    local urgency=critical
+    local expiretime=0
+    local user=""
     local icon=/usr/share/icons/Qogir/scalable/apps/system-reboot.svg
     [ -e $icon ] || icon=system-reboot
+
+
+    # Configuration file may contain a user name to receive notifications,
+    # then other users don't get them, and the notification can have a timer value
+    # in the configuration file.
+
+    if [ "${REBOOT_NOTIFICATION_USER}${REBOOT_EXPIRE_TIME}" ] ; then   # if both vars are set
+        user="$REBOOT_NOTIFICATION_USER"                               # the user receiving the notification
+        urgency=normal                                                 # enables expiretime!
+        expiretime="${REBOOT_EXPIRE_TIME}000"                          # seconds to milliseconds
+    fi
 
     local cmd=(
         eos_notification_all           # function to notify all users
         $icon                          # icon
-        critical                       # urgency
-        0                              # expire time (not used!)
+        $urgency                       # urgency
+        $expiretime                    # expire time (not used with critical urgency!)
         "'EndeavourOS notification'"   # appname
         "$title"                       # title
         "$msg"                         # message
         RED                            # message color on TTY
+        $user                          # may be empty
     )
     "${cmd[@]}"
 }
@@ -42,9 +57,13 @@ Wait_before_notifying() {
     # Do this by detecting when the $lockfile disappears, but do not wait more
     # than $REBOOT_MAX_TOTAL_WAIT seconds.
 
-    local -r conffile=/etc/eos-reboot-required.conf
-    local REBOOT_MAX_TOTAL_WAIT=300          # can be configured in $conffile
-    local REBOOT_WAIT_DIFF=4                 # can be configured in $conffile
+    local -r conffile=/etc/eos-reboot-recommended.conf
+
+    # These 4 variables can be configured in $conffile.
+    local REBOOT_MAX_TOTAL_WAIT=300
+    local REBOOT_WAIT_DIFF=4
+    local REBOOT_NOTIFICATION_USER=""
+    local REBOOT_EXPIRE_TIME=""
 
     [ -e $conffile ] && source $conffile
     systemctl disable --now eos-reboot-required.timer

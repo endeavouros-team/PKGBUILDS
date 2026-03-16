@@ -4,7 +4,7 @@
 
 pkgname=eos-reboot-recommended
 pkgdesc="Notify if a reboot is recommended after system upgrade."
-pkgver=25.12.1
+pkgver=26
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -12,21 +12,23 @@ depends=(
     eos-bash-shared    # notification help, detect the running kernel, detect if in chroot
     libnotify          # notifications
 )
+backup=(etc/eos-reboot-recommended.conf)
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/refs/heads/master/$pkgname"
 
 source=(
+  $_url/eos-reboot-recommended.conf
   $_url/eos-reboot-required2
   $_url/eos-reboot-required3
-  # $_url/eos-reboot-required.conf
   $_url/eos-reboot-required.hook
   $_url/eos-reboot-required.timer
   $_url/eos-reboot-required.service
 )
 
-sha512sums=('314ad10214a24e8cde22d5c788bc0bbe81f85d75d3b7da81f4458bd6c4c5530ada213bc0da043eb6dfccf9ce78a7fe7a7d4799a72d842a4d4c39eb18844a31a5'
-            'b0fe0eeea5c3edfc385153ba5c8ac88ddd8f47ad251c429b18e39b8e8d5e447781c06cda5f47dcda40f82fab10747c03b338d58c43e4d8b3f32f8056a1c53d4c'
+sha512sums=('23746dcd369528468af26733ff862fc9c9bc25ef481cd003a2fd8728d864ddbc664d5d2eb2c1ba2ab4e10c513836944ecad8821ff41b384b8344c833f7f1f099'
+            '314ad10214a24e8cde22d5c788bc0bbe81f85d75d3b7da81f4458bd6c4c5530ada213bc0da043eb6dfccf9ce78a7fe7a7d4799a72d842a4d4c39eb18844a31a5'
+            '814352d03398adb2b30bc6a3bdb0b5d22f51e41c8451b5630ca7705555b6eba30178c0b22d66d3e425d29ea836a35913f3d84c56e0673466c314f6927d7ea0c2'
             '0bd433261cddf2b304615d567d77a2a31287d1470240f954cb353ca0e0ac37fbc55dcb2de3652da0bae7f7ba18b642e3f7fae5c275d7d81c09254c18b01a1900'
             'b26a06683f6ab8039df3befe93140a72c9e750f9c6a1e5e9b9f653a776a3ef9ab61e14a8485c53022e5959dd17eb94d8fd0be6f81a5e6a0aef95701f0100817a'
             '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f')
