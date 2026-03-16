@@ -213,8 +213,8 @@ _tr_add2 after_install_themedef     "EndeavourOS的预设Xfce主题"
 _tr_add2 after_install_themedeftip  "使用EndeavourOS的预设Xfce主题"
 
 # 2020-Jun-28:
-_tr_add2 after_install_pclean       "啓用自动清理软件包快取"
-_tr_add2 after_install_pcleantip    "配置自订清理软件包快取的服务"
+_tr_add2 after_install_pclean       "啓用自动清理软件包"
+_tr_add2 after_install_pcleantip    "配置自动清理软件包的服务"
 
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "自订指令"                   # modified 2020-Jul-08
