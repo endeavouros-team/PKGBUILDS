@@ -212,7 +212,7 @@ _tr_add2 after_install_themevantip   "使用 Xfce 原版主題"
 _tr_add2 after_install_themedef     "EndeavourOS 的預設 Xfce 主題"
 _tr_add2 after_install_themedeftip  "使用 EndeavourOS 的預設 Xfce 主題"
 
-# 2026-3-16:
+# 2020-Jun-28:
 _tr_add2 after_install_pclean       "軟體包清理配置"
 _tr_add2 after_install_pcleantip    "配置軟體包清理服務"
 
