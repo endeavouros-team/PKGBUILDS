@@ -1,0 +1,5 @@
+# list of files containing extractable gettext strings
+# one file per line, path relative to base folder with
+# buildscript (folder containing PKGBUILD)
+akm
+akm.desktop
