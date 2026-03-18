@@ -7,8 +7,8 @@ pkgdesc="EndeavourOS ISO hotfixes"
 
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
-pkgver=26.02
-pkgrel=2
+pkgver=26.03
+pkgrel=1
 
 arch=('any')
 license=('GPL')
@@ -51,6 +51,7 @@ _prepare_eos_iso_hotfix() {
         # $_url_hotfix/settings_online.conf.patch
         # $_url_hotfix/packagechooser.conf_ganymede_neo.patch
         # $_url_hotfix/netinstall.yaml_ganymede_neo.patch
+        # $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
 
     )
 
