@@ -27,6 +27,8 @@ _prepare_eos_iso_hotfix() {
     # If hotfixes change (e.g. need new files), this function may fail.
     # Then modify the lists of files according to changes required by the hotfixes.
 
+    # EDIT: all necessary files related to hotfixes must be added manually in the arrays below!!
+
     local script_files=(                          # hotfixes may use/modify these files
         $_url_script/cleaner_script.sh
         $_url_script/chrooted_cleaner_script.sh
@@ -35,28 +37,46 @@ _prepare_eos_iso_hotfix() {
         $_url_module/packagechooser.conf
         $_url_module/pacstrap.conf
     )
-    local hotfix_files=()                         # adding the hotfix files to this array below
-    local file
+    local hotfix_files=(
+        $_url_hotfix/README.md
+        $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
+        $_url_hotfix/hotfix-end.bash
+        $_url_hotfix/hotfix-start.bash
+        $_url_hotfix/netinstall.yaml-cassini-R3.patch
+        $_url_hotfix/netinstall.yaml_ganymede_neo.patch
+        $_url_hotfix/netinstall.yaml_mercury_neo.patch
+        $_url_hotfix/packagechooser.conf.patch
+        $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
+        $_url_hotfix/packagechooser.conf_ganymede.patch
+        $_url_hotfix/packagechooser.conf_ganymede_neo.patch
+        $_url_hotfix/packagechooser.conf_gemini_1.patch
+        $_url_hotfix/packagechooser.conf_mercury_neo.patch
+        $_url_hotfix/pacstrap.conf_endeavour_neo.patch
+        $_url_hotfix/settings_offline.conf.patch
+        $_url_hotfix/settings_online.conf.patch
+    )
 
-    # Download hotfix files since these might change often.
-    local dir=$(mktemp -d)
-    chmod go-rwx $dir
-    git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
-        rm -rf $dir
-        exit 1
-    }
+    if false ; then
+        # Download hotfix files since these might change often.
+        local file
+        local dir=$(mktemp -d)
+        chmod go-rwx $dir
+        git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
+            rm -rf $dir
+            exit 1
+        }
 
-    # Add the hotfix files to the 'hotfix_files' array.
-    for file in $(/bin/ls -1 -v "$dir") ; do
-        case "$file" in
-            *.bash | *.patch | *.md)
-                hotfix_files+=("$_url_hotfix/${file##*/}") ;;
-        esac
-    done
-    rm -rf "$dir"
+        # Add the hotfix files to the 'hotfix_files' array.
+        for file in $(/bin/ls -1 -v "$dir") ; do
+            case "$file" in
+                *.bash | *.patch | *.md)
+                    hotfix_files+=("$_url_hotfix/${file##*/}") ;;
+            esac
+        done
+        rm -rf "$dir"
+    fi
 
     source=(
-        # $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | /bin/sort -f -V)
         $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}")
     )
     # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
