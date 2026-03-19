@@ -56,7 +56,7 @@ _prepare_eos_iso_hotfix() {
     rm -rf "$dir"
 
     source=(
-        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | /bin/sort -f)
+        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | /bin/sort -f -V)
     )
     # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
 }
