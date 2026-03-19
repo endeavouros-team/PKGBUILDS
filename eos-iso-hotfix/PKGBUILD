@@ -47,7 +47,7 @@ _prepare_eos_iso_hotfix() {
     }
 
     # Add the hotfix files to the 'hotfix_files' array.
-    for file in $(/bin/ls -1 "$dir") ; do
+    for file in $(/bin/ls -1 -v "$dir") ; do
         case "$file" in
             *.bash | *.patch | *.md)
                 hotfix_files+=("$_url_hotfix/${file##*/}") ;;
@@ -56,7 +56,8 @@ _prepare_eos_iso_hotfix() {
     rm -rf "$dir"
 
     source=(
-        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | /bin/sort -f -V)
+        # $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}" | /bin/sort -f -V)
+        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}")
     )
     # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
 }
