@@ -1,9 +1,22 @@
 #!/bin/bash
 
-echo2()  { echo -e "$@" >&2; }
-INFO()   { eos-color info 2; echo2 "==> $progname: info: $1"; eos-color reset 2; }
-WARN()   { eos-color warning 2; echo2 "==> $progname: warning: $1"; eos-color reset 2; }
-DIE()    { Cleanup; eos-color error 2; echo2 "==> $progname: error: $1"; eos-color reset 2; exit 1; }
+echo2()   { echo -e "$@" >&2; }
+printf2() { printf  "$@" >&2; }
+INFO()    { eos-color info 2; echo2 "==> $progname: info: $1"; eos-color reset 2; }
+WARN()    { eos-color warning 2; echo2 "==> $progname: warning: $1"; eos-color reset 2; }
+#DIE()    { Cleanup; eos-color error 2; echo2 "==> $progname: error: $1"; eos-color reset 2; exit 1; }
+DIE()     {
+    Cleanup
+    eos-color error 2
+    local prompt="$progname: error"
+    printf2 "$prompt: %s\n" "$1"
+    shift
+    if [ "$1" ] ; then
+        printf2 "${prompt//?/ }  %s\n" "$@"
+    fi
+    eos-color reset 2
+    exit 1
+}
 
 ASSERT_DIE()  { "$@" || DIE "'$*' failed."; }
 ASSERT_WARN() { "$@" && return 0; WARN "'$*' failed."; return 1; }
@@ -49,7 +62,7 @@ FetchCountries() {
 
     info=$("${reflector_command[@]}" 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/d')
     if [ -z "$info" ] ; then
-        WARN "could not update '$dbfile'"
+        WARN "could not update '$cc_vs_name_file'"
         return 1
     fi
     # shellcheck disable=SC2207
@@ -59,20 +72,24 @@ FetchCountries() {
 
     local code country ix count=${#codes[*]}
 
-    echo -e "#!/bin/bash\nreflector_countries=(" > "$dbfile"
-
+    echo -e "#!/bin/bash\ncc_to_cname=(" > "$cc_vs_name_file"
     for ((ix=0; ix < count; ix++ )) ; do
         code=${codes[$ix]}
         country=${countries[$ix]}
-        echo "    [${code,,}]='$country'" >> "$dbfile"
+        echo "    [${code,,}]='$country'" >> "$cc_vs_name_file"
     done
-    echo ")" >> "$dbfile"
-    echo2 "==> Created $(realpath "$dbfile")."
-    return 0
-}
+    echo ")" >> "$cc_vs_name_file"
 
-CC2name() {
-    echo "${reflector_countries[$1]}"
+    echo -e "\ncname_to_cc=(" >> "$cc_vs_name_file"
+    for ((ix=0; ix < count; ix++ )) ; do
+        code=${codes[$ix]}
+        country=${countries[$ix]}
+        echo "    [$country]=${code,,}" >> "$cc_vs_name_file"
+    done
+    echo ")" >> "$cc_vs_name_file"
+
+    # echo2 "==> Created $(realpath "$cc_vs_name_file")."
+    return 0
 }
 
 ExtractCountryMirrors() {
@@ -87,7 +104,7 @@ ExtractCountryMirrors() {
 AddCountry() {
     local cc="$1"
     [ "$cc" ] || return
-    local cn=${reflector_countries[$cc]}
+    local cn=${cc_to_cname[$cc]}
     if [ -z "$cn" ] ; then
         WARN "'$cc': no active Arch mirrors found for this country"
         return
@@ -273,9 +290,35 @@ AddRecommendedCountries() {
 
 DumpCCs() {
     # shellcheck disable=SC1090
-    source "$dbfile"                                               # gets array reflector_countries
+    source "$cc_vs_name_file"                                               # gets array cc_to_cname
     # shellcheck disable=SC2046
-    echo $(printf "%s\n" "${!reflector_countries[@]}" | sort)
+    echo $(printf "%s\n" "${!cc_to_cname[@]}" | sort)
+}
+
+# CC2name() { echo "${cc_to_cname[$1]}" ; }
+# Name2cc() { echo ${cname_to_cc[$1]} ; }
+
+FakeCountry2cc() {
+    local -r country="$1"
+    local ctmp
+    case "$country" in
+        [a-z][a-z])
+            ctmp="${cc_to_cname[$country]}"
+            if [ "$ctmp" ] ; then
+                fake_country="$country"
+            else
+                DIE "country code '$country' is not recognized." "See /etc/create-ml-country-mapping-arch.conf about supported countries."
+            fi
+            ;;
+        *)
+            ctmp="${cname_to_cc[$country]}"
+            if [ "$ctmp" ] ; then
+                fake_country="$ctmp"
+            else
+                DIE "country name '$country' is not recognized." "See /etc/create-ml-country-mapping-arch.conf about supported countries."
+            fi
+            ;;
+    esac
 }
 
 Parameters() {
@@ -294,7 +337,7 @@ Parameters() {
 
             --user-countries)    UserCountriesFromFile ;;
             -c | --countries)    UserCountriesFromCommand "$2"; shift ;;
-            --fake-country)      fake_country="$2"; shift ;;
+            --fake-country)      FakeCountry2cc "$2"; shift ;;
             --offline)           has_internet_connection=no ;;
             --nolocal)           local_country_wanted=no ;;
             --http | --rsync)    protocols+=("${1:2}") ;;
@@ -375,7 +418,7 @@ Main() {
     local -r target_def=/etc/pacman.d/mirrorlist
     local target=$target_def
     local mirrordata="${progname}-active-mirrors-arch.conf"                # support file: active Arch mirrors in various countries
-    local dbfile="${progname}-country-mapping-arch.conf"                   # support file: mappings between country-code and country-name
+    local cc_vs_name_file="${progname}-country-mapping-arch.conf"          # support file: mappings between country-code and country-name
     local has_internet_connection=yes
     local country_code=""
     local fake_country=""
@@ -392,7 +435,8 @@ Main() {
     local has_countries_option=no
     local use_recommended_countries=yes
     local use_saved_cc=no
-    declare -A reflector_countries
+    declare -A cc_to_cname                                         # country code -> country name
+    declare -A cname_to_cc                                         # country name -> country code
     local update_supports=no
     local -r timeout_mirror_def=10
     local TIMEOUT_MIRROR=$timeout_mirror_def                       # timeout for each mirror, see --timeout-mirror
@@ -404,6 +448,7 @@ Main() {
     local prefslist=""
     local issue_test=no
 
+    GetCountryMappings                                             # creates cc_to_cname
     Parameters "$@"
 
     if [ $has_internet_connection = yes ] ; then
@@ -414,7 +459,6 @@ Main() {
         [ $has_internet_connection = yes ] && WARN "file '$configfile' not found, using default timeout values"
     fi
 
-    GetCountryMappings                                             # creates reflector_countries
     GetMirrorsFile                                                 # creates a list of all active mirrors
 
     if [ $update_supports = yes ] ; then
@@ -493,12 +537,12 @@ GetMirrorsFile() {
 }
 GetCountryMappings() {
     if FetchCountries ; then
-        NeedsCleanupOfSupportFiles && cleanup_files+=("$dbfile")
+        NeedsCleanupOfSupportFiles && cleanup_files+=("$cc_vs_name_file")
     else
-        dbfile="/etc/${dbfile##*/}"
+        cc_vs_name_file="/etc/${cc_vs_name_file##*/}"
     fi
     # shellcheck disable=SC1090
-    source "$dbfile"                                               # gets array country mappings into reflector_countries
+    source "$cc_vs_name_file"                                               # gets array country mappings into cc_to_cname
 }
 
 Main "$@"
