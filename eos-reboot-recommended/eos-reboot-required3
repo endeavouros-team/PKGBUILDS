@@ -14,10 +14,10 @@ DoNotify() {
     # then other users don't get them, and the notification can have a timer value
     # in the configuration file.
 
-    if [ "$REBOOT_NOTIFICATION_USER" ] && [ "$REBOOT_EXPIRE_TIME" ] ; then   # if both vars are set
-        user="$REBOOT_NOTIFICATION_USER"                                     # the user receiving the notification
-        urgency=normal                                                       # enables expiretime!
-        expiretime="${REBOOT_EXPIRE_TIME}000"                                # seconds to milliseconds
+    if [ "$REBOOT_EXPIRE_TIME" ] ; then
+        user="$REBOOT_NOTIFICATION_USER"                                     # The user receiving the notification.
+        urgency=normal                                                       # Enables expiretime!
+        expiretime="${REBOOT_EXPIRE_TIME}000"                                # Seconds to milliseconds.
     fi
 
     local cmd=(
