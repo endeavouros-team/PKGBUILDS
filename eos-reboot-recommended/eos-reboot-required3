@@ -22,14 +22,14 @@ DoNotify() {
 
     local cmd=(
         eos_notification_all           # function to notify all users
-        $icon                          # icon
-        $urgency                       # urgency
-        $expiretime                    # expire time (not used with critical urgency!)
+        "$icon"                        # icon
+        "$urgency"                     # urgency
+        "$expiretime"                  # expire time (not used with critical urgency!)
         "'EndeavourOS notification'"   # appname
         "$title"                       # title
         "$msg"                         # message
         RED                            # message color on TTY
-        $user                          # may be empty
+        "$user"                        # may be empty
     )
     "${cmd[@]}"
 }
@@ -42,10 +42,10 @@ WaitLoop() {
     rm -f $tmp
 
     while true ; do
-        sleep $sleeptime
+        sleep "$sleeptime"
         ((seconds_left -= sleeptime))
         if [ $seconds_left -gt 0 ] && [ -e $lockfile ] && sudo fuser $lockfile &> /dev/null && ps -C pacman,yay,paru &> /dev/null ; then
-            echo "$FUNCNAME: $(date): waiting ..." >> $tmp
+            echo "${FUNCNAME[0]}: $(date): waiting ..." >> $tmp
         else
             break
         fi
@@ -65,7 +65,8 @@ Wait_before_notifying() {
     local REBOOT_NOTIFICATION_USER=""
     local REBOOT_EXPIRE_TIME=""
 
-    [ -e $conffile ] && source $conffile
+    # shellcheck disable=SC1090
+    [ -e "$conffile" ] && source "$conffile"
     systemctl disable --now eos-reboot-required.timer
     source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return
     WaitLoop $REBOOT_MAX_TOTAL_WAIT $REBOOT_WAIT_DIFF  # max seconds to wait before notifying about recommended reboot

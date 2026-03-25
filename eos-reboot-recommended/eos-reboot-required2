@@ -27,10 +27,11 @@ Main() {
 
     [ "$EOS_REBOOT_RECOMMENDING" = "no" ] && return 0
 
-    local targets=$(cat)  # list of updated package names from the hook (stdin)
+    local targets       # list of updated package names from the hook (stdin)
     local target
     local running_kernel=""
     local list_of_targets=()
+    targets=$(cat)
 
     # do not notify if the updated package is not in use
     for target in $targets ; do
@@ -66,7 +67,7 @@ Main() {
                 ;;
         esac
     done
-    [ "$list_of_targets" ] && DoNotify || return 0    # 'return 0' here prevents the *false* error message from pacman
+    [ "${list_of_targets[0]}" ] && DoNotify || return 0    # 'return 0' here prevents the *false* error message from pacman
 }
 
 Main "$@"
