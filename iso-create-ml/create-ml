@@ -227,7 +227,16 @@ Main2() {
             # shellcheck disable=SC2016
             ranked_out=$(create-ml-rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|')
             Header
-            echo "$ranked_out"
+            if [ $verbose = yes ] ; then
+                local just_times just_mirrors
+                just_times=$(echo "$ranked_out" | grep -E "^# ([^ ]+)[ ]+([^ ]+)")      # Skip failed mirrors.
+                just_times=$(echo "$just_times" | LC_ALL=C sort -k3rb,3 -k4V,4)         # Sort: age first, then speed.
+                just_mirrors=$(echo "$ranked_out" | grep -v "^# ")                      # Show mirrors.
+                echo -e "$just_times\n"
+                echo "$just_mirrors"
+            else
+                echo "$ranked_out"
+            fi
         } > "$mirrorlist"
         echo2 "==> Mirrors ranked."
     else
@@ -387,11 +396,11 @@ Notes:   * Country codes are the two-letter codes as listed by command 'reflecto
          * By default only https:// mirrors are included.
          * Use option --save to change the existing $target_def.
          * Use option --no-recommended-countries to rank mirrors without adding recommended countries.
-         * If available and option --offline is not used, internet connection is used for:
-               1) fetching a list of active mirrors from the Arch web site
-               2) fetching country code and name mappings from the Arch web site
-               3) ranking mirrors
-           Without a connection the ranking result is very likely suboptimal.
+         * If internet connection is available and option --offline is not used, the connection is used for:
+               1) Fetching a list of active mirrors from the Arch web site.
+               2) Fetching country code and name mappings from the Arch web site.
+               3) Ranking mirrors.
+           Without a connection the ranking result can be suboptimal or even problematic.
 EOF
 #         --rsync                      Include the rsync:// mirrors (experimental, not fully implemented).
                 exit 0
@@ -412,7 +421,7 @@ Main() {
     local OPTS=""
     OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
-    OPTS+=",use-saved-cc,timeout-mirror:"
+    OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local -r target_def=/etc/pacman.d/mirrorlist
@@ -449,14 +458,15 @@ Main() {
     local issue_test=no
 
     GetCountryMappings                                             # creates cc_to_cname
+
+    if ! source "$configfile" ; then
+        [ $has_internet_connection = yes ] && INFO "file '$configfile' not found"
+    fi
+
     Parameters "$@"
 
     if [ $has_internet_connection = yes ] ; then
         eos-connection-checker || has_internet_connection=no       # make sure if we are online or offline
-    fi
-
-    if ! source "$configfile" ; then
-        [ $has_internet_connection = yes ] && WARN "file '$configfile' not found, using default timeout values"
     fi
 
     GetMirrorsFile                                                 # creates a list of all active mirrors
@@ -485,8 +495,10 @@ Main() {
 
     GetCountryCode
 
-    [ -r "$recommended_countries" ] && source "$recommended_countries"
-    AddRecommendedCountries
+    if [ "$use_recommended_countries" = "yes" ] ; then
+        [ -r "$recommended_countries" ] && source "$recommended_countries"
+        AddRecommendedCountries
+    fi
 
     Main2
 }
