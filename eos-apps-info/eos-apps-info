@@ -82,6 +82,7 @@ Main()
     local -r apps=(
         akm ChangeDisplayResolution
         # checkupdatesext
+        create-ml
         curl-exit-code-to-string
         eos-apps-info eos-connection-checker
         eos-downgrade eos-download-wallpapers
@@ -92,7 +93,7 @@ Main()
         # eos-update-notifier eos-update-notifier-configure
         eos-wallpaper-set eos-welcome grub-colour-chooser
         # mirrorlist-rank-info
-        nvidia-inst
+        # nvidia-inst
         # nvidia-driver-supported-branches
         paccache-service-manager
         pahis rami reflector-simple RunInTerminal show-location-info su-c_wrapper

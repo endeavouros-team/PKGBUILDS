@@ -163,7 +163,8 @@ Main()
     cd $infos_folder       || DIE "changing folder to '$infos_folder' failed"
 
     # app's help option to html
-    for app in eos-packagelist nvidia-inst nvidia-driver-supported-branches rate-mirrors ; do
+    for app in eos-packagelist rate-mirrors # nvidia-inst # nvidia-driver-supported-branches
+    do
         if [ -x /usr/bin/$app ] ; then
             Help2html $app
         else
