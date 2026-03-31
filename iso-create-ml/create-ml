@@ -180,7 +180,7 @@ Header() {
         local tmp
         for item in $prefslist ; do
             if [ "$ranked_out" ] ; then
-                tmp=$(echo "$ranked_out" | grep "$item" | awk '{print $NF}')
+                tmp=$(echo "$ranked_out" | grep "^Server = .*$item" | awk '{print $NF}')
                 if [ -z "$tmp" ] ; then
                     WARN "--prefs arguments: no match for '$item' within ranked mirrors"
                     continue
