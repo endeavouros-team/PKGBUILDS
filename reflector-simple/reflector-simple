@@ -229,7 +229,7 @@ EOF
 
 HandleOptions() {
     local opts
-    local lopts="age:,country:,country-exclude:,help,latest:,number:,protocol:,sort:,threads:"
+    local lopts="age:,country:,country-exclude:,download-timeout:,help,latest:,number:,protocol:,sort:,threads:"
     local sopts="a:c:hl:n:p:"
 
     opts="$(/bin/getopt -o=$sopts --longoptions $lopts --name "$progname" -- "$@")" || Usage 1
@@ -270,6 +270,7 @@ HandleOptions() {
                                conf_dropped_countries+=("$xx")
                                conf_dropped_countries+=("$yy")
                                ;;
+            --download-timeout) conf_dltimeout="$2"; shift ;;
             -l | --latest)     [ "$use_number_instead_of_latest" = "yes" ] || conf_number="$2"; shift ;;
             -n | --number)     [ "$use_number_instead_of_latest" = "yes" ] && conf_number="$2"; shift ;;
             -p | --protocol)   list="$2"
@@ -425,6 +426,7 @@ AskCountriesAndOptions() {
     local default_age=2
     local default_sort='^age!rate!country!score!delay'
     local default_number=20
+    local default_dltimeout=5
     local use_saved=""
 
     Verbose "Creating the yad command..."
@@ -440,6 +442,7 @@ AskCountriesAndOptions() {
     [ -n "$conf_age" ]     && default_age="$conf_age"
     [ -n "$conf_number" ]  && default_number="$conf_number"
     [ -n "$conf_sort" ]    && default_sort="$(echo "$default_sort" | sed -e 's|\^||' -e "s|$conf_sort|^$conf_sort|")"
+    [ -n "$conf_dltimeout" ]  && default_dltimeout="$conf_dltimeout"
     
 
     command=(eos_yad --form --columns=$REFLECTOR_SIMPLE_COLUMNS --title="Select Arch mirrors with $progname v$VERSION_INFO")
@@ -485,7 +488,7 @@ AskCountriesAndOptions() {
     else
         command+=(--field="Max number of freshest mirrors":num $default_number)    # --latest
     fi
-    command+=(--field="Download timeout in seconds":num 5)                         # --download-timeout
+    command+=(--field="Download timeout in seconds":num $default_dltimeout)        # --download-timeout
 
     [ "$threads" ] && command+=(--field="Threads":num $threads)                    # --threads
 
@@ -524,7 +527,7 @@ BuildReflectorCommand() {
     reflector_cmd=(reflector --verbose)
 
     if [ -r "$REFLECTOR_X_CONF" ] ; then
-        reflector_cmd+=($(cat $tmpconf | grep -v "^$country_exclude"))
+        reflector_cmd+=($(cat $tmpconf | grep -Ev "(^$country_exclude |^--sort |^--download-timeout |^--threads )"))
         # now we may have countries from config file
         for ac in "${conf_selected_countries[@]}" ; do
             added_countries+=("$(CountryToCode "$ac")")
@@ -814,6 +817,7 @@ Main() {
     local conf_age=""
     local conf_sort=""
     local conf_number=""
+    local conf_dltimeout=""
     local conf_protocol=()
     local worldwide_selected=0
     local use_number_instead_of_latest="$REFLECTOR_SIMPLE_PREFER_NUMBER"  # from exported env var
