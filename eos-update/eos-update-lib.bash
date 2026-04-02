@@ -50,18 +50,65 @@ ColorLines() {
     local -r head2="${head//?/ }"
     shift 2
     eos-color "$color" 2
-    printf "${head}  %s\n" "$first_line" >&2
+    printf "${head} %s\n" "$first_line" >&2
     [ "$1" ] && printf "${head2} %s\n" "$@" >&2      # other lines of the message
     eos-color reset 2
 }
-_ColorLines() { ColorLines "$@" ; }
 
 
-####### Function DeprecatedOldCompatibility is deprecated and will be removed later. ########
+EOS_DateReached() {
+    local targetdate="$1"       # format: YYYY-MM-DD
+    targetdate=$(date --date="$targetdate" "+%s")
+    [ "$(date "+%s")" -ge "$targetdate" ] && return 0 || return 1
+}
 
-DeprecatedOldCompatibility() {
-    if OncePerBootSession "I2301msiEBoRW" ; then
-        ColorLines info "Tip: you may add other update commands into ${0}."
+_EOS_UPDATE_LIB_BASH_FILE="/etc/eos-update-lib.bash"
+
+
+####### Deprecated functions to be removed later. ########
+
+_ColorLines() {                                                       # This function will be removed around 1-Sep-2026.
+    local -r killdate="2026-09-01"
+    local -r id="CL_u1506VBKe2pZ"
+    local tips=(
+        "Instead consider using function"
+        "    ColorLines"
+        "See also: $_EOS_UPDATE_LIB_BASH_FILE."
+    )
+
+    if EOS_DateReached "$killdate" ; then
+        ColorLines error "$0: function $FUNCNAME has been removed." "${tips[@]}"
+        return 1
+    else
+        if OncePerBootSession "$id" ; then
+            ColorLines warning "$0: function $FUNCNAME is deprecated and will be removed at $killdate." "${tips[@]}"
+        fi
+        ColorLines "$@"
+        return 0
+    fi
+}
+
+DeprecatedOldCompatibility() {                                        # This function will be removed around 1-Sep-2026.
+    local -r killdate="2026-03-01"
+    local -r id="I2301msiEBoRW"
+    local tips=(
+        "Instead consider using functions"
+        "    OncePerBootSession"
+        "    ColorLines"
+        "See also: $_EOS_UPDATE_LIB_BASH_FILE."
+    )
+
+    if EOS_DateReached "$killdate" ; then
+        ColorLines error "$0: function $FUNCNAME has been removed." "${tips[@]}"
+        return 1
+    else
+        if OncePerBootSession "$id" ; then
+            ColorLines warning "$0: function $FUNCNAME is deprecated and will be removed at $killdate." "${tips[@]}"
+            if OncePerBootSession "$id" ; then
+                ColorLines info "Tip: you may add other update commands into $0."
+            fi
+        fi
+        return 0
     fi
 }
 
