@@ -89,7 +89,7 @@ _ColorLines() {                                                       # This fun
 }
 
 DeprecatedOldCompatibility() {                                        # This function will be removed around 1-Sep-2026.
-    local -r killdate="2026-03-01"
+    local -r killdate="2026-09-01"
     local -r id="I2301msiEBoRW"
     local tips=(
         "Instead consider using functions"
