@@ -504,11 +504,16 @@ Main() {
 }
 
 SaveCountryCode() {
+    # Save detected country code to a file only if it is not a
+    # - fake country
+    # - previously saved country
     local cc="$1"
-    local tmpfile=/tmp/fd983hlkHL
-    echo "$cc" > $tmpfile
-    sudo cp "$tmpfile" "$stored_country_file"
-    rm -f "$tmpfile"
+    [ "$cc" = "$fake_country" ] && return
+    local -r country_stored="$(cat "$stored_country_file" 2>/dev/null)"
+    if [ "$cc" != "$country_stored" ] ; then
+        INFO "saving country code '$cc' to file $stored_country_file."
+        echo "$cc" | sudo tee "$stored_country_file" > /dev/null
+    fi
 }
 GetCountryCode() {
     [ "$fake_country" ] && { country_code="$fake_country"; return 0; }      # has fake country, use it
