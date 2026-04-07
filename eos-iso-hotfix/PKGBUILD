@@ -8,7 +8,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
 pkgver=26.03
-pkgrel=4
+pkgrel=5
 
 arch=('any')
 license=('GPL')
@@ -84,7 +84,7 @@ _prepare_eos_iso_hotfix() {
 }
 _prepare_eos_iso_hotfix
 
-sha512sums=('543be51da757d69388c7acb3cd7001d0604629cb506b17fc7371d2dc40b57159289a2c0c4b8ceeed0c56fe04943998cb54d08f9c03976cc74eb434f89699bf45'
+sha512sums=('945c62bbacad55f7557955b97a774b495bc4301c441946880f0988da4f013abe2f1f5979a5bb9f751787789a799d5f2167e52e055ef930ab73dfed7ae481155a'
             'fc190898188b7492763a4172fc19cf658350eda15db55ab3d3fa084bb2bb710ebac0cfcc1df36cc84e48957dab4f58546b4098b1ce44436a0360509872c88e69'
             'c30d85be6450109855c638374c2cead0fe31e5c9476490042f9d80da260a8fb515d88015f08f87e95f0f305a04cb6d73840d287f40e3b549038e722e7ea86fdf'
             '0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
