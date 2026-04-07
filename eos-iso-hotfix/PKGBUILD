@@ -8,7 +8,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
 pkgver=26.03
-pkgrel=3
+pkgrel=4
 
 arch=('any')
 license=('GPL')
@@ -39,6 +39,7 @@ _prepare_eos_iso_hotfix() {
     )
     local hotfix_files=(
         $_url_hotfix/README.md
+        $_url_hotfix/packagechooser.conf_titan.patch
         $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
         $_url_hotfix/hotfix-end.bash
         $_url_hotfix/hotfix-start.bash
@@ -84,9 +85,10 @@ _prepare_eos_iso_hotfix() {
 _prepare_eos_iso_hotfix
 
 sha512sums=('543be51da757d69388c7acb3cd7001d0604629cb506b17fc7371d2dc40b57159289a2c0c4b8ceeed0c56fe04943998cb54d08f9c03976cc74eb434f89699bf45'
+            'fc190898188b7492763a4172fc19cf658350eda15db55ab3d3fa084bb2bb710ebac0cfcc1df36cc84e48957dab4f58546b4098b1ce44436a0360509872c88e69'
             'c30d85be6450109855c638374c2cead0fe31e5c9476490042f9d80da260a8fb515d88015f08f87e95f0f305a04cb6d73840d287f40e3b549038e722e7ea86fdf'
             '0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
-            '66cb4a6ab258b3944afc3395087c917b20a8be5eb8207f4e6baabde7fc44ac02e9ed09c1d0e4de4779c0cf71770bea4ff3a1dff6357b7d7609d83e0bc04db50c'
+            'f065d1cd806be7543c59afaca315325065c4a79772a0aea2e474851ddd45520f91d6cfd4e24faa116d2bd69ccba0b3c2355c9285252436680b4de572da0e0690'
             '5dab144e787cc9649cd57addbbc542ece54ada5085dda42c9baf10201fcb406c74056969f93622d3a0d6be5ba70d053a16e299e699b21d0f64402eabf93abd6e'
             'b352da65f1613bf5a4db2339757db713f1d8f6f33da0a3e566ca2b127b91d2a2a0160f607f9c8d026aaf010212c4e9b2a28b0fe7cc6392c0dd5ec0bb5cb841c2'
             '75c30687f979a8e1a03ba94688728464408c06a239120ab8b5ccfdbaa94803e30fbf9b0280243450380ec285ac795b35e22e27918b8a51509389398df1c0da84'
@@ -101,7 +103,7 @@ sha512sums=('543be51da757d69388c7acb3cd7001d0604629cb506b17fc7371d2dc40b57159289
             '9c48e4b7d752ace0ff6c806b649b9a30cd2a89ca7d5ddad54065fa140dc8069a126bc7997b8ca40bb09645454108687ec0595a048e77a80903b97f770cebab22'
             'f0846f936c995db6fe4f8412b215d36fcd82d79b4838507b31de9c64c456d0f3487eb5e0f84c32c8b114b8e617e27d91a6ccb36780457b70ddd627a50a823437'
             'b672ea045503dcb33bee237cd2bbc6ecc6d736d9aac2f734cf15d65eec8570c69c814f69568ee0b1799ed4bc532a2e37cc657aea062a4cdc3800c8b2d3bfa5cb'
-            'ce4a0dcdf2ca9cb90657d3f4eeaf48fe3f4518ae4b8d597fe0cd498545d592582ff5539bfb5ce5330d3019cba45f8fa793b79359c184246535f6f9d314247936'
+            'ab99425365449a421239bf2a50eb7a4a320782e56006a679007a32622e29a928ff48ff7ef83df2a4327fce04163f39fb46e2cea72ea42750b61bd7ffa7e11797'
             'c5d22504ac53a10bf09045e74ea1c413dabfec09e94932d2b735c36aa2b8b786db734dcfbe0c259835a6077295a2ea4d12eccc11ed7dad807fb2e6bbd2e641be')
 
 package() {
