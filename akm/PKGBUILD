@@ -15,14 +15,32 @@ backup=(etc/$pkgname.conf)
 source=(
     "$_url/$pkgname"
     "$_url/$pkgname.conf"
-    "$_url/$pkgname.desktop"
+    "$pkgname.desktop.in::$_url/$pkgname.desktop"
+    "$_url/po/cs.po"
+    "$_url/po/fi.po"
+    "$_url/po/LINGUAS"
 )
-sha512sums=('0377e7c032a98033e3ff7e5d4c727264f736104bead6ed1ead410c59e10cb77aa8e75e86e120e9142c828d616a0fe2cb09533d940f2d1edf41fa602435353c67'
-            '9ab486eaa58857dfaf1d3b3838768b9c629f65709177544ad4602daf2752be9709a529abba359fe984a9f231688ae30bb7aa3df97a2c8d88fbb37742f5fd26f7'
-            '3d8e3bddd23cb6871f86070d864decf1dd9fc117ac18d8983217b009d2c5eb04ff0a51745e5e59ba82b4c6cb65f70ac0d0bad031d28777db446d1c27d73d3ac3')
+sha512sums=('ac8cfeb00ce8b16ae9bfc3385b2793bc183cf4e0c96b719389a5be26085664d6385a26cad5515fa2c9b8ea43250a09d59736f86248c8fd21f450bc5088ef75c2'
+            '96356a5916715d83163e3f6c6c88fc78968b0035e6754171a91b09c5ba88464ce3cc742c7f1512b5b358cffe56672309873f3b456228ab53541101f139dd3c3d'
+            'b91cbb5d472a1f0f48e26c60d66e012f025be4a384cc01cc876ac1d96a7bff186d3ddb57fd9a58e757612d692961338eaa58ac347361be1e3cc286f042090ddc'
+            '7f1586abab207bf2e5f759bfffda1536ce028952608d2a0724c7449de19e3e87f558c0e486c5739d6884a78c7cfc9481a85998b28d99fd1c24504728e864e9e6'
+            'bbd27fb28b71a232b7a8316beeb03a50247672a87f33615255907e7b1f0543bc31fd28a72125c0dd76ef7e52689042fe053ab7b7e2da34c7bb79b5c8e78bbed0'
+            '7ab8bc35ac78ea7eb2ab6303b68621b2eae0e55bc30bf22b1ccc72f175c08e148f14b1bc9b3c363a37dd9f9905b98fabedbba39328b0b261d8a73cf219c4377a')
+
+build() {
+  msgfmt --desktop --template="$pkgname.desktop.in" -d "./" --output-file="$pkgname.desktop"
+  local lang
+  for lang in *.po; do
+    msgfmt -c -o "${lang::-3}.mo" "${lang}"
+  done
+}
 
 package() {
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
   install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
   install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
+  local lang
+  for lang in *.mo; do
+    install -Dm644 $lang          $pkgdir/usr/share/locale/${lang::-3}/LC_MESSAGES/$pkgname.mo
+  done
 }
