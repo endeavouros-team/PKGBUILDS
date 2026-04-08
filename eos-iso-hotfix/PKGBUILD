@@ -8,118 +8,81 @@ pkgdesc="EndeavourOS ISO hotfixes"
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
 pkgver=26.03
-pkgrel=6
+pkgrel=7
 
 arch=('any')
 license=('GPL')
-depends=(git)
+depends=()
 
-# URLs to hotfix files and files managed by hotfixes.
-_url_hotfix="https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/refs/heads/main"
+# URL "folders" to hotfix files and files managed by hotfixes.
 _url_script="https://raw.githubusercontent.com/endeavouros-team/calamares/refs/heads/calamares/data/eos/scripts"
 _url_module="https://raw.githubusercontent.com/endeavouros-team/calamares/refs/heads/calamares/data/eos/modules"
+_url_hotfix="https://raw.githubusercontent.com/endeavouros-team/ISO-hotfixes/refs/heads/main"
 
-_prepare_eos_iso_hotfix() {
-    # This function fetches the latest hotfix files and some related calamares files.
-    # Fetch hotfix files from github using 'git clone'.
-    # The files that hotfixes will use should also be listed below.
-    #
-    # If hotfixes change (e.g. need new files), this function may fail.
-    # Then modify the lists of files according to changes required by the hotfixes.
 
-    # EDIT: all necessary files related to hotfixes must be added manually in the arrays below!!
+source=(
+    $_url_script/chrooted_cleaner_script.sh
+    $_url_script/cleaner_script.sh
 
-    local script_files=(                          # hotfixes may use/modify these files
-        $_url_script/cleaner_script.sh
-        $_url_script/chrooted_cleaner_script.sh
-    )
-    local module_files=(                          # hotfixes may use/modify these files
-        $_url_module/packagechooser.conf
-        $_url_module/pacstrap.conf
-    )
-    local hotfix_files=(
-        $_url_hotfix/README.md
-        $_url_hotfix/netinstall.yaml_titan.patch
-        $_url_hotfix/packagechooser.conf_titan.patch
-        $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
-        $_url_hotfix/hotfix-end.bash
-        $_url_hotfix/hotfix-start.bash
-        $_url_hotfix/netinstall.yaml-cassini-R3.patch
-        $_url_hotfix/netinstall.yaml_ganymede_neo.patch
-        $_url_hotfix/netinstall.yaml_mercury_neo.patch
-        $_url_hotfix/packagechooser.conf.patch
-        $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
-        $_url_hotfix/packagechooser.conf_ganymede.patch
-        $_url_hotfix/packagechooser.conf_ganymede_neo.patch
-        $_url_hotfix/packagechooser.conf_gemini_1.patch
-        $_url_hotfix/packagechooser.conf_mercury_neo.patch
-        $_url_hotfix/pacstrap.conf_endeavour_neo.patch
-        $_url_hotfix/settings_offline.conf.patch
-        $_url_hotfix/settings_online.conf.patch
-    )
+    $_url_module/packagechooser.conf
+    $_url_module/pacstrap.conf
 
-    if false ; then
-        # Download hotfix files since these might change often.
-        local file
-        local dir=$(mktemp -d)
-        chmod go-rwx $dir
-        git clone https://github.com/endeavouros-team/ISO-hotfixes.git "$dir" &>/dev/null || {
-            rm -rf $dir
-            exit 1
-        }
+    $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
+    $_url_hotfix/hotfix-end.bash
+    $_url_hotfix/hotfix-start.bash
+    $_url_hotfix/netinstall.yaml-cassini-R3.patch
+    $_url_hotfix/netinstall.yaml_ganymede_neo.patch
+    $_url_hotfix/netinstall.yaml_mercury_neo.patch
+    $_url_hotfix/netinstall.yaml_titan.patch
+    $_url_hotfix/packagechooser.conf.patch
+    $_url_hotfix/packagechooser.conf_endeavour_neo_1.patch
+    $_url_hotfix/packagechooser.conf_ganymede.patch
+    $_url_hotfix/packagechooser.conf_ganymede_neo.patch
+    $_url_hotfix/packagechooser.conf_gemini_1.patch
+    $_url_hotfix/packagechooser.conf_mercury_neo.patch
+    $_url_hotfix/packagechooser.conf_titan.patch
+    $_url_hotfix/pacstrap.conf_endeavour_neo.patch
+    $_url_hotfix/settings_offline.conf.patch
+    $_url_hotfix/settings_online.conf.patch
 
-        # Add the hotfix files to the 'hotfix_files' array.
-        for file in $(/bin/ls -1 -v "$dir") ; do
-            case "$file" in
-                *.bash | *.patch | *.md)
-                    hotfix_files+=("$_url_hotfix/${file##*/}") ;;
-            esac
-        done
-        rm -rf "$dir"
-    fi
+    # $_url_hotfix/README.md                                 # Not a hotfix, skip.
+)
 
-    source=(
-        $( printf "%s\n" "${hotfix_files[@]}" "${script_files[@]}" "${module_files[@]}")
-    )
-    # Now 'source' should contain all the latest files (URLs) needed to support the hotfix feature in the EndeavourOS installer.
-}
-_prepare_eos_iso_hotfix
-
-sha512sums=('01c1857a14f79c99c7ea0a77ed4245354d59e92ca72fdb81cca5eb4be7cd256d1455908ff70e6ab00771b3d2fce78a3b9de2053b5fc8a5b18fe04613cb1275b6'
-            '972855f8dd015ce5c210b661952fc055ea24a71f121aa953cb91260dda1c7346025c33612c70591be8216ac9de410542eebc4b7024722ac3ff5283f0e3871fc1'
-            'fc190898188b7492763a4172fc19cf658350eda15db55ab3d3fa084bb2bb710ebac0cfcc1df36cc84e48957dab4f58546b4098b1ce44436a0360509872c88e69'
+sha512sums=('b672ea045503dcb33bee237cd2bbc6ecc6d736d9aac2f734cf15d65eec8570c69c814f69568ee0b1799ed4bc532a2e37cc657aea062a4cdc3800c8b2d3bfa5cb'
+            'f0846f936c995db6fe4f8412b215d36fcd82d79b4838507b31de9c64c456d0f3487eb5e0f84c32c8b114b8e617e27d91a6ccb36780457b70ddd627a50a823437'
+            'ab99425365449a421239bf2a50eb7a4a320782e56006a679007a32622e29a928ff48ff7ef83df2a4327fce04163f39fb46e2cea72ea42750b61bd7ffa7e11797'
+            'c5d22504ac53a10bf09045e74ea1c413dabfec09e94932d2b735c36aa2b8b786db734dcfbe0c259835a6077295a2ea4d12eccc11ed7dad807fb2e6bbd2e641be'
             'c30d85be6450109855c638374c2cead0fe31e5c9476490042f9d80da260a8fb515d88015f08f87e95f0f305a04cb6d73840d287f40e3b549038e722e7ea86fdf'
             '0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
             'bad5e92945f6d6cb43a99db2b473050e4f37d47140dd5c27b689b74373c142bd05c90c5e0c50e17cfcc8774ad609cc25a186d53cf1741fb5be000903d41e1590'
             '5dab144e787cc9649cd57addbbc542ece54ada5085dda42c9baf10201fcb406c74056969f93622d3a0d6be5ba70d053a16e299e699b21d0f64402eabf93abd6e'
             'b352da65f1613bf5a4db2339757db713f1d8f6f33da0a3e566ca2b127b91d2a2a0160f607f9c8d026aaf010212c4e9b2a28b0fe7cc6392c0dd5ec0bb5cb841c2'
             '75c30687f979a8e1a03ba94688728464408c06a239120ab8b5ccfdbaa94803e30fbf9b0280243450380ec285ac795b35e22e27918b8a51509389398df1c0da84'
+            '972855f8dd015ce5c210b661952fc055ea24a71f121aa953cb91260dda1c7346025c33612c70591be8216ac9de410542eebc4b7024722ac3ff5283f0e3871fc1'
             'e5d8bbe5d22e3535ce2c67c42c92328dd25f2a64559b5d6e6acc05917bf8a076a49a8781f94b53e9d1a27a410a36ff2c86efbfbbbdbd345b1d5b7fb5e0087319'
             '8e4c446dab9b31c2deeb44218629d7c82354b5433925768cb2b4c2c6279bd36f80ddcd4063d9ed5da0d55105b061e1b7a1a51da3fc9fe9433e2e387243f7739d'
             'b68be30ee80cb6b2fca41ac85cb9560addeb0c061afef75bd956dc50cbed397ed20878bd677a16033df591d3b9ae2b2f6bf44bd82da2aa4e9d6367873e809688'
             '76632ce6465bb97d3df00c0dc59116fd82c366731e6c2e4f9c38c7a4f7e800c4e734e824779d367c427d98ed8cf20059084889f822868e96e2cd6aed650625e1'
             '3aa95fce738c40e4b239c35339195165261717938f0f3e2653c01610cf6da6bfa2548287d821a8bee0906e0a3a623129e1f1304c34946602de9fe46ad3e304c6'
             '47cf864cd1ec5c28e64d322126515aabfdcfeb37fce71d97d29056d09eb71af8402c47813fb921d6cde26da498d5de0e450b1926cb6b8e88e512941b2927a094'
+            'fc190898188b7492763a4172fc19cf658350eda15db55ab3d3fa084bb2bb710ebac0cfcc1df36cc84e48957dab4f58546b4098b1ce44436a0360509872c88e69'
             'eddfe733abd98f53e7481d147e78dec4bea5b7438ceeb967460fae63ae9390f6173d55a26fca715d0e99c15b2ddf595b780cc81ca63d2b0b1b9ec531d7b94a92'
             '8d0176fec8dff63dd57a282bc69385d0db93d2b2656c52f95483040f1d7d071b6f7d4032273480d3729a55cf3f1db5bd45e4e616891dc2d0b150a214ecfb9890'
-            '9c48e4b7d752ace0ff6c806b649b9a30cd2a89ca7d5ddad54065fa140dc8069a126bc7997b8ca40bb09645454108687ec0595a048e77a80903b97f770cebab22'
-            'f0846f936c995db6fe4f8412b215d36fcd82d79b4838507b31de9c64c456d0f3487eb5e0f84c32c8b114b8e617e27d91a6ccb36780457b70ddd627a50a823437'
-            'b672ea045503dcb33bee237cd2bbc6ecc6d736d9aac2f734cf15d65eec8570c69c814f69568ee0b1799ed4bc532a2e37cc657aea062a4cdc3800c8b2d3bfa5cb'
-            'ab99425365449a421239bf2a50eb7a4a320782e56006a679007a32622e29a928ff48ff7ef83df2a4327fce04163f39fb46e2cea72ea42750b61bd7ffa7e11797'
-            'c5d22504ac53a10bf09045e74ea1c413dabfec09e94932d2b735c36aa2b8b786db734dcfbe0c259835a6077295a2ea4d12eccc11ed7dad807fb2e6bbd2e641be')
+            '9c48e4b7d752ace0ff6c806b649b9a30cd2a89ca7d5ddad54065fa140dc8069a126bc7997b8ca40bb09645454108687ec0595a048e77a80903b97f770cebab22')
 
 package() {
-    local item src
-    local cleanups=()
+    local cleanups=()        # For deleting temporary files after build.
+    local surl               # For holding one url from the 'source' array.
+    local filename           # For holding the filename from the $surl (directory dropped).
 
-    for src in "${source[@]}" ; do
-        item="${src##*/}"
-        case "$src" in
-            ${_url_script}/*)   install -Dm755 "$item" "$pkgdir/usr/share/endeavouros/hotfix/scripts/$item" ;;
-            ${_url_module}/*)   install -Dm644 "$item" "$pkgdir/usr/share/endeavouros/hotfix/modules/$item" ;;
-            ${_url_hotfix}/*)   install -Dm644 "$item" "$pkgdir/usr/share/endeavouros/hotfix/hotfixes/$item" ;;
+    for surl in "${source[@]}" ; do
+        filename="${surl##*/}"
+        case "$surl" in
+            "$_url_script/$filename")   install -Dm755 "$filename" "$pkgdir/usr/share/endeavouros/hotfix/scripts/$filename"  ;;
+            "$_url_module/$filename")   install -Dm644 "$filename" "$pkgdir/usr/share/endeavouros/hotfix/modules/$filename"  ;;
+            "$_url_hotfix/$filename")   install -Dm644 "$filename" "$pkgdir/usr/share/endeavouros/hotfix/hotfixes/$filename" ;;
         esac
-        cleanups+=("../$item")
+        cleanups+=("../$filename")
     done
     rm -f "${cleanups[@]}"
 }
