@@ -8,7 +8,7 @@ pkgdesc="EndeavourOS ISO hotfixes"
 url="https://github.com/endeavouros-team/ISO-hotfixes/"
 
 pkgver=26.03
-pkgrel=5
+pkgrel=6
 
 arch=('any')
 license=('GPL')
@@ -39,6 +39,7 @@ _prepare_eos_iso_hotfix() {
     )
     local hotfix_files=(
         $_url_hotfix/README.md
+        $_url_hotfix/netinstall.yaml_titan.patch
         $_url_hotfix/packagechooser.conf_titan.patch
         $_url_hotfix/chrooted_cleaner_script.sh_titan.patch
         $_url_hotfix/hotfix-end.bash
@@ -84,11 +85,12 @@ _prepare_eos_iso_hotfix() {
 }
 _prepare_eos_iso_hotfix
 
-sha512sums=('945c62bbacad55f7557955b97a774b495bc4301c441946880f0988da4f013abe2f1f5979a5bb9f751787789a799d5f2167e52e055ef930ab73dfed7ae481155a'
+sha512sums=('01c1857a14f79c99c7ea0a77ed4245354d59e92ca72fdb81cca5eb4be7cd256d1455908ff70e6ab00771b3d2fce78a3b9de2053b5fc8a5b18fe04613cb1275b6'
+            '972855f8dd015ce5c210b661952fc055ea24a71f121aa953cb91260dda1c7346025c33612c70591be8216ac9de410542eebc4b7024722ac3ff5283f0e3871fc1'
             'fc190898188b7492763a4172fc19cf658350eda15db55ab3d3fa084bb2bb710ebac0cfcc1df36cc84e48957dab4f58546b4098b1ce44436a0360509872c88e69'
             'c30d85be6450109855c638374c2cead0fe31e5c9476490042f9d80da260a8fb515d88015f08f87e95f0f305a04cb6d73840d287f40e3b549038e722e7ea86fdf'
             '0efec1ab124a22bc95c822852ecc0ba6d6a7231fb0958da92f6dbdb19d036611634d16aba0615f8fe0e0ba634d47bc8c79bb3bc9786c36ef7534f2e1bc04ade1'
-            'f065d1cd806be7543c59afaca315325065c4a79772a0aea2e474851ddd45520f91d6cfd4e24faa116d2bd69ccba0b3c2355c9285252436680b4de572da0e0690'
+            'bad5e92945f6d6cb43a99db2b473050e4f37d47140dd5c27b689b74373c142bd05c90c5e0c50e17cfcc8774ad609cc25a186d53cf1741fb5be000903d41e1590'
             '5dab144e787cc9649cd57addbbc542ece54ada5085dda42c9baf10201fcb406c74056969f93622d3a0d6be5ba70d053a16e299e699b21d0f64402eabf93abd6e'
             'b352da65f1613bf5a4db2339757db713f1d8f6f33da0a3e566ca2b127b91d2a2a0160f607f9c8d026aaf010212c4e9b2a28b0fe7cc6392c0dd5ec0bb5cb841c2'
             '75c30687f979a8e1a03ba94688728464408c06a239120ab8b5ccfdbaa94803e30fbf9b0280243450380ec285ac795b35e22e27918b8a51509389398df1c0da84'
