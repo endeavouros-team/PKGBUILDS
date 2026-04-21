@@ -102,8 +102,10 @@ gettime() {
             ;;
         *)
             eos_color2 warning
-            echo "    -> $url:" >&2
-            echo "       curl($curl_exitcode): $(curl-exit-code-to-string $curl_exitcode)" >&2
+            if [[ $SHOW_FAILED ]] ; then
+                echo "    -> $url:" >&2
+                echo "       curl($curl_exitcode): $(curl-exit-code-to-string $curl_exitcode)" >&2
+            fi
             eos_color2 reset
             return 1
             ;;
@@ -198,6 +200,7 @@ while [[ $1 ]]; do
 				URL="$2";
 				shift 2 ;;
 			verbose) VERBOSE=1; shift ;;
+                        show-failed) SHOW_FAILED=1; shift ;;
 			version) version ;;
 			working-only) WORKING_ONLY=1; shift ;;
 			*) err "'$1' is an invalid argument." ;;
@@ -303,7 +306,7 @@ tmpfile=$(mktemp)
 if [[ $PARALLEL ]]; then
 	servers=()
 	# Exports for GNU parallel
-	export MAX_TIME ARCH TARGETREPO VERBOSE TIMESONLY WORKING_ONLY tmpfile
+	export MAX_TIME ARCH TARGETREPO VERBOSE SHOW_FAILED TIMESONLY WORKING_ONLY tmpfile
 	export -f getfetchurl gettime get_url_time
 fi
 

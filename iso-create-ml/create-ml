@@ -219,8 +219,9 @@ Main2() {
 
     if [ $has_internet_connection = yes ] ; then
         local rankmirrors_opt=(--max-time $TIMEOUT_MIRROR)
-        [ $verbose  = yes ] && rankmirrors_opt+=(-v)
-        [ $parallel = yes ] && rankmirrors_opt+=(-p)
+        [ $verbose  = yes ]    && rankmirrors_opt+=(-v)
+        [ $show_failed = yes ] && rankmirrors_opt+=(--show-failed)
+        [ $parallel = yes ]    && rankmirrors_opt+=(-p)
 
         echo2 "==> Ranking mirrors."
         {
@@ -354,6 +355,7 @@ Parameters() {
             --save)              save=yes; target=$target_def ;;
             --savefile)          save=yes; target="$2"; shift ;;
             -v | --verbose)      verbose=yes ;;
+            --show-failed)       show_failed=yes ;;
             --no-recommended-countries) use_recommended_countries=no ;;
             --dump-options)      DumpOptions; exit 0 ;;
             --dump-ccs)          DumpCCs; exit 0 ;;
@@ -372,6 +374,7 @@ Options: --help, -h                   This help.
          --save                       Save mirrorlist to $target_def (see also option --savefile).
          --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
          --verbose, -v                Show more ranking details.
+         --show-failed                Show info about failed mirrors.
          --http                       Include the http:// mirrors.
          --countries, -c              Give a list of country codes that will be used as additional mirror countries.
                                       The list items can be separated by commas or spaces.
@@ -421,7 +424,7 @@ Main() {
     local OPTS=""
     OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
-    OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:"
+    OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:,show-failed"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local -r target_def=/etc/pacman.d/mirrorlist
@@ -433,6 +436,7 @@ Main() {
     local fake_country=""
     local local_country_wanted=yes                                         # include local country in the mirrorlist or not?
     local verbose=no
+    local show_failed=no
     local save=no
     local parallel=yes                                                     # ranking mirrors in pararallel or not?
     local protocols=(https)                                                # list of supported protocols
