@@ -232,17 +232,17 @@ Main() {
         "Navigation keys:  Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
         "Other keys:       Ctrl-E = Edit config file"
         "                  Ctrl-H = Help"
-        "Download folder:  $TARGETDIR"
         "Config file:      $configfile2"
+        "Download folder:  $TARGETDIR"
         "Fetching app:     $getter"
-        "Tip:              Names with trailing '/' are folders, navigate to them if needed"
+        "Tip:              Names with trailing '/' are folders, navigate to them if needed."
     )
-    printf -v header "%s\n" "" "${header_lines[@]}" ""        # add empty extra lines to separate/hilight header
+    printf -v header "%s\n" "${header_lines[@]}"
 
     local fzf=(
         fzf
         --exact +i --tac --multi
-        --header="$header"
+        --footer="$header" --footer-border=bold --footer-label=" SELECTING FILE(S) TO DOWNLOAD "
         --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
     )
     local selected="" items="" items_orig=()
@@ -404,18 +404,24 @@ CheckTheSum() {
     local ret=0
     local header_lines=(
         "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
-        "Select a checksum file above"
+        "Select a checksum file below."
     )
     local header
-    printf -v header "%s\n" "" "${header_lines[@]}" ""
-    checksumfile=$(printf "%s\n" "${targets[@]}" | grep "\.$sumtype" | fzf --header="$header")
+    printf -v header "%s\n" "${header_lines[@]}"
+    local fzf=(
+        fzf
+        --footer="$header"
+        --footer-border=bold
+        --footer-label=" SELECTING FILE TO VERIFY CHECKSUM "
+    )
+    checksumfile=$(printf "%s\n" "${targets[@]}" | grep -P "\.$sumtype$|\.${sumtype}sum$" | "${fzf[@]}")
     if [ "$checksumfile" ] ; then
         if [ -e "$checksumfile" ] ; then
-            isofile="${checksumfile%.$sumtype*}"
+            isofile="${checksumfile%.*}"
             if [ -e "$isofile" ] ; then
                 pushd "$TARGETDIR" >/dev/null
                 echo -n "==> ${sumtype}sum -c $checksumfile ... "
-                if ${sumtype}sum -c "$checksumfile" >&/dev/null ; then
+                if ${sumtype}sum -c "$checksumfile" &>/dev/null ; then
                     echo OK
                     rm -f "$checksumfile"         # we shouldn't need this file anymore
                 else
