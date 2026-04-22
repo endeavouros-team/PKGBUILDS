@@ -12,16 +12,23 @@ IsRunningKernel() {
 }
 
 DoNotify() {
-    local logfile=/var/log/reboot-recommendation-trigger.log
-    echo "[$(/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" > $logfile
-    chmod o-rwx $logfile
+    echo "[$(/usr/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" > "$logfile"
+    chmod o-rwx "$logfile"
     systemctl enable --now eos-reboot-required.timer 2>/dev/null
 }
 
-Main() {
-    [ "$EUID" = "0" ] || return 0    # require elevated privileges
+STOP() { echo "==> $progname: error: $1" > "$errlog"; exit 0; }
 
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return 0
+Main() {
+    local -r progname=${0##*/}
+    local -r errlog="/var/log/$progname.errlog"
+    local -r logfile="/var/log/$progname.log"
+    local -r common_scripts_file="/usr/share/endeavouros/scripts/eos-script-lib-yad"
+
+    [ "$EUID" = "0" ]                           || STOP "elevated privileges required."
+    [ -r "$common_scripts_file" ]               || STOP "failed to read file $common_scripts_file."
+    # shellcheck disable=SC1090
+    source "$common_scripts_file" --limit-icons || STOP "failed to source file $common_scripts_file"
 
     eos_is_in_chroot && return 0
 
@@ -31,7 +38,7 @@ Main() {
     local target
     local running_kernel=""
     local list_of_targets=()
-    targets=$(cat)
+    targets=$(/usr/bin/cat)
 
     # do not notify if the updated package is not in use
     for target in $targets ; do
@@ -54,7 +61,7 @@ Main() {
                 ;;
             btrfs-progs)
                 # Notify only if btrfs is in use
-                [ "$(/usr/bin/df -hT | awk '{print $2}' | grep -w btrfs)" ] && list_of_targets+=("$target")
+                /usr/bin/df -hT | awk '{print $2}' | grep -qw btrfs && list_of_targets+=("$target")
                 ;;
             wayland | egl-wayland)
                 case "$XDG_SESSION_TYPE" in
@@ -67,7 +74,8 @@ Main() {
                 ;;
         esac
     done
-    [ "${list_of_targets[0]}" ] && DoNotify || return 0    # 'return 0' here prevents the *false* error message from pacman
+    [ "${list_of_targets[0]}" ] || return 0    # nothing to notify
+    DoNotify
 }
 
 Main "$@"
