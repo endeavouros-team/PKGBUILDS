@@ -4,8 +4,8 @@
 
 pkgname=calamares
 pkgver=26.03.2.1
-pkgrel=1
-release_name="Titan_neo"
+pkgrel=2
+release_name="Titan-Neo"
 pkgdesc="Calamares installer for EndeavourOS"
 arch=('any')
 url="https://github.com/endeavouros-team/calamares"
