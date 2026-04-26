@@ -3,7 +3,7 @@
 # Calamares installer (fork) configured for EndeavourOS
 
 pkgname=calamares
-pkgver=26.03.2.2
+pkgver=26.03.2.3
 pkgrel=1
 release_name="Titan-Neo"
 pkgdesc="Calamares installer for EndeavourOS"
@@ -19,7 +19,7 @@ provides=("calamares")
 options=(!strip !emptydirs)
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
 
-sha256sums=('6c8b442ed3b25214a5c1dc212b22d97bb5d85813d966190013e8239b162311ac')
+sha256sums=('fcf6b52c82f6f55f81b9586e6888db481d4a40e1814cef9727e5b699510dbc27')
 
 prepare() {
     # Update branding.desc with the proper values
