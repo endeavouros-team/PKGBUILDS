@@ -183,7 +183,11 @@ ReadConfig() {
     case "$APP" in
         curl | wget) getter="$APP" ;;
     esac
-    [ "$TARGETDIR" ]    || DIE2 "TARGETDIR has no value in $configfile2"
+    case "$TARGETDIR" in
+        "") DIE2 "TARGETDIR has no value in $configfile2" ;;
+        "/") ;;
+        *"/") TARGETDIR="${TARGETDIR:: -1}" ;;
+    esac
     TARGETDIR="${TARGETDIR/\~/$HOME}"
     [ -d "$TARGETDIR" ] || DIE2 "'$TARGETDIR' does not exist or is not a folder"
     [ -w "$TARGETDIR" ] || DIE "cannot write to TARGETDIR ($TARGETDIR)"
