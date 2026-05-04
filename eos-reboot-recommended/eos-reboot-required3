@@ -38,26 +38,36 @@ WaitLoop() {
     local seconds_left="$1"
     local sleeptime="$2"
     local -r lockfile=/var/lib/pacman/db.lck
-    local -r tmp=/tmp/tmp.sdoij87SA5hX
-    rm -f $tmp
+    local -r tasks="pacman,yay,paru"
 
     while true ; do
         sleep "$sleeptime"
         ((seconds_left -= sleeptime))
-        if [ $seconds_left -gt 0 ] && [ -e $lockfile ] && sudo fuser $lockfile &> /dev/null && ps -C pacman,yay,paru &> /dev/null ; then
-            echo "${FUNCNAME[0]}: $(date): waiting ..." >> $tmp
+        if [ $seconds_left -gt 0 ] && [ -e $lockfile ] && sudo fuser $lockfile &> /dev/null && ps -C $tasks &> /dev/null ; then
+            if [ $seconds_left -gt 0 ] ; then
+                INFO "${FUNCNAME[0]}: $(date): waiting, $seconds_left seconds left ..."
+            elif [ -e $lockfile ] && sudo fuser $lockfile &> /dev/null ; then
+                INFO "${FUNCNAME[0]}: $(date): waiting for the release of $lockfile ..."
+            elif ps -C $tasks &> /dev/null ; then
+                INFO "${FUNCNAME[0]}: $(date): waiting for all processes of [$tasks] to finish ..."
+            fi
         else
             break
         fi
     done
 }
+ERROR() { [ -d /tmp ] && echo "$progname: error: $1" >> "$infolog"; exit 0; }
+INFO()  { [ -d /tmp ] && echo "$progname: info: $1"  >> "$infolog"; }
 
 Wait_before_notifying() {
     # Wait for all pacman-like processes to finish before giving a notification.
     # Do this by detecting when the $lockfile disappears, but do not wait more
     # than $REBOOT_MAX_TOTAL_WAIT seconds.
 
+    local -r progname=${0##*/}
     local -r conffile=/etc/eos-reboot-recommended.conf
+    local -r infolog="/tmp/$progname.log"
+    local -r common_lib=/usr/share/endeavouros/scripts/eos-script-lib-yad
 
     # These 4 variables can be configured in $conffile.
     local REBOOT_MAX_TOTAL_WAIT=300
@@ -65,10 +75,12 @@ Wait_before_notifying() {
     local REBOOT_NOTIFICATION_USER=""
     local REBOOT_EXPIRE_TIME=""
 
+    [ -d /tmp ] && rm -f "$infolog"
+
     # shellcheck disable=SC1090
     [ -e "$conffile" ] && source "$conffile"
     systemctl disable --now eos-reboot-required.timer
-    source /usr/share/endeavouros/scripts/eos-script-lib-yad --limit-icons || return
+    source $common_lib --limit-icons || ERROR "failed reading file $common_lib"
     WaitLoop $REBOOT_MAX_TOTAL_WAIT $REBOOT_WAIT_DIFF  # max seconds to wait before notifying about recommended reboot
 
     [ -d /tmp ] && touch /tmp/reboot-recommended
