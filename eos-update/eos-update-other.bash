@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## File /etc/eos-update-lib contains functions that can be used here.
+## File /etc/eos-update-lib.bash contains functions that can be used here.
 ## Functions:
 ##    OncePerBootSession                # parameters:  unique-id
 ##    OncePerNDays                      # parameters:  unique-id number-of-days
