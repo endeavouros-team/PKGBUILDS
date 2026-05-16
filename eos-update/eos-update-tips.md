@@ -39,6 +39,14 @@ Example:
 ```
 eos-update --aur --other-updates
 ```
+## Prevent accidental reboot, shutdown, suspend, etc.
+
+Use option `--keep-system-running` to prevent setting system down before `eos-update` is finished.<br>
+Tip: consider creating the following definition in your `~/.bashrc`:
+
+```
+alias eos-update='eos-update --keep-system-running'
+```
 
 
 ## Unlock locked privilege elevation
