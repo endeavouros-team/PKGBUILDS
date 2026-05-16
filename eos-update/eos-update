@@ -491,6 +491,7 @@ Options:
                           Use this only if keyring issues constantly make system update fail.
   --no-keyring            Do not try to update keyrings first.
   --no-sync               Do not run 'sync' after update.
+  --keep-system-running   Do not allow sleep, hibernate, reboot, or shutdown if '$progname' is still running.
   --run-mode <val>        Specifies the mode how the updating commands will be executed.
                           Supported values:
                              plain   Use current privileges. Uses 'sudo' for commands that need it.
@@ -597,8 +598,9 @@ RunUserCommands() {
     fi
 }
 
-Main() {
-    local progname="${0##*/}"
+_EosUpdate_Main2() {
+    # local progname="${0##*/}"
+    DebugBreak
     local cmdfile=""
     local -r pacmanconf=/etc/pacman.conf
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
@@ -610,7 +612,7 @@ Main() {
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
-    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs,keep-system-running"
     # lopts+=",system-checks"
     local sopts="dhl:"
 
@@ -641,10 +643,9 @@ Main() {
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
-
-    echo2tip "$progname: package updater with additional features"
     
     SingleOptions "$@"
+    echo2tip "$progname: package updater with additional features"
 
     RunUserCommands beginning
 
@@ -750,5 +751,16 @@ EOF
 }
 
 DebugBreak() { : ; }
+
+Main() {
+    local progname="${0##*/}"
+    if [[ "$*" =~ "--keep-system-running" ]] ; then
+        local params=()
+        readarray -t params < <(printf "%s\n" "$@" | grep -v -- '--keep-system-running')
+        systemd-inhibit --who="$progname" --why="Updating." "$progname" "${params[@]}"
+    else
+        _EosUpdate_Main2 "$@"
+    fi
+}
 
 Main "$@"
