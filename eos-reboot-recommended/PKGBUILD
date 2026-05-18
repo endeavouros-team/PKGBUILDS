@@ -5,7 +5,7 @@
 pkgname=eos-reboot-recommended
 pkgdesc="Notify if a reboot is recommended after system upgrade."
 pkgver=26.5
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('GPL')
 depends=(
@@ -26,7 +26,7 @@ source=(
   $_url/eos-reboot-required.service
 )
 
-sha512sums=('d8f73776a421c8496a37d7a52273b215578db09b65c84bbffb946a6fbcf44de7b81388c2e17d9abde42c7025464c186b41558f0258be61390b270538fe54116c'
+sha512sums=('e6b3f9261ba6a902a1d944c3d124b90b422b7a7654ed1c3de0df26cf5adaa8b32fe7e4cfbba453aa1953e14a5d8af85337c424dfbb48107f274bc94de5834a8d'
             '2714f6acdc24c68914e23705fd147c900952d3a8511d24806516d392ee4bd80c1bf414a80536fd7e42384443baf9fc31f711f6b18856e2178ed302ba66037e3d'
             'f4c4394d95a6cabf76c1acf1f053cd6524bc107bc2a40d40d7c3b9ab2a01d2fc046e4b6fdc6d694a286ad524f965a7c10ebdebf3b3dd430459cb4588505f0780'
             '0bd433261cddf2b304615d567d77a2a31287d1470240f954cb353ca0e0ac37fbc55dcb2de3652da0bae7f7ba18b642e3f7fae5c275d7d81c09254c18b01a1900'
