@@ -346,6 +346,9 @@ SingleOptions() {
             --edit-mirrorlist)                   EditMirrorlist "$2"
                                                  exit 0
                                                  ;;
+            --tips)                              xdg-open "/usr/share/doc/$progname/${progname}-tips.html"
+                                                 exit 0
+                                                 ;;
             --show-only-fixed)                   which arch-audit >/dev/null && arch-audit -u
                                                  exit
                                                  ;;
@@ -613,6 +616,7 @@ _EosUpdate_Main2() {
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
     lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs,keep-system-running"
+    lopts+=",tips"
     # lopts+=",system-checks"
     local sopts="dhl:"
 

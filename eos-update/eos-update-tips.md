@@ -124,6 +124,8 @@ eos-update --colors no        # disable additional colors in output
 
 Here's some potentially useful aliases for `eos-update`:
 ```
+alias eos-update='eos-update --keep-system-running'
+
 alias u='eos-update --fast --descriptions'           # "fast" update check; also show the descriptions of updated packages
 alias u='eos-update --fast --descriptions --nvidia'  # the same when Nvidia GPU is installed
 alias u='eos-update --cache-limit 1'                 # limits the growth of the package cache

@@ -2,7 +2,7 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.5
+pkgver=26.5.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -32,27 +32,35 @@ source=(
   $_url/eos-update-fast
   $_url/eos-update-lib.bash
   $_url/eos-update-other.bash    # "config" for additional update tools
+  $_url/eos-update-tips.md
 )
 
-sha512sums=('e7d18b3220174599e923ad25893211bb9db89f85f1550811b4c2c452ba6ba5114a4d38c6e3afec5df4779b370737e4dfdcb1f7699eb87c64d567e5de734e140e'
+sha512sums=('4918c15d8287e6705a0d822329136459dbc7cec3ed78c28e0abc93c6a770acd70addb3eed6cbbce24c8477eb21c8fba4b3b895b13c8c10e1898779f3a1a67a08'
             '2a2508df7fe084c5ac9b33dbc6894e5d7a3156ffa707ac4f2ed4ce148b9b16c94be9a50d19501edd4e128189d80b15aa8b66224b1d5deeb5063f397f9487853a'
             'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
             '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
             '25d45e2698f4cfc46ba4f1b68053180a9292997eda7d8dbf15ab5370e9f8504634a37732076bdebfb5b7b1f109e8325a0662768cf8858f777fde8885559f7767'
             '1caea153f9dbe69aa247871a720a401eb9092fb6cda5b622ca816f32fcfef85f400727fece4a80b3628122373184e0e5fa088dfafec666e86394eef44decbcca'
-            '52e0fc6bc5a48db75c251ecd8425af9f9673e3f037ceed562f4909e3bed62862512d6f048cbfdac767a141960ef2afb7b11dd63e467b171bc71e88ade9f85cca')
+            '52e0fc6bc5a48db75c251ecd8425af9f9673e3f037ceed562f4909e3bed62862512d6f048cbfdac767a141960ef2afb7b11dd63e467b171bc71e88ade9f85cca'
+            'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4')
 
 package() {
   local file src
 
+  # markdown_py eos-update-tips.md > eos-update-tips.html
+  [ -e eos-update-tips.html ] || pandoc -f gfm eos-update-tips.md -o eos-update-tips.html
+
   for src in "${source[@]}" ; do
       file="${src##*/}"
       case "$file" in
+          *.md)                  file="${file%.md}.html"
+                                 install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
           *.desktop)             install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
           *.completion)          install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
           *.bash)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *)                     install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done
+  rm -f eos-update-tips.html
 }
