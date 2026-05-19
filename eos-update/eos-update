@@ -463,6 +463,7 @@ Optional help:
 Usage: $progname [options]
 Options:
   --help, -h              This help.
+  --tips                  Tips and examples for $progname.
   --rank-mirrors          Executes user-written bash script $rank_command_file which may contain
                           ranking commands for both Arch and EndeavourOS mirrors, and exits.
                           Example commands:
