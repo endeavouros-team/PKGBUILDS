@@ -703,6 +703,29 @@ AllOrLocalMirrors() {
     AllContinents
 }
 
+ObsoleteRami() {
+    local header_lines=(
+        "Consider installing package 'iso-create-ml' and using app 'create-ml' for ranking Arch mirrors."
+        "Example:"
+        "    create-ml --save"
+        "Alternative apps: rate-mirrors, reflector, reflector-simple."
+    )
+    local header=""
+    printf -v header "%s\n" "${header_lines[@]}"
+    local reply=""
+    local fzf=()
+    fzf=(fzf --exact --disabled --layout=reverse --no-input
+         --header="$header" --header-label=" ${progname^^} is obsolete! " --header-border
+         --list-label=" Proceed with $progname? " --list-label-pos=3 --list-border
+        )
+
+    reply=$(printf "%s\n" "no (recommended)" "yes" | "${fzf[@]}")
+    case "$reply" in
+        yes) ;;
+        *) exit 1 ;;
+    esac
+}
+
 Main() {
     local -r progname=${0##*/}
     local -r ml=/etc/pacman.d/mirrorlist
@@ -714,6 +737,8 @@ Main() {
     local -r now=$(GetTimeInfo)
     local auto_update_days=7
     local verbosity=default
+
+    ObsoleteRami
 
     source /etc/eos-script-lib-yad.conf    # for SudoEdit()
 
