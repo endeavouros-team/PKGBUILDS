@@ -9,13 +9,18 @@ DoNotify() {
     local icon=/usr/share/icons/Qogir/scalable/apps/system-reboot.svg
     [ -e $icon ] || icon=system-reboot
 
-
     # Configuration file may contain a user name to receive notifications,
     # then other users don't get them, and the notification can have a timer value
     # in the configuration file.
 
-    if [ "$REBOOT_EXPIRE_TIME" ] ; then
-        user="$REBOOT_NOTIFICATION_USER"                                     # The user receiving the notification.
+    if [ "$REBOOT_EXPIRE_TIME" ] && [ -z "${REBOOT_EXPIRE_TIME//[0-9]/}" ] && [ $REBOOT_EXPIRE_TIME -ne 0 ]; then
+        if [ "$REBOOT_NOTIFICATION_USER" ] ; then
+            if printf "%s\n" $(/bin/users) | sort -u | grep "$REBOOT_NOTIFICATION_USER" >/dev/null ; then
+                user="$REBOOT_NOTIFICATION_USER"                             # The user receiving the notification.
+            else
+                WARNING "variable REBOOT_NOTIFICATION_USER in $conffile contains an unknown user '$REBOOT_NOTIFICATION_USER'."
+            fi
+        fi
         urgency=normal                                                       # Enables expiretime!
         expiretime="${REBOOT_EXPIRE_TIME}000"                                # Seconds to milliseconds.
     fi
@@ -56,8 +61,9 @@ WaitLoop() {
         fi
     done
 }
-ERROR() { [ -d /tmp ] && echo "$progname: error: $1" >> "$infolog"; exit 0; }
-INFO()  { [ -d /tmp ] && echo "$progname: info: $1"  >> "$infolog"; }
+ERROR()    { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; exit 0; }
+WARNING()  { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
+INFO()     { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
 
 Wait_before_notifying() {
     # Wait for all pacman-like processes to finish before giving a notification.
