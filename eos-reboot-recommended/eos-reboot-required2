@@ -7,6 +7,7 @@
 IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
         running_kernel=$(eos_running_kernel)
+        [ "$running_kernel" ] || STOP "unable to determine running kernel"
     fi
     test "$1" = "$running_kernel"
 }
