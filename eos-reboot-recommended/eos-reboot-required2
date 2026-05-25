@@ -7,32 +7,41 @@
 IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
         running_kernel=$(eos_running_kernel)
-        [ "$running_kernel" ] || STOP "unable to determine running kernel"
+        [ "$running_kernel" ] || ERROR "unable to determine running kernel"
     fi
     test "$1" = "$running_kernel"
 }
 
 DoNotify() {
-    echo "[$(/usr/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" > "$logfile"
-    chmod o-rwx "$logfile"
+    DEBUG "${FUNCNAME[0]} begin."
+    # echo "[$(/usr/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" >> "$logfile"
+    INFO "Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}"
+    # chmod o-rwx "$logfile"
     systemctl enable --now eos-reboot-required.timer 2>/dev/null
+    DEBUG "${FUNCNAME[0]} end."
 }
 
-STOP() { echo "==> $progname: error: $1" > "$errlog"; exit 0; }
+ERROR()  { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; exit 0; }
+DEBUG()  { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
+INFO()   { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
 
 Main() {
     local -r progname=${0##*/}
-    local -r errlog="/var/log/$progname.errlog"
     local -r logfile="/var/log/$progname.log"
     local -r common_scripts_file="/usr/share/endeavouros/scripts/eos-script-lib-yad"
 
-    [ "$EUID" = "0" ]                           || STOP "elevated privileges required."
-    [ -r "$common_scripts_file" ]               || STOP "failed to read file $common_scripts_file."
+    rm -f "$logfile"
+    DEBUG "$progname begin."
+
+    [ "$EUID" = "0" ]                           || ERROR "elevated privileges required."
+    [ -r "$common_scripts_file" ]               || ERROR "failed to read file $common_scripts_file."
     # shellcheck disable=SC1090
-    source "$common_scripts_file" --limit-icons || STOP "failed to source file $common_scripts_file"
+    source "$common_scripts_file" --limit-icons || ERROR "failed to source file $common_scripts_file"
 
     eos_is_in_chroot && return 0
+    DEBUG "${FUNCNAME[0]}: not chrooting."
 
+    DEBUG "${FUNCNAME[0]}: variable EOS_REBOOT_RECOMMENDING == '$EOS_REBOOT_RECOMMENDING'"
     [ "$EOS_REBOOT_RECOMMENDING" = "no" ] && return 0
 
     local targets       # list of updated package names from the hook (stdin)
@@ -75,8 +84,13 @@ Main() {
                 ;;
         esac
     done
-    [ "${list_of_targets[0]}" ] || return 0    # nothing to notify
+    if [ -z "${list_of_targets[0]}" ] ; then
+        DEBUG "${FUNCNAME[0]}: no target found to trigger reboot notification."
+        DEBUG "${FUNCNAME[0]}: target list: ${list_of_targets[*]}."
+        return 0    # nothing to notify
+    fi
     DoNotify
+    DEBUG "$progname end."
 }
 
 Main "$@"

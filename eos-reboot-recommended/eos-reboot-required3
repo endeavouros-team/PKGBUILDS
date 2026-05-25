@@ -9,6 +9,8 @@ DoNotify() {
     local icon=/usr/share/icons/Qogir/scalable/apps/system-reboot.svg
     [ -e $icon ] || icon=system-reboot
 
+    DEBUG "${FUNCNAME[0]} begin."
+
     # Configuration file may contain a user name to receive notifications,
     # then other users don't get them, and the notification can have a timer value
     # in the configuration file.
@@ -37,6 +39,7 @@ DoNotify() {
         "$user"                        # may be empty
     )
     "${cmd[@]}"
+    DEBUG "${FUNCNAME[0]} end."
 }
 
 WaitLoop() {
@@ -44,6 +47,8 @@ WaitLoop() {
     local sleeptime="$2"
     local -r lockfile=/var/lib/pacman/db.lck
     local -r tasks="pacman,yay,paru"
+
+    DEBUG "${FUNCNAME[0]} begin."
 
     while true ; do
         sleep "$sleeptime"
@@ -60,10 +65,13 @@ WaitLoop() {
             break
         fi
     done
+    DEBUG "${FUNCNAME[0]} end."
 }
-ERROR()    { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; exit 0; }
-WARNING()  { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
-INFO()     { [ -d /tmp ] && echo "$progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
+
+ERROR()    { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; exit 0; }
+WARNING()  { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
+INFO()     { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
+DEBUG()    { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$infolog"; }
 
 Wait_before_notifying() {
     # Wait for all pacman-like processes to finish before giving a notification.
@@ -72,16 +80,17 @@ Wait_before_notifying() {
 
     local -r progname=${0##*/}
     local -r conffile=/etc/eos-reboot-recommended.conf
-    local -r infolog="/tmp/$progname.log"
+    local -r infolog="/var/log/$progname.log"
     local -r common_lib=/usr/share/endeavouros/scripts/eos-script-lib-yad
+
+    rm -f "$infolog"
+    DEBUG "$progname begin."
 
     # These 4 variables can be configured in $conffile.
     local REBOOT_MAX_TOTAL_WAIT=300
     local REBOOT_WAIT_DIFF=4
     local REBOOT_NOTIFICATION_USER=""
     local REBOOT_EXPIRE_TIME=""
-
-    [ -d /tmp ] && rm -f "$infolog"
 
     # shellcheck disable=SC1090
     [ -e "$conffile" ] && source "$conffile"
@@ -93,6 +102,7 @@ Wait_before_notifying() {
 
     DoNotify "Reboot recommended!" "Reboot is recommended due to the upgrade of core system package(s)."
     systemctl disable --now eos-reboot-required.timer
+    DEBUG "$progname end."
 }
 
 Wait_before_notifying "$@"
