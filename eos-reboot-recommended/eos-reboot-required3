@@ -17,7 +17,7 @@ DoNotify() {
 
     if [ "$REBOOT_EXPIRE_TIME" ] && [ -z "${REBOOT_EXPIRE_TIME//[0-9]/}" ] && [ $REBOOT_EXPIRE_TIME -ne 0 ]; then
         if [ "$REBOOT_NOTIFICATION_USER" ] ; then
-            if printf "%s\n" $(/bin/users) | sort -u | grep "$REBOOT_NOTIFICATION_USER" >/dev/null ; then
+            if eos_GetUsers | grep "$REBOOT_NOTIFICATION_USER" >/dev/null ; then
                 user="$REBOOT_NOTIFICATION_USER"                             # The user receiving the notification.
             else
                 WARNING "variable REBOOT_NOTIFICATION_USER in $conffile contains an unknown user '$REBOOT_NOTIFICATION_USER'."
