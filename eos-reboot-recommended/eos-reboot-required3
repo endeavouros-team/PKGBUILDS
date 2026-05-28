@@ -26,6 +26,7 @@ DoNotify() {
         urgency=normal                                                       # Enables expiretime!
         expiretime="${REBOOT_EXPIRE_TIME}000"                                # Seconds to milliseconds.
     fi
+    DEBUG "user = '$user'; expiretime = '$expiretime'; urgency = '$urgency'"
 
     local cmd=(
         eos_notification_all           # function to notify all users
