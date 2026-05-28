@@ -18,7 +18,7 @@ depends=( 'qt6-svg' 'qt6-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcorea
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt6' 'python' 'solid' 'qt6-tools' 'libpwquality' 'ckbcomp' 'qt6-declarative' )
 provides=("calamares")
 options=(!strip !emptydirs)
-source=("git+https://github.com/endeavouros-team/$_reponame.git#branch=localeq")
+source=("git+https://github.com/endeavouros-team/$_reponame.git#branch=calamares")
 
 sha256sums=('SKIP')
             
@@ -48,9 +48,9 @@ build() {
     -DINSTALL_CONFIG=OFF \
     -DSKIP_MODULES="dracut \
     dummycpp dummyprocess dummypython dummypythonqt \
-    finishedq initcpio keyboard license locale notesqml oemid \
+    finishedq initcpio keyboardq license localeq notesqml oemid \
     openrcdmcryptcfg plymouthcfg plasmalnf services-openrc \
-    summaryq tracking webview welcome"
+    summaryq tracking webview welcomeq"
     export DESTDIR="$srcdir/build"
     make -C build
 }
