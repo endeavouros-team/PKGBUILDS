@@ -4,16 +4,25 @@ DoNotify() {
     local -r title="$1"
     local -r msg="$2"
     local urgency=normal
-    local expiretime="${REBOOT_EXPIRE_TIME}000"
+    local expiretime=0
     local user="$REBOOT_NOTIFICATION_USER"
     local icon=/usr/share/icons/Qogir/scalable/apps/system-reboot.svg
     [ -e $icon ] || icon=system-reboot
+    [ "$REBOOT_EXPIRE_TIME" ] && expiretime="${REBOOT_EXPIRE_TIME}000"
 
     DEBUG "${FUNCNAME[0]} begin."
 
     # Configuration file may contain a user name to receive notifications,
     # then other users don't get them, and the notification can have a timer value
     # in the configuration file.
+
+    if [ "$user" ] ; then
+        if printf "%s\n" $(eos_GetUsers) | grep "$user" >/dev/null ; then
+            :
+        else
+            WARNING "/usr/bin/users did not find username '$user'"
+        fi
+    fi
 
     DEBUG "user = '$user'; expiretime = '$expiretime'; urgency = '$urgency'"
 
