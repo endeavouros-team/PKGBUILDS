@@ -6,7 +6,7 @@
 
 pkgname=eos-bash-shared
 pkgdesc="Bash code shared by certain EndeavourOS apps."
-pkgver=26.5.2
+pkgver=26.5.3
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -51,7 +51,7 @@ source=(
   $_url/eos-script-lib-yad
   $_url/eos-script-lib-yad.conf
 
-  $_url/eos-FindAppIcon
+  # $_url/eos-FindAppIcon
   $_url/RunInTerminal
   $_url/RunInTerminalOpt
   $_url/RunInTerminalEx
@@ -94,7 +94,6 @@ source=(
 
 sha512sums=('b6084912329889ed40314a3d901af639991139cf6700dbdee8f3377a14f6c51745be944e24423c5a783e87f57a57529e10ff48ebe270173bfed4a9edf548fc07'
             '14c15aedc818a9e0c0bc1ace7e49acfa4d8db76e1ba4b37146450776bc3f6be01d9f98ff618fab0b6f732d8516b12f0a778a4b478df0065ec7280a47424d2c1d'
-            'ce6ea00a8956f930408795b678d05fe5abfa1a08167438221786c9aa091ef0c63dc107896af8faa3d37dfeed47243600b16c1191040b0c76870b2b3cbfe8c9e1'
             '0467c636eb33eafaef049de3397e6e8dca53d2a47a30bb70a83f9cb37aa128c0a0ebc3275487d06ba510d94decfe8f1c864fdcf7cb852187a86fbce3aa0f2aaa'
             '6c27a5bf1a9b54f629f27fcc75a4edb240e1df2c4122aae307f208df174a44513a9b63be3ebb0d0e563952021d9987cd46584cb229b1a4f221d97425da0df3d1'
             'a67976cb1aab264585a671c9f773bce6a033b66acdfeaac34a62f61818fabb176cb3437b9a5e42f62e6b24c2b8d9bfec850eea4d3c8f8d56804a4d43495187ed'
