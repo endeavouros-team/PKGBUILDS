@@ -2,7 +2,7 @@
 
 pkgname=eos-update-notifier
 pkgdesc="Software update notifier and 'news for you' for EndeavourOS users."
-pkgver=24.7.1
+pkgver=26
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -15,6 +15,8 @@ optdepends=(
   "vim:   alternative editor (see EOS_SUDO_EDITORS in /etc/eos-script-lib-yad.conf for more)"
 )
 backup=(etc/$pkgname.conf)
+
+install=$pkgname.install
 
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"

@@ -1,0 +1,21 @@
+post_upgrade() {
+    eos-color warning
+    cat <<EOF
+==> eos-update-notifier is deprecated and will be removed at 2026-September-01.
+    To update your system, please consider using any of the following commands
+        eos-update              # updates native packages
+        eos-update --aur        # updates native and AUR packages
+        sudo pacman -Syu        # updates native packages
+        yay                     # updates native and AUR packages
+    More information with commands
+        eos-update --help
+        eos-update --tips
+        man pacman
+        man yay
+EOF
+    eos-color reset
+}
+
+post_install() {
+    post_upgrade
+}
