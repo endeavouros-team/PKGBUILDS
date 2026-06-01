@@ -1,0 +1,16 @@
+post_upgrade() {
+    eos-color warning
+    cat <<EOF
+==> rami is deprecated and will be removed at 2026-September-01.
+    Alternative Arch mirror ranking apps:
+        create-ml            # see package iso-create-ml
+        rate-mirrors
+        reflector
+        reflector-simple
+EOF
+    eos-color reset
+}
+
+post_install() {
+    post_upgrade
+}
