@@ -9,7 +9,7 @@ printf2() { printf "$@" >&2 ; }
 WARN()    { echo2warning "==> $progname: warning: $1"; }
 DIE()     { echo2error   "==> $progname: error: $1"; exit 1;  }
 
-UseColor() { [ $use_colors = yes ] && eos-color "$@" 2 ; }
+UseColor() { [ "$use_colors" = yes ] && eos-color "$@" 2 ; }
 
 echo2error()   { UseColor error;   echo2 "$@"; UseColor reset ; }
 echo2info()    { UseColor info;    echo2 "$@"; UseColor reset ; }
@@ -42,15 +42,15 @@ MirrorCheckResult() {
         return 0
     else
         if [ ${#unsupported[@]} -gt 0 ] ; then
-            EditMirrorlist $ml "${unsupported[0]%%:*}"   # second parameter is the line number
+            EditMirrorlist "$ml" "${unsupported[0]%%:*}"   # second parameter is the line number
         else
-            EditMirrorlist $ml
+            EditMirrorlist "$ml"
         fi
         return 1
     fi
 }
 
-Hardware-x86_64() { [ $(eos_GetArch) = x86_64 ] || DIE "sorry, this implementation supports only x86_64 environment"; }
+Hardware-x86_64() { [ "$(eos_GetArch)" = x86_64 ] || DIE "sorry, this implementation supports only x86_64 environment"; }
 
 CheckYourArchMirrorlist() {
     Hardware-x86_64
@@ -100,8 +100,8 @@ CheckYourEndeavourosMirrorlist() {
     # esac
 
     for url in "${mirrors[@]}" ; do
-        data=$(curl -Lsm 30 -o- $url)
-        if [ $? -eq 0 ] && [ "$data" ] ; then
+        data=$(curl -Lsm 30 -o- "$url") || continue
+        if [ "$data" ] ; then
             data=$(echo "$data" | grep "endeavouros-mirrorlist.*\.sig")   # the line that contains the pkg file name
             data=${data#*\"}                                              # skip prefix
             data=${data%%\.sig*}                                          # skip suffix
@@ -110,7 +110,7 @@ CheckYourEndeavourosMirrorlist() {
                 supported=()
 
                 url+="/$data"
-                curl -Lsm 30 -o$tmpfile $url
+                curl -Lsm 30 -o"$tmpfile" "$url"
 
                 good_mirrors=$(tar xvf $tmpfile ${eml:1} -O 2>/dev/null | grep "^Server = " | sed 's|^Server = ||')
                 rm -f $tmpfile
@@ -118,9 +118,9 @@ CheckYourEndeavourosMirrorlist() {
 
                 for lm in $local_mirrors ; do
                     if [ "$(echo "$good_mirrors" | grep "${lm#*:}")" ] ; then
-                        supported+=(${lm#*:})
+                        supported+=("${lm#*:}")
                     else
-                        unsupported+=($lm)  # includes the line number: "nr:https://..."
+                        unsupported+=("$lm")  # includes the line number: "nr:https://..."
                     fi
                 done
                 MirrorCheckResult $eml
@@ -139,8 +139,8 @@ EditMirrorlist() {
     [ -x $editor ] || { WARN "package 'nano' is required for editing $list"; return 1; }
 
     case "$list" in
-        arch | $aml)        list="$aml" ;;
-        endeavouros | $eml) list="$eml" ;;
+        arch | "$aml")        list="$aml" ;;
+        endeavouros | "$eml") list="$eml" ;;
         "") DIE "supported mirrorlists: arch, endeavouros" ;;
     esac
     if [ "$linenr" ] ; then
@@ -155,7 +155,7 @@ EditMirrorlist() {
 }
 
 ResetKeyrings() {
-    Cmd sudo mv /etc/pacman.d/gnupg /root/pacman-key.bak.$(date +%Y%m%d-%H%M).by.$progname
+    Cmd sudo mv /etc/pacman.d/gnupg /root/pacman-key.bak."$(date +%Y%m%d-%H%M)".by."$progname"
     Cmd sudo pacman-key --init
     Cmd sudo pacman-key --populate archlinux endeavouros
     Cmd sudo pacman -Syy --noconfirm archlinux-keyring endeavouros-keyring
@@ -200,17 +200,17 @@ CheckReposPacmanConf() {
     local stop=no
 
     for item in "${problem_repos[@]}" ; do
-        [ "$(grep "^\[$item\]" $file)" ] && toberemoved+=("[$item]")
+        grep "^\[$item\]" "$file" >/dev/null && toberemoved+=("[$item]")
     done
     for item in "${needed_repos[@]}" ; do
-        [ "$(grep "^\[$item\]" $file)" ] || tobeadded+=("[$item]")
+        grep "^\[$item\]" "$file" || tobeadded+=("[$item]")
     done
-    if [ "$tobeadded" ] ; then
+    if [ "${tobeadded[0]}" ] ; then
         echo2error "==> $progname: error: the following repo definitions must be added to $file:"
         printf2  "    %s\n" "${tobeadded[@]}"
         stop=yes
     fi
-    if [ "$toberemoved" ] ; then
+    if [ "${toberemoved[0]}" ] ; then
         echo2error "==> $progname: error: the following repo definitions must be removed from $file:"
         printf2  "    %s\n" "${toberemoved[@]}"
         stop=yes
@@ -220,11 +220,11 @@ CheckReposPacmanConf() {
 
 FaillockCheck() {
     if [ $faillockcheck = yes ] ; then
-        if [ $(LANG=C faillock --user $LOGNAME | grep -EA1 "^When[ ]+Type[ ]+Source" | wc -l) -gt 1 ] ; then
+        if [ "$(LANG=C faillock --user "$LOGNAME" | grep -EA1 "^When[ ]+Type[ ]+Source" | wc -l)" -gt 1 ] ; then
             sleep 1
             read -p "Info: elevating privileges is locked, press ENTER to unlock, or Ctrl-C to quit: " >&2
             case "$?" in
-                0) faillock --user $LOGNAME --reset ; sleep 2 ;;
+                0) faillock --user "$LOGNAME" --reset ; sleep 2 ;;
                 *) exit 0 ;;
             esac
         fi
@@ -237,7 +237,7 @@ PacCache() {
             # pacman 7.1.0.r7.gb9f7d4a-1 started creating subfolders named 'download-*', so remove them
             local leftover_dirs=()
             readarray -t leftover_dirs < <(/bin/sudo /bin/find "${pkg_cache_dir%/}" -type d -empty -name 'download-*')
-            if [ "$leftover_dirs" ] ; then
+            if [ "${leftover_dirs[0]}" ] ; then
                 UseColor warning 2
                 echo2 "==> Removing empty folders created by pacman:"
                 /bin/ls -ld "${leftover_dirs[@]}" | sed 's|^|    |'
@@ -246,9 +246,10 @@ PacCache() {
             fi
 
             echo2info "==> paccache -rk$paccache_limit"
-            sudo /usr/bin/paccache --verbose -rk$paccache_limit      # sudo not really required here but it takes one unnecessary output line away
+            sudo /usr/bin/paccache --verbose -rk"$paccache_limit"      # sudo not really required here but it takes one unnecessary output line away
 
-            local amount=$(/bin/du -hd1 "$pkg_cache_dir" | awk '{print $1}')
+            local amount
+            amount=$(/bin/du -hd1 "$pkg_cache_dir" | awk '{print $1}')
             UseColor info 2
             printf2 "==> Disk space used in the package cache: %s [%s]\n" "$amount" "${pkg_cache_dir%/}"
             UseColor reset 2
@@ -259,13 +260,13 @@ PacCache() {
 ResetPacmanConf() {
     local -r pacmanconf_url="https://raw.githubusercontent.com/endeavouros-team/EndeavourOS-ISO/refs/heads/main/airootfs/etc/pacman.conf"
     local -r tmpfile=$(mktemp)
-    wget -qO $tmpfile "$pacmanconf_url" || DIE "cannot fetch $pacmanconf_url"
+    wget -qO "$tmpfile" "$pacmanconf_url" || DIE "cannot fetch $pacmanconf_url"
     local -r time=$(date +%Y%m%d-%H%M%S)
     sudo mkdir -p /etc/.EOS_BACKUPDIR
-    sudo mv $pacmanconf /etc/.EOS_BACKUPDIR/${pacmanconf##*/}.$time
+    sudo mv $pacmanconf /etc/.EOS_BACKUPDIR/${pacmanconf##*/}."$time"
     sudo gzip "/etc/.EOS_BACKUPDIR/${pacmanconf##*/}.$time"
-    sudo cp $tmpfile $pacmanconf
-    rm -f $tmpfile
+    sudo cp "$tmpfile" "$pacmanconf"
+    rm -f "$tmpfile"
 }
 
 RankWithUserCommand() {
@@ -284,14 +285,15 @@ YourFavPkgs() {
 
     local favsfile=/etc/${progname}-favorites.conf     # alternatively an url?
     if [ ! -r "$favsfile" ] ; then
-        echo2warning "sorry, file '$favfile' is not readable"
+        echo2warning "sorry, file '$favsfile' is not readable"
         exit 1
     fi
 
     source "$favsfile"
     local cmd=""
     if [ "$FAVORITES_UNINSTALL" ] ; then
-        local to_uninstall=$(/bin/expac %n "${FAVORITES_UNINSTALL[@]}")
+        local to_uninstall
+        to_uninstall=$(/bin/expac %n "${FAVORITES_UNINSTALL[@]}")
         if [ "$to_uninstall" ] ; then
             cmd="sudo pacman -R $to_uninstall"
             echo2info "==> Running command: $cmd"
@@ -303,8 +305,9 @@ YourFavPkgs() {
         echo2warning "==> FAVORITES_UNINSTALL is empty in $favsfile"
     fi
     if [ "$FAVORITES_INSTALL" ] ; then
-        local already_installed=$(/bin/expac %n "${FAVORITES_INSTALL[@]}")
-        local to_install=$(printf "%s\n" "${FAVORITES_INSTALL[@]}" | grep -vf <(printf "%s\n" "${already_installed[@]}"))
+        local already_installed to_install
+        already_installed=$(/bin/expac %n "${FAVORITES_INSTALL[@]}")
+        to_install=$(printf "%s\n" "${FAVORITES_INSTALL[@]}" | grep -vf <(printf "%s\n" "${already_installed[@]}"))
         if [ "$to_install" ] ; then
             cmd="sudo pacman -Syu --needed $to_install"
             echo2info "==> Running command: $cmd"
@@ -325,7 +328,7 @@ SingleOptions() {
             # --system-checks)                     SystemValidityChecks_warn ;;  # does not exit without a problem
 
             --fav-pkgs)                          YourFavPkgs     # can install your favorite packages
-                                                 exit 0
+                                                 # exit 0
                                                  ;;
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
@@ -352,7 +355,8 @@ SingleOptions() {
             --show-only-fixed)                   which arch-audit >/dev/null && arch-audit -u
                                                  exit
                                                  ;;
-            --show-upstream-news)                local br=$(eos_select_browser)
+            --show-upstream-news)                local br
+                                                 br=$(eos_select_browser)
                                                  [ "$br" ] && $br https://archlinux.org/news
                                                  exit
                                                  ;;
@@ -360,7 +364,7 @@ SingleOptions() {
                                                  lopts="--${lopts//,/ --}"
                                                  sopts="${sopts//:/}"
                                                  sopts="$(echo "$sopts" | sed -E 's|([a-z])| -\1|g')"
-                                                 echo $lopts $sopts
+                                                 echo "$lopts $sopts"
                                                  exit 0
                                                  ;;
             --other-updates)                     other_updates=yes ;;   # does not exit and it is OK
@@ -402,7 +406,7 @@ Options() {
                 ;;
             # --system-checks)                     ;;                # already handled in SingleOptions
             --fast)                              eufast=yes ;;
-            --fav-pkgs)                          YourFavPkgs; exit 0 ;;   # can install your favorite packages
+            --fav-pkgs)                          YourFavPkgs ;;      # exit 0 ;;   # can install your favorite packages
             --nvidia)                            nvidia=yes ;;
             --rank-mirrors)                      ;;
             --no-keyring)                        keyring=no ;;
@@ -415,7 +419,7 @@ Options() {
             --run-mode)                          mode="$2"; shift ;;
             --min-free-bytes)                    min_free_bytes="$2" ; shift ;;
             --helper)                            SetHelper "$2" ; shift ;;
-            --aur)                               SetHelper; eufast_opt+=" $1" ;;
+            --aur)                               SetHelper; eufast_opt+=("$1") ;;
             --paru | --yay | --pacman)           SetHelper "${1/--/}" ;;
             --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
             --cache-limit | -l)                  paccache_limit="$2"
@@ -533,17 +537,18 @@ Tip: create an alias in file ~/.bashrc for $progname to have the options you nee
 EOF
 #  --fav-pkgs              Uses a config file where you manage favorite packages defined by you.
 #  --system-checks         After some checks may give recommendations for your system, but changes nothing.
-    [ "$1" ] && exit $1
+    [ "$1" ] && exit "$1"
 }
 
 DiskSpace() {
-    local available=$(findmnt / -nbo avail)
-    local min=$min_free_bytes
+    local available min
+    available=$(findmnt / -nbo avail)
+    min=$min_free_bytes
 
-    if [ $available -lt $min ] ; then
+    if [ "$available" -lt "$min" ] ; then
         {
             WARN "your root partition (/) has only $available bytes of free space."
-            if [ $(du -b -d0 "$pkg_cache_dir" | awk '{print $1}') -gt $min ] ; then
+            if [ "$(du -b -d0 "$pkg_cache_dir" | awk '{print $1}')" -gt "$min" ] ; then
                 printf "\nFor example, cleaning up the package cache may help.\n"
                 printf "Command 'sudo paccache -rk1' would do this:"
                 paccache -dk1
@@ -563,9 +568,9 @@ SystemValidityChecks_error() {
     local files_required=("$pacmanconf" "$aml" "$eml")
     local file
     for file in "${files_required[@]}" ; do
-        [ -e "$file" ]                   || DIE "file '$file' is missing!"
-        [ $(stat -c %s "$file") -gt 0 ]  || DIE "file '$file' is empty!"
-        [ -r "$file" ]                   || DIE "file '$file' is not readable!"
+        [ -e "$file" ]                     || DIE "file '$file' is missing!"
+        [ "$(stat -c %s "$file")" -gt 0 ]  || DIE "file '$file' is empty!"
+        [ -r "$file" ]                     || DIE "file '$file' is not readable!"
     done
     CheckReposPacmanConf
 }
@@ -595,7 +600,7 @@ RunUserCommands() {
     if [ $other_updates = yes ] ; then
         local -r when="$1"
         if [ -r $otherUpdatesFile ] ; then
-            bash $otherUpdatesFile $when
+            bash $otherUpdatesFile "$when"
         else
             [ $((runusercommands_warning_count++)) -eq 0 ] && WARN "script $otherUpdatesFile does not exist"
         fi
@@ -629,16 +634,14 @@ _EosUpdate_Main2() {
     local pacdiffer=""                            # default = "" because pacdiff can change critical files
     local -r pacdiffer_cmd_default="eos-pacdiff --quiet"
     local subopts=()
-    local afteropts=()
     local keyring=yes                             # user may disable keyring check with --no-keyring
     local nvidia=no                               # user may enable Nvidia check with --nvidia
     local descriptions=no                         # user may enable showing descriptions of the package updates
     local faillockcheck=no
     local other_updates=no                        # user can add update commands for other sources
-    local nvidia_opt=""
     local sync="sync"
     local eufast=no
-    local eufast_opt="--arch --endeavouros"
+    local eufast_opt=(--arch --endeavouros)
     local paccache_limit=""
     local runusercommands_warning_count=0         # limit warnings to 1 from RunUserCommands
 
@@ -660,13 +663,14 @@ _EosUpdate_Main2() {
     Options "$@"
 
     if [ $eufast = yes ] ; then
-        eos-update-fast $eufast_opt
+        eos-update-fast "${eufast_opt[@]}"
         case "$?" in
             2) echo2 "$(ltr sysup_no)" ; exit ;;
         esac
     fi
 
-    local pkg_cache_dir=$(GetCacheDir)
+    local pkg_cache_dir
+    pkg_cache_dir=$(GetCacheDir)
 
     if [ $EUID -eq 0 ] && [ $mode = plain ] ; then    # mode can change based on current privileges
         mode=login
@@ -684,7 +688,7 @@ _EosUpdate_Main2() {
         echo2error "==> File $lock is in use.\n    Check if another process is still managing packages."
         exit 1
         # DIE "file $lock is in use. Check if another process is still managing packages."
-        rmopt=i
+        #rmopt=i
     fi
 
     case "$helper" in
