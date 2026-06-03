@@ -172,7 +172,8 @@ Header() {
     echo -e "### Program: $progname version $(expac %v $pkgname)"
     echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
     echo -n "### Command: $progname"
-    [ "${orig_args[0]}" ] && printf " '%s'" "${orig_args[@]}"
+    [ "${CREATE_ML_OPTIONS[0]}" ] && printf " '%s'" "${CREATE_ML_OPTIONS[@]}"
+    [ "${orig_args[0]}"          ] && printf " '%s'" "${orig_args[@]}"
     echo -e "\n"
 
     if [ "$prefslist" ] ; then
@@ -469,16 +470,17 @@ Main() {
     local TIMEOUT_REFLECTOR_CONNECTION=5                           # --connection-timeout in reflector
     local TIMEOUT_REFLECTOR_DOWNLOAD=5                             # --download-timeout in reflector
     local TIMEOUT_COUNTRY_CODE=5                                   # for fetching the current country code (not used!)
+    local CREATE_ML_OPTIONS=()                                     # user can include options into this array in $configfile
     local prefslist=""
     local issue_test=no
 
     GetCountryMappings                                             # creates cc_to_cname
 
-    if ! source "$configfile" ; then
+    if ! source "$configfile" "$@" ; then
         [ $has_internet_connection = yes ] && INFO "file '$configfile' not found"
     fi
 
-    Parameters "$@"
+    Parameters "${CREATE_ML_OPTIONS[@]}" "$@"
 
     if [ "$target_msg" ] ; then
         INFO "$target_msg"
