@@ -1,0 +1,8 @@
+# list of languages for which to create translations
+#
+# used by update_po_files to create new / update existing
+# translations, and during package creation to generate
+# translated .desktop file
+#
+# list of language codes separated by space:
+cs fi
