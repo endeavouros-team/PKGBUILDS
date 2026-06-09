@@ -110,7 +110,7 @@ EditFile() {
     DIE "no app for editing a file!"
 }
 EditConfigFile() {
-    INFO "Editing file $configfile."
+    INFO "Editing file $configfile." 
     EditFile "$configfile"
 }
 
@@ -272,7 +272,7 @@ Main() {
         items=$(printf "%s\n" "${items[@]}" | "${fzf[@]}")
         [ "$items" ] || exit 0                        # nothing selected
 
-for selected in $items ; do
+        for selected in $items ; do
             case "$selected" in
                 *"/") case "$selected" in
                           "/") subdir=""
@@ -288,29 +288,23 @@ for selected in $items ; do
                       exit 1
                       ;;
                 *)
-                    # Collect cleanup_files, urls, targets for the selected ISO
+                    # collect cleanup_files. urls, targets
+
                     cleanup_files+=("$selected")
                     case "$subdir" in
                         "") urls+=("$URLBASE/$selected") ;;
                         *)  urls+=("$URLBASE/$subdir/$selected") ;;
                     esac
-                    [ "$TARGETDIR" ] && local t_file="$TARGETDIR/$selected" || t_file="$PWD/$selected"
-                    targets+=("$t_file")
-
-                    # Check if an accompanying .sha512sum file exists on the remote server
-                    if [[ "$selected" == *.iso ]] ; then
-                        local sha_file="${selected}.sha512sum"
-                        # Verify if the sha512sum file is present in the original item list from the server
-                        if printf "%s\n" "${items_orig[@]}" | grep -Fq "$sha_file" ; then
-                            cleanup_files+=("$sha_file")
-                            case "$subdir" in
-                                "") urls+=("$URLBASE/$sha_file") ;;
-                                *)  urls+=("$URLBASE/$subdir/$sha_file") ;;
-                            esac
-                            [ "$TARGETDIR" ] && targets+=("$TARGETDIR/$sha_file") || targets+=("$PWD/$sha_file")
-                        fi
-                    fi
+                    [ "$TARGETDIR" ] && selected="$TARGETDIR/$selected" || selected="$PWD/$selected"
+                    targets+=("$selected")
                     ;;
+                # *)    FetchIsoFile "$selected" "$subdir"
+                #       exitcode=$?
+                #       if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
+                #           CheckTheSum
+                #           exit $exitcode
+                #       fi
+                #       ;;
             esac
         done
         if [ "$urls" ] ; then
@@ -345,20 +339,15 @@ FetchIsoFiles() {
             esac
         fi
 
-        # Only prompt the user if it is NOT a checksum file
-        if [[ "$target" != *."$sumtype" && "$target" != *."${sumtype}sum" ]]; then
-            case "$(echo -e "Download to $target\nExit now" | fzf)" in
-                "" | Exit*) exit 0 ;;
-            esac
-        fi
-
-        # Notify the user about the start of the download
-        echo2 "==> Downloading ${target##*/} ..."
+        #echo2 "\n==> Downloading to $target ...\n"
+        case "$(echo -e "Download to $target\nExit now" | fzf)" in
+            "" | Exit*) exit 0 ;;
+        esac
 
         case "$getter" in
             curl)
-                targetopt="-o$target"
-                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?
+                targetopt="-o$target"    # targetopt+=" -m2000"
+                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
                 [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
                 ;;
             wget)
@@ -367,11 +356,6 @@ FetchIsoFiles() {
                 [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
                 ;;
         esac
-
-        # Notify the user about the successful completion of the download
-        if [ $exitcode = 0 ]; then
-            echo2 "==> Downloaded ${target##*/} successfully."
-        fi
     done
 }
 
@@ -423,32 +407,30 @@ FetchIsoFile() {                      # old implementation, not tested, still wo
 CheckTheSum() {
     local checksumfile isofile
     local ret=0
-    local target_item
-
-    # Automatically detect the downloaded checksum file from the targets array
-    for target_item in "${targets[@]}"; do
-        if [[ "$target_item" == *."$sumtype" || "$target_item" == *."${sumtype}sum" ]]; then
-            checksumfile="$target_item"
-            break
-        fi
-    done
-
-    # If a checksum file was found, proceed with automatic verification
+    local header_lines=(
+        "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
+        "Select a checksum file below."
+    )
+    local header
+    printf -v header "%s\n" "${header_lines[@]}"
+    local fzf=(
+        fzf
+        --footer="$header"
+        --footer-border=bold
+        --footer-label=" SELECTING FILE TO VERIFY CHECKSUM "
+    )
+    checksumfile=$(printf "%s\n" "${targets[@]}" | grep -P "\.$sumtype$|\.${sumtype}sum$" | "${fzf[@]}")
     if [ "$checksumfile" ] ; then
         if [ -e "$checksumfile" ] ; then
             isofile="${checksumfile%.*}"
             if [ -e "$isofile" ] ; then
                 pushd "$TARGETDIR" >/dev/null
-
-                # Extract only the base filename for clean output and execution
-                local check_target="${checksumfile##*/}"
-                echo2 "==> Verifying integrity of ${isofile##*/} ..."
-
-                if ${sumtype}sum -c "$check_target" &>/dev/null ; then
-                    echo2 "==> Checksum: OK"
-                    rm -f "$check_target"
+                echo -n "==> ${sumtype}sum -c $checksumfile ... "
+                if ${sumtype}sum -c "$checksumfile" &>/dev/null ; then
+                    echo OK
+                    rm -f "$checksumfile"         # we shouldn't need this file anymore
                 else
-                    errorline "==> Checksum: FAIL (The ISO file or checksum file is invalid)"
+                    echo FAIL                     # either ISO file or checksum file is invalid
                     ret=1
                 fi
                 popd >/dev/null
