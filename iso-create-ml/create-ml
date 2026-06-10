@@ -175,7 +175,9 @@ Header() {
     [ "${CREATE_ML_OPTIONS[0]}" ] && printf " '%s'" "${CREATE_ML_OPTIONS[@]}"
     [ "${orig_args[0]}"          ] && printf " '%s'" "${orig_args[@]}"
     echo -e "\n"
+}
 
+UserPrefs() {
     if [ "$prefslist" ] ; then
         echo -e "####### Mirrors by user preference >>>>"
         local tmp
@@ -194,6 +196,17 @@ Header() {
         done
         echo -e "####### Mirrors by user preference <<<<\n"
     fi
+}
+
+ShowRankResults() {
+    local -r header="MIRROR-URL UPDATED-AT FETCH-TIME"
+    local -r underline="${header//[A-Z-]/\~}"
+    {
+        echo "# $header"
+        echo "# $underline"
+        echo -e "$just_times\n"
+    } | column -t
+    echo ""
 }
 
 Main2() {
@@ -234,9 +247,11 @@ Main2() {
                 just_times=$(echo "$ranked_out" | grep -E "^# ([^ ]+)[ ]+([^ ]+)")      # Skip failed mirrors.
                 just_times=$(echo "$just_times" | LC_ALL=C sort -k3rb,3 -k4V,4)         # Sort: age first, then speed.
                 just_mirrors=$(echo "$ranked_out" | grep -v "^# ")                      # Show mirrors.
-                echo -e "$just_times\n"
+                ShowRankResults
+                UserPrefs
                 echo "$just_mirrors"
             else
+                UserPrefs
                 echo "$ranked_out"
             fi
         } > "$mirrorlist"
