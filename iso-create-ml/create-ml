@@ -300,6 +300,7 @@ AddRecommendedCountries() {
     # is unknown.
     case "$country_code" in
         al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  additional_mirror_countries+=(ww de fr) ;;
+        ar)                                                  additional_mirror_countries+=(ww us) ;;
         'fi')                                                additional_mirror_countries+=(ww se) ;;
         de|us)                                               ;;
         cn|ru)                                               protocols+=(http) ;;
