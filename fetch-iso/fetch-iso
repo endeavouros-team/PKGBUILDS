@@ -3,7 +3,10 @@
 #source /etc/eos-color.conf
 
 echo2()   { echo -e "$@" >&2 ; }
-printf2() { printf  "$@" >&2 ; }
+printf2() {
+    # shellcheck disable=2059
+    printf  "$@" >&2
+}
 
 errorline() {
     eos-color error 2
@@ -27,24 +30,24 @@ INFO() {
 
 GetInfoPage() {
     # Make sure the download data is stored in a local file.
-    if [ ! -e $datafile ] ; then
+    if [ ! -e "$datafile" ] ; then
         case "$getter" in
-            curl) /bin/curl --fail -Lsm 30 -o$datafile -u "$HELLO" $URLBASE                 || DIE "failed fetching the info page '$URLBASE'." ;;
-            wget) /bin/wget -qO $datafile --user "$ACCOUNT" --password "$PASSWORD" $URLBASE || DIE "failed fetching the info page '$URLBASE'." ;;
+            curl) /bin/curl --fail -Lsm 30 -o"$datafile" -u "$HELLO" "$URLBASE"                 || DIE "failed fetching the info page '$URLBASE'." ;;
+            wget) /bin/wget -qO "$datafile" --user "$ACCOUNT" --password "$PASSWORD" "$URLBASE" || DIE "failed fetching the info page '$URLBASE'." ;;
         esac
         [ "$1" != "-q" ] && echo2 "==> Info about available downloads refreshed."
     fi
 }
 
 RefreshInfo() {
-    rm -f $datafile
+    rm -f "$datafile"
     GetInfoPage "$@"
 }
 
 ShowFiles() {
     # Show downloadable files from the fetched download page.
     RefreshInfo "$@"
-    grep EndeavourOS[-_] $datafile | sed -E 's|.*">(En.*)</a.*|\1|'             # all downloads
+    grep "EndeavourOS[-_]" "$datafile" | sed -E 's|.*">(En.*)</a.*|\1|'             # all downloads
 
     #echo2 "==> function $FUNCNAME()"
 }
@@ -77,6 +80,7 @@ AskValue() {
     local -r defaultval="$3"
     local value=""
 
+    # shellcheck disable=2162
     read -p "$prompt : " value >&2
     case "$value" in
         "") value="$defaultval" ;;
@@ -103,14 +107,20 @@ AskConfigValues() {
 }
 
 EditFile() {
-    local app apps=(kate gedit gnome-text-editor pluma xed emacs exo-open xdg-open kde-open)
+    local app
+    local apps=()
+    case "$XDG_CURRENT_DESKTOP" in
+        KDE) apps=(kde-open xdg-open exo-open) ;;
+        *)   apps=(xdg-open exo-open kde-open) ;;
+    esac
+    apps+=(kate gedit gnome-text-editor pluma xed emacs)
     for app in "${apps[@]}" ; do
-        [ -x /bin/$app ] && { $app "$@" 2>/dev/null ; return ; }
+        [ -x /bin/"${app%% *}" ] && { $app "$@" 2>/dev/null ; return ; }
     done
     DIE "no app for editing a file!"
 }
 EditConfigFile() {
-    INFO "Editing file $configfile." 
+    INFO "Editing file $configfile."
     EditFile "$configfile"
 }
 
@@ -120,7 +130,7 @@ DumpOptions() {
         [ "${o::1}" = "/" ] || o="--$o"    # add leading '--' if first option is long
         o=${o//,/ --}                      # manage long options
         o=${o//\// -}                      # manage short options
-        echo $o
+        echo "$o"
     fi
 }
 
@@ -129,7 +139,9 @@ Options() {
     # Short option starts with '/'.
     local OPTS="help/h,dump-options,show-files,edit-config,curl/c,wget/w"                  # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
 
+    # shellcheck disable=2155
     local sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
+    # shellcheck disable=2155
     local lopts="$(echo "$OPTS" | sed -E 's|(/.[:]*)||g')"
     local opts
 
@@ -138,13 +150,13 @@ Options() {
 
     while true ; do
         case "$1" in
-            --)               shift;                                      break  ;;
-            --dump-options)   DumpOptions;                                exit 0 ;;
-            --show-files)     ReadConfig; printf "%s\n" $(ShowFiles -q);  exit 0 ;;
-            --edit-config)    EditConfigFile;                             exit 0 ;;
-            --curl | -c)      getter=curl                                        ;;
-            --wget | -w)      getter=wget                                        ;;
-            --help | -h)      Usage;                                      exit 0 ;;
+            --)               shift;                                        break  ;;
+            --dump-options)   DumpOptions;                                  exit 0 ;;
+            --show-files)     ReadConfig; printf "%s\n" "$(ShowFiles -q)";  exit 0 ;;
+            --edit-config)    EditConfigFile;                               exit 0 ;;
+            --curl | -c)      getter=curl                                          ;;
+            --wget | -w)      getter=wget                                          ;;
+            --help | -h)      Usage;                                        exit 0 ;;
         esac
         shift
     done
@@ -166,6 +178,7 @@ ReadConfig() {
 
     # config file sets important values
     [ -e "$configfile" ] || AskConfigValues
+    # shellcheck disable=1090
     source "$configfile" || DIE "file $configfile2 has a problem"
     [ "$URLBASE" ]       || DIE2 "URLBASE has no value in $configfile2"
     if [ -z "$HELLO" ] ; then
@@ -212,6 +225,7 @@ Main() {
     local -r configfile2="${configfile/$HOME/\~}"
 
     if [ -z "$XDG_DOWNLOAD_DIR" ] && [ -e "$HOME/.config/user-dirs.dirs" ] ; then
+        # shellcheck disable=1091
         source "$HOME/.config/user-dirs.dirs"
     fi
     local URLBASE=""
@@ -225,7 +239,7 @@ Main() {
     local urls=()
     local targets=()
     local cleanup_files=()
-    local sumfile=""
+    # local sumfile=""
     local TARGETDIR="${XDG_DOWNLOAD_DIR:-~}"           # $HOME/Downloads or $HOME
     local sumtype=sha512                               # support only *.sha512* checksum files
 
@@ -250,15 +264,16 @@ Main() {
         --footer="$header" --footer-border=bold --footer-label=" SELECTING FILE(S) TO DOWNLOAD "
         --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
     )
-    local selected="" items="" items_orig=()
+    local selected="" items=() items_orig=()
     local subdir=""
     while true ; do
         # keep the names of files, drop other info
-        items=$(${progname}-show-all-info "$subdir") || exitcode=$?
+        readarray -t items < <("$progname"-show-all-info "$subdir") || exitcode=$?
         case "$exitcode" in
             0) ;;
             130) exit 1 ;;   # interrupted
             *)
+                # shellcheck disable=2155
                 local string="$(curl-exit-code-to-string "$exitcode" "$APP")"
                 if [ "$string" ] ; then
                     DIE "$APP: '$string'"
@@ -267,12 +282,11 @@ Main() {
                 fi
                 ;;
         esac
-        readarray -t items < <(echo "$items" | awk '{print $1}' | sort)
-        items_orig=("${items[@]}")
-        items=$(printf "%s\n" "${items[@]}" | "${fzf[@]}")
-        [ "$items" ] || exit 0                        # nothing selected
+        readarray -t items_orig < <(printf "%s\n" "${items[@]}"      | awk '{print $1}' | sort)
+        readarray -t items      < <(printf "%s\n" "${items_orig[@]}" | "${fzf[@]}")
+        [ "${items[0]}" ] || exit 0                        # nothing selected
 
-        for selected in $items ; do
+        for selected in "${items[@]}" ; do
             case "$selected" in
                 *"/") case "$selected" in
                           "/") subdir=""
@@ -288,26 +302,33 @@ Main() {
                       exit 1
                       ;;
                 *)
-                    # collect cleanup_files. urls, targets
-
+                    # Collect cleanup_files, urls, targets for the selected ISO
                     cleanup_files+=("$selected")
                     case "$subdir" in
                         "") urls+=("$URLBASE/$selected") ;;
                         *)  urls+=("$URLBASE/$subdir/$selected") ;;
                     esac
-                    [ "$TARGETDIR" ] && selected="$TARGETDIR/$selected" || selected="$PWD/$selected"
-                    targets+=("$selected")
+                    [ "$TARGETDIR" ] && local t_file="$TARGETDIR/$selected" || t_file="$PWD/$selected"
+                    targets+=("$t_file")
+
+                    # Check if an accompanying .sha512sum file exists on the remote server
+                    if [[ "$selected" == *.iso ]] ; then
+                        local sha_file="${selected}.$sumtype"       # local sha_file="${selected}.sha512sum"
+                        # Verify if the sha512sum file is present in the original item list from the server
+                        sha_file=$(printf "%s\n" "${items_orig[@]}" | grep -F "$sha_file")
+                        if [ "$sha_file" ] ; then
+                            cleanup_files+=("$sha_file")
+                            case "$subdir" in
+                                "") urls+=("$URLBASE/$sha_file") ;;
+                                *)  urls+=("$URLBASE/$subdir/$sha_file") ;;
+                            esac
+                            [ "$TARGETDIR" ] && targets+=("$TARGETDIR/$sha_file") || targets+=("$PWD/$sha_file")
+                        fi
+                    fi
                     ;;
-                # *)    FetchIsoFile "$selected" "$subdir"
-                #       exitcode=$?
-                #       if [ "$selected" = "$(echo "$items" | tail -n1)" ] ; then
-                #           CheckTheSum
-                #           exit $exitcode
-                #       fi
-                #       ;;
             esac
         done
-        if [ "$urls" ] ; then
+        if [ "${urls[0]}" ] ; then
             FetchIsoFiles
             CheckTheSum
             exit 0
@@ -333,21 +354,27 @@ FetchIsoFiles() {
         target="${targets[$ix]}"
 
         if [ -e "$target" ] ; then
+            # shellcheck disable=2162
             read -p "${target} exists, download again (y/N)? " reply
             case "$reply" in
                 "" | [Nn]*) continue ;;
             esac
         fi
 
-        #echo2 "\n==> Downloading to $target ...\n"
-        case "$(echo -e "Download to $target\nExit now" | fzf)" in
-            "" | Exit*) exit 0 ;;
-        esac
+        # Only prompt the user if it is NOT a checksum file
+        if [[ "$target" != *."$sumtype" && "$target" != *."${sumtype}sum" ]]; then
+            case "$(echo -e "Download to $target\nExit now" | fzf)" in
+                "" | Exit*) exit 0 ;;
+            esac
+        fi
+
+        # Notify the user about the start of the download
+        echo2 "==> Downloading ${target##*/} ..."
 
         case "$getter" in
             curl)
-                targetopt="-o$target"    # targetopt+=" -m2000"
-                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?     #  --remote-name-all
+                targetopt="-o$target"
+                /bin/curl --fail -L "$targetopt" -u "$HELLO" "$url" || exitcode=$?
                 [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'curl'" "$exitcode"
                 ;;
             wget)
@@ -356,6 +383,11 @@ FetchIsoFiles() {
                 [ $exitcode = 0 ] || DIE "downloading $url failed, exit code $exitcode from 'wget'" "$exitcode"
                 ;;
         esac
+
+        # Notify the user about the successful completion of the download
+        if [ $exitcode = 0 ]; then
+            echo2 "==> Downloaded ${target##*/} successfully."
+        fi
     done
 }
 
@@ -407,35 +439,38 @@ FetchIsoFile() {                      # old implementation, not tested, still wo
 CheckTheSum() {
     local checksumfile isofile
     local ret=0
-    local header_lines=(
-        "Navigation keys: Up/Down/PgUp/PgDn; TAB=Select, ENTER=Accept, ESC=Quit"
-        "Select a checksum file below."
-    )
-    local header
-    printf -v header "%s\n" "${header_lines[@]}"
-    local fzf=(
-        fzf
-        --footer="$header"
-        --footer-border=bold
-        --footer-label=" SELECTING FILE TO VERIFY CHECKSUM "
-    )
-    checksumfile=$(printf "%s\n" "${targets[@]}" | grep -P "\.$sumtype$|\.${sumtype}sum$" | "${fzf[@]}")
+    local target_item
+
+    # Automatically detect the downloaded checksum file from the targets array
+    for target_item in "${targets[@]}"; do
+        if [[ "$target_item" == *."$sumtype" || "$target_item" == *."${sumtype}sum" ]]; then
+            checksumfile="$target_item"
+            break
+        fi
+    done
+
+    # If a checksum file was found, proceed with automatic verification
     if [ "$checksumfile" ] ; then
         if [ -e "$checksumfile" ] ; then
             isofile="${checksumfile%.*}"
             if [ -e "$isofile" ] ; then
-                pushd "$TARGETDIR" >/dev/null
-                echo -n "==> ${sumtype}sum -c $checksumfile ... "
-                if ${sumtype}sum -c "$checksumfile" &>/dev/null ; then
-                    echo OK
-                    rm -f "$checksumfile"         # we shouldn't need this file anymore
+                pushd "$TARGETDIR" >/dev/null || DIE "'pushd $TARGETDIR' failed"
+
+                # Extract only the base filename for clean output and execution
+                local check_target="${checksumfile##*/}"
+                echo2 -n "==> Verifying integrity of ${isofile##*/} ... "
+
+                if ${sumtype}sum -c "$check_target" &>/dev/null ; then
+                    echo2 "OK"
+                    rm -f "$check_target"
+                    echo "==> Removed $check_target."
                 else
-                    echo FAIL                     # either ISO file or checksum file is invalid
+                    errorline "FAIL (the ISO file or checksum file is invalid)"
                     ret=1
                 fi
-                popd >/dev/null
+                popd >/dev/null || DIE "'popd' failed"
             else
-                errorline "==> $isofile not found."
+                errorline "==> '$isofile' not found."
                 ret=2
             fi
         else
