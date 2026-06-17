@@ -1,10 +1,10 @@
 #!/bin/bash
 
 echo2()   { echo -e "$@" >&2; }
+# shellcheck disable=2059
 printf2() { printf  "$@" >&2; }
 INFO()    { eos-color info 2; echo2 "==> $progname: info: $1"; eos-color reset 2; }
 WARN()    { eos-color warning 2; echo2 "==> $progname: warning: $1"; eos-color reset 2; }
-#DIE()    { Cleanup; eos-color error 2; echo2 "==> $progname: error: $1"; eos-color reset 2; exit 1; }
 DIE()     {
     Cleanup
     eos-color error 2
@@ -56,8 +56,8 @@ FetchCountries() {
     local reflector_command=(
         /bin/reflector
         --list-countries
-        --connection-timeout=$TIMEOUT_REFLECTOR_CONNECTION
-        --download-timeout=$TIMEOUT_REFLECTOR_DOWNLOAD
+        --connection-timeout="$TIMEOUT_REFLECTOR_CONNECTION"
+        --download-timeout="$TIMEOUT_REFLECTOR_DOWNLOAD"
     )
 
     info=$("${reflector_command[@]}" 2>/dev/null | /bin/sed -E '/^Country[ ]+Code/,/^-----/d')
@@ -94,7 +94,7 @@ FetchCountries() {
 
 ExtractCountryMirrors() {
     local countryname="$1" mirrors_in_country
-    mirrors_in_country=$(cat "$mirrordata" | sed -n "/^## ${countryname}$/,/^$/p" | sed -E 's|^#(Server = )|\1|')
+    mirrors_in_country=$(sed -n "/^## ${countryname}$/,/^$/p" "$mirrordata" | sed -E 's|^#(Server = )|\1|')
     # include wanted protocols
     for pp in "${protocols[@]}" ; do
         echo "$mirrors_in_country" | grep "$pp://"
@@ -173,7 +173,7 @@ Header() {
     echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
     echo -n "### Command: $progname"
     [ "${CREATE_ML_OPTIONS[0]}" ] && printf " '%s'" "${CREATE_ML_OPTIONS[@]}"
-    [ "${orig_args[0]}"          ] && printf " '%s'" "${orig_args[@]}"
+    [ "${orig_args[0]}"         ] && printf " '%s'" "${orig_args[@]}"
     echo -e "\n"
 }
 
@@ -190,7 +190,7 @@ UserPrefs() {
                 fi
                 item="$tmp"
             else
-                item=$(grep "$item" $mirrordata | awk '{print $NF}')
+                item=$(grep "$item" "$mirrordata" | awk '{print $NF}')
             fi
             echo "Server = $item"
         done
@@ -209,9 +209,22 @@ ShowRankResults() {
     echo ""
 }
 
+Epoch2Date() { date --date "@$1" "$datetime_format" ; }
+
+Epoch2Dates() {
+    local lines=() line arr datetime
+    readarray -t lines < <(echo "$just_times")
+    # shellcheck disable=2206
+    for line in "${lines[@]}" ; do
+        arr=($line)                                # $line = "# url epoch fetchtime"
+        datetime="$(Epoch2Date "${arr[2]}")"
+        echo "# ${arr[1]} $datetime ${arr[3]}"
+    done
+}
+
 Main2() {
     local tmplist mirrorlist ranked_out=""
-    tmplist=$(mktemp)                           # collect mirrors that user wanted here
+    tmplist=$(mktemp)                              # collect mirrors that user wanted here
     mirrorlist=$(mktemp)
 
     chmod go-rwx "$tmplist" "$mirrorlist"
@@ -232,12 +245,12 @@ Main2() {
     done
 
     if [ $has_internet_connection = yes ] ; then
-        local rankmirrors_opt=(--max-time $TIMEOUT_MIRROR)
+        local rankmirrors_opt=(--max-time "$TIMEOUT_MIRROR")
         [ $verbose  = yes ]    && rankmirrors_opt+=(-v)
         [ $show_failed = yes ] && rankmirrors_opt+=(--show-failed)
         [ $parallel = yes ]    && rankmirrors_opt+=(-p)
 
-        echo2 "==> Ranking mirrors."
+        echo2 -n "==> Ranking mirrors ... "
         {
             # shellcheck disable=SC2016
             ranked_out=$(create-ml-rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|')
@@ -246,6 +259,9 @@ Main2() {
                 local just_times just_mirrors
                 just_times=$(echo "$ranked_out" | grep -E "^# ([^ ]+)[ ]+([^ ]+)")      # Skip failed mirrors.
                 just_times=$(echo "$just_times" | LC_ALL=C sort -k3rb,3 -k4V,4)         # Sort: age first, then speed.
+                if [ $time_format = datetime ] ; then
+                    just_times=$(Epoch2Dates)
+                fi
                 just_mirrors=$(echo "$ranked_out" | grep -v "^# ")                      # Show mirrors.
                 ShowRankResults
                 UserPrefs
@@ -255,7 +271,7 @@ Main2() {
                 echo "$ranked_out"
             fi
         } > "$mirrorlist"
-        echo2 "==> Mirrors ranked."
+        echo2 "done."
     else
         local msg_not_ranked="NOTE: this mirrorlist was NOT ranked due to unavailable internet connection."
         local msg_not_ranked2="We strongly recommend to rank it soon."
@@ -269,7 +285,7 @@ Main2() {
 
     if [ $save = yes ] ; then
         echo2 "==> Updating $target"
-        if [ "$target" = $target_def ] ; then
+        if [ "$target" = "$target_def" ] ; then
             sudo rm -f "$target.bak"
             sudo mv "$target" "$target.bak"
             sudo cp -i "$mirrorlist" "$target"
@@ -318,7 +334,7 @@ AddRecommendedCountries() {
 DumpCCs() {
     # shellcheck disable=SC1090
     source "$cc_vs_name_file"                                               # gets array cc_to_cname
-    # shellcheck disable=SC2046
+    # shellcheck disable=SC2046,SC2005
     echo $(printf "%s\n" "${!cc_to_cname[@]}" | sort)
 }
 
@@ -345,6 +361,13 @@ FakeCountry2cc() {
                 DIE "country name '$country' is not recognized." "See /etc/create-ml-country-mapping-arch.conf about supported countries."
             fi
             ;;
+    esac
+}
+
+TimeFormatCheck() {
+    case "$time_format" in
+        epoch | datetime) ;;
+        *) DIE "unknown value '$time_format' for option --time-format; supported: 'datetime', 'epoch'" ;;
     esac
 }
 
@@ -381,6 +404,7 @@ Parameters() {
             --issue-test)        issue_test=yes ;;          # for internal testing about potential problems
             --use-saved-cc)      use_saved_cc=yes ;;
             --timeout-mirror)    TIMEOUT_MIRROR="$2"; shift ;;
+            --time-format)       time_format="$2"; shift; TimeFormatCheck ;;
             -h | --help)
                 cat <<EOF >&2
 Usage:   $progname [options]
@@ -407,6 +431,9 @@ Options: --help, -h                   This help.
          --use-saved-cc               The detected local country code is saved to a file $stored_country_file.
                                       This option allows using it when local country detection fails (advanced).
          --savefile=*                 File path to save the mirrorlist (advanced).
+         --time-format=*              If --verbose is used, show the latest update time of mirrors in epoch seconds (see 'man date')
+                                      or in date-time format ($datetime_format). Supported values: 'epoch' or 'datetime'.
+                                      Default: '$time_format_def'.
          --timeout-mirror='seconds'   Max time to rank before timing out a mirror. Default: $timeout_mirror_def.
          --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
                                       Use single quotes around the list. Separate items by a space.
@@ -442,6 +469,7 @@ Main() {
     OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
     OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:,show-failed"
+    OPTS+=",time-format:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
     local target_msg=""
@@ -459,12 +487,15 @@ Main() {
         local mirrordata="$HOME/.${progname}-active-mirrors-arch.conf"                # support file: active Arch mirrors in various countries
         local cc_vs_name_file="$HOME/.${progname}-country-mapping-arch.conf"          # support file: mappings between country-code and country-name
     fi
+    local -r datetime_format="+%Y%m%d-%H%M%S"
     local has_internet_connection=yes
     local country_code=""
     local fake_country=""
     local local_country_wanted=yes                                         # include local country in the mirrorlist or not?
     local verbose=no
     local show_failed=no
+    local time_format_def=datetime
+    local time_format=$time_format_def
     local save=no
     local parallel=yes                                                     # ranking mirrors in pararallel or not?
     local protocols=(https)                                                # list of supported protocols
@@ -472,8 +503,8 @@ Main() {
     local countries_handled=()
     local cleanup_files=()
     local orig_args=("$@")
-    local args=()
-    local has_countries_option=no
+    # local args=()
+    # local has_countries_option=no
     local use_recommended_countries=yes
     local use_saved_cc=no
     declare -A cc_to_cname                                         # country code -> country name
@@ -485,13 +516,17 @@ Main() {
     local TIMEOUT_ACTIVE_MIRRORS=8                                 # for fetching the list of active mirrors
     local TIMEOUT_REFLECTOR_CONNECTION=5                           # --connection-timeout in reflector
     local TIMEOUT_REFLECTOR_DOWNLOAD=5                             # --download-timeout in reflector
-    local TIMEOUT_COUNTRY_CODE=5                                   # for fetching the current country code (not used!)
+    # local TIMEOUT_COUNTRY_CODE=5                                   # for fetching the current country code (not used!)
     local CREATE_ML_OPTIONS=()                                     # user can include options into this array in $configfile
     local prefslist=""
+
+    # aashellcheck disable=2034
     local issue_test=no
+    [ "$issue_test" ] || :
 
     GetCountryMappings                                             # creates cc_to_cname
 
+    # shellcheck disable=1090
     if ! source "$configfile" "$@" ; then
         [ $has_internet_connection = yes ] && INFO "file '$configfile' not found"
     fi
@@ -533,6 +568,7 @@ Main() {
     GetCountryCode
 
     if [ "$use_recommended_countries" = "yes" ] ; then
+        # shellcheck disable=1090
         [ -r "$recommended_countries" ] && source "$recommended_countries"
         AddRecommendedCountries
     fi
@@ -579,7 +615,7 @@ GetCountryCode() {
 }
 
 NeedsCleanupOfSupportFiles() {
-    [ -z "$(grep "^pkgname=$pkgname$" PKGBUILD 2>/dev/null)" ]   # using, not developing
+    ! grep -q "^pkgname=$pkgname$" PKGBUILD 2>/dev/null    # using, not developing
 }
 
 GetMirrorsFile() {
