@@ -1,32 +1,28 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-cosmic
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
-pkgdesc="Cosmic settings for EndeavourOS"
+pkgdesc="Cosmic settings for EndeavourOS user profiles"
 arch=('any')
 url="https://github.com/endeavouros-team"
 license=('GPL-3.0-or-later')
-depends=('glib2' 'endeavouros-branding')
+depends=('glib2' 'endeavouros-theming')
 source=('99_eos-settings-cosmic.gschema.override'
         'default'
         'theme'
         'Arc-Dark.ron')
-sha256sums=('694275b8521ac744b6124715e22e26e2d5da2c0a2c53e24d35ce526eb4c71d8e'
-            '89307646f0b14f2f875633248bc6d2855e4f5d4e82a37a936be6afe0337c0fc2'
-            'edc44661ded3ef337437d4b49bda43c66dfa23e8a03ae8accaf74a0b6504f4d7'
-            'cb9b4bec05744183519a4e979d60ccddc142aac5f00f72a3b445ddf279d9be7c')
+sha256sums=('1c050ad273cad523de06a87f8f66602d8b3ef12259fb5929a74dd1880c03b988'
+            '9e57d74c8c974e81b2484378a30d609fade2212632a1ce7ebe43316f033ce450'
+            '9e57d74c8c974e81b2484378a30d609fade2212632a1ce7ebe43316f033ce450'
+            '436eda4e783c1c3d1fd886a0abb46f5b2939d0ee093da373bffd2402cea4fc88')
 
 package() {
-    # GTK GSchema Override
+    # GTK GSchema Override (Kein Konflikt mit Upstream)
     install -Dm644 "${srcdir}/99_eos-settings-cosmic.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_eos-settings-cosmic.gschema.override"
 
-    # COSMIC Background Configuration
-    install -Dm644 "${srcdir}/default" "${pkgdir}/usr/share/cosmic/cosmic-bg/v1/default"
-
-    # COSMIC Global Theme Profile
-    install -Dm644 "${srcdir}/theme" "${pkgdir}/usr/share/cosmic/cosmic-theme/v1/theme"
-
-    # COSMIC RON Palette Definition
-    install -Dm644 "${srcdir}/Arc-Dark.ron" "${pkgdir}/usr/share/cosmic/cosmic-theme/v1/themes/Arc-Dark.ron"
+    # COSMIC User-Skel Konfigurationen (Sicher vor Upstream-Dateikonflikten)
+    install -Dm644 "${srcdir}/default" "${pkgdir}/etc/skel/.config/cosmic/cosmic-bg/v1/default"
+    install -Dm644 "${srcdir}/theme" "${pkgdir}/etc/skel/.config/cosmic/cosmic-theme/v1/theme"
+    install -Dm644 "${srcdir}/Arc-Dark.ron" "${pkgdir}/etc/skel/.config/cosmic/cosmic-theme/v1/themes/Arc-Dark.ron"
 }
