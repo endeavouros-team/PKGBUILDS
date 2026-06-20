@@ -1,0 +1,5 @@
+# File: /usr/share/glib-2.0/schemas/99_eos-settings-cosmic.gschema.override
+[org.gnome.desktop.interface]
+gtk-theme='Arc-Dark'
+icon-theme='Qogir-Dark'
+color-scheme='prefer-dark'

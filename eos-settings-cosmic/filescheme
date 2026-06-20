@@ -1,0 +1,14 @@
+usr/
+└── share/
+    ├── cosmic/
+    │   ├── cosmic-bg/
+    │   │   └── v1/
+    │   │       └── default           # Konfiguration des Hintergrundbildes
+    │   └── cosmic-theme/
+    │       └── v1/
+    │           ├── theme             # Hauptthema (Icon-Theme, Modus)
+    │           └── themes/
+    │               └── Arc-Dark.ron   # Definition des Farbschemas im RON-Format
+    └── glib-2.0/
+        └── schemas/
+            └── 99_eos-settings-cosmic.gschema.override  # GTK/Arc-Dark Fallback

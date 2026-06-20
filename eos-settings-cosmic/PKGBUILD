@@ -18,15 +18,15 @@ sha256sums=('694275b8521ac744b6124715e22e26e2d5da2c0a2c53e24d35ce526eb4c71d8e'
             'cb9b4bec05744183519a4e979d60ccddc142aac5f00f72a3b445ddf279d9be7c')
 
 package() {
-    # GTK GSchema Override (Modus 644)
+    # GTK GSchema Override
     install -Dm644 "${srcdir}/99_eos-settings-cosmic.gschema.override" "${pkgdir}/usr/share/glib-2.0/schemas/99_eos-settings-cosmic.gschema.override"
 
-    # COSMIC Background Configuration (Modus 644)
+    # COSMIC Background Configuration
     install -Dm644 "${srcdir}/default" "${pkgdir}/usr/share/cosmic/cosmic-bg/v1/default"
 
-    # COSMIC Global Theme Profile (Modus 644)
+    # COSMIC Global Theme Profile
     install -Dm644 "${srcdir}/theme" "${pkgdir}/usr/share/cosmic/cosmic-theme/v1/theme"
 
-    # COSMIC RON Palette Definition (Modus 644)
+    # COSMIC RON Palette Definition
     install -Dm644 "${srcdir}/Arc-Dark.ron" "${pkgdir}/usr/share/cosmic/cosmic-theme/v1/themes/Arc-Dark.ron"
 }

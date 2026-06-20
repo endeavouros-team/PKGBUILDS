@@ -1,0 +1,14 @@
+// File: /usr/share/cosmic/cosmic-theme/v1/themes/Arc-Dark.ron
+(
+    name: "Arc-Dark",
+    palette: (
+        // Arc-Dark Hintergrund-Farbton
+        background: "#2f343f",
+        // Arc-Dark Textfarbe (hell)
+        foreground: "#d3dae3",
+        // EndeavourOS Purple/Blue Akzentfarbe
+        accent: "#7f7fd5",
+        neutral: "#383c4a",
+    ),
+    is_dark: true,
+)
