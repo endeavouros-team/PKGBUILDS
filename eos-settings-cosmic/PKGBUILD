@@ -5,10 +5,11 @@ pkgver=1.0
 pkgrel=7
 pkgdesc="Cosmic settings for EndeavourOS user profiles"
 arch=('any')
-url="https://github.com/endeavouros-team"
+url="https://github.com/endeavouros-team/${pkgname}"
 license=('GPL-3.0-or-later')
 depends=('endeavouros-branding' 'git')
-source=("${pkgname}::git+file://../${pkgname}")
+# Clones directly from the remote GitHub repository using the master branch
+source=("${pkgname}::git+${url}.git#branch=master")
 sha256sums=('SKIP')
 
 package() {
@@ -16,7 +17,7 @@ package() {
 
     install -d "${_skel}"
 
-    # Copy the structures directly from the cloned tree
+    # Copy the structures directly from the cloned remote tree
     cp -r "${srcdir}/${pkgname}/cosmic"  "${_skel}/"
     cp -r "${srcdir}/${pkgname}/gtk-3.0" "${_skel}/"
     cp -r "${srcdir}/${pkgname}/gtk-4.0" "${_skel}/"
