@@ -12,10 +12,10 @@ source=('99_eos-settings-cosmic.gschema.override'
         'default'
         'theme'
         'Arc-Dark.ron')
-sha256sums=('1c050ad273cad523de06a87f8f66602d8b3ef12259fb5929a74dd1880c03b988'
-            '9e57d74c8c974e81b2484378a30d609fade2212632a1ce7ebe43316f033ce450'
-            '9e57d74c8c974e81b2484378a30d609fade2212632a1ce7ebe43316f033ce450'
-            '436eda4e783c1c3d1fd886a0abb46f5b2939d0ee093da373bffd2402cea4fc88')
+sha256sums=('694275b8521ac744b6124715e22e26e2d5da2c0a2c53e24d35ce526eb4c71d8e'
+            '89307646f0b14f2f875633248bc6d2855e4f5d4e82a37a936be6afe0337c0fc2'
+            'edc44661ded3ef337437d4b49bda43c66dfa23e8a03ae8accaf74a0b6504f4d7'
+            'cb9b4bec05744183519a4e979d60ccddc142aac5f00f72a3b445ddf279d9be7c')
 
 package() {
     # GTK GSchema Override (Kein Konflikt mit Upstream)
