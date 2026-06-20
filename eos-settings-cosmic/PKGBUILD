@@ -9,7 +9,7 @@ url="https://github.com/endeavouros-team/${pkgname}"
 license=('GPL-3.0-or-later')
 depends=('endeavouros-branding' 'git')
 # Clones directly from the remote GitHub repository using the master branch
-source=("${pkgname}::git+${url}.git#branch=master")
+source=("${pkgname}::git+${url}.git#branch=main")
 sha256sums=('SKIP')
 
 package() {
