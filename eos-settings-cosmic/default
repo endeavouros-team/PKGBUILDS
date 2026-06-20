@@ -1,7 +1,0 @@
-// File: /usr/share/cosmic/cosmic-bg/v1/default
-(
-    output: "all",
-    source: Path("/usr/share/backgrounds/endeavouros/eos_wallpaper_default.png"),
-    fit: Cover,
-    background_color: (0.101, 0.113, 0.145, 1.0),
-)

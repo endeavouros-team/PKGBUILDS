@@ -1,0 +1,10 @@
+// File: ~/.config/cosmic/com.system76.CosmicBackground/v1/all
+(
+    filter_by_theme: false,
+    filter_method: Lanczos,
+    output: "all",
+    rotation_frequency: 300,
+    sampling_method: Alphanumeric,
+    scaling_mode: Zoom,
+    source: Path("/usr/share/endeavouros/backgrounds/endeavouros-wallpaper.png"),
+)

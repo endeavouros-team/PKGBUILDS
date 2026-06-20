@@ -1,14 +1,23 @@
-usr/
-└── share/
-    ├── cosmic/
-    │   ├── cosmic-bg/
-    │   │   └── v1/
-    │   │       └── default           # Konfiguration des Hintergrundbildes
-    │   └── cosmic-theme/
-    │       └── v1/
-    │           ├── theme             # Hauptthema (Icon-Theme, Modus)
-    │           └── themes/
-    │               └── Arc-Dark.ron   # Definition des Farbschemas im RON-Format
-    └── glib-2.0/
-        └── schemas/
-            └── 99_eos-settings-cosmic.gschema.override  # GTK/Arc-Dark Fallback
+eos-settings-cosmic/
+├── cosmic/
+│   ├── com.system76.CosmicAppList/v1/favorites
+│   ├── com.system76.CosmicBackground/v1/
+│   │   ├── all
+│   │   └── same-on-all
+│   ├── com.system76.CosmicSettingsDaemon/v1/gtk_theme
+│   ├── com.system76.CosmicTheme.Dark/v1/
+│   │   ├── button
+│   │   ├── palette
+│   │   └── primary
+│   └── com.system76.CosmicTK/v1/
+│       ├── active_theme
+│       ├── apply_theme_global
+│       └── icon_theme
+├── gtk-3.0/
+│   ├── dark.css
+│   └── settings.ini
+└── gtk-4.0/
+    ├── settings.ini
+    └── cosmic/
+        ├── dark.css
+        └── light.css

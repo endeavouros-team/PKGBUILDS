@@ -1,6 +1,0 @@
-// File: /usr/share/cosmic/cosmic-theme/v1/theme
-(
-    active_theme: Some("Arc-Dark"),
-    icon_theme: Some("Qogir-Dark"),
-    mode: Dark,
-)
