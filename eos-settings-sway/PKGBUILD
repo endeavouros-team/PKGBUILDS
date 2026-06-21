@@ -1,0 +1,20 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+_pkgname=endeavouros-sway-setup
+pkgname=eos-settings-sway
+pkgver=1.0
+pkgrel=1
+pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
+arch=("any")
+url="https://github.com/endeavouros-team/${_pkgname}"
+license=("GPL")
+depends=('endeavouros-branding')
+makedepends=("git")
+source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('df58fd2131f624eeaf254b8492574e314212184')
+
+package() {
+    cd "$_pkgname-$pkgver"
+    cp -R "etc" "${pkgdir}/"
+    chmod -R +x "${pkgdir}/etc/skel/.config/sway/scripts"
+}
