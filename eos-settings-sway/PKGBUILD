@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-sway-setup
 pkgname=eos-settings-sway
-pkgver=1.5
+pkgver=1.7
 pkgrel=1
 pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
 arch=("any")
@@ -12,7 +12,7 @@ depends=('endeavouros-branding' 'eos-sway-tools' 'greetd' 'greetd-tuigreet')
 makedepends=("git")
 install=eos-settings-sway.install
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('26f44d0451990a8d0b2ad8f5e052b7e19a987a3d978c5db2dcc18d4b88cc1d11')
+sha256sums=('276b7d11a9e498fcacaa532db5c57c9e17cd9c2043b54b403657d8b1b1964e5d')
 
 package() {
     # Enter the unpacked source directory
@@ -20,16 +20,11 @@ package() {
 
     # Create the target directory structure for skel
     mkdir -p "${pkgdir}/etc"
-
     # Install configuration files to /etc/skel
     cp -a skel "${pkgdir}/etc/skel"
 
-    # Install the profile.d script
-    install -Dm755 eos-sway-settings.sh "${pkgdir}/etc/profile.d/eos-sway-settings.sh"
-
     # Install custom sway start wrapper
     install -Dm755 eos-sway-wrapper "${pkgdir}/usr/bin/eos-sway-wrapper"
-
     # Install the custom sway session
     install -Dm644 eos-sway.desktop "${pkgdir}/usr/share/wayland-sessions/eos-sway.desktop"
 
