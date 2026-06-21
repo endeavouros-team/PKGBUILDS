@@ -1,0 +1,43 @@
+# Maintainer: joekamprad <joekamprad at endeavouros.com>
+
+_pkgname=sway_tools
+
+pkgname=eos-sway-tools
+pkgver=1.0
+pkgrel=1
+pkgdesc="A collection of simple Bash scripts to enhance Sway without adding unnecessary complexity."
+arch=("any")
+url="https://github.com/killajoe/${_pkgname}"
+license=("GPL3")
+depends=('libnotify'
+         'sway'
+         'rofi'
+         'power-profiles-daemon'
+         'wf-recorder'
+         'slurp'
+         'grim'
+         'swappy'
+         'wl-clipboard'
+         'waybar'
+         'xdg-user-dirs')
+# Local naming for the source archive prevents conflicts in SRCDEST
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/killajoe/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('6ed82edbcdce865a6c90de66eb6b991e0af74efe2a1d51e69ac2a0916c3e9cae')
+
+package() {
+    # Extract directory defaults to reponame-version on GitHub
+    cd "${srcdir}/${_pkgname}-${pkgver}"
+
+    # Create destination directory for system binaries
+    install -d "${pkgdir}/usr/bin"
+
+    # Install scripts with proper permissions (755) and unified naming
+    install -m755 gracefully_exit/gracefully_exit "${pkgdir}/usr/bin/sway-gracefully-exit"
+    install -m755 new_workspace/new_workspace "${pkgdir}/usr/bin/sway-new-workspace"
+    install -m755 power_profiles_switcher/power-profiles "${pkgdir}/usr/bin/sway-powerprofiles"
+    install -m755 powermenu/powermenu_gracefully "${pkgdir}/usr/bin/sway-powermenu"
+    install -m755 swaycast/swaycast "${pkgdir}/usr/bin/swaycast"
+    install -m755 swayshot/swayshot "${pkgdir}/usr/bin/swayshot"
+    install -m755 waybar_toggle/waybar_toggle "${pkgdir}/usr/bin/waybar-toggle"
+    install -m755 weather/openweather "${pkgdir}/usr/bin/sway-openweather"
+}

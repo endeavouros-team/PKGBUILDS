@@ -1,0 +1,20 @@
+post_install() {
+    local config_file="/etc/greetd/config.toml"
+
+    if [ -f "$config_file" ]; then
+        local target_cmd="command = \"tuigreet --time --time-format '%d.%m.%Y - %H:%M:%S' --remember --remember-session --asterisks --width 70 --container-padding 3 --prompt-padding 2 --user-menu --theme 'container=black;border=gray;text=white;input=white;prompt=magenta;time=magenta;action=white;button=magenta' --cmd sway\""
+
+        # Check if configuration is pristine upstream or matches our previous deployment
+        if grep -q '^command = "agreety' "$config_file" || grep -q 'command = "tuigreet --time' "$config_file"; then
+            echo "==> Configuring greetd/tuigreet for EndeavourOS Sway..."
+            sed -i 's|^command = .*|'"$target_cmd"'|' "$config_file"
+        else
+            # User altered the configuration manually (e.g., using gtkgreet or custom flags)
+            echo "==> Custom greetd configuration detected. Skipping modification to respect user choices."
+        fi
+    fi
+}
+
+post_upgrade() {
+    post_install
+}
