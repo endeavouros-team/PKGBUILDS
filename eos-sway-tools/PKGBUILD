@@ -3,7 +3,7 @@
 _pkgname=sway_tools
 
 pkgname=eos-sway-tools
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="A collection of simple Bash scripts to enhance Sway without adding unnecessary complexity."
 arch=("any")
@@ -20,9 +20,8 @@ depends=('libnotify'
          'wl-clipboard'
          'waybar'
          'xdg-user-dirs')
-# Local naming for the source archive prevents conflicts in SRCDEST
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/killajoe/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('6ed82edbcdce865a6c90de66eb6b991e0af74efe2a1d51e69ac2a0916c3e9cae')
+sha256sums=('c18f3ceba67ac188f11ac7c527cc5c631a766fc17f2424f0db529fec3130f0c4')
 
 package() {
     # Extract directory defaults to reponame-version on GitHub
@@ -30,14 +29,17 @@ package() {
 
     # Create destination directory for system binaries
     install -d "${pkgdir}/usr/bin"
+    install -d "$pkgdir/usr/share/sway_tools/rofi"
 
-    # Install scripts with proper permissions (755) and unified naming
-    install -m755 gracefully_exit/gracefully_exit "${pkgdir}/usr/bin/sway-gracefully-exit"
-    install -m755 new_workspace/new_workspace "${pkgdir}/usr/bin/sway-new-workspace"
-    install -m755 power_profiles_switcher/power-profiles "${pkgdir}/usr/bin/sway-powerprofiles"
-    install -m755 powermenu/powermenu_gracefully "${pkgdir}/usr/bin/sway-powermenu"
+    # Install scripts and configs
+    install -m755 gracefully_exit/sway-gracefully-exit "${pkgdir}/usr/bin/sway-gracefully-exit"
+    install -m755 new_workspace/sway-new-workspace "${pkgdir}/usr/bin/sway-new-workspace"
+    install -m755 power_profiles_switcher/sway-power-profiles "${pkgdir}/usr/bin/sway-power-profiles"
+    install -m644 power_profiles_switcher/power-profiles.rasi "${pkgdir}/usr/share/sway_tools/rofi/power-profiles.rasi"
+    install -m755 powermenu/sway-powermenu-gracefully "${pkgdir}/usr/bin/sway-powermenu"
+    install -m644 powermenu/powermenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/powermenu.rasi"
     install -m755 swaycast/swaycast "${pkgdir}/usr/bin/swaycast"
     install -m755 swayshot/swayshot "${pkgdir}/usr/bin/swayshot"
-    install -m755 waybar_toggle/waybar_toggle "${pkgdir}/usr/bin/waybar-toggle"
-    install -m755 weather/openweather "${pkgdir}/usr/bin/sway-openweather"
+    install -m755 waybar_toggle/waybar-toggle "${pkgdir}/usr/bin/waybar-toggle"
+    install -m755 weather/sway-openweather "${pkgdir}/usr/bin/sway-openweather"
 }
