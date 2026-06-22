@@ -271,7 +271,7 @@ Main2() {
                 echo "$ranked_out"
             fi
         } > "$mirrorlist"
-        echo2 "done."
+        echo2 " done."
     else
         local msg_not_ranked="NOTE: this mirrorlist was NOT ranked due to unavailable internet connection."
         local msg_not_ranked2="We strongly recommend to rank it soon."

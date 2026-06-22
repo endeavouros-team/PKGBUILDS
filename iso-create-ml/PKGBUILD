@@ -1,7 +1,7 @@
 # Maintainer : manuel at endeavouros.com
 
 pkgname=iso-create-ml
-pkgver=26.6.4
+pkgver=26.6.5
 pkgrel=1
 pkgdesc="Create a mirrorlist for the ISO"
 arch=('any')
@@ -15,12 +15,12 @@ source=(
     create-ml-country-mapping-arch.conf
     create-ml-active-mirrors-arch.conf
 )
-sha256sums=('032f1d169e0e63f8c32a99c9bd24e69601aeee758156a2a67c815609710584cd'
+sha256sums=('abb6bf4d738a64503b743ac73aebff73f0c040830a72ebce5033a94f9020d584'
             '7e560eb19dc568ea20fbbbc203b16b3131468b04e35cdabc719107c01417b670'
-            'f5fb14988ee5f9e50ea87fc9d6b0e7f4ac9c3e393b21287939448b28a8f9a047'
+            '265db6391c5f1b8d3d48cf5b33a338b1ed59d39278d58dda9c25a06108f96257'
             'a4b50820f58c4469c8daaad09f8e03a6a5e52cfc9a1516cf889d1ffb25003604'
             'a52800cf08a67ca685e0943c5e6746b984904e7176a5897813ffa2f78314c367'
-            '90d3bcdef8ca89cc0bddf68340ac153edf9286901458d86fc1bc5760e442ef41')
+            '26d01bd0830ebefa90e70627ba8983f98ec7b30cb3f973e1d9d2d53295dff03a')
 backup=(etc/create-ml.conf)
 
 _prepare_iso_create_ml() {

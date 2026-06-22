@@ -284,6 +284,7 @@ fi
 
 get_url_time() {
 	server=$1
+        echo -n "." >&2
 	url="$(getfetchurl "$server")"
 	[[ $url = fail ]] && err "URL '$server' is malformed."
 	if time=$(gettime "$url") ; then #|| ! [[ $WORKING_ONLY ]]; then
