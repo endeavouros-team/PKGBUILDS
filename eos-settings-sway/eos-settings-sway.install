@@ -3,7 +3,7 @@ post_install() {
 
     if [ -f "$config_file" ]; then
         # Updated --cmd to use eos-sway-wrapper instead of plain sway
-        local target_cmd="command = \"tuigreet --time --time-format '%d.%m.%Y - %H:%M:%S' --remember --remember-session --asterisks --width 70 --container-padding 3 --prompt-padding 2 --user-menu --theme 'container=black;border=gray;text=white;input=white;prompt=magenta;time=magenta;action=white;button=magenta' --cmd eos-sway-wrapper\""
+        local target_cmd="command = \"tuigreet --time --time-format '%d.%m.%Y - %H:%M:%S' --remember --asterisks --width 70 --container-padding 3 --prompt-padding 2 --user-menu --theme 'container=black;border=gray;text=white;input=white;prompt=magenta;time=magenta;action=white;button=magenta' --cmd eos-sway-wrapper\""
 
         # Check if configuration is pristine upstream (agreety) or matches our previous deployments (tuigreet with sway or eos-sway-wrapper)
         if grep -q '^command = "agreety' "$config_file" || grep -q 'command = "tuigreet --time.*--cmd \(sway\|eos-sway-wrapper\)' "$config_file"; then
