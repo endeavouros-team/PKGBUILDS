@@ -315,7 +315,8 @@ AddRecommendedCountries() {
     # In offline mode we fall back to the last branch of the case..esac below because the $current_country
     # is unknown.
     case "$country_code" in
-        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  additional_mirror_countries+=(ww de fr) ;;
+        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|pl|pt|se)     additional_mirror_countries+=(ww de fr) ;;
+        no)                                                  additional_mirror_countries+=(ww de se) ;;
         ar)                                                  additional_mirror_countries+=(ww us) ;;
         'fi')                                                additional_mirror_countries+=(ww se) ;;
         de|us)                                               ;;
