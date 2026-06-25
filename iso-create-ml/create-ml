@@ -137,24 +137,39 @@ ShowLocationInfo() {
 
 UserCountriesFromFile() {
     if [ -r "$user_fav_countries" ] ; then
-        local item item2 items
-        items=$(cat "$user_fav_countries")
-        for item in $items ; do
-            item2="$item"
-            item=${item,,}
+        local item itemsav items=()
+        readarray -t items < <(cat "$user_fav_countries" | grep -Pv "^[ \t]*$|^[ \t]*#")    # skips empty and comment lines
+        for item in "${items[@]}" ; do
+            itemsav="$item"
             case "$item" in
-                [a-z][a-z]) printf "%s\n" "${additional_mirror_countries[@]}" | grep "^$item$" >/dev/null || additional_mirror_countries+=("$item") ;;
-                *)          WARN "$user_fav_countries: country code '$item2' ignored" ;;
+                [a-zA-Z][a-zA-Z])
+                    item="${item,,}"
+                    ;;
+                *)
+                    item="$(CountryNameToCountryCode "$item")"
+                    if [ -z "$item" ] ; then
+                        WARN "$user_fav_countries: country code/name '$itemsav' not supported"
+                        continue
+                    fi
+                    ;;
             esac
+            printf "%s\n" "${additional_mirror_countries[@]}" | grep -q "^$item$" || additional_mirror_countries+=("$item")
         done
     else
         WARN "cannot read file '$user_fav_countries'"
     fi
 }
 UserCountriesFromCommand() {
-    local list="$1" cc                  # list items can separated by spaces ( ), commas (,), or pipes (|)
-    for cc in ${list//[,|]/ } ; do
-        additional_mirror_countries+=("${cc,,}")
+    local list="$1"                  # list items can separated by commas (,), or pipes (|)
+    local list2=() cc cc2
+    readarray -t list2 < <(echo "$list" | sed 's|[,|]|\n|g')
+    for cc in "${list2[@]}" ; do
+        case "$cc" in
+            [a-zA-Z][a-zA-Z]) additional_mirror_countries+=("${cc,,}") ;;
+            *) cc2="$(CountryNameToCountryCode "$cc")"
+               [ "$cc2" ] && additional_mirror_countries+=("$cc2")
+               ;;
+        esac
     done
 }
 
@@ -172,8 +187,10 @@ Header() {
     echo -e "### Program: $progname version $(expac %v $pkgname)"
     echo -e "### Mirror list generated at: $(date -u "+%x %X") UTC"
     echo -n "### Command: $progname"
-    [ "${CREATE_ML_OPTIONS[0]}" ] && printf " '%s'" "${CREATE_ML_OPTIONS[@]}"
-    [ "${orig_args[0]}"         ] && printf " '%s'" "${orig_args[@]}"
+    [ "${CREATE_ML_OPTIONS[0]}" ]           && printf " '%s'" "${CREATE_ML_OPTIONS[@]}"
+    [ "${orig_args[0]}"         ]           && printf " '%s'" "${orig_args[@]}"
+    [ "$country_code" ]                     && printf " '-c' '%s'" "$country_code"
+    [ "${additional_mirror_countries[0]}" ] && printf " '-c' '%s'" "${additional_mirror_countries[@]}"
     echo -e "\n"
 }
 
@@ -222,6 +239,24 @@ Epoch2Dates() {
     done
 }
 
+CountryNameToCountryCode() {
+    if [ "$1" ] ; then
+        local name="${1,,}"        # likely a country name; make lower case now
+        local cc=""                # will contain "return value"
+
+        # Example: "united kingdom" --> "United Kingdom".
+        # $name may include spaces and all its words must start with capital letters.
+        # shellcheck disable=2206
+        local arr=($name)
+        name="${arr[*]^}"
+
+        cc="${cname_to_cc[$name]}"
+    else
+        cc=""
+    fi
+    echo -n "$cc"
+}
+
 Main2() {
     local tmplist mirrorlist ranked_out=""
     tmplist=$(mktemp)                              # collect mirrors that user wanted here
@@ -236,11 +271,20 @@ Main2() {
     fi
 
     # add user given countries into $tmplist
-    local cc
+    local cc cc2
     for cc in "${additional_mirror_countries[@]}" ; do
         case "$cc" in
-            [a-z][a-z]) AddCountry "$cc" ;;
-            *)          WARN "country code '$cc' is not supported" ;;
+            [a-zA-Z][a-zA-Z]) AddCountry "${cc,,}" ;;
+            *)
+                # In $cc the user may have given a country name instead of country code?
+                # If so, make sure country name is in correct format.
+                cc2="$(CountryNameToCountryCode "$cc")"
+                if [ "$cc2" ] ; then
+                    AddCountry "$cc2"
+                else
+                    WARN "country code '$cc' is not supported"
+                fi
+                ;;
         esac
     done
 
@@ -418,13 +462,13 @@ Options: --help, -h                   This help.
          --verbose, -v                Show more ranking details.
          --show-failed                Show info about failed mirrors.
          --http                       Include the http:// mirrors.
-         --countries, -c              Give a list of country codes that will be used as additional mirror countries.
-                                      The list items can be separated by commas or spaces.
+         --countries, -c              Give a list of country codes or names that will be used as additional mirror countries.
+                                      Separate list items with commas or pipes.
                                       Examples:
                                            -c ca,fr,tw
-                                           -c 'ca fr tw'    # note: quotes required here
-         --user-countries             Use file $user_fav_countries to give country codes.
-                                      It can contain a list of country codes separated by white spaces.
+                                           -c 'united states,germany'  # note: comma (and quotes) required with country names
+         --user-countries             Use file ${user_fav_countries/$HOME/\~} to give country codes.
+                                      It can contain a list of country codes or names, each on a separate line.
          --no-recommended-countries   Don't use recommended countries.
                                       Instead you may give one or more country codes
                                       with option --countries or option --user-countries.
