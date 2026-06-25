@@ -1,5 +1,16 @@
 ## `rami` - rank Arch mirrors
 
+NOTE: `rami` is deprecated and will be removed at 2026-September-01.
+
+Alternative apps for ranking Arch mirrors:
+
+```
+create-ml          # package: iso-create-ml
+rate-mirrors
+reflector
+reflector-simple
+```
+
 `rami` is a command line program for ranking Arch mirrors.
 
 This document describes mainly the options of `rami` considered most useful in normal usage.

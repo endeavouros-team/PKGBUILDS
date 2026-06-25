@@ -6,10 +6,19 @@ However, it can be used for ranking Arch mirrors in online mode, and on an insta
 
 Its prominent online feature is the pre-defined list of *recommended* mirror countries for each location.
 The pre-defined list is used for including more mirror sources in addition to the current location.
-
 The list can be overridden or disabled by the user.
 
-## Examples
+Another noteworthy feature is *parallel* mirror ranking which makes it pretty fast.
+
+## Usage and parameters
+
+Use command
+```
+create-ml --help
+```
+to see the explanation of supported parameters.
+
+## Command examples
 
 Command | Notes
 ---- | ----
@@ -18,55 +27,14 @@ Command | Notes
 `create-ml --prefs='fi.*niranjan umea' --save` | Specify some preferred mirrors (using regular expressions) that will be the first in the list.<br>Note the necessary *quotes* with option `--prefs`.
 `create-ml --timeout-mirror 2 --save`          | Use a timeout for each mirror. Helps discarding unresponsive mirrors.
 
-
-## Usage and parameters
-
-```
-Usage:   create-ml [options]
-
-Options: --help, -h                   This help.
-         --nolocal                    Do not include mirrors from the current country.
-         --offline                    Don't use internet even when a connection is available.
-         --save                       Save mirrorlist to /etc/pacman.d/mirrorlist (see also option --savefile).
-         --sequential                 Rank mirrors sequentially (slower) instead of in parallel (faster).
-         --verbose, -v                Show more ranking details.
-         --http                       Include the http:// mirrors.
-         --countries, -c              Give a list of country codes that will be used as additional mirror countries.
-                                      The list items can be separated by commas or spaces.
-                                      Examples:
-                                           -c ca,fr,tw
-                                           -c 'ca fr tw'    # note: quotes required here
-         --user-countries             Use file /home/edi/user-countries.txt to give country codes.
-                                      It can contain a list of country codes separated by white spaces.
-         --no-recommended-countries   Don't use recommended countries.
-                                      Instead you may give one or more country codes
-                                      with option --countries or option --user-countries.
-         --fake-country=*             Set a fake current country code (advanced).
-         --use-saved-cc               The detected local country code is saved to a file /etc/create-ml-saved-cc.conf.
-                                      This option allows using it when local country detection fails (advanced).
-         --savefile=*                 File path to save the mirrorlist (advanced).
-         --timeout-mirror='seconds'   Max time to rank before timing out a mirror. Default: 10.
-         --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
-                                      Use single quotes around the list. Separate items by a space.
-
-Notes:   * Country codes are the two-letter codes as listed by command 'reflector --list-countries'.
-           Note: a special code 'ww' can be used too. It is a compact list of 'Worldwide' mirrors.
-         * By default only https:// mirrors are included.
-         * Use option --save to change the existing /etc/pacman.d/mirrorlist.
-         * Use option --no-recommended-countries to rank mirrors without adding recommended countries.
-         * If internet connection is available and option --offline is not used, the connection is used for:
-               1) Fetching a list of active mirrors from the Arch web site.
-               2) Fetching country code and name mappings from the Arch web site.
-               3) Ranking mirrors.
-           Without a connection the ranking result can be suboptimal or even problematic.
-```
-
 ## Configure the countries for additional mirrors (*advanced*)
 
 File `/etc/create-ml-recommended-cc.conf` can include a bash function `AddRecommendedCountries` that specifies which additional countries to include in ranking.<br>
 The default values (shown below) *should be* reasonable for most users, but there may be reasons to adjust them.
 
 Note that the function below is directly copied from file `/bin/create-ml`. If user creates this file with the function, it overrides the function in `create-ml`.
+
+All two letter items below are country codes (for example, `de` means Germany). A special code `ww` means Worldwide.
 
 ```
 AddRecommendedCountries() {
@@ -75,7 +43,8 @@ AddRecommendedCountries() {
     # because the current country is unknown.
 
     case "$country_code" in
-        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|no|pl|pt|se)  additional_mirror_countries+=(ww de fr) ;;
+        al|at|be|cz|dk|ee|es|fr|gb|gr|hr|it|nl|pl|pt|se)     additional_mirror_countries+=(ww de fr) ;;
+        no)                                                  additional_mirror_countries+=(ww de se) ;;
         'fi')                                                additional_mirror_countries+=(ww se) ;;
         de|us)                                               ;;
         cn|ru)                                               protocols+=(http) ;;
@@ -97,8 +66,10 @@ Help appreciated: If you think some listed country or countries need adjusting a
 ## See also
 
 Some alternative apps for the same purpose:
-- `rami`
-- `rate-mirrors`
-- `reflector`
-- `reflector-simple`
+```
+ rami                # deprecated!
+ rate-mirrors
+ reflector
+ reflector-simple
+```
 
