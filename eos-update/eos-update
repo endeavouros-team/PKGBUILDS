@@ -599,8 +599,8 @@ SystemValidityChecks_error() {
 RunUserCommands() {
     if [ $other_updates = yes ] ; then
         local -r when="$1"
-        if [ -r $otherUpdatesFile ] ; then
-            bash $otherUpdatesFile "$when"
+        if [ -r "$otherUpdatesFile" ] ; then
+            bash "$otherUpdatesFile" "$when"
         else
             [ $((runusercommands_warning_count++)) -eq 0 ] && WARN "script $otherUpdatesFile does not exist"
         fi
@@ -717,6 +717,11 @@ _EosUpdate_Main2() {
     RunUserCommands end
 
     Cleanup
+
+    eos-color tip 2
+    echo2 "==> All done!"
+    eos-color reset 2
+    echo ""                      # this line should reset curson color to default
 }
 
 CreateCmds() {

@@ -1,44 +1,64 @@
 #!/bin/bash
 
-## File /etc/eos-update-lib.bash contains functions that can be used here.
-## Functions:
-##    OncePerBootSession                # parameters:  unique-id
-##    OncePerNDays                      # parameters:  unique-id number-of-days
-##    ColorLines                        # parameters:  N strings each on a separate line
-## Functions to be removed later:
-##    DeprecatedOldCompatibility
-##    _ColorLines                       # replaced by ColorLines
-#
-source /etc/eos-update-lib.bash
-
-## Function 'Main' will be called with one of the parameters
+## With option --other-updates 'eos-update' will call function 'Main' (below) with one of the parameters
 ##    beginning
 ##    end
-##    ''                                 # no parameter; deprecated, use 'end' instead.
+## Your job is to fill up the contents of the 'beginning' and 'end' branches
+## of the case...esac construct below.
+##
+## Available functions that can be used here:
+##     OncePerBootSession
+##         Purpose:     Allows running your commands once after each system boot.
+##         Parameters:  - "unique-id"
+##     OncePerNDays
+##         Purpose:     Allows running your commands once per "number-of-days" days.
+##         Parameters:  - "unique-id"
+##                      - "number-of-days"
+##     ColorLines
+##         Purpose:     Prints given text strings, each string on a separate line.
+##         Parameters:  - One of: "info" "warning" "error" "tip" (see also: /bin/eos-color).
+##                      - One or more strings (see the examples below).
+##     ColorLine
+##         Purpose:     Prints the given text string with a color.
+##         Parameters:  - Optionally: options -e and -n from the 'echo' command, see 'man echo'.
+##                      - One of: "info" "warning" "error" "tip" (see also: /bin/eos-color).
+##                      - A string (see the examples below).
+##
+## Available but deprecated functions:
+##     DeprecatedOldCompatibility      # Shows a deprecation message.
+##     _ColorLines                     # Shows a deprecation message; replaced by ColorLines.
 
-Main() {
+source "/etc/eos-update-lib.bash"      # gets the functions mentioned above
+
+Main() {  # NOTE: do NOT rename this function!
+
     ## Run your commands at various points in time during eos-update.
     case "$1" in
         beginning)
             ## HERE: Add your commands to be executed in the beginning of eos-update.
             ##
-            ## EXAMPLE: rank mirrors once after every boot.
-            # local my_country=Netherlands
+            ## EXAMPLES: rank mirrors once after every system boot; see Arch news.
             # if OncePerBootSession "id-983aa9587" ; then
-            #     ColorLines "Updating /etc/pacman.d/mirrorlist"
-            #     reflector -p https -c $my_country,de --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+            #     ColorLine info "Updating /etc/pacman.d/mirrorlist"
+            #     create-ml --save         # requires package iso-create-ml
+            #     Colorline -en info "\n==> Checking Arch news, please wait ... "
+            #     paru -Pw 2>/dev/null || ColorLine info "nothing."
             # fi
             ;;
         end)
             ## HERE: Add your commands to be executed in the end of eos-update.
             ##
-            ## EXAMPLE: Freshen up database for 'pacman -Fl <package-name>' once a week:
+            ## EXAMPLES: Freshen up database for 'pacman -Fl <package-name>' once a week;
+            ##           show non-native packages.
             # if OncePerNDays "id-k95i60923" 7
+            #     ColorLine info "pacman -Fy"
             #     sudo pacman -Fy
             # fi
+            # ColorLine info "pacman -Qm"
+            # pacman -Qm | sed 's|^|    |' >&2
             #
-            ## EXAMPLE 2: show a multiline message.
-            # ColorLines "first line" "second line" "third line" 
+            ## EXAMPLES: show a multiline message.
+            # ColorLines tip "first line" "second line" "third line"
             ;;
         *)
             # This is just for backwards compatibility. You may remove or comment out the following line.
