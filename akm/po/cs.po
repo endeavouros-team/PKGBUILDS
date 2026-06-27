@@ -1,0 +1,381 @@
+# Czech translations for akm package.
+# Copyright (C) 2026 endeavouros-team
+# This file is distributed under the same license as the akm package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: akm 26-1\n"
+"Report-Msgid-Bugs-To: <https://github.com/endeavouros-team/PKGBUILDS/issues>\n"
+"POT-Creation-Date: 2026-03-18 21:47+0100\n"
+"PO-Revision-Date: 2026-03-18 21:19+0100\n"
+"Last-Translator: khagaroth <khagaroth@gmail.com>\n"
+"Language-Team: Czech <khagaroth@gmail.com>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);\n"
+
+#: ../akm:42
+#, sh-printf-format
+msgid "Checkboxes for installing/uninstalling kernel packages"
+msgstr "Zaškrtávací políčka pro instalaci/odinstalaci balíčků jader"
+
+#: ../akm:54
+#, sh-printf-format
+msgid "Kernel package name"
+msgstr "Název balíčku jádra"
+
+#: ../akm:66
+#, sh-printf-format
+msgid "Internal error, cannot determine the running kernel."
+msgstr "Interní chyba, nelze určit aktuálně používané jádro."
+
+#: ../akm:69
+#, sh-printf-format
+msgid ""
+"Installed kernel package versions.&#10;The currently running kernel is in <i>italics</i>.&#10;A <b>bolded</"
+"b> string means the latest K.o. version."
+msgstr ""
+"Nainstalované verze balíčku jádra.&#10;Aktuálně používané jádro zobrazeno <i>kurzívou</i>.&#10;<b>Tučně</b> "
+"je zobrazena nejnovější dostupná verze na kernel.org."
+
+#: ../akm:110 ../akm:143
+#, sh-printf-format
+msgid " (currently in use)"
+msgstr " (aktuálně používané)"
+
+#: ../akm:112
+#, sh-printf-format
+msgid "Versions available from the stable repos%s"
+msgstr "Verze dostupné ze stabilních repozitářů%s"
+
+#: ../akm:137
+#, sh-format, sh-printf-format
+msgid "%1$s is currently unavailable%2$s!"
+msgstr "%1$s je aktuálně nedostupný%2$s!"
+
+#: ../akm:151
+#, sh-printf-format
+msgid "Fetching info from %s failed!"
+msgstr "Načítání informací z %s selhalo!"
+
+#: ../akm:153
+#, sh-printf-format
+msgid "Versions available from the testing repos%s"
+msgstr "Verze dostupné z testovacích repozitářů%s"
+
+#: ../akm:178
+#, sh-printf-format
+msgid "Kernel category at kernel.org"
+msgstr "Kategorie jádra na kernel.org"
+
+#: ../akm:192
+#, sh-printf-format
+msgid "Latest version announced at kernel.org"
+msgstr "Nejnovější verze ohlášená na kernel.org"
+
+#: ../akm:242
+#, sh-printf-format
+msgid "Sorry, package 'eos-bash-shared' is not installed."
+msgstr "Balíček 'eos-bash-shared' není nainstalován."
+
+#: ../akm:263
+#, sh-printf-format
+msgid "==> Config file %s read."
+msgstr "==> Soubor nastavení %s načten."
+
+#: ../akm:271
+#, sh-printf-format
+msgid "AKM message"
+msgstr "AKM - zpráva"
+
+#: ../akm:293
+#, sh-printf-format
+msgid "Usage: %s [options]"
+msgstr "Použití: %s [možnosti]"
+
+#: ../akm:294
+#, sh-printf-format
+msgid "options:"
+msgstr "možnosti:"
+
+#: ../akm:295
+#, sh-printf-format
+msgid "    --connect-header      Make kernel and header package go together at install or uninstall."
+msgstr ""
+"   --connect-header      Při instalaci nebo odinstalaci zpracovávat balíčky jádra a hlaviček společně."
+
+#: ../akm:296
+#, sh-printf-format
+msgid ""
+"    --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are "
+"available."
+msgstr ""
+"   --scroll              Povolit rolování v okně informací o jádrech. Užitečné pokud jsou dostupná "
+"dodatečná jádra."
+
+#: ../akm:297
+#, sh-printf-format
+msgid ""
+"    --small               Make the akm window smaller, meant for helping with small displays at 1366x768 "
+"resolution."
+msgstr ""
+"   --small               Použít menší okno, určeno pro použití na malých displejích s rozlišením 1366x768."
+
+#: ../akm:298
+#, sh-printf-format
+msgid "    --quiet | -q          Be less verbose."
+msgstr "   --quiet | -q          Produkovat méně podrobný výstup."
+
+#: ../akm:299
+#, sh-printf-format
+msgid "    --no-progress         Don't show the progress window."
+msgstr "   --no-progress         Nezobrazovat okno s průběhem."
+
+#: ../akm:300
+#, sh-printf-format
+msgid "    --help | -h           This help."
+msgstr "   --help | -h           Tato nápověda."
+
+#: ../akm:312
+#, sh-printf-format
+msgid "unsupported option '%s'"
+msgstr "nepodporovaná možnost ‚%s’"
+
+#: ../akm:313
+#, sh-printf-format
+msgid "unsupported parameter '%s'"
+msgstr "nepodporovaný parametr ‚%s’"
+
+#: ../akm:397
+#, sh-printf-format
+msgid "==> Info: detecting available kernel packages."
+msgstr "==> Informace: zjišťování dostupných balíčků jádra."
+
+#: ../akm:419
+#, sh-printf-format
+msgid "Choose"
+msgstr "Vybrat"
+
+#: ../akm:420
+#, sh-printf-format
+msgid "PkgName"
+msgstr "Název balíčku"
+
+#: ../akm:421
+#, sh-printf-format
+msgid "Installed"
+msgstr "Nainstalováno"
+
+#: ../akm:422
+#, sh-printf-format
+msgid "Stable"
+msgstr "Stabilní"
+
+#: ../akm:423
+#, sh-printf-format
+msgid "Testing"
+msgstr "Testovací"
+
+#: ../akm:424
+#, sh-printf-format
+msgid "K.o.category"
+msgstr "K.o. kategorie"
+
+#: ../akm:425
+#, sh-printf-format
+msgid "K.o.version"
+msgstr "K.o. verze"
+
+#: ../akm:430
+#, sh-printf-format
+msgid "Here's information about <i>currently available</i> Linux kernels that are or can be installed."
+msgstr "Informace o <i>aktuálně dostupných</i> Linuxových jádrech, která jsou nebo mohou být nainstalována."
+
+#: ../akm:431
+#, sh-printf-format
+msgid "Install and/or uninstall kernel packages using the checkboxes on the leftmost column."
+msgstr "Nainstalujte nebo odinstalujte balíčky jader pomocí zaškrtávacích políček v levém sloupci."
+
+#: ../akm:432
+#, sh-printf-format
+msgid "<i>Please make sure the system is fully updated when starting <b>%s</b></i>."
+msgstr "<i>Před spuštěním <b>%s</b> se přesvědčte, že je váš systém plně aktualizován</i>."
+
+#: ../akm:435
+#, sh-printf-format
+msgid "Column headers:"
+msgstr "Záhlaví sloupců:"
+
+#: ../akm:436
+#, sh-printf-format
+msgid "    Choose       Checkboxes for installing/uninstalling kernel packages."
+msgstr "    Vybrat          Zaškrtávací políčka pro instalaci/odinstalaci balíčků jader."
+
+#: ../akm:437
+#, sh-printf-format
+msgid "                 The installed packages are checked at start."
+msgstr "                    Nainstalované balíčky jsou kontrolovány při spuštění."
+
+#: ../akm:438
+#, sh-printf-format
+msgid "    PkgName      Kernel package name."
+msgstr "    Název balíčku   Název balíčku jádra."
+
+#: ../akm:439
+#, sh-printf-format
+msgid "    Installed    Installed kernel package versions."
+msgstr "    Nainstalováno   Nainstalované verze balíčku jádra."
+
+#: ../akm:440
+#, sh-printf-format
+msgid "                 The currently running kernel is printed in italics."
+msgstr "                    Aktuálně používané jádro je zobrazeno kurzívou."
+
+#: ../akm:441
+#, sh-printf-format
+msgid "                 The latest kernel.org version is printed in bold."
+msgstr "                    Nejnovější verze na kernel.org je zobrazena tučně."
+
+#: ../akm:442
+#, sh-printf-format
+msgid "    Stable       Versions available from the stable repos."
+msgstr "    Stabilní        Verze dostupné ze stabilních repozitářů."
+
+#: ../akm:443
+#, sh-printf-format
+msgid "    Testing      Versions available from the testing repos."
+msgstr "    Testovací       Verze dostupné z testovacích repozitářů."
+
+#: ../akm:444
+#, sh-printf-format
+msgid "    %s Kernel category at kernel.org."
+msgstr "    %s  Kategorie jádra na kernel.org."
+
+#: ../akm:445
+#, sh-printf-format
+msgid "    %s  Latest version announced at kernel.org."
+msgstr "    %s      Nejnovější verze ohlášená na kernel.org."
+
+#: ../akm:448
+#, sh-printf-format
+msgid "Your currently used repo (Stable or Testing) is printed in italics (see also /etc/pacman.conf)."
+msgstr ""
+"Aktuálně používaný repozitář (stabilní nebo testovací) je zobrazen kurzívou (více viz /etc/pacman.conf)."
+
+#: ../akm:449
+#, sh-printf-format
+msgid "Marking <b>%s</b> means: info not available."
+msgstr "Značka <b>%s</b> znamená: informace není k dispozici."
+
+#: ../akm:450
+#, sh-printf-format
+msgid "See file <tt>/etc/akm.conf</tt> for configuration details."
+msgstr "Podrobné informace o nastavení viz <tt>/etc/akm.conf</tt>."
+
+#: ../akm:454
+#, sh-printf-format
+msgid "Simple kernel manager"
+msgstr "Jednoduchý správce jader"
+
+#: ../akm:455
+#, sh-printf-format
+msgid "Changelog"
+msgstr "Seznam změn"
+
+#: ../akm:456
+#, sh-printf-format
+msgid "Show latest changes of this program"
+msgstr "Zobrazit seznam změn pro tento program"
+
+#: ../akm:457
+#, sh-printf-format
+msgid "Help"
+msgstr "Nápověda"
+
+#: ../akm:458
+#, sh-printf-format
+msgid "Helps to use %s"
+msgstr "Nápověda pro %s"
+
+#: ../akm:459
+#, sh-printf-format
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: ../akm:460
+#, sh-printf-format
+msgid "Change nothing"
+msgstr "Ukončit bez provedení změn"
+
+#: ../akm:461
+#, sh-printf-format
+msgid "Execute"
+msgstr "Provést"
+
+#: ../akm:462
+#, sh-printf-format
+msgid "Make your changes"
+msgstr "Ukončit a provést změny"
+
+#: ../akm:483
+#, sh-printf-format
+msgid "AKM progress"
+msgstr "AKM - průběh"
+
+#: ../akm:484
+#, sh-printf-format
+msgid "Fetching information, please wait..."
+msgstr "Načítání informací..."
+
+#: ../akm:502
+#, sh-printf-format
+msgid "Network access required.&#10;Please check the internet connection."
+msgstr "Vyžadováno síťové připojení.&#10;Zkontrolujte dostupnost připojení k internetu."
+
+#: ../akm:504
+#, sh-printf-format
+msgid "Fetching info from %s failed."
+msgstr "Načítání informací z %s selhalo."
+
+#: ../akm:519
+#, sh-printf-format
+msgid "==> Warning: yad output should have been exactly one line, but is:\\n'%s'\\n"
+msgstr "==> Varování: výstup příkazu yad měl být jeden řádek, ale je:\\n'%s'\\n"
+
+#: ../akm:522
+#, sh-printf-format
+msgid "==> Warning: using the last line:\\n'%s'"
+msgstr "==> Varování: použit poslední řádek:\\n'%s'"
+
+#: ../akm:525
+#, sh-printf-format
+msgid "cannot parse yad output:\\n'%s'"
+msgstr "nepodařilo se analyzovat výstup příkazu jad:\\n'%s'"
+
+#: ../akm:602 ../akm:608
+#, sh-printf-format
+msgid "Function %s failed."
+msgstr "Funkce %s selhala."
+
+#: ../akm:614
+#, sh-printf-format
+msgid "#===> Done.\\n100\\n"
+msgstr "#===> Dokončeno.\\n100\\n"
+
+#: ../akm.desktop:4
+msgid "akm"
+msgstr "akm"
+
+#: ../akm.desktop:5
+msgid "Manages official kernels in EndeavourOS"
+msgstr "Správce oficiálních linuxových jader pro EndeavourOS"
+
+#, sh-printf-format
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#, sh-printf-format
+#~ msgid "Fetching info from https://archlinux.org failed!"
+#~ msgstr "Načítání informací z https://archlinux.org selhalo!"
