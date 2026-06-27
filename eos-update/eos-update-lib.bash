@@ -65,26 +65,39 @@ ColorLines() {
 ColorLine() {
     ## Print a message with the given "color" (see also /bin/eos-color).
     ## A message is a one liner.
-    ## Note: options -n and -e from the 'echo' command are supported, and -e is on by default.
-    ## Example: ColorLine -n warning "this is a test"
+    ## Supported options:
+    ##     -n    similar to the same option in the 'echo' command
+    ##     -e    similar to the same option in the 'echo' command; enabled by default in this function
+    ##     -m    do not add a prefix $linemarker (==>) to the line.
+    ## Example: ColorLine -n warning "Test result ... "
 
     local color=""
     local line=""
-    local linemarker="==>"
+    local linemarker="==> "  # trailing space required
     local opts=(-e)
 
     while [ "$1" ] ; do
         case "$1" in
-            -e) ;;           # -e is always enabled in this function!
-            -n | -ne | -en)  opts+=(-n) ;;
-            -*)              echo "==> ${0##*/}: ${FUNCNAME[0]}: option '$1' is not supported" >&2 ;;
-            *)               [ "$color" ] && line="$1" || color="$1" ;;
+            -*m*) linemarker="" ;;  # prints the line without leading "==>"
+        esac
+        case "$1" in
+            -*n*) opts+=(-n) ;;
+        esac
+        case "$1" in
+            -*e* | -*n* | -*m*)     # -e always enabled; others already handled above
+                ;;
+            -*)
+                echo "==> ${0##*/}: ${FUNCNAME[0]}: warning: option '$1' is not supported" >&2
+                ;;
+            *)
+                [ "$color" ] && line="$1" || color="$1"
+                ;;
         esac
         shift
     done
 
     eos-color "$color" 2
-    echo "${opts[@]}" "${linemarker} $line" >&2     # print the first line of the message
+    echo "${opts[@]}" "${linemarker}$line" >&2
     eos-color reset 2
 }
 

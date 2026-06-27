@@ -42,7 +42,7 @@ Main() {  # NOTE: do NOT rename this function!
             #     ColorLine info "Updating /etc/pacman.d/mirrorlist"
             #     create-ml --save         # requires package iso-create-ml
             #     Colorline -en info "\n==> Checking Arch news, please wait ... "
-            #     paru -Pw 2>/dev/null || ColorLine info "nothing."
+            #     paru -Pw 2>/dev/null || ColorLine -m info "nothing."
             # fi
             ;;
         end)
