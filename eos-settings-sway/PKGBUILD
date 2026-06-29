@@ -12,7 +12,7 @@ depends=('endeavouros-branding' 'eos-sway-tools' 'greetd' 'greetd-tuigreet')
 makedepends=("git")
 install=eos-settings-sway.install
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('ecea1499ef91f2b51cfa5a16aadf4c1b5bf97f4234975c851ea561c9f5b97f95')
+sha256sums=('bf71a8dd73be7bdfc97c21ff60ce632e679f486f216fcdb7bcf4b7632b4fabff')
 
 package() {
     # Enter the unpacked source directory
