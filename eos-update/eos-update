@@ -4,7 +4,10 @@
 # Handles db lock file, keyrings, syncing, and optionally AUR with given AUR helper.
 
 echo2()   { echo -e "$@" >&2 ; }
-printf2() { printf "$@" >&2 ; }
+printf2() {
+    # shellcheck disable=2059
+    printf "$@" >&2
+}
 
 WARN()    { echo2warning "==> $progname: warning: $1"; }
 DIE()     { echo2error   "==> $progname: error: $1"; exit 1;  }
@@ -117,7 +120,7 @@ CheckYourEndeavourosMirrorlist() {
                 local_mirrors=$(grep -n "^[ \t]*Server[ \t]*=[ \t]*" $eml | sed 's|[ \t]*Server[ \t]*=[ \t]*||')
 
                 for lm in $local_mirrors ; do
-                    if [ "$(echo "$good_mirrors" | grep "${lm#*:}")" ] ; then
+                    if echo "$good_mirrors" | grep -q "${lm#*:}" ; then
                         supported+=("${lm#*:}")
                     else
                         unsupported+=("$lm")  # includes the line number: "nr:https://..."
@@ -222,6 +225,7 @@ FaillockCheck() {
     if [ $faillockcheck = yes ] ; then
         if [ "$(LANG=C faillock --user "$LOGNAME" | grep -EA1 "^When[ ]+Type[ ]+Source" | wc -l)" -gt 1 ] ; then
             sleep 1
+            # shellcheck disable=2162
             read -p "Info: elevating privileges is locked, press ENTER to unlock, or Ctrl-C to quit: " >&2
             case "$?" in
                 0) faillock --user "$LOGNAME" --reset ; sleep 2 ;;
@@ -289,6 +293,7 @@ YourFavPkgs() {
         exit 1
     fi
 
+    # shellcheck disable=1090
     source "$favsfile"
     local cmd=""
     if [ "$FAVORITES_UNINSTALL" ] ; then
@@ -653,13 +658,14 @@ _EosUpdate_Main2() {
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
     
     SingleOptions "$@"
-    echo2tip "$progname: package updater with additional features"
+    echo2tip "$progname: package updater with additional features\n"
 
     RunUserCommands beginning
 
     DebugBreak
+    # shellcheck disable=2119
     _init_translations
-    
+
     Options "$@"
 
     if [ $eufast = yes ] ; then
@@ -745,13 +751,12 @@ eos_update_as_user() {
     fi
 }
 eos_update_as_root() {
-    local -r so="$1"
     rm -$rmopt $lock                        || return
     if [ ! -e $lock ] ; then
         pacman -Sy                          || return
         ${progname}-extras ${subopts[*]}    || return
         pacman -Su                          || return
-        /bin/sudo $so --user $LOGNAME $helper2  || return
+        /bin/sudo $1 --user $LOGNAME $helper2  || return
         $pacdiffer
         $sync
     fi

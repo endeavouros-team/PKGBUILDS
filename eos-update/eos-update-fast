@@ -7,6 +7,9 @@
 Operate() {
     opts=$(/bin/getopt -o=$sopts --longoptions=$lopts --name $progname -- "$@") || Usage $EXIT_ERROR
     eval set -- "$opts"
+    eos-color info 2
+    echo2 "==> Fetching package update data"
+    eos-color reset 2
     while true ; do
         case "$1" in
             -a | --arch)
@@ -147,7 +150,7 @@ DiscoverUrlAndData() {
 
         case "$url" in
             http*) ;;
-            *) DIE "$FUNCNAME: getting proper $os URL failed" ;;
+            *) DIE "${FUNCNAME[0]}: getting proper $os URL failed" ;;
         esac
 
         data=$(curl --fail -Lsm 10 -o- "$url") || exitcode=$?
@@ -159,7 +162,7 @@ DiscoverUrlAndData() {
         fi
         [ "$data" ]                            || { echo2 " -> no data from $url"; continue; }
         [ "${data//[0-9]*/}" ]                 && { echo2 " -> $url data corrupt"; continue; }       # data must be numbers only
-        echo2 " -> fetching $url: OK"
+        echo2 " -> successfully fetched for $os"
         return
     done
     DIE "fetching data from $os mirrors failed"
@@ -254,6 +257,10 @@ ShowResult() {
 }
 
 echo2() { echo "$@" >&2 ; }
+printf2() {
+    # shellcheck disable=2059
+    printf "$@" >&2
+}
 DIE() {
     printf "%s: error: %s\n\n" "$progname" "$1" >&2
     Usage $EXIT_ERROR
