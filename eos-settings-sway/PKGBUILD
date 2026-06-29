@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-sway-setup
 pkgname=eos-settings-sway
-pkgver=2.1
+pkgver=2.2
 pkgrel=1
 pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
 arch=("any")
@@ -23,6 +23,9 @@ package() {
 
     # Install configuration files to /etc/skel
     cp -a skel "${pkgdir}/etc/skel"
+
+    # Make set_once.sh executable
+    chmod 755 "${pkgdir}/etc/skel/set_once.sh"
 
     # Ensure scripts in .local/bin are executable
     if [ -d "${pkgdir}/etc/skel/.local/bin" ]; then
