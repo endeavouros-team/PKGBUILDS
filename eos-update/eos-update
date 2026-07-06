@@ -734,7 +734,7 @@ CreateCmds() {
     local helper2="$1"
     [ "$helper2" ] || helper2="true"
 
-    cmdfile=$(mktemp "$HOME/.$progname.helper.XXX")
+    cmdfile=$(mktemp "$HOME/.cache/.$progname.helper.XXX")
 
     cat <<EOF > "$cmdfile"
 #!/bin/bash
