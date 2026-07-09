@@ -1,8 +1,10 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
+# shellcheck disable=2034,2154   # unused variable, unassigned variable used
+
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=26.6.2
+pkgver=26.7
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -20,6 +22,7 @@ optdepends=(
   'diffuse: alternative app for pacdiff to use'
   'vim: alternative app for pacdiff to use'
   'eos-quickstart: quick start with installing apps'
+  'polkit: some apps of the welcome package use pkexec'
 )
 
 # url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
@@ -29,20 +32,24 @@ optdepends=(
 url=https://github.com/endeavouros-team/welcome
 _url=https://raw.githubusercontent.com/endeavouros-team/welcome/main
 
+backup=(etc/eos-reisub.conf)
+
 source=(
-  $_url/$pkgname
-  $_url/${pkgname}-installer.conf
-  $_url/$pkgname.bash-completion
-  $_url/$pkgname.desktop
-  $_url/wallpaper-once
-  $_url/wallpaper-once.desktop
-  $_url/eos-kill-yad-zombies
-  $_url/welcome-dnd
-  $_url/welcome-tip-pages
-  $_url/eos-install-mode-run-calamares
-  $_url/arm-eos-welcome-installer
+  "$_url/$pkgname"
+  "$_url/${pkgname}-installer.conf"
+  "$_url/$pkgname.bash-completion"
+  "$_url/$pkgname.desktop"
+  "$_url/wallpaper-once"
+  "$_url/wallpaper-once.desktop"
+  "$_url/eos-kill-yad-zombies"
+  "$_url/welcome-dnd"
+  "$_url/welcome-tip-pages"
+  "$_url/eos-install-mode-run-calamares"
+  "$_url/arm-eos-welcome-installer"
+  "$_url/eos-reisub"
+  "$_url/eos-reisub.conf"
 )
-sha512sums=('bee321271b2c489997152dfa176ffe3f2f93fb04f448d9f4f50fbac93f98c57e93bc2de27d4cfe4d26a626cd4377597479bf0c0fa98b64cf0bd07fe05c1e2748'
+sha512sums=('9b3124da0dfcf4529dedb7aa26391585c8479db48d2be1ffad74a05f02e4083cbce3919f75be922e53bac61d2087fb739d3b9ddd49306188725a7e9200abebf3'
             '63f8cb7eff80f8f3b69c1629c7acf7b3e5207cdcbd560060177ce1a8dbd7593ec1c42582787fc3446d429b52e7791145c815bc1f01f4c1a3a70b518bbb22cd18'
             '36dcdd5db1d86b88a87c4e48b718b0986107980fc289dd8dd643a365508255a81680d197442dfe6933bbb8b06e2ccc7d7b55bf28ce1a925cdfd0278c6fee2c7f'
             '5ca4b7108573a980d9d4011c5afde4f459abe8e36f5b6bc846368dcc48cfa2e672133f074fdeac4282835fa5b87f7afb2cd9dc3e985b4d2e8f574ac239c90ba2'
@@ -50,9 +57,11 @@ sha512sums=('bee321271b2c489997152dfa176ffe3f2f93fb04f448d9f4f50fbac93f98c57e93b
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
             'f49a10eb276078857f7ff4849b581bb64deb9571aa35f2c717d1f01951f4944b3f1c5c7532eecd7b5c08d4c75c36455f86f6377a4356476267921f50c4d4d8e8'
-            '42e5aeb0ea71e2d77fd6ad741a48bf3927a20a2a71c48d68aafbe462b32755bf3e40ac2d0a54471a15b0c6242cdbbc332fd095822609827b69c75371fb4109e0'
+            '2d959368ee57ce6c2d1bcee43ce1eb9e893b5bf351d5cc4ef68d68dec295b8c49f48d6fde52e8dcd9296ceeab8d67ee065da230889c09e47ba415c6a74c70081'
             'f690c56bb21c67ba0da6e7adf12b17645f13c4e715eb9e6afabf6fbe17c40980007737e09c38fccf26b9e0ac48b5979c48f3b025e91b1c2eef88a7993b368a04'
-            'cbc39b4806cbfc6a81ddad7cc174d3850f82699c46c949a3ac9855f3c63f6cd6e91102ca357dc4176c7edcb02682e10b0175a95adcede81ec23a7ee84ab231aa')
+            'cbc39b4806cbfc6a81ddad7cc174d3850f82699c46c949a3ac9855f3c63f6cd6e91102ca357dc4176c7edcb02682e10b0175a95adcede81ec23a7ee84ab231aa'
+            'd2442dbfdc48c8e0ad36d6f8595644323a5cb0d89352fee1919d9745182888f50378d7079590a2a421a2fbec565afd4da9b1bd8501892b37482b1d5f82a844c3'
+            '8788a0bc9401f2bd61b5e27613973d07d265b753bfa505cff482ad7f569cec103ecc6329acbd6d000d14f25e82aafe0f4a5f06234445edf71ed790ccebdfc882')
 package() {
     local -r eosdir=usr/share/endeavouros/scripts
     local src name
