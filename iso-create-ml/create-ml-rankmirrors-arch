@@ -57,6 +57,7 @@ Options:
   -v, --verbose         be verbose in output
   -w, --working-only    only output mirrors that respond within the timeout
   -V, --version         display version information and exit
+  --progress-mode <val> display ranking progress with 'dots' (default), 'mirrors', or 'none'
 EOF
 	exit 0
 }
@@ -203,6 +204,10 @@ while [[ $1 ]]; do
                         show-failed) SHOW_FAILED=1; shift ;;
 			version) version ;;
 			working-only) WORKING_ONLY=1; shift ;;
+                        progress-mode)
+                                [[ $2 ]] || err "Must specify 'dots', 'mirrors', or 'none'";
+                                PROGRESS_MODE="$2"
+                                shift 2 ;;
 			*) err "'$1' is an invalid argument." ;;
 		esac
 	elif [[ ${1:0:1} = - ]]; then
@@ -284,7 +289,12 @@ fi
 
 get_url_time() {
 	server=$1
-        echo -n "." >&2
+        case "$PROGRESS_MODE" in
+            mirrors) echo "  -> ${server%/lastupdate}" >&2 ;;
+            dots)    echo -n "." >&2 ;;
+            none)    ;;        # show no progress indicator
+            *)       ;;        # ignore unsupported value
+        esac
 	url="$(getfetchurl "$server")"
 	[[ $url = fail ]] && err "URL '$server' is malformed."
 	if time=$(gettime "$url") ; then #|| ! [[ $WORKING_ONLY ]]; then
@@ -307,7 +317,7 @@ tmpfile=$(mktemp)
 if [[ $PARALLEL ]]; then
 	servers=()
 	# Exports for GNU parallel
-	export MAX_TIME ARCH TARGETREPO VERBOSE SHOW_FAILED TIMESONLY WORKING_ONLY tmpfile
+	export MAX_TIME ARCH TARGETREPO VERBOSE SHOW_FAILED PROGRESS_MODE TIMESONLY WORKING_ONLY tmpfile
 	export -f getfetchurl gettime get_url_time
 fi
 

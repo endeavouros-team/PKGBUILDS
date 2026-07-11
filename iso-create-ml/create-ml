@@ -294,7 +294,13 @@ Main2() {
         [ $show_failed = yes ] && rankmirrors_opt+=(--show-failed)
         [ $parallel = yes ]    && rankmirrors_opt+=(-p)
 
-        echo2 -n "==> Ranking mirrors ... "
+        case "$progress_mode" in
+            mirrors) echo2    "==> Ranking mirrors:" ;;
+            dots)    echo2 -n "==> Ranking mirrors " ;;
+            none)    ;;
+            *)       DIE "--progress-mode: value '$progress_mode' not supported" ;;
+        esac
+        rankmirrors_opt+=(--progress-mode "$progress_mode")
         {
             # shellcheck disable=SC2016
             ranked_out=$(create-ml-rankmirrors-arch "${rankmirrors_opt[@]}" "$tmplist" | column -t -s'|' | sed 's|/lastupdate|/$repo/os/$arch|')
@@ -315,7 +321,11 @@ Main2() {
                 echo "$ranked_out"
             fi
         } > "$mirrorlist"
-        echo2 " done."
+        case "$progress_mode" in
+            mirrors) echo2 "==> Mirror ranking done." ;;
+            dots)    echo2 " done." ;;
+            none)    ;;
+        esac
     else
         local msg_not_ranked="NOTE: this mirrorlist was NOT ranked due to unavailable internet connection."
         local msg_not_ranked2="We strongly recommend to rank it soon."
@@ -451,6 +461,13 @@ Parameters() {
             --timeout-mirror)    TIMEOUT_MIRROR="$2"; shift ;;
             --time-format)       time_format="$2"; shift; TimeFormatCheck ;;
             --conf-name)         echo "$configfile"; exit 0 ;;
+            --progress-mode)     progress_mode="$2"
+                                 case "$progress_mode" in
+                                     dots|mirrors|none) ;;
+                                     *) DIE "--progress-mode: '$progress_mode' is not supported"
+                                 esac
+                                 shift
+                                 ;;
             -h | --help)
                 cat <<EOF >&2
 Usage:   $progname [options]
@@ -483,6 +500,7 @@ Options: --help, -h                   This help.
          --timeout-mirror='seconds'   Max time to rank before timing out a mirror. Default: $timeout_mirror_def.
          --prefs='regexp-list'        List of preferred mirrors as regexps for grep (advanced).
                                       Use single quotes around the list. Separate items by a space.
+         --progress-mode=*            Show mirror ranking progress with 'dots' (default), 'mirrors', or 'none'.
          --conf-name                  Show the name of the config file and exit.
                                       Tip: you can modify the config file contents with your favorite editor, for example:
                                           kate \$($progname --conf-name)
@@ -512,12 +530,13 @@ Main() {
     local -r configfile="/etc/$progname.conf"
     local -r recommended_countries="/etc/${progname}-recommended-cc.conf"
     local -r stored_country_file="/etc/${progname}-saved-cc.conf"
+    local progress_mode=dots
 
     local -r sep="&"
     local OPTS=""
     OPTS+="help${sep}h,http,nolocal,offline,save,savefile:,no-recommended-countries,rsync,sequential"
     OPTS+=",user-countries,fake-country:,verbose${sep}v,dump-options,dump-ccs,update-supports,prefs:,issue-test"
-    OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:,show-failed,conf-name"
+    OPTS+=",use-saved-cc,timeout-mirror:,countries:${sep}c:,show-failed,conf-name,progress-mode:"
     OPTS+=",time-format:"
 
     local -r user_fav_countries=$HOME/user-countries.txt
