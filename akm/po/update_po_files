@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -uo pipefail
+cd "$(pwd)" || exit
+
+name=''
+version=''
+ret=0
+srcinfo=$(makepkg --printsrcinfo --dir "../") || ret=1
+if [ $ret -eq 0 ]; then
+    if [ -f "akm.pot" ]; then
+        mv ./akm.pot ./akm.pot~
+    fi
+    name=$(echo "$srcinfo" | awk -F "=| = " '/pkgname/ {print $2}' -)
+    version=$(echo "$srcinfo" | awk -F "=| = " '{OFS = ""; ORS = ""} {if ($0 ~ "epoch") {print $2":"} if ($0 ~ "pkgver") {print $2} if($0 ~ "pkgrel") {print"-" $2}}' -)
+    bugurl='<https://github.com/endeavouros-team/PKGBUILDS/issues>'
+    xgetcmd="\
+            --copyright-holder=endeavouros-team \
+            --package-name=$name \
+            --package-version=$version \
+            --msgid-bugs-address=$bugurl \
+            --default-domain=$name \
+            --from-code=UTF-8 \
+            --sort-by-file \
+            --width=110 \
+            --output=$name.pot"
+    xgettext --language=Shell $xgetcmd ../akm || ret=1
+    xgettext -j --language=Desktop $xgetcmd ../akm.desktop || ret=1
+else
+    echo -e "PKGBUILD file not found, unable to determine package name and version.\nPOT file not created. Exiting."
+    exit $ret
+fi
+
+if [ -f "akm.pot" ] && [ $ret -eq 0 ]; then
+    if [ -f "akm.pot~" ]; then
+        rm "./akm.pot~"
+        echo "POT file updated!"
+        echo
+    else
+        echo "POT file created!"
+        echo
+    fi
+elif [ -f "akm.pot~" ]; then
+    mv ./akm.pot~ ./akm.pot
+    echo "Unable to update POT file. Restored backup of previsous version!"
+    echo
+else
+    echo "Unable to create POT file."
+    echo
+fi
+
+if [ $ret -eq 0 ]; then
+while IFS='' read -r langs; do
+    if [[ "$langs" =~ ^[[:space:]]*#.*$ ]]; then
+        :
+    else
+        IFS=" "
+        for lang in $langs; do
+            if [ -f "${lang}.po" ]; then
+                :
+            else
+                msginit --input="${name}.pot" --width="110" --locale="${lang}"
+                if [ ! -f "${lang}.po" ]; then
+                    echo "Unable to create PO file for languge '$lang'!"
+                fi
+            fi
+        done
+    fi
+done < LINGUAS
+
+
+for pofile in *.po; do
+    echo "Updating ${pofile}:"
+    echo '###############'
+    msgmerge --verbose --sort-by-file --previous --backup=none --width="110" --update "${pofile}" "akm.pot"
+    echo '---'
+    echo
+done
+fi
+
+exit $ret
