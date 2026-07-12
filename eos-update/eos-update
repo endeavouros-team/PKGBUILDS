@@ -9,6 +9,7 @@ printf2() {
     printf "$@" >&2
 }
 
+INFO()    { echo2info    "==> $progname: info: $1"; }
 WARN()    { echo2warning "==> $progname: warning: $1"; }
 DIE()     { echo2error   "==> $progname: error: $1"; exit 1;  }
 
@@ -326,6 +327,21 @@ YourFavPkgs() {
     exit 0
 }
 
+DeprecatedOption() {
+    local -r option="$1"
+    local date_depr date_now
+    date_depr="$(/bin/date --date="${DeprecationDates[$1]}" +%s)"
+    date_now="$(/bin/date +%s)"
+
+    if [ "$date_now" -lt "$date_depr" ] ; then
+        WARN "option $option is deprecated and will be removed at ${DeprecationDates[$1]}."
+        return 0
+    else
+        WARN "option $option has been removed at ${DeprecationDates[$1]}."
+        return 1
+    fi
+}
+
 SingleOptions() {
     local ret=0
     while [ "$1" ] ; do
@@ -338,7 +354,7 @@ SingleOptions() {
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
                                                  ;;
-            --rank-mirrors)                      RankWithUserCommand
+            --rank-mirrors)                      DeprecatedOption "$1" && RankWithUserCommand
                                                  exit
                                                  ;;
             --check-mirrors)                     CheckYourEndeavourosMirrorlist || ((ret++))
@@ -371,6 +387,14 @@ SingleOptions() {
                                                  sopts="$(echo "$sopts" | sed -E 's|([a-z])| -\1|g')"
                                                  echo "$lopts $sopts"
                                                  exit 0
+                                                 ;;
+            --conf-filename)                     if [ -e "$eosupdateconf" ] ; then
+                                                     echo "$eosupdateconf"
+                                                     exit 0
+                                                 else
+                                                     INFO "file $eosupdateconf does not exist"
+                                                     exit 1
+                                                 fi
                                                  ;;
             --other-updates)                     other_updates=yes ;;   # does not exit and it is OK
             -h | --help)                         Usage 0 ;;
@@ -406,10 +430,9 @@ Options() {
     local ret=0
     while true ; do
         case "$1" in
-            --reset-pacmanconf | --check-mirrors | --check-mirrors-arch | --check-mirrors-eos | --edit-mirrorlist | --show-only-fixed | --show-upstream-news | --dump-options | -h | --help)
-                : # already handled in SingleOptions
-                ;;
-            # --system-checks)                     ;;                # already handled in SingleOptions
+            --reset-pacmanconf|--check-mirrors|--check-mirrors-arch|--check-mirrors-eos) ;;        # handled in SingleOptions
+            --edit-mirrorlist|--show-only-fixed|--show-upstream-news|--dump-options|-h|--help) ;;  # handled in SingleOptions
+            # --system-checks)                     ;;                                              # handled in SingleOptions
             --fast)                              eufast=yes ;;
             --fav-pkgs)                          YourFavPkgs ;;      # exit 0 ;;   # can install your favorite packages
             --nvidia)                            nvidia=yes ;;
@@ -426,7 +449,7 @@ Options() {
             --helper)                            SetHelper "$2" ; shift ;;
             --aur)                               SetHelper; eufast_opt+=("$1") ;;
             --paru | --yay | --pacman)           SetHelper "${1/--/}" ;;
-            --pacdiff)                           pacdiffer="$pacdiffer_cmd_default" ;;
+            --pacdiff)                           DeprecatedOption "$1" && pacdiffer="$pacdiffer_cmd_default" ;;
             --cache-limit | -l)                  paccache_limit="$2"
                                                  case "$paccache_limit" in
                                                      1|2|3|4|5) ;;
@@ -435,6 +458,7 @@ Options() {
                                                  shift
                                                  ;;
             --other-updates)                     ;; # other_updates=yes ;;
+            --conf-filename)                     ;;
             --colors)                            use_colors="$2"
                                                  case "$use_colors" in
                                                      yes | no) ;;
@@ -457,6 +481,7 @@ $progname is implemented as a wrapper around commands pacman and optionally yay/
 Essentially runs commands 'pacman -Syu' and optionally 'yay -Sua' or 'paru -Sua'.
 
 $progname includes (by default) special help in the following situations:
+- Prevents reboot, shutdown, hibernate, and suspend while $progname is running.
 - A dangling pacman db lock file (/var/lib/pacman/db.lck).
 - Disk space availability for updates (with a configurable minimum space).
 - Keyring package updating before updating other packages.
@@ -468,12 +493,15 @@ Optional help:
 - Can check the validity of the locally configured lists of mirrors.
 - Updates AUR packages (with option --helper, see Usage below).
 - Ad hoc check for Nvidia GPU driver vs. kernel updates (non-dkms only).
+- Provides a way for users to include additional commands before and after $progname does its essentials.
+and more, see below.
 
 Usage: $progname [options]
 Options:
   --help, -h              This help.
   --tips                  Tips and examples for $progname.
-  --rank-mirrors          Executes user-written bash script $rank_command_file which may contain
+  --rank-mirrors          (Deprecated, see --other-updates. Will be removed at ${DeprecationDates[--rank-mirrors]}).
+                          Executes user-written bash script $rank_command_file which may contain
                           ranking commands for both Arch and EndeavourOS mirrors, and exits.
                           Example commands:
                               reflector -phttps -c "your-country-spec" | sudo tee $aml
@@ -505,6 +533,7 @@ Options:
   --no-keyring            Do not try to update keyrings first.
   --no-sync               Do not run 'sync' after update.
   --keep-system-running   Do not allow sleep, hibernate, reboot, or shutdown if '$progname' is still running.
+                          Default: enabled.
   --run-mode <val>        Specifies the mode how the updating commands will be executed.
                           Supported values:
                              plain   Use current privileges. Uses 'sudo' for commands that need it.
@@ -514,7 +543,8 @@ Options:
                           Default: plain.
   --show-only-fixed       Show only packages that have already been fixed (runs: arch-audit -u) and exit.
   --show-upstream-news    Show the news page of the upstream site and exit.
-  --pacdiff		  Run eos-pacdiff in the end of $progname. See also EOS_UPDATE_PACDIFFER
+  --pacdiff               (Deprecated, see --other-updates. Will be removed at ${DeprecationDates[--pacdiff]}).
+                          Run eos-pacdiff in the end of $progname. See also EOS_UPDATE_PACDIFFER
   			  in file /etc/eos-script-lib-yad.conf.
   --cache-limit, -l <val> Runs 'paccache -rk <val>' after updates. Limits the size of the package cache.
                           Supported numbers for <val>: 1..5.
@@ -533,11 +563,11 @@ Options:
   --other-updates         Enable support for *user-defined* other updates (e.g. 'flatpak update').
                           Note that user-defined commands can be performed in the beginning and end
                           of execution of eos-update, see $otherUpdatesFile.
+  --conf-filename         Show the name of the configuration file.
+                          Tip: to edit the config file with 'nano':
+                              sudo nano \$($progname --conf-filename)
 
-Tip: create an alias in file ~/.bashrc for $progname to have the options you need, for example:
-
-     # Enable Nvidia update check, disable sync execution, use paru for AUR updates.
-     alias $progname='$progname --nvidia --no-sync --paru'
+Tip: preferred options can be added to variable EOS_UPDATE_OPTIONS in file $eosupdateconf.
 
 EOF
 #  --fav-pkgs              Uses a config file where you manage favorite packages defined by you.
@@ -613,10 +643,16 @@ RunUserCommands() {
 }
 
 _EosUpdate_Main2() {
-    # local progname="${0##*/}"
+    # Some deprecated features:
+    declare -A DeprecationDates=(
+        [--pacdiff]="2026-09-01"
+        [--rank-mirrors]="2026-09-01"
+    )
+
     DebugBreak
     local cmdfile=""
     local -r pacmanconf=/etc/pacman.conf
+    local -r eosupdateconf=/etc/$progname.conf
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
     local -r rank_command_file=/bin/eos-update-rank-mirrors
@@ -627,7 +663,7 @@ _EosUpdate_Main2() {
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
     lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs,keep-system-running"
-    lopts+=",tips"
+    lopts+=",tips,conf-filename"
     # lopts+=",system-checks"
     local sopts="dhl:"
 
@@ -649,6 +685,9 @@ _EosUpdate_Main2() {
     local eufast_opt=(--arch --endeavouros)
     local paccache_limit=""
     local runusercommands_warning_count=0         # limit warnings to 1 from RunUserCommands
+    local EOS_UPDATE_OPTIONS=(--keep-system-running)
+
+    [ "$EOS_UPDATE_PACDIFFER" ] && pacdiffer="$EOS_UPDATE_PACDIFFER"
 
     SystemValidityChecks_error
 
@@ -656,9 +695,16 @@ _EosUpdate_Main2() {
 
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
+
+    # shellcheck disable=1090,2086
+    [ -e "$eosupdateconf" ] && source "$eosupdateconf"
+
+    local all_options=("${EOS_UPDATE_OPTIONS[@]}" "$@")
     
-    SingleOptions "$@"
-    echo2tip "$progname: package updater with additional features\n"
+    SingleOptions "${all_options[@]}"
+
+    echo2tip "$progname: package updater with additional features."
+    echo2tip "Command: $progname" "${all_options[@]}" "\n"
 
     RunUserCommands beginning
 
@@ -666,7 +712,7 @@ _EosUpdate_Main2() {
     # shellcheck disable=2119
     _init_translations
 
-    Options "$@"
+    Options "${all_options[@]}"
 
     if [ $eufast = yes ] ; then
         eos-update-fast "${eufast_opt[@]}"
@@ -681,8 +727,6 @@ _EosUpdate_Main2() {
     if [ $EUID -eq 0 ] && [ $mode = plain ] ; then    # mode can change based on current privileges
         mode=login
     fi
-
-    [ "$EOS_UPDATE_PACDIFFER" ] && pacdiffer="$EOS_UPDATE_PACDIFFER"
 
     [ $descriptions  = yes ] && subopts+=(--descriptions)
     [ $nvidia  = yes ] && subopts+=(--nvidia)

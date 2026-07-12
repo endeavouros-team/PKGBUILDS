@@ -1,15 +1,17 @@
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
+# shellcheck disable=2034,2154
+
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.7
+pkgver=26.7.1
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
-  bash
-  eos-translations
-  expac
+    bash
+    eos-translations
+    expac
 )
 optdepends=(
     "yay: alternative for AUR updates in eos-update"
@@ -17,25 +19,27 @@ optdepends=(
     "arch-audit: for showing only packages that have already been fixed"
 )
 
-backup=(etc/eos-update-other.bash)
+backup=(etc/eos-update-other.bash etc/eos-update.conf)
 
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/refs/heads/master/$pkgname"
 
 
 source=(
-  $_url/eos-update
-  $_url/eos-update.completion
-  $_url/eos-update.desktop
-  $_url/eos-update-descriptions
-  $_url/eos-update-extras
-  $_url/eos-update-fast
-  $_url/eos-update-lib.bash
-  $_url/eos-update-other.bash    # "config" for additional update tools
-  $_url/eos-update-tips.md
+    "$_url/eos-update"
+    "$_url/eos-update.conf"
+    "$_url/eos-update.completion"
+    "$_url/eos-update.desktop"
+    "$_url/eos-update-descriptions"
+    "$_url/eos-update-extras"
+    "$_url/eos-update-fast"
+    "$_url/eos-update-lib.bash"
+    "$_url/eos-update-other.bash"    # "config" for additional update tools
+    "$_url/eos-update-tips.md"
 )
 
-sha512sums=('bc1c0980967daeebed3536163a8820fd99cbb5711b7b03a4436e6825355fc25647983ee840c7f6b9c5f3e3b8528717725329bd3a1919aadac762f86b2e9c219a'
+sha512sums=('374204a0beab912421da207e16570edc33821062cc3a38108ef55ac4a7894200d51b8f71a0509855247fc73f580e4edb157954523f67ac2f66f3d028abf7c39b'
+            'cc855e68f9b1d2b258335bd868dfe813354a21fde95a771d67a528714b4f21bd158637c021f73c75eea014ad8a68294f6d151a968714d062d4ecb42a64e0cc7b'
             '2a2508df7fe084c5ac9b33dbc6894e5d7a3156ffa707ac4f2ed4ce148b9b16c94be9a50d19501edd4e128189d80b15aa8b66224b1d5deeb5063f397f9487853a'
             'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
@@ -48,7 +52,7 @@ sha512sums=('bc1c0980967daeebed3536163a8820fd99cbb5711b7b03a4436e6825355fc256479
 package() {
   local file src
 
-  # markdown_py eos-update-tips.md > eos-update-tips.html
+  # generate html doc
   [ -e eos-update-tips.html ] || pandoc -f gfm eos-update-tips.md -o eos-update-tips.html
 
   for src in "${source[@]}" ; do
@@ -59,6 +63,7 @@ package() {
           *.desktop)             install -Dm644 "$file"   "$pkgdir/usr/share/applications/$file" ;;
           *.completion)          install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
           *.bash)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+          *.conf)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *)                     install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done
