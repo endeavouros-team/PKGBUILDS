@@ -4,7 +4,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=26.7
+pkgver=26.7.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -49,10 +49,10 @@ source=(
   "$_url/eos-reisub"
   "$_url/eos-reisub.conf"
 )
-sha512sums=('9b3124da0dfcf4529dedb7aa26391585c8479db48d2be1ffad74a05f02e4083cbce3919f75be922e53bac61d2087fb739d3b9ddd49306188725a7e9200abebf3'
+sha512sums=('b98267bc570e0ac50c38baf10ddfdd9e584e1e112c6e25a76a9cd7c06a92f7aec92b10408b7aabd41cf8147c68871a2dd336f8dac85e42b8c7a0c8402f19288c'
             '63f8cb7eff80f8f3b69c1629c7acf7b3e5207cdcbd560060177ce1a8dbd7593ec1c42582787fc3446d429b52e7791145c815bc1f01f4c1a3a70b518bbb22cd18'
             '36dcdd5db1d86b88a87c4e48b718b0986107980fc289dd8dd643a365508255a81680d197442dfe6933bbb8b06e2ccc7d7b55bf28ce1a925cdfd0278c6fee2c7f'
-            '5ca4b7108573a980d9d4011c5afde4f459abe8e36f5b6bc846368dcc48cfa2e672133f074fdeac4282835fa5b87f7afb2cd9dc3e985b4d2e8f574ac239c90ba2'
+            'bb5d67dd88e864a84cea5fa2f48f998b192664d7e0998bbecc5eb5945e1b20a62d19b141b93b5b5b1aa8b22e32470f5062b13d2ad3ccc9b4b63402a488faf197'
             'acd528bafe16d61690d532961da562b0e9238153aa609c7d84d719a19525afe191b9cd54294b837d1d81c4d6cc6c9ae766712174aecb3708314e869addc6b537'
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
@@ -63,29 +63,28 @@ sha512sums=('9b3124da0dfcf4529dedb7aa26391585c8479db48d2be1ffad74a05f02e4083cbce
             'd2442dbfdc48c8e0ad36d6f8595644323a5cb0d89352fee1919d9745182888f50378d7079590a2a421a2fbec565afd4da9b1bd8501892b37482b1d5f82a844c3'
             '8788a0bc9401f2bd61b5e27613973d07d265b753bfa505cff482ad7f569cec103ecc6329acbd6d000d14f25e82aafe0f4a5f06234445edf71ed790ccebdfc882')
 package() {
-    local -r eosdir=usr/share/endeavouros/scripts
+    local -r eosdir="usr/share/endeavouros/scripts"
+    local -r applications="$pkgdir/usr/share/applications"
+    local -r autostart="$pkgdir/etc/xdg/autostart"
     local src name
 
     for src in "${source[@]}" ; do
         name=${src##*/}
         case "$name" in
-            *.bash-completion)   install -Dm644 "$name"  "$pkgdir/usr/share/bash-completion/completions/${name%.*}" ;;
-            *.desktop)           install -Dm644 "$name"  "$pkgdir/etc/xdg/autostart/$name" ;;
-            *.conf)              install -Dm644 "$name"  "$pkgdir/etc/$name" ;;
-            "$pkgname")          install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
-            wallpaper-once)      install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
-            welcome-tip-pages)   install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
-            *)                   install -Dm755 "$name"  "$pkgdir/usr/bin/$name" ;;
+            "$pkgname")                install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
+            wallpaper-once)            install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
+            welcome-tip-pages)         install -Dm755 "$name"  "$pkgdir/$eosdir/$name" ;;
+            wallpaper-once.desktop)    install -Dm644 "$name"  "$autostart/$name" ;;
+            "$pkgname.desktop")        install -Dm644 "$name"  "$autostart/$name"
+                                       install -Dm644 "$name"  "$applications/$name"
+                                       # sed -E -i "$autostart/$name" -e 's|^(Exec=.*)|\1 --autostart|'
+                                       ;;
+            *.bash-completion)         install -Dm644 "$name"  "$pkgdir/usr/share/bash-completion/completions/${name%.*}" ;;
+            *.conf)                    install -Dm644 "$name"  "$pkgdir/etc/$name" ;;
+            *)                         install -Dm755 "$name"  "$pkgdir/usr/bin/$name" ;;
         esac
     done
 
-    # create symlink: /usr/bin/eos-welcome -> /usr/share/endeavouros/scripts/welcome
+    # symlink: /usr/bin/eos-welcome -> /usr/share/endeavouros/scripts/welcome
     ln -s "/$eosdir/$pkgname"   "$pkgdir/usr/bin/eos-$pkgname"
-
-    # create app desktop file /usr/share/applications/welcome.desktop
-    cp -a "$pkgname.desktop" "$pkgname.desktop-enable"
-    sed -i "$pkgname.desktop-enable" \
-        -e 's|^\(Exec=.* --startdelay.*\)$|#\1|' \
-        -e 's|^#\(Exec=.* --once.*\)$|\1|'
-    install -Dm644 "$pkgname.desktop-enable"  "$pkgdir/usr/share/applications/$pkgname.desktop"      # has --once
 }
