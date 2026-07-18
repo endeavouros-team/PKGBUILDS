@@ -4,7 +4,7 @@
 
 pkgname=welcome
 pkgdesc="Welcome greeter for new EndeavourOS users."
-pkgver=26.7.1
+pkgver=26.7.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -52,7 +52,7 @@ source=(
 sha512sums=('b98267bc570e0ac50c38baf10ddfdd9e584e1e112c6e25a76a9cd7c06a92f7aec92b10408b7aabd41cf8147c68871a2dd336f8dac85e42b8c7a0c8402f19288c'
             '63f8cb7eff80f8f3b69c1629c7acf7b3e5207cdcbd560060177ce1a8dbd7593ec1c42582787fc3446d429b52e7791145c815bc1f01f4c1a3a70b518bbb22cd18'
             '36dcdd5db1d86b88a87c4e48b718b0986107980fc289dd8dd643a365508255a81680d197442dfe6933bbb8b06e2ccc7d7b55bf28ce1a925cdfd0278c6fee2c7f'
-            'bb5d67dd88e864a84cea5fa2f48f998b192664d7e0998bbecc5eb5945e1b20a62d19b141b93b5b5b1aa8b22e32470f5062b13d2ad3ccc9b4b63402a488faf197'
+            '363f307b0a4418e639b5bb0078731689f23af2d68bbce2b4bc15e2f282ba3229c6b0ffe8a303fb5624d4949e72aa831c57e53ac05f37a5d12fbf12aaff9b1bb3'
             'acd528bafe16d61690d532961da562b0e9238153aa609c7d84d719a19525afe191b9cd54294b837d1d81c4d6cc6c9ae766712174aecb3708314e869addc6b537'
             'a193a605d95d837db568dab2feb074c035bea12bc7b08a39a7be3b075dd063cd05fb46b4bde5c86f81a26456c0aab3b0b834cb1ffd88820095a14291b4e059a5'
             '90dfc1f08a428787305d72a2e439a377aee0bc095fcb0a2efb4245a15285d4b96b5e0ac644c02f27ab68aebbfc5c64e6ab7d733d9db8952d2999d589410d3b9e'
@@ -60,7 +60,7 @@ sha512sums=('b98267bc570e0ac50c38baf10ddfdd9e584e1e112c6e25a76a9cd7c06a92f7aec92
             '2d959368ee57ce6c2d1bcee43ce1eb9e893b5bf351d5cc4ef68d68dec295b8c49f48d6fde52e8dcd9296ceeab8d67ee065da230889c09e47ba415c6a74c70081'
             'f690c56bb21c67ba0da6e7adf12b17645f13c4e715eb9e6afabf6fbe17c40980007737e09c38fccf26b9e0ac48b5979c48f3b025e91b1c2eef88a7993b368a04'
             'cbc39b4806cbfc6a81ddad7cc174d3850f82699c46c949a3ac9855f3c63f6cd6e91102ca357dc4176c7edcb02682e10b0175a95adcede81ec23a7ee84ab231aa'
-            'd2442dbfdc48c8e0ad36d6f8595644323a5cb0d89352fee1919d9745182888f50378d7079590a2a421a2fbec565afd4da9b1bd8501892b37482b1d5f82a844c3'
+            '9c2b4d8a80391fecbf1dd6235b7d89897e8965accdc3eb68511622968a7bc819753fa7f68b3270329ae93f9a3516edd79f8d49dab0e49ae797be2292f863ec96'
             '8788a0bc9401f2bd61b5e27613973d07d265b753bfa505cff482ad7f569cec103ecc6329acbd6d000d14f25e82aafe0f4a5f06234445edf71ed790ccebdfc882')
 package() {
     local -r eosdir="usr/share/endeavouros/scripts"
@@ -77,7 +77,7 @@ package() {
             wallpaper-once.desktop)    install -Dm644 "$name"  "$autostart/$name" ;;
             "$pkgname.desktop")        install -Dm644 "$name"  "$autostart/$name"
                                        install -Dm644 "$name"  "$applications/$name"
-                                       # sed -E -i "$autostart/$name" -e 's|^(Exec=.*)|\1 --autostart|'
+                                       sed -E -i "$applications/$name" -e 's|^(Exec=.*)|\1 --once|'
                                        ;;
             *.bash-completion)         install -Dm644 "$name"  "$pkgdir/usr/share/bash-completion/completions/${name%.*}" ;;
             *.conf)                    install -Dm644 "$name"  "$pkgdir/etc/$name" ;;
