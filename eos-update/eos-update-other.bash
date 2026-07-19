@@ -37,7 +37,9 @@ Main() {  # NOTE: do NOT rename this function!
         beginning)
             ## HERE: Add your commands to be executed in the beginning of eos-update.
             ##
-            ## EXAMPLES: rank mirrors once after every system boot; see Arch news.
+            ## EXAMPLE: Once after every system boot:
+            ##          - Rank mirrors once after every system boot;
+            ##          - See Arch news.
             # if OncePerBootSession "id-983aa9587" ; then
             #     ColorLine info "Updating /etc/pacman.d/mirrorlist"
             #     create-ml --save         # requires package iso-create-ml
@@ -48,17 +50,20 @@ Main() {  # NOTE: do NOT rename this function!
         end)
             ## HERE: Add your commands to be executed in the end of eos-update.
             ##
-            ## EXAMPLES: Freshen up database for 'pacman -Fl <package-name>' once a week;
-            ##           show non-native packages.
-            # if OncePerNDays "id-k95i60923" 7
-            #     ColorLine info "pacman -Fy"
-            #     sudo pacman -Fy
-            # fi
-            # ColorLine info "pacman -Qm"
-            # pacman -Qm | sed 's|^|    |' >&2
-            #
-            ## EXAMPLES: show a multiline message.
-            # ColorLines tip "first line" "second line" "third line"
+            ## EXAMPLE: Once a week:
+            ##          - Freshen up database for 'pacman -Fl <package-name>'.
+            #     if OncePerNDays "id-k95i60923" 7
+            #         ColorLine info "pacman -Fy"
+            #         sudo pacman -Fy
+            #     fi
+            ## EXAMPLE: Show non-native packages.
+            #     ColorLine info "pacman -Qm"
+            #     pacman -Qm | sed 's|^|    |' >&2
+            ## EXAMPLE: Handle files like *.pacnew and friends.
+            #     ColorLine info "eos-pacdiff --quiet"
+            #     eos-pacdiff --quiet                   # ADVANCED! Be careful, don't overwrite system files blindly!
+            ## EXAMPLE: Show a multiline message.
+            #     ColorLines tip "first line" "second line" "third line"
             ;;
         *)
             # This is just for backwards compatibility. You may remove or comment out the following line.
