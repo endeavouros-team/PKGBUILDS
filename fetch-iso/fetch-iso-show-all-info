@@ -48,25 +48,51 @@ Main() {
     echo "$data" > /tmp/foo
 
     # directories
+    local dirs=() tmp=() tmp2
+
     echo "/ (site's root dir)"
-    local dirs=() tmp=()
-    readarray -t tmp < <(echo "$data" | grep 'alt="\[DIR\]"' | sed -E -e "s|.*\"indexcolname\"><a href=\"([^\"]+)\".*\"indexcollastmod\">([^<]+)<.*|\1$sep\2|g" -e 's|[ ]*$||' | grep -Pv "^\.|^archive/")
+    tmp2="$(echo "$data" | grep 'alt="\[DIR\]"')"
+
+    # extract "name" and "last-modification-time":
+    tmp2="$(echo "$tmp2" | sed -E -e "s|.*\"indexcolname\"><a href=\"([^\"]+)\".*\"indexcollastmod\">([^<]+)<.*|\1$sep\2|g" -e 's|[ ]*$||')"
+
+    # remove file/dir names:
+    #    1) starting with dot (".")
+    #    2) "archive/"
+    tmp2="$(echo "$tmp2" | grep -Pv "^\.|^archive/")"
+
+    readarray -t tmp < <(echo "$tmp2")
+
     [ "${tmp[0]}" ] && dirs+=("${tmp[@]}")
     count=${#dirs[@]}
-    for ((ix=0; ix<count; ix++)) ; do
-        echo "${dirs[$ix]}" # >&2           # TODO: out to stdin
-    done | Sorter
+    if [ "$count" -gt 0 ] ; then
+        for ((ix=0; ix<count; ix++)) ; do
+            echo "${dirs[$ix]}"
+        done | PrettyPrint                           # output info about directories
+    fi
 
     # files
-    readarray -t files < <(echo "$data" | grep 'alt="\[   \]"' | sed -E -e 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
-    readarray -t dates < <(echo "$data" | grep 'alt="\[   \]"' | sed -E -e 's|.*"indexcollastmod">[ ]*([^<]+)<.*|\1|g' -e 's|[ ]*$||')
-    readarray -t sizes < <(echo "$data" | grep 'alt="\[   \]"' | sed -E -e 's|.*"indexcolsize">[ ]*([^<]+)<.*|\1|g'    -e 's|[ ]*$||')
+    local unit sz
+    data="$(echo "$data" | grep 'alt="\[   \]"')"
+    readarray -t files < <(echo "$data" | sed -E -e 's|.*"indexcolname"><a href="([^"]+)".*|\1|g')
+    readarray -t dates < <(echo "$data" | sed -E -e 's|.*"indexcollastmod">[ ]*([^<]+)<.*|\1|g' -e 's|[ ]*$||')
+    readarray -t sizes < <(echo "$data" | sed -E -e 's|.*"indexcolsize">[ ]*([^<]+)<.*|\1|g'    -e 's|[ ]*$||')
     count=${#files[@]}
-    for ((ix=0; ix<count; ix++)) ; do
-        echo "${files[$ix]}$sep${dates[$ix]}$sep${sizes[$ix]}"
-    done | Sorter
+    if [ "$count" -gt 0 ] ; then
+        for ((ix=0; ix<count; ix++)) ; do
+            sz="${sizes[$ix]}"
+            unit="${sz: -1}"
+            if true ; then
+                case "$unit" in
+                    G | M | K) sz="${sz:: -1} ${unit}B" ;;
+                    [0-9])     sz+=" B" ;;
+                esac
+            fi
+            echo "${files[$ix]}$sep${dates[$ix]}$sep$sz"
+        done | PrettyPrint                           # output info about files
+    fi
 }
 
-Sorter() { column -t -s"$sep" | sort -k2 -k3 ; }
+PrettyPrint() { column -t -s"$sep" | sort -k2 -k3 ; }
 
 Main "$@"

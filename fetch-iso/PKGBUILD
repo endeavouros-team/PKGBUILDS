@@ -7,7 +7,7 @@
 pkgname=fetch-iso
 pkgdesc="A special helper tool for the EndeavourOS ISO testers"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=26.7
+pkgver=26.7.1
 pkgrel=1
 
 arch=('any')
@@ -23,10 +23,10 @@ source=(
     "$url/$pkgname.completion"
     "$url/$pkgname-show-all-info"
 )
-sha512sums=('2213918a83e58118967d70119b29d3df2f92f8a20a6ac297833655a80a392973ca9f57ef4b12d3d13b082da2cc97c1a2a034795d1d806c34614876fe5dbdf1b5'
+sha512sums=('dcbe66aa55318497ad1bb8dea0057d423b74071fd073fb65cca3f25cc442781d2efcc424bc6707c74633cf77316e1eaff14eed1996181a38b3c745896926da6e'
             '5b2897dc51353b33446ddefdae6d312b36da825ac505418aea535eacaeef568b1f024db171668878ed499e532bc0dc654d35633a8a9fe6c77e25b43e7288cfca'
             'd99fa711c27f4101dbe982ad69b383fe4dc4ebcb96c838155e0750d34f72a37d9586adf095963b13aa265a3cec3d211000e999da8ac1abd3076128b66d0776d6'
-            '0aaa060a26f5d5e227cbfff5b4d8653467bb1eea8c5a30c3d889f301c6d7160ef88701ebc66d40d9ad72ab562ddd761c77b7c097f42806dbc935f355d372f95e')
+            '5349b129f5adc6a8b362910e1a61fa019b1f396b20717873d95da1e1b6a466af61791f001f2b66984aac8d4ba55b8cd2395e03e3457609b0ce06b6aeec726685')
 # backup=(etc/skel/$pkgname.conf)
 
 package() {

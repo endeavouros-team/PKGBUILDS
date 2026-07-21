@@ -100,7 +100,7 @@ AskConfigValues() {
     AskValue "Remote base dir URL"            URLBASE   ""
     AskValue "Remote account"                 ACCOUNT   ""
     AskValue "Remote password"                PASSWORD  ""
-    AskValue "Local download folder$dl"       TARGETDIR "$dldir"
+    AskValue "Local download folder$dl"       TARGETDIR "${dldir/$HOME/\~}"
     AskValue "Downloader app (wget)"          APP       "wget"
 
     printf "%s\n" "${values[@]}" > "$configfile"
@@ -164,7 +164,7 @@ Options() {
     case "$1" in
         "") ;;
         *.iso.tar.gz | *.iso | *.iso.${sumtype}*)
-            echo2 "Download folder: $TARGETDIR"
+            echo2 "Download folder: ${TARGETDIR/$HOME/\~}"
             FetchIsoFile "$1"
             exit
             ;;
@@ -252,7 +252,7 @@ Main() {
         "Other keys:       Ctrl-E = Edit config file"
         "                  Ctrl-H = Help"
         "Config file:      $configfile2"
-        "Download folder:  $TARGETDIR"
+        "Download folder:  ${TARGETDIR/$HOME/\~}"
         "Fetching app:     $getter"
         "Tip:              Names with trailing '/' are folders, navigate to them if needed."
     )
