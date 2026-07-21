@@ -2,10 +2,12 @@
 
 # Maintainer: manuel at endeavouros.com
 
+# shellcheck disable=2034,2154
+
 pkgname=fetch-iso
 pkgdesc="A special helper tool for the EndeavourOS ISO testers"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=26.6
+pkgver=26.7
 pkgrel=1
 
 arch=('any')
@@ -16,15 +18,15 @@ optdepends=(
     'curl: alternative fetcher'
 )
 source=(
-    $url/$pkgname
-    $url/$pkgname.conf
-    $url/$pkgname.completion
-    $url/$pkgname-show-all-info
+    "$url/$pkgname"
+    "$url/$pkgname.conf"
+    "$url/$pkgname.completion"
+    "$url/$pkgname-show-all-info"
 )
-sha512sums=('8ef4d41700f5f8368bcee33d2145f750b157347e4b72c4d68adcd5b51d2f5f51bece60d9753f8d970674c9745fe41d8657f64a296e3ebb37fe5808a44cff61e3'
+sha512sums=('2213918a83e58118967d70119b29d3df2f92f8a20a6ac297833655a80a392973ca9f57ef4b12d3d13b082da2cc97c1a2a034795d1d806c34614876fe5dbdf1b5'
             '5b2897dc51353b33446ddefdae6d312b36da825ac505418aea535eacaeef568b1f024db171668878ed499e532bc0dc654d35633a8a9fe6c77e25b43e7288cfca'
             'd99fa711c27f4101dbe982ad69b383fe4dc4ebcb96c838155e0750d34f72a37d9586adf095963b13aa265a3cec3d211000e999da8ac1abd3076128b66d0776d6'
-            '8a910e558e460e48e3c2d50bf8d3f1ccd17f4c8fee564e867105937c21806d3e62733611f01effbd8cdcfdf2e03b5852cfe470b21625df518fcbf04cadd9cf9f')
+            '0aaa060a26f5d5e227cbfff5b4d8653467bb1eea8c5a30c3d889f301c6d7160ef88701ebc66d40d9ad72ab562ddd761c77b7c097f42806dbc935f355d372f95e')
 # backup=(etc/skel/$pkgname.conf)
 
 package() {
@@ -32,9 +34,9 @@ package() {
     for xx in "${source[@]}" ; do
         name=$(basename "$xx")
         case "$name" in
-            *.completion) install -Dm644 $name   $pkgdir/usr/share/bash-completion/completions/${name%.*} ;;
-            *.conf)       install -Dm644 $name   $pkgdir/etc/skel/$name ;;
-            *)            install -Dm755 $name   $pkgdir/usr/bin/$name ;;
+            *.completion) install -Dm644 "$name"   "$pkgdir/usr/share/bash-completion/completions/${name%.*}" ;;
+            *.conf)       install -Dm644 "$name"   "$pkgdir/etc/skel/$name" ;;
+            *)            install -Dm755 "$name"   "$pkgdir/usr/bin/$name" ;;
         esac
     done
 }

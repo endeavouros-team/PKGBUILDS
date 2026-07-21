@@ -282,11 +282,12 @@ Main() {
                 fi
                 ;;
         esac
-        readarray -t items_orig < <(printf "%s\n" "${items[@]}"      | awk '{print $1}' | sort)
+        items_orig=("${items[@]}")                         # readarray -t items_orig < <(printf "%s\n" "${items[@]}")  # | awk '{print $1}' | sort)
         readarray -t items      < <(printf "%s\n" "${items_orig[@]}" | "${fzf[@]}")
         [ "${items[0]}" ] || exit 0                        # nothing selected
 
         for selected in "${items[@]}" ; do
+            selected="${selected%% *}"
             case "$selected" in
                 *"/") case "$selected" in
                           "/") subdir=""
