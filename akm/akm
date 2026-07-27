@@ -1,7 +1,10 @@
 #!/bin/bash
 
 Line2()   { echo "$@" >&2 ; }
-Printf2() { printf "$@" >&2 ; }
+Printf2() {
+    # shellcheck disable=2059
+    printf "$@" >&2
+}
 Verbose2() { [ $quiet = no ] && Line2 "$@"; }
 
 FormatVersion()     { printf "%s%s  " "$1" "$2" ; }
@@ -48,12 +51,14 @@ PkgName() {
 
 Installed() {
     local version xx
-    local kernel=$(eos_running_kernel)
+    local kernel
+    kernel=$(eos_running_kernel)
     case "$kernel" in
         linux*) ;;
         *) DIE "Internal error, cannot determine the running kernel." ;;
     esac
-    local running=$(expac -Q %v $kernel)
+    local running
+    running=$(expac -Q %v "$kernel")
     local ind1 ind2
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. The currently running kernel is in <i>italics</i>. A <b>bolded</b> string means the latest K.o. version.":LBL "")
     for xx in "${kernels[@]}" ; do
@@ -93,7 +98,7 @@ StableVersions() {
 
 Stable() {
     local version in_use=""
-    if [ "$FUNCNAME" = "$RepoType" ] ; then
+    if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the stable repos$in_use":LBL "")
@@ -109,12 +114,12 @@ TestingVersion() {
     local pkg="${1##*/}"
     if true ; then
         local tmp="$testinginfo"
-        tmp=$(echo "$tmp" | grep -A2 /packages/core-testing/x86_64/$pkg/)
+        tmp=$(echo "$tmp" | grep -A2 "/packages/core-testing/x86_64/$pkg/")
         tmp=$(echo "$tmp" | tail -n1)
         tmp=$(echo "$tmp" | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|')
         echo "$tmp"
     else
-        echo "$testinginfo" | grep -A2 /packages/core-testing/x86_64/$pkg/ | tail -n 1 | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|'
+        echo "$testinginfo" | grep -A2 "/packages/core-testing/x86_64/$pkg/" | tail -n 1 | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|'
     fi
 }
 
@@ -122,14 +127,15 @@ UNAVAILABLE() { DIE "$1 is currently unavailable${2}!" ; }
 
 Testing() {
     local in_use=""
-    if [ "$FUNCNAME" = "$RepoType" ] ; then
+    if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
         in_use=" (currently in use)"
     fi
     local URL="https://archlinux.org/packages/?repo=Core-Testing&q=linux+kernel+and+modules"
     local testinginfo
     local version xx
 
-    testinginfo="$(/usr/bin/curl --fail -Ls $URL_timeout $URL)" || UNAVAILABLE "${URL%%/packages*}"
+    # shellcheck disable=2086
+    testinginfo="$(/usr/bin/curl --fail -Ls $URL_timeout "$URL")" || UNAVAILABLE "${URL%%/packages*}"
 
     [ -n "$testinginfo" ] || DIE "Fetching info from https://archlinux.org failed!"
 
@@ -145,10 +151,11 @@ KernelOrgVersion() {
     local type="$1"
     local count="$2"
     [ -n "$count" ] || count=1
-    local result="$(echo "$kernelorg" | grep -A2 $type: | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
+    local result
+    result="$(echo "$kernelorg" | grep -A2 "$type:" | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
     case "$type" in
         mainline) ;;
-        longterm) result="$(echo "$result" | head -n $count)" ;;
+        longterm) result="$(echo "$result" | head -n "$count")" ;;
         *) result="$(echo "$result" | grep -v "[0-9][0-9\.]*-rc")" ;;
     esac
     echo "$result"
@@ -164,12 +171,12 @@ KernelOrg() {
             ((count--))
         done
     done
-    PaddingLines $count
+    PaddingLines "$count"
 }
 
 KOVersion() {
     local version versions xx count=${#kernels[@]}
-    local stableversion="$(KernelOrgVersion stable)"
+    # local stableversion="$(KernelOrgVersion stable)"
     cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Latest version announced at kernel.org":LBL "")
     for xx in "${org_kernels[@]}" ; do
         readarray -t versions < <(KernelOrgVersion "$xx")
@@ -188,7 +195,7 @@ KOVersion() {
                 ;;
         esac
     done
-    PaddingLines $count
+    PaddingLines "$count"
 }
 
 IsLatestKO() {
@@ -222,6 +229,7 @@ CommonStuff() {
         Line2 "Sorry, package 'eos-bash-shared' is not installed."
         exit 1
     fi
+    # shellcheck disable=1090
     source $EOS_SCRIPTS_YAD
     export -f eos_yad
     export -f eos_yad_RunCmdTermBash
@@ -232,6 +240,7 @@ CommonStuff() {
 AkmConfig() {
     local conf=/etc/akm.conf
     if [ -f $conf ] ; then
+        # shellcheck disable=1090
         source $conf
 
         [ -n "$KERNEL_HEADER_WITH_KERNEL" ] && connect_header_with_kernel="$KERNEL_HEADER_WITH_KERNEL"
@@ -247,7 +256,7 @@ AkmConfig() {
 }
 
 DIE() {
-    eos_yad --form --width=400 --title="AKM message" --image=$ICO_ERROR --text="$1" --button=yad-quit
+    eos_yad --form --width=400 --title="AKM message" --image="$ICO_ERROR" --text="$1" --button=yad-quit
     exit 1
 }
 
@@ -314,25 +323,26 @@ AvailableKernelsAndHeaders() {
     local header
     local kernel
     local pacman=/usr/bin/pacman
-    local headers=$(expac -Ss '%r/%n' 'linux[-]*[^ pi]*-headers' | grep -Pv 'testing/linux-')    # 'pi' removes all 'linux-api-headers'
+    local headers
+    headers=$(expac -Ss '%r/%n' 'linux[-]*[^ pi]*-headers' | grep -Pv 'testing/linux-')    # 'pi' removes all 'linux-api-headers'
 
     # Get kernel names from header names and display them all
     for header in $headers ; do
         kernel=${header%-headers}
-        echo "$kernel $header"
+        echo -e "$kernel\n$header"
     done
 
     # Display kernels added by the user
-    [ -n "${akm_kernels_headers_user}" ] && echo "${akm_kernels_headers_user[@]}"
+    [ "${akm_kernels_headers_user[0]}" ] && echo "${akm_kernels_headers_user[@]}"
 }
 
 Manual() {
-    xdg-open $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md)
+    xdg-open "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md)"
 }
 export -f Manual
 
 Changelog() {
-    xdg-open $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm)
+    xdg-open "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm)"
 }
 export -f Changelog
 
@@ -345,7 +355,7 @@ Main() {
     local quiet=no
 
     CommonStuff                   # fetches common bash definitions
-    eos_assert_deps $progname yad || return 1
+    eos_assert_deps "$progname" yad || return 1
     Main2 "$@"
 }
 
@@ -361,8 +371,9 @@ Main2() {
     local smallBegin=""
     local smallEnd=""
     local nrofkernelitems                  # 8 with only upstream kernels
-    local RepoType=$(RepoType)
+    local RepoType
     local progress=yes
+    RepoType=$(RepoType)
 
     AkmConfig "$@"
 
@@ -372,7 +383,7 @@ Main2() {
     fi
 
     Verbose2 "==> Info: detecting available kernel packages."
-    kernels=( $(AvailableKernelsAndHeaders) )
+    readarray -t kernels < <(AvailableKernelsAndHeaders)
 
     local functions=(  # order is important!
         Choose
@@ -385,7 +396,7 @@ Main2() {
     )
 
     nrofkernelitems=${#kernels[@]}
-    [ $nrofkernelitems -gt 8 ] && scroll=yes
+    [ "$nrofkernelitems" -gt 8 ] && scroll=yes
 
     local URL_timeout="--max-time 30"                      # used for all curl calls here
 
@@ -396,7 +407,7 @@ Main2() {
     local KOVersionName="K.o.version"
     local xx
     local t1=""
-    local km="*"
+    # local km="*"
 
     t1+="$smallBegin"
     t1+="Here's information about <i>currently available</i> Linux kernels that are or can be installed.\n"
@@ -425,11 +436,11 @@ Main2() {
 
     local cmd=(
         eos_yad
-        --width=$akm_window_width
+        --width="$akm_window_width"
         --use-interp
         --form --title="Simple kernel manager" --columns=${#functions[@]}
         --text="$t1"
-        --image=$ICO_UPDATE
+        --image="$ICO_UPDATE"
         --button=" ${smallBegin}Changelog${smallEnd}!applications-development!Show latest changes of this program":"Changelog"
         --button=" ${smallBegin}Help${smallEnd}!help-contents!Helps to use $progname":"Manual"
         --button=" ${smallBegin}Cancel${smallEnd}!gtk-cancel!Change nothing":1
@@ -444,16 +455,18 @@ Main2() {
     local progress_cmd=(
         eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
         --width=400 --no-buttons
-        --image=$ICO_INFO
+        --image="$ICO_INFO"
         --title="AKM progress"
         --text="Fetching information, please wait..."
     )
     local ix=1 count=${#functions[@]} val
-    local cmdfile="$(mktemp $HOME/.cache/akm.tmp.XXXXX)"    # will gather the whole value of 'cmd' into this file (used due to the progress window)
+    local cmdfile
+    cmdfile="$(mktemp "$HOME/.cache/akm.tmp.XXXXX")"    # will gather the whole value of 'cmd' into this file (used due to the progress window)
 
     if [ -z "$kernelorg" ] ; then
         local errcode=0
-        kernelorg="$(/usr/bin/curl --fail -Ls $URL_timeout $URL)" || errcode=$?
+        # shellcheck disable=2086
+        kernelorg="$(/usr/bin/curl --fail -Ls $URL_timeout "$URL")" || errcode=$?
         case $errcode in
             0) ;;
             *) eos-connection-checker || DIE "Network access required.\nPlease check the internet connection." && UNAVAILABLE "$URL" ;;
@@ -463,7 +476,7 @@ Main2() {
 
     RunWithProgressOrNot
     
-    local installed install=() uninstall=() pkg partner result result1="" retval
+    local install=() uninstall=() pkg partner result result1="" retval
 
     result="$("${cmd[@]}")"
     retval=$?
@@ -523,9 +536,9 @@ Main2() {
                 fi
                 ;;
             FALSE)
-                [ -n "$(LocalVersion "$pkg")" ] && uninstall+=($(basename "$pkg"))
+                [ "$(LocalVersion "$pkg")" ] && uninstall+=("${pkg##*/}")
                 if [ "$connect_header_with_kernel" = "yes" ] ; then
-                    [ -n "$(LocalVersion "$partner")" ] && uninstall+=($(basename "$partner"))
+                    [ "$(LocalVersion "$partner")" ] && uninstall+=("${partner##*/}")
                 fi
                 ;;
         esac
@@ -535,10 +548,12 @@ Main2() {
     UniqueArr uninstall
 
     cmd=()
-    test -n "$uninstall" && cmd+=($pacman -Rsn ${uninstall[*]} ";")
-    test -n "$install"   && cmd+=($pacman -S ${install[*]} ";")
+    # shellcheck disable=2206
+    test -n "${uninstall[0]}" && cmd+=("$pacman" -Rsn ${uninstall[*]} ";")
+    # shellcheck disable=2206
+    test -n "${install[0]}"   && cmd+=("$pacman" -S   ${install[*]}   ";")
 
-    if [ -n "$cmd" ] ; then
+    if [ -n "${cmd[0]}" ] ; then
         case "$pacman" in
             yay | paru | /usr/bin/yay | /usr/bin/paru)
                 RunInTerminal "echo '${cmd[*]}' ; ${cmd[*]}"
