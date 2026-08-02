@@ -4,8 +4,8 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.7.1
-pkgrel=2
+pkgver=26.7.2
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -31,21 +31,20 @@ source=(
     "$_url/eos-update.completion"
     "$_url/eos-update.desktop"
     "$_url/eos-update-descriptions"
-    "$_url/eos-update-extras"
+#    "$_url/eos-update-extras"
     "$_url/eos-update-fast"
     "$_url/eos-update-lib.bash"
     "$_url/eos-update-other.bash"    # "config" for additional update tools
     "$_url/eos-update-tips.md"
 )
 
-sha512sums=('374204a0beab912421da207e16570edc33821062cc3a38108ef55ac4a7894200d51b8f71a0509855247fc73f580e4edb157954523f67ac2f66f3d028abf7c39b'
+sha512sums=('819f626a8b7bc944a4316768f5985daa794d7c6fbea730765afee6266a12c262af889a0731ee0dd7974d1602a7c0fa470de39173516e245dd6a0302c7d5e1122'
             'cc855e68f9b1d2b258335bd868dfe813354a21fde95a771d67a528714b4f21bd158637c021f73c75eea014ad8a68294f6d151a968714d062d4ecb42a64e0cc7b'
             '2a2508df7fe084c5ac9b33dbc6894e5d7a3156ffa707ac4f2ed4ce148b9b16c94be9a50d19501edd4e128189d80b15aa8b66224b1d5deeb5063f397f9487853a'
             'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
-            '8f74252ab514d84b4ac57586838ac9582b1a14927518a3844e5b033a8b02de3e687af1e5e5e1fa13cd8b592d67847dcdb9936b85b530894ef0588fb088d2ccf3'
             'fde7a2b4986a6a42e2f58bc950d7abf5807d05de8d532893927e4b5f406e7010fd58eb6ee3136ebab61c7980872e3ad5d24d705486aea287cd91fcec1e89f409'
-            '8e9d0cedc872a88fd66d4df24680d803cf39b8048a3c143a9f1a1ced1002f451758a1bfab2197ddfe035175c68a3babac83dfde21ba3f4d087a4c3da0579d9a2'
+            '58d14796aa428485cf9973b496f6dbfa4af117849c3e6357c0f1352d3e9dbebf1c91377a9b852d50869e08975d5670d3e338752444db72c09703f7acd7a61bc2'
             'af19a9a264fc583e27f36459be21f1aee8524c0659195ffd87ccdf13bbb0226e4deb7730f3fd2bf359dfde33459689c35dbd33d6452f39f1e853ec64ef118bb4'
             'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4')
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Package updater for EndeavourOS and Arch.
-# Handles db lock file, keyrings, syncing, and optionally AUR with given AUR helper.
+# Handles db lock file, keyrings, syncing, optionally AUR with given AUR helper, and more.
 
 echo2()   { echo -e "$@" >&2 ; }
 printf2() {
@@ -28,9 +28,12 @@ SetHelper() {
     helper=pacman
 }
 
-Cmd() {                           # Show a command, run it, and exit on issues.
-    echo2 "==>" "$@"
-    "$@" || DIE "'$*' failed."
+CmdShow() {
+    echo2info "==>" "$@"
+    "$@"
+}
+TRY() {                           # Show a command, run it, and exit on issues.
+    CmdShow "$@" || DIE "'$*' failed."
 }
 
 MirrorCheckResult() {
@@ -96,13 +99,6 @@ CheckYourEndeavourosMirrorlist() {
     local lm
     local unsupported=() supported=()
 
-    # local continent=""
-    # [ -x /bin/location ] && continent="$(/bin/location list-countries --show-continent | awk '{print $2}')"
-    # case "$continent" in
-    #     NA) mirrors=("${mirrors_NA[@]}" "${mirrors_EU[@]}") ;;
-    #     *)  mirrors=("${mirrors_EU[@]}" "${mirrors_NA[@]}") ;;
-    # esac
-
     for url in "${mirrors[@]}" ; do
         data=$(curl -Lsm 30 -o- "$url") || continue
         if [ "$data" ] ; then
@@ -159,17 +155,17 @@ EditMirrorlist() {
 }
 
 ResetKeyrings() {
-    Cmd sudo mv /etc/pacman.d/gnupg /root/pacman-key.bak."$(date +%Y%m%d-%H%M)".by."$progname"
-    Cmd sudo pacman-key --init
-    Cmd sudo pacman-key --populate archlinux endeavouros
-    Cmd sudo pacman -Syy --noconfirm archlinux-keyring endeavouros-keyring
-    Cmd sudo pacman -Syu
+    TRY sudo mv /etc/pacman.d/gnupg /root/pacman-key.bak."$(date +%Y%m%d-%H%M)".by."$progname"
+    TRY sudo pacman-key --init
+    TRY sudo pacman-key --populate archlinux endeavouros
+    TRY sudo pacman -Syy --noconfirm archlinux-keyring endeavouros-keyring
+    TRY sudo pacman -Syu
     echo2 "Keyrings reset."
     exit 0
 }
 
 ClearDatabases() {
-    Cmd sudo rm -r /var/lib/pacman/sync
+    TRY sudo rm -r /var/lib/pacman/sync
     echo2 "Package databases cleared."
     exit 0
 }
@@ -251,7 +247,7 @@ PacCache() {
             fi
 
             echo2info "==> paccache -rk$paccache_limit"
-            sudo /usr/bin/paccache --verbose -rk"$paccache_limit"      # sudo not really required here but it takes one unnecessary output line away
+            /usr/bin/paccache --verbose -rk"$paccache_limit"
 
             local amount
             amount=$(/bin/du -hd1 "$pkg_cache_dir" | awk '{print $1}')
@@ -330,14 +326,14 @@ YourFavPkgs() {
 DeprecatedOption() {
     local -r option="$1"
     local date_depr date_now
-    date_depr="$(/bin/date --date="${DeprecationDates[$1]}" +%s)"
+    date_depr="$(/bin/date --date="${DeprecationDates[$option]}" +%s)"
     date_now="$(/bin/date +%s)"
 
     if [ "$date_now" -lt "$date_depr" ] ; then
-        WARN "option $option is deprecated and will be removed at ${DeprecationDates[$1]}."
+        WARN "option $option is deprecated and will be removed at ${DeprecationDates[$option]}."
         return 0
     else
-        WARN "option $option has been removed at ${DeprecationDates[$1]}."
+        WARN "option $option has been removed at ${DeprecationDates[$option]}."
         return 1
     fi
 }
@@ -346,11 +342,6 @@ SingleOptions() {
     local ret=0
     while [ "$1" ] ; do
         case "$1" in
-            # --system-checks)                     SystemValidityChecks_warn ;;  # does not exit without a problem
-
-            --fav-pkgs)                          YourFavPkgs     # can install your favorite packages
-                                                 # exit 0
-                                                 ;;
             --reset-pacmanconf)                  ResetPacmanConf
                                                  exit 0
                                                  ;;
@@ -397,6 +388,14 @@ SingleOptions() {
                                                  fi
                                                  ;;
             --other-updates)                     other_updates=yes ;;   # does not exit and it is OK
+            --colors)                            use_colors="$2"
+                                                 case "$use_colors" in
+                                                     yes | no) ;;
+                                                     *) DIE "value '$use_colors' for option $1 is not supported; use 'yes' or 'no'" ;;
+                                                 esac
+                                                 export _EOS_UPDATE_USE_COLORS="$use_colors"   # for eos-update-lib.bash
+                                                 shift
+                                                 ;;
             -h | --help)                         Usage 0 ;;
         esac
         shift
@@ -432,11 +431,11 @@ Options() {
         case "$1" in
             --reset-pacmanconf|--check-mirrors|--check-mirrors-arch|--check-mirrors-eos) ;;        # handled in SingleOptions
             --edit-mirrorlist|--show-only-fixed|--show-upstream-news|--dump-options|-h|--help) ;;  # handled in SingleOptions
-            # --system-checks)                     ;;                                              # handled in SingleOptions
+            --other-updates|--conf-filename|--rank-mirrors) ;;                                     # already in SingleOptions
+            --colors)                            shift ;;                                          # already in SingleOptions
+
             --fast)                              eufast=yes ;;
-            --fav-pkgs)                          YourFavPkgs ;;      # exit 0 ;;   # can install your favorite packages
             --nvidia)                            nvidia=yes ;;
-            --rank-mirrors)                      ;;
             --no-keyring)                        keyring=no ;;
             --descriptions | -d)                 descriptions=yes ;;
             --faillock-check)                    faillockcheck=yes ;;
@@ -444,7 +443,13 @@ Options() {
             --keyrings-reset)                    ResetKeyrings ;;
             --clear-databases)                   ClearDatabases ;;
             --check-databases)                   CheckPackageDatabases ;;
-            --run-mode)                          mode="$2"; shift ;;
+            --run-mode)                          mode="$2"
+                                                 case "$mode" in
+                                                     plain|root|login) ;;
+                                                     *) DIE "unsupported value '$mode' for option $1" ;;
+                                                 esac
+                                                 shift
+                                                 ;;
             --min-free-bytes)                    min_free_bytes="$2" ; shift ;;
             --helper)                            SetHelper "$2" ; shift ;;
             --aur)                               SetHelper; eufast_opt+=("$1") ;;
@@ -454,15 +459,6 @@ Options() {
                                                  case "$paccache_limit" in
                                                      1|2|3|4|5) ;;
                                                      *) DIE "value '$paccache_limit' for option $1 is not supported; use numbers 1 to 5" ;;
-                                                 esac
-                                                 shift
-                                                 ;;
-            --other-updates)                     ;; # other_updates=yes ;;
-            --conf-filename)                     ;;
-            --colors)                            use_colors="$2"
-                                                 case "$use_colors" in
-                                                     yes | no) ;;
-                                                     *) DIE "value '$use_colors' for option $1 is not supported; use 'yes' or 'no'" ;;
                                                  esac
                                                  shift
                                                  ;;
@@ -570,8 +566,6 @@ Options:
 Tip: preferred options can be added to variable EOS_UPDATE_OPTIONS in file $eosupdateconf.
 
 EOF
-#  --fav-pkgs              Uses a config file where you manage favorite packages defined by you.
-#  --system-checks         After some checks may give recommendations for your system, but changes nothing.
     [ "$1" ] && exit "$1"
 }
 
@@ -595,10 +589,6 @@ DiskSpace() {
     fi
 }
 
-Cleanup() {
-    [ "$cmdfile" ] && rm -f -- "$cmdfile"
-}
-
 SystemValidityChecks_error() {
     local files_required=("$pacmanconf" "$aml" "$eml")
     local file
@@ -609,27 +599,6 @@ SystemValidityChecks_error() {
     done
     CheckReposPacmanConf
 }
-
-# SystemValidityChecks_warn() {
-#     local NATIVES_TO_AUR=()
-#     local NATIVES_REMOVED=()
-#     local file=/etc/eos-update-removed.conf
-#     local pkg
-
-#     if [ -e "$file" ] ; then
-#         source "$file"
-#         for pkg in "${NATIVES_TO_AUR[@]}" ; do
-#             if pacman -Qq "$pkg" &> /dev/null ; then
-#                 WARN "package '$pkg' was moved from repos to AUR. Consider removing it from this system."
-#             fi
-#         done
-#         for pkg in "${NATIVES_REMOVED[@]}" ; do
-#             if pacman -Qq "$pkg" &> /dev/null ; then
-#                 WARN "package '$pkg' was removed from repos. Consider removing it from this system."
-#             fi
-#         done
-#     fi
-# }
 
 RunUserCommands() {
     if [ $other_updates = yes ] ; then
@@ -650,7 +619,6 @@ _EosUpdate_Main2() {
     )
 
     DebugBreak
-    local cmdfile=""
     local -r pacmanconf=/etc/pacman.conf
     local -r eosupdateconf=/etc/$progname.conf
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
@@ -662,9 +630,8 @@ _EosUpdate_Main2() {
     local lopts="aur,clear-databases,descriptions,dump-options,fast,keyrings-reset,nvidia,no-keyring,no-sync,helper:"
     lopts+=",min-free-bytes:,pacdiff,paru,yay,pacman,help,run-mode:,faillock-check"
     lopts+=",show-only-fixed,show-upstream-news,check-mirrors-arch,check-mirrors-eos,check-mirrors,edit-mirrorlist:"
-    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,fav-pkgs,keep-system-running"
+    lopts+=",check-databases,reset-pacmanconf,other-updates,colors:,cache-limit:,rank-mirrors,keep-system-running"
     lopts+=",tips,conf-filename"
-    # lopts+=",system-checks"
     local sopts="dhl:"
 
     local use_colors=yes
@@ -685,21 +652,30 @@ _EosUpdate_Main2() {
     local eufast_opt=(--arch --endeavouros)
     local paccache_limit=""
     local runusercommands_warning_count=0         # limit warnings to 1 from RunUserCommands
+    local use_config_file=yes
     local EOS_UPDATE_OPTIONS=(--keep-system-running)
+    local args=("$@")
 
     [ "$EOS_UPDATE_PACDIFFER" ] && pacdiffer="$EOS_UPDATE_PACDIFFER"
 
     SystemValidityChecks_error
 
-    trap Cleanup EXIT
-
     source /usr/share/endeavouros/scripts/eos-script-lib-yad || exit 1
     source /usr/share/endeavouros/scripts/translations.bash || exit 1
 
-    # shellcheck disable=1090,2086
-    [ -e "$eosupdateconf" ] && source "$eosupdateconf"
+    if [[ "$*" =~ "--no-config" ]] ; then
+        # --no-config is an option for testing
+        use_config_file=no
+        EOS_UPDATE_OPTIONS=()
+        readarray -t args < <(printf "%s\n" "$@" | grep -v -- "^--no-config$")
+    fi
 
-    local all_options=("${EOS_UPDATE_OPTIONS[@]}" "$@")
+    # shellcheck disable=1090,2086
+    if [ "$use_config_file" = yes ] ; then
+        [ -e "$eosupdateconf" ] && source "$eosupdateconf"
+    fi
+
+    local all_options=("${EOS_UPDATE_OPTIONS[@]}" "${args[@]}")
     
     SingleOptions "${all_options[@]}"
 
@@ -741,76 +717,79 @@ _EosUpdate_Main2() {
         #rmopt=i
     fi
 
-    case "$helper" in
-	pacman)
-            echo2info "Updating native apps..."
-            CreateCmds
-	    ;;
-	*)
-            echo2info "Updating native and AUR apps..."
-            CreateCmds "$helper -Sua"
-	    ;;
-    esac
-    chmod u+x,go-rwx "$cmdfile"
-    FaillockCheck
+    FaillockCheck                # reset faillock if user wants
 
-    case "$mode" in
-        plain)         "$cmdfile" ;;
-        login | root)  sudo "$cmdfile" ;;       # $EOS_ROOTER "$cmdfile" ;;
-        *)             DIE "unsupported value for option --run-mode" ;;
-    esac
-
-    PacCache
+    sudo rm -$rmopt $lock
+    if [ ! -e $lock ] ; then
+        RunUpdateCommands        # run package update commands
+        $pacdiffer               # run 'eos-pacdiff'
+        $sync                    # run 'sync'
+    fi
+    PacCache                     # limit growth of the package cache
 
     # support for user-defined other updates
     RunUserCommands              # deprecated, only for backwords compatibility
     RunUserCommands end
 
-    Cleanup
-
-    eos-color tip 2
-    echo2 "==> All done!"
-    eos-color reset 2
-    echo ""                      # this line should reset curson color to default
+    echo2tip "==> All done!"
+    echo ""                      # this line is meant to reset cursor color to default
 }
 
-CreateCmds() {
-    local helper2="$1"
-    [ "$helper2" ] || helper2="true"
+RunUpdateCommands() {
+    local aur_helper=()
+    case "$helper" in
+	pacman)
+            echo2info "Updating native apps..."
+            ;;
+	*)
+            echo2info "Updating native and AUR apps..."
+            aur_helper=("$helper" "-Sua")
+            ;;
+    esac
 
-    cmdfile=$(mktemp "$HOME/.cache/.$progname.helper.XXX")
+    TRY sudo pacman -Sy
+    HandleExtraCommands "${subopts[@]}"    # TRY "${progname}-extras" "${subopts[@]}"
+    TRY sudo pacman -Su
 
-    cat <<EOF > "$cmdfile"
-#!/bin/bash
-
-eos_update_as_user() {
-    sudo rm -$rmopt $lock                 || return
-    if [ ! -e $lock ] ; then
-        sudo pacman -Sy                   || return
-        ${progname}-extras ${subopts[*]}  || return
-        sudo pacman -Su                   || return
-        $helper2                          || return             # Note: 'paru' returns 1 on error, but 'yay' does not!
-        $pacdiffer
-        $sync
+    if [ "${aur_helper[0]}" ] ; then
+        case "$mode" in
+            plain) TRY                                "${aur_helper[@]}" ;;
+            root)  TRY sudo         --user "$LOGNAME" "${aur_helper[@]}" ;;
+            login) TRY sudo --login --user "$LOGNAME" "${aur_helper[@]}" ;;
+        esac
     fi
 }
-eos_update_as_root() {
-    rm -$rmopt $lock                        || return
-    if [ ! -e $lock ] ; then
-        pacman -Sy                          || return
-        ${progname}-extras ${subopts[*]}    || return
-        pacman -Su                          || return
-        /bin/sudo $1 --user $LOGNAME $helper2  || return
-        $pacdiffer
-        $sync
-    fi
-}
-case "$mode" in
-    plain) eos_update_as_user ;;
-    root)  eos_update_as_root ;;
-    login) eos_update_as_root --login ;;
-esac
-EOF
+
+HandleExtraCommands() {
+    local updates=()
+    readarray -t updates < <(pacman -Quq)
+    [ "${updates[0]}" ] || return 0
+
+    local item
+    local update_first=()   # these will be updated before others
+
+    while [ "$1" ] ; do
+        case "$1" in
+            --descriptions)
+                CmdShow eos-update-descriptions --title "descriptions" --header no "${updates[@]}"
+                ;;
+            --nvidia)
+                CmdShow eos-kernel-nvidia-update-check "${updates[@]}" || WARN "'Nvidia & kernel' check failed."
+                ;;
+            --keyrings | --keyring)
+                # Update certain packages before others.
+                for item in archlinux-keyring endeavouros-keyring ; do
+                    printf "%s\n" "${updates[@]}" | grep -q "^$item$" && update_first+=("$item")
+                done
+                [ "${update_first[0]}" ] && TRY sudo pacman -S --noconfirm "${update_first[@]}"
+                ;;
+            *)
+                WARN "parameter '$1' ignored."
+                ;;
+        esac
+        shift
+    done
+    return 0
 }
 
 DebugBreak() { : ; }

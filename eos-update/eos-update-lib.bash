@@ -43,6 +43,8 @@ OncePerNDays() {
     fi
 }
 
+_eos_update_lib_color() { [ "$_EOS_UPDATE_USE_COLORS" = yes ] && eos-color "$@"; }
+
 ColorLines() {
     ## Print a message with the given "color" (see also /bin/eos-color).
     ## A message may include multiple lines via positional parameters.
@@ -54,13 +56,13 @@ ColorLines() {
     local linemarker="==>"
 
     shift 2
-    eos-color "$color" 2
+    _eos_update_lib_color "$color" 2
     printf "${linemarker} %s\n" "$first_line" >&2     # print the first line of the message
     if [ "$1" ] ; then
         linemarker="${linemarker//?/ }"               # make line marker empty for other lines
         printf "${linemarker} %s\n" "$@" >&2          # print the other lines of the message
     fi
-    eos-color reset 2
+    _eos_update_lib_color reset 2
 }
 ColorLine() {
     ## Print a message with the given "color" (see also /bin/eos-color).
@@ -96,9 +98,9 @@ ColorLine() {
         shift
     done
 
-    eos-color "$color" 2
+    _eos_update_lib_color "$color" 2
     echo "${opts[@]}" "${linemarker}$line" >&2
-    eos-color reset 2
+    _eos_update_lib_color reset 2
 }
 
 
