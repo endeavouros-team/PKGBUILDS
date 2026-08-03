@@ -393,13 +393,17 @@ SingleOptions() {
                                                      yes | no) ;;
                                                      *) DIE "value '$use_colors' for option $1 is not supported; use 'yes' or 'no'" ;;
                                                  esac
-                                                 export _EOS_UPDATE_USE_COLORS="$use_colors"   # for eos-update-lib.bash
+                                                 FillColorFile
                                                  shift
                                                  ;;
             -h | --help)                         Usage 0 ;;
         esac
         shift
     done
+}
+
+FillColorFile() {
+    echo "_EOS_UPDATE_USE_COLORS=$use_colors" > "$colorfile"   # used by eos-update-lib.bash
 }
 
 Options() {
@@ -635,6 +639,8 @@ _EosUpdate_Main2() {
     local sopts="dhl:"
 
     local use_colors=yes
+    local colorfile="$HOME/.cache/${progname}_use-colors.txt"
+    FillColorFile
     local helper="pacman"
     local lock=/var/lib/pacman/db.lck
     local rmopt=f
@@ -736,21 +742,18 @@ _EosUpdate_Main2() {
 }
 
 RunUpdateCommands() {
-    local aur_helper=()
-    case "$helper" in
-	pacman)
-            echo2info "Updating native apps..."
-            ;;
-	*)
-            echo2info "Updating native and AUR apps..."
-            aur_helper=("$helper" "-Sua")
-            ;;
-    esac
-
+    ## Handle native packages first
     TRY sudo pacman -Sy
-    HandleExtraCommands "${subopts[@]}"    # TRY "${progname}-extras" "${subopts[@]}"
+    HandleExtraCommands "${subopts[@]}"
     TRY sudo pacman -Su
 
+    ## Handle AUR packages next
+    local aur_helper=()
+    # shellcheck disable=2206
+    case "$helper" in
+	pacman*) ;;                        # echo2info "Updating native apps..."
+	*) aur_helper=($helper -Sua) ;;    # echo2info "Updating native and AUR apps..."
+    esac
     if [ "${aur_helper[0]}" ] ; then
         case "$mode" in
             plain) TRY                                "${aur_helper[@]}" ;;

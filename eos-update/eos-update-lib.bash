@@ -43,7 +43,12 @@ OncePerNDays() {
     fi
 }
 
-_eos_update_lib_color() { [ "$_EOS_UPDATE_USE_COLORS" = yes ] && eos-color "$@"; }
+_eos_update_lib_color() {
+    local colorfile="$HOME/.cache/eos-update_use-colors.txt"   # eos-update fills this!
+    # shellcheck disable=1090
+    [ -e "$colorfile" ] && source "$colorfile"
+    [ "$_EOS_UPDATE_USE_COLORS" = yes ] && eos-color "$@"
+}
 
 ColorLines() {
     ## Print a message with the given "color" (see also /bin/eos-color).
