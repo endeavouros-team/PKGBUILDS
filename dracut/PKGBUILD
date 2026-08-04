@@ -1,9 +1,9 @@
 # Maintainer: dalto
 
 pkgname=dracut
-pkgver=111_eos
+pkgver=112_eos
 pkgrel=1
-upstream_version=111
+upstream_version=112
 pkgdesc="An event driven initramfs infrastructure"
 arch=('x86_64')
 url="https://github.com/dracut-ng/dracut-ng"
@@ -84,7 +84,7 @@ backup=('etc/dracut.conf')
 source=(
   "${pkgname}-${upstream_version}::git+${url}#tag=${upstream_version}"
 )
-sha256sums=('341418150bb4988b6b0e3c9a2d15a93f63dd5bb1fdbf0698bdaed50fea3df7b2')
+sha256sums=('e056b33c1883dfbd8f877a8de449a50d82fbdaee93c1f79b531a4aac136f2db0')
 
 _backports=(
 )
