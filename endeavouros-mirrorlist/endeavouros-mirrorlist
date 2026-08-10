@@ -47,6 +47,9 @@ Server = https://mirrors.nxtgen.com/endeavouros-mirror/repo/$repo/$arch
 ## Japan
 Server = https://www.miraa.jp/endeavouros/repo/$repo/$arch
 
+## Luxembourg
+Server = https://mirror.lu.stratonexus.net/endeavouros/repo/$repo/$arch
+
 ## Singapore
 Server = https://mirror.jingk.ai/endeavouros/repo/$repo/$arch
 Server = https://mirror.freedif.org/EndeavourOS/repo/$repo/$arch
@@ -60,6 +63,7 @@ Server = https://mirror.funami.tech/endeavouros/repo/$repo/$arch
 ## Sweden
 Server = https://mirror.accum.se/mirror/endeavouros/repo/$repo/$arch
 Server = https://mirror.retropc.se/endeavouros/repo/$repo/$arch
+Server = https://mirror.zyner.org/mirror/endeavouros/repo/$repo/$arch
 
 ## Switzerland
 Server = https://mirror.gofoss.xyz/endeavouros/repo/$repo/$arch
