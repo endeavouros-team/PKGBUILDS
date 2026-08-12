@@ -9,7 +9,8 @@
 source /etc/eos-color.conf
 
 echo2()   { echo -e "$@" >&2 ; }
-printf2() { printf  "$@" >&2 ; }
+# shellcheck disable=2059
+printf2() { printf "$@" >&2 ; }
 
 notif_echo2()   { printf2 "==> " ; echo2   "$@" ; }
 notif_printf2() { printf2 "==> " ; printf2 "$@" ; }
@@ -77,7 +78,7 @@ RemoveFromDelList() {
 ShowArray() {
     local item
     for item in "$@" ; do
-        echo $item
+        echo "$item"
     done
 }
 
@@ -88,12 +89,12 @@ RankMirrors() {
     local lastm=""
     local lastix ix
 
-    readarray -t marr < <(grep "^Server = " $latest_ml)
+    readarray -t marr < <(grep "^Server = " "$latest_ml")
 
     [ "$added_mirror" ] && marr+=("Server = $added_mirror")        # for test-ranking a mirror
 
     lastix=${#marr[@]}
-    while [ $lastix -gt 0 ] ; do
+    while [ "$lastix" -gt 0 ] ; do
         ((lastix--))
         lastm="${marr[$lastix]}"
         [ "$lastm" ] && break
@@ -118,30 +119,30 @@ RankPerAge() {
     # result    : out
     local mirror m m2
     local marr
-    local sortopts=""
-    local sort_rate="-k3,3 -k2r,2"
-    local sort_age="-k2r,2 -k3,3"
+    local sortopts=()
+    local sort_rate=("-k3,3" "-k2r,2")
+    local sort_age=("-k2r,2" "-k3,3")
 
     case "$sort" in
-        rate | fastest | speed) sortopts="$sort_rate" ;;
-        age | latest)           sortopts="$sort_age" ;;
+        rate | fastest | speed) sortopts=("${sort_rate[@]}") ;;
+        age | latest)           sortopts=("${sort_age[@]}") ;;
         *)                      WARN "value '$sort' of option --sort is unsupported, using 'age'."
-                                sortopts="$sort_age"
+                                sortopts=("${sort_age[@]}")
                                 ;;
     esac
 
-    readarray -t result < <(RankMirrors "$latest_ml" | LC_ALL=C sort -g $sortopts)
+    readarray -t result < <(RankMirrors "$latest_ml" | LC_ALL=C sort -g "${sortopts[@]}")
 
     if [ ${#result[@]} -le 1 ] ; then
         local msg="no mirrors found!"
-        [ $timeout -lt 10 ] && msg+=" Too short timeout ($timeout)?"
+        [ "$timeout" -lt 10 ] && msg+=" Too short timeout ($timeout)?"
         DIE "$msg"
     fi
 }
 
 RankMirrors_parallel() {
-    local parallel_opts=""   #"--bar"
-    printf "%s\n" "${mirrors_to_rank[@]}" | parallel $parallel_opts "eos-rankmirrors-helper {} $timeout $mirror_verbosity $reference_level"
+    local parallel_opts=()   # (--bar)
+    printf "%s\n" "${mirrors_to_rank[@]}" | parallel "${parallel_opts[@]}" "eos-rankmirrors-helper {} $timeout $mirror_verbosity $reference_level"
 }
 
 RankMirrors_sequential() {
@@ -152,7 +153,7 @@ RankMirrors_sequential() {
             ((rank_errs++))
         fi
         if [ "$mirror" = "$lastm" ] ; then
-            if [ $rank_errs -ne 0 ] ; then
+            if [ "$rank_errs" -ne 0 ] ; then
                 local secs=5
                 # notif_printf2 "Sleeping $secs seconds...\n"
                 sleep $secs                                              # some mirrors failed, sleep a few seconds to show it
@@ -163,9 +164,10 @@ RankMirrors_sequential() {
 
 GetReferenceUpdateLevel() {
     local refroot="https://mirror.alpix.eu/endeavouros/repo"
-    local result=$(eos-rankmirrors-helper "$refroot" $timeout "$mirror_verbosity" "")
+    local outcome
+    outcome=$(eos-rankmirrors-helper "$refroot" "$timeout" "$mirror_verbosity" "")
 
-    [ "$result" ] && reference_level=$(echo "$result" | awk '{print $2}')
+    [ "$outcome" ] && reference_level=$(echo "$outcome" | awk '{print $2}')
 }
 
 CheckMirrorlist() {
@@ -182,7 +184,7 @@ ExtractListFromPackage() {
     local -r pkg="$1"
     [ "$pkg" ] || return 1
     INFO "extracting package $pkgname $latest_remote ..."
-    tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > $latest_ml
+    tar --extract -O -f "$pkg" etc/pacman.d/endeavouros-mirrorlist > "$latest_ml"
 }
 
 GetLatestRemoteVersion() {
@@ -193,10 +195,12 @@ GetLatestRemoteVersion() {
     local data
     local url
     local urls=(
-        https://mirror.alpix.eu/endeavouros/repo/endeavouros/${arch}
-        https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}
-        $(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | awk '{print $3}' | sed -e "s|\$repo|$repo|" -e "s|\$arch|$arch|")
+        "https://mirror.alpix.eu/endeavouros/repo/endeavouros/${arch}"
+        "https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}"
     )
+    local urltmp=()
+    readarray -t urltmp < <(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | awk '{print $3}' | sed -e "s|\$repo|$repo|" -e "s|\$arch|$arch|")
+    urls+=("${urltmp[@]}")
     for url in "${urls[@]}" ; do
         data=$(curl -Lsm 10 "$url" | grep "$pkgname" | grep -v zst\.sig | sed -E -e "s|.*>(${pkgname}-.*\.zst)<.*|\1|")
         case "$data" in
@@ -220,12 +224,13 @@ FetchLatestMirrorlist() {
     local pkg
     local code=0
     local url
-    local urls2="$(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | awk '{print $3}')"
-    urls2=$(LANG=C echo "$urls2" | sed -e "s|\$repo|$repo|" -e "s|\$arch|$arch|" -e "s|$|/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst|")
+    local urls2=()
+    readarray -t urls2 < <(grep ^Server /etc/pacman.d/endeavouros-mirrorlist | awk '{print $3}')
+    readarray -t urls2 < <(LANG=C printf "%s\n" "${urls2[@]}" | sed -e "s|\$repo|$repo|" -e "s|\$arch|$arch|" -e "s|$|/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst|")
     local urls=(
         "https://mirror.alpix.eu/endeavouros/repo/endeavouros/${arch}/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst"
         "https://mirror.moson.org/endeavouros/repo/endeavouros/${arch}/endeavouros-mirrorlist-${latest_remote}-any.pkg.tar.zst"
-        $urls2
+        "${urls2[@]}"
     )
 
     DEBUG "'$arch' '${urls[0]}'" 
@@ -234,7 +239,7 @@ FetchLatestMirrorlist() {
     delete_at_end+=("$pkg")
 
     for url in "${urls[@]}" ; do
-        curl --fail -Lsm $timeout -o $pkg "$url"
+        curl --fail -Lsm "$timeout" -o "$pkg" "$url"
         code=$?
         [ $code -eq 0 ] && break
     done
@@ -517,12 +522,10 @@ EditConfig() {
 
 Usage() {
     cat <<EOF | $pager
-Purpose: $progname is meant for creating a new file that can be used as file
-             $emlpath
-         after ranking the mirrors.
+Purpose: $progname ranks EndeavourOS mirrors and creates file $emlpath.
 
-Note 1:  The Arch mirrorlist file /etc/pacman.d/mirrorlist will not be updated with this app.
-Note 2:  This app potentially creates file $emlpath.pacnew which needs to merged.
+Note 1:  The Arch mirrorlist file $mlfolder/mirrorlist will not be updated with this app.
+Note 2:  This app potentially creates file $emlpath.pacnew which may need to be merged.
 Note 3:  File $conf can contain many more settings and options, explained in the file.
 
 Usage: $progname [options]
@@ -550,7 +553,7 @@ Options:
              EOS_RANKMIRRORS_EXIT_CODE_VERBOSITY.
 
   --no-save, -n
-             Don't save the generated mirrorlist.
+             Don't save the generated mirrorlist to $emlpath.
 
   --edit-config
              Edit $conf.
@@ -587,8 +590,8 @@ Options:
              Default: $show_ranking_info_default.
 
   --sort <value>
-             Primary key for sorting the mirrors.
-             Supported key values:
+             Primary preference item for sorting the mirrors.
+             Supported preference items:
                  age     (latest first)
                  rate    (fastest first)
              Default: $sort_default.
@@ -599,7 +602,7 @@ Options:
 
   --use-local-mirrorlist
              For testing purposes.
-             Uses information in local $mlfolder/$pkgname as the base for ranking.
+             Uses information in local $emlpath as the base for ranking.
 
   --verbose
              Show more detailed output.

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 WarningAbout() {
-    source /etc/eos-color.conf
     eos-color warning 2
     printf "==> Warning about %s (curl code %s):\n" "$mirror" "$curl_exitcode" >&2
     [ "$1" ] && printf "    %s\n" "$@" >&2
@@ -13,20 +12,20 @@ RankOneMirror() {
     local timeout="$2"                  # timeout for fetching a file from the mirror
     local mirror_verbosity="$3"
     local reference_level="$4"          # if empty then caller must be is fetching the reference_level !
-    local mirror="$url"'/$repo/$arch'   # mirror url with /$repo/$arch
+    local mirror="$url/\$repo/\$arch"   # mirror url with /$repo/$arch
     local curl_exitcode
-    local time                          # time spent in fetching a file
-    local -r progname=${0##*/}
+    local time_level                    # will contain the file fetch time and EndeavourOS update level
 
     url+=/state
 
-    time=$(curl --fail -Lsm $timeout -w "%{time_total}" "$url")              # $time contains the file fetch time and EndeavourOS update level
+    time_level=$(curl --fail -Lsm "$timeout" -w "%{time_total}" "$url")
     curl_exitcode=$?
 
     case "$curl_exitcode" in
         0)
-            local update_level=$(echo "$time" | head -n1)                    # update level number (=state)
-            time=$(              echo "$time" | tail -n1)
+            local update_level
+            update_level=$(echo "$time_level" | head -n1)              # update level number (=state)
+            time=$(        echo "$time_level" | tail -n1)              # file fetch time
 
 	    if [ "${update_level//[0-9]/}" ] ; then   # check that $update_level is a number
 		WarningAbout "Unrecognized data returned by this mirror."
@@ -39,18 +38,18 @@ RankOneMirror() {
 
             if [ "$reference_level" ] ; then
                 # ad hoc tests for the update level value in the state file
-                if [ $update_level -ne $reference_level ] ; then
+                if [ "$update_level" -ne "$reference_level" ] ; then
                     local low_limit=$((reference_level - 2))                 # still acceptable value
                     local too_low_limit=$((reference_level - 10))            # probably fails when below this
-                    if [ $update_level -gt $reference_level ] ; then
-                        if [ "$mirror" != 'https://mirror.alpix.eu/endeavouros/repo/$repo/$arch' ] || [ $update_level -gt $((reference_level + 1)) ] ; then
+                    if [ "$update_level" -gt "$reference_level" ] ; then
+                        if [ "$mirror" != "https://mirror.alpix.eu/endeavouros/repo/\$repo/\$arch" ] || [ "$update_level" -gt $((reference_level + 1)) ] ; then
                             WarningAbout "Update level $update_level is too high (> $reference_level), ignoring this mirror."
                         fi
                         return 1
-                    elif [ $update_level -lt $too_low_limit ] ; then
+                    elif [ "$update_level" -lt $too_low_limit ] ; then
                         WarningAbout "Update level $update_level/$reference_level is very low, ignoring this mirror."
                         return 1
-                    elif [ $update_level -lt $low_limit ] ; then
+                    elif [ "$update_level" -lt $low_limit ] ; then
                         WarningAbout "update level $update_level/$reference_level is lower than expected, will lower the ranking of this mirror."
                     fi
                 fi
