@@ -39,10 +39,24 @@ FetchInterventionsFile() {
         cp "/etc/$filename" "$interventions_file"
     else
         # fetch the interventions file from github/gitlab
-        local dlok=yes tim=20
-        wget -T$tim -qO "$interventions_file" "$github" || wget -T$tim -qO "$interventions_file" "$gitlab" || dlok=no
-        if [ $dlok = no ] ; then
-            WARN "failed to download $filename\n    from github/gitlab, use it from /etc instead."
+        local src_url failcode
+        for src_url in "$github" "$gitlab" ; do
+            failcode=0
+            case "$fetcher" in
+                curl)
+                    curl -Lsm $timeout -o "$interventions_file" "$src_url" || failcode=$?
+                    [ $failcode -eq 0 ] && break
+                    WARN "'$fetcher '$src_url'' failed with code $failcode."
+                    ;;
+                wget)
+                    wget -T$timeout -qO "$interventions_file" "$src_url" || failcode=$?
+                    [ $failcode -eq 0 ] && break
+                    WARN "'$fetcher '$src_url'' failed with code $failcode."
+                    ;;
+            esac
+        done
+        if [ $failcode -ne 0 ] ; then
+            WARN "failed to download $filename\n    from github/gitlab, using it from /etc instead."
             cp "/etc/$filename" "$interventions_file"    # /etc/$filename should exist always
         fi
     fi
@@ -141,6 +155,9 @@ Help() {
 Purpose: Execute and manage essential manual interventions.
 Usage:   $progname [options]
 Options: -h, --help            This help.
+         --curl                Use 'curl' to fetch files.
+         --wget                Use 'wget' to fetch files.
+         --timeout             Give a timeout value in seconds for fetching files with curl or wget (default $timeout_default).
          --ask-ignorepkg       If 'IgnorePkg' is used in $pacmanconf, ask user whether to proceed.
          -n, --show-arch-news  Show the Arch news page in a browser.
          --count               Only show the number of available interventions, don't run them.
@@ -149,16 +166,29 @@ EOF
 
 Options() {
     local arg
-    for arg in "$@" ; do
+    while [ "$1" ] ; do
+        arg="$1"
         case "$arg" in
             -h | --help)           Help; exit 0 ;;
             -n | --show-arch-news) NewsPage; exit 0 ;;
             --ask-ignorepkg)       ask_ignorepkg=yes ;;
             --count)               only_show_count=yes ;;
+            --curl)                fetcher=curl ;;
+            --wget)                fetcher=wget ;;
+            --timeout|--timeout=*) case "$arg" in
+                                       --timeout) timeout="$2"; shift ;;
+                                       *)         timeout="${arg#*=}" ;;
+                                   esac
+                                   if [ -z "$timeout" ] || [ "${timeout//[0-9]/}" ] ; then
+                                       WARN "the value '$timeout' of option '--timeout' is not supported, setting it to $timeout_default."
+                                       timeout=$timeout_default
+                                   fi
+                                   ;;
             -t | --test)           use_local_ifile=yes ;;   # for internal testing
             -*)                    WARN "unsupported option $arg, see $progname --help" ;;
             *)                     WARN "unsupported parameter '$arg', see $progname --help" ;;
         esac
+        shift
     done
 }
 
@@ -172,6 +202,9 @@ Main() {
     local MI_func_names=()
     local only_show_count=no
     local use_local_ifile=no
+    local fetcher=curl
+    local -r timeout_default=20
+    local timeout=$timeout_default
 
     Options "$@"
     CheckPacmanConf
