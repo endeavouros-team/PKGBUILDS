@@ -13,6 +13,7 @@ DIE()   { echo2 "==> $progname: error: $1"; exit 1; }
 RUN() {
     local reply=""
     # echo2 "   ->" "$@"
+    # shellcheck disable=2162
     read -p "==> Run '$*' (Y/n)? " reply >&2
     case "$reply" in
         "" | [yY]*) "$@" || DIE "'$*' failed." ;;
@@ -61,7 +62,8 @@ FetchInterventionsFile() {
         fi
     fi
 
-    if [ -e "$interventions_file" ] && [ $(stat -c %s "$interventions_file") -gt 0 ] ; then
+    if [ -e "$interventions_file" ] && [ "$(stat -c %s "$interventions_file")" -gt 0 ] ; then
+        # shellcheck disable=1090
         source "$interventions_file"
     else
         DIE "file ${interventions_file/$HOME/\~} has no contents!"
@@ -83,7 +85,7 @@ RunInterventionsIfNeeded() {
         return 2
     fi
 
-    if [ $count -eq 0 ] ; then
+    if [ "$count" -eq 0 ] ; then
         echo2 "==> No manual interventions available."
         return 2
     fi
@@ -124,7 +126,8 @@ NewsPage() {
 }
 
 CheckPacmanConf() {
-    local lines="$(grep -n "^[ \t]*IgnorePkg[ \t]*=[ \t]*[a-zA-Z0-9]" $pacmanconf)"
+    local lines
+    lines="$(grep -n "^[ \t]*IgnorePkg[ \t]*=[ \t]*[a-zA-Z0-9]" $pacmanconf)"
     if [ "$lines" ] ; then
         cat <<EOF >&2
 
@@ -137,6 +140,7 @@ EOF
             printf "      %s\n" "${lines[@]}" >&2
             echo2 ""
             local reply=""
+            # shellcheck disable=2162
             read -p "==> Do you want to continue [yes/NO]? " reply >&2
             case "$reply" in
                 [yY]*) ;;
