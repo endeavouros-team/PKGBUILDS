@@ -5,8 +5,8 @@ pkgname=akm
 pkgdesc="Arch kernel manager."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=26.7
-pkgrel=2
+pkgver=26.8
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(eos-bash-shared yad)
@@ -19,7 +19,7 @@ source=(
 )
 sha512sums=('fcd39d85a4e680b734ac7e5b03df59a596fc4654583efe6972f08d5c8f1934693394299541558791cf0bda6769f17e47c7a612a2cafde9b1cd5055611406a350'
             '9ab486eaa58857dfaf1d3b3838768b9c629f65709177544ad4602daf2752be9709a529abba359fe984a9f231688ae30bb7aa3df97a2c8d88fbb37742f5fd26f7'
-            '3d8e3bddd23cb6871f86070d864decf1dd9fc117ac18d8983217b009d2c5eb04ff0a51745e5e59ba82b4c6cb65f70ac0d0bad031d28777db446d1c27d73d3ac3')
+            '462c92d6a4ed505a8d74d99335c2c521534abf699cda7154b35353aa96629dd9c5e7171cd7cc3f2307e6a68f63cfebe1d80ea24364077f77810b85013b2c7938')
 
 package() {
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname

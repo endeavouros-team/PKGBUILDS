@@ -6,6 +6,7 @@ Comment=Manages official kernels in EndeavourOS
 Comment[fi]=Asentaa/poistaa linux-ytimiä ja näyttää ytimien tietoja
 Exec=akm
 Icon=endeavouros-icon
+StartupWMClass=yad
 Hidden=false
 Terminal=false
 StartupNotify=true
