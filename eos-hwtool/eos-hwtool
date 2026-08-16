@@ -644,6 +644,12 @@ def do_enable_services(device_list):
 
 
 def do_check_nvidia(device_list):
+    """
+    Checks which nvidia driver should be used. Used by the ISO
+
+    :param device_list: A list of the profiles to be considered for each GPU device
+    :return: N/A
+    """
     profile_set = set()
     for device in device_list:
         for profile in device["profiles"]:
@@ -660,6 +666,44 @@ def do_check_nvidia(device_list):
         print("none")
 
 
+def do_check_profile(profile, arg_list):
+    """
+    Checks if the packages for a profile are installed
+
+    :param profile: The profile to check
+    :param arg_list: A Namespace object from parse_args
+    :return: N/A
+    """
+    package_set = set()
+
+    packages = ProfileData.get_packages(profile, arg_list.no32, arg_list.iso)
+
+    if packages:
+        for package in packages:
+            if not is_installed(package):
+                package_set.add(package)
+
+        if package_set:
+            print(f"Missing packages for profile {profile.name}:")
+            for package in package_set:
+                print(f"\t{package}")
+        else:
+            print(f"All packages installed for profile {profile.name}")
+
+
+def do_check_recommended(device_list, arg_list):
+    """
+    Checks if the recommended profiles are installed
+
+    :param device_list: A list of the profiles to be considered for each GPU device
+    :param arg_list: A Namespace object from parse_args
+    :return: N/A
+    """
+    for device in device_list:
+        for profile in device["profiles"]:
+            do_check_profile(profile, arg_list)
+
+
 if __name__ == '__main__':
     # Set up the available command line arguments
     parser = argparse.ArgumentParser(description='The EndeavourOS hardware management tool is used to manage VM and GPU '
@@ -669,15 +713,17 @@ if __name__ == '__main__':
     parser.add_argument('--list', action="store_true", help='Show all the profiles valid for your devices')
     parser.add_argument('--free', action="store_true", help='Exclude proprietary drivers(Currently only nvidia-open')
     parser.add_argument('--no32', action="store_true", help='Exclude 32-bit libraries')
+    parser.add_argument('--check', action="store_true", help='Check if the recommended profile is installed')
     parser.add_argument('--recommended', action="store_true", help='Show the recommended profiles for each device')
-    parser.add_argument('--check-nvidia', action="store_true",
-                        help='Determine if the nvidia-open drivers should be loaded on the ISO')
+    parser.add_argument('--check-profile', type=str, nargs='?', action="store", metavar='Profile',
+                        help='Check if the selected profile is installed')
     parser.add_argument('--install-recommended', action="store_true",
                         help='Install or repair the selected profile')
     parser.add_argument('--install', '--repair', type=str, nargs='*', action="append", metavar='Profile',
                         help='Install or repair the selected profile')
     parser.add_argument('--remove', type=str, nargs='*', action="append", metavar='Profile',
                         help='Remove the selected profile')
+    parser.add_argument('--check-nvidia', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--purge', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--iso', action="store_true", help=argparse.SUPPRESS)
     parser.add_argument('--nvidia-only', action="store_true", help=argparse.SUPPRESS)
@@ -686,7 +732,7 @@ if __name__ == '__main__':
     args = parser.parse_args(args=None if sys.argv[1:] else ['--recommended'])
 
     # We use only_recommended to limit the profile selection in various places to only the best profile for the card
-    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia or args.enable_services
+    only_recommended = args.recommended or args.install_recommended or args.purge or args.check_nvidia or args.enable_services or args.check
 
     # First we check if we are in a VM
     devices = get_vm()
@@ -714,6 +760,19 @@ if __name__ == '__main__':
             for profile_item in device_item["profiles"]:
                 print(f'\t{profile_item.name}')
 
+        sys.exit(0)
+
+    if args.check:
+        do_check_recommended(devices, args)
+        sys.exit(0)
+
+    if args.check_profile:
+        try:
+            profile_to_check = getattr(Profile, args.check_profile)
+        except AttributeError:
+            print(f'{args.check_profile} is not a valid profile name', file=sys.stderr)
+            sys.exit(1)
+        do_check_profile(profile_to_check, args)
         sys.exit(0)
 
     # Operations below this point require root privileges
