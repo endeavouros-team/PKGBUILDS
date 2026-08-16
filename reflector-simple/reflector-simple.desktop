@@ -6,6 +6,7 @@ Comment=A simple GUI for 'reflector'
 Comment[fi]=Helppo graafinen käyttöliittymä ohjelmalle 'reflector'
 Exec=/usr/bin/reflector-simple
 Icon=endeavouros-icon
+StartupWMClass=yad
 StartupNotify=true
 # Terminal=False
 Hidden=false
