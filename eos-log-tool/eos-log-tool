@@ -51,15 +51,15 @@ Msg() {
         icon="$ICO_TIPS"
         shift 2
     fi
-    local -r cmd=(
+    local -r yad_cmd=(
         eos_yad --form --title="$title" --text="$msg"
-        --image=$icon --button=yad-quit "$@"
+        --image="$icon" --button=yad-quit "$@"
     )
-    "${cmd[@]}"
+    "${yad_cmd[@]}"
 }
 ErrorMsg() {
     local -r msg="$1"
-    Msg "$msg" "Error" $ICO_ERROR
+    Msg "$msg" "Error" "$ICO_ERROR"
 }
 WarningMsg() {
     local -r msg="$1"
@@ -70,42 +70,42 @@ Header() { printf "%s\n\n" "#################### $* ########################" ; 
 Footer() { printf "\n\n" ; }
 
 Cmd() {
-    local -r cmd="$1"
+    local -r lcmd="$1"
 
     echo "==> Handling '$*'" >&2
 
-    if [ "$cmd" = "cat" ] ; then
+    if [ "$lcmd" = "cat" ] ; then
         if [ "${2::1}" = "." ] ; then
-            cd                  # $HOME stuff: go to $HOME to hide unnecessary info
+            cd || :                 # $HOME stuff: go to $HOME to hide unnecessary info
         fi
     fi
 
-    case "$cmd" in
-        pkexec)
+    case "$lcmd" in
+        sudo)
             shift
-            SUDO_CMDS+=" ; echo '$(Header "$@")' >> $FILE_OF_LOGS"
-            SUDO_CMDS+=" ; $* >> $FILE_OF_LOGS"
-            SUDO_CMDS+=" ; echo '$(Footer)' >> $FILE_OF_LOGS"
+            SUDO_CMDS+=("echo '$(Header "$@")'")
+            SUDO_CMDS+=("sudo $*")
+            SUDO_CMDS+=("echo '$(Footer)'")
             return
             ;;
         FuncCall)
             # params: FuncCall "func"
-            Header "$2" >> $FILE_OF_LOGS
-            "$2"        >> $FILE_OF_LOGS
-            Footer      >> $FILE_OF_LOGS
+            Header "$2" >> "$FILE_OF_LOGS"
+            "$2"        >> "$FILE_OF_LOGS"
+            Footer      >> "$FILE_OF_LOGS"
             return
             ;;
         "")
-            echo "==> $FUNCNAME: empty command!" >&2
+            echo "==> ${FUNCNAME[0]}: empty command!" >&2
             return
             ;;
         *)
             Header "$@" >> "$FILE_OF_LOGS"
-            if [ -x /usr/bin/"$cmd" ] ; then
+            if [ -x /usr/bin/"$lcmd" ] ; then
                 "$@" 2>/dev/null >> "$FILE_OF_LOGS"
             else
-                WarningMsg "Command '$cmd' not found."
-                echo "Sorry, command '$cmd' not found." >> "$FILE_OF_LOGS"
+                WarningMsg "Command '$lcmd' not found."
+                echo "Sorry, command '$lcmd' not found." >> "$FILE_OF_LOGS"
             fi
             Footer >> "$FILE_OF_LOGS"
             ;;
@@ -143,7 +143,7 @@ SendToInternet() {
             ;;
         "")                                                    # Reject empty URL.
             local -r logfilesize=$(stat -c %s "$FILE_OF_LOGS")
-            if [ $logfilesize -gt $EOS_LOG_TOOL_MAX_LOG_SIZE ] ; then
+            if [ "$logfilesize" -gt $EOS_LOG_TOOL_MAX_LOG_SIZE ] ; then
                 ErrorMsg "Sending log data failed (returned empty URL)!\nLog size $logfilesize bytes too large?"
             else
                 ErrorMsg "Sending log data failed (returned empty URL)!"
@@ -171,9 +171,11 @@ UserNames() {
     local -r high="$2"    # highest user id number
     local nr
     local user users=""
+    local uids
+    uids=$(cut -d ':' -f 3  /etc/passwd)
 
-    for nr in $(cat /etc/passwd | cut -d ':' -f 3) ; do
-        if [ $nr -ge $low ] && [ $nr -le $high ] ; then
+    for nr in $uids ; do
+        if [ "$nr" -ge "$low" ] && [ "$nr" -le "$high" ] ; then
             user=$(grep ":$nr:" /etc/passwd | cut -d ':' -f 1)
             if [ -z "$users" ] ; then
                 users="$user"
@@ -191,11 +193,11 @@ RemovePersonalData() {
         exit 1
     fi
     cp -a "$FILE_OF_LOGS" "$FILE_OF_LOGS.bak"
-    local user
-    local uid=$(id -u)
     local ssid="foobarfoobarfoobar"
     local mac="foobarfoobarfoobar"
-    local interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
+    local user uid interface
+    uid=$(id -u)
+    interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
 
     if [ -x /usr/bin/iwgetid ] ; then
         ssid=$(iwgetid -r)
@@ -262,15 +264,17 @@ RemovePersonalData() {
     done
 
     # hide hostname from logs
-    sed -i "$FILE_OF_LOGS" \
-        -e 's| '$HOSTNAME' | _hostname_ |g' \
-        -e 's|"'$HOSTNAME'"|"_hostname_"|g' \
-        -e 's|<'$HOSTNAME'>|<_hostname_>|g' \
-        -e 's|='$HOSTNAME' |=_hostname_ |g' \
-        -e 's| '$HOSTNAME'\.| _hostname_.|g' \
-        -e 's| '$HOSTNAME'"| _hostname_"|g' \
-        -e 's|-'$HOSTNAME':|-_hostname_:|g' \
-        -e "s|'"$HOSTNAME"'|'_hostname_'|g"
+    # shellcheck disable=2016
+    sed -i "$FILE_OF_LOGS"                    \
+        -e "s|/$HOSTNAME:|/_hostname_:|g"     \
+        -e "s| $HOSTNAME | _hostname_ |g"     \
+        -e "s|\"$HOSTNAME\"|\"_hostname_\"|g" \
+        -e "s|<$HOSTNAME>|<_hostname_>|g"     \
+        -e "s|=$HOSTNAME |=_hostname_ |g"     \
+        -e "s| $HOSTNAME\.| _hostname_.|g"    \
+        -e "s| $HOSTNAME\"| _hostname_\"|g"   \
+        -e "s|-$HOSTNAME:|-_hostname_:|g"     \
+        -e "s|'$HOSTNAME'|'_hostname_'|g"
 
     # User may create an additional filter for removing
     # any remaining personal data from the logs.
@@ -290,11 +294,12 @@ IsInstalled() { expac -Q %n "$1" &> /dev/null ; }
 PrintPkgData() {
     local pkg ver desc
     local ix
+    # shellcheck disable=2001
     for ((ix=0; ix<${#data[@]}; ix=ix+3 )) ; do
         pkg="$( echo "${data[ix]}"   | sed 's|[^:]*: ||')"
         ver="$( echo "${data[ix+1]}" | sed 's|[^:]*: ||')"
         desc="$(echo "${data[ix+2]}" | sed 's|[^:]*: ||')"
-        
+
         printf "%s$separator%s$separator%s\n" "$pkg" "$ver" "$desc"
     done | Columnize
 }
@@ -327,7 +332,7 @@ Local_ShowEosInstallLog() {
     case "$instlog" in
         /home/*)    Cmd cat "$instlog"
                     ;;
-        /var/log/*) Cmd pkexec cat "$instlog"
+        /var/log/*) Cmd sudo cat "$instlog"
                     ;;
         *)          WarningMsg "no EndeavourOS install log found!"
                     echo "Sorry, EndeavourOS install log was not found." >> "$FILE_OF_LOGS"
@@ -344,7 +349,7 @@ FindInstallLog() {
     )
     local log
     for log in "${instlogs[@]}" ; do
-        if [ -f $log ] ; then                       #  note: some files in /var/log may be readable only by root, thus option -f
+        if [ -f "$log" ] ; then                       #  note: some files in /var/log may be readable only by root, thus option -f
             instlog="$log"
             break
         fi
@@ -374,7 +379,7 @@ Options() {
                 enable_journal=yes
                 ;;
             --changelog)
-                $(eos_select_browser) $(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)
+                $(eos_select_browser) "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/$progname)"
                 exit 0
                 ;;
 
@@ -422,16 +427,17 @@ Main()
     local -r DIR_OF_CONFIG="$HOME/.config/$progname"
     local -r DIR_OF_CONFIG2="\$HOME/.config/$progname"
 
-    local SUDO_CMDS=":"                                           # collects commands that need elevated privileges
+    local SUDO_CMDS=()                                           # collects commands that need elevated privileges
 
     # option values, can be changed in the config file
     local EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
     local EOS_LOG_TOOL_MAX_LOG_SIZE=500000                        # bytes
 
     local -r conffile="/etc/$progname.conf"
-    local -r conffile_tt="<tt>$conffile</tt>"
+    # local -r conffile_tt="<tt>$conffile</tt>"
 
     if [ -r $conffile ] ; then
+        # shellcheck disable=1090
         source $conffile                                # may change option values
     fi
 
@@ -486,10 +492,10 @@ Main()
     )
     if  [ "$enable_journal" = "yes" ] ; then
         FieldInfo1+=(
-        "System journal, most recent"                                         "true"     ""         "Journal from the most recent boot: $(TT "$cmd_journal0")"                                    "pkexec $cmd_journal0"
-        "System journal, 2nd most recent"                                     ""         ""         "Journal from the second most recent boot: $(TT "$cmd_journal1")"                             "pkexec $cmd_journal1"
-        "System journal, 3rd most recent"                                     ""         ""         "Journal from the third most recent boot: $(TT "$cmd_journal2")"                              "pkexec $cmd_journal2"
-        "System journal, user defined options in file\n$conffile"             ""         ""         "Journal by user: $(TT "$cmd_journalX")"                                                      "pkexec $cmd_journalX"
+        "System journal, most recent"                                         "true"     ""         "Journal from the most recent boot: $(TT "$cmd_journal0")"                                    "sudo $cmd_journal0"
+        "System journal, 2nd most recent"                                     ""         ""         "Journal from the second most recent boot: $(TT "$cmd_journal1")"                             "sudo $cmd_journal1"
+        "System journal, 3rd most recent"                                     ""         ""         "Journal from the third most recent boot: $(TT "$cmd_journal2")"                              "sudo $cmd_journal2"
+        "System journal, user defined options in file\n$conffile"             ""         ""         "Journal by user: $(TT "$cmd_journalX")"                                                      "sudo $cmd_journalX"
         )
     fi
     FieldInfo1+=(
@@ -507,12 +513,12 @@ Main()
         "EndeavourOS install log"                                             ""         ""         "The log about the install of EndeavourOS: $(TT "$cmd_instlog")"                              "Local_ShowEosInstallLog"
         "X session errors"                                                    ""         ""         "Lists X session errors: $(TT "$cmd_X_sess_err")"                                             "$cmd_X_sess_err"
         "Xorg log"                                                            ""         ""         "Log about Xorg events: $(TT "$cmd_X_events")"                                                "$cmd_X_events"
-        "Display manager log"                                                 ""         "lightdm"  "Display manager (lightdm) log: $(TT "$cmd_dm")"                                              "pkexec $cmd_dm"
-        "Display manager log, X related"                                      ""         "lightdm"  "Display manager log, X server related: $(TT "$cmd_dm_X")"                                    "pkexec $cmd_dm_X"
-        "Grub configuration file"                                             ""         "grub"     "Grub (bootloader) configuration file: $(TT "$cmd_grub")"                                     "pkexec $cmd_grub"
+        "Display manager log"                                                 ""         "lightdm"  "Display manager (lightdm) log: $(TT "$cmd_dm")"                                              "sudo $cmd_dm"
+        "Display manager log, X related"                                      ""         "lightdm"  "Display manager log, X server related: $(TT "$cmd_dm_X")"                                    "sudo $cmd_dm_X"
+        "Grub configuration file"                                             ""         "grub"     "Grub (bootloader) configuration file: $(TT "$cmd_grub")"                                     "sudo $cmd_grub"
         "Filesystem mountpoints (fstab)"                                      ""         ""         "Static information about the filesystem and mointpoints: $(TT "$cmd_fstab")"                 "$cmd_fstab"
         "Disks and partitions (lsblk)"                                        ""         ""         "List information about disks, partitions, labels, uuids: $(TT "$cmd_lsblk")"                 "$cmd_lsblk"
-        "Disks and partitions (fdisk)"                                        ""         ""         "Another list of disk and partition information: $(TT "$cmd_fdisk")"                          "pkexec $cmd_fdisk"
+        "Disks and partitions (fdisk)"                                        ""         ""         "Another list of disk and partition information: $(TT "$cmd_fdisk")"                          "sudo $cmd_fdisk"
         "Pacman configuration file"                                           "true"     ""         "Pacman (package manager) configuration file: $(TT "$cmd_pacman_conf")"                       "$cmd_pacman_conf"
         "Native packages"                                                     ""         ""         "List native packages (=from pacman repositories): $(TT "$cmd_native") (slow without expac)"  "Local_ShowNativePackages"
         "Foreign packages"                                                    "true"     ""         "List foreign packages (=not from pacman repositories): $(TT "$cmd_foreign")"                 "Local_ShowForeignPackages"
@@ -561,13 +567,13 @@ Main()
         --title="EndeavourOS log tools"
         --text="$helptext"
         # --width=600        # not needed?
-        --image=$tool_image
-        --button="yad-cancel!!Cancel this operation":$code_cancel
-        --button="yad-save!!Save the logs to file $FILE_OF_LOGS2":$code_localsave
-        --button="Share logs to the internet!$ICO_SHARE!Send the logs using <tt>eos-sendlog</tt>":$code_send_to_internet
+        --image="$tool_image"
+        --button="yad-cancel!!Cancel this operation":"$code_cancel"
+        --button="yad-save!!Save the logs to file $FILE_OF_LOGS2":"$code_localsave"
+        --button="Share logs to the internet!$ICO_SHARE!Send the logs using <tt>eos-sendlog</tt>":"$code_send_to_internet"
     )
 
-    # Skip entries that don't have the app installed
+    : # Skip entries that don't have the app installed
 
     for ((ix=0; ix < ${#FieldInfo1[@]}; ix+=5)) ; do
         installed="${FieldInfo1[$((ix+2))]}"
@@ -581,7 +587,7 @@ Main()
         FieldInfo+=("${FieldInfo1[$((ix + offset_command))]}")
     done
 
-    # Add entries to the yad command
+    : # Add entries to the yad command
 
     for ((ix=0; ix < ${#FieldInfo[@]}; ix+=5)) ; do
         name="${FieldInfo[$((      ix + offset_name ))]}"
@@ -596,7 +602,7 @@ Main()
             IsInstalled "$installed" || continue
         fi
         ((count++))
-        log_tool_cmd+=(--field="$name!$tip":chk $selected)            # adds a log command entry to the yad command
+        log_tool_cmd+=(--field="$name!$tip":chk "$selected")            # adds a log command entry to the yad command
     done
     log_tool_cmd+=( --height=$((35 * count)) )            # was: 550
 
@@ -608,9 +614,9 @@ Main()
     retval=$?
 
     case "$retval" in
-        $code_localsave | $code_send_to_internet) [ -n "$result" ] || DIE "No result from yad!" ;;
-        $code_cancel | $code_close_window)        return ;;
-        *)                                        DIE "Invalid exit code $retval from yad!" ;;
+        "$code_localsave" | "$code_send_to_internet") [ -n "$result" ] || DIE "No result from yad!" ;;
+        "$code_cancel" | "$code_close_window")        return ;;
+        *)                                            DIE "Invalid exit code $retval from yad!" ;;
     esac
 
     # Now $retval is either $code_localsave or $code_send_to_internet
@@ -621,25 +627,24 @@ Main()
     for ((ix=0; ix < ${#FieldInfo[@]}; ix+=5)) ; do
         xx="$(echo "$result" | cut -d'|' -f $jx)"
         case "$xx" in
-            true | TRUE) true_indexes+=($ix) ;;
+            true | TRUE) true_indexes+=("$ix") ;;
         esac
         ((jx++))
     done
-
+    :
     for ((ix=0; ix < ${#true_indexes[@]}; ix++)) ; do
         jx=${true_indexes[$ix]}
         command="${FieldInfo[$((jx + offset_command))]}"
         case "$command" in
             Local_*)    ;;
-            "pkexec "*) command="$(echo "$command" | sed 's|^pkexec |Cmd pkexec |')" ;;
-            *)          command="$(echo "$command" | sed 's|^|Cmd |')" ;;
+            *)          command="Cmd $command" ;;
         esac
         $command
         cmds+=("$command")
     done
 
-    if [ "$SUDO_CMDS" != ":" ] ; then
-        pkexec bash -c "$SUDO_CMDS"
+    if [ "${SUDO_CMDS[0]}" ] ; then
+        RunSudoCommands "${SUDO_CMDS[@]}"
     fi
 
     # All logs are now saved into a file.
@@ -647,9 +652,31 @@ Main()
     RemovePersonalData    # always remove personal data!
 
     case "$retval" in
-        $code_localsave)         Msg "Log file $(TT "$FILE_OF_LOGS2") created." "Info" ;;
-        $code_send_to_internet)  SendToInternet ;;
+        "$code_localsave")         Msg "Log file $(TT "$FILE_OF_LOGS2") created." "Info" ;;
+        "$code_send_to_internet")  SendToInternet ;;
     esac
+}
+
+RunSudoCommands() {
+    local cmd
+    local tmpfile
+    tmpfile=$(mktemp)
+
+    chmod go-rwx "$tmpfile"
+    chmod u+x "$tmpfile"
+
+    echo "echo -e '==> Executing the following commands:'" >> "$tmpfile"
+    for cmd in "$@" ; do
+        case "$cmd" in
+            "sudo "*) echo "echo '      $cmd'" >> "$tmpfile" ;;
+        esac
+    done
+    for cmd in "$@" ; do
+        echo "$cmd >> '$FILE_OF_LOGS'" >> "$tmpfile"
+    done
+
+    RunInTerminal "$tmpfile"
+    rm -f "$tmpfile"
 }
 
 Main "$@"
