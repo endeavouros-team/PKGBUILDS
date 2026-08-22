@@ -2,10 +2,12 @@
 
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
+# shellcheck disable=2034,2154
+
 pkgname=eos-pkgbuild-setup
 _main_appname=assets.make
 pkgdesc="Environment setup and tools for building EOS packages."
-pkgver=26.8.1
+pkgver=26.8.2
 pkgrel=1
 arch=(any)
 license=(GPL2)
@@ -13,8 +15,8 @@ url="https://github.com/endeavouros-team/$pkgname"
 _url="https://raw.githubusercontent.com/endeavouros-team/$pkgname/main"
 depends=(git hub yay curl xdg-utils meld)
 backup=(
-    etc/${_main_appname}.conf
-    etc/${_main_appname}-general.conf
+    "etc/${_main_appname}.conf"
+    "etc/${_main_appname}-general.conf"
 
     etc/assets.conf.endeavouros
     etc/assets.conf.endeavouros-testing-dev
@@ -24,40 +26,40 @@ backup=(
 source=(
     # git+https://github.com/endeavouros-team/eos-pkgbuild-setup.git
 
-    $_url/$pkgname
-    $_url/PackageFunc
-    $_url/add-release-assets
-    $_url/add-release-assets.completion
-    $_url/archive-sync-to-remote
-    $_url/${_main_appname}
-    $_url/${_main_appname}.completion
-    $_url/delete-release-assets
-    $_url/download-release-assets
-    $_url/${_main_appname}.conf
-    $_url/${_main_appname}-general.conf
-    $_url/githubcheck
-    $_url/EosGitUpdate
-    $_url/local-general-setup
-    $_url/mirrorcheck
-    $_url/mirrorcheck.completion
-    $_url/pacman-for-${_main_appname}
-    $_url/release-asset-names
-    $_url/is-aur-available
-    $_url/aur-pkgs-fetch
-#    $_url/aur-fetch-pkg-info
-#    $_url/fetch-aur-stuff
+    "$_url/$pkgname"
+    "$_url/PackageFunc"
+    "$_url/add-release-assets"
+    "$_url/add-release-assets.completion"
+    "$_url/archive-sync-to-remote"
+    "$_url/${_main_appname}"
+    "$_url/${_main_appname}.completion"
+    "$_url/delete-release-assets"
+    "$_url/download-release-assets"
+    "$_url/${_main_appname}.conf"
+    "$_url/${_main_appname}-general.conf"
+    "$_url/githubcheck"
+    "$_url/EosGitUpdate"
+    "$_url/local-general-setup"
+    "$_url/mirrorcheck"
+    "$_url/mirrorcheck.completion"
+    "$_url/pacman-for-${_main_appname}"
+    "$_url/release-asset-names"
+    "$_url/is-aur-available"
+    "$_url/aur-pkgs-fetch"
+#    "$_url/aur-fetch-pkg-info"
+#    "$_url/fetch-aur-stuff"
 
-    $_url/assets.conf.endeavouros
-    $_url/assets.conf.endeavouros-testing-dev
+    "$_url/assets.conf.endeavouros"
+    "$_url/assets.conf.endeavouros-testing-dev"
 
-    $_url/changelogs.conf.endeavouros-testing-dev
+    "$_url/changelogs.conf.endeavouros-testing-dev"
 )
 sha512sums=('ef90d33ec65cf02aabc2c6aec9ac6ef9772aae7d33e7b960930904dcdf3dcde86bda132377b8ac435addba30fc6c34cb8d2f49074c96732800b3c4b7c5db85bf'
             '14e8ce5d3e3cafbd6ae2ad5b1d25a6c0756b993d11a3dfd4db78b4e98b02a09bcd5fb6aa9d582a875904327fb9d75dcb7436d68333a2c90826c8829c47fa57f7'
             '0d84a66bc5921a41b0e753c0c6a945a67239a73103a7f1cc2d2335fee9b04229ce7680db7c8ef7d39050c6385e59435e7951293723ff84e1f1a56d442ea267f9'
             'ef71c6df24cf1a5ef3105cadf64ba1286ceb3cc60206bcd1ae9f3936ecac5719649f019da5abcbc6dc11f8be049f73f7f127a836198b9bfb0661e5a4977aa134'
             '05633b2acc5583fab051d4e809d93a11fd6afef0b93ee38992d3a8eaf297e6506be2f8ea61b404d0e4b2a62ae23b1dcf83365d4c266b6792788dbf2dadfa31ca'
-            'a15fd13f9708bfdf05133365d2a9b391903c1b5e0f42cd4a1d8b46964f4b65996bff0fe5e3d5b3730f6e986d3685758cf4badcbca6f35c8848de6051960124ae'
+            '12687c45b1a7267197e1ec1fa3769be38c3c8dbd73f1bf952bda1c514f3d4775ddbe5dfab74f0e60626755d17cc8ca47611ea535cc13ca61877cbc2a6905b227'
             '54b86b18ce513f4bda73262970ea917714b0e54a264200c96f51e97732a2de93229b1ed889e1048afcda6d6248241788dd0df9816312eb73ec5de0012b781b61'
             '3844766bace7987f812b82668fc70491bda9b549a6a046847953d9cf3569cdc67e59285cbfed6f58773b55c8cb2e042d5a1b3d6a58f101b6a82776ceb4738afe'
             'ddcad78a929e39520bccc09b5e4d0d0ee93756063cc2dd21842c7109752521db2c8e9c3440d56021136dfa16e44054407ab30dcbe22a38876349434bf445feb6'
