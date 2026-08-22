@@ -60,6 +60,7 @@ Usage: $progname [options] [filename]
 Options:
     --help, -h           This help.
     --edit-config        Edit the config file of $progname.
+    --show-config        Output the name of the config file of $progname.
     --curl               Use curl as the helper app.
     --wget               Use wget as the helper app.
 
@@ -70,6 +71,9 @@ Tip1: Write a config file at $configfile2. It must contain variables
       and the values will be asked.
 Tip2: Without parameters a selection of downloadable files is presented (using fzf).
 Tip3: Bash command completion is supported, just press the TAB key after $progname and see.
+Tip4: Edit the config file easily with command:
+          nano \$($progname --show-config)
+      or use your favorite editor instead of 'nano' above.
 
 EOF
 }
@@ -123,6 +127,9 @@ EditConfigFile() {
     INFO "Editing file $configfile."
     EditFile "$configfile"
 }
+ShowConfigFile() {
+    echo "$configfile"     # E.g. for command: nano $(fetch-iso --show-config)
+}
 
 DumpOptions() {
     if [ "$OPTS" ] ; then
@@ -137,7 +144,7 @@ DumpOptions() {
 Options() {
     # "Bind" long option to its short option. This is used in DumpOptions().
     # Short option starts with '/'.
-    local OPTS="help/h,dump-options,show-files,edit-config,curl/c,wget/w"                  # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
+    local OPTS="help/h,dump-options,show-files,edit-config,show-config,curl/c,wget/w"          # syntax: "aaa/a,bbb:/b:,ccc:,ddd"
 
     # shellcheck disable=2155
     local sopts="$(echo "$OPTS" | sed -E 's|[^/]*/(.[:]*)[^/]*|\1|g')"
@@ -154,6 +161,7 @@ Options() {
             --dump-options)   DumpOptions;                                  exit 0 ;;
             --show-files)     ReadConfig; printf "%s\n" "$(ShowFiles -q)";  exit 0 ;;
             --edit-config)    EditConfigFile;                               exit 0 ;;
+            --show-config)    ShowConfigFile;                               exit 0 ;;
             --curl | -c)      getter=curl                                          ;;
             --wget | -w)      getter=wget                                          ;;
             --help | -h)      Usage;                                        exit 0 ;;
