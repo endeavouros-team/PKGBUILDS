@@ -1,0 +1,31 @@
+#!/bin/bash
+# Maintainer: EndeavourOS-Team <info@endeavouros.com>
+
+pkgname=bash-app-translate
+pkgdesc="Add translation support for bash language apps"
+pkgver=26
+pkgrel=1
+arch=('any')
+license=('GPL')
+depends=(bash)
+optdepends=()
+url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
+_url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
+
+source=(
+    "$_url/$pkgname"       # contains functions needed for translations
+    "$_url/$pkgname.md"    # user guide
+)
+sha512sums=('2079fcc1eaea7b04b299f0b5f5a95c0df94c3a13a4e86e28681d071ff07e2ed6045e977d5899179625b17433a37c3ecce0ba584b9e255f4dbc80e0297b243bdf'
+            'c50a62dbaa0fc6df5a79b29e9fa2f516f883a81c187482cb9ab98b0a45aea9033289482a6621e87a132cf444c638991be5aae5825f3c0955394cf4c39e6c46fd')
+
+package() {
+    local src file
+    for src in "${source[@]}" ; do
+        file=${src##*/}
+        case "$file" in
+            *.md)     install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
+            *)        install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
+        esac
+    done
+}

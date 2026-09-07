@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# An app can use function BTR for translation strings.
+# %s in te string can be used for parameters (because of printf below).
+#
+BTR() {
+    local akey="$1"
+    shift
+    printf "${BTR_ARR[$akey]}" "$@"
+}
+
+# Language identifier is reduced from the value of the $LANG environment variable.
+# This id is used in the names of the translation files.
+# Note: this implementation is not anywhere near complete...
+#
+_btr_get_lang_() {
+    # See: /usr/share/i18n/locales
+    case "$LANG" in
+        nl_NL* | pt_BR* | uk_UA* | zh_CN* | zh_HK* | zh_SG* | zh_TW*)
+            echo ${LANG::5} ;;
+        *)
+            echo ${LANG::2} ;;
+    esac
+}
+
+# Grab the proper BTR_ARR contents for the app & language.
+#
+source "/usr/share/endeavouros/translations/btr_$1_$(_btr_get_lang_)" || exit 1
