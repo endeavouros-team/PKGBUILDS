@@ -3,7 +3,7 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26
+pkgver=26.1
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -16,8 +16,8 @@ source=(
     "$_url/$pkgname"       # contains functions needed for translations
     "$_url/$pkgname.md"    # user guide
 )
-sha512sums=('2079fcc1eaea7b04b299f0b5f5a95c0df94c3a13a4e86e28681d071ff07e2ed6045e977d5899179625b17433a37c3ecce0ba584b9e255f4dbc80e0297b243bdf'
-            'c50a62dbaa0fc6df5a79b29e9fa2f516f883a81c187482cb9ab98b0a45aea9033289482a6621e87a132cf444c638991be5aae5825f3c0955394cf4c39e6c46fd')
+sha512sums=('6b3bb30c350475d198555798348db42cbdc5e8f385bb01c9ad413806d7f40b7e7074e9faa3a2ddd896e3fd836d5a6853d54e57988c89cc27de7d9d9f45e02ff7'
+            '2673460b0507245ae74d74341bb962a26783a56b5c7c45cb2bd9adffb475e56a03c95e2e3f83dfbcd72777d10e94153461aeb9e5da5b6a7c3fef45329146da3b')
 
 package() {
     local src file

@@ -1,12 +1,42 @@
 #!/bin/bash
 
+BTR_printf() {
+    local fmt="$1"
+    local arg
+    shift
+    for arg in "$@" ; do
+        fmt=${fmt/\%s/$arg}
+    done
+    echo -n "$fmt"
+}
+
+_BTR_MULTILINE_() {   # NOT TESTED YET!!
+    # Note: %s is NOT supported here!
+    local -n _btr_array_arg_="$1"
+    local line
+    shift
+    for line in "${_btr_array_arg_[@]}" ; do
+        printf "%s\n" "$line"                  # without "%s\n" newlines are consumed...
+    done
+}
+
 # An app can use function BTR for translation strings.
 # %s in te string can be used for parameters (because of printf below).
 #
 BTR() {
     local akey="$1"
+    local contents="${BTR_ARR[$akey]}"
     shift
-    printf "${BTR_ARR[$akey]}" "$@"
+    case "$contents" in
+#        _MULTILNE_*)
+#            # Parameters NOT supported!
+#            _BTR_MULTILINE_ "$contents"
+#            ;;
+        *)
+            # printf "${BTR_ARR[$akey]}" "$@"
+            BTR_printf "${BTR_ARR[$akey]}" "$@"
+            ;;
+    esac
 }
 
 # Language identifier is reduced from the value of the $LANG environment variable.
@@ -22,6 +52,15 @@ _btr_get_lang_() {
             echo ${LANG::2} ;;
     esac
 }
+
+
+# Some definitions that may be needed in the translations:
+BTR_exclamation='&#33;'         # '!'
+BTR_and='&#38;'                 # '&'
+BTR_question='&#63;'            # '?'
+BTR_exclamation_down='&#161;'   # '¡'
+BTR_question_down='&#191;'      # '¿'
+
 
 # Grab the proper BTR_ARR contents for the app & language.
 #
