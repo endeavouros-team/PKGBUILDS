@@ -1,41 +1,45 @@
 #!/bin/bash
 
-BTR_printf() {
+# Convert any %s in a string to the corresponding parameter.
+#
+__BTR_printf_() {
     local fmt="$1"
-    local arg
+    local param fmt_prev
     shift
-    for arg in "$@" ; do
-        fmt=${fmt/\%s/$arg}
+    for param in "$@" ; do
+        fmt_prev="$fmt"
+        fmt="${fmt/\%s/$param}"
+        [ "$fmt" != "$fmt_prev" ] && ((params_consumed++))
     done
     echo -n "$fmt"
 }
 
-_BTR_MULTILINE_() {   # NOT TESTED YET!!
-    # Note: %s is NOT supported here!
-    local -n _btr_array_arg_="$1"
-    local line
+# Allow for multiline strings via an array.
+#
+__BTR_MULTILINE_() {
+    local -n _btr_array_param_="$1"
     shift
-    for line in "${_btr_array_arg_[@]}" ; do
-        printf "%s\n" "$line"                  # without "%s\n" newlines are consumed...
+    local line
+    local params=("$@")
+
+    for line in "${_btr_array_param_[@]}" ; do
+        params_consumed=0
+        __BTR_printf_ "$line" "${params[@]}"
+        params=("${params[@]:$params_consumed}")
     done
 }
 
 # An app can use function BTR for translation strings.
-# %s in te string can be used for parameters (because of printf below).
+# One or more %s in the string can be used for parameters.
 #
 BTR() {
     local akey="$1"
     local contents="${BTR_ARR[$akey]}"
+    local params_consumed=0
     shift
     case "$contents" in
-#        _MULTILNE_*)
-#            # Parameters NOT supported!
-#            _BTR_MULTILINE_ "$contents"
-#            ;;
-        *)
-            # printf "${BTR_ARR[$akey]}" "$@"
-            BTR_printf "${BTR_ARR[$akey]}" "$@"
-            ;;
+        _MULTILINE_*)  __BTR_MULTILINE_ "$contents" "$@" ;;
+        *)             __BTR_printf_    "$contents" "$@" ;;
     esac
 }
 
@@ -43,7 +47,7 @@ BTR() {
 # This id is used in the names of the translation files.
 # Note: this implementation is not anywhere near complete...
 #
-_btr_get_lang_() {
+__btr_get_lang_() {
     # See: /usr/share/i18n/locales
     case "$LANG" in
         nl_NL* | pt_BR* | uk_UA* | zh_CN* | zh_HK* | zh_SG* | zh_TW*)
@@ -55,6 +59,7 @@ _btr_get_lang_() {
 
 
 # Some definitions that may be needed in the translations:
+#
 BTR_exclamation='&#33;'         # '!'
 BTR_and='&#38;'                 # '&'
 BTR_question='&#63;'            # '?'
@@ -64,4 +69,4 @@ BTR_question_down='&#191;'      # '¿'
 
 # Grab the proper BTR_ARR contents for the app & language.
 #
-source "/usr/share/endeavouros/translations/btr_$1_$(_btr_get_lang_)" || exit 1
+source "/usr/share/endeavouros/translations/btr_$1_$(__btr_get_lang_)" || exit 1

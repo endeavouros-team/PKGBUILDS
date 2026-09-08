@@ -1,6 +1,8 @@
 # bash-app-translate user guide
 
-`bash-app-translate` provides a simple way to add support for langguage translations into bash scripts.
+`bash-app-translate` provides a simple way to support language translations in bash scripts.<br>
+This document describes how to use it with a bash app.<br>
+The examples below assume EndeavourOS linux distribution.
 
 ## Applying bash-app-translate in a bash-language app
 
@@ -10,10 +12,11 @@ A script (=bash app) must add the following line before any translation is neede
 source /usr/share/endeavouros/translations/bash-app-translate "${appname}" || exit 1
 ```
 
+In addition, the app needs to implement the *translation files* and use the translated strings with a special (but simple) syntax.<br>
+The initialization above finds the proper translation file (see **Translation files** below) automatically.
+
 <small>Note: the `${appname}` often is `${0##*/}` which provides the name of the app in a script file.</small>
 
-In addition, the app needs to implement the *translation files* and use the translated string with a special syntax.<br>
-The initialization above finds the proper translation file (see **Translation files** below) automatically.
 
 ## Translation files
 
@@ -25,8 +28,8 @@ btr_${appname}_${lang}
 ```
 
 where
-- `${appname}` is the name of the app that needs various translations
-- `${lang}` referes to the value of the LANG environment variable before the first dot. Note that in some cases only 2 first letters of LANG value is needed (e.g. `fi`), but sometimes a more specific language part (e.g. `pt_BR`) is needed.
+- `${appname}` is the name of the app that uses the translations
+- `${lang}` referes to the value of the LANG environment variable before the first dot. Note that in some cases only 2 first letters of LANG value is needed (e.g. `fi`), but sometimes a more specific language part (e.g. `pt_BR`) may be needed.
 
 A translation file must contain an associative array with name BTR_ARR, for example:
 
@@ -42,7 +45,7 @@ declare -A BTR_ARR=(
 
 <small>Note: bash allows an *alternative* syntax for the associative array. This *may* make the array definition more readable. See `man bash` for more info.</small>
 
-Then a translation (using the same *keynames*) in another language with the *alternative* bash syntax:
+Then a translation (using the same *keynames*) in another language using the *alternative* bash syntax:
 
 ```
 # a Finnish translation example in file "btr_${appname}_fi"
@@ -60,9 +63,9 @@ Note the `%s` in the strings related to `keyname2` and `keyname3`: it is a place
 
 ## Using translations in the app
 
-When an app needs a translated string somewhere, use the pairs of `key` and `string` in the `BTR_ARR`. The key identifies for the string, as already seen above in the contents of the `BTR_ARR` above.
+When an app needs a translated string somewhere, use the pairs of `key` and `string` in the `BTR_ARR` (as already seen above). The *key* identifies the *string* in the contents of the `BTR_ARR` above.
 
-Usage in an app is very simple:
+Usage in an app is very simple, we use function `BTR`:
 
 ```
 # Assuming English translation
@@ -83,6 +86,39 @@ Locale dependent special characters may need special handling.
 
 The implementation supports `%s` (better known from `printf`) to allow adding (one or more) parameters inside the string (see the examples above).<br>Limitation: only this simple form `%s` is supported, nothing more, so e.g. `%7s` is not supported.
 
+#### Multiline parameters
+
+There may be situations when you want to use e.g. long multiline messages. The above *can* be used but it may be clumsy.<br>
+Therefore we have a way to bind several strings together:
+
+```
+declare -A BTR_ARR=(
+    [keyname1]="something related to keyname1"   # like before
+
+    [my_many_lines]="_MULTILINE_my_lines"        # refers to the array of strings in _MULTILINE_my_lines below
+)
+
+_MULTILINE_my_lines=(
+    "something else"
+    "something else with one parameter: %s"
+    "something else with two parameters: %s %s"
+)
+```
+
+The app can use it simply:
+
+```
+many_lines_of_text="$(BTR my_many_lines  "my_param1" "my_param2" "my_param3")"
+```
+
+where `my_many_lines` was the *key* in the BTR_ARR.
+
+Some additional notes:
+
+1. The *name* of the multiline array **must** start with `_MULTILINE_`, otherwise it is not recognized as a multiline array but a simple string.
+2. The *order* of the parameters is important: my_param1 replaces the `%s` on the second array line, and the other parameters replace the two `%s` placeholders on the last array line.
+
+
 ## Notes about creating a new translation
 
 The English translation is considered as the *reference translation*. Other translations should translate each `string` for the `[keyname]=string` pairs.
@@ -95,7 +131,7 @@ This gives the following benefits:
 
 It is also recommended to keep the order of the translation lines the same as in the English translation. If and when the English translations change, this may help find the TODOs.
 
-## Special chanacters
+## Special characters
 
 A translation may need special characters, but not all are supported directly by `yad`.<br>
 For this purpose there are some predefined variables to be used by a translation:
