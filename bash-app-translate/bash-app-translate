@@ -1,16 +1,40 @@
 #!/bin/bash
 
+# Definitions used from the environment:
+#    - the 'LANG' environment variable to detect the language
+#    - $0 special variable in potential warnings
+
 # Convert any %s in a string to the corresponding parameter.
 #
 __BTR_printf_() {
     local fmt="$1"
-    local param fmt_prev
-    shift
-    for param in "$@" ; do
-        fmt_prev="$fmt"
-        fmt="${fmt/\%s/$param}"
-        [ "$fmt" != "$fmt_prev" ] && ((params_consumed++))
-    done
+
+    if [ "$fmt" != "${fmt/\%}" ] ; then    # fmt includes % ?
+        shift
+        local -r fmt_orig="$fmt"
+        if [ "$1" ] ; then                 # params exist ?
+            local param placeholder tmp
+            local parts=()
+            for param in "$@" ; do
+                # Try parsing %s or %Ns where N is a number (including negative).
+                readarray -t parts < <(echo "$fmt" | sed -E 's|([^%]*)(%[-]*[0-9]*s)(.*)|\1\n\2\n\3|')
+                placeholder="${parts[1]}"
+                case "$placeholder" in
+                    "") break ;;
+                    %s |  %[0-9]s |  %[0-9][0-9]s |  %[0-9][0-9][0-9]s) ;;
+                    %s | %-[0-9]s | %-[0-9][0-9]s | %-[0-9][0-9][0-9]s) ;;
+                    *)  echo "==> ${0##*/}: warning: could not parse '$placeholder' in '$fmt_orig'" >&2
+                        break
+                        ;;
+                esac
+                printf -v tmp "$placeholder" "$param"   # works with newlines in $param ?
+                fmt="${parts[0]}${tmp}${parts[2]}"
+                ((params_consumed++))
+            done
+        else
+            echo "==> ${0##*/}: warning: positional parameter missing for '$fmt_orig'" >&2
+        fi
+    fi
     echo -n "$fmt"
 }
 
@@ -25,7 +49,7 @@ __BTR_MULTILINE_() {
     for line in "${_btr_array_param_[@]}" ; do
         params_consumed=0
         __BTR_printf_ "$line" "${params[@]}"
-        params=("${params[@]:$params_consumed}")
+        [ $params_consumed -ne 0 ] && params=("${params[@]:$params_consumed}")
     done
 }
 
@@ -60,11 +84,11 @@ __btr_get_lang_() {
 
 # Some definitions that may be needed in the translations:
 #
-BTR_exclamation='&#33;'         # '!'
-BTR_and='&#38;'                 # '&'
-BTR_question='&#63;'            # '?'
-BTR_exclamation_down='&#161;'   # '¡'
-BTR_question_down='&#191;'      # '¿'
+local -r BTR_exclamation='&#33;'         # '!'
+local -r BTR_and='&#38;'                 # '&'
+local -r BTR_question='&#63;'            # '?'
+local -r BTR_exclamation_down='&#161;'   # '¡'
+local -r BTR_question_down='&#191;'      # '¿'
 
 
 # Grab the proper BTR_ARR contents for the app & language.

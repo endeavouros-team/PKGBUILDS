@@ -84,7 +84,22 @@ Locale dependent special characters may need special handling.
 
 ### Parameters
 
-The implementation supports `%s` (better known from `printf`) to allow adding (one or more) parameters inside the string (see the examples above).<br>Limitation: only this simple form `%s` is supported, nothing more, so e.g. `%7s` is not supported.
+The implementation supports `%s` (better known from `printf`, see `man 3 printf`) to allow adding (one or more) parameters inside the string (see the examples above).
+
+```
+declare -A BTR_ARR=(
+    [mykey1]="the width of string '%-15s' is 15 characters, aligned left"
+    [mykey2]="the width of string '%15s' is 15 characters, aligned right"
+    # and so on
+)
+```
+
+Note that this implementation supports only a small subset of features what printf can provide.<br>
+Limitations:
+
+1. Only formats `%s`, `%Ns`, and `%-Ns` (where N is a positive integer) are supported. No other **conversion** is supported.<br>
+For example, `%*s` is *not* supported.
+2. Parsing the format syntax may ignore *unsupported* formats, and this may lead to errors.
 
 #### Multiline parameters
 
@@ -98,7 +113,7 @@ declare -A BTR_ARR=(
     [my_many_lines]="_MULTILINE_my_lines"        # refers to the array of strings in _MULTILINE_my_lines below
 )
 
-_MULTILINE_my_lines=(
+_MULTILINE_my_lines=(                            # always use prefix: _MULTILINE_
     "something else"
     "something else with one parameter: %s"
     "something else with two parameters: %s %s"
@@ -111,13 +126,35 @@ The app can use it simply:
 many_lines_of_text="$(BTR my_many_lines  "my_param1" "my_param2" "my_param3")"
 ```
 
-where `my_many_lines` was the *key* in the BTR_ARR.
+where `my_many_lines` is the *key* in the BTR_ARR.
 
 Some additional notes:
 
-1. The *name* of the multiline array **must** start with `_MULTILINE_`, otherwise it is not recognized as a multiline array but a simple string.
-2. The *order* of the parameters is important: my_param1 replaces the `%s` on the second array line, and the other parameters replace the two `%s` placeholders on the last array line.
+1. The *name* of the multiline array **must** start with `_MULTILINE_`, otherwise it is not recognized as a multiline array but a simple string instead.
+2. The *order* of the **parameters** is important: `my_param1` replaces the `%s` on the second array line, and the other parameters replace the two `%s` placeholders on the last array line.
 
+## Special characters
+
+A translation may need special characters, but not all are directly supported by `yad` (which is the GUI implementation used by `akm`).<br>
+For this purpose there are the following *predefined* variables a translation can use:
+```
+BTR_exclamation='&#33;'         # '!'
+BTR_and='&#38;'                 # '&'
+BTR_question='&#63;'            # '?'
+BTR_exclamation_down='&#161;'   # '�'
+BTR_question_down='&#191;'      # '�'
+```
+
+Example:
+
+```
+declare -A BTR_ARR=(
+    [a_demo_key]="This is a knife$BTR_exclamation"    # shows as: This is a knife!
+    # ...
+)
+```
+
+If these are not enough, the developer of a translation is advised to create similar assignments in the translation file as needed.
 
 ## Notes about creating a new translation
 
@@ -130,16 +167,3 @@ This gives the following benefits:
 - It is easy to see what still needs to be done.
 
 It is also recommended to keep the order of the translation lines the same as in the English translation. If and when the English translations change, this may help find the TODOs.
-
-## Special characters
-
-A translation may need special characters, but not all are supported directly by `yad`.<br>
-For this purpose there are some predefined variables to be used by a translation:
-```
-BTR_exclamation='&#33;'         # '!'
-BTR_and='&#38;'                 # '&'
-BTR_question='&#63;'            # '?'
-BTR_exclamation_down='&#161;'   # '�'
-BTR_question_down='&#191;'      # '�'
-```
-If these are not enough, the developer of a translation is advised to create similar assignments in the translation file as needed.
