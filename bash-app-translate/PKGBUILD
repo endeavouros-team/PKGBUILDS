@@ -3,27 +3,31 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.2
+pkgver=26.1.3
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(bash)
 optdepends=()
+backup=("etc/$pkgname.conf")
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
     "$_url/$pkgname"       # contains functions needed for translations
     "$_url/$pkgname.md"    # user guide
+    "$_url/$pkgname.conf"  # user configurations
 )
-sha512sums=('b7b83572e38f2fe74337e54531aeefdbaf5c1221b71729c0871f7e2ec569ddd68530a3246aa825fe72ff11ea607eb2a3ef2746dd1d9ebc7307a38aea52a384f5'
-            '295597545b2c6af9e79199798c33b00670a53c74f93e5ef4a170e255616a14a4b5936d4ca3b8962fdb12ce6f0ef0c52de8bc2b8d0708db5ba4e3365695c4d1ab')
+sha512sums=('331cb1e167037b39d0556367d0002de64f32160ab1219592f6f5a5be65d6bd60df96284b920f31b6a0118d3b4c2f692712fb5c1530a47884cd066ce87c7b44ba'
+            'a3aee8a15fcf869b52678275dc785789b140b83a253b446466c056e58286d52e82fcad27d18224fcd3b6bdf5206ec8395d274ed09fa8e775c203cd5b7e55ea5c'
+            '26bdbc7462cbc176d3c4f270a0cac9234fa5113c37f24d20cf07eeb51952a9010551eebbaf8802e49bdc6357bcac4205cdccba77cf5eb2fe0cd8cd551be9d73f')
 
 package() {
     local src file
     for src in "${source[@]}" ; do
         file=${src##*/}
         case "$file" in
+            *.conf)   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             *.md)     install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
             *)        install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
         esac
