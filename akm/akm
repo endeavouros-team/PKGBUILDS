@@ -13,6 +13,11 @@ FormatName()        { FormatVersion "$1" ; }
 Header() {
     local fname="${FUNCNAME[1]}"
     case "$fname" in
+        Choose)    fname="$(BTR akm_title_choose)" ;;
+        PkgName)   fname="$(BTR akm_title_pkgname)" ;;
+        Installed) fname="$(BTR akm_title_installed)" ;;
+        Stable)    fname="$(BTR akm_title_stable)" ;;
+        Testing)   fname="$(BTR akm_title_testing)" ;;
         KernelOrg) fname="$KOName" ;;
         KOVersion) fname="$KOVersionName" ;;
     esac
@@ -26,16 +31,16 @@ Header() {
 
 LocalVersion() {
     local pkg="${1##*/}"
-    expac -Q %v "$pkg"
+    [ "${LocalPkgVersions[$pkg]}" ] || LocalPkgVersions[$pkg]=$(expac -Q %v "$pkg")
+    echo "${LocalPkgVersions[$pkg]}"
 }
-Exist()        { [ -n "$version" ] && echo TRUE || echo FALSE ; }
 
 Choose() {
     local version exist xx
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Checkboxes for installing/uninstalling kernel packages":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_choose_tip)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
-        exist="$(Exist)"
+        [ "$version" ] && exist=TRUE || exist=FALSE
         cmd+=(--field="":CHK "$exist")   # Field has one space, workaround for a yad bug.
                                          # Fixed in yad 7.2-1, removed workaround.
     done
@@ -43,7 +48,7 @@ Choose() {
 
 PkgName() {
     local xx
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Kernel package name":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_pkgname_tip)":LBL "")
     for xx in "${kernels[@]}" ; do
         cmd+=(--field="${smallBegin}$(FormatName "$xx")${smallEnd}":LBL "")
     done
@@ -55,12 +60,12 @@ Installed() {
     kernel=$(eos_running_kernel)
     case "$kernel" in
         linux*) ;;
-        *) DIE "Internal error, cannot determine the running kernel." ;;
+        *) DIE "$(BTR die_internal_error)" ;;
     esac
     local running
     running=$(expac -Q %v "$kernel")
-    local ind1 ind2
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Installed kernel package versions. The currently running kernel is in <i>italics</i>. A <b>bolded</b> string means the latest K.o. version.":LBL "")
+    local ind1 ind2 type
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_installed_tip)":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(LocalVersion "$xx")"
         ind1=""
@@ -71,7 +76,12 @@ Installed() {
                 *) ind1="<i>"; ind2="</i>" ;;       # currently running kernel: italics font
             esac
         fi
-        if IsLatestKO "$version" ; then
+        case "$xx" in
+            */linux | */linux-headers) type=stable ;;
+            */linux-lts*)              type=longterm ;;
+            *)                         type="" ;;
+        esac
+        if IsLatestKO "$version" "$type" ; then
             cmd+=(--field="${smallBegin}$(FormatVersion "$ind1<b>$version</b>$ind2")${smallEnd}":LBL "")
         else
             cmd+=(--field="${smallBegin}$(FormatVersion "$ind1$version$ind2")${smallEnd}":LBL "")
@@ -99,9 +109,9 @@ StableVersions() {
 Stable() {
     local version in_use=""
     if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
-        in_use=" (currently in use)"
+        in_use="$(BTR op_in_use)"
     fi
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the stable repos$in_use":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Stable" "$in_use")":LBL "")
     local versions=() ix=0
     StableVersions
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
@@ -115,20 +125,22 @@ TestingVersion() {
     if true ; then
         local tmp="$testinginfo"
         tmp=$(echo "$tmp" | grep -A2 "/packages/core-testing/x86_64/$pkg/")
-        tmp=$(echo "$tmp" | tail -n1)
-        tmp=$(echo "$tmp" | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|')
+        if [ "$tmp" ] ; then
+            tmp=$(echo "$tmp" | tail -n1)
+            tmp=$(echo "$tmp" | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|')
+        fi
         echo "$tmp"
     else
         echo "$testinginfo" | grep -A2 "/packages/core-testing/x86_64/$pkg/" | tail -n 1 | sed -E 's|.*>([0-9][0-9a-z\.\-]+)<.*$|\1|'
     fi
 }
 
-UNAVAILABLE() { DIE "$1 is currently unavailable${2}!" ; }
+UNAVAILABLE() { DIE "$(BTR item_not_available "$1" "$2")" ; }
 
 Testing() {
     local in_use=""
     if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
-        in_use=" (currently in use)"
+        in_use="$(BTR op_in_use)"
     fi
     local URL="https://archlinux.org/packages/?repo=Core-Testing&q=linux+kernel+and+modules"
     local testinginfo
@@ -137,9 +149,9 @@ Testing() {
     # shellcheck disable=2086
     testinginfo="$(/usr/bin/curl --fail -Ls $URL_timeout "$URL")" || UNAVAILABLE "${URL%%/packages*}"
 
-    [ -n "$testinginfo" ] || DIE "Fetching info from https://archlinux.org failed!"
+    [ -n "$testinginfo" ] || DIE "$(BTR die_arch_fail)"
 
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Versions available from the testing repos$in_use":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Testing" "$in_use")":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
         test -n "$version" || version="$na"
@@ -151,19 +163,19 @@ KernelOrgVersion() {
     local type="$1"
     local count="$2"
     [ -n "$count" ] || count=1
-    local result
-    result="$(echo "$kernelorg" | grep -A2 "$type:" | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
+    local result1
+    result1="$(echo "$kernelorg" | grep -A2 "$type:" | grep -v EOL | grep strong | sed -e 's|^.*<strong>||' -e 's|</strong>.*$||')"
     case "$type" in
         mainline) ;;
-        longterm) result="$(echo "$result" | head -n "$count")" ;;
-        *) result="$(echo "$result" | grep -v "[0-9][0-9\.]*-rc")" ;;
+        longterm) result1="$(echo "$result1" | head -n "$count")" ;;
+        *) result1="$(echo "$result1" | grep -v "[0-9][0-9\.]*-rc")" ;;
     esac
-    echo "$result"
+    echo "$result1"
 }
 
 KernelOrg() {
     local version versions xx count=${#kernels[@]}
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Kernel category at kernel.org":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_ko_tip)":LBL "")
     for xx in "${org_kernels[@]}" ; do
         readarray -t versions < <(KernelOrgVersion "$xx")
         for version in "${versions[@]}" ; do
@@ -176,8 +188,7 @@ KernelOrg() {
 
 KOVersion() {
     local version versions xx count=${#kernels[@]}
-    # local stableversion="$(KernelOrgVersion stable)"
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!Latest version announced at kernel.org":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_ko_latest)":LBL "")
     for xx in "${org_kernels[@]}" ; do
         readarray -t versions < <(KernelOrgVersion "$xx")
         case "$xx" in
@@ -200,18 +211,18 @@ KOVersion() {
 
 IsLatestKO() {
     local installed_version="$1"
-    local type versions version
+    local type="$2"
 
-    installed_version="$(echo "$installed_version" | sed -e 's|-.*||' -e 's|\.[a-z].*||')"   # skip Arch suffixes
-
-    for type in stable longterm ; do
-        readarray -t versions < <(KernelOrgVersion "$type" 100)
-        for version in "${versions[@]}" ; do
-            if [ "$installed_version" = "$version" ] ; then
-                return 0
-            fi
-        done
-    done
+    case "$type" in
+        stable | longterm)
+            local versions version=()
+            installed_version="$(echo "$installed_version" | sed -e 's|-.*||' -e 's|\.[a-z].*||')"   # skip Arch suffixes
+            readarray -t versions < <(KernelOrgVersion "$type" 100)
+            for version in "${versions[@]}" ; do
+                [ "$installed_version" = "$version" ] && return 0
+            done
+            ;;
+    esac
     return 1
 }
 
@@ -223,10 +234,15 @@ PaddingLines() {
     done
 }
 
+
+# Export these small functions:
+Changelog() { xdg-open "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm)"; }
+Manual()    { eos-apps-info-helper akm; }
+
 CommonStuff() {
     local EOS_SCRIPTS_YAD=/usr/share/endeavouros/scripts/eos-script-lib-yad
     if [ ! -f $EOS_SCRIPTS_YAD ] ; then
-        Line2 "Sorry, package 'eos-bash-shared' is not installed."
+        Line2 "$(BTR msg_not_installed "eos-bash-shared")"
         exit 1
     fi
     # shellcheck disable=1090
@@ -235,6 +251,7 @@ CommonStuff() {
     export -f eos_yad_RunCmdTermBash
     export -f eos_yad_terminal
     AssignIconVariables_in_eos_bash_shared
+    export -f Changelog Manual
 }
 
 AkmConfig() {
@@ -279,10 +296,12 @@ Options() {
     local arg
     for arg in "$@" ; do
         case "$arg" in
+            --lang=*) ;;                                             # already handled
             --connect-header) connect_header_with_kernel=yes ;;
             --no-progress) progress=no ;;
             --scroll) scroll=yes ;;
             --small) small_font=yes ;;
+            --debug) debug=yes ;;
             -q | --quiet) quiet=yes ;;
             -h | --help)
                 cat <<EOF >&2
@@ -290,6 +309,7 @@ Usage: $progname [options]
 options:
     --connect-header      Make kernel and header package go together at install or uninstall.
     --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
+    --lang=*              Prefer the given target language '*'.
     --small               Make the akm window smaller, meant for helping with small displays at 1366x768 resolution.
     --quiet | -q          Be less verbose.
     --no-progress         Don't show the progress window.
@@ -336,16 +356,6 @@ AvailableKernelsAndHeaders() {
     [ "${akm_kernels_headers_user[0]}" ] && echo "${akm_kernels_headers_user[@]}"
 }
 
-Manual() {
-    xdg-open "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/blob/master/akm/README.md)"
-}
-export -f Manual
-
-Changelog() {
-    xdg-open "$(eos-github2gitlab https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm)"
-}
-export -f Changelog
-
 RepoType() {
     pacman-conf --repo-list | grep "\-testing$" >/dev/null && echo "Testing" || echo "Stable"
 }
@@ -353,6 +363,15 @@ RepoType() {
 Main() {
     local progname="${0##*/}"
     local quiet=no
+    local debug=no
+    declare -A LocalPkgVersions=()
+    local language=""
+
+    if [[ "$*" =~ "--lang=" ]] ; then
+        language=$(printf "%s\n" "$@" | grep -- "--lang=" | tail -n1 | sed 's|--lang=||')
+    fi
+
+    source /usr/share/endeavouros/translations/bash-app-translate "" "$language" || exit 1
 
     CommonStuff                   # fetches common bash definitions
     eos_assert_deps "$progname" yad || return 1
@@ -373,6 +392,9 @@ Main2() {
     local nrofkernelitems                  # 8 with only upstream kernels
     local RepoType
     local progress=yes
+
+    DebugBreak
+
     RepoType=$(RepoType)
 
     AkmConfig "$@"
@@ -403,61 +425,50 @@ Main2() {
     local URL="https://www.kernel.org"
     local kernelorg=""
     local org_kernels=(mainline stable longterm linux-next)
-    local KOName="K.o.category"
-    local KOVersionName="K.o.version"
+    local KOName=$(BTR akm_title_koname)           # "K.o.category"
+    local KOVersionName=$(BTR akm_title_kovname)   # "K.o.version"
     local xx
+    local titles=() title
     local t1=""
-    # local km="*"
+
+    DebugBreak
 
     t1+="$smallBegin"
-    t1+="Here's information about <i>currently available</i> Linux kernels that are or can be installed.\n"
-    t1+="Install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n\n"
-    t1+="<i>Please make sure the system is fully updated when starting <b>$progname</b></i>.\n"
-    t1+="\n"
+    t1+="$(BTR t1a_str "$progname")"
     if [ "$small_font" = "no" ] ; then
-        t1+="Column headers:\n"
-        t1+="<tt>"
-        t1+="    Choose        Checkboxes for installing/uninstalling kernel packages.\n"
-        t1+="                  The installed packages are checked at start.\n"
-        t1+="    PkgName       Kernel package name.\n"
-        t1+="    Installed     Installed kernel package versions.\n"
-        t1+="                  The currently running kernel is printed in italics.\n"
-        t1+="                  The latest kernel.org version is printed in bold.\n"
-        t1+="    Stable        Versions available from the stable repos.\n"
-        t1+="    Testing       Versions available from the testing repos.\n"
-        t1+="    $KOName  Kernel category at kernel.org.\n"
-        t1+="    $KOVersionName   Latest version announced at kernel.org.\n\n"
-        t1+="</tt>"
+        for title in akm_title_choose akm_title_pkgname akm_title_installed akm_title_stable akm_title_testing ; do
+            titles+=("$(BTR "$title")")
+        done
+        t1+="$(BTR t1b_str "${titles[@]}" "$KOName" "$KOVersionName")"
     fi
-    t1+="Your currently used repo (Stable or Testing) is printed in italics (see also /etc/pacman.conf).\n"
-    t1+="Marking <b>$na</b> means: info not available.\n\n"
-    t1+="See file <tt>/etc/akm.conf</tt> for configuration details.\n"
+    t1+="$(BTR t1c_str "$na" "/etc/$progname.conf")"
     t1+="$smallEnd"
+
+    local -r yad_s_chl="firefox '$(eos-github2gitlab 'https://github.com/endeavouros-team/PKGBUILDS/commits/master/akm')'"
+    local -r yad_s_man="eos-apps-info-helper akm"
 
     local cmd=(
         eos_yad
         --width="$akm_window_width"
         --use-interp
-        --form --title="Simple kernel manager" --columns=${#functions[@]}
+        --form --title="$(BTR yad_s_title)" --columns=${#functions[@]}
         --text="$t1"
         --image="$ICO_UPDATE"
-        --button=" ${smallBegin}Changelog${smallEnd}!applications-development!Show latest changes of this program":"Changelog"
-        --button=" ${smallBegin}Help${smallEnd}!help-contents!Helps to use $progname":"Manual"
-        --button=" ${smallBegin}Cancel${smallEnd}!gtk-cancel!Change nothing":1
-        --button=" ${smallBegin}Execute${smallEnd}!system-run!Make your changes":0
+        --button=" ${smallBegin}$(BTR yad_s_chl)${smallEnd}!applications-development!$(BTR yad_s_chltip)":"Changelog"
+        --button=" ${smallBegin}$(BTR yad_s_man)${smallEnd}!help-contents!$(BTR yad_s_mantip "$progname")":"Manual"
+        --button=" ${smallBegin}$(BTR yad_s_cancel)${smallEnd}!gtk-cancel!$(BTR yad_s_no_change)":1
+        --button=" ${smallBegin}$(BTR yad_s_run)${smallEnd}!system-run!$(BTR yad_s_make_change)":0
     )
     if [ "$scroll" = "yes" ] ; then
-        cmd+=(--scroll
-              --height=700   # 660 is about the default
-             )
+        cmd+=(--scroll --height=700)   # 660 is about the default
     fi
 
     local progress_cmd=(
         eos_yad --progress --enable-log --log-on-top --log-expanded --log-height 150 --auto-close
         --width=400 --no-buttons
         --image="$ICO_INFO"
-        --title="AKM progress"
-        --text="Fetching information, please wait..."
+        --title="$(BTR proc_title)"
+        --text="$(BTR proc_text)"
     )
     local ix=1 count=${#functions[@]} val
     local cmdfile
@@ -469,10 +480,12 @@ Main2() {
         kernelorg="$(/usr/bin/curl --fail -Ls $URL_timeout "$URL")" || errcode=$?
         case $errcode in
             0) ;;
-            *) eos-connection-checker || DIE "Network access required.\nPlease check the internet connection." && UNAVAILABLE "$URL" ;;
+            *) eos-connection-checker || DIE "$(BTR die_net_fail)" && UNAVAILABLE "$URL" ;;
         esac
-        test -n "$kernelorg" || DIE "Fetching info from $URL failed.\n"
+        test -n "$kernelorg" || DIE "$(BTR die_curl_fail "$URL")"
     fi
+
+    DebugBreak
 
     RunWithProgressOrNot
     
@@ -484,15 +497,17 @@ Main2() {
     [ $retval -ne 0 ] && return
     test -z "$result" && return
 
-    # For some users the yad output contains 2 lines instead of one ... ???
-    if [ "$(echo "$result" | wc -l)" != "1" ] ; then
-        Printf2 "==> Warning: yad output should have been exactly one line, but is:\n'$result'\n"
-        result1="$result"
-        result="$(echo "$result" | tail -n1)"
-        Printf2 "==> Warning: using the last line:\n'$result'\n"
-    fi
-    if [ "$(echo "$result" | wc -l)" != "1" ] ; then
-        DIE "cannot parse yad output:\n'$result1'\n"
+    if true ; then
+        # For some users the yad output contains 2 lines instead of one ... ???
+        if [ "$(echo "$result" | wc -l)" != "1" ] ; then
+            Printf2 $(BTR warn_odd_problem1 "$result")  # "==> Warning: yad output should have been exactly one line, but is:\n'$result'\n"
+            result1="$result"
+            result="$(echo "$result" | tail -n1)"
+            Printf2 $(BTR warn_odd_problem2 "$result")  # "==> Warning: using the last line:\n'$result'\n"
+        fi
+        if [ "$(echo "$result" | wc -l)" != "1" ] ; then
+            DIE $(BTR die_parse_error "$result1")       # "cannot parse yad output:\n'$result1'\n"
+        fi
     fi
 
     result="${result:1}"                               # skip first LBL field !!
@@ -571,25 +586,31 @@ RunWithProgressOrNot() {
     case "$progress" in
         no)
             for func1 in "${functions[@]}" ; do
-                $func1 || DIE "Function '$func1' failed.\n"     # run each function to add stuff to the '$cmd'
+                $func1 || DIE $(BTR die_func_fail "$func1")        # run each function to add stuff to the '$cmd'
             done
             ;;
         yes)
             {
                 for func1 in "${functions[@]}" ; do
-                    $func1 || DIE "Function '$func1' failed.\n"     # run each function to add stuff to the '$cmd'
-                    val="$(( ix < count ? ix*100/count : 99 ))"     # progress window stuff
+                    $func1 || DIE $(BTR dis_func_fail "$func1")    # run each function to add stuff to the '$cmd'
+                    val="$(( ix < count ? ix*100/count : 99 ))"    # progress window stuff
                     ((ix++))
                     printf "#%s\n%s\n" "$func1" "$val"
                 done
                 printf "%s\n" "${cmd[@]}" > "$cmdfile"              # now print the gathered value of 'cmd' into $cmdfile
-                printf "#===> Done.\n100\n"                         # stop the progress window
+                printf "#===> $(BTR msg_progress_done)\n100\n"      # stop the progress window
             } | "${progress_cmd[@]}"
 
-            readarray -t cmd < <(cat "$cmdfile")                  # now get the full 'cmd' from the file
+            readarray -t cmd < <(cat "$cmdfile")                    # now get the full 'cmd' from the file
             rm -f "$cmdfile"
             ;;
     esac
+}
+
+DebugBreak() {
+    if [ $debug = yes ] ; then
+        :                        # add breakpoint to this line!
+    fi
 }
 
 Main "$@"

@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# English translation for 'akm' strings.
+
+declare -A BTR_ARR=(
+    akm_title_choose      "Choose"
+    akm_title_pkgname     "PkgName"
+    akm_title_installed   "Installed"
+    akm_title_stable      "Stable"
+    akm_title_testing     "Testing"
+    akm_title_koname      "K.o.category"
+    akm_title_kovname     "K.o.version"
+
+    yad_s_title           "Simple kernel manager"
+    yad_s_chl             "Changelog"
+    yad_s_chltip          "Show the latest changes of this program"
+    yad_s_man             "Help"
+    yad_s_mantip          "Opens %s manual"
+    yad_s_cancel          "Cancel"
+    yad_s_no_change       "Change nothing"
+    yad_s_run             "Execute"
+    yad_s_make_change     "Make your changes"
+
+    proc_title            "AKM progress"
+    proc_text             "Fetching information, please wait..."
+
+    die_net_fail          "Network access required.\nPlease check the internet connection."
+    die_curl_fail         "Fetching info from %s failed.\n"
+    die_parse_error       "cannot parse yad output:\n'%s'\n"
+    die_func_fail         "Function '%s' failed.\n"
+    die_internal_error    "Internal error, cannot determine the running kernel."
+    die_arch_fail         "Fetching info from https://archlinux.org failed$BTR_exclamation"
+
+    warn_odd_problem1     "==> Warning: yad output should have been exactly one line, but is:\n'%s'\n"
+    warn_odd_problem2     "==> Warning: using the last line:\n'%s'\n"
+
+    msg_progress_done     "Done."
+    msg_not_installed     "Sorry, package '%s' is not installed."
+
+    op_choose_tip         "Checkboxes for installing/uninstalling kernel packages"
+    op_pkgname_tip        "Kernel package name"
+    op_installed_tip      "Installed kernel package versions. The currently running kernel is in <i>italics</i>. A <b>bolded</b> string means the latest K.o. version."
+    op_versions_tip       "Versions available from the %s repos%s"
+    op_ko_tip             "Kernel category at kernel.org"
+    op_ko_latest          "Latest version announced at kernel.org"
+    op_in_use             " (currently in use)"
+
+    item_not_available    "%s is currently unavailable%s$BTR_exclamation"    # second %s not needed?
+
+    t1a_str               "_MULTILINE_t1a"   # don't translate this line!
+    t1b_str               "_MULTILINE_t1b"   # don't translate this line!
+    t1c_str               "_MULTILINE_t1c"   # don't translate this line!
+)
+
+_MULTILINE_t1a=(
+    "Here's information about <i>currently available</i> Linux kernels that are or can be installed.\n"
+    "Install and/or uninstall kernel packages using the checkboxes on the leftmost column.\n\n"
+    "<i>Please make sure the system is fully updated when starting <b>%s</b></i>.\n"
+    "\n"
+)
+
+# Variables for aligning the output for _MULTILINE_t1b lines:
+BTR_item_length="15"     # the number of characters reserved for the first "word" on the lines of _MULTILINE_t1b below
+BTR_empty_item=$(printf "%${BTR_item_length}s")
+#
+_MULTILINE_t1b=(
+    "Column headers:\n"
+    "<tt>"
+    "    %-${BTR_item_length}s Checkboxes for installing/uninstalling kernel packages.\n"
+    "    $BTR_empty_item The installed packages are checked at start.\n"
+    "    %-${BTR_item_length}s Kernel package name.\n"
+    "    %-${BTR_item_length}s Installed kernel package versions.\n"
+    "    $BTR_empty_item The currently running kernel is printed in italics.\n"
+    "    $BTR_empty_item The latest kernel.org version is printed in bold.\n"
+    "    %-${BTR_item_length}s Versions available from the stable repos.\n"
+    "    %-${BTR_item_length}s Versions available from the testing repos.\n"
+    "    %-${BTR_item_length}s Kernel category at kernel.org.\n"
+    "    %-${BTR_item_length}s Latest version announced at kernel.org.\n\n"
+    "</tt>"
+)
+
+_MULTILINE_t1c=(
+    "Your currently used repo (Stable or Testing) is printed in italics (see also /etc/pacman.conf).\n"
+    "Marking <b>%s</b> means: info not available.\n\n"
+    "See file <tt>%s</tt> for configuration details.\n"
+)
+

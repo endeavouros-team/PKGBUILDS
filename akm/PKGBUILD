@@ -5,24 +5,31 @@ pkgname=akm
 pkgdesc="Arch kernel manager."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=26.8
+pkgver=26.9
 pkgrel=1
 arch=('any')
 license=('GPL')
-depends=(eos-bash-shared yad)
+depends=(eos-bash-shared yad bash-app-translate)
 backup=(etc/$pkgname.conf)
 
 source=(
     "$_url/$pkgname"
     "$_url/$pkgname.conf"
     "$_url/$pkgname.desktop"
+    "btr_${pkgname}_en"
+    "btr_${pkgname}_fi"
 )
-sha512sums=('fcd39d85a4e680b734ac7e5b03df59a596fc4654583efe6972f08d5c8f1934693394299541558791cf0bda6769f17e47c7a612a2cafde9b1cd5055611406a350'
+sha512sums=('65b1083761204839e52a3bb00f8aa85317f1cd6b01e427ccee19a69cf383ecda687905456532817f4ca8aea4187717514a5e2b71aeab55d759833fd5b41e7f15'
             '9ab486eaa58857dfaf1d3b3838768b9c629f65709177544ad4602daf2752be9709a529abba359fe984a9f231688ae30bb7aa3df97a2c8d88fbb37742f5fd26f7'
-            '462c92d6a4ed505a8d74d99335c2c521534abf699cda7154b35353aa96629dd9c5e7171cd7cc3f2307e6a68f63cfebe1d80ea24364077f77810b85013b2c7938')
+            '461e66cadd3e6c7c909e88778419f074a7f659fc38d285a6d0b988533c1f139bfba7c15c0f620a31923e558a1ec6609a588c806c68f6c1dc3fdc218b0f42dc5f'
+            'efcb5e424e2c90e400182ac4f4584eafb6142602f4f0e4bed30632bb7d286442e7a8bd82c4cb986a4626fbb0ab30a9120d6670006fcdebfb8efa240fc05d6030'
+            '62cf9292674b7300da658a07c6000c58db577cd6ee3d44f5a56c4bdb1b597b677a9465db384aa5ddd04df516cb48c0ff8f967946e7e7678611019e241629d68d')
 
 package() {
   install -Dm755 $pkgname         $pkgdir/usr/bin/$pkgname
   install -Dm644 $pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
   install -Dm644 $pkgname.conf    $pkgdir/etc/$pkgname.conf
+
+  install -Dm644 "btr_${pkgname}_en" $pkgdir/usr/share/endeavouros/translations/btr_${pkgname}_en
+  install -Dm644 "btr_${pkgname}_fi" $pkgdir/usr/share/endeavouros/translations/btr_${pkgname}_fi
 }

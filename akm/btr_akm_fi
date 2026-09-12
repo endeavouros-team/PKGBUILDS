@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Finnish translation for 'akm' strings.
+
+declare -A BTR_ARR=(
+    akm_title_choose      "Valitse"
+    akm_title_pkgname     "Pakettinimi"
+    akm_title_installed   "Asennettu"
+    akm_title_stable      "Stabiili"
+    akm_title_testing     "Testaus"
+    akm_title_koname      "K.o.kategoria"
+    akm_title_kovname     "K.o.versio"
+
+    yad_s_title           "Helppo ytimien pakettihallinta"
+    yad_s_chl             "Muutosloki"
+    yad_s_chltip          "Näytä tämän ohjelman viimeisimmät muutokset"
+    yad_s_man             "Käyttöohje"
+    yad_s_mantip          "Avaa %s:n käyttöohjeen"
+    yad_s_cancel          "Lopeta"
+    yad_s_no_change       "Älä muuta mitään"
+    yad_s_run             "Suorita"
+    yad_s_make_change     "Tee muutokset"
+
+    proc_title            "AKM:n eteneminen"
+    proc_text             "Haetaan tietoja, odota..."
+
+    die_net_fail          "Internetiin ei nyt päästä.\nTarkista yhteydet."
+    die_curl_fail         "Tietojen haku %s:sta epäonnistui.\n"
+    die_parse_error       "Yad-ohjelman tulosteen parsiminen epäonnistui:\n'%s'\n"
+    die_func_fail         "Funktio '%s' epäonnistui.\n"
+    die_internal_error    "Sisäinen virhe, en saa selvitettyä ajossa olevaa ydinpakettia."
+    die_arch_fail         "Tietojen haku osoitteesta https://archlinux.org epäonnistui$BTR_exclamation"
+
+    warn_odd_problem1     "==> Varoitus: yad:n tulostus olisi pitänyt olla vain yksi rivi, mutta on:\n'%s'\n"
+    warn_odd_problem2     "==> Varoitus: käytetään viimeistä riviä:\n'%s'\n"
+
+    msg_progress_done     "Valmis."
+    msg_not_installed     "Valitettavasti paketti '%s' ei ole asennettu."
+
+    op_choose_tip         "Valintaruudut ydinpakettien asentamiseksi/poistamiseksi"
+    op_pkgname_tip        "Ydinpaketin nimi"
+    op_installed_tip      "Asennetujen ydinpakettien versiot. Käytössä oleva ydin on <i>kursiivilla</i>. <b>Lihavoitu</b> merkkijono näyttää viimeisimmän K.o. version."
+    op_versions_tip       "%s-pakettilähteistä saatavilla olevat versiot%s"
+    op_ko_tip             "Ytimen kategoria kernel.org:ssa"
+    op_ko_latest          "Viimeisin julkaistu versio kernel.org:ssa"
+    op_in_use             " (paraikaa käytössä)"
+
+    item_not_available    "%s ei nyt ole käytettävissä%s$BTR_exclamation"    # second %s not needed?
+
+    t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
+    t1b_str               "_MULTILINE_t1b"   # älä käännä tätä riviä!
+    t1c_str               "_MULTILINE_t1c"   # älä käännä tätä riviä!
+)
+
+local _MULTILINE_t1a=(
+    "Tietoja saatavilla olevista Linux-ytimistä jotka joko on asennettu tai voidaan asentaa.\n"
+    "Asenna tai poista ydinpaketteja käyttäen valintaruutuja vasemmanpuoleisimmassa sarakkeessa.\n\n"
+    "<i>Varmista että systeemi on täysin päivitetty ennen <b>%s:n</b> käynnistämistä</i>.\n"
+    "\n"
+)
+
+local _MULTILINE_t1b=(
+    "Sarakeotsikot:\n"
+    "<tt>"
+    "    %-15s Valintaruudut ydinpakettien asentamiseksi tai poistamiseksi.\n"
+    "    $(printf "%15s") Asennetut paketit näkyvät alussa.\n"
+    "    %-15s Ydinpaketin nimi.\n"
+    "    %-15s Asennettujen ydinpakettien versiot.\n"
+    "    $(printf "%15s") Ajossa oleva ydin on kursiivilla.\n"
+    "    $(printf "%15s") Viimeisin kernel.org-versio on lihavoituna.\n"
+    "    %-15s Saatavilla olevat stable-repojen versiot.\n"
+    "    %-15s Saatavilla olevat testing-repojen versiot.\n"
+    "    %-15s Ytimen kategoria kernel.org:ssa.\n"
+    "    %-15s Viimeisin julkaistu versio kernel.org:ssa.\n\n"
+    "</tt>"
+)
+
+local _MULTILINE_t1c=(
+    "Käytössäsi oleva pakettilähde (Stabiili tai Testaus) on kirjoitettu kursiivilla (katso myös /etc/pacman.conf).\n"
+    "Merkintä <b>%s</b> tarkoittaa: tietoa ei saatavilla.\n\n"
+    "Katso tiedostosta <tt>%s</tt> konfiguroidut yksityiskohdat.\n"
+)
+
