@@ -3,7 +3,7 @@
 _pkgname=sway_tools
 
 pkgname=eos-sway-tools
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="A collection of simple Bash scripts to enhance Sway without adding unnecessary complexity."
 arch=("any")
@@ -21,7 +21,7 @@ depends=('libnotify'
          'waybar'
          'xdg-user-dirs')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/killajoe/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('c18f3ceba67ac188f11ac7c527cc5c631a766fc17f2424f0db529fec3130f0c4')
+sha256sums=('e8f11bb92d6fb3eb11aa5657fa45499480c0b694d159dc26c0c6bf9e8dbdda12')
 
 package() {
     # Extract directory defaults to reponame-version on GitHub
