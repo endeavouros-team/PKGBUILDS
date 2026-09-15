@@ -1,28 +1,30 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-cosmic
-pkgver=1.0
-pkgrel=7
+pkgver=1.1
+pkgrel=1
 pkgdesc="Cosmic settings for EndeavourOS user profiles"
-arch=('any')
+arch=("any")
 url="https://github.com/endeavouros-team/${pkgname}"
-license=('GPL-3.0-or-later')
-depends=('endeavouros-branding' 'git')
-# Clones directly from the remote GitHub repository using the master branch
-source=("${pkgname}::git+${url}.git#branch=main")
-sha256sums=('SKIP')
+license=("GPL-3.0-or-later")
+depends=('endeavouros-branding')
+makedepends=("git")
+source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
+sha256sums=('bb3f2ce44ac9f8ec1b214b0388847e29156474fa4928d69e2aec6a8de51e203c')
 
 package() {
-    local _skel="${pkgdir}/etc/skel/.config"
+    # Enter the unpacked source directory
+    cd "${srcdir}/${pkgname}-${pkgver}"
 
-    install -d "${_skel}"
+    # Create the target directory structure for skel
+    install -d "${pkgdir}/etc/skel/.config"
 
-    # Copy the structures directly from the cloned remote tree
-    cp -r "${srcdir}/${pkgname}/cosmic"  "${_skel}/"
-    cp -r "${srcdir}/${pkgname}/gtk-3.0" "${_skel}/"
-    cp -r "${srcdir}/${pkgname}/gtk-4.0" "${_skel}/"
+    # Copy the structures directly from the unpacked tree
+    cp -r cosmic  "${pkgdir}/etc/skel/.config/"
+    cp -r gtk-3.0 "${pkgdir}/etc/skel/.config/"
+    cp -r gtk-4.0 "${pkgdir}/etc/skel/.config/"
 
     # Normalize permissions for the target system
-    find "${_skel}" -type d -exec chmod 755 {} +
-    find "${_skel}" -type f -exec chmod 644 {} +
+    find "${pkgdir}/etc/skel/.config" -type d -exec chmod 755 {} +
+    find "${pkgdir}/etc/skel/.config" -type f -exec chmod 644 {} +
 }
