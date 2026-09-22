@@ -1,9 +1,11 @@
 #!/bin/bash
 # Maintainer: EndeavourOS-Team <info@endeavouros.com>
 
+# shellcheck disable=2034,2154
+
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.3
+pkgver=26.1.4
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -14,13 +16,15 @@ url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
 
 source=(
-    "$_url/$pkgname"       # contains functions needed for translations
-    "$_url/$pkgname.md"    # user guide
-    "$_url/$pkgname.conf"  # user configurations
+    "$_url/$pkgname"                        # contains functions needed for translations
+    "$_url/$pkgname.md"                     # user guide
+    "$_url/$pkgname.conf"                   # user configurations
+    "$_url/get-legacy-id-lang-translation"  # uses the legacy (Welcome's) implementation
 )
-sha512sums=('331cb1e167037b39d0556367d0002de64f32160ab1219592f6f5a5be65d6bd60df96284b920f31b6a0118d3b4c2f692712fb5c1530a47884cd066ce87c7b44ba'
+sha512sums=('af2d0d79f31a0cf130595722fd0d6aee94d1581e23409837fe45ff75f87195f9c6921751356f49b94d3682efa2de3a4efc58cbc72c59f592e268493e709cb523'
             'a3aee8a15fcf869b52678275dc785789b140b83a253b446466c056e58286d52e82fcad27d18224fcd3b6bdf5206ec8395d274ed09fa8e775c203cd5b7e55ea5c'
-            '26bdbc7462cbc176d3c4f270a0cac9234fa5113c37f24d20cf07eeb51952a9010551eebbaf8802e49bdc6357bcac4205cdccba77cf5eb2fe0cd8cd551be9d73f')
+            '26bdbc7462cbc176d3c4f270a0cac9234fa5113c37f24d20cf07eeb51952a9010551eebbaf8802e49bdc6357bcac4205cdccba77cf5eb2fe0cd8cd551be9d73f'
+            '7a0f882797b0592e2030c232dfdecd4d6246ff452889dfb44bd4f2122bf584e62380e9d870713ccba28a6eff0380a3da3b5885ca9021749acb9488a86a413b34')
 
 package() {
     local src file
@@ -29,6 +33,8 @@ package() {
         case "$file" in
             *.conf)   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             *.md)     install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
+            get-legacy-id-lang-translation)
+                      install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
             *)        install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
         esac
     done

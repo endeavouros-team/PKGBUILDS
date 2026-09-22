@@ -1,0 +1,57 @@
+#!/bin/bash
+
+Main() {
+    local msgid="$1"
+    local lang="$2"    # optional; instead $LANG can be used
+    local fname
+    local lines=()
+    local files=()
+    local -r dir=/usr/share/endeavouros/scripts
+    local -r progname=${0##*/}
+
+    [ "$msgid" ] || ERROR "required parameter 'msgid' is missing."
+
+    case "$lang" in
+        ??)    files=("$dir/translation-$lang.bash") ;;
+        ?????) files=("$dir/translation-$lang.bash" "$dir/translation-${lang::2}.bash") ;;
+        "")
+            source /etc/bash-app-translate.conf     # continue even if this line fails
+            if [ "$BTR_PREFER_LANG" ] ; then
+                lang="$BTR_PREFER_LANG"
+            else
+                lang="${LANG%.*}"
+            fi
+            "${FUNCNAME[0]}" "$msgid" "$lang"
+            return ;;
+        *)
+            return 1 ;;
+    esac
+
+    for fname in "${files[@]}" ; do
+        if [ -e "$fname" ] ; then
+            readarray -t lines < <(grep -w "$msgid" "$fname" | grep -v "^[ \t]*#")
+            case "${#lines[@]}" in
+                1) echo "${lines[0]}" | sed -E "s|^[ \t]*_tr_add2 [ \t]*$msgid [ ]*\"([^\"]+)\".*|\1|"
+                   return 0
+                   ;;
+                0) break ;;
+                *) ERROR "more than one match for '$msgid'." ;;
+            esac
+        fi
+    done
+    ERROR "cannot find the implementation for translating msgid '$msgid' to language '$lang' under '$dir'."
+}
+
+ERROR() {
+    echo -e "==> $progname: error:\n    $1" >&2
+    cat <<EOF
+
+Usage: $progname <msgid> [<language>]
+where
+        <msgid>       Identifier for the translated message.
+        <language>    2 or 5 first characters of the LANG environment variable.
+EOF
+    exit 1
+}
+
+Main "$@"
