@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Finnish translation for 'eos-update' strings.
+
+# shellcheck disable=2034,2190
+
+declare -A BTR_ARR=(
+    eup_msg_info            "tiedoksi"
+    eup_msg_warning         "varoitus"
+    eup_msg_error           "virhe"
+    eup_msg_helper_missing  "AUR-työkalua ei löydy"
+
+    die_result_failed       "epäonnistui"
+
+    msg_file_contains       "==> %s sisältää"
+    msg_avail_mirrors       "    - saavutettavia peilipalvelimia:     %s"
+    msg_unavail_mirrors     "    - saavuttamattomia peilipallvelimia: %s"
+    msg_why_sys_running     "Päivitetään."
+
+    tip_prog_purpose        "%s: ohjelmiston päivittäjä & lisäominaisuuksia."
+    tip_used_command        "==> Komento: %s"
+    tip_all_done            "==> Kaikki tehty!"
+
+    sysup_no                "Ei päivityksiä."
+
+    filelock_err            "==> Tiedosto %s on jo käytössä.\n    Tarkista käsitteleekö joku toinen prosessi paketteja."
+
+    warn_nvidia_chk_fail    "Nvidian GPU-ajurin ja ytimen yhteensopivuuden tarkistus epäonnistui. GPU-ajurin dkms-version käyttö voi auttaa."    # "'Nvidia & kernel' check failed."
+    warn_param_ignored      "parametri '%s' hylättiin ja ohitettiin."
+
+    # t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
+)
+
+_MULTILINE_t1a=(
+    "Tietoja saatavilla olevista Linux-ytimistä jotka joko on asennettu tai voidaan asentaa.\n"
+    "Asenna tai poista ydinpaketteja käyttäen valintaruutuja vasemmanpuoleisimmassa sarakkeessa.\n\n"
+    "<i>Varmista että systeemi on täysin päivitetty ennen <b>%s:n</b> käynnistämistä</i>.\n"
+    "\n"
+)

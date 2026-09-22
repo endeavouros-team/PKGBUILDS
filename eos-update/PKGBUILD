@@ -4,13 +4,14 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.9
+pkgver=26.9.1
 pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
     bash
-    eos-translations
+    #eos-translations     # deprecated!
+    bash-app-translate
     expac
 )
 optdepends=(
@@ -36,17 +37,22 @@ source=(
     "$_url/eos-update-lib.bash"
     "$_url/eos-update-other.bash"    # "config" for additional update tools
     "$_url/eos-update-tips.md"
+
+    "$_url/btr_${pkgname}_en_US"
+    "$_url/btr_${pkgname}_fi_FI"
 )
 
-sha512sums=('35f0d054df02d859fb3aa3c0ace33deca86a77e4314af2ac6c2ce21df4d84ff99f055956afba13f617c548301f6dff79e3378769ac6248384bff51268699b790'
+sha512sums=('58e4235fb4ba94d3cae83bf7ac9970f6a6724c4b0c8b756faedc08e3a5bbf7b6c64899e22d5403222b72136e4d3d76d71e8b7085f7ca641d34ebab80c5c10a98'
             'cc855e68f9b1d2b258335bd868dfe813354a21fde95a771d67a528714b4f21bd158637c021f73c75eea014ad8a68294f6d151a968714d062d4ecb42a64e0cc7b'
             '2a2508df7fe084c5ac9b33dbc6894e5d7a3156ffa707ac4f2ed4ce148b9b16c94be9a50d19501edd4e128189d80b15aa8b66224b1d5deeb5063f397f9487853a'
             'c3a60ac60d50573d4d51aea7f4015f48f0f1740e5b195040131cb27edcd59baefc9c131128a22045de950b669d007917035f67b9b51dc7c34f71b4324816b6d2'
             'fa0e76f45623a30995cd0b34b1c07390d1ba88b87c9304041ba12b2ca1d11fc90d19245bd24f8588d4987315bff96dd7e96e372384c03ccfe3a0bba9a3067fd6'
             'fde7a2b4986a6a42e2f58bc950d7abf5807d05de8d532893927e4b5f406e7010fd58eb6ee3136ebab61c7980872e3ad5d24d705486aea287cd91fcec1e89f409'
             'd0bdc726b157a4d3a1e4b497db7059ce2f1534f31256daa300c579fcfef8f858a59d93217fc8579b4cd38047ee2a1a857f2f5ee89575b0457b172327f61500a9'
-            'af19a9a264fc583e27f36459be21f1aee8524c0659195ffd87ccdf13bbb0226e4deb7730f3fd2bf359dfde33459689c35dbd33d6452f39f1e853ec64ef118bb4'
-            'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4')
+            'cbede379e1418b96c1e9a31389ce6f2492c5de013cfb87afc1d8a3f2197237ee6b1115b97671737c46031f5cfe0b8c1fb315c19b732d467d88165965724cc9d7'
+            'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4'
+            '190f99cbafcf50a80112c3cd9f2ba62659bb47fd385c685cf7b482ace1ab876a1396bee07d674bbf246d2133484ef6ff31901657130643f917beaaf61e28a5a7'
+            '4ad7eb1fc667b60076ae8f696924b1bec226084397c282eb98312502f2bd5210b3706d80137c7e57a63eb3a8e07fe1cb999078e21eed077f6e9da346c7784011')
 
 package() {
   local file src
@@ -63,6 +69,7 @@ package() {
           *.completion)          install -Dm644 "$file"   "$pkgdir/usr/share/bash-completion/completions/${file%.completion}" ;;
           *.bash)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.conf)                install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
+          btr_${pkgname}_*)      install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
           *)                     install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done

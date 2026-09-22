@@ -66,8 +66,8 @@ Main() {  # NOTE: do NOT rename this function!
             #     ColorLines tip "first line" "second line" "third line"
             ;;
         *)
-            # This is just for backwards compatibility. You may remove or comment out the following line.
-            DeprecatedOldCompatibility
+            # This is just for backwards compatibility.
+            # DeprecatedOldCompatibility
             ;;
     esac
 }
