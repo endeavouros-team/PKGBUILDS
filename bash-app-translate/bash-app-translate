@@ -4,22 +4,53 @@
 ##    - the 'LANG' environment variable to detect the language
 ##    - ${BASH_SOURCE[0]} special variable in potential warnings
 ##
-## Definitions made here which can be used in the user's app:
+## Definitions here can be used in a bash app:
 ##    - function BTR
 ##
-## Definitions made here which can be used in translation files:
+## Definitions here can be used in translation files:
 ##    - variables starting with BTR_
 ##
-## Definitions made here which should be avoided in the user's app:
+## Definitions that should be avoided in the bash app:
 ##    - function names starting with '__BTR_' and ending with '_'
 ##    - variables starting with '_BTR_' and ending with '_'
 
+
 # shellcheck disable=2034,1090
 
+##############################################################################################
+## Functions that can be directly used in translations and bash apps.
+##############################################################################################
 
-# Convert any %s in a string to the corresponding parameter.
-#
+BTR() {
+    # An app can use function BTR for translation strings.
+    # One or more %s in the string can be used for parameters.
+    #
+    local akey="$1"
+    local contents="${BTR_ARR[$akey]}"
+    local params_consumed=0
+    shift
+    case "$contents" in
+        _MULTILINE_*)  __BTR_MULTILINE_ "$contents" "$@" ;;
+        *)             __BTR_printf_    "$contents" "$@" ;;
+    esac
+}
+
+BTR_get_lang() {
+    # Language identifier is reduced from the value of the $LANG environment variable.
+    # This id is used in the names of the translation files.
+    # Note: this implementation is not anywhere near complete...
+    # See: /usr/share/i18n/locales and the eos-translations app
+    #
+    echo "${LANG%[. @]*}"
+}
+
+##############################################################################################
+## "Hidden" functions used by functions above.
+##############################################################################################
+
 __BTR_printf_() {
+    # Convert any %s in a string to the corresponding parameter.
+    #
     local fmt="$1"
 
     if [ "$fmt" != "${fmt/\%}" ] ; then    # fmt includes % ?
@@ -36,7 +67,7 @@ __BTR_printf_() {
                     "") break ;;
                     %s | %[0-9]s |  %[0-9][0-9]s |  %[0-9][0-9][0-9]s) ;;
                         %-[0-9]s | %-[0-9][0-9]s | %-[0-9][0-9][0-9]s) ;;
-                    *)  _BTR_important_msg_ " warning: could not parse '$placeholder' in '$fmt_orig'"
+                    *)  __BTR_important_msg_ " warning: could not parse '$placeholder' in '$fmt_orig'"
                         break
                         ;;
                 esac
@@ -46,15 +77,15 @@ __BTR_printf_() {
                 ((params_consumed++))
             done
         else
-            _BTR_important_msg_ "warning: positional parameter missing for '$fmt_orig'"
+            __BTR_important_msg_ "warning: positional parameter missing for '$fmt_orig'"
         fi
     fi
     echo -n "$fmt"
 }
 
-# Allow for multiline strings via an array.
-#
 __BTR_MULTILINE_() {
+    # Allow for multiline strings via an array.
+    #
     local -n _btr_array_param_="$1"
     shift
     local line
@@ -67,57 +98,14 @@ __BTR_MULTILINE_() {
     done
 }
 
-# An app can use function BTR for translation strings.
-# One or more %s in the string can be used for parameters.
-#
-BTR() {
-    local akey="$1"
-    local contents="${BTR_ARR[$akey]}"
-    local params_consumed=0
-    shift
-    case "$contents" in
-        _MULTILINE_*)  __BTR_MULTILINE_ "$contents" "$@" ;;
-        *)             __BTR_printf_    "$contents" "$@" ;;
-    esac
+__BTR_important_msg_() {
+    # For error and warning messages here.
+    #
+    echo "==> $_BTR_appname_: $_BTR_translator_: $1" >&2
 }
 
-# Language identifier is reduced from the value of the $LANG environment variable.
-# This id is used in the names of the translation files.
-# Note: this implementation is not anywhere near complete...
-#
-__BTR_get_lang_() {
-    # See: /usr/share/i18n/locales and the eos-translations app
-    echo "${LANG%[. @]*}"
-    return
-
-    # if false ; then
-    #     case "$LANG" in
-    #         nl_NL* | pt_BR* | uk_UA* | zh_CN* | zh_HK* | zh_SG* | zh_TW*)
-    #             echo "${LANG::5}" ;;
-    #         *)
-    #             echo "${LANG::2}" ;;
-    #     esac
-    # fi
-    # if false ; then
-    #     case "$LANG" in
-    #         ca*|cs*|de*|el*|en*|es*|fa*|'fi'*|fr*|hi*|hr*|is*|it*|ja*|pl*|pt_PT*|ro*|rs*|ru*|th*|tr*)
-    #             echo "${LANG::2}" ;;
-    #         nl_NL* | pt_BR* | uk_UA* | zh_CN* | zh_HK* | zh_SG* | zh_TW*)
-    #             echo "${LANG::5}" ;;
-    #         *)
-    #             echo "${LANG::5}" ;;
-    #     esac
-    # fi
-}
-
-# Some definitions that may be needed in the translations:
-#
-BTR_exclamation='&#33;'         # '!'
-BTR_and='&#38;'                 # '&'
-BTR_question='&#63;'            # '?'
-BTR_exclamation_down='&#161;'   # '¡'
-BTR_question_down='&#191;'      # '¿'
-
+##############################################################################################
+## Variables used only in this file.
 ##############################################################################################
 
 # _BTR_translator_ to be used in this file!
@@ -128,10 +116,11 @@ case "${BASH_SOURCE[0]}" in
         _BTR_translator_=bash-app-translate ;;
 esac
 
-# For error and warning messages here.
-_BTR_important_msg_() { echo "==> $_BTR_appname_: $_BTR_translator_: $1" >&2; }
-
-[ -e "/etc/$_BTR_translator_.conf" ] && source "/etc/$_BTR_translator_.conf"
+if [ -e "/etc/$_BTR_translator_.conf" ] ; then
+    # Get user's configuration file.
+    #
+    source "/etc/$_BTR_translator_.conf"
+fi
 
 # Grab the proper BTR_ARR contents for the app & language.
 #
@@ -139,16 +128,39 @@ _BTR_appname_="$1"     # optional but recommended for clarity
 _BTR_lang_id_="$2"     # optional
 
 [ "$_BTR_appname_" ] || _BTR_appname_="${0##*/}"              # name of the calling app
-[ "$_BTR_lang_id_" ] || _BTR_lang_id_="${BTR_PREFER_LANG}"    # user configured target language
-[ "$_BTR_lang_id_" ] || _BTR_lang_id_="$(__BTR_get_lang_)"    # automatically detected target language
+[ "$_BTR_lang_id_" ] || _BTR_lang_id_="$BTR_PREFER_LANG"      # user configured target language
+[ "$_BTR_lang_id_" ] || _BTR_lang_id_="$(BTR_get_lang)"       # automatically detected target language
+
+[ -e "/etc/$_BTR_translator_.conf" ] || __BTR_important_msg_ "warning: language translation config file /etc/$_BTR_translator_.conf not found."
 
 _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_}"
 
 [ -e "$_BTR_language_file_" ] || _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"
 
+# Some definitions that may be needed in the translations:
+#
+BTR_exclamation='&#33;'         # '!'
+BTR_and='&#38;'                 # '&'
+BTR_question='&#63;'            # '?'
+BTR_exclamation_down='&#161;'   # '¡'
+BTR_question_down='&#191;'      # '¿'
+
 if [ -e "$_BTR_language_file_" ] ; then
     source "$_BTR_language_file_" || exit 1
 else
-    _BTR_important_msg_ "error: '$_BTR_language_file_' does not exist!"
-    exit 1
+    __BTR_important_msg_ "warning: '$_BTR_language_file_' does not exist!"
+    if /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* &>/dev/null ; then
+        echo "==> The following files might match:" >&2
+        /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* 2>/dev/null | sed 's|^|      |'
+    fi
+    if [ -e "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_en_US" ] ; then
+        echo "==> Falling back to en_US."
+        source "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_en_US" || exit 1
+    else
+        exit 1
+    fi
 fi
+
+# Unset variables that are meant to be used only here.
+unset _BTR_lang_id_
+unset _BTR_language_file_

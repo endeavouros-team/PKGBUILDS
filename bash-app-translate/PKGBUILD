@@ -5,7 +5,7 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.4
+pkgver=26.1.5
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,7 +21,7 @@ source=(
     "$_url/$pkgname.conf"                   # user configurations
     "$_url/get-legacy-id-lang-translation"  # uses the legacy (Welcome's) implementation
 )
-sha512sums=('af2d0d79f31a0cf130595722fd0d6aee94d1581e23409837fe45ff75f87195f9c6921751356f49b94d3682efa2de3a4efc58cbc72c59f592e268493e709cb523'
+sha512sums=('615f0ff821821a52144c44106b86b29ab3db533b5081161d883fd5b9c2fe01804764d61df3ab067a1058f3fe016b698c3778086f1def14b5d08d8daf6bd29ada'
             'a3aee8a15fcf869b52678275dc785789b140b83a253b446466c056e58286d52e82fcad27d18224fcd3b6bdf5206ec8395d274ed09fa8e775c203cd5b7e55ea5c'
             '26bdbc7462cbc176d3c4f270a0cac9234fa5113c37f24d20cf07eeb51952a9010551eebbaf8802e49bdc6357bcac4205cdccba77cf5eb2fe0cd8cd551be9d73f'
             '7a0f882797b0592e2030c232dfdecd4d6246ff452889dfb44bd4f2122bf584e62380e9d870713ccba28a6eff0380a3da3b5885ca9021749acb9488a86a413b34')
