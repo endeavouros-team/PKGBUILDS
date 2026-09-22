@@ -2,6 +2,8 @@
 
 # Finnish translation for 'akm' strings.
 
+# shellcheck disable=2034,2190,2154,2183
+
 declare -A BTR_ARR=(
     akm_title_choose      "Valitse"
     akm_title_pkgname     "Pakettinimi"
@@ -52,30 +54,34 @@ declare -A BTR_ARR=(
     t1c_str               "_MULTILINE_t1c"   # älä käännä tätä riviä!
 )
 
-local _MULTILINE_t1a=(
+_MULTILINE_t1a=(
     "Tietoja saatavilla olevista Linux-ytimistä jotka joko on asennettu tai voidaan asentaa.\n"
     "Asenna tai poista ydinpaketteja käyttäen valintaruutuja vasemmanpuoleisimmassa sarakkeessa.\n\n"
     "<i>Varmista että systeemi on täysin päivitetty ennen <b>%s:n</b> käynnistämistä</i>.\n"
     "\n"
 )
 
-local _MULTILINE_t1b=(
+# Variables for aligning the output for _MULTILINE_t1b lines:
+BTR_item_length="-15"                              # "length" for the first "word" on some lines of _MULTILINE_t1b below
+BTR_empty_item=$(printf "%${BTR_item_length}s")    # BTR_item_length spaces
+#
+_MULTILINE_t1b=(
     "Sarakeotsikot:\n"
     "<tt>"
-    "    %-15s Valintaruudut ydinpakettien asentamiseksi tai poistamiseksi.\n"
-    "    $(printf "%15s") Asennetut paketit näkyvät alussa.\n"
-    "    %-15s Ydinpaketin nimi.\n"
-    "    %-15s Asennettujen ydinpakettien versiot.\n"
-    "    $(printf "%15s") Ajossa oleva ydin on kursiivilla.\n"
-    "    $(printf "%15s") Viimeisin kernel.org-versio on lihavoituna.\n"
-    "    %-15s Saatavilla olevat stable-repojen versiot.\n"
-    "    %-15s Saatavilla olevat testing-repojen versiot.\n"
-    "    %-15s Ytimen kategoria kernel.org:ssa.\n"
-    "    %-15s Viimeisin julkaistu versio kernel.org:ssa.\n\n"
+    "    %${BTR_item_length}s Valintaruudut ydinpakettien asentamiseksi tai poistamiseksi.\n"
+    "    ${BTR_empty_item} Asennetut paketit näkyvät alussa.\n"
+    "    %${BTR_item_length}s Ydinpaketin nimi.\n"
+    "    %${BTR_item_length}s Asennettujen ydinpakettien versiot.\n"
+    "    ${BTR_empty_item} Ajossa oleva ydin on kursiivilla.\n"
+    "    ${BTR_empty_item} Viimeisin kernel.org-versio on lihavoituna.\n"
+    "    %${BTR_item_length}s Saatavilla olevat stable-repojen versiot.\n"
+    "    %${BTR_item_length}s Saatavilla olevat testing-repojen versiot.\n"
+    "    %${BTR_item_length}s Ytimen kategoria kernel.org:ssa.\n"
+    "    %${BTR_item_length}s Viimeisin julkaistu versio kernel.org:ssa.\n\n"
     "</tt>"
 )
 
-local _MULTILINE_t1c=(
+_MULTILINE_t1c=(
     "Käytössäsi oleva pakettilähde (Stabiili tai Testaus) on kirjoitettu kursiivilla (katso myös /etc/pacman.conf).\n"
     "Merkintä <b>%s</b> tarkoittaa: tietoa ei saatavilla.\n\n"
     "Katso tiedostosta <tt>%s</tt> konfiguroidut yksityiskohdat.\n"

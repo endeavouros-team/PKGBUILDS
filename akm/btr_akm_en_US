@@ -2,6 +2,8 @@
 
 # English translation for 'akm' strings.
 
+# shellcheck disable=2034,2190,2154,2183
+
 declare -A BTR_ARR=(
     akm_title_choose      "Choose"
     akm_title_pkgname     "PkgName"
@@ -60,22 +62,22 @@ _MULTILINE_t1a=(
 )
 
 # Variables for aligning the output for _MULTILINE_t1b lines:
-BTR_item_length="15"     # the number of characters reserved for the first "word" on the lines of _MULTILINE_t1b below
-BTR_empty_item=$(printf "%${BTR_item_length}s")
+BTR_item_length="-15"                              # "length" for the first "word" on some lines of _MULTILINE_t1b below
+BTR_empty_item=$(printf "%${BTR_item_length}s")    # BTR_item_length spaces
 #
 _MULTILINE_t1b=(
     "Column headers:\n"
     "<tt>"
-    "    %-${BTR_item_length}s Checkboxes for installing/uninstalling kernel packages.\n"
-    "    $BTR_empty_item The installed packages are checked at start.\n"
-    "    %-${BTR_item_length}s Kernel package name.\n"
-    "    %-${BTR_item_length}s Installed kernel package versions.\n"
-    "    $BTR_empty_item The currently running kernel is printed in italics.\n"
-    "    $BTR_empty_item The latest kernel.org version is printed in bold.\n"
-    "    %-${BTR_item_length}s Versions available from the stable repos.\n"
-    "    %-${BTR_item_length}s Versions available from the testing repos.\n"
-    "    %-${BTR_item_length}s Kernel category at kernel.org.\n"
-    "    %-${BTR_item_length}s Latest version announced at kernel.org.\n\n"
+    "    %${BTR_item_length}s Checkboxes for installing/uninstalling kernel packages.\n"
+    "    ${BTR_empty_item} The installed packages are checked at start.\n"
+    "    %${BTR_item_length}s Kernel package name.\n"
+    "    %${BTR_item_length}s Installed kernel package versions.\n"
+    "    ${BTR_empty_item} The currently running kernel is printed in italics.\n"
+    "    ${BTR_empty_item} The latest kernel.org version is printed in bold.\n"
+    "    %${BTR_item_length}s Versions available from the stable repos.\n"
+    "    %${BTR_item_length}s Versions available from the testing repos.\n"
+    "    %${BTR_item_length}s Kernel category at kernel.org.\n"
+    "    %${BTR_item_length}s Latest version announced at kernel.org.\n\n"
     "</tt>"
 )
 
