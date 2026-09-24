@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Swedish translation for 'eos-update' strings.
+
+declare -A BTR_ARR=(
+    eup_msg_info            "info"
+    eup_msg_warning         "varning"
+    eup_msg_error           "fel"
+    eup_msg_helper_missing  "AUR hjälpare hittades inte"
+
+    die_result_failed       "misslyckades"
+
+    msg_file_contains       "==> %s innehåller"
+    msg_avail_mirrors       "    - tillgängliga speglar:   %s"
+    msg_unavail_mirrors     "    - inte tillgängliga speglar: %s"
+    msg_why_sys_running     "Uppdaterar."
+
+    tip_prog_purpose        "%s: paketuppdaterare & ytterligare funktioner."
+    tip_used_command        "==> Kommando: %s"
+    tip_all_done            "==> Allt klart!"
+
+    sysup_no                "Inga uppdateringar."
+
+    filelock_err            "==> Fil %s används.\n Kontrollera om en annan process fortfarande hanterar paket."
+
+    warn_nvidia_chk_fail    "Kompatibilitetskontrollen mellan 'kärnan' och 'Nvidia GPU-drivrutinen' misslyckades. Att använda drivrutinens dkms-version kan hjälpa."
+    warn_param_ignored      "parameter '%s' ignoreras."
+
+    # item_not_available    %s är inte tillgänglig nu%s$BTR_exclamation"    # den andra %s behövs inte?
+    # t1a_str               "_MULTILINE_t1a"   # översätt inte den här raden!
+)
+
+local _MULTILINE_t1a=(
+    "Information om tillgängliga Linux-kärnor som antingen är installerade eller kan installeras.\n"
+"Installera eller ta bort kärnpaket med hjälp av kryssrutorna i den vänstra kolumnen.\n\n"
+"<i>Se till att ditt system är helt uppdaterat innan du startar <b>%s</b></i>.\n"
+"\n"
+
+
+)
