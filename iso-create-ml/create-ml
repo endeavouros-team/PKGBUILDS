@@ -197,19 +197,36 @@ Header() {
 UserPrefs() {
     if [ "$prefslist" ] ; then
         echo -e "####### Mirrors by user preference >>>>"
-        local tmp
+        local item tmp
+        local prefs_found=()
         for item in $prefslist ; do
             if [ "$ranked_out" ] ; then
-                tmp=$(echo "$ranked_out" | grep "^Server = .*$item" | awk '{print $NF}')
-                if [ -z "$tmp" ] ; then
-                    WARN "--prefs arguments: no match for '$item' within ranked mirrors"
-                    continue
+                if true ; then
+                    readarray -t prefs_found < <(echo "$ranked_out" | grep "^Server = .*$item" | awk '{print $NF}')
+                    case "${#prefs_found[@]}" in
+                        0)
+                            WARN "--prefs arguments: no match for '$item' within ranked mirrors"
+                            continue
+                            ;;
+                        *)
+                            for tmp in "${prefs_found[@]}" ; do
+                                echo "Server = $tmp"
+                            done
+                            ;;
+                    esac
+                else
+                    tmp=$(echo "$ranked_out" | grep "^Server = .*$item" | awk '{print $NF}')
+                    if [ -z "$tmp" ] ; then
+                        WARN "--prefs arguments: no match for '$item' within ranked mirrors"
+                        continue
+                    fi
+                    item="$tmp"
+                    echo "Server = $item"
                 fi
-                item="$tmp"
             else
                 item=$(grep "$item" "$mirrordata" | awk '{print $NF}')
+                echo "Server = $item"
             fi
-            echo "Server = $item"
         done
         echo -e "####### Mirrors by user preference <<<<\n"
     fi
