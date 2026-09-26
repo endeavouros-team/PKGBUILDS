@@ -19,6 +19,7 @@ class Profile(Enum):
     nvidia_open = "NVIDIA nvidia-open"
     nvidia_580xx = "NVIDIA nvidia 580.xx"
     nvidia_legacy = "NVIDIA nouveau"
+    nvidia_nouveau = "NVIDIA nouveau (NVK)"
     amd_amdgpu = "AMD amdgpu"
     amd_legacy = "AMD legacy"
     generic = "Generic"
@@ -115,6 +116,11 @@ class ProfileData:
             'services': {},
             'dracut_config': 'force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "'},
         Profile.nvidia_580xx: {
+            'packages': {"mesa", "vulkan-nouveau"},
+            'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
+            'services': {},
+            'dracut_config': 'force_drivers+=" nouveau "'},
+        Profile.nvidia_nouveau: {
             'packages': {"mesa", "vulkan-nouveau"},
             'packages32': {"lib32-mesa", "lib32-vulkan-nouveau"},
             'services': {},
@@ -457,6 +463,9 @@ def get_device_info(input_gpu_info):
                 device["profiles"].add(Profile.amd_legacy)
             case "nouveau" | "nvidia":
 
+                # nouveau (NVK) is usable on any nvidia GPU, so always offer it
+                device["profiles"].add(Profile.nvidia_nouveau)
+
                 nvidia_profile = get_nvidia_profile(gpu_device)
                 if nvidia_profile in (Profile.nvidia_open, Profile.nvidia_580xx):
                     if not args.free:
@@ -465,6 +474,8 @@ def get_device_info(input_gpu_info):
                     if args.free or not only_recommended:
                         device["profiles"].add(Profile.nvidia_legacy)
                 else:
+                    # For pre-Maxwell cards this fallback is the best available
+                    # profile, so it is added unconditionally
                     device["profiles"].add(Profile.nvidia_legacy)
             case "xe":
                 device["profiles"].add(Profile.intel_xe)
@@ -653,6 +664,10 @@ def do_check_nvidia(device_list):
     profile_set = set()
     for device in device_list:
         for profile in device["profiles"]:
+            # The nouveau profile is always offered and would otherwise mask the
+            # recommended proprietary driver, so it is not considered here
+            if profile in (Profile.nvidia_nouveau, Profile.nvidia_legacy):
+                continue
             profile_set.add(profile)
 
     # If we are installing on the ISO
