@@ -148,13 +148,15 @@ BTR_question_down='&#191;'      # '¿'
 if [ -e "$_BTR_language_file_" ] ; then
     source "$_BTR_language_file_" || exit 1
 else
-    __BTR_important_msg_ "warning: '$_BTR_language_file_' does not exist!"
-    if /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* &>/dev/null ; then
-        echo "==> The following files might match:" >&2
-        /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* 2>/dev/null | sed 's|^|      |'
+    if false ; then
+        __BTR_important_msg_ "warning: $_BTR_language_file_* does not exist!"
+        if /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* &>/dev/null ; then
+            echo "==> The following files might match:" >&2
+            /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* 2>/dev/null | sed 's|^|      |'
+        fi
     fi
     if [ -e "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_en_US" ] ; then
-        echo "==> Falling back to en_US."
+        # echo "==> Falling back to en_US."
         source "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_en_US" || exit 1
     else
         exit 1
