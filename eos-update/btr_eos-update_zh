@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Chinese translation for 'eos-update' strings.
+# eos-update 的中文翻译
+
+declare -A BTR_ARR=(
+    eup_msg_info            "信息"
+    eup_msg_warning         "警告"
+    eup_msg_error           "错误"
+    eup_msg_helper_missing  "未发现 AUR 助手"
+
+    die_result_failed       "失败"
+
+    msg_file_contains       "==> %s 包含"
+    msg_avail_mirrors       "    - 可用镜像:   %s"
+    msg_unavail_mirrors     "    - 不可用镜像: %s"
+    msg_why_sys_running     "更新中。"
+
+    tip_prog_purpose        "%s: 更新包以及一些额外的功能。"
+    tip_used_command        "==> 命令: %s"
+    tip_all_done            "==> 全部完成！"
+
+    sysup_no                "没有更新。"
+
+    filelock_err            "==> 文件 %s 仍在使用中。\n    请检查是否有其他进程仍在管理包。"
+
+    warn_nvidia_chk_fail    "内核与 Nvidia GPU 驱动兼容性检查失败。使用 DKMS 版本的驱动或许能解决问题。"
+    warn_param_ignored      "参数 '%s' 已被忽略。"
+
+    # item_not_available    "%s ei nyt ole käytettävissä%s$BTR_exclamation"    # second %s not needed?
+    # t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
+)
+
+local _MULTILINE_t1a=(
+    "关于可用 Linux 内核的信息（已安装或可安装）。\n"
+    "使用最左侧列的复选框安装或移除内核。\n\n"
+    "<i>在启动 <b>%s:n</b> 前请确保系统已完全更新。</i>.\n"
+    "\n"
+)
