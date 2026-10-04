@@ -198,10 +198,15 @@ RemovePersonalData() {
     local user uid interface
     uid=$(id -u)
 
-    if /bin/expac %n iproute2 >/dev/null ; then
+    if [ -x /bin/nmcli ] ; then
+        interface="$(nmcli -f device connection show --active | grep -vE '^DEVICE|^lo' | head -n1)"
+        interface=${interface%% *}
+    elif [ -x /bin/ip ] ; then
         interface="$(ip --brief addr | awk '{print $1}' | grep -v lo | head -n1)"
-    else
+    elif [ -x /bin/ifconfig ] ; then
         interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
+    else
+        DIE "sorry, one of the packages [iproute2, networkmanager, net-tools] is required by $progname."
     fi
 
     if [ -x /usr/bin/iwgetid ] ; then

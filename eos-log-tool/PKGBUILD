@@ -3,7 +3,7 @@
 pkgname=eos-log-tool
 pkgdesc="Gathers selected system logs and sends them to the internet."
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
-pkgver=26.10
+pkgver=26.10.1
 pkgrel=1
 
 arch=('any')
@@ -19,6 +19,9 @@ optdepends=(
     'xclip: for automatic copying the returned URL to clipboard'
     'inxi: for inxi logs'
     'polkit: for pkexec'
+    'iproute2: for detecting interface names'
+    'networkmanager: for detecting interface names'
+    'net-tools: for detecting interface names'
 )
 backup=(etc/$pkgname.conf)
 
@@ -27,7 +30,7 @@ source=(
     $pkgname.desktop
     $pkgname.conf
 )
-sha512sums=('e10e9294e4f65664be303f425e311465acc2ce76db2a0952f2626beaaee4f708609adba3bef0224c5220ff0f74304687860969375e3e2f71c6bec55fcf221fff'
+sha512sums=('355f61f22adf1db96e666dca909626f8e094fa08d50bea1413c4eaf86aaa4e8c43da86e77b4a0012f1d73c0980c0d10cdb03c1a19411e233911620ca99d33750'
             '6cd144109818f0da59a571956b55f0688b41f2e0bf467b059a1a4157206b038bd339955b1cb33a97c2eb51e0824b165b5e04656403db1fef39ee2797fb6a0189'
             '781f2d48101d0a0a23da049ccbaa70d3da30dda7e2e31458bcb671ceb25721dec86c7f32d87245554e5a3043cdf35fd9664761efe0a8cc82aeb982055488d229')
 
