@@ -197,7 +197,12 @@ RemovePersonalData() {
     local mac="foobarfoobarfoobar"
     local user uid interface
     uid=$(id -u)
-    interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
+
+    if /bin/expac %n iproute2 >/dev/null ; then
+        interface="$(ip --brief addr | awk '{print $1}' | grep -v lo | head -n1)"
+    else
+        interface="$(ifconfig | grep "^[a-z]" | sed 's|: .*||' | grep -v "^lo$" | head -n1)"
+    fi
 
     if [ -x /usr/bin/iwgetid ] ; then
         ssid=$(iwgetid -r)
@@ -220,6 +225,10 @@ RemovePersonalData() {
             -e "s|($interface)|($interface2)|g" \
             -e "s| \([iI]nterface\) $interface\.| \1 $interface2\.|g" \
             -e "s| on $interface\.| on $interface2\.|g" \
+            -e "s| $interface created| $interface2 created|g" \
+            -e "s|p2p-dev-$interface|p2p-dev-$interface2|g" \
+            -e "s|ifname=$interface|ifname=$interface2|g" \
+            -e "s|,$interface]|,$interface2]|g" \
             -e "s|uid=$uid |uid=$uid2 |g" \
             -e "s|uid=$uid)|uid=$uid2)|g" \
             -e "s|UID $uid|UID $uid2|g" \
