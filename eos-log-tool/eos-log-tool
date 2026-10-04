@@ -288,7 +288,9 @@ RemovePersonalData() {
         -e "s| $HOSTNAME\.| _hostname_.|g"    \
         -e "s| $HOSTNAME\"| _hostname_\"|g"   \
         -e "s|-$HOSTNAME:|-_hostname_:|g"     \
-        -e "s|'$HOSTNAME'|'_hostname_'|g"
+        -e "s|'$HOSTNAME'|'_hostname_'|g"     \
+        -e 's|"Set password for user root"|"Set password for user _user2_"|' \
+        -e 's|.* "usermod" "-p" .*||'
 
     # User may create an additional filter for removing
     # any remaining personal data from the logs.
