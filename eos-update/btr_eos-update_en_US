@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Finnish translation for 'eos-update' strings.
+# English translation for 'eos-update' strings.
+
+# shellcheck disable=2034,2190
 
 declare -A BTR_ARR=(
     eup_msg_info            "info"
@@ -10,9 +12,9 @@ declare -A BTR_ARR=(
 
     die_result_failed       "failed"
 
-    msg_file_contains       "==> %s contains"
-    msg_avail_mirrors       "    - available mirrors:   %s"
-    msg_unavail_mirrors     "    - unavailable mirrors: %s"
+    msg_file_contains       "==> Mirrors in %s currently"
+    msg_avail_mirrors       "    - available:   %3s"
+    msg_unavail_mirrors     "    - unavailable: %3s"
     msg_why_sys_running     "Updating."
 
     tip_prog_purpose        "%s: package updater & additional features."
@@ -26,13 +28,5 @@ declare -A BTR_ARR=(
     warn_nvidia_chk_fail    "The compatibility check between the 'kernel' and the 'Nvidia GPU driver' failed. Using driver's dkms version may help."
     warn_param_ignored      "parameter '%s' ignored."
 
-    # item_not_available    "%s ei nyt ole käytettävissä%s$BTR_exclamation"    # second %s not needed?
-    # t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
-)
-
-local _MULTILINE_t1a=(
-    "Tietoja saatavilla olevista Linux-ytimistä jotka joko on asennettu tai voidaan asentaa.\n"
-    "Asenna tai poista ydinpaketteja käyttäen valintaruutuja vasemmanpuoleisimmassa sarakkeessa.\n\n"
-    "<i>Varmista että systeemi on täysin päivitetty ennen <b>%s:n</b> käynnistämistä</i>.\n"
-    "\n"
+    warn_arch_not_supported  "sorry, architecture %s is not supported by this implementation"
 )

@@ -12,9 +12,9 @@ declare -A BTR_ARR=(
 
     die_result_failed       "epäonnistui"
 
-    msg_file_contains       "==> %s sisältää"
-    msg_avail_mirrors       "    - saavutettavia peilipalvelimia:     %s"
-    msg_unavail_mirrors     "    - saavuttamattomia peilipallvelimia: %s"
+    msg_file_contains       "==> Tiedoston %s peilipalvelimista on tällä hetkellä"
+    msg_avail_mirrors       "    - toimivia:      %3s"
+    msg_unavail_mirrors     "    - toimimattomia: %3s"
     msg_why_sys_running     "Päivitetään."
 
     tip_prog_purpose        "%s: ohjelmiston päivittäjä & lisäominaisuuksia."
@@ -25,15 +25,8 @@ declare -A BTR_ARR=(
 
     filelock_err            "==> Tiedosto %s on jo käytössä.\n    Tarkista käsitteleekö joku toinen prosessi paketteja."
 
-    warn_nvidia_chk_fail    "Nvidian GPU-ajurin ja ytimen yhteensopivuuden tarkistus epäonnistui. GPU-ajurin dkms-version käyttö voi auttaa."    # "'Nvidia & kernel' check failed."
+    warn_nvidia_chk_fail    "Nvidian GPU-ajurin ja ytimen yhteensopivuuden tarkistus epäonnistui. GPU-ajurin dkms-version käyttö voi auttaa."
     warn_param_ignored      "parametri '%s' hylättiin ja ohitettiin."
 
-    # t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
-)
-
-_MULTILINE_t1a=(
-    "Tietoja saatavilla olevista Linux-ytimistä jotka joko on asennettu tai voidaan asentaa.\n"
-    "Asenna tai poista ydinpaketteja käyttäen valintaruutuja vasemmanpuoleisimmassa sarakkeessa.\n\n"
-    "<i>Varmista että systeemi on täysin päivitetty ennen <b>%s:n</b> käynnistämistä</i>.\n"
-    "\n"
+    warn_arch_not_supported  "valitan, tämä toteutus ei tue %s-arkkitehtuuria"
 )
