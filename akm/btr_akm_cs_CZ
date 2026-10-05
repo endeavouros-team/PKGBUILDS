@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# English translation for 'akm' strings.
+
+# shellcheck disable=2034,2190,2154,2183
+
+declare -A BTR_ARR=(
+    akm_title_choose      "Vybrat"
+    akm_title_pkgname     "Název balíčku"
+    akm_title_installed   "Nainstalováno"
+    akm_title_stable      "Stabilní"
+    akm_title_testing     "Testovací"
+    akm_title_koname      "K.o. kategorie"
+    akm_title_kovname     "K.o. verze"
+
+    yad_s_title           "Jednoduchý správce jader"
+    yad_s_chl             "Seznam změn"
+    yad_s_chltip          "Zobrazit seznam změn pro tuto aplikaci"
+    yad_s_man             "Nápověda"
+    yad_s_mantip          "Otevřít nápovědu pro %s"
+    yad_s_cancel          "Zrušit"
+    yad_s_no_change       "Ukončit bez provedení změn"
+    yad_s_run             "Použít"
+    yad_s_make_change     "Ukončit a provést změny"
+
+    proc_title            "AKM - průběh"
+    proc_text             "Načítání informací..."
+
+    die_net_fail          "Vyžadováno síťové připojení.\nZkontrolujte dostupnost připojení k internetu."
+    die_curl_fail         "Načítání informací z %s selhalo.\n"
+    die_parse_error       "nepodařilo se analyzovat výstup příkazu yad:\n'%s'\n"
+    die_func_fail         "Funkce '%s' selhala.\n"
+    die_internal_error    "Vnitřní chyba, nelze určit aktuálně používané jádro."
+    die_arch_fail         "Načítání informací z from https://archlinux.org selhalo$BTR_exclamation"
+
+    warn_odd_problem1     "==> Varování: výstup příkazu yad měl být jednořádkový, ale je:\n'%s'\n"
+    warn_odd_problem2     "==> Varování: použit bude poslední řádek:\n'%s'\n"
+
+    msg_progress_done     "Dokončeno."
+    msg_not_installed     "Balíček '%s' není nainstalován."
+
+    op_choose_tip         "Zaškrtávací políčka pro instalaci/odinstalaci balíčků jader"
+    op_pkgname_tip        "Název balíčku jádra"
+    op_installed_tip      "Nainstalované verze balíčků jader.&#10;Aktuálně používané jádro zobrazeno <i>kurzívou</i>.&#10;<b>Tučně</b> zobrazena nejnovější dostupná verze na kernel.org."
+    op_versions_stab_tip  "Verze dostupné ze stabilních repozitářů%s"
+    op_versions_test_tip  "Verze dostupné z testovacích repozitářů%s"
+    op_ko_tip             "Kategorie jádra kernel.org"
+    op_ko_latest          "Nejnovější verze ohlášená na kernel.org"
+    op_in_use             " (aktuálně používané)" # keep leading space!
+
+    item_not_available    "Adresa %s je aktuálně nedostupná%s$BTR_exclamation"    # second %s not needed?
+
+    t1a_str               "_MULTILINE_t1a"   # don't translate this line!
+    t1b_str               "_MULTILINE_t1b"   # don't translate this line!
+    t1c_str               "_MULTILINE_t1c"   # don't translate this line!
+)
+
+_MULTILINE_t1a=(
+    "Informace o <i>aktuálně dostupných</i> Linuxových jádrech, která jsou nebo mohou být nainstalována.\n"
+    "Nainstalujte nebo odinstalujte balíčky jader pomocí zaškrtávacích políček v levém sloupci.\n\n"
+    "<i>Před spuštěním <b>%s</b> se přesvědčte, že je váš systém plně aktualizován</i>.\n"
+    "\n"
+)
+
+# Variables for aligning the output for _MULTILINE_t1b lines:
+BTR_item_length="-16"                              # "length" for the first "word" on some lines of _MULTILINE_t1b below
+BTR_empty_item=$(printf "%${BTR_item_length}s")    # BTR_item_length spaces
+#
+_MULTILINE_t1b=(
+    "Záhlaví sloupců:\n"
+    "<tt>"
+    "    %${BTR_item_length}s Zaškrtávací políčka pro instalaci/odinstalaci balíčků jader.\n"
+    "    ${BTR_empty_item} Nainstalované balíčky jsou kontrolovány při spuštění.\n"
+    "    %${BTR_item_length}s    Název balíčku jádra.\n"
+    "    %${BTR_item_length}s  Nainstalované verze balíčku jádra.\n"
+    "    ${BTR_empty_item} Aktuálně používané jádro je zobrazeno kurzívou.\n"
+    "    ${BTR_empty_item} Nejnovější verze na kernel.org je zobrazena tučně.\n"
+    "    %${BTR_item_length}s  Verze dostupné ze stabilních repozitářů.\n"
+    "    %${BTR_item_length}s  Verze dostupné z testovacích repozitářů.\n"
+    "    %${BTR_item_length}s Kategorie jádra na kernel.org.\n"
+    "    %${BTR_item_length}s Nejnovější verze ohlášená na kernel.org.\n\n"
+    "</tt>"
+)
+
+_MULTILINE_t1c=(
+    "Aktuálně používaný repozitář (stabilní nebo testovací) je zobrazen kurzívou (více viz /etc/pacman.conf).\n"
+    "Značka <b>%s</b> znamená: informace není k dispozici.\n\n"
+    "Podrobné informace o nastavení viz <tt>%s</tt>.\n"
+)
+
