@@ -263,6 +263,7 @@ Main() {
         "Download folder:  ${TARGETDIR/$HOME/\~}"
         "Fetching app:     $getter"
         "Tip:              Names with trailing '/' are folders, navigate to them if needed."
+        "Tip2:             If selecting only the ISO file, the related checksum file will be automatically fetched too."
     )
     printf -v header "%s\n" "${header_lines[@]}"
 
@@ -272,11 +273,12 @@ Main() {
         --footer="$header" --footer-border=bold --footer-label=" SELECTING FILE(S) TO DOWNLOAD "
         --bind "ctrl-e:execute-silent(xdg-open '$configfile'),ctrl-h:execute-silent(RunInTerminal '$progname -h')"
     )
-    local selected="" items=() items_orig=()
+    local selected="" items=() items_selected=() items_full=() items_all_names=()
+    local sha_file=""
     local subdir=""
     while true ; do
         # keep the names of files, drop other info
-        readarray -t items < <("$progname"-show-all-info "$subdir") || exitcode=$?
+        readarray -t items_full < <("$progname"-show-all-info "$subdir") || exitcode=$?
         case "$exitcode" in
             0) ;;
             130) exit 1 ;;   # interrupted
@@ -290,21 +292,19 @@ Main() {
                 fi
                 ;;
         esac
-        readarray -t items      < <(printf "%s\n" "${items[@]}" | "${fzf[@]}" | awk '{print $1}')
+        readarray -t items_all_names < <(printf "%s\n" "${items_full[@]}" | awk '{print $1}')
+        readarray -t items           < <(printf "%s\n" "${items_full[@]}" | "${fzf[@]}" | awk '{print $1}')
         [ "${items[0]}" ] || exit 0                        # nothing selected
-        items_orig=("${items[@]}")
+        items_selected=("${items[@]}")
 
-        for selected in "${items[@]}" ; do
-            selected="${selected%% *}"
+        for selected in "${items_selected[@]}" ; do
+            # selected="${selected%% *}"
             case "$selected" in
-                *"/") case "$selected" in
-                          "/") subdir=""
-                               ;;
-                          *)   case "$subdir" in
-                                   "") subdir="${selected%/}" ;;
-                                   *)  subdir="$subdir/${selected%/}" ;;
-                               esac
-                               ;;
+                "/") subdir=""
+                     ;;
+                *"/") case "$subdir" in
+                          "") subdir="${selected%/}" ;;
+                          *)  subdir="$subdir/${selected%/}" ;;
                       esac
                       ;;
                 "")   echo2 "Nothing selected."
@@ -314,26 +314,26 @@ Main() {
                     # Collect cleanup_files, urls, targets for the selected ISO
                     cleanup_files+=("$selected")
                     case "$subdir" in
-                        "") urls+=("$URLBASE/$selected") ;;
-                        *)  urls+=("$URLBASE/$subdir/$selected") ;;
+                        "") AddTo_urls "$URLBASE/$selected" ;;
+                        *)  AddTo_urls "$URLBASE/$subdir/$selected" ;;
                     esac
                     [ "$TARGETDIR" ] && local t_file="$TARGETDIR/$selected" || t_file="$PWD/$selected"
-                    targets+=("$t_file")
+                    AddTo_targets "$t_file"
 
                     # Check if an accompanying .sha512sum file exists on the remote server
-                    if [[ "$selected" == *.iso ]] ; then
-                        local sha_file="${selected}.$sumtype"       # local sha_file="${selected}.sha512sum"
-                        # Verify if the sha512sum file is present in the original item list from the server
-                        sha_file=$(printf "%s\n" "${items_orig[@]}" | grep -F "$sha_file")
-                        if [ "$sha_file" ] ; then
-                            cleanup_files+=("$sha_file")
-                            case "$subdir" in
-                                "") urls+=("$URLBASE/$sha_file") ;;
-                                *)  urls+=("$URLBASE/$subdir/$sha_file") ;;
-                            esac
-                            [ "$TARGETDIR" ] && targets+=("$TARGETDIR/$sha_file") || targets+=("$PWD/$sha_file")
-                        fi
-                    fi
+                    case "$selected" in
+                        *.iso)
+                            sha_file="$(printf "%s\n" "${items_all_names[@]}" | grep "$selected\.${sumtype}.*$")"
+                            if [ "$sha_file" ] ; then
+                                # cleanup_files+=("$sha_file")
+                                case "$subdir" in
+                                    "") AddTo_urls "$URLBASE/$sha_file" ;;
+                                    *)  AddTo_urls "$URLBASE/$subdir/$sha_file" ;;
+                                esac
+                                [ "$TARGETDIR" ] && AddTo_targets "$TARGETDIR/$sha_file" || AddTo_targets "$PWD/$sha_file"
+                            fi
+                            ;;
+                    esac
                     ;;
             esac
         done
@@ -351,6 +351,9 @@ Main() {
     #    0       download OK
     #    else    failure, nothing downloaded
 }
+
+AddTo_urls()    { printf "%s\n" "${urls[@]}"    | grep -q "$1" || urls+=("$1")    ; }
+AddTo_targets() { printf "%s\n" "${targets[@]}" | grep -q "$1" || targets+=("$1") ; }
 
 FetchIsoFiles() {
     local target
@@ -411,7 +414,7 @@ FetchIsoFile() {                      # old implementation, not tested, still wo
     local msg_tail="Exit now"
 
     cleanup_files+=("$file")
-    if printf "%s\n" "${items_orig[@]}" | grep "$file".sha512sum >/dev/null; then
+    if printf "%s\n" "${items_selected[@]}" | grep "$file".sha512sum >/dev/null; then
         cleanup_files=("$file".sha512sum "${cleanup_files[@]}")
         msg_middle="[$file and its .sha512sum]"
     else
