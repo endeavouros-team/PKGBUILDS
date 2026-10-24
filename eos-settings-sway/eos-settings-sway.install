@@ -3,8 +3,13 @@ post_install() {
     local target_cmd="command = \"tuigreet --time --time-format '%d.%m.%Y - %H:%M:%S' --greeting 'Welcome to EndeavourOS' --remember --asterisks --width 70 --container-padding 3 --prompt-padding 2 --user-menu --theme 'container=black;border=gray;text=white;input=white;prompt=magenta;time=magenta;action=white;button=magenta' --cmd eos-sway-wrapper\""
 
     if [ -f "$config_file" ]; then
-        echo "==> Configuring greetd/tuigreet for EndeavourOS Sway..."
-        sed -i 's|^command = .*|'"$target_cmd"'|' "$config_file"
+        echo "==> Updating default_session for greetd/tuigreet..."
+        # Update default_session command safely regardless of existing modifications
+        if grep -q '\[default_session\]' "$config_file"; then
+            sed -i '/\[default_session\]/,/\[/ s|^command = .*|' "$target_cmd"|' "$config_file"
+        else
+            echo -e "\n[default_session]\n$target_cmd\nuser = \"greeter\"" >> "$config_file"
+        fi
     fi
 }
 
