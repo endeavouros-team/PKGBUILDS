@@ -458,7 +458,8 @@ Main()
     fi
 
     # Security fix: Validate EOS_LOG_TOOL_JOURNAL_OPTS to prevent shell injection
-    if [[ ! "$EOS_LOG_TOOL_JOURNAL_OPTS" =~ ^[a-zA-Z0-9\ \-\'\"\:\.\_\=\/]+$ ]]; then
+    local SAFE_REGEX="^[a-zA-Z0-9[:space:]_=:./'\"-]+$"
+    if [[ ! "$EOS_LOG_TOOL_JOURNAL_OPTS" =~ $SAFE_REGEX ]]; then
         echo "==> WARNING: Unsafe characters detected in EOS_LOG_TOOL_JOURNAL_OPTS. Reverting to default." >&2
         EOS_LOG_TOOL_JOURNAL_OPTS="--since '20 minutes ago'"
     fi
