@@ -46,7 +46,7 @@ _tr_add2 butt_noshowtip        "Schakel $PRETTY_PROGNAME uit"
 _tr_add2 butt_help             "Help"
 
 
-_tr_add2 nb_tab_INSTALL        "INSTALLEER"
+_tr_add2 nb_tab_INSTALL        "INSTALLEREN"
 _tr_add2 nb_tab_GeneralInfo    "Algemene Informatie"
 _tr_add2 nb_tab_AfterInstall   "Na installatie"
 _tr_add2 nb_tab_AddMoreApps    "Voeg applicaties toe"
@@ -55,9 +55,9 @@ _tr_add2 nb_tab_AddMoreApps    "Voeg applicaties toe"
 _tr_add2 after_install_text    "Taken voor na de installatie"
 
 _tr_add2 after_install_um      "Update spiegelservers"
-_tr_add2 after_install_umtip   "Update de lijst met spiegelservers alvorens het systeem op te waarderen"
+_tr_add2 after_install_umtip   "Update de lijst met spiegelservers voordat je het systeem bijwerkt"
 
-_tr_add2 after_install_us      "Update systeem,"
+_tr_add2 after_install_us      "Update systeem"
 _tr_add2 after_install_ustip   "Update systeemsoftware"
 
 _tr_add2 after_install_dsi     "Spoor systeemproblemen op"
@@ -155,14 +155,14 @@ _tr_add2 sysup_no                "Geen updates."
 _tr_add2 sysup_check             "Controleren op softwareupdates..."
 
 _tr_add2 issues_title            "Controleren op problemen met pakketten"
-_tr_add2 issues_grub             "BELANGRIJK: opstartmenu moet handmatig weer worden aangemnaakt."
+_tr_add2 issues_grub             "BELANGRIJK: opstartmenu moet handmatig weer worden aangemaakt."
 _tr_add2 issues_run              "Commando's worden uitgevoerd:"
 _tr_add2 issues_no               "Geen belangrijke systeemproblemen zijn gedetecteerd."
 
 _tr_add2 cal_noavail            "Niet beschikbaar: "        # installer program
 _tr_add2 cal_warn               "Waarschuwing"
 _tr_add2 cal_info1              "Dit is een ontwikkelrelease van de community.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> methode installeert de %%s desktop.\nInternetverbinding is niet vereisd.\n\n"
+_tr_add2 cal_info2              "<b>Offline</b> methode installeert de %%s desktop.\nInternetverbinding is niet vereist.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> methode geeft de mogelijkheid een desktop te kiezen.\nInternetverbinding is vereist.\n\n"
 _tr_add2 cal_info4              "Let op: Deze release is in ontwikkeling. Help ons alstublieft om deze stabiel te maken door fouten te rapporteren.\n"
 _tr_add2 cal_info5              "\nNa de installatie is een systeemupdate aangeraden.\n\n"
@@ -209,8 +209,8 @@ _tr_add2 useful_tips_text      "Handige tips"
 _tr_add2 butt_changelog        "Wijzigingsgeschiedenis"
 _tr_add2 butt_changelogtip     "Toon de wijzigingsgeschiedenis van Welcome"
 
-_tr_add2 after_install_themevan      "Xfce standaard EndeavourOS thema"
-_tr_add2 after_install_themevantip   "Gebruik het standaard EndeavourOS thema"
+_tr_add2 after_install_themevan      "Xfce vanilla thema"
+_tr_add2 after_install_themevantip   "Gebruik vanilla Xfce thema"
 
 _tr_add2 after_install_themedef     "Xfce EndeavourOS standaard thema"
 _tr_add2 after_install_themedeftip  "Gebruik EndeavourOS standaard Xfce thema"
@@ -299,11 +299,11 @@ _tr_add2 after_install_itab          "Kies het initiële Welcome-tabblad"
 _tr_add2 after_install_itab_tip      "Bepaalt het tabblad waarmee Welcome wordt opgestart"
 
 # 2021-Jun-08
-_tr_add2 daily_assist_apps           "Applicatiecategoriën"
+_tr_add2 daily_assist_apps           "Applicatiecategorieën"
 _tr_add2 daily_assist_apps_tip       "Applicaties gesorteerd op categorie"
 
 _tr_add2 after_install_vbox1         "Schakel VirtualBox Guest utilities in"
-_tr_add2 after_install_vbox2         "Om VirtualBox Guest utilities in te schakelen, kies <b>na installie</b> tabblak and klik op de knop "
+_tr_add2 after_install_vbox2         "Om VirtualBox Guest utilities in te schakelen, kies het <b>Na installatie</b> tabblad en klik op de knop "
 
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Bedraad netwerkprobleem$_question Schakel tussen r8168 en r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
@@ -315,7 +315,7 @@ _tr_add2 daily_assist_DEinfo_tip     "meer informatie over deze Desktop/Window M
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Kies populaire applicaties om te installeren"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "Kies en installer populaire applicaties"
+_tr_add2 add_more_apps_qstip         "Kies en installeer populaire applicaties"
 
 # 2022-Mar-21
 _tr_add2 ins_blue_notes              "Bluetooth opmerkingen"
@@ -335,7 +335,7 @@ _tr_add2 daily_assist_anewstip       "Opent het laatste Arch nieuws in een brows
 
 # 2022-Sep-25
 _tr_add2 nb_notify_user1             "Er is belangrijk nieuws op"                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_notify_user2             "Druk aub op"                                  # Software News
+_tr_add2 nb_notify_user2             "Klik alstublieft op"                                  # Software News
 _tr_add2 nb_notify_user3             "de knop linksonder in dit venster."
 
 # 2023-Feb-20
@@ -393,3 +393,6 @@ _tr_add2 arch_chroot                 "arch-chroot informatie"
 _tr_add2 arch_chroot_tip             "arch-chroot biedt toegang tot een ander systeem via een opdrachtregel"
 _tr_add2 _commonphrase_not_found     "%%s niet gevonden"                                         # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
 
+# 2025-Oct-05
+_tr_add2 after_install_mani          "Handmatige interventies"
+_tr_add2 after_install_manitip       "Voer essentiële handmatige interventies uit (d.w.z. noodzakelijke oplossingen, zie https://archlinux.org/news)"
