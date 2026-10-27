@@ -128,7 +128,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) voor Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Om $PRETTY_PROGNAME weer te starten, start in een terminal dit commando:\n<tt>   $PROGNAME --enable</tt>\nor\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
+_tr_add2 settings_dis_contents   "Om $PRETTY_PROGNAME weer te starten, start in een terminal dit commando:\n<tt>   $PROGNAME --enable</tt>\nof\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
 _tr_add2 settings_dis_text       "Schakel $PRETTY_PROGNAME weer in:"
 _tr_add2 settings_dis_title      "Hoe $PRETTY_PROGNAME weer ingeschakeld wordt"
 _tr_add2 settings_dis_butt       "Weet ik"
