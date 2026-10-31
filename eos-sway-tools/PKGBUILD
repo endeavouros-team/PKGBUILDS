@@ -4,7 +4,7 @@ _pkgname=sway_tools
 
 pkgname=eos-sway-tools
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A collection of simple Bash scripts to enhance Sway without adding unnecessary complexity."
 arch=("any")
 url="https://github.com/killajoe/${_pkgname}"
@@ -39,9 +39,10 @@ package() {
     install -m644 power_profiles_switcher/power-profiles.rasi "${pkgdir}/usr/share/sway_tools/rofi/power-profiles.rasi"
     install -m755 powermenu/sway-powermenu-gracefully "${pkgdir}/usr/bin/sway-powermenu"
     install -m644 powermenu/powermenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/powermenu.rasi"
+    install -m644 app_menu/rofidmenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofidmenu.rasi"
     install -m755 keyhint/keyhint "${pkgdir}/usr/bin/keyhint"
     install -m755 keyhint/keyhint2/keyhint2 "${pkgdir}/usr/bin/keyhint2"
-    install -m644 keyhint/keyhint2//rofikeyhint2.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofikeyhint2.rasi"
+    install -m644 keyhint/keyhint2/rofikeyhint2.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofikeyhint2.rasi"
     install -m755 swaycast/swaycast "${pkgdir}/usr/bin/swaycast"
     install -m755 swayshot/swayshot "${pkgdir}/usr/bin/swayshot"
     install -m755 waybar_toggle/waybar-toggle "${pkgdir}/usr/bin/waybar-toggle"
