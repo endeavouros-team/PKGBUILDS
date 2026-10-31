@@ -22,7 +22,7 @@ depends=('grim'
          'wl-clipboard'
          'xdg-user-dirs')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/killajoe/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('XXX')
+sha256sums=('d41ab40b74bfd43e633d5af66807193b127b471894c37620f7bf16f3071002df')
 
 package() {
     # Extract directory defaults to reponame-version on GitHub
