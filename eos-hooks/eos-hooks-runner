@@ -32,7 +32,7 @@ Os_release() {
     local doc=https://discovery.endeavouros.com
     local support=https://forum.endeavouros.com
     local bugs=https://forum.endeavouros.com/c/general-system/endeavouros-installation
-    local privacy=https://endeavouros.com/privacy-policy-2
+    local privacy=https://endeavouros.com/privacy-policy-2/
 
     sed -i $file \
         -e "s|^NAME=.*|NAME=${quote}EndeavourOS${quote}|" \
