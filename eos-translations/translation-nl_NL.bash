@@ -35,7 +35,7 @@ _question='&#63;'      # '?'
 ###################### Now the actual strings to be translated: ######################
 # func   <placeholder>         "string"
 
-_tr_add2 welcome_disabled      "$PRETTY_PROGNAME applicatie is uitgeschakeld. Om het toch te starten gebruik de optie: --enable (tijdelijk: --once)."  # changed 2022-Feb-21
+_tr_add2 welcome_disabled      "$PRETTY_PROGNAME applicatie is uitgeschakeld. Om het toch te starten, gebruik de optie: --enable (tijdelijk: --once)."  # changed 2022-Feb-21
 
 _tr_add2 butt_later            "Tot ziens"
 _tr_add2 butt_latertip         "Houd $PRETTY_PROGNAME ingeschakeld"
@@ -46,7 +46,7 @@ _tr_add2 butt_noshowtip        "Schakel $PRETTY_PROGNAME uit"
 _tr_add2 butt_help             "Help"
 
 
-_tr_add2 nb_tab_INSTALL        "INSTALLEER"
+_tr_add2 nb_tab_INSTALL        "INSTALLEREN"
 _tr_add2 nb_tab_GeneralInfo    "Algemene Informatie"
 _tr_add2 nb_tab_AfterInstall   "Na installatie"
 _tr_add2 nb_tab_AddMoreApps    "Voeg applicaties toe"
@@ -55,9 +55,9 @@ _tr_add2 nb_tab_AddMoreApps    "Voeg applicaties toe"
 _tr_add2 after_install_text    "Taken voor na de installatie"
 
 _tr_add2 after_install_um      "Update spiegelservers"
-_tr_add2 after_install_umtip   "Update de lijst met spiegelservers alvorens het systeem op te waarderen"
+_tr_add2 after_install_umtip   "Update de lijst met spiegelservers voordat je het systeem bijwerkt"
 
-_tr_add2 after_install_us      "Update systeem,"
+_tr_add2 after_install_us      "Update systeem"
 _tr_add2 after_install_ustip   "Update systeemsoftware"
 
 _tr_add2 after_install_dsi     "Spoor systeemproblemen op"
@@ -70,7 +70,7 @@ _tr_add2 after_install_cdm     "Wissel Display Manager"
 _tr_add2 after_install_cdmtip  "Gebruik een andere display manager"
 
 _tr_add2 after_install_ew      "EndeavourOS standaard achtergrond"      # was: "EndeavourOS wallpaper"
-_tr_add2 after_install_ewtip   "Schakel standaard achtergrond weer in"     # was: "Change desktop wallpaper to EOS default"
+_tr_add2 after_install_ewtip   "Herstel naar de standaardachtergrond"   # was: "Change desktop wallpaper to EOS default"
 
 
 _tr_add2 after_install_pm      "Pakkettenonderhoud"
@@ -92,7 +92,7 @@ _tr_add2 after_install_ft      "Forum tips"
 _tr_add2 after_install_fttip   "Help ons jou te helpen$_exclamation"
 
 
-_tr_add2 general_info_text     "Wegwijs op de EndeavourOS website$_exclamation"
+_tr_add2 general_info_text     "Vind je weg op de EndeavourOS-website$_exclamation"
 
 _tr_add2 general_info_ws       "Website"
 
@@ -128,7 +128,7 @@ _tr_add2 add_more_apps_bt_bm   "Bluetooth (blueman) voor Xfce"
 
 ####################### NEW STUFF AFTER THIS LINE:
 
-_tr_add2 settings_dis_contents   "Om $PRETTY_PROGNAME weer te starten, start in een terminal dit commando:\n<tt>   $PROGNAME --enable</tt>\nor\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
+_tr_add2 settings_dis_contents   "Om $PRETTY_PROGNAME weer te starten, voer in een terminal dit commando uit:\n<tt>   $PROGNAME --enable</tt>\nof\n<tt>   $PROGNAME --once</tt>\n"  # slightly changed 2021-Dec-21; changed again 2022-Apr-06
 _tr_add2 settings_dis_text       "Schakel $PRETTY_PROGNAME weer in:"
 _tr_add2 settings_dis_title      "Hoe $PRETTY_PROGNAME weer ingeschakeld wordt"
 _tr_add2 settings_dis_butt       "Weet ik"
@@ -155,14 +155,14 @@ _tr_add2 sysup_no                "Geen updates."
 _tr_add2 sysup_check             "Controleren op softwareupdates..."
 
 _tr_add2 issues_title            "Controleren op problemen met pakketten"
-_tr_add2 issues_grub             "BELANGRIJK: opstartmenu moet handmatig weer worden aangemnaakt."
+_tr_add2 issues_grub             "BELANGRIJK: opstartmenu moet handmatig weer worden aangemaakt."
 _tr_add2 issues_run              "Commando's worden uitgevoerd:"
 _tr_add2 issues_no               "Geen belangrijke systeemproblemen zijn gedetecteerd."
 
 _tr_add2 cal_noavail            "Niet beschikbaar: "        # installer program
 _tr_add2 cal_warn               "Waarschuwing"
-_tr_add2 cal_info1              "Dit is een ontwikkelrelease van de community.\n\n"                                   # specials needed!
-_tr_add2 cal_info2              "<b>Offline</b> methode installeert de %%s desktop.\nInternetverbinding is niet vereisd.\n\n"
+_tr_add2 cal_info1              "Dit is een ontwikkelrelease van de community.\n\n"                 # specials needed!
+_tr_add2 cal_info2              "<b>Offline</b> methode installeert de %%s desktop.\nInternetverbinding is niet vereist.\n\n"
 _tr_add2 cal_info3              "<b>Online</b> methode geeft de mogelijkheid een desktop te kiezen.\nInternetverbinding is vereist.\n\n"
 _tr_add2 cal_info4              "Let op: Deze release is in ontwikkeling. Help ons alstublieft om deze stabiel te maken door fouten te rapporteren.\n"
 _tr_add2 cal_info5              "\nNa de installatie is een systeemupdate aangeraden.\n\n"
@@ -191,7 +191,7 @@ _tr_add2 ins_rel               "Laatste release informatie"
 _tr_add2 ins_reltip            "Meer informatie over de laatste release"
 _tr_add2 ins_tips              "Installatietips"
 _tr_add2 ins_tipstip           "Installatietips"
-_tr_add2 ins_trouble           "Onderzoek problemen"
+_tr_add2 ins_trouble           "Probleemoplossing"
 _tr_add2 ins_troubletip        "Systeemherstel"
 
 _tr_add2 after_install_us_from    "Updates vanaf"                            # AUR or upstream
@@ -209,8 +209,8 @@ _tr_add2 useful_tips_text      "Handige tips"
 _tr_add2 butt_changelog        "Wijzigingsgeschiedenis"
 _tr_add2 butt_changelogtip     "Toon de wijzigingsgeschiedenis van Welcome"
 
-_tr_add2 after_install_themevan      "Xfce standaard EndeavourOS thema"
-_tr_add2 after_install_themevantip   "Gebruik het standaard EndeavourOS thema"
+_tr_add2 after_install_themevan      "Xfce vanilla thema"
+_tr_add2 after_install_themevantip   "Gebruik vanilla Xfce thema"
 
 _tr_add2 after_install_themedef     "Xfce EndeavourOS standaard thema"
 _tr_add2 after_install_themedeftip  "Gebruik EndeavourOS standaard Xfce thema"
@@ -221,7 +221,7 @@ _tr_add2 after_install_pcleantip    "Configureer het opschonen van de pakketten 
 
 # 2020-Jul-04:
 _tr_add2 nb_tab_OwnCommands         "Eigen commando's"                   # modified 2020-Jul-08
-_tr_add2 nb_tab_owncmds_text        "Aangepaste eigen commando's"               # modified 2020-Jul-08
+_tr_add2 nb_tab_owncmds_text        "Gepersonaliseerde commando's"       # modified 2020-Jul-08
 
 # 2020-Jul-08:
 _tr_add2 nb_tab_owncmdstip          "Hulp bij het toevoegen van eigen commando's"
@@ -233,7 +233,7 @@ _tr_add2 add_more_apps_akmtip       "Een kleine linux kernelmanager en informati
 _tr_add2 butt_owncmds_help        "Tutorial: eigen commando's"
 
 # 2020-Aug-05:
-_tr_add2 butt_owncmds_dnd         "Eigen commando's slepen${_and}neerzetten"
+_tr_add2 butt_owncmds_dnd         "Eigen commando's slepen ${_and} neerzetten"
 _tr_add2 butt_owncmds_dnd_help    "Toon een venster waar items voor nieuwe knoppen naartoe gesleept kunnen worden"
 
 # 2020-Sep-03:
@@ -253,11 +253,12 @@ _tr_add2 after_install_ew2        "Kies één van de EndeavourOS achtergronden" 
 _tr_add2 after_install_ewtip2     "Achtergrond kiezer"                          # was: "Choose from EndeavourOS default wallpapers"
 
 # 2020-Sep-15:
-#    IMPORTANT NOTE:
-#       - line 71:  changed text of 'after_install_ew'
-#       - line 72:  changed text of 'after_install_ewtip'
-#       - line 249: changed text of 'after_install_ew2'
-#       - line 250: changed text of 'after_install_ewtip2'
+#    IMPORTANT NOTE — changed text of the following placeholders
+#    (the "# was:" comments above already record the previous English text):
+#       - after_install_ew
+#       - after_install_ewtip
+#       - after_install_ew2
+#       - after_install_ewtip2
 
 # 2020-Oct-23:
 _tr_add2 updt_update_check        "update controle"
@@ -268,8 +269,7 @@ _tr_add2 updt_nothing_todo        "Er valt niet te doen"
 _tr_add2 updt_press_enter         "Druk op ENTER om dit venster te sluiten"
 
 # 2020-Oct-24:
-#    IMPORTANT NOTE:
-#       - line 244: changed text of 'add_more_apps_done2_text'
+#    IMPORTANT NOTE — changed text of: add_more_apps_done2_text
 
 # 2020-Dec-11:
 _tr_add2 after_install_pacdiff_tip "Beheer pacnew, pacorig $_and pacsave bestanden met pacdiff $_and"
@@ -278,7 +278,7 @@ _tr_add2 after_install_pacdiff_tip "Beheer pacnew, pacorig $_and pacsave bestand
 _tr_add2 after_install_conf           "Configureer"                             # a starting verb on a sentence "Configure eos-update-notifier"
 _tr_add2 after_install_more_wall      "Download meer EndeavourOS achtergronden"
 _tr_add2 after_install_more_wall_tip  "Download EndeavourOS legacy en community achtergronden"
-_tr_add2 after_install_info           "informatie"                           # last word on a sentence, means just any information
+_tr_add2 after_install_info           "informatie"                             # last word on a sentence, means just any information
 
 _tr_add2 butt_softnews                "Software nieuws"
 _tr_add2 butt_softnews_tip            "Belangrijk nieuws over EndeavourOS software"
@@ -299,11 +299,11 @@ _tr_add2 after_install_itab          "Kies het initiële Welcome-tabblad"
 _tr_add2 after_install_itab_tip      "Bepaalt het tabblad waarmee Welcome wordt opgestart"
 
 # 2021-Jun-08
-_tr_add2 daily_assist_apps           "Applicatiecategoriën"
+_tr_add2 daily_assist_apps           "Applicatiecategorieën"
 _tr_add2 daily_assist_apps_tip       "Applicaties gesorteerd op categorie"
 
 _tr_add2 after_install_vbox1         "Schakel VirtualBox Guest utilities in"
-_tr_add2 after_install_vbox2         "Om VirtualBox Guest utilities in te schakelen, kies <b>na installie</b> tabblak and klik op de knop "
+_tr_add2 after_install_vbox2         "Om VirtualBox Guest utilities in te schakelen, kies het <b>Na installatie</b> tabblad en klik op de knop "
 
 # 2021-Jun-17
 _tr_add2 after_install_r8168         "Bedraad netwerkprobleem$_question Schakel tussen r8168 en r8169 driver$_exclamation"    # changed 2021-Dec-14 !!
@@ -315,7 +315,7 @@ _tr_add2 daily_assist_DEinfo_tip     "meer informatie over deze Desktop/Window M
 
 # 2022-Feb-16
 _tr_add2 add_more_apps_qs            "Kies populaire applicaties om te installeren"                      # runs eos-quickstart
-_tr_add2 add_more_apps_qstip         "Kies en installer populaire applicaties"
+_tr_add2 add_more_apps_qstip         "Kies en installeer populaire applicaties"
 
 # 2022-Mar-21
 _tr_add2 ins_blue_notes              "Bluetooth opmerkingen"
@@ -335,7 +335,7 @@ _tr_add2 daily_assist_anewstip       "Opent het laatste Arch nieuws in een brows
 
 # 2022-Sep-25
 _tr_add2 nb_notify_user1             "Er is belangrijk nieuws op"                        # one (or more) dates, e.g. 2023-Feb-18
-_tr_add2 nb_notify_user2             "Druk aub op"                                  # Software News
+_tr_add2 nb_notify_user2             "Klik alstublieft op"                               # Software News
 _tr_add2 nb_notify_user3             "de knop linksonder in dit venster."
 
 # 2023-Feb-20
@@ -355,7 +355,7 @@ _tr_add2 ins_arm_start               "EndeavourOS ARM Image Installer"
 _tr_add2 ins_arm_starttip            "Begin het installeren van de EndeavourOS ARM edition"
 
 # 2024-Apr-18
-_tr_add2 ins_conn_issue_title        "Volgende stap?"                                                                   # NOTE: '?' works in a yad title!
+_tr_add2 ins_conn_issue_title        "Volgende stap?"                                    # NOTE: '?' works in a yad title!
 _tr_add2 ins_conn_issue_text         "Geen internetverbinding gevonden (wifi is misschien niet gereed${_question})"
 _tr_add2 ins_conn_issue_nm1          "Netwerkmanager"
 _tr_add2 ins_conn_issue_nm2          "Start de netwerkmanager"
@@ -370,14 +370,14 @@ _tr_add2 ins_please_wait             "Even geduld..."
 
 # 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
 _tr_add2 after_install_usnat         "Update Arch-eigen pakketten"
-_tr_add2 after_install_usnat_tip     "Updatet pakketten van de repos in /etc/pacman.conf"
-_tr_add2 after_install_usnataur      "Update Arch-eigen $_and AUR pakketten"
-_tr_add2 after_install_usnataur_tip  "Updatet pakketten van repos in /etc/pacman.conf en AUR"
-_tr_add2 after_install_ushlp         "Update Arch-eigen $_and AUR pakketten"
-_tr_add2 after_install_ushlp_tip     "Updatet pakketten van repos in /etc/pacman.conf en AUR met een AUR helper"
+_tr_add2 after_install_usnat_tip     "Werkt pakketten van de repo's in /etc/pacman.conf bij"
+_tr_add2 after_install_usnataur      "Update Arch-eigen $_and AUR-pakketten"
+_tr_add2 after_install_usnataur_tip  "Werkt pakketten van de repo's in /etc/pacman.conf en AUR bij"
+_tr_add2 after_install_ushlp         "Update Arch-eigen $_and AUR-pakketten"
+_tr_add2 after_install_ushlp_tip     "Werkt pakketten van de repo's in /etc/pacman.conf en AUR bij met een AUR-helper"
 
-_tr_add2 after_install_umartip       "Update lijst met Arch spiegelservers alvorens pakketten te updaten"
-_tr_add2 after_install_umentip       "Updatet lijst met EndeavourOS spiegelservers voordat de pakketten geupdatet worden"
+_tr_add2 after_install_umartip       "Werkt de lijst met Arch-spiegelservers bij voordat pakketten worden bijgewerkt"
+_tr_add2 after_install_umentip       "Werkt de lijst met EndeavourOS-spiegelservers bij voordat de pakketten worden bijgewerkt"
 
 # 2024-Dec-06
 _tr_add2 after_install_reisub        "REISUB informatie"
@@ -391,5 +391,8 @@ _tr_add2 _commonphrase_disabled      "uitgeschakeld"
 # 2024-Dec-10
 _tr_add2 arch_chroot                 "arch-chroot informatie"
 _tr_add2 arch_chroot_tip             "arch-chroot biedt toegang tot een ander systeem via een opdrachtregel"
-_tr_add2 _commonphrase_not_found     "%%s niet gevonden"                                         # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
+_tr_add2 _commonphrase_not_found     "%%s niet gevonden"                                 # Example usage: "$(ltr _commonphrase_not_found "file1.txt")"
 
+# 2025-Oct-05
+_tr_add2 after_install_mani          "Handmatige interventies"
+_tr_add2 after_install_manitip       "Voer essentiële handmatige interventies uit (d.w.z. noodzakelijke oplossingen, zie https://archlinux.org/news)"
