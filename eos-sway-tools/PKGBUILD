@@ -3,25 +3,26 @@
 _pkgname=sway_tools
 
 pkgname=eos-sway-tools
-pkgver=1.2
+pkgver=2.0
 pkgrel=1
 pkgdesc="A collection of simple Bash scripts to enhance Sway without adding unnecessary complexity."
 arch=("any")
 url="https://github.com/killajoe/${_pkgname}"
 license=("GPL3")
-depends=('libnotify'
-         'sway'
-         'rofi'
+depends=('grim'
+         'libnotify'
          'power-profiles-daemon'
-         'wf-recorder'
+         'python-i3ipc'
+         'rofi'
          'slurp'
-         'grim'
          'swappy'
-         'wl-clipboard'
+         'sway'
          'waybar'
+         'wf-recorder'
+         'wl-clipboard'
          'xdg-user-dirs')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/killajoe/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('e8f11bb92d6fb3eb11aa5657fa45499480c0b694d159dc26c0c6bf9e8dbdda12')
+sha256sums=('XXX')
 
 package() {
     # Extract directory defaults to reponame-version on GitHub
@@ -38,8 +39,18 @@ package() {
     install -m644 power_profiles_switcher/power-profiles.rasi "${pkgdir}/usr/share/sway_tools/rofi/power-profiles.rasi"
     install -m755 powermenu/sway-powermenu-gracefully "${pkgdir}/usr/bin/sway-powermenu"
     install -m644 powermenu/powermenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/powermenu.rasi"
+    install -m755 keyhint/keyhint "${pkgdir}/usr/bin/keyhint"
+    install -m755 keyhint/keyhint2/keyhint2 "${pkgdir}/usr/bin/keyhint2"
+    install -m644 keyhint/keyhint2//rofikeyhint2.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofikeyhint2.rasi"
     install -m755 swaycast/swaycast "${pkgdir}/usr/bin/swaycast"
     install -m755 swayshot/swayshot "${pkgdir}/usr/bin/swayshot"
     install -m755 waybar_toggle/waybar-toggle "${pkgdir}/usr/bin/waybar-toggle"
     install -m755 weather/sway-openweather "${pkgdir}/usr/bin/sway-openweather"
+    install -m755 contrib_tools/app_id "${pkgdir}/usr/bin/app_id"
+    install -m755 contrib_tools/audio-device-switch "${pkgdir}/usr/bin/audio-device-switch"
+    install -m755 contrib_tools/bandwidth2 "${pkgdir}/usr/bin/bandwidth2"
+    install -m755 contrib_tools/import-gsettings "${pkgdir}/usr/bin/import-gsettings"
+    install -m755 contrib_tools/inactive-window-transparency.py "${pkgdir}/usr/bin/inactive-window-transparency.py"
+    install -m755 contrib_tools/terminal-alias "${pkgdir}/usr/bin/terminal-alias"
+    
 }
