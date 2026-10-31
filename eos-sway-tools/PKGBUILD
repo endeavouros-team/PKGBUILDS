@@ -31,6 +31,7 @@ package() {
     # Create destination directory for system binaries
     install -d "${pkgdir}/usr/bin"
     install -d "$pkgdir/usr/share/sway_tools/rofi"
+    install -d "${pkgdir}/usr/share/rofi/themes"
 
     # Install scripts and configs
     install -m755 gracefully_exit/sway-gracefully-exit "${pkgdir}/usr/bin/sway-gracefully-exit"
@@ -40,6 +41,7 @@ package() {
     install -m755 powermenu/sway-powermenu-gracefully "${pkgdir}/usr/bin/sway-powermenu"
     install -m644 powermenu/powermenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/powermenu.rasi"
     install -m644 app_menu/rofidmenu.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofidmenu.rasi"
+    install -m644 rofi_themes/deep-purple.rasi "${pkgdir}/usr/share/rofi/themes/deep-purple.rasi"
     install -m755 keyhint/keyhint "${pkgdir}/usr/bin/keyhint"
     install -m755 keyhint/keyhint2/keyhint2 "${pkgdir}/usr/bin/keyhint2"
     install -m644 keyhint/keyhint2/rofikeyhint2.rasi "${pkgdir}/usr/share/sway_tools/rofi/rofikeyhint2.rasi"
