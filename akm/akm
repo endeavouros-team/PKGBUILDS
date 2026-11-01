@@ -111,7 +111,7 @@ Stable() {
     if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
         in_use="$(BTR op_in_use)"
     fi
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Stable" "$in_use")":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_stab_tip "$in_use")":LBL "")
     local versions=() ix=0
     StableVersions
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
@@ -151,7 +151,7 @@ Testing() {
 
     [ -n "$testinginfo" ] || DIE "$(BTR die_arch_fail)"
 
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Testing" "$in_use")":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_test_tip "$in_use")":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
         test -n "$version" || version="$na"
