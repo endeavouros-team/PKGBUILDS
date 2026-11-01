@@ -14,23 +14,31 @@ IsRunningKernel() {
 
 DoNotify() {
     DEBUG "${FUNCNAME[0]} begin."
-    # echo "[$(/usr/bin/date "+%x %X")] Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}" >> "$logfile"
+    echo "      -> Reboot is recommended." >&2
     INFO "Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}"
-    # chmod o-rwx "$logfile"
     systemctl enable --now eos-reboot-required.timer 2>/dev/null
     DEBUG "${FUNCNAME[0]} end."
 }
 
-ERROR()  { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; exit 0; }
-DEBUG()  { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
-INFO()   { echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
+ERROR()  { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; exit 0; }
+DEBUG()  { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
+INFO()   { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
 
 Main() {
     local -r progname=${0##*/}
     local -r logfile="/var/log/$progname.log"
     local -r common_scripts_file="/usr/share/endeavouros/scripts/eos-script-lib-yad"
+    local -r conffile="/etc/eos-reboot-recommended.conf"
+    local LOG_ERROR=yes
+    local LOG_INFO=""
+    local LOG_DEBUG=""
 
-    rm -f "$logfile"
+    [ -e "$conffile" ] && source "$conffile"
+
+    if [ "$LOG_ERROR" = yes ] || [ "$LOG_INFO" = yes ] || [ "$LOG_DEBUG" = yes ] ; then
+        rm -f "$logfile"
+    fi
+
     DEBUG "$progname begin."
 
     [ "$EUID" = "0" ]                           || ERROR "elevated privileges required."
@@ -91,6 +99,8 @@ Main() {
     fi
     DoNotify
     DEBUG "$progname end."
+    return 0
 }
 
 Main "$@"
+
