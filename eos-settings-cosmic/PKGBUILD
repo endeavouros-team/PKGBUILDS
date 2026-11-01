@@ -1,7 +1,7 @@
 # Maintainer: joekamprad <joekamprad at endeavouros.com>
 
 pkgname=eos-settings-cosmic
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
 pkgdesc="Cosmic settings for EndeavourOS user profiles"
 arch=("any")
@@ -10,7 +10,7 @@ license=("GPL-3.0-or-later")
 depends=('endeavouros-branding')
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('bb3f2ce44ac9f8ec1b214b0388847e29156474fa4928d69e2aec6a8de51e203c')
+sha256sums=('56a7ff296d9c2f44f66780b2d560a86e4d01b8a2d573cdc536ac056ccd36d6ef')
 
 package() {
     # Enter the unpacked source directory
