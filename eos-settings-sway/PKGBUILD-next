@@ -29,7 +29,7 @@ package() {
     install -Dm644 eos-sway.desktop "${pkgdir}/usr/share/wayland-sessions/eos-sway.desktop"
 
     # Install template config to system share to avoid direct file conflict with greetd
-    # a schellprocess in calamares handle moving it to /etc/greetd/
+    # a shellprocess in calamares handle moving it to /etc/greetd/
     install -Dm644 config.toml "${pkgdir}/usr/share/eos-settings-sway/config.toml"
 
     mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
