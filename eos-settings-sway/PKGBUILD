@@ -2,8 +2,8 @@
 
 _pkgname=endeavouros-sway-setup
 pkgname=eos-settings-sway
-pkgver=3.3
-pkgrel=2
+pkgver=3.4
+pkgrel=1
 pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
 arch=("any")
 url="https://github.com/endeavouros-team/${_pkgname}"
@@ -11,7 +11,7 @@ license=("GPL")
 depends=('endeavouros-branding' 'eos-sway-tools' 'greetd' 'greetd-tuigreet')
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('1a99ae0cac4b667e54c1a811334dd3e69a2b8a13bcdf61f629c117544d9d6ecd')
+sha256sums=('ab9ac657a6833b59bc3c3dde4e55c994a12d55939dbc83a420b3b7c9c118c829')
 
 package() {
     cd "${srcdir}/${_pkgname}-${pkgver}"
@@ -28,9 +28,8 @@ package() {
     install -Dm755 eos-sway-wrapper "${pkgdir}/usr/bin/eos-sway-wrapper"
     install -Dm644 eos-sway.desktop "${pkgdir}/usr/share/wayland-sessions/eos-sway.desktop"
 
-    # Install template config to system share to avoid direct file conflict with greetd
-    # a shellprocess in calamares handle moving it to /etc/greetd/
     install -Dm644 config.toml "${pkgdir}/usr/share/eos-settings-sway/config.toml"
+    install -Dm644 override.conf "${pkgdir}/usr/share/eos-settings-sway/override.conf"
 
     mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
