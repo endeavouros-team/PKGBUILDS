@@ -397,3 +397,7 @@ _tr_add2 _commonphrase_not_found     "%%s nebyl nalezen"    # Example usage: "$(
 # 2025-Oct-05
 _tr_add2 after_install_mani          "Manuální intervence"
 _tr_add2 after_install_manitip       "Proveďte nezbytné manuální zásahy (např. nezbytné opravy, viz https://archlinux.org/news)"
+
+# 2026-Nov-07
+_tr_add2 ins_kbd_layout              "Preferované rozložení klávesnice"
+_tr_add2 ins_kbd_layouttip           "Změňte nebo přidejte rozložení klávesnice"
