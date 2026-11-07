@@ -85,6 +85,11 @@ Wait_before_notifying() {
     local LOG_WARNING=""
     local LOG_INFO=""
     local LOG_DEBUG=""
+    # These 4 variables can be configured in $conffile.
+    local REBOOT_MAX_TOTAL_WAIT=300
+    local REBOOT_WAIT_DIFF=4
+    local REBOOT_NOTIFICATION_USER=""
+    local REBOOT_EXPIRE_TIME=""
 
     # shellcheck disable=SC1090
     [ -e "$conffile" ] && source "$conffile"
@@ -93,12 +98,6 @@ Wait_before_notifying() {
         rm -f "$logfile"
     fi
     DEBUG "$progname begin."
-
-    # These 4 variables can be configured in $conffile.
-    local REBOOT_MAX_TOTAL_WAIT=300
-    local REBOOT_WAIT_DIFF=4
-    local REBOOT_NOTIFICATION_USER=""
-    local REBOOT_EXPIRE_TIME=""
 
     systemctl disable --now eos-reboot-required.timer
     source $common_lib --limit-icons || ERROR "failed reading file $common_lib"
