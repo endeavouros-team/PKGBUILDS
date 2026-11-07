@@ -14,14 +14,14 @@ license=('GPL3')
 makedepends=('git' 'cmake' 'extra-cmake-modules' 'python-jsonschema' 'python-pyaml' 'python-unidecode' 'gawk')
 conflicts=('calamares')
 depends=( 'qt6-svg' 'qt6-webengine' 'yaml-cpp' 'networkmanager' 'upower' 'kcoreaddons' 'kconfig' 'ki18n' 'kservice' \
-'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'pybind11' 'python-tomlkit' 'cryptsetup' 'doxygen' 'dmidecode' \
+'kwidgetsaddons' 'kpmcore' 'squashfs-tools' 'rsync' 'pybind11' 'python-toml' 'cryptsetup' 'doxygen' 'dmidecode' \
 'gptfdisk' 'hwinfo' 'kparts' 'polkit-qt6' 'python' 'solid' 'qt6-tools' 'libpwquality' 'ckbcomp' 'qt6-declarative' )
 provides=("calamares")
 options=(!strip !emptydirs)
 source=("git+https://github.com/endeavouros-team/$_reponame.git#branch=calamares")
 
 sha256sums=('SKIP')
-            
+
 pkgver() {
   cd "${_reponame}"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
