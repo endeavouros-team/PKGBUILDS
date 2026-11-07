@@ -18,6 +18,8 @@
 #    <language>      An acronym for the language, e.g. "en" for English (check the LANG variable!).
 #    <placeholder>   A pre-defined name that identifies the place in the Welcome app where this string is used.
 #    "string"        The translated string for the Welcome app.
+#
+# Positional parameter %%s is supported inside a "string". Note that %%s is like %s in printf.
 
 # Finnish:
 
@@ -395,3 +397,7 @@ _tr_add2 _commonphrase_not_found     "%%s ei saatavilla"                        
 # 2025-Oct-05
 _tr_add2 after_install_mani          "Manuaaliset interventiot"
 _tr_add2 after_install_manitip       "Suorita ns. manuaaliset interventiot (eli tärkeät korjaukset, katso https://archlinux.org/news)"
+
+# 2026-Nov-07
+_tr_add2 ins_kbd_layout              "Vaihda näppäimistöasettelu"
+_tr_add2 ins_kbd_layouttip           "Vaihda näppäimistöasettelu haluamaksesi"

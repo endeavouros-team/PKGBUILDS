@@ -397,3 +397,7 @@ _tr_add2 _commonphrase_not_found     "%%s not found"                            
 # 2025-Oct-05
 _tr_add2 after_install_mani          "Manual interventions"
 _tr_add2 after_install_manitip       "Execute essential manual interventions (i.e. necessary fixes, see https://archlinux.org/news)"
+
+# 2026-Nov-07
+_tr_add2 ins_kbd_layout              "Preferred keyboard layout"
+_tr_add2 ins_kbd_layouttip           "Change or add keyboard layout"
