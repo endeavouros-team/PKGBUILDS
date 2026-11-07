@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-sway-setup
 pkgname=eos-settings-sway
-pkgver=3.4
+pkgver=3.5
 pkgrel=1
 pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
 arch=("any")
@@ -11,7 +11,7 @@ license=("GPL")
 depends=('endeavouros-branding' 'eos-sway-tools' 'greetd' 'greetd-tuigreet')
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('ab9ac657a6833b59bc3c3dde4e55c994a12d55939dbc83a420b3b7c9c118c829')
+sha256sums=('cc836468841b09ea714612b4e77d1729250716f0b92196f0fae9314925fef0d1')
 
 package() {
     cd "${srcdir}/${_pkgname}-${pkgver}"
@@ -29,7 +29,6 @@ package() {
     install -Dm644 eos-sway.desktop "${pkgdir}/usr/share/wayland-sessions/eos-sway.desktop"
 
     install -Dm644 config.toml "${pkgdir}/usr/share/eos-settings-sway/config.toml"
-    install -Dm644 override.conf "${pkgdir}/usr/share/eos-settings-sway/override.conf"
 
     mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
