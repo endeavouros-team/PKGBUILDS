@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Translations for the eos-reboot-recommended package.
+#
+# Note: variables may be used if they are already defined either
+# - in the app
+# - globally
+
+
+# Help with some special characters (HTML). Yad has problems without them:
+_exclamation='&#33;'   # '!'
+_and='&#38;'           # '&'
+_question='&#63;'      # '?'
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Checking if user should be informed about rebooting after certain system package upgrades."
+    reboot_recommended      "    -> Yes, reboot is recommended."
+    error_running_kernel    "unable to determine running kernel"
+    error_privileges        "elevated privileges required."
+    error_settings_read     "failed to read file %s."
+    error_settings_source   "failed to source file %s"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "Reboot is recommended!"
+    reboot_rec_body         "Reboot is recommended due to the upgrade of core system package(s)."
+)

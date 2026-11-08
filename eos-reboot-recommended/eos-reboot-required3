@@ -91,6 +91,8 @@ Wait_before_notifying() {
     local REBOOT_NOTIFICATION_USER=""
     local REBOOT_EXPIRE_TIME=""
 
+    source /usr/share/endeavouros/translations/bash-app-translate "eos-reboot-recommended" || exit 1
+
     # shellcheck disable=SC1090
     [ -e "$conffile" ] && source "$conffile"
 
@@ -100,12 +102,12 @@ Wait_before_notifying() {
     DEBUG "$progname begin."
 
     systemctl disable --now eos-reboot-required.timer
-    source $common_lib --limit-icons || ERROR "failed reading file $common_lib"
+    source $common_lib --limit-icons || ERROR "$(BTR error_settings_source $common_lib)"
     WaitLoop $REBOOT_MAX_TOTAL_WAIT $REBOOT_WAIT_DIFF  # max seconds to wait before notifying about recommended reboot
 
     [ -d /tmp ] && touch /tmp/reboot-recommended
 
-    DoNotify "Reboot recommended!" "Reboot is recommended due to the upgrade of core system package(s)."
+    DoNotify "$(BTR reboot_rec_header)" "$(BTR reboot_rec_body)"
     systemctl disable --now eos-reboot-required.timer
     DEBUG "$progname end."
     return 0

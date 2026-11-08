@@ -4,7 +4,7 @@
 
 pkgname=eos-reboot-recommended
 pkgdesc="Notify if a reboot is recommended after system upgrade."
-pkgver=26.11.1
+pkgver=26.11.2
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,17 +21,21 @@ source=(
   $_url/eos-reboot-recommended.conf
   $_url/eos-reboot-required2
   $_url/eos-reboot-required3
-  $_url/eos-reboot-required.hook
   $_url/eos-reboot-required.timer
   $_url/eos-reboot-required.service
+  $_url/eos-reboot-recommended.hook
+  $_url/btr_eos-reboot-recommended_en_US
+  $_url/btr_eos-reboot-recommended_fi_FI
 )
 
 sha512sums=('ac796f35c2b7f2346f9baea6a27abdafa3473bedd3ba1c1d37b5dcb219fa5c5601460cf50e6b77eca6914b9737f7884d06aa03e9c80cda7be31ad2e6f2a2dec0'
-            'e88ddf9f46bd7c168db31fb9af4047c39a25e4db2da6f75b752aa67184621b1aee0609eb3ea62fa9b0b576402efbc55ef8597e88f18c0e855ba86e08a9469334'
-            '616c8e32bb2d022d24dc73fc037a6d099937f92fe716ace543375ffc3d1d6c7a59e741445674d475e567b0e12dfdd8b04351a62414d2411a5edbf89c40231b80'
-            '0bd433261cddf2b304615d567d77a2a31287d1470240f954cb353ca0e0ac37fbc55dcb2de3652da0bae7f7ba18b642e3f7fae5c275d7d81c09254c18b01a1900'
+            'dbe80fbe08d927bc44f301a4824a8cc66d4a39f9e493a1058734df5298d37f1c1f61aabb4b1617b73164f06ba2a1290166ac59ca001cc01b2a85f05768522d63'
+            'cce7485572a7a7868c337c8f9c84048aeefa247d16ee1df63bbc53bd6def5fcc24c1719a20b4bc27c8e82a08c7a2a7d83be09f3b01278e3de58f1b5af47797b5'
             'b26a06683f6ab8039df3befe93140a72c9e750f9c6a1e5e9b9f653a776a3ef9ab61e14a8485c53022e5959dd17eb94d8fd0be6f81a5e6a0aef95701f0100817a'
-            '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f')
+            '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f'
+            '8a4d5be006977900dda67c1d71cf401d03ad799440ff4df6e2f2dac419e07ab36888e794c78b9530635adb703eb936da83084df06f842885bb1fe31cb817e9bd'
+            'eba18437cc872ce8df42088d4344cfbe387dc2fa13212396ca0765fcb36fe14ccd5e5b2dbecbfe90225e58f35fb850399a13f4c952699870791d9624d09b273f'
+            '284d919ae75f45c038a3a8c3b813820e66501fe936fffd2380613102074d1a63bfd737c54eb1dd4e87d4fc64c22468b07d9ddd27c754e3e2f4b3f6e80f3eb0ad')
 
 package() {
   local file src
@@ -42,6 +46,7 @@ package() {
           *.conf)                                   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
           *.hook)                                   install -Dm644 "$file"   "$pkgdir/usr/share/libalpm/hooks/$file" ;;
           *.timer | *.service)                      install -Dm644 "$file"   "$pkgdir/usr/lib/systemd/system/$file" ;;
+          btr_${pkgname}_*)                         install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
           *)                                        install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
       esac
   done

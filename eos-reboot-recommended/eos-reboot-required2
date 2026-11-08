@@ -7,14 +7,14 @@
 IsRunningKernel() {
     if [ -z "$running_kernel" ] ; then
         running_kernel=$(eos_running_kernel)
-        [ "$running_kernel" ] || ERROR "unable to determine running kernel"
+        [ "$running_kernel" ] || ERROR "$(BTR error_running_kernel)"
     fi
     test "$1" = "$running_kernel"
 }
 
 DoNotify() {
     DEBUG "${FUNCNAME[0]} begin."
-    echo "      -> Reboot is recommended." >&2
+    PACMAN_MSG "$(BTR reboot_recommended)"
     INFO "Reboot recommendation triggered by updating package(s): ${list_of_targets[*]}"
     systemctl enable --now eos-reboot-required.timer 2>/dev/null
     DEBUG "${FUNCNAME[0]} end."
@@ -23,6 +23,8 @@ DoNotify() {
 ERROR()  { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; exit 0; }
 DEBUG()  { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
 INFO()   { [ "$LOG_${FUNCNAME[0]}" = yes ] || return; echo "==> $progname: ${FUNCNAME[0],,}: $1" >> "$logfile"; }
+
+PACMAN_MSG() { echo -e "$1" >&2; }
 
 Main() {
     local -r progname=${0##*/}
@@ -33,6 +35,10 @@ Main() {
     local LOG_INFO=""
     local LOG_DEBUG=""
 
+    source /usr/share/endeavouros/translations/bash-app-translate "eos-reboot-recommended" || exit 1
+
+    PACMAN_MSG "$(BTR reboot_check_msg)"
+
     [ -e "$conffile" ] && source "$conffile"
 
     if [ "$LOG_ERROR" = yes ] || [ "$LOG_INFO" = yes ] || [ "$LOG_DEBUG" = yes ] ; then
@@ -41,10 +47,10 @@ Main() {
 
     DEBUG "$progname begin."
 
-    [ "$EUID" = "0" ]                           || ERROR "elevated privileges required."
-    [ -r "$common_scripts_file" ]               || ERROR "failed to read file $common_scripts_file."
+    [ "$EUID" = "0" ]                           || ERROR "$(BTR error_privileges)"
+    [ -r "$common_scripts_file" ]               || ERROR "$(BTR error_settngs_read "$common_scripts_file")"
     # shellcheck disable=SC1090
-    source "$common_scripts_file" --limit-icons || ERROR "failed to source file $common_scripts_file"
+    source "$common_scripts_file" --limit-icons || ERROR "$(BTR error_setings_source $common_scripts_file)"
 
     eos_is_in_chroot && return 0
     DEBUG "${FUNCNAME[0]}: not chrooting."

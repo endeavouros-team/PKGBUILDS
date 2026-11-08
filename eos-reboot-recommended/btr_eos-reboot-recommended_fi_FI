@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Translations for the eos-reboot-recommended package.
+#
+# Note: variables may be used if they are already defined either
+# - in the app
+# - globally
+
+
+# Help with some special characters (HTML). Yad has problems without them:
+_exclamation='&#33;'   # '!'
+_and='&#38;'           # '&'
+_question='&#63;'      # '?'
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Tarkistan onko tarvetta suositella uudelleenkäynnistystä."
+    reboot_recommended      "    -> Kyllä, suosittelen uudelleenkäynnistystä."
+    error_running_kernel    "ajossa olevan ytimen selvittäminen ei onnistunut"
+    error_privileges        "korotettuja oikeuksia tarvitaan."
+    error_settings_read     "Tiedoston %s lukeminen ei onnistu."
+    error_settings_source   "Tiedoston %s suorittaminen epäonnistui"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "Uudelleenkäynnistys suositeltavaa!"
+    reboot_rec_body         "Tärkeitä systeemipaketteja päivitetty, uudelleenkännistystä suositellaan."
+)
