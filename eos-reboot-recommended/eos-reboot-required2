@@ -48,9 +48,9 @@ Main() {
     DEBUG "$progname begin."
 
     [ "$EUID" = "0" ]                           || ERROR "$(BTR error_privileges)"
-    [ -r "$common_scripts_file" ]               || ERROR "$(BTR error_settngs_read "$common_scripts_file")"
+    [ -r "$common_scripts_file" ]               || ERROR "$(BTR error_settings_read "$common_scripts_file")"
     # shellcheck disable=SC1090
-    source "$common_scripts_file" --limit-icons || ERROR "$(BTR error_setings_source $common_scripts_file)"
+    source "$common_scripts_file" --limit-icons || ERROR "$(BTR error_settings_source $common_scripts_file)"
 
     eos_is_in_chroot && return 0
     DEBUG "${FUNCNAME[0]}: not chrooting."
