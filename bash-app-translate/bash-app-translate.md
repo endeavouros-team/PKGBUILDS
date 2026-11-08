@@ -13,19 +13,49 @@ The examples below assume EndeavourOS linux distribution.
 
 ### Initialization
 
-The app must add the following line before any translation is needed (typically one of the first commands of the app):
+The app must initialize the translation system, especially bind the proper translation file with the app. Binding is facilitated by the naming of the translation files.
+<br>
+A translation file has the following naming:
+
+```
+btr_<app-related-part>_<language-part>
+```
+
+The `<app-related-part>` is a unique name relating to the app or apps that use the translation. This part can be the app name directly, or it can be a string selected by the app designer that in one way or another binds the translation file to the app.<br>
+Note that more than one app can use the same translation file, so the `<app-relates-part>` should be seletected in a suitable manner.
+
+The `<language-part>` specifies the language for the translation. This part should be the first part of the value of the environment variable `$LANG`. For example, it can be `en_US` or `fi_FI` from `en_US.UTF-8` or `fi_FI.UTF-8` respectively.<br>
+The translation system can automatically detect the language from the `$LANG` value.
+As an example, for the `welcome` app translation files would be `btr_welcome_en_US` and `btr_welcome_fi_FI`.
+
+Now, there are a few ways to initialize the translation system in an app and bind the (user) app to the proper translation file.
+
+The less generic way is to allow the translation system to detect the app's name, and to use it to find the proper translation file:
 
 ```
 source /usr/share/endeavouros/translations/bash-app-translate || exit 1
 ```
 
-If the appname is not the same as `${0##*/}` then the appname needs to be specified:
+The line above detects the name of the app and tries to find the translation file based on the detected appname.
+
+<small>Note: in `bash` the `${appname}` often is the same as `${0##*/}` which provides the name of the app in a script file.</small>
+
+The more generic way is to use a string that relates user app(s) to the translation file:
 
 ```
-source /usr/share/endeavouros/translations/bash-app-translate ${appname} || exit 1
+source /usr/share/endeavouros/translations/bash-app-translate "<app-related-part>" || exit 1
 ```
 
-<small>Note: the `${appname}` often is the same as `${0##*/}` which provides the name of the app in a script file.</small>
+The latter is useful if more than one app uses the same translation file.
+
+There's still one (even more generic) way to initialize translation:
+
+```
+source /usr/share/endeavouros/translations/bash-app-translate "<app-related-part>" "<language-part>" || exit 1
+```
+
+This can be useful for pre-selecting the language to be used.<br>
+Note that the used language can be configured in the configuration file, see below.
 
 ### Usage
 
@@ -52,7 +82,7 @@ For now it only allows user to select the target language, assuming it has been 
 
 Variable | Default value | Purpose
 ---- | ---- | ----
-`BTR_PREFER_LANG` | `""` | Specifies the target language to be used by the app. By default it is empty which means the LANG environment variable will be used for determining the target language automatically.<br>Note that automatic language detection is dependendent on the **names** of the *translation files* (see below), specifically the suffix of the each file name, like suffix `en` in file `btr_${appname}_en`.
+`BTR_PREFER_LANG` | `""` | Specifies the target language to be used by the app. By default it is empty which means the LANG environment variable will be used for determining the target language automatically.<br>Note that automatic language detection is dependendent on the **names** of the *translation files* (see below), specifically the suffix of the each file name, like suffix `en_US` in file `btr_<app-related-part>_en_US`.
 
 ## Creating translations
 
@@ -60,23 +90,17 @@ The app developer/translator needs to implement the *translation files*.
 The translation file(s) should be found in folder `/usr/share/endeavouros/translations`.
 *Initialization* above finds the proper translation file automatically.
 
-The names of the translation files have this naming convention:
+The naming convention was already explained above.<br>
+If the user does not select the language, the LANG environment variable will be used.
 
-```
-btr_${appname}_${lang}
-```
+Note that below we may use `${appname}` to mean the `<app-related-part>`.
 
-where
-- `${appname}` is the name of the app that uses the translations
-- `${lang}` refers to either user-selected or automatically detected language.
-
-If the user does not select the language, the LANG environment variable will be used.<br>
-Depending on the name of the translation file for an app (like `btr_${appname}_en` or `btr_${appname}_pt_BR`), 2 or 5 first characters of the LANG value is needed.
+### Contents of a translation file
 
 A translation file must contain an associative array with name `BTR_ARR`, for example:
 
 ```
-# an English translation example in file "btr_${appname}_en"
+# an English translation example in file "btr_${appname}_en_US"
 declare -A BTR_ARR=(
     [keyname1]="something related to key name1"
     [keyname2]="something %s related to key name2"
@@ -90,7 +114,7 @@ declare -A BTR_ARR=(
 Then a translation (using the **same** *keynames*) in another language, but using the *alternative* bash syntax:
 
 ```
-# a Finnish translation example in file "btr_${appname}_fi"
+# a Finnish translation example in file "btr_${appname}_fi_FI"
 declare -A BTR_ARR=(
     keyname1  "jotain avaimelle key name1"
     keyname2  "jotain %s avaimelle key name2"
@@ -193,7 +217,7 @@ If these are not enough, the developer of a translation is advised to create sim
 
 ## The roles of the translation files
 
-The English translation is considered to be the *reference* that others should copy and translate.
+The English translation (en_US) is considered to be the *reference* that others should copy and translate.
 
 Use the placeholders (%s) according to the requirements of the target language.
 
