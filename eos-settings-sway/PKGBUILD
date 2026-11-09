@@ -2,7 +2,7 @@
 
 _pkgname=endeavouros-sway-setup
 pkgname=eos-settings-sway
-pkgver=3.6
+pkgver=3.7
 pkgrel=1
 pkgdesc="pre user creation skel setup for Sway under EndeavourOS"
 arch=("any")
@@ -11,7 +11,7 @@ license=("GPL")
 depends=('endeavouros-branding' 'eos-sway-tools' 'greetd' 'greetd-tuigreet')
 makedepends=("git")
 source=("https://github.com/endeavouros-team/${_pkgname}/archive/refs/tags/${pkgver}.tar.gz")
-sha256sums=('f8466d9f51d09d21ad52e969be63e9c04439216c730ebed8c5875c62ff80fa10')
+sha256sums=('8f319caa0e70289132f9909fc8cfc872b0b65f02261470cbd42e438c274fde01')
 
 package() {
     cd "${srcdir}/${_pkgname}-${pkgver}"
