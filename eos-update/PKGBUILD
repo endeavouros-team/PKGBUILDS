@@ -4,7 +4,7 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.9.2
+pkgver=26.11
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -40,6 +40,7 @@ source=(
 
     "$_url/btr_${pkgname}_en_US"
     "$_url/btr_${pkgname}_fi_FI"
+    "$_url/btr_${pkgname}_sv_SE"
 )
 
 sha512sums=('781285ac653901cb12d5c2988fbb6eabc95ac991b6031224e9158c6edd80cd0e1c4d3f8a54abc967c4267660adc4f174ddd6e2c414ef290be9c7c227fe97a10a'
@@ -52,12 +53,18 @@ sha512sums=('781285ac653901cb12d5c2988fbb6eabc95ac991b6031224e9158c6edd80cd0e1c4
             'cbede379e1418b96c1e9a31389ce6f2492c5de013cfb87afc1d8a3f2197237ee6b1115b97671737c46031f5cfe0b8c1fb315c19b732d467d88165965724cc9d7'
             'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4'
             '8cfab3a8d48db3255c0c80ef703ff0c1d2156a3525591d00d09323a2d41edd84e512a5fd7dcef4519dbe136585862ca86b16f6db9da1e55e98da14fb15a8fabe'
-            '8fe12e8d85e9e2ccea200d44a5032a5cd099a5970c905cafaac95bdc53ec81b42fbdae1bcfb726dff13e77f97e687cd911f389597e974b0e83cbadf0f2ea9364')
+            '8fe12e8d85e9e2ccea200d44a5032a5cd099a5970c905cafaac95bdc53ec81b42fbdae1bcfb726dff13e77f97e687cd911f389597e974b0e83cbadf0f2ea9364'
+            'c754f7cce0decbcd6f393703dbc09ae2840b3e9f45510b36d5b45a1a3d5841d7c9f2901bee29fb1db49afb654885c85635937c7282f7c15189855083f11eb6c6')
 
 package() {
   local file src
 
   # generate html doc
+  local -r required_pkg=pandoc-cli
+  if ! pacman -Q $required_pkg &>/dev/null ; then
+      echo "==> Error: cannot create eos-update-tips.html without package '$required_pkg'." >&2
+      return 1
+  fi
   [ -e eos-update-tips.html ] || pandoc -f gfm eos-update-tips.md -o eos-update-tips.html
 
   for src in "${source[@]}" ; do
