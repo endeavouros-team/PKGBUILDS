@@ -666,6 +666,17 @@ _EosUpdate_Main2() {
     local -r progname=${0##*/}
     local -r pacmanconf=/etc/pacman.conf
     local -r eosupdateconf=/etc/$progname.conf
+    case "$*" in
+        *--no-config*) ;;
+        *)  if [ -e "$eosupdateconf" ] ; then
+                # If $eosupdateconf sets BTR_PREFER_LANG it needs to be sourced before the call to bash-app-translate.
+                # shellcheck disable=1090
+                source "$eosupdateconf"
+            fi
+            ;;
+    esac
+    source /usr/share/endeavouros/translations/bash-app-translate "$progname" || exit 1
+
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
     local -r rank_command_file=/bin/eos-update-rank-mirrors
@@ -837,7 +848,6 @@ DebugBreak() { : ; }
 
 Main() {
     local -r progname="${0##*/}"
-    source /usr/share/endeavouros/translations/bash-app-translate "$progname" || exit 1
     local -r eosupdateconf=/etc/$progname.conf
     local PARAMS=() arg AllArgs=()
     local run_mode=indirect
@@ -846,9 +856,15 @@ Main() {
 
     case "$*" in
         *--no-config*) ;;
-        *)  # shellcheck disable=1090
-            [ -e "$eosupdateconf" ] && source "$eosupdateconf" ;;
+        *)  if [ -e "$eosupdateconf" ] ; then
+                # If $eosupdateconf sets BTR_PREFER_LANG it needs to be sourced before the call to bash-app-translate.
+                # shellcheck disable=1090
+                source "$eosupdateconf"
+            fi
+            ;;
     esac
+    source /usr/share/endeavouros/translations/bash-app-translate "$progname" || exit 1
+
     AllArgs=("${EOS_UPDATE_OPTIONS[@]}" "$@")
     readarray -t PARAMS < <(printf "%s\n" "${AllArgs[@]}" | grep -v -- '--mode=direct')
 
