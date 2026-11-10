@@ -84,6 +84,14 @@ Variable | Default value | Purpose
 ---- | ---- | ----
 `BTR_PREFER_LANG` | `""` | Specifies the target language to be used by the app. By default it is empty which means the LANG environment variable will be used for determining the target language automatically.<br>Note that automatic language detection is dependendent on the **names** of the *translation files* (see below), specifically the suffix of the each file name, like suffix `en_US` in file `btr_<app-related-part>_en_US`.
 
+Tip: if you haven't set `BTR_PREFER_LANG` in `/etc/bash-app-translate.conf` there's another way to use a particular language translation for an app. Simply use prefix `LANG=<lang-def>` before the command name, e.g.
+```
+LANG=fi_FI       eos-update      # eos-update will use translation file 'btr_eos-update_fi_FI'
+LANG=fi_FI.UTF-8 eos-update      # same as above
+```
+
+This can help when testing a new translation.
+
 ## Creating translations
 
 The app developer/translator needs to implement the *translation files*.

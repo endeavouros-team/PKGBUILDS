@@ -117,10 +117,19 @@ case "${BASH_SOURCE[0]}" in
         _BTR_translator_=bash-app-translate ;;
 esac
 
-if [ -e "/etc/$_BTR_translator_.conf" ] ; then
-    # Get user's configuration file.
-    #
-    source "/etc/$_BTR_translator_.conf"
+
+# The language variable value ($BTR_PREFER_LANG) may come from the following sources with this preference order:
+#   1. app's configuration file may set it
+#   2. it is set in /etc/bash-app-translate.conf
+#   3. the LANG environment variable, e.g. set in the app call
+#   4. the app gives the language parameter to bash-app-translate
+
+if [ -z "$BTR_PREFER_LANG" ] ; then
+    if [ -e "/etc/$_BTR_translator_.conf" ] ; then
+        # Get user's configuration file.
+        #
+        source "/etc/$_BTR_translator_.conf"
+    fi
 fi
 
 # Grab the proper BTR_ARR contents for the app & language.
