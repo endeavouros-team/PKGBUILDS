@@ -2,6 +2,7 @@
 
 # Swedish translation for 'eos-update' strings.
 
+
 declare -A BTR_ARR=(
     eup_msg_info            "info"
     eup_msg_warning         "varning"

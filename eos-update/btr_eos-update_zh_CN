@@ -26,14 +26,5 @@ declare -A BTR_ARR=(
 
     warn_nvidia_chk_fail    "内核与 Nvidia GPU 驱动兼容性检查失败。使用 DKMS 版本的驱动或许能解决问题。"
     warn_param_ignored      "参数 '%s' 已被忽略。"
-
-    # item_not_available    "%s ei nyt ole käytettävissä%s$BTR_exclamation"    # second %s not needed?
-    # t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
 )
 
-local _MULTILINE_t1a=(
-    "关于可用 Linux 内核的信息（已安装或可安装）。\n"
-    "使用最左侧列的复选框安装或移除内核。\n\n"
-    "<i>在启动 <b>%s:n</b> 前请确保系统已完全更新。</i>.\n"
-    "\n"
-)
