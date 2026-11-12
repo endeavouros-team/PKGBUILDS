@@ -111,7 +111,7 @@ Stable() {
     if [ "${FUNCNAME[0]}" = "$RepoType" ] ; then
         in_use="$(BTR op_in_use)"
     fi
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Stable" "$in_use")":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_stab_tip "$in_use")":LBL "")
     local versions=() ix=0
     StableVersions
     for ((ix=0; ix < ${#kernels[@]}; ix++)) ; do
@@ -151,7 +151,7 @@ Testing() {
 
     [ -n "$testinginfo" ] || DIE "$(BTR die_arch_fail)"
 
-    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_tip "Testing" "$in_use")":LBL "")
+    cmd+=(--field="${smallBegin}$(Header)${smallEnd}!$(BTR op_versions_test_tip "$in_use")":LBL "")
     for xx in "${kernels[@]}" ; do
         version="$(TestingVersion "$xx")"
         test -n "$version" || version="$na"
@@ -296,7 +296,11 @@ Options() {
     local arg
     for arg in "$@" ; do
         case "$arg" in
-            --lang=*) ;;                                             # already handled
+            --lang=*) ;;                                                        # already handled
+            --translations)
+                /bin/ls -1 $akm_translations_dir/btr_akm_*
+                exit 0
+                ;;
             --connect-header) connect_header_with_kernel=yes ;;
             --no-progress) progress=no ;;
             --scroll) scroll=yes ;;
@@ -309,7 +313,8 @@ Usage: $progname [options]
 options:
     --connect-header      Make kernel and header package go together at install or uninstall.
     --scroll              Enable scrolling in the kernel info window. Useful if additional kernels are available.
-    --lang=*              Prefer the given target language '*'.
+    --lang=*              Prefer the given target language '*', e.g. "en_US" or "fi_FI".
+    --translations        Show the available translation language files for 'akm'.
     --small               Make the akm window smaller, meant for helping with small displays at 1366x768 resolution.
     --quiet | -q          Be less verbose.
     --no-progress         Don't show the progress window.
@@ -366,12 +371,13 @@ Main() {
     local debug=no
     declare -A LocalPkgVersions=()
     local language=""
+    local -r akm_translations_dir=/usr/share/endeavouros/translations
 
     if [[ "$*" =~ "--lang=" ]] ; then
         language=$(printf "%s\n" "$@" | grep -- "--lang=" | tail -n1 | sed 's|--lang=||')
     fi
 
-    source /usr/share/endeavouros/translations/bash-app-translate "" "$language" || exit 1
+    source $akm_translations_dir/bash-app-translate "" "$language" || exit 1
 
     CommonStuff                   # fetches common bash definitions
     eos_assert_deps "$progname" yad || return 1
