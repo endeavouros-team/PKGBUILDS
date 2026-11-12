@@ -57,7 +57,7 @@ __BTR_printf_() {
     if [ "$fmt" != "${fmt/\%}" ] ; then    # fmt includes % ?
         shift
         local -r fmt_orig="$fmt"
-        if [ "$1" ] ; then                 # params exist ?
+        if [[ -v 1 ]] ; then               # params exist ?           # was: if [ "$1" ] ; then                 
             local param placeholder tmp
             local parts=()
             for param in "$@" ; do
