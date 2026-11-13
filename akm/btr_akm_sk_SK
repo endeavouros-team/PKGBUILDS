@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Slovak translation for 'akm' strings.
+
+declare -A BTR_ARR=(
+    akm_title_choose      "Voľba"
+    akm_title_pkgname     "Názov balíku"
+    akm_title_installed   "Nainštalované"
+    akm_title_stable      "Stabilné"
+    akm_title_testing     "V testovaní"
+    akm_title_koname      "Kategória na k.o."
+    akm_title_kovname     "Verzia na k.o."
+
+    yad_s_title           "Jednoduchý správca jadier"
+    yad_s_chl             "Zoznam zmien"
+    yad_s_chltip          "Zobrazí najnovšie zmeny tohto programu"
+    yad_s_man             "Pomocník"
+    yad_s_mantip          "Otvorí príručku k aplikácii %s"
+    yad_s_cancel          "Zrušiť"
+    yad_s_no_change       "Bez vykonania zmien"
+    yad_s_run             "Vykonať"
+    yad_s_make_change     "Vykoná vaše zmeny"
+
+    proc_title            "Priebeh aplikácie AKM"
+    proc_text             "Získavajú sa informácie. Prosím, čakajte..."
+
+    die_net_fail          "Vyžaduje sa prístup k sieti.\nProsím, skontrolujte pripojenie k internetu."
+    die_curl_fail         "Získavanie informácií z %s zlyhalo.\n"
+    die_parse_error       "Nedá sa analyzovať výstup programu yad\n„%s“\n"
+    die_func_fail         "Funkcia „%s“ zlyhala.\n"
+    die_internal_error    "Interná chyba, nedá sa rozpoznať spustené jadro."
+    die_arch_fail         "Získavanie informácií z lokality https://archlinux.org zlyhalo$BTR_exclamation"
+
+    warn_odd_problem1     "==> Upozornenie: výstup programu yad by mal byť presne jednoriadkový, ale je:\n„%s“\n"
+    warn_odd_problem2     "==> Upozornenie: použije sa posledný riadok:\n„%s“\n"
+
+    msg_progress_done     "Hotovo."
+    msg_not_installed     "Prepáčte, balík „%s“ nie je nainštalovaný."
+
+    op_choose_tip         "Zaškrtávacie polia na inštalovanie/odinštalovanie balíkov jadier"
+    op_pkgname_tip        "Názov balíku s jadrom"
+    op_installed_tip      "Nainštalované verzie balíkov jadier. Momentálne spustené jadro je vypísané <i>kurzívou</i>. <b>Tučný</b> reťazec znamená najnovšie jadro na lokalite kernel.org."
+    op_versions_tip       "Verzie dostupné v repozitároch „%s“ %s"
+    op_ko_tip             "Kategória jadra na lokalite kernel.org"
+    op_ko_latest          "Najnovšia verzia ohlásená na lokalite kernel.org"
+    op_in_use             " (momentálne používané)"
+
+    item_not_available    "%s momentálne nie je dostupné%s$BTR_exclamation"    # second %s not needed?
+
+    t1a_str               "_MULTILINE_t1a"   # don't translate this line!
+    t1b_str               "_MULTILINE_t1b"   # don't translate this line!
+    t1c_str               "_MULTILINE_t1c"   # don't translate this line!
+)
+
+_MULTILINE_t1a=(
+    "Tu sa nachádzajú informácie o <i>momentálne dostupných</i> jadrách systému Linux, ktoré sú alebo môžu byť nainštalované.\n"
+    "Nainštalujte a/alebo odinštalujte balíky jadier pomocou zaškrtávacích polí umiestnených v prvom ľavom stĺpci.\n\n"
+    "<i>Prosím, pred spustením aplikácie <b>%s</b> sa uistite, že je systém plne aktualizovaný</i>.\n"
+    "\n"
+)
+
+# Variables for aligning the output for _MULTILINE_t1b lines:
+BTR_item_length="15"     # the number of characters reserved for the first "word" on the lines of _MULTILINE_t1b below
+BTR_empty_item=$(printf "%${BTR_item_length}s")
+#
+_MULTILINE_t1b=(
+    "Záhlavia stĺpcov:\n"
+    "<tt>"
+    "    %-${BTR_item_length}s Zaškrtávacie polia na inštalovanie/odinštalovanie balíkov jadier.\n"
+    "    $BTR_empty_item Nainštalované balíky sú skontrolované po spustení.\n"
+    "    %-${BTR_item_length}s Názov balíku jadra.\n"
+    "    %-${BTR_item_length}s Nainštalované verzie balíkov jadier.\n"
+    "    $BTR_empty_item Momentálne spustené jadro je vypísané kurzívou.\n"
+    "    $BTR_empty_item Najnovšia verzia z lokality kernel.org je vypísaná tučným písmom.\n"
+    "    %-${BTR_item_length}s Verzie dostupné v stabilných repozitároch.\n"
+    "    %-${BTR_item_length}s Verzie dostupné v testovacích repozitároch.\n"
+    "    %-${BTR_item_length}s Kategória jadra na lokalite kernel.org.\n"
+    "    %-${BTR_item_length}s Najnovšia verzia ohlásená na lokalite kernel.org.\n\n"
+    "</tt>"
+)
+
+_MULTILINE_t1c=(
+    "Váš momentálne používaný repozitár (Stabilný alebo Testovací) je vypísaný kurzívou (viď /etc/pacman.conf).\n"
+    "Znak <b>%s</b> znamená: informácie nie sú dostupné.\n\n"
+    "Pre podrobnosti o konfigurácii prezrite súbor <tt>%s</tt>.\n"
+)
+
