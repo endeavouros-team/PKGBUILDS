@@ -4,6 +4,7 @@ Encoding=UTF-8
 Name=akm
 Comment=Manages official kernels in EndeavourOS
 # Comment[fi]=Asentaa/poistaa virallisia linux-ytimiä ja näyttää ytimien tietoja
+Comment[sk]=Spravuje oficiálne jadrá systému EndeavourOS
 Exec=akm
 Icon=endeavouros-icon
 StartupWMClass=yad
