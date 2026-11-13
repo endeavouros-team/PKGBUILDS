@@ -6,7 +6,7 @@ pkgname=rami
 pkgdesc="Rank Arch mirrors, prefer up-to-date mirrors"
 url="https://github.com/endeavouros-team/PKGBUILDS/raw/master/$pkgname"
 pkgver=26.9
-pkgrel=1
+pkgrel=2
 
 arch=('any')
 license=('GPL')
@@ -44,7 +44,7 @@ package() {
     for src in "${source[@]}" ; do
         src=${src##*/}
         case "$src" in
-            *.md)                install -Dm644 $src  "$pkgdir/usr/share/doc/$pkgname/$src" ;;
+            # *.md)                install -Dm644 $src  "$pkgdir/usr/share/doc/$pkgname/$src" ;;
             *.conf)              install -Dm644 $src  "$pkgdir/etc/skel/$src" ;;
             *.completion)        install -Dm644 $src  "$pkgdir/usr/share/bash-completion/completions/${src%.completion}" ;;
             *)                   install -Dm755 $src  "$pkgdir/usr/bin/$src" ;;
