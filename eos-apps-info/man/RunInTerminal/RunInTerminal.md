@@ -11,5 +11,5 @@ Usage: RunInTerminal [command(s)]
 ```
 RunInTerminal 'ls -la ; pwd'
 RunInTerminal 'ls -la foo\ bar ; pwd'
-RunInTerminal 'ls -la 'foo bar' ; pwd'
+RunInTerminal "ls -la 'foo bar' ; pwd"
 ```
