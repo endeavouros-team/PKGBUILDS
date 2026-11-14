@@ -40,7 +40,6 @@ declare -A BTR_ARR=(
     op_choose_tip         "Zaškrtávacie polia na inštalovanie/odinštalovanie balíkov jadier"
     op_pkgname_tip        "Názov balíku s jadrom"
     op_installed_tip      "Nainštalované verzie balíkov jadier. Momentálne spustené jadro je vypísané <i>kurzívou</i>. <b>Tučný</b> reťazec znamená najnovšie jadro na lokalite kernel.org."
-    # op_versions_tip       "Verzie dostupné v repozitároch „%s“ %s"      # Replaced this with the following two lines. @manuel
     op_versions_stab_tip  "Verzie dostupné v stabilných repozitároch%s"
     op_versions_test_tip  "Verzie dostupné v testovacích repozitároch%s"
     op_ko_tip             "Kategória jadra na lokalite kernel.org"
