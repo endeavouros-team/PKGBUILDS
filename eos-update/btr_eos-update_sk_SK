@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# English translation for 'eos-update' strings.
+
+
+declare -A BTR_ARR=(
+    eup_msg_info            "informácia"
+    eup_msg_warning         "upozornenie"
+    eup_msg_error           "chyba"
+    eup_msg_helper_missing  "Pomocný nástroj repozitára AUR sa nenašiel"
+
+    die_result_failed       "zlyhanie"
+
+    msg_file_contains       "==> Aktuálne zrkadiel: %s"
+    msg_avail_mirrors       "    - dostupných:   %3s"
+    msg_unavail_mirrors     "    - nedostupných: %3s"
+    msg_why_sys_running     "Aktualizuje sa."
+
+    tip_prog_purpose        "%s: nástroj na aktualizáciu balíkov a dodatočných funkcií."
+    tip_used_command        "==> Príkaz: %s"
+    tip_all_done            "==> Všetko je hotové!"
+
+    sysup_no                "Žiadne aktualizácie."
+
+    filelock_err            "==> Súbor %s sa práve používa.\n    Skontrolujte, či iný proces nespravuje balíky."
+
+    warn_nvidia_chk_fail    "Kontrola kompatibility medzi jadrom a ovládačom grafickej karty Nvidia zlyhala. Môže pomôcť použitie dkms verzie ovládača."
+    warn_param_ignored      "parameter „%s“ bol ignorovaný."
+
+    warn_arch_not_supported  "prepáčte, architektúra %s nie je touto implementáciou podporovaná"
+)

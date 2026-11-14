@@ -4,6 +4,7 @@ Encoding=UTF-8
 Name=eos-update
 Comment=Update system packages in a terminal window
 Comment[fi]=Päivitä järjestelmä pääteikkunassa
+Comment[sk]=Aktualizuje systémové balíky v okne terminálu
 Exec=bash -c "echo '==> eos-update --aur'; eos-update --aur; eos-sleep-counter 60"
 Terminal=true
 Icon=endeavouros-icon
