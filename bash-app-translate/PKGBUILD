@@ -5,7 +5,7 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.9
+pkgver=26.1.10
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -17,11 +17,13 @@ _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgna
 
 source=(
     "$_url/$pkgname"                        # contains functions needed for translations
+    "$_url/${pkgname}-fallback"             # contains language fallback code
     "$_url/$pkgname.md"                     # user guide
     "$_url/$pkgname.conf"                   # user configurations
     "$_url/get-legacy-id-lang-translation"  # uses the legacy (Welcome's) implementation
 )
-sha512sums=('28cf8e34eca7e50bd9084ae65bb0f36e84b11560701578b98864887ee5ff81d9e20b29c983cba3958bbd327141d1331a109e732c34f058cdf0fc7c2636461963'
+sha512sums=('8ce99b9e6c397e5e1de047a54b54d4c7e7ed08f13a7aab93d62c97c61de09e08cf6ddb0bbd115ef6898b87aadc24f437dd3b315c98849a3566264271973407d6'
+            'caad76cc813d6df5c35768c234de1d607f26f44fb6daa9d9a692bcdcdb0cd4a7896362c1c3f5f3c786d95fa3cb84e4a394212e7a8cc840f330dfdc6c878627df'
             'a74a08b553298d1c580f6fd5d58a09296678710d3cef7d62770ca29e2434dc0a0bc5127bb475f01b59d626b969c2459524f87e473c80b639b121a8f92d287df3'
             '169b40bf7dba229b59d6131f98abd889cf773fe766e743e8e99ae7c382c3ff32b3ba2bed048f01bf094f1dace8e96a184710e6a62a6207c529e6636195821ed9'
             '7a0f882797b0592e2030c232dfdecd4d6246ff452889dfb44bd4f2122bf584e62380e9d870713ccba28a6eff0380a3da3b5885ca9021749acb9488a86a413b34')
@@ -33,7 +35,7 @@ package() {
         case "$file" in
             *.conf)   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             *.md)     install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
-            get-legacy-id-lang-translation)
+            get-legacy-id-lang-translation | *-fallback)
                       install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
             *)        install -Dm644 "$file"   "$pkgdir/usr/share/endeavouros/translations/$file" ;;
         esac

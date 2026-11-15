@@ -106,7 +106,7 @@ __BTR_important_msg_() {
 }
 
 ##############################################################################################
-## Variables used only in this file.
+## Variables to be used only in this file.
 ##############################################################################################
 
 # _BTR_translator_ to be used in this file!
@@ -124,12 +124,8 @@ esac
 #   3. the LANG environment variable, e.g. set in the app call
 #   4. the app gives the language parameter to bash-app-translate
 
-if [ -z "$BTR_PREFER_LANG" ] ; then
-    if [ -e "/etc/$_BTR_translator_.conf" ] ; then
-        # Get user's configuration file.
-        #
-        source "/etc/$_BTR_translator_.conf"
-    fi
+if [ -z "$BTR_PREFER_LANG" ] && [ -e "/etc/$_BTR_translator_.conf" ] ; then
+    source "/etc/$_BTR_translator_.conf"        # Read user's configuration file.
 fi
 
 # Grab the proper BTR_ARR contents for the app & language.
@@ -143,14 +139,10 @@ _BTR_lang_id_="$2"     # optional
 
 [ -e "/etc/$_BTR_translator_.conf" ] || __BTR_important_msg_ "warning: language translation config file /etc/$_BTR_translator_.conf not found."
 
-_BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_}"
+# _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_}"
+_BTR_language_file_=$(bash-app-translate-fallback "$_BTR_appname_" "$_BTR_lang_id_") || exit 1
 
-if false ; then
-    # Use only 2 first chars from the $LANG value is not supported!
-    [ -e "$_BTR_language_file_" ] || _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"
-fi
-
-# Some definitions that may be needed in the translations:
+# Some definitions that may be needed in the translation files:
 #
 BTR_exclamation='&#33;'         # '!'
 BTR_and='&#38;'                 # '&'
@@ -158,22 +150,18 @@ BTR_question='&#63;'            # '?'
 BTR_exclamation_down='&#161;'   # '¡'
 BTR_question_down='&#191;'      # '¿'
 
+# Include the translation file.
 if [ -e "$_BTR_language_file_" ] ; then
-    source "$_BTR_language_file_" || exit 1
-else
-    if false ; then
-        __BTR_important_msg_ "warning: $_BTR_language_file_* does not exist!"
-        if /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* &>/dev/null ; then
-            echo "==> The following files might match:" >&2
-            /bin/ls -1 "/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_::2}"* 2>/dev/null | sed 's|^|      |'
-        fi
+    if ! source "$_BTR_language_file_" ; then
+        __BTR_important_msg_ "error: file $_BTR_language_file_ fails!"
+        exit 1
     fi
-    # try fallback to English
-    _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_en_US"
-    if [ -e "$_BTR_language_file_" ] ; then
-        source "$_BTR_language_file_" || exit 1
-    else
-        __BTR_important_msg_ "error: translation fallback file $_BTR_language_file_ does not exist!"
+else
+    # Translation file was not found, fall back to en_US which *should* exist.
+    __BTR_important_msg_ "warning: file $_BTR_language_file_ was not found, fallback to en_US."
+    _BTR_language_file_=$(bash-app-translate-fallback "$_BTR_appname_" "en_US") || exit 1
+    if ! source "$_BTR_language_file_" ; then
+        __BTR_important_msg_ "error: file $_BTR_language_file_ fails!"
         exit 1
     fi
 fi
