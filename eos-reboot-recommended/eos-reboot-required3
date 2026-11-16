@@ -91,7 +91,7 @@ Wait_before_notifying() {
     local REBOOT_NOTIFICATION_USER=""
     local REBOOT_EXPIRE_TIME=""
 
-    source /usr/share/endeavouros/translations/bash-app-translate "eos-reboot-recommended" || exit 1
+    source /usr/share/endeavouros/translations/bash-app-translate --appid="eos-reboot-recommended" || exit 1
 
     # shellcheck disable=SC1090
     [ -e "$conffile" ] && source "$conffile"

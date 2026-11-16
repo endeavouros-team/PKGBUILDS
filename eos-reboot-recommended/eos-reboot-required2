@@ -35,7 +35,7 @@ Main() {
     local LOG_INFO=""
     local LOG_DEBUG=""
 
-    source /usr/share/endeavouros/translations/bash-app-translate "eos-reboot-recommended" || exit 1
+    source /usr/share/endeavouros/translations/bash-app-translate --appid="eos-reboot-recommended" || exit 1
 
     PACMAN_MSG "$(BTR reboot_check_msg)"
 
