@@ -43,3 +43,16 @@ example version: **22.03.1.1**
 **Not used for the ISO release names!**
 
 ---
+## License
+
+Unless stated otherwise, all files in this repository (PKGBUILDs, patches,
+and other packaging-related files) are licensed under the
+[GNU General Public License v3.0](LICENSE) (GPL-3.0-or-later).
+
+Individual packages may be released under a different license. In that case,
+the license is stated in the package's own subdirectory and applies to that
+package's files.
+
+Note that the software built by these PKGBUILDs is not covered by this
+license. It remains under its respective upstream license(s), as declared in
+the `license=()` array of each PKGBUILD.
