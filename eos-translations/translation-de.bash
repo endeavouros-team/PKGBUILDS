@@ -368,7 +368,9 @@ _tr_add2 ins_conn_issue_ex2      "Das Programm beenden"
 
 
 # 2024-Apr-20
-_tr_add2 ins_start_calamares         "Calamares startet"
+_tr_add2 ins_start_calamares         "Calamares startet"# 2026-Nov-07
+_tr_add2 ins_kbd_layout              "Preferred keyboard layout"
+_tr_add2 ins_kbd_layouttip           "Change or add keyboard layout"
 _tr_add2 ins_please_wait             "Es geht gleich weiter..."
 
 # 2024-Dec-05 (see also: 'after_install_us' and 'after_install_ustip' above)
@@ -400,3 +402,6 @@ _tr_add2 _commonphrase_not_found     "%%s nicht gefunden"                       
 _tr_add2 after_install_mani          "Manuelle Eingriffe"
 _tr_add2 after_install_manitip       "Führen Sie wichtige manuelle Eingriffe durch (für aktuelle notwendige Korrekturen, siehe: https://archlinux.org/news)"
 
+# 2026-Nov-07
+_tr_add2 ins_kbd_layout              "Bevorzugtes Tastatur-Layout"
+_tr_add2 ins_kbd_layouttip           "Ändere oder füge ein Tastatur-Layout hinzu"
