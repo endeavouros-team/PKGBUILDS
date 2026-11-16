@@ -377,7 +377,7 @@ Main() {
         language=$(printf "%s\n" "$@" | grep -- "--lang=" | tail -n1 | sed 's|--lang=||')
     fi
 
-    source $akm_translations_dir/bash-app-translate "" "$language" || exit 1
+    source $akm_translations_dir/bash-app-translate --appid="$progname" --lang="$language" || exit 1
 
     CommonStuff                   # fetches common bash definitions
     eos_assert_deps "$progname" yad || return 1
