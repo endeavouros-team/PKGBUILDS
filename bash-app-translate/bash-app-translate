@@ -130,8 +130,22 @@ fi
 
 # Grab the proper BTR_ARR contents for the app & language.
 #
-_BTR_appname_="$1"     # optional but recommended for clarity
-_BTR_lang_id_="$2"     # optional
+if true ; then
+    _BTR_appname_="$1"       # optional but recommended for clarity
+    _BTR_lang_id_="$2"       # optional
+    _BTR_fallback_opt_="$3"  # optional, options for bash-app-translate-fallback
+fi
+if true ; then
+    # another syntax to get parameters (in random order):
+    while [[ -v 1 ]] ; do
+        case "$1" in
+            --appid=*)          _BTR_appname_=${1#*=} ;;
+            --lang=*)           _BTR_lang_id_=${1#*=} ;;
+            --quiet-fallback)   _BTR_fallback_opt_="$1" ;;
+        esac
+        shift
+    done
+fi
 
 [ "$_BTR_appname_" ] || _BTR_appname_="${0##*/}"              # name of the calling app
 [ "$_BTR_lang_id_" ] || _BTR_lang_id_="$BTR_PREFER_LANG"      # user configured target language
@@ -139,8 +153,7 @@ _BTR_lang_id_="$2"     # optional
 
 [ -e "/etc/$_BTR_translator_.conf" ] || __BTR_important_msg_ "warning: language translation config file /etc/$_BTR_translator_.conf not found."
 
-# _BTR_language_file_="/usr/share/endeavouros/translations/btr_${_BTR_appname_}_${_BTR_lang_id_}"
-_BTR_language_file_=$(bash-app-translate-fallback "$_BTR_appname_" "$_BTR_lang_id_") || exit 1
+_BTR_language_file_=$(/bin/bash-app-translate-fallback "$_BTR_appname_" "$_BTR_lang_id_" "$_BTR_fallback_opt_") || exit 1
 
 # Some definitions that may be needed in the translation files:
 #
@@ -151,19 +164,9 @@ BTR_exclamation_down='&#161;'   # '¡'
 BTR_question_down='&#191;'      # '¿'
 
 # Include the translation file.
-if [ -e "$_BTR_language_file_" ] ; then
-    if ! source "$_BTR_language_file_" ; then
-        __BTR_important_msg_ "error: file $_BTR_language_file_ fails!"
-        exit 1
-    fi
-else
-    # Translation file was not found, fall back to en_US which *should* exist.
-    __BTR_important_msg_ "warning: file $_BTR_language_file_ was not found, fallback to en_US."
-    _BTR_language_file_=$(bash-app-translate-fallback "$_BTR_appname_" "en_US") || exit 1
-    if ! source "$_BTR_language_file_" ; then
-        __BTR_important_msg_ "error: file $_BTR_language_file_ fails!"
-        exit 1
-    fi
+if ! source "$_BTR_language_file_" ; then
+    __BTR_important_msg_ "error: file $_BTR_language_file_ fails!"
+    exit 1
 fi
 
 # Unset variables that are meant to be used only here.

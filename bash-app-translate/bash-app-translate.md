@@ -30,6 +30,8 @@ As an example, for the `welcome` app translation files would be `btr_welcome_en_
 
 Now, there are a few ways to initialize the translation system in an app and bind the (user) app to the proper translation file.
 
+#### The easy way (for easy cases)
+
 The less generic way is to allow the translation system to detect the app's name, and to use it to find the proper translation file:
 
 ```
@@ -40,22 +42,36 @@ The line above detects the name of the app and tries to find the translation fil
 
 <small>Note: in `bash` the `${appname}` often is the same as `${0##*/}` which provides the name of the app in a script file.</small>
 
+#### The recommended way (for most cases)
+
 The more generic way is to use a string that relates user app(s) to the translation file:
 
 ```
-source /usr/share/endeavouros/translations/bash-app-translate "<app-related-part>" || exit 1
+source /usr/share/endeavouros/translations/bash-app-translate --appid="<app-related-part>" || exit 1
 ```
 
-The latter is useful if more than one app uses the same translation file.
+This is the recommended way to initialize the translation system. It is also useful if more than one app uses the same translation file.
 
-There's still one (even more generic) way to initialize translation:
+#### When more control is required
+
+There's still even more generic way to initialize translation:
 
 ```
-source /usr/share/endeavouros/translations/bash-app-translate "<app-related-part>" "<language-part>" || exit 1
+source /usr/share/endeavouros/translations/bash-app-translate --appid="<app-related-part>" --lang="<language-part>" || exit 1
 ```
 
-This can be useful for pre-selecting the language to be used.<br>
-Note that the used language can be configured in the configuration file, see below.
+This can be useful for pre-selecting the language to be used if the app has an additional support for it.<br>
+Note that the user can configure used the language in the configuration file, see **Configuration file for the user** below.
+
+#### For special cases with even more control
+
+Sometimes an app needs to be called more than once. Then, if for example a specific language translation is missing, `bash-app-translate-fallback` app will complain and falls back to the English translation (which *should* exist always).<br>The app designer may add yet another option: `--quiet-fallback`, which can prevent the unnecessary complaint:
+
+```
+source /usr/share/endeavouros/translations/bash-app-translate --appid="<app-related-part>" --lang="<language-part>" --quiet-fallback || exit 1
+```
+
+Likely most apps don't need this option.
 
 ### Usage
 

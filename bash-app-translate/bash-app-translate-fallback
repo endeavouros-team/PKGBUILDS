@@ -2,13 +2,26 @@
 
 Main() {
     local appId="$1"                  # e.g. "eos-update"
-    local langHint="${2:-en_US}"      # e.g. "en" or "en_US"; "" means "en_US"; must be a unique head part!
+    local langHint="$2"               # e.g. "en" or "en_US"; "" means "en_US"; must be a unique head part!
+    local extraopts="$3"
     local -r progname=${0##*/}
     local langfile=""
+    local ll
+    local -r fallbackLang=en_US
 
     [ "$appId" ] || DIE "parameter <appname> is missing"
+    
+    case "$langHint" in
+        C | "") langHint="$fallbackLang"
+                Find langfile "$langHint" || exit 1
+                ;;
+        *)
+            if ! Find langfile "$langHint" ; then
+                Find langfile "$fallbackLang" || exit 1
+            fi
+            ;;
+    esac
 
-    Find langfile "$langHint" || exit 1
     echo -n "$langfile"
 }
 
@@ -22,7 +35,7 @@ Usage() {
     cat <<EOF >&2
 Usage: $progname <app-name> [<lang>]
   <appname>    Name (id) of the app subject to language translation, e.g. 'eos-update'.
-  <lang>       Optional language spec, e.g. 'en_US' or 'sv_SE'. Defaults to 'en_US'.
+  <lang>       Optional language spec, e.g. '$fallbackLang' or 'sv_SE'. Defaults to '$fallbackLang'.
 EOF
 }
 echo2() { echo -e "$@" >&2; }
@@ -36,15 +49,25 @@ Find() {
 
     case "${translations[0]}" in
         *\*)
-            DIE "translation file problem:\n-> '${searchItem}*' matches nothing.\nPlease check your language definition."
+            case "$extraopts" in
+                --quiet-fallback) ;;
+                *) [ "$langHint" != "$fallbackLang" ] && echo2 "==> Translation file '${searchItem}*' not found. Falling back to $fallbackLang."
+            esac
+            return 1
             ;;
         *)
             if [ "${#translations[@]}" -eq 1 ] ; then
                 _retvar="${translations[0]}"
             else
-                local tmp=""
-                printf -v tmp "  %s\n" "${translations[@]}"
-                DIE "multiple translation file matches:\n${tmp}Please check your language definition."
+                case "$extraopts" in
+                    --quiet-fallback) ;;
+                    *) local tmp=""
+                       printf -v tmp "  %s\n" "${translations[@]}"
+                       echo2 "==> Multiple translation file matches:\n${tmp}Please check your language definition."
+                       [ "$langHint" != "$fallbackLang" ] && echo2 "Falling back to $fallbackLang."
+                       ;;
+                esac
+                return 1
             fi
             ;;
     esac
