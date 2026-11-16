@@ -46,12 +46,20 @@ Find() {
     local -r trdir="/usr/share/endeavouros/translations"
     local -r searchItem="$trdir/btr_${appId}_$langHint"
     local translations=("${searchItem}"*)     # use given lang tip
+    local -r conffile=/etc/bash-app-translate.conf
 
     case "${translations[0]}" in
         *\*)
             case "$extraopts" in
                 --quiet-fallback) ;;
-                *) [ "$langHint" != "$fallbackLang" ] && echo2 "==> Translation file '${searchItem}*' not found. Falling back to $fallbackLang."
+                *)
+                    [ -e $conffile ] && source $conffile
+                    case "$BTR_WARN_ABOUT_MISSING_TRANSLATION" in
+                        "" | yes)
+                            [ "$langHint" != "$fallbackLang" ] && echo2 "==> Translation file '${searchItem}*' not found. Falling back to $fallbackLang."
+                            ;;
+                    esac
+                    ;;
             esac
             return 1
             ;;
@@ -61,11 +69,17 @@ Find() {
             else
                 case "$extraopts" in
                     --quiet-fallback) ;;
-                    *) local tmp=""
-                       printf -v tmp "  %s\n" "${translations[@]}"
-                       echo2 "==> Multiple translation file matches:\n${tmp}Please check your language definition."
-                       [ "$langHint" != "$fallbackLang" ] && echo2 "Falling back to $fallbackLang."
-                       ;;
+                    *)
+                        [ -e $conffile ] && source $conffile
+                        case "$BTR_WARN_ABOUT_MISSING_TRANSLATION" in
+                            "" | yes)
+                                local tmp=""
+                                printf -v tmp "  %s\n" "${translations[@]}"
+                                echo2 "==> Multiple translation file matches:\n${tmp}Please check your language definition."
+                                [ "$langHint" != "$fallbackLang" ] && echo2 "Falling back to $fallbackLang."
+                                ;;
+                        esac
+                        ;;
                 esac
                 return 1
             fi

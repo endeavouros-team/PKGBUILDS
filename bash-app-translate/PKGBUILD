@@ -5,7 +5,7 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.11
+pkgver=26.1.12
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -23,9 +23,9 @@ source=(
     "$_url/get-legacy-id-lang-translation"  # uses the legacy (Welcome's) implementation
 )
 sha512sums=('ca7077d8f159af0b23d25166afa92814a59650c86ce4eda3f34fc303b6ef2c6f4229fe56a2d5c859a2d2f9701f02805e961b90e98b59c14f6eb4cce21e1e0346'
-            '0cb434d04feecfffb14feb5fb5213322f9895b9de51284531e2db011b4ae367c41892539c3602b7ac6f12ce518ab547b49ea1832a7be4ab9021edc8ecf06c10a'
+            'b0d5989c53dd8c75d634aad14c307c5a53b0a8456330cab6676fbbfe630c4d30754bab72891fde4b7b51c6efd1208e8b7f011a3e91b769e14560aa3a410f1a21'
             '90e914a7f30fc2b3b0893992a838a4b3316a95f4ab5e405abdc8e2db716d18a978dc7e6006bb633f8cbc2601b82c2fae313c42a4398a9692d2b3390a9a46274d'
-            '169b40bf7dba229b59d6131f98abd889cf773fe766e743e8e99ae7c382c3ff32b3ba2bed048f01bf094f1dace8e96a184710e6a62a6207c529e6636195821ed9'
+            'daeee517d18b231edb5cf7fccbe18ca9c0b394d691f77df764e87b1850855662b94f86bb6dfdddaab4d3b97d44acec8a19d5409a3a7ea053e6b5c8ad63cb4bd4'
             '7a0f882797b0592e2030c232dfdecd4d6246ff452889dfb44bd4f2122bf584e62380e9d870713ccba28a6eff0380a3da3b5885ca9021749acb9488a86a413b34')
 
 package() {
