@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# German translation for 'eos-update' strings.
+
+
+declare -A BTR_ARR=(
+    eup_msg_info            "Info"
+    eup_msg_warning         "Warnung"
+    eup_msg_error           "Fehler"
+    eup_msg_helper_missing  "AUR Helfer wurde nicht gefunden"
+
+    die_result_failed       "Fehlgeschlagen"
+
+    msg_file_contains       "==> Spiegel enthalten in %s"
+    msg_avail_mirrors       "    - verfügbare Spiegel:   %3s"
+    msg_unavail_mirrors     "    - nicht verfügbare Spiegel: %3s"
+    msg_why_sys_running     "Aktualisierungen."
+
+    tip_prog_purpose        "%s: Paket Updater & zusätzliche Funktionen."
+    tip_used_command        "==> Befehl: %s"
+    tip_all_done            "==> Alles erledigt!"
+
+    sysup_no                "Keine Updates vorhanden."
+
+    filelock_err            "==> Paketmanager Lock datei %s aktiv.\n    Überprüfe ob ein anderer Paketmanager Prozess läuft."
+
+    warn_nvidia_chk_fail    "Kompatibilitätsprüfung zwischen 'Kernel' und 'Nvidia-Treiber' ist fehlgeschlagen. Die DKMS-Version des Treibers könnte Abhilfe schaffen."
+    warn_param_ignored      "Parameter '%s' wird ignoriert."
+
+    warn_arch_not_supported  "Sorry, die %s Architektur wird nicht unterstützt."
+)
