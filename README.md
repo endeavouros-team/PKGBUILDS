@@ -45,7 +45,6 @@ example version: **22.03.1.1**
 ---
 
 # License
-
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/endeavouros-team/PKGBUILDS/blob/main/LICENSE) 
 
 Unless stated otherwise, all files in this repository (PKGBUILDs, patches,
