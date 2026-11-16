@@ -4,8 +4,8 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.11.4
-pkgrel=2
+pkgver=26.11.5
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -38,6 +38,7 @@ source=(
     "$_url/eos-update-other.bash"    # "config" for additional update tools
     "$_url/eos-update-tips.md"
 
+    "$_url/btr_${pkgname}_de_DE"
     "$_url/btr_${pkgname}_en_US"
     "$_url/btr_${pkgname}_fi_FI"
     "$_url/btr_${pkgname}_sk_SK"
@@ -54,6 +55,7 @@ sha512sums=('f4467adfd7255d7d51b189e4bdf75c18098ac25146b356ae9954351cd6fb7ef310f
             'd0bdc726b157a4d3a1e4b497db7059ce2f1534f31256daa300c579fcfef8f858a59d93217fc8579b4cd38047ee2a1a857f2f5ee89575b0457b172327f61500a9'
             'cbede379e1418b96c1e9a31389ce6f2492c5de013cfb87afc1d8a3f2197237ee6b1115b97671737c46031f5cfe0b8c1fb315c19b732d467d88165965724cc9d7'
             'db4b7e9123b8c9262ffcd00d8b4fca1aee515cb05d5d06808cabdac69db00af7efe5790fc2cb88d5671ad7bd8de9ec5752e77b12bbe3bdde0affe172d9c97aa4'
+            '8bdc88b6e640e555b15607c75df9bd9c9d49edac50ff1ff604965edb0595aa54010a4083e6d5fb5e08d295b8245632109bc394c45e0c5a8dd86080faa4e1cc51'
             'ced1d1f876b6b6b599931f774446cd81f1e15d7334df9264259c9b5352b74db5cfa1c8fd2f69150bee30d7d31e583f3895515159934ad37ebc7a0b71cda2a564'
             '9703b2afea987d783ce7000f578bdd09562e06a3895f9bd89b519ee8ebc9f20fdba875acc30b33216d63aa436695a95a8586c064d47016a14542ffdcc7c1765c'
             '45f408ab2c6a8f7c30d89f823d5c69588f2ae02206cae4cdf6f09e78afd1dada26a03056e5be61b126a72409c64fdf874d7e7359d16e81d239db11b3c22f347c'
