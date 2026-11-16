@@ -675,7 +675,7 @@ _EosUpdate_Main2() {
             fi
             ;;
     esac
-    source /usr/share/endeavouros/translations/bash-app-translate "$progname" || exit 1
+    source /usr/share/endeavouros/translations/bash-app-translate --appid="$progname" --lang="" || exit 1
 
     local -r eml=/etc/pacman.d/endeavouros-mirrorlist
     local -r aml=/etc/pacman.d/mirrorlist
@@ -863,7 +863,7 @@ Main() {
             fi
             ;;
     esac
-    source /usr/share/endeavouros/translations/bash-app-translate "$progname" || exit 1
+    source /usr/share/endeavouros/translations/bash-app-translate --appid="$progname" --lang="" --quiet-fallback || DIE "$progname failed."
 
     AllArgs=("${EOS_UPDATE_OPTIONS[@]}" "$@")
     readarray -t PARAMS < <(printf "%s\n" "${AllArgs[@]}" | grep -v -- '--mode=direct')

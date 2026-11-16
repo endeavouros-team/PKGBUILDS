@@ -4,7 +4,7 @@
 
 pkgname=eos-update
 pkgdesc="A package updater with additional features for EndeavourOS"
-pkgver=26.11.3
+pkgver=26.11.4
 pkgrel=2
 arch=('any')
 license=('GPL')
@@ -45,7 +45,7 @@ source=(
     "$_url/btr_${pkgname}_zh_CN"
 )
 
-sha512sums=('59f5799b658116287a16128d0a28879152e07145c081b89d44ba51b81f66ac9673604d84fc9df69eb30c5cd253fbde259c058fe409faefff7cc1e3a4a6f776c2'
+sha512sums=('f4467adfd7255d7d51b189e4bdf75c18098ac25146b356ae9954351cd6fb7ef310f9b1254f360fa68c1c0d036f7edb47d6516f7d6074d26b2ff172dd5d88f3c9'
             'cc855e68f9b1d2b258335bd868dfe813354a21fde95a771d67a528714b4f21bd158637c021f73c75eea014ad8a68294f6d151a968714d062d4ecb42a64e0cc7b'
             '2a2508df7fe084c5ac9b33dbc6894e5d7a3156ffa707ac4f2ed4ce148b9b16c94be9a50d19501edd4e128189d80b15aa8b66224b1d5deeb5063f397f9487853a'
             'd4c599f30755a39e525da5323d15bbfef717f61b60396e23bba67a483f167939f7ac6e5255621da02fccc3284896834dccbc382f3fab6f66de4bd8935d8d8c45'
