@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Dutch translation for 'eos-update' strings.
+
+
+declare -A BTR_ARR=(
+    eup_msg_info            "info"
+    eup_msg_warning         "waarschuwing"
+    eup_msg_error           "fout"
+    eup_msg_helper_missing  "AUR helper niet gevonden"
+
+    die_result_failed       "mislukt"
+
+    msg_file_contains       "==> Mirrors in %s momenteel"
+    msg_avail_mirrors       "    - beschikbaar:   %3s"
+    msg_unavail_mirrors     "    - niet beschikbaar %3s"
+    msg_why_sys_running     "Bezig met bijwerken."
+
+    tip_prog_purpose        "%s: pakketbeheerder en aanvullende functies."
+    tip_used_command        "==> Opdracht: %s"
+    tip_all_done            "==> Alles voltooid!"
+
+    sysup_no                "Geen updates."
+
+    filelock_err            "==> Bestand %s is in gebruik.\n    Controleer of een ander proces nog pakketten beheert."
+
+    warn_nvidia_chk_fail    "De compatibiliteitscontrole tussen de 'kernel' en het 'Nvidia GPU stuurprogramma' is mislukt. Het gebruik van de dkms versie van het stuurprogramma kan helpen."
+    warn_param_ignored      "parameter '%s' genegeerd."
+
+    warn_arch_not_supported  "sorry, architectuur %s wordt niet ondersteund door deze implementatie"
+)
