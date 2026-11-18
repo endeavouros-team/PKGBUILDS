@@ -1,6 +1,4 @@
-**PKGBUILDS for EndeavourOS**
-
-[![Maintenance](https://img.shields.io/maintenance/yes/2026.svg)]()
+**PKGBUILDS for EndeavourOS** [![Maintenance](https://img.shields.io/maintenance/yes/2026.svg)]()
 
 # PKGBUILDS **of interest** to EndeavourOS.
 
