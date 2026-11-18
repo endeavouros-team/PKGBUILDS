@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Translations for the eos-reboot-recommended package.
+#
+# Note: variables may be used if they are already defined either
+# - in the app
+# - globally
+
+
+# Help with some special characters (HTML). Yad has problems without them:
+_exclamation='&#33;'   # '!'
+_and='&#38;'           # '&'
+_question='&#63;'      # '?'
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Kontroluje sa, či by mal byť používateľ informovaný o reštartovaní po aktualizovaní určitých systémových balíkov."
+    reboot_recommended      "    -> Áno, odporúča sa vykonať reštart."
+    error_running_kernel    "nie je možné rozpoznať spustené jadro"
+    error_privileges        "vyžadujú sa vyvýšené právomoci."
+    error_settings_read     "zlyhalo čítanie súboru %s."
+    error_settings_source   "zlyhalo spracovanie súboru %s"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "Odporúčaný reštart!"
+    reboot_rec_body         "Odporúča sa vykonať reštart kvôli aktualizácii systémových balíkov."
+)
