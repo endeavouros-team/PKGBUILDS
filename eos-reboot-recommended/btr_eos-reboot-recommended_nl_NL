@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Translations for the eos-reboot-recommended package.
+#
+# Note: variables may be used if they are already defined either
+# - in the app
+# - globally
+
+
+# Help with some special characters (HTML). Yad has problems without them:
+_exclamation='&#33;'   # '!'
+_and='&#38;'           # '&'
+_question='&#63;'      # '?'
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Controleren of de gebruiker geïnformeerd moet worden over een herstart na bepaalde systeem pakketupdates."
+    reboot_recommended      "    -> Ja, een herstart wordt aanbevolen."
+    error_running_kernel    "kan de actieve kernel niet vaststellen"
+    error_privileges        "verhoogde rechten vereist."
+    error_settings_read     "kan bestand %s niet lezen."
+    error_settings_source   "kan bestand %s niet laden"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "Herstart aanbevolen!"
+    reboot_rec_body         "Een herstart wordt aanbevolen vanwege de update van een of meer essentiële systeempakketten."
+)
