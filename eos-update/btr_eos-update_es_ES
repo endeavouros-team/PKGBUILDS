@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Traducción al español (de España) de las cadenas de caracteres de 'eos-update'.
+
+
+declare -A BTR_ARR=(
+    eup_msg_info            "información"
+    eup_msg_warning         "alerta"
+    eup_msg_error           "error"
+    eup_msg_helper_missing  "no se ha encontrado AUR helper"
+
+    die_result_failed       "fallido"
+
+    msg_file_contains       "==> Servidores de réplicas (mirrors) actualmente en %s "
+    msg_avail_mirrors       "    - disponibles:   %3s"
+    msg_unavail_mirrors     "    - no disponibles: %3s"
+    msg_why_sys_running     "Actualizando."
+
+    tip_prog_purpose        "%s: actualizador de paquetes y funciones adicionales."
+    tip_used_command        "==> Orden: %s"
+    tip_all_done            "==> ¡Finalizado!"
+
+    sysup_no                "No hay actualizaciones."
+
+    filelock_err            "==> El archivo %s está en uso.\n    Compruebe si otro proceso está aún trabajando con paquetes."
+
+    warn_nvidia_chk_fail    "La comprobación de compatibilidad entre el 'núcleo' (kernel) y el 'controlador de la tarjeta gráfica Nvidia' ha fallado. Usar la versión dkms del controlador podría ayudar."
+    warn_param_ignored      "el parámetro '%s' ha sido ignorado."
+
+    warn_arch_not_supported  "lo sentimos, esta implementación no tiene soporte para la arquitectura %s."
+)
+
+
