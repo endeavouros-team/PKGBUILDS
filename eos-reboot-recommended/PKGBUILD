@@ -4,7 +4,7 @@
 
 pkgname=eos-reboot-recommended
 pkgdesc="Notify if a reboot is recommended after system upgrade."
-pkgver=26.11.5
+pkgver=26.11.6
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -24,10 +24,12 @@ source=(
   $_url/eos-reboot-required.timer
   $_url/eos-reboot-required.service
   $_url/eos-reboot-recommended.hook
-  $_url/btr_eos-reboot-recommended_en_US
+
   $_url/btr_eos-reboot-recommended_cs_CZ
+  $_url/btr_eos-reboot-recommended_en_US
   $_url/btr_eos-reboot-recommended_fi_FI
   $_url/btr_eos-reboot-recommended_nl_NL
+  $_url/btr_eos-reboot-recommended_sk_SK
 )
 
 sha512sums=('ac796f35c2b7f2346f9baea6a27abdafa3473bedd3ba1c1d37b5dcb219fa5c5601460cf50e6b77eca6914b9737f7884d06aa03e9c80cda7be31ad2e6f2a2dec0'
@@ -36,10 +38,11 @@ sha512sums=('ac796f35c2b7f2346f9baea6a27abdafa3473bedd3ba1c1d37b5dcb219fa5c56014
             'b26a06683f6ab8039df3befe93140a72c9e750f9c6a1e5e9b9f653a776a3ef9ab61e14a8485c53022e5959dd17eb94d8fd0be6f81a5e6a0aef95701f0100817a'
             '00557e96e9b5155424e83ae87fb242dc23968d79e63ea8831bddaf697ef5267351bc7fa2a7343b6a5c9aadaf170759e62ee1210f3dce839e395c51b00eb13d2f'
             '8a4d5be006977900dda67c1d71cf401d03ad799440ff4df6e2f2dac419e07ab36888e794c78b9530635adb703eb936da83084df06f842885bb1fe31cb817e9bd'
-            'eba18437cc872ce8df42088d4344cfbe387dc2fa13212396ca0765fcb36fe14ccd5e5b2dbecbfe90225e58f35fb850399a13f4c952699870791d9624d09b273f'
             'f48aabf7da16b76f456bfc5a15d47395e22fc3eb66d6be690d083e45415baecb178b4b5c73c20022b6e36644f7b326e21b4924f7632f85e3bd838876c2b308ee'
+            'eba18437cc872ce8df42088d4344cfbe387dc2fa13212396ca0765fcb36fe14ccd5e5b2dbecbfe90225e58f35fb850399a13f4c952699870791d9624d09b273f'
             '284d919ae75f45c038a3a8c3b813820e66501fe936fffd2380613102074d1a63bfd737c54eb1dd4e87d4fc64c22468b07d9ddd27c754e3e2f4b3f6e80f3eb0ad'
-            '53b62a6fe2d89bebd2e14bbffe887fdf230189bf6301451c2e71075708a9f58a228fb691c87917f08b4a88c0611b950ad22b77fa3d0c2c3baca0b73d2b5726cc')
+            '53b62a6fe2d89bebd2e14bbffe887fdf230189bf6301451c2e71075708a9f58a228fb691c87917f08b4a88c0611b950ad22b77fa3d0c2c3baca0b73d2b5726cc'
+            '1eadbd071d79f1bf0ff6ea79bce0e883c8e6aabb201d7f4a266aa5498223d0f5a2711056f9481ab329fecf5e1dfcf603113e3ebd81d3ba72a4d1e88e713e56fb')
 
 package() {
   local file src
