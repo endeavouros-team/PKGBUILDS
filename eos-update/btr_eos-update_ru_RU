@@ -2,6 +2,7 @@
 
 # Russian translation for 'eos-update' strings.
 
+
 declare -A BTR_ARR=(
     eup_msg_info            "информация"
     eup_msg_warning         "предупреждение"
