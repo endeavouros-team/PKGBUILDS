@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Russian translation for the eos-reboot-recommended package.
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Проверка необходимости уведомить пользователя о перезагрузке после обновления определённых системных пакетов."
+    reboot_recommended      "    -> Да, рекомендуется перезагрузить систему."
+    error_running_kernel    "не удалось определить используемую версию ядра"
+    error_privileges        "требуются повышенные привилегии."
+    error_settings_read     "не удалось прочитать файл %s."
+    error_settings_source   "не удалось загрузить файл %s"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "Рекомендуется перезагрузить систему!"
+    reboot_rec_body         "Перезагрузка рекомендуется после обновления основных системных пакетов."
+)
+
