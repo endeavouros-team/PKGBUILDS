@@ -323,16 +323,25 @@ Columnize() { column -t -s "$separator" ; }
 
 ForeignPkgInfo() {
     local data
-    readarray -t data < <(LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
+    readarray -t data < <(LANGUAGE=C LANG=C pacman -Qmi | grep -P '^Name|^Version|^Description')
     PrintPkgData
 }
 NativePkgInfo() {
+    local showDescription=no                           # yes or no
     if [ -x /usr/bin/expac ] ; then
         # expac is much faster
-        expac -Q "%n$separator%v" | Columnize
+        if [ $showDescription = yes ] ; then
+            expac -Q "%n$separator%v$separator%d" | Columnize
+        else
+            expac -Q "%n$separator%v" | Columnize      # to save some disk space, don't show Description
+        fi
     else
         local data
-        readarray -t data < <(LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
+        if [ $showDescription = yes ] ; then
+            readarray -t data < <(LANGUAGE=C LANG=C pacman -Qni | grep -P '^Name|^Version|^Description')
+        else
+            readarray -t data < <(LANGUAGE=C LANG=C pacman -Qni | grep -P '^Name|^Version')
+        fi
         PrintPkgData
     fi
 }
