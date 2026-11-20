@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Russian translation for 'eos-update' strings.
+
+declare -A BTR_ARR=(
+    eup_msg_info            "информация"
+    eup_msg_warning         "предупреждение"
+    eup_msg_error           "ошибка"
+    eup_msg_helper_missing  "Помощник AUR не найден"
+
+    die_result_failed       "не удалось"
+
+    msg_file_contains       "==> Зеркала в %s сейчас"
+    msg_avail_mirrors       "    - доступны:     %3s"
+    msg_unavail_mirrors     "    - недоступны:   %3s"
+    msg_why_sys_running     "Выполняется обновление."
+
+    tip_prog_purpose        "%s: средство обновления пакетов и дополнительные функции."
+    tip_used_command        "==> Команда: %s"
+    tip_all_done            "==> Всё готово!"
+
+    sysup_no                "Обновлений нет."
+
+    filelock_err            "==> Файл %s используется.\n    Проверьте, не управляет ли другой процесс пакетами."
+
+    warn_nvidia_chk_fail    "Проверка совместимости между «ядром» и «драйвером видеокарты NVIDIA» завершилась неудачно. Возможно, поможет использование версии драйвера DKMS."
+    warn_param_ignored      "Параметр '%s' проигнорирован."
+
+    warn_arch_not_supported "Извините, архитектура %s не поддерживается данной реализацией."
+)
+
