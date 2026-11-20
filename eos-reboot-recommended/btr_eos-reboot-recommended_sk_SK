@@ -1,16 +1,6 @@
 #!/bin/bash
 
 # Translations for the eos-reboot-recommended package.
-#
-# Note: variables may be used if they are already defined either
-# - in the app
-# - globally
-
-
-# Help with some special characters (HTML). Yad has problems without them:
-_exclamation='&#33;'   # '!'
-_and='&#38;'           # '&'
-_question='&#63;'      # '?'
 
 
 declare -A BTR_ARR=(

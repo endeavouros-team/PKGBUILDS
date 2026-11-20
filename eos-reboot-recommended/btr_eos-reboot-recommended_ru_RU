@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Russian translation for the eos-reboot-recommended package.
+# Russian translation for the 'eos-reboot-recommended' package.
 
 
 declare -A BTR_ARR=(
