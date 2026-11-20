@@ -587,7 +587,7 @@ YesOrNo() {
     esac
 
     while true ; do
-        read -p "$question ${options}? " reply >&2
+        read -r -p "$question ${options}? " reply >&2
         [ "$reply" ] || reply="$default"
         case "$reply" in
             [Nn]) exit 0 ;;
