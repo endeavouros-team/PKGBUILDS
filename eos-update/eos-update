@@ -792,9 +792,12 @@ _EosUpdate_Main2() {
 
 RunUpdateCommands() {
     ## Handle native packages first
+    local updates=()
+
     TRY sudo pacman -Sy
     HandleExtraCommands "${subopts[@]}"
-    TRY sudo pacman -Su
+
+    [ "${updates[0]}" ] && TRY sudo pacman -Su
 
     ## Handle AUR packages next
     local aur_helper=()
@@ -813,7 +816,6 @@ RunUpdateCommands() {
 }
 
 HandleExtraCommands() {
-    local updates=()
     readarray -t updates < <(pacman -Quq)
     [ "${updates[0]}" ] || return 0
 
