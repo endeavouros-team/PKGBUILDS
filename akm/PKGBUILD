@@ -7,7 +7,7 @@ pkgname=akm
 pkgdesc="Arch kernel manager."
 url=https://github.com/endeavouros-team/PKGBUILDS/tree/master/$pkgname
 _url="https://raw.githubusercontent.com/endeavouros-team/PKGBUILDS/master/$pkgname"
-pkgver=26.9.5
+pkgver=26.11
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -23,7 +23,7 @@ source=(
     "btr_${pkgname}_fi_FI"
     "btr_${pkgname}_sk_SK"
 )
-sha512sums=('10815dd626caba57977ecb40054c8087c90c163767d413cdb20f01d1e346d26349a65195ad4e01e1b88f1c0cf34c43d001e5a269aab22a4d8b899ecf1ec684b3'
+sha512sums=('581fc7b2f2b74148bc8ae1dc3dc8172a3ab6f07a7dd7a6cf60a9595a516af0ad3d42f98d08a657325542069f360d5ab0d51e670386192cb70b4291f2fbb62bf7'
             '9ab486eaa58857dfaf1d3b3838768b9c629f65709177544ad4602daf2752be9709a529abba359fe984a9f231688ae30bb7aa3df97a2c8d88fbb37742f5fd26f7'
             '7b2a5f25e7a79641daf10365c73ff1166992ec4c1201b740c8c12dbb7da080d8b9f973b0617d0168559da078eee71186b36bd768ad491060e8ff1c8e22587d70'
             'fdefcaf2d2200f428ed04761efd6473b4fb2e4068b3d610b5ba7e2dcf9d15cf4b715f1eb8f5e1bd5341512df573e926151d4367c2b703c8d73de322f3a77b9f2'
