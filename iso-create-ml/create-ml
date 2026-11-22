@@ -199,17 +199,18 @@ Listify() {
     echo -n ${out%,}
 }
 IgnoreMirrors() {
-    local item tmp count=0
+    local item newRankedList count=0 igmir
     if [ "$ignorelist" ] ; then
         for item in $ignorelist ; do
-            tmp=$(echo "$ranked_out" | grep -v "^Server = .*$item")
-            if [ "$tmp" != "$ranked_out" ] ; then
+            newRankedList=$(echo "$ranked_out" | grep -v "^Server = .*$item")
+            if [ "$newRankedList" != "$ranked_out" ] ; then
                 case "$progress_mode" in
                     dots|mirrors)
-                        echo2 -n "\n    -> Ignored by user: $item"
+                        igmir="$(echo "$ranked_out" | grep "^Server = .*$item" | awk '{print $3}')"
+                        echo2 -n "\n    -> user ignored: $igmir"
                         ;;
                 esac
-                ranked_out="$tmp"
+                ranked_out="$newRankedList"
                 ((count++))
             fi
         done
