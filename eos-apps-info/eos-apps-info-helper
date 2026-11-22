@@ -108,10 +108,10 @@ URL_from_package() {
     for prog in /usr/bin/yay /usr/bin/pacman ; do
         if [ -x $prog ] ; then
             for opt in "-Qi" "-Si" ; do
-	        url="$(LANG=C $prog $opt "$pkgname" 2>/dev/null | grep -m1 -w ^URL | awk '{print $NF}')"
-	        if [ -n "$url" ] ; then
-	            return
-	        fi
+                url="$(LANG=C $prog $opt "$pkgname" 2>/dev/null | grep -m1 -w ^URL | awk '{print $NF}')"
+                if [ -n "$url" ] ; then
+                    return
+                fi
             done
             return
         fi
