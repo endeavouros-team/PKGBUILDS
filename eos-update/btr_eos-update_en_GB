@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# English translation for the strings of 'eos-update'.
+
+# Translators!
+#   1. Please change only the "double quoted" strings.
+#   2. Please change the end of your translation filename according to the value of $LANG (see: echo $LANG).
+#      Examples:
+#          LANGUAGE   FILENAME               COMMENT
+#          English    btr_"appname"_en_US    If value of LANG starts with "en_US".
+#          Finnish    btr_"appname"_fi_FI    If value of LANG starts with "fi_FI".
+
+
+declare -A BTR_ARR=(
+    eup_msg_info            "info"
+    eup_msg_warning         "warning"
+    eup_msg_error           "error"
+    eup_msg_helper_missing  "AUR helper not found"
+
+    die_result_failed       "failed"
+
+    msg_file_contains       "==> Mirrors in %s currently"
+    msg_avail_mirrors       "    - available:   %3s"
+    msg_unavail_mirrors     "    - unavailable: %3s"
+    msg_why_sys_running     "Updating."
+
+    tip_prog_purpose        "%s: package updater & additional features."
+    tip_used_command        "==> Command: %s"
+    tip_all_done            "==> All done!"
+
+    sysup_no                "No updates."
+
+    filelock_err            "==> File %s is in use.\n    Check if another process is still managing packages."
+
+    warn_nvidia_chk_fail    "The compatibility check between the 'kernel' and the 'Nvidia GPU driver' failed. Using driver's dkms version may help."
+    warn_param_ignored      "parameter '%s' ignored."
+
+    warn_arch_not_supported "sorry, architecture %s is not supported by this implementation"
+)
+
+
