@@ -12,9 +12,10 @@ Main() {
     [ "$appId" ] || DIE "parameter <appname> is missing"
     
     case "$langHint" in
-        C | "") langHint="$fallbackLang"
-                Find langfile "$langHint" || exit 1
-                ;;
+        C | "" | en)
+            langHint="$fallbackLang"
+            Find langfile "$langHint" || exit 1
+            ;;
         *)
             if ! Find langfile "$langHint" ; then
                 Find langfile "$fallbackLang" || exit 1
@@ -53,6 +54,9 @@ Find() {
             case "$extraopts" in
                 --quiet-fallback) ;;
                 *)
+                    case "$langHint" in
+                        en_*) return 1 ;;    # If e.g. en_GB is not found, then fall back to en_US
+                    esac
                     [ -e $conffile ] && source $conffile
                     case "$BTR_WARN_ABOUT_MISSING_TRANSLATION" in
                         "" | yes)
