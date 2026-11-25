@@ -27,5 +27,6 @@ declare -A BTR_ARR=(
     # for eos-reboot-required3:
     reboot_rec_header       "Reboot is recommended!"
     reboot_rec_body         "Reboot is recommended due to the upgrade of core system package(s)."
+    reboot_popup_title      "EndeavourOS notification"
 )
 

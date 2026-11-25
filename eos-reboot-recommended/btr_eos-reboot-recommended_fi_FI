@@ -15,4 +15,9 @@ declare -A BTR_ARR=(
     # for eos-reboot-required3:
     reboot_rec_header       "Uudelleenkäynnistys suositeltavaa!"
     reboot_rec_body         "Tärkeitä systeemipaketteja päivitetty, uudelleenkännistystä suositellaan."
+    reboot_popup_title      "EndeavourOS:n ilmoitus"
 )
+
+# Easter egg:
+[ $(date "+%Y%m%d") -lt 20261126 ] && BTR_ARR[reboot_popup_title]="EndeavourOS:n presidentillinen ilmoitus"
+

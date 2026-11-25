@@ -31,7 +31,7 @@ DoNotify() {
         "$icon"                        # icon
         "$urgency"                     # urgency
         "$expiretime"                  # expire time (not used with critical urgency!)
-        "EndeavourOS notification"     # appname
+        "$(BTR reboot_popup_title)"    # popup title
         "$title"                       # title
         "$msg"                         # message
         RED                            # message color on TTY
