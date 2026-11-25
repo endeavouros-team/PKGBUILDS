@@ -6,8 +6,8 @@
 
 pkgname=eos-reboot-recommended
 pkgdesc="Notify if a reboot is recommended after system upgrade."
-pkgver=26.11.7
-pkgrel=2
+pkgver=26.11.8
+pkgrel=1
 arch=('any')
 license=('GPL')
 depends=(
@@ -29,6 +29,7 @@ source=(
 
   "$_url/btr_eos-reboot-recommended_cs_CZ"
   "$_url/btr_eos-reboot-recommended_en_US"
+  "$_url/btr_eos-reboot-recommended_es_ES"
   "$_url/btr_eos-reboot-recommended_fi_FI"
   "$_url/btr_eos-reboot-recommended_nl_NL"
   "$_url/btr_eos-reboot-recommended_sk_SK"
@@ -43,6 +44,7 @@ sha512sums=('ac796f35c2b7f2346f9baea6a27abdafa3473bedd3ba1c1d37b5dcb219fa5c56014
             '8a4d5be006977900dda67c1d71cf401d03ad799440ff4df6e2f2dac419e07ab36888e794c78b9530635adb703eb936da83084df06f842885bb1fe31cb817e9bd'
             'b9a1e5d40a83c79ac7e55fbc7c25b0cf19cd37ba4a9dc4536d37528f4fd3e14e66d8860f029d4448b9d8604a7eab7f9556d14b05c2d0f44ec0541fc529e020d8'
             'bf71caa85d90d90171482040a1eaa01f4c43b0eca49a045bba3fc4e683c6acb7a5c4fde02d31978537264d7997bafe4c339ff92114b40a435d0c65786a34964c'
+            '824f19e85af687f508b2e007dceebaeeb632d29cea6059d9b98fc89d5ee1d1e6164a28c6d187eaaa6d152467cfd61e9049aa383ae26f298737bf2837eeb25fcc'
             'd2248c75b471d88be2c857de5e2653dcae7a613bfcf045622018829d830233db008998aa7439afd3fdfecb33b65a1aa6497e54afd5761261fdd186b6d2d22822'
             'e1daf8c445a6ebcac33b1d0eef5b94973abac18288bf850741d7d88b8ec73b59b4da9bd75f7311b5b7e93085b788c0ee9406b02b951e792a0484d1a7e440b59b'
             '989149c8674b323f8708902baf2e6d22c0c0cc9e3ec11b2cfe316a90b136c88d9975f8fd86af4c2e846e524f06b1e8c1d3edd1db1fffd316e26540cc41be80f6'
