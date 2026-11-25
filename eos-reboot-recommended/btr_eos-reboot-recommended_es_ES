@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# shellcheck disable=2190,2034
+
+# Spanish translation for the eos-reboot-recommended package.
+
+# Translators!
+#   1. Please translate only the "double quoted" strings.
+#   2. Please change the end of your translation filename according to the value of $LANG (see: echo $LANG).
+#      Examples:
+#          LANGUAGE   FILENAME               COMMENT
+#          English    btr_"appname"_en_US    If value of LANG starts with "en_US".
+#          Finnish    btr_"appname"_fi_FI    If value of LANG starts with "fi_FI".
+#   3. Please don't translate or change the comments.
+# More info: https://github.com/endeavouros-team/PKGBUILDS/blob/master/bash-app-translate/bash-app-translate.md.
+
+
+declare -A BTR_ARR=(
+    # for eos-reboot-required2:
+    reboot_check_msg        "==> Comprobando si se debe informar al usuario sobre la necesidad de reiniciar tras ciertas actualizaciones de paquetes del sistema."
+    reboot_recommended      "    -> Sí, se recomienda reiniciar."
+    error_running_kernel    "no se pudo determinar el kernel en ejecución"
+    error_privileges        "se requieren permisos de administrador."
+    error_settings_read     "no se pudo leer el archivo %s."
+    error_settings_source   "no se pudo cargar el archivo %s"   # also for eos-reboot-required3
+
+    # for eos-reboot-required3:
+    reboot_rec_header       "¡Se recomienda reiniciar!"
+    reboot_rec_body         "Se recomienda reiniciar debido a la actualización de uno o varios paquetes del núcleo del sistema."
+)
