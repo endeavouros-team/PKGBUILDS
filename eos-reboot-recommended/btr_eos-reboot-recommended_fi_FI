@@ -18,6 +18,3 @@ declare -A BTR_ARR=(
     reboot_popup_title      "EndeavourOS:n ilmoitus"
 )
 
-# Easter egg:
-[ $(date "+%Y%m%d") -lt 20261126 ] && BTR_ARR[reboot_popup_title]="EndeavourOS:n presidentillinen ilmoitus"
-
