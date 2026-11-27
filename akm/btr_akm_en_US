@@ -50,6 +50,9 @@ declare -A BTR_ARR=(
 
     item_not_available    "%s is currently unavailable%s$BTR_exclamation"    # second %s not needed?
 
+    msg_detecting_kernel  "==> Info: detecting available kernel packages."
+    msg_conf_read         "==> Config file %s read."
+
     t1a_str               "_MULTILINE_t1a"   # don't translate this line!
     t1b_str               "_MULTILINE_t1b"   # don't translate this line!
     t1c_str               "_MULTILINE_t1c"   # don't translate this line!

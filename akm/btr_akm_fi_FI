@@ -50,6 +50,9 @@ declare -A BTR_ARR=(
 
     item_not_available    "%s ei nyt ole käytettävissä%s$BTR_exclamation"    # second %s not needed?
 
+    msg_detecting_kernel  "==> Etsin saatavilla olevia ydinpaketteja."
+    msg_conf_read         "==> Asetustiedosto %s luettu."
+
     t1a_str               "_MULTILINE_t1a"   # älä käännä tätä riviä!
     t1b_str               "_MULTILINE_t1b"   # älä käännä tätä riviä!
     t1c_str               "_MULTILINE_t1c"   # älä käännä tätä riviä!

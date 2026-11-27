@@ -266,7 +266,7 @@ AkmConfig() {
         [ -n "$AKM_PREFER_SMALL_WINDOW" ]   && small_font=$AKM_PREFER_SMALL_WINDOW
 
         Options "$@"
-        Verbose2 "==> Config file $conf read."
+        Verbose2 "$(BTR msg_conf_read "$conf")"
     else
         Options "$@"
     fi
@@ -410,7 +410,7 @@ Main2() {
         smallEnd="</small>"
     fi
 
-    Verbose2 "==> Info: detecting available kernel packages."
+    Verbose2 "$(BTR msg_detecting_kernel)"
     readarray -t kernels < <(AvailableKernelsAndHeaders)
 
     local functions=(  # order is important!
