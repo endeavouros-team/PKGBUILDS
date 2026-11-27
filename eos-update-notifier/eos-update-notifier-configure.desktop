@@ -6,6 +6,7 @@ Comment=Configures the Update Notifier and Updater for EndeavourOS
 Comment[fi]=Konfiguroi päivitysten näyttäjä
 Exec=eos-update-notifier-configure
 Icon=endeavouros-icon
+StartupWMClass=yad
 # StartupNotify=false
 # Terminal=False
 Hidden=false
