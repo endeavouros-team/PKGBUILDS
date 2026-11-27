@@ -8,6 +8,7 @@ Comment[sk]=Aktualizuje systémové balíky v okne terminálu
 Exec=bash -c "echo '==> eos-update --aur'; eos-update --aur; eos-sleep-counter 60"
 Terminal=true
 Icon=endeavouros-icon
+StartupWMClass=yad
 Hidden=false
 X-GNOME-Autostart-enabled=true
 X-KDE-autostart-after=panel
