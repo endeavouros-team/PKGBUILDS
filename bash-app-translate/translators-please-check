@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Check that a translation file includes all translation placeholders from the en_US file.
+# TODO: checking multiline strings.
+
+# shellcheck disable=1090,2004,2034,2178
+
+ReadBtrArr() {
+    local -n _targetVar="$1"
+    local lang="$2"
+    source "$trdir/btr_${appname}_$lang" || Error "'source $trdir/btr_${appname}_$lang' failed."
+    local key
+    for key in ${!BTR_ARR[*]} ; do
+        _targetVar[$key]="${BTR_ARR[$key]}"
+    done
+}
+
+CompareArr() {
+    local -n _targetVar="$1"
+    local key
+    for key in ${!BTR_ARR_en_US[*]} ; do
+        if [ -z "${_targetVar[$key]}" ] ; then
+            Warning "file btr_${appname}_$langToCheck: key '$key' is not assigned. See btr_${appname}_en_US."
+            ok=no
+        fi
+    done
+}
+
+echo2()    { echo -e "$@" >&2; }
+MSG()      { echo2 "==> $progname: ${FUNCNAME[1],,}: $1" ; }
+Warning()  { MSG "$1" ; }
+Error()    { MSG "$1\n" ; Usage ; exit 1 ; }
+Usage() {
+    cat <<EOF
+Usage:       $progname <app-name> <lang-spec>
+Parameters:  app-name    App-name part of the translation file (see $trdir).
+             lang-spec   Language specifier part of the translation file (see $trdir).
+Example:     $progname eos-update fi_FI
+EOF
+}
+
+Main() {
+    local -r appname="$1"             # e.g. "eos-update"
+    local -r langToCheck="$2"         # e.g. "fi_FI"
+    local -r progname=${0##*/}
+    local -r trdir=/usr/share/endeavouros/translations
+    local -r langfile="$trdir/btr_${appname}_$langToCheck"
+    local ok=yes
+
+    [ "$appname" ]     || Error "parameter(s) missing"
+    [ "$langToCheck" ] || Error "parameter 'lang-spec' is missing"
+    [ -e "$langfile" ] || Error "file '$langfile' does not exist"
+
+    declare -A BTR_ARR_en_US=()
+    declare -A BTR_ARR_another=()
+
+    # Check BTR_ARR
+    ReadBtrArr BTR_ARR_en_US   "en_US"
+    ReadBtrArr BTR_ARR_another "$langToCheck"
+    CompareArr BTR_ARR_another
+
+    # TODO: _MULTILINE_* checking!
+
+    if [ $ok = yes ] ; then
+        echo2 "SUCCESS! No missing translations detected."
+    fi
+}
+
+Main "$@"
