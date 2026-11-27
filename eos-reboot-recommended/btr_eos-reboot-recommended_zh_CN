@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# shellcheck disable=2190,2034
+
+# Chinese translation for the eos-reboot-recommended package.
+
+# Translators!
+#   1. Please translate only the "double quoted" strings.
+#   2. Please change the end of your translation filename according to the value of $LANG (see: echo $LANG).
+#      Examples:
+#          LANGUAGE   FILENAME               COMMENT
+#          English    btr_"appname"_en_US    If value of LANG starts with "en_US".
+#          Finnish    btr_"appname"_fi_FI    If value of LANG starts with "fi_FI".
+#   3. Please don't translate or change the comments.
+# More info: https://github.com/endeavouros-team/PKGBUILDS/blob/master/bash-app-translate/bash-app-translate.md.
+
+declare -A BTR_ARR=(
+  # for eos-reboot-required2:
+  reboot_check_msg "==> 正在检查特定系统包更新后是否需要通知用户重启。"
+  reboot_recommended "    -> 是，建议重启。"
+  error_running_kernel "无法识别正在运行的内核"
+  error_privileges "需要提升权限。"
+  error_settings_read "读取文件 %s 失败"
+  error_settings_source "载入文件 %s 失败" # also for eos-reboot-required3
+
+  # for eos-reboot-required3:
+  reboot_rec_header "建议重启！"
+  reboot_rec_body "由于核心系统包更新，建议重启系统。"
+  reboot_popup_title "EndeavourOS 通知"
+)
