@@ -5,7 +5,7 @@
 
 pkgname=bash-app-translate
 pkgdesc="Add translation support for bash language apps"
-pkgver=26.1.14
+pkgver=26.1.15
 pkgrel=1
 arch=('any')
 license=('GPL')
@@ -21,7 +21,7 @@ source=(
     "$_url/$pkgname.md"                     # user guide
     "$_url/$pkgname.conf"                   # user configurations
     "$_url/get-legacy-id-lang-translation"  # uses the legacy (Welcome's) implementation
-    "$_url/translators-please-check"        # only for translators to ad-hoc check their translation file
+    "$_url/eos-translators-please-check"    # only for translators to ad-hoc check their translation file
 )
 sha512sums=('ca7077d8f159af0b23d25166afa92814a59650c86ce4eda3f34fc303b6ef2c6f4229fe56a2d5c859a2d2f9701f02805e961b90e98b59c14f6eb4cce21e1e0346'
             '4346076168d085672efab5584a32b4d480f295894a079e82a90ea1a66a816e21da81dd474108969172dbb827bf03750df6fe0256a9a4cdf83113b20dc0be8d15'
@@ -37,7 +37,7 @@ package() {
         case "$file" in
             *.conf)   install -Dm644 "$file"   "$pkgdir/etc/$file" ;;
             *.md)     install -Dm644 "$file"   "$pkgdir/usr/share/doc/$pkgname/$file" ;;
-            translators-please-check)
+            eos-translators-please-check)
                       install -Dm755 "$file"   "$pkgdir/usr/local/bin/$file" ;;
             get-legacy-id-lang-translation | *-fallback)
                       install -Dm755 "$file"   "$pkgdir/usr/bin/$file" ;;
